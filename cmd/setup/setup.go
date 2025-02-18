@@ -9,7 +9,6 @@ import (
 	"path"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/riverqueue/river"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -475,10 +474,7 @@ func initProjections(
 		config.DefaultInstance.SecretGenerators,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
-	q, _ := queue.NewQueue(&queue.Config{
-		Config: &river.Config{
-			Workers: river.NewWorkers(),
-		},
+	q := queue.NewQueue(&queue.Config{
 		Client: queryDBClient,
 	})
 	notify_handler.Register(

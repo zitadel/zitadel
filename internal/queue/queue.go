@@ -14,46 +14,66 @@ import (
 // Queue abstracts the underlying queuing library
 // For more information see github.com/riverqueue/river
 type Queue struct {
-	driver  riverdriver.Driver[pgx.Tx]
-	client  *river.Client[pgx.Tx]
-	workers *river.Workers
+	driver riverdriver.Driver[pgx.Tx]
+	client *river.Client[pgx.Tx]
+
+	config *river.Config
 }
 
 type Config struct {
-	*river.Config
-	Client *database.DB
+	Client *database.DB `mapstructure:"-"`
 }
 
-func NewQueue(config *Config) (queue *Queue, err error) {
-	queue = &Queue{
-		driver:  riverpgxv5.New(config.Client.Pool),
-		workers: config.Workers,
+func NewQueue(config *Config) *Queue {
+	return &Queue{
+		driver: riverpgxv5.New(config.Client.Pool),
+		config: &river.Config{
+			Workers:    river.NewWorkers(),
+			Queues:     make(map[string]river.QueueConfig),
+			JobTimeout: -1,
+		},
 	}
+}
 
-	queue.client, err = river.NewClient(queue.driver, config.Config)
+func (q *Queue) Start(ctx context.Context) (err error) {
+	ctx = WithQueue(ctx)
+	q.client, err = river.NewClient(q.driver, q.config)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	return queue, nil
-}
-
-func (q *Queue) Start(ctx context.Context) error {
 	return q.client.Start(ctx)
 }
 
 func (q *Queue) AddWorkers(w ...Worker) {
 	for _, worker := range w {
-		worker.Register(q.workers)
+		worker.Register(q.config.Workers, q.config.Queues)
 	}
 }
 
-func (q *Queue) Insert(ctx context.Context, args river.JobArgs) error {
+type insertOpt func(*river.InsertOpts)
+
+func WithMaxAttempts(maxAttempts uint8) insertOpt {
+	return func(opts *river.InsertOpts) {
+		opts.MaxAttempts = int(maxAttempts)
+	}
+}
+
+func WithQueueName(name string) insertOpt {
+	return func(opts *river.InsertOpts) {
+		opts.Queue = name
+	}
+}
+
+func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...insertOpt) error {
+	options := new(river.InsertOpts)
 	ctx = WithQueue(ctx)
-	_, err := q.client.Insert(ctx, args, nil)
+	for _, opt := range opts {
+		opt(options)
+	}
+	_, err := q.client.Insert(ctx, args, options)
 	return err
 }
 
 type Worker interface {
-	Register(workers *river.Workers)
+	Register(workers *river.Workers, queues map[string]river.QueueConfig)
 }

@@ -16,6 +16,8 @@ const (
 	RetryRequestedType      = notificationEventPrefix + "retry.requested"
 	SentType                = notificationEventPrefix + "sent"
 	CanceledType            = notificationEventPrefix + "canceled"
+
+	QueueName = "notification"
 )
 
 type Request struct {

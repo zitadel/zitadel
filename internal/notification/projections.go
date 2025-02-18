@@ -62,7 +62,6 @@ func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
-	worker.Start(ctx)
 }
 
 func ProjectInstance(ctx context.Context) error {

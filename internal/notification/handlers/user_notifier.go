@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/repository/notification"
@@ -19,79 +18,16 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func init() {
-	RegisterSentHandler(user.HumanInitialCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanInitCodeSent(ctx, orgID, id)
-		},
-	)
-	RegisterSentHandler(user.HumanEmailCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanEmailVerificationCodeSent(ctx, orgID, id)
-		},
-	)
-	RegisterSentHandler(user.HumanPasswordCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.PasswordCodeSent(ctx, orgID, id, generatorInfo)
-		},
-	)
-	RegisterSentHandler(user.HumanOTPSMSCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanOTPSMSCodeSent(ctx, id, orgID, generatorInfo)
-		},
-	)
-	RegisterSentHandler(session.OTPSMSChallengedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.OTPSMSSent(ctx, id, orgID, generatorInfo)
-		},
-	)
-	RegisterSentHandler(user.HumanOTPEmailCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanOTPEmailCodeSent(ctx, id, orgID)
-		},
-	)
-	RegisterSentHandler(session.OTPEmailChallengedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.OTPEmailSent(ctx, id, orgID)
-		},
-	)
-	RegisterSentHandler(user.UserDomainClaimedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.UserDomainClaimedSent(ctx, orgID, id)
-		},
-	)
-	RegisterSentHandler(user.HumanPasswordlessInitCodeRequestedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanPasswordlessInitCodeSent(ctx, id, orgID, args["CodeID"].(string))
-		},
-	)
-	RegisterSentHandler(user.HumanPasswordChangedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.PasswordChangeSent(ctx, orgID, id)
-		},
-	)
-	RegisterSentHandler(user.HumanPhoneCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanPhoneVerificationCodeSent(ctx, orgID, id, generatorInfo)
-		},
-	)
-	RegisterSentHandler(user.HumanInviteCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.InviteCodeSent(ctx, orgID, id)
-		},
-	)
-}
-
 const (
 	UserNotificationsProjectionTable = "projections.notifications"
 )
 
 type userNotifier struct {
-	commands     Commands
 	queries      *NotificationQueries
 	otpEmailTmpl string
 
-	queue *queue.Queue
+	queue       *queue.Queue
+	maxAttempts uint8
 }
 
 func NewUserNotifier(
@@ -108,10 +44,10 @@ func NewUserNotifier(
 		return NewUserNotifierLegacy(ctx, config, commands, queries, channels, otpEmailTmpl)
 	}
 	return handler.NewHandler(ctx, &config, &userNotifier{
-		commands:     commands,
 		queries:      queries,
 		otpEmailTmpl: otpEmailTmpl,
 		queue:        queue,
+		maxAttempts:  config.MaxFailureCount,
 	})
 }
 
@@ -220,23 +156,27 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:                     e.Aggregate(),
-			UserID:                        e.Aggregate().ID,
-			UserResourceOwner:             e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin:             origin,
-			EventType:                     e.EventType,
-			NotificationType:              domain.NotificationTypeEmail,
-			MessageType:                   domain.InitCodeMessageType,
-			Code:                          e.Code,
-			CodeExpiry:                    e.Expiry,
-			IsOTP:                         false,
-			UnverifiedNotificationChannel: true,
-			URLTemplate:                   login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID),
-			Args: &domain.NotificationArguments{
-				AuthRequestID: e.AuthRequestID,
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             origin,
+				EventType:                     e.EventType,
+				NotificationType:              domain.NotificationTypeEmail,
+				MessageType:                   domain.InitCodeMessageType,
+				Code:                          e.Code,
+				CodeExpiry:                    e.Expiry,
+				IsOTP:                         false,
+				UnverifiedNotificationChannel: true,
+				URLTemplate:                   login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID),
+				Args: &domain.NotificationArguments{
+					AuthRequestID: e.AuthRequestID,
+				},
 			},
-		})
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -266,23 +206,27 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:                     e.Aggregate(),
-			UserID:                        e.Aggregate().ID,
-			UserResourceOwner:             e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin:             origin,
-			EventType:                     e.EventType,
-			NotificationType:              domain.NotificationTypeEmail,
-			MessageType:                   domain.VerifyEmailMessageType,
-			Code:                          e.Code,
-			CodeExpiry:                    e.Expiry,
-			IsOTP:                         false,
-			UnverifiedNotificationChannel: true,
-			URLTemplate:                   u.emailCodeTemplate(origin, e),
-			Args: &domain.NotificationArguments{
-				AuthRequestID: e.AuthRequestID,
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             origin,
+				EventType:                     e.EventType,
+				NotificationType:              domain.NotificationTypeEmail,
+				MessageType:                   domain.VerifyEmailMessageType,
+				Code:                          e.Code,
+				CodeExpiry:                    e.Expiry,
+				IsOTP:                         false,
+				UnverifiedNotificationChannel: true,
+				URLTemplate:                   u.emailCodeTemplate(origin, e),
+				Args: &domain.NotificationArguments{
+					AuthRequestID: e.AuthRequestID,
+				},
 			},
-		})
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -318,23 +262,27 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:                     e.Aggregate(),
-			UserID:                        e.Aggregate().ID,
-			UserResourceOwner:             e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin:             origin,
-			EventType:                     e.EventType,
-			NotificationType:              e.NotificationType,
-			MessageType:                   domain.PasswordResetMessageType,
-			Code:                          e.Code,
-			CodeExpiry:                    e.Expiry,
-			IsOTP:                         false,
-			UnverifiedNotificationChannel: true,
-			URLTemplate:                   u.passwordCodeTemplate(origin, e),
-			Args: &domain.NotificationArguments{
-				AuthRequestID: e.AuthRequestID,
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             origin,
+				EventType:                     e.EventType,
+				NotificationType:              e.NotificationType,
+				MessageType:                   domain.PasswordResetMessageType,
+				Code:                          e.Code,
+				CodeExpiry:                    e.Expiry,
+				IsOTP:                         false,
+				UnverifiedNotificationChannel: true,
+				URLTemplate:                   u.passwordCodeTemplate(origin, e),
+				Args: &domain.NotificationArguments{
+					AuthRequestID: e.AuthRequestID,
+				},
 			},
-		})
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -366,19 +314,23 @@ func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.S
 		if err != nil {
 			return err
 		}
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:         e.Aggregate(),
-			UserID:            e.Aggregate().ID,
-			UserResourceOwner: e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin: http_util.DomainContext(ctx).Origin(),
-			EventType:         e.EventType,
-			NotificationType:  domain.NotificationTypeSms,
-			MessageType:       domain.VerifySMSOTPMessageType,
-			Code:              e.Code,
-			CodeExpiry:        e.Expiry,
-			IsOTP:             true,
-			Args:              otpArgs(ctx, e.Expiry),
-		})
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:         e.Aggregate(),
+				UserID:            e.Aggregate().ID,
+				UserResourceOwner: e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin: http_util.DomainContext(ctx).Origin(),
+				EventType:         e.EventType,
+				NotificationType:  domain.NotificationTypeSms,
+				MessageType:       domain.VerifySMSOTPMessageType,
+				Code:              e.Code,
+				CodeExpiry:        e.Expiry,
+				IsOTP:             true,
+				Args:              otpArgs(ctx, e.Expiry),
+			},
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -414,19 +366,23 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 
 		args := otpArgs(ctx, e.Expiry)
 		args.SessionID = e.Aggregate().ID
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:         e.Aggregate(),
-			UserID:            s.UserFactor.UserID,
-			UserResourceOwner: s.UserFactor.ResourceOwner,
-			TriggeredAtOrigin: http_util.DomainContext(ctx).Origin(),
-			EventType:         e.EventType,
-			NotificationType:  domain.NotificationTypeSms,
-			MessageType:       domain.VerifySMSOTPMessageType,
-			Code:              e.Code,
-			CodeExpiry:        e.Expiry,
-			IsOTP:             true,
-			Args:              args,
-		})
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:         e.Aggregate(),
+				UserID:            s.UserFactor.UserID,
+				UserResourceOwner: s.UserFactor.ResourceOwner,
+				TriggeredAtOrigin: http_util.DomainContext(ctx).Origin(),
+				EventType:         e.EventType,
+				NotificationType:  domain.NotificationTypeSms,
+				MessageType:       domain.VerifySMSOTPMessageType,
+				Code:              e.Code,
+				CodeExpiry:        e.Expiry,
+				IsOTP:             true,
+				Args:              args,
+			},
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -459,20 +415,24 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 		}
 		args := otpArgs(ctx, e.Expiry)
 		args.AuthRequestID = authRequestID
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:         e.Aggregate(),
-			UserID:            e.Aggregate().ID,
-			UserResourceOwner: e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin: origin,
-			EventType:         e.EventType,
-			NotificationType:  domain.NotificationTypeEmail,
-			MessageType:       domain.VerifyEmailOTPMessageType,
-			Code:              e.Code,
-			CodeExpiry:        e.Expiry,
-			IsOTP:             true,
-			URLTemplate:       login.OTPLinkTemplate(origin, authRequestID, domain.MFATypeOTPEmail),
-			Args:              args,
-		})
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:         e.Aggregate(),
+				UserID:            e.Aggregate().ID,
+				UserResourceOwner: e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin: origin,
+				EventType:         e.EventType,
+				NotificationType:  domain.NotificationTypeEmail,
+				MessageType:       domain.VerifyEmailOTPMessageType,
+				Code:              e.Code,
+				CodeExpiry:        e.Expiry,
+				IsOTP:             true,
+				URLTemplate:       login.OTPLinkTemplate(origin, authRequestID, domain.MFATypeOTPEmail),
+				Args:              args,
+			},
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -508,20 +468,24 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 
 		args := otpArgs(ctx, e.Expiry)
 		args.SessionID = e.Aggregate().ID
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:         e.Aggregate(),
-			UserID:            s.UserFactor.UserID,
-			UserResourceOwner: s.UserFactor.ResourceOwner,
-			TriggeredAtOrigin: origin,
-			EventType:         e.EventType,
-			NotificationType:  domain.NotificationTypeEmail,
-			MessageType:       domain.VerifyEmailOTPMessageType,
-			Code:              e.Code,
-			CodeExpiry:        e.Expiry,
-			IsOTP:             true,
-			URLTemplate:       u.otpEmailTemplate(origin, e),
-			Args:              args,
-		})
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:         e.Aggregate(),
+				UserID:            s.UserFactor.UserID,
+				UserResourceOwner: s.UserFactor.ResourceOwner,
+				TriggeredAtOrigin: origin,
+				EventType:         e.EventType,
+				NotificationType:  domain.NotificationTypeEmail,
+				MessageType:       domain.VerifyEmailOTPMessageType,
+				Code:              e.Code,
+				CodeExpiry:        e.Expiry,
+				IsOTP:             true,
+				URLTemplate:       u.otpEmailTemplate(origin, e),
+				Args:              args,
+			},
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -561,19 +525,23 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:         e.Aggregate(),
-			UserID:            e.Aggregate().ID,
-			UserResourceOwner: e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin: origin,
-			EventType:         e.EventType,
-			NotificationType:  domain.NotificationTypeEmail,
-			MessageType:       domain.DomainClaimedMessageType,
-			URLTemplate:       login.LoginLink(origin, e.Aggregate().ResourceOwner),
-			Args: &domain.NotificationArguments{
-				TempUsername: e.UserName,
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:         e.Aggregate(),
+				UserID:            e.Aggregate().ID,
+				UserResourceOwner: e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin: origin,
+				EventType:         e.EventType,
+				NotificationType:  domain.NotificationTypeEmail,
+				MessageType:       domain.DomainClaimedMessageType,
+				URLTemplate:       login.LoginLink(origin, e.Aggregate().ResourceOwner),
+				Args: &domain.NotificationArguments{
+					TempUsername: e.UserName,
+				},
 			},
-		})
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -600,21 +568,25 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:         e.Aggregate(),
-			UserID:            e.Aggregate().ID,
-			UserResourceOwner: e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin: origin,
-			EventType:         e.EventType,
-			NotificationType:  domain.NotificationTypeEmail,
-			MessageType:       domain.PasswordlessRegistrationMessageType,
-			URLTemplate:       u.passwordlessCodeTemplate(origin, e),
-			Args: &domain.NotificationArguments{
-				CodeID: e.ID,
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:         e.Aggregate(),
+				UserID:            e.Aggregate().ID,
+				UserResourceOwner: e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin: origin,
+				EventType:         e.EventType,
+				NotificationType:  domain.NotificationTypeEmail,
+				MessageType:       domain.PasswordlessRegistrationMessageType,
+				URLTemplate:       u.passwordlessCodeTemplate(origin, e),
+				Args: &domain.NotificationArguments{
+					CodeID: e.ID,
+				},
+				CodeExpiry: e.Expiry,
+				Code:       e.Code,
 			},
-			CodeExpiry: e.Expiry,
-			Code:       e.Code,
-		})
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -656,17 +628,21 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:                     e.Aggregate(),
-			UserID:                        e.Aggregate().ID,
-			UserResourceOwner:             e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin:             origin,
-			EventType:                     e.EventType,
-			NotificationType:              domain.NotificationTypeEmail,
-			MessageType:                   domain.PasswordChangeMessageType,
-			URLTemplate:                   console.LoginHintLink(origin, "{{.PreferredLoginName}}"),
-			UnverifiedNotificationChannel: true,
-		})
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             origin,
+				EventType:                     e.EventType,
+				NotificationType:              domain.NotificationTypeEmail,
+				MessageType:                   domain.PasswordChangeMessageType,
+				URLTemplate:                   console.LoginHintLink(origin, "{{.PreferredLoginName}}"),
+				UnverifiedNotificationChannel: true,
+			},
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -696,21 +672,25 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:                     e.Aggregate(),
-			UserID:                        e.Aggregate().ID,
-			UserResourceOwner:             e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin:             http_util.DomainContext(ctx).Origin(),
-			EventType:                     e.EventType,
-			NotificationType:              domain.NotificationTypeSms,
-			MessageType:                   domain.VerifyPhoneMessageType,
-			CodeExpiry:                    e.Expiry,
-			Code:                          e.Code,
-			UnverifiedNotificationChannel: true,
-			Args: &domain.NotificationArguments{
-				Domain: http_util.DomainContext(ctx).RequestedDomain(),
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             http_util.DomainContext(ctx).Origin(),
+				EventType:                     e.EventType,
+				NotificationType:              domain.NotificationTypeSms,
+				MessageType:                   domain.VerifyPhoneMessageType,
+				CodeExpiry:                    e.Expiry,
+				Code:                          e.Code,
+				UnverifiedNotificationChannel: true,
+				Args: &domain.NotificationArguments{
+					Domain: http_util.DomainContext(ctx).RequestedDomain(),
+				},
 			},
-		})
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -744,23 +724,27 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 		if applicationName == "" {
 			applicationName = "ZITADEL"
 		}
-		return u.queue.Insert(ctx, &notification.Request{
-			Aggregate:                     e.Aggregate(),
-			UserID:                        e.Aggregate().ID,
-			UserResourceOwner:             e.Aggregate().ResourceOwner,
-			TriggeredAtOrigin:             origin,
-			EventType:                     e.EventType,
-			NotificationType:              domain.NotificationTypeEmail,
-			MessageType:                   domain.InviteUserMessageType,
-			CodeExpiry:                    e.Expiry,
-			Code:                          e.Code,
-			UnverifiedNotificationChannel: true,
-			URLTemplate:                   u.inviteCodeTemplate(origin, e),
-			Args: &domain.NotificationArguments{
-				AuthRequestID:   e.AuthRequestID,
-				ApplicationName: applicationName,
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             origin,
+				EventType:                     e.EventType,
+				NotificationType:              domain.NotificationTypeEmail,
+				MessageType:                   domain.InviteUserMessageType,
+				CodeExpiry:                    e.Expiry,
+				Code:                          e.Code,
+				UnverifiedNotificationChannel: true,
+				URLTemplate:                   u.inviteCodeTemplate(origin, e),
+				Args: &domain.NotificationArguments{
+					AuthRequestID:   e.AuthRequestID,
+					ApplicationName: applicationName,
+				},
 			},
-		})
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 

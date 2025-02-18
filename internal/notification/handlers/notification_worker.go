@@ -39,6 +39,14 @@ type NotificationWorker struct {
 	backOff  func(current time.Duration) time.Duration
 }
 
+func (w *NotificationWorker) NextRetry(job *river.Job[*notification.Request]) time.Time {
+	return w.now().Add(job.CreatedAt.Sub(w.now()))
+}
+
+func (w *NotificationWorker) Timeout(*river.Job[*notification.Request]) time.Duration {
+	return w.config.TransactionDuration
+}
+
 // Work implements [river.Worker].
 func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notification.Request]) error {
 	ctx = ContextWithNotifier(ctx, job.Args.Aggregate)
@@ -80,9 +88,7 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 type WorkerConfig struct {
 	LegacyEnabled       bool
 	Workers             uint8
-	BulkLimit           uint16
 	RequeueEvery        time.Duration
-	RetryWorkers        uint8
 	RetryRequeueEvery   time.Duration
 	TransactionDuration time.Duration
 	MaxAttempts         uint8
@@ -92,19 +98,7 @@ type WorkerConfig struct {
 	RetryDelayFactor    float32
 }
 
-// nowFunc makes [time.Now] mockable
 type nowFunc func() time.Time
-
-type Sent func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error
-
-var sentHandlers map[eventstore.EventType]Sent
-
-func RegisterSentHandler(eventType eventstore.EventType, sent Sent) {
-	if sentHandlers == nil {
-		sentHandlers = make(map[eventstore.EventType]Sent)
-	}
-	sentHandlers[eventType] = sent
-}
 
 func NewNotificationWorker(
 	config WorkerConfig,
@@ -137,13 +131,10 @@ func NewNotificationWorker(
 
 var _ river.Worker[*notification.Request] = (*NotificationWorker)(nil)
 
-func (w *NotificationWorker) Register(workers *river.Workers) {
+func (w *NotificationWorker) Register(workers *river.Workers, queues map[string]river.QueueConfig) {
 	river.AddWorker(workers, w)
-}
-
-func (w *NotificationWorker) Start(ctx context.Context) {
-	if w.config.LegacyEnabled {
-		return
+	queues[notification.QueueName] = river.QueueConfig{
+		MaxWorkers: int(w.config.Workers),
 	}
 }
 
@@ -191,7 +182,11 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 		args[OTP] = code
 	}
 
-	return notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel)
+	err = notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel)
+	if err != nil {
+		return err
+	}
+	w.commands.HumanEmailVerificationCodeSent()
 }
 
 func (w *NotificationWorker) exponentialBackOff(current time.Duration) time.Duration {

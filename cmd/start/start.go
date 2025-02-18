@@ -17,7 +17,6 @@ import (
 	"github.com/common-nighthawk/go-figure"
 	"github.com/fatih/color"
 	"github.com/gorilla/mux"
-	"github.com/riverqueue/river"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -269,19 +268,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	q, err := queue.NewQueue(&queue.Config{
-		Config: &river.Config{
-			JobTimeout: -1,
-			Queues: map[string]river.QueueConfig{
-				river.QueueDefault: {MaxWorkers: 100},
-			},
-			Workers: river.NewWorkers(),
-		},
+	q := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
-	if err != nil {
-		return err
-	}
 
 	notification.Register(
 		ctx,
@@ -309,8 +298,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	)
 	notification.Start(ctx)
 
-	queueCtx := queue.WithQueue(ctx)
-	if err = q.Start(queueCtx); err != nil {
+	if err = q.Start(ctx); err != nil {
 		return err
 	}
 
