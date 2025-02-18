@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"slices"
 	"strings"
 	"time"
@@ -657,7 +656,6 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 	})
 	if permissionCheckV2 {
 		if allowReturnCurrentUser {
-	fmt.Printf("allowReturnCurrentUser = %+v\n", allowReturnCurrentUser)
 			query = wherePermittedOrgsOrCurrentUser(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
 		} else {
 			query = wherePermittedOrgs(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), domain.PermissionUserRead)

@@ -39,6 +39,7 @@ func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, filterOrgId
 
 func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, userIdColum, permission string) sq.SelectBuilder {
 	userID := authz.GetCtxData(ctx).UserID
+	fmt.Printf("userID = %+v\n", userID)
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "user_id_colum", userIdColum, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
 
 	return query.Where(

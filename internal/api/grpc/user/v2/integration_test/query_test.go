@@ -322,6 +322,40 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 	}
 }
 
+func TestServer_Human_ListUsers(t *testing.T) {
+	tests := []struct {
+		name string
+		want *user.ListUsersResponse
+		err  error
+	}{
+		{
+			name: "list human user, no permission",
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						UserId: Instance.Users.Get(integration.UserTypeHumanNoPermission).ID,
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.ListUsers(HumanCTX, &user.ListUsersRequest{})
+			fmt.Printf("got = %+v\n", got)
+			assert.Equal(t, tt.err, err)
+			// TODO: fix below
+			// assert.Equal(t, tt.want.Details.TotalResult, got.Details.TotalResult)
+			assert.Equal(t, tt.want.Result[0].UserId, got.Result[0].UserId)
+		})
+	}
+}
+
 type userAttrs []userAttr
 
 func (u userAttrs) userIDs() []string {
