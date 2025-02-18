@@ -130,7 +130,6 @@ To register your login domain on your instance, [add](/docs/apis/resources/admin
 When setting up the new login app for OIDC, ensure it meets the following requirements:
 
 - The OIDC Proxy is deployed and running on HTTPS
-- The OIDC Proxy sets `x-zitadel-login-client` which is the user ID of the service account
 - The OIDC Proxy sets `x-zitadel-public-host` which is the host, your login is deployed to `ex. login.example.com`.
 - The OIDC Proxy sets `x-zitadel-instance-host` which is the host of your instance `ex. test-hdujwl.zitadel.cloud`.
 
@@ -145,5 +144,7 @@ Copy its id from the overview and set it as `ZITADEL_SERVICE_USER_ID`.
 Then create a personal access token (PAT), copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_OWNER` permissions.
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
 Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain).
+
+If you want to enforce users to have their email verified, you can set the optional `EMAIL_VERIFICATION` variable to `true` in your environment and your users will be enforced to verify their email address before they can log in.
 
 ![Deploy to Vercel](/img/deploy-to-vercel.png)

@@ -17,6 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -67,6 +68,7 @@ type Client struct {
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
+	SCIM           *scim.Client
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
@@ -99,6 +101,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
+		SCIM:           scim.NewScimClient(target),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -594,12 +597,31 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
+func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *mgmt.AddProjectGrantResponse {
+	resp, err := i.Client.Mgmt.AddProjectGrant(ctx, &mgmt.AddProjectGrantRequest{
+		GrantedOrgId: grantedOrgID,
+		ProjectId:    projectID,
+	})
+	logging.OnError(err).Panic("create project grant")
+	return resp
+}
+
 func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) string {
 	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 	})
 	require.NoError(t, err)
+	return resp.GetUserGrantId()
+}
+
+func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, projectID, projectGrantID, userID string) string {
+	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		ProjectGrantId: projectGrantID,
+	})
+	logging.OnError(err).Panic("create project grant user grant")
 	return resp.GetUserGrantId()
 }
 

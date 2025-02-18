@@ -702,6 +702,54 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 			},
 			res: res{},
 		},
+		{
+			name: "change org name case verified, with primary",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+					),
+					expectPush(
+						org.NewOrgChangedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, "org", "ORG",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
+				orgID: "org1",
+				name:  "ORG",
+			},
+			res: res{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1216,10 +1264,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 					),
 					expectPush(

@@ -5,6 +5,8 @@ import (
 	"net"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -14,6 +16,7 @@ const (
 	CacheControl     = "cache-control"
 	ContentType      = "content-type"
 	ContentLength    = "content-length"
+	ContentLocation  = "content-location"
 	Expires          = "expires"
 	Location         = "location"
 	Origin           = "origin"
@@ -42,6 +45,9 @@ const (
 	PermissionsPolicy       = "permissions-policy"
 
 	ZitadelOrgID = "x-zitadel-orgid"
+
+	OrgIdInPathVariableName = "orgId"
+	OrgIdInPathVariable     = "{" + OrgIdInPathVariableName + "}"
 )
 
 type key int
@@ -104,18 +110,18 @@ func GetAuthorization(r *http.Request) string {
 }
 
 func GetOrgID(r *http.Request) string {
+	// path variable takes precedence over header
+	orgID, ok := mux.Vars(r)[OrgIdInPathVariableName]
+	if ok {
+		return orgID
+	}
+
 	return r.Header.Get(ZitadelOrgID)
 }
 
 func GetForwardedFor(headers http.Header) (string, bool) {
-	forwarded, ok := headers[ForwardedFor]
-	if ok {
-		ip := strings.TrimSpace(strings.Split(forwarded[0], ",")[0])
-		if ip != "" {
-			return ip, true
-		}
-	}
-	return "", false
+	forwarded := strings.Split(headers.Get(ForwardedFor), ",")[0]
+	return forwarded, forwarded != ""
 }
 
 func RemoteAddrFromCtx(ctx context.Context) string {
