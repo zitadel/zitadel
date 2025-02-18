@@ -85,7 +85,7 @@ export class ProviderOIDCComponent {
       issuer: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
       isIdTokenMapping: new UntypedFormControl(),
-      usePkce: new UntypedFormControl(true),
+      usePkce: new UntypedFormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {

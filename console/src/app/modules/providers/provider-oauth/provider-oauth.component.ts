@@ -89,7 +89,7 @@ export class ProviderOAuthComponent {
       userEndpoint: new UntypedFormControl('', [requiredValidator]),
       idAttribute: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
-      usePkce: new UntypedFormControl(true),
+      usePkce: new UntypedFormControl(false),
     });
 
     this.authService
