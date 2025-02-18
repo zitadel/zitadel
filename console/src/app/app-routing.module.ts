@@ -129,6 +129,22 @@ const routes: Routes = [
         },
       },
       {
+        path: 'groups/project/:projectid',
+        loadChildren: () => import('src/app/pages/groups/group-grant-create/group-grant-create.module'),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['user.grant.write'],
+        },
+      },
+      {
+        path: 'groups/project/:projectid/grant/:grantid',
+        loadChildren: () => import('src/app/pages/groups/group-grant-create/group-grant-create.module'),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['user.grant.write'],
+        },
+      },
+      {
         path: '',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module'),
         canActivate: [RoleGuard],

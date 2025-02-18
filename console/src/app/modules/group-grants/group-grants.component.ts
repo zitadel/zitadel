@@ -21,7 +21,7 @@ import { ActionKeysType } from '../action-keys/action-keys.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { UserGrantRoleDialogComponent } from '../user-grant-role-dialog/user-grant-role-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
-import { GroupGrantsDataSource } from './group-grants-datasource';
+import { GroupGrantContext, GroupGrantsDataSource } from './group-grants-datasource';
 import { Org, OrgIDQuery, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 
 export enum GroupGrantListSearchKey {
@@ -43,6 +43,7 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
   public GroupGrantListSearchKey: any = GroupGrantListSearchKey;
 
   public INITIAL_PAGE_SIZE: number = 50;
+  @Input() context: GroupGrantContext = GroupGrantContext.NONE;
   @Input() refreshOnPreviousRoutes: string[] = [];
 
   public dataSource: GroupGrantsDataSource = new GroupGrantsDataSource(this.groupService);
@@ -93,7 +94,20 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
   ];
 
   ngOnInit(): void {
-    this.routerLink = ['/grant-create/groups/'];
+    switch (this.context) {
+      case GroupGrantContext.OWNED_PROJECT:
+        if (this.projectId) {
+          this.routerLink = ['/grant-create/groups/', 'project', this.projectId];
+        }
+        break;
+      case GroupGrantContext.GRANTED_PROJECT:
+        if (this.grantId) {
+          this.routerLink = ['/grant-create/groups/', 'project', this.projectId, 'grant', this.grantId];
+        }
+        break;
+      case GroupGrantContext.NONE:
+        this.routerLink = ['/grant-create/groups/'];
+    }
     this.loadGrantsPage();
   }
 
@@ -109,6 +123,7 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
     let queries: GroupGrantQuery[] = [];
 
     this.dataSource.loadGrants(
+      this.context,
       this.paginator?.pageIndex ?? 0,
       this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
       {
@@ -234,6 +249,7 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
 
   public changePage(event?: PageEvent): void {
     this.dataSource.loadGrants(
+      this.context,
       event?.pageIndex ?? this.paginator?.pageIndex ?? 0,
       event?.pageSize ?? this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
       {
