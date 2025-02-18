@@ -14,14 +14,14 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 export GOCOVERDIR INTEGRATION_DB_FLAVOR ZITADEL_MASTERKEY
 
 .PHONY: compile
-compile: core_build console_build compile_pipeline
+compile: core_build compile_pipeline
 
 .PHONY: docker_image
 docker_image: compile
 	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
-compile_pipeline: console_move
+compile_pipeline: 
 	CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
 	chmod +x zitadel
 
@@ -81,25 +81,6 @@ core_api: core_api_generator core_grpc_dependencies
 .PHONY: core_build
 core_build: core_dependencies core_api core_static core_assets
 
-.PHONY: console_move
-console_move:
-	cp -r console/dist/console/* internal/api/ui/console/static
-
-.PHONY: console_dependencies
-console_dependencies:
-	cd console && \
-	yarn install --immutable
-
-.PHONY: console_client
-console_client:
-	cd console && \
-	yarn generate
-
-.PHONY: console_build
-console_build: console_dependencies console_client
-	cd console && \
-	yarn build
-
 .PHONY: clean
 clean:
 	$(RM) -r .artifacts/grpc
@@ -153,11 +134,6 @@ core_integration_reports:
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
-
-.PHONY: console_lint
-console_lint:
-	cd console && \
-	yarn lint
 
 .PHONY: core_lint
 core_lint:
