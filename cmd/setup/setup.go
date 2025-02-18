@@ -9,6 +9,7 @@ import (
 	"path"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/riverqueue/river"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -37,6 +38,7 @@ import (
 	notify_handler "github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/queue"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 	"github.com/zitadel/zitadel/internal/webauthn"
@@ -473,6 +475,12 @@ func initProjections(
 		config.DefaultInstance.SecretGenerators,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
+	q, _ := queue.NewQueue(&queue.Config{
+		Config: &river.Config{
+			Workers: river.NewWorkers(),
+		},
+		Client: queryDBClient,
+	})
 	notify_handler.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
@@ -495,6 +503,7 @@ func initProjections(
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		queryDBClient,
+		q,
 	)
 	for _, p := range notify_handler.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)

@@ -27,7 +27,7 @@ type Config struct {
 func NewQueue(config *Config) (queue *Queue, err error) {
 	queue = &Queue{
 		driver:  riverpgxv5.New(config.Client.Pool),
-		workers: river.NewWorkers(),
+		workers: config.Workers,
 	}
 
 	queue.client, err = river.NewClient(queue.driver, config.Config)

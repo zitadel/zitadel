@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/riverqueue/river"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -37,11 +36,8 @@ func Register(
 	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
 	tokenLifetime time.Duration,
 	client *database.DB,
+	queue *queue.Queue,
 ) {
-	queue, _ := queue.NewQueue(&queue.Config{
-		Config: &river.Config{},
-		Client: client,
-	})
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig.LegacyEnabled, queue))

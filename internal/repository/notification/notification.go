@@ -35,6 +35,10 @@ type Request struct {
 	Args                          *domain.NotificationArguments `json:"args,omitempty"`
 }
 
+func (e *Request) Kind() string {
+	return "notification_request"
+}
+
 func (e *Request) NotificationAggregateID() string {
 	if e.Aggregate.ID == "" {
 		return e.UserID

@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/queue"
+	"github.com/zitadel/zitadel/internal/repository/notification"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -220,22 +221,23 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.queue.Insert(ctx, command.NewNotificationRequest(
-			e.Aggregate(),
-			e.Aggregate().ID,
-			e.Aggregate().ResourceOwner,
-			origin,
-			e.EventType,
-			domain.NotificationTypeEmail,
-			domain.InitCodeMessageType,
-		).
-			WithURLTemplate(login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
-			WithCode(e.Code, e.Expiry).
-			WithArgs(&domain.NotificationArguments{
+		return u.queue.Insert(ctx, &notification.Request{
+			Aggregate:                     e.Aggregate(),
+			UserID:                        e.Aggregate().ID,
+			UserResourceOwner:             e.Aggregate().ResourceOwner,
+			TriggeredAtOrigin:             origin,
+			EventType:                     e.EventType,
+			NotificationType:              domain.NotificationTypeEmail,
+			MessageType:                   domain.InitCodeMessageType,
+			Code:                          e.Code,
+			CodeExpiry:                    e.Expiry,
+			IsOTP:                         false,
+			UnverifiedNotificationChannel: true,
+			URLTemplate:                   login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID),
+			Args: &domain.NotificationArguments{
 				AuthRequestID: e.AuthRequestID,
-			}).
-			WithUnverifiedChannel(),
-		)
+			},
+		})
 	}), nil
 }
 
