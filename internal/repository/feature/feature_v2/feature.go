@@ -40,6 +40,7 @@ var (
 	InstanceEnableBackChannelLogout                  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyEnableBackChannelLogout)
 	InstanceLoginVersion                             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginV2)
 	InstancePermissionCheckV2                        = setEventTypeFromFeature(feature.LevelInstance, feature.KeyPermissionCheckV2)
+	InstanceConsoleUseV2UserApi                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyConsoleUseV2UserApi)
 )
 
 const (
