@@ -307,7 +307,7 @@ func TestServer_VerifyClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
+			_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
 			require.NoError(t, err)
 			linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: authRequestID,

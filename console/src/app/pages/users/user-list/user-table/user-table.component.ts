@@ -1,6 +1,6 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, Signal, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -12,11 +12,15 @@ import { enterAnimations } from 'src/app/animations';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
-import { SearchQuery, Type, TypeQuery, User, UserFieldName, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { UserService } from 'src/app/services/user.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { SearchQuery, SearchQuerySchema, Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
+import { UserState, User as UserV2 } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { create } from '@bufbuild/protobuf';
+import { Timestamp } from '@bufbuild/protobuf/wkt';
 
 enum UserListSearchKey {
   FIRST_NAME,
@@ -34,20 +38,22 @@ enum UserListSearchKey {
 })
 export class UserTableComponent implements OnInit {
   public userSearchKey: UserListSearchKey | undefined = undefined;
-  public Type: any = Type;
-  @Input() public type: Type = Type.TYPE_HUMAN;
+  public Type = Type;
+  @Input() public type: Type = Type.HUMAN;
   @Input() refreshOnPreviousRoutes: string[] = [];
   @Input() public canWrite$: Observable<boolean> = of(false);
   @Input() public canDelete$: Observable<boolean> = of(false);
+
+  private user: Signal<User.AsObject | undefined> = toSignal(this.authService.user, { requireSync: true });
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatSort) public sort!: MatSort;
   public INITIAL_PAGE_SIZE: number = 20;
 
-  public viewTimestamp!: Timestamp.AsObject;
+  public viewTimestamp!: Timestamp;
   public totalResult: number = 0;
-  public dataSource: MatTableDataSource<User.AsObject> = new MatTableDataSource<User.AsObject>();
-  public selection: SelectionModel<User.AsObject> = new SelectionModel<User.AsObject>(true, []);
+  public dataSource: MatTableDataSource<UserV2> = new MatTableDataSource<UserV2>();
+  public selection: SelectionModel<UserV2> = new SelectionModel<UserV2>(true, []);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   @Input() public displayedColumnsHuman: string[] = [
@@ -70,7 +76,7 @@ export class UserTableComponent implements OnInit {
     'actions',
   ];
 
-  @Output() public changedSelection: EventEmitter<Array<User.AsObject>> = new EventEmitter();
+  @Output() public changedSelection: EventEmitter<Array<UserV2>> = new EventEmitter();
 
   public UserState: any = UserState;
   public UserListSearchKey: any = UserListSearchKey;
@@ -83,7 +89,7 @@ export class UserTableComponent implements OnInit {
     private router: Router,
     public translate: TranslateService,
     private authService: GrpcAuthService,
-    private userService: ManagementService,
+    private userService: UserService,
     private toast: ToastService,
     private dialog: MatDialog,
     private route: ActivatedRoute,
@@ -97,12 +103,12 @@ export class UserTableComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
       if (!params['filter']) {
-        this.getData(this.INITIAL_PAGE_SIZE, 0, this.type, this.searchQueries);
+        this.getData(this.INITIAL_PAGE_SIZE, 0, this.type, this.searchQueries).then();
       }
 
       if (params['deferredReload']) {
         setTimeout(() => {
-          this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
+          this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type).then();
         }, 2000);
       }
     });
@@ -110,16 +116,23 @@ export class UserTableComponent implements OnInit {
 
   public setType(type: Type): void {
     this.type = type;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        type: type === Type.TYPE_HUMAN ? 'human' : type === Type.TYPE_MACHINE ? 'machine' : 'human',
-      },
-      replaceUrl: true,
-      queryParamsHandling: 'merge',
-      skipLocationChange: false,
-    });
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, this.searchQueries);
+    this.router
+      .navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          type: type === Type.HUMAN ? 'human' : type === Type.MACHINE ? 'machine' : 'human',
+        },
+        replaceUrl: true,
+        queryParamsHandling: 'merge',
+        skipLocationChange: false,
+      })
+      .then();
+    this.getData(
+      this.paginator.pageSize,
+      this.paginator.pageIndex * this.paginator.pageSize,
+      this.type,
+      this.searchQueries,
+    ).then();
   }
 
   public isAllSelected(): boolean {
@@ -134,17 +147,17 @@ export class UserTableComponent implements OnInit {
 
   public changePage(event: PageEvent): void {
     this.selection.clear();
-    this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type, this.searchQueries);
+    this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type, this.searchQueries).then();
   }
 
   public deactivateSelectedUsers(): void {
-    Promise.all(
-      this.selection.selected
-        .filter((u) => u.state === UserState.USER_STATE_ACTIVE)
-        .map((value) => {
-          return this.userService.deactivateUser(value.id);
-        }),
-    )
+    const usersToDeactivate = this.selection.selected
+      .filter((u) => u.state === UserState.ACTIVE)
+      .map((value) => {
+        return this.userService.deactivateUser(value.userId);
+      });
+
+    Promise.all(usersToDeactivate)
       .then(() => {
         this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
         this.selection.clear();
@@ -158,13 +171,13 @@ export class UserTableComponent implements OnInit {
   }
 
   public reactivateSelectedUsers(): void {
-    Promise.all(
-      this.selection.selected
-        .filter((u) => u.state === UserState.USER_STATE_INACTIVE)
-        .map((value) => {
-          return this.userService.reactivateUser(value.id);
-        }),
-    )
+    const usersToReactivate = this.selection.selected
+      .filter((u) => u.state === UserState.INACTIVE)
+      .map((value) => {
+        return this.userService.reactivateUser(value.userId);
+      });
+
+    Promise.all(usersToReactivate)
       .then(() => {
         this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
         this.selection.clear();
@@ -177,39 +190,43 @@ export class UserTableComponent implements OnInit {
       });
   }
 
-  public gotoRouterLink(rL: any): void {
-    this.router.navigate(rL);
+  public gotoRouterLink(rL: any): Promise<boolean> {
+    return this.router.navigate(rL);
   }
 
   private async getData(limit: number, offset: number, type: Type, searchQueries?: SearchQuery[]): Promise<void> {
     this.loadingSubject.next(true);
 
-    let queryT = new SearchQuery();
-    const typeQuery = new TypeQuery();
-    typeQuery.setType(type);
-    queryT.setTypeQuery(typeQuery);
+    let queryT = create(SearchQuerySchema, {
+      query: {
+        case: 'typeQuery',
+        value: {
+          type,
+        },
+      },
+    });
 
     let sortingField: UserFieldName | undefined = undefined;
     if (this.sort?.active && this.sort?.direction)
       switch (this.sort.active) {
         case 'displayName':
-          sortingField = UserFieldName.USER_FIELD_NAME_DISPLAY_NAME;
+          sortingField = UserFieldName.DISPLAY_NAME;
           break;
         case 'username':
-          sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
+          sortingField = UserFieldName.USER_NAME;
           break;
         case 'preferredLoginName':
           // TODO: replace with preferred username sorting once implemented
-          sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
+          sortingField = UserFieldName.USER_NAME;
           break;
         case 'email':
-          sortingField = UserFieldName.USER_FIELD_NAME_EMAIL;
+          sortingField = UserFieldName.EMAIL;
           break;
         case 'state':
-          sortingField = UserFieldName.USER_FIELD_NAME_STATE;
+          sortingField = UserFieldName.STATE;
           break;
         case 'creationDate':
-          sortingField = UserFieldName.USER_FIELD_NAME_CREATION_DATE;
+          sortingField = UserFieldName.CREATION_DATE;
           break;
       }
 
@@ -223,14 +240,14 @@ export class UserTableComponent implements OnInit {
       )
       .then((resp) => {
         if (resp.details?.totalResult) {
-          this.totalResult = resp.details?.totalResult;
+          this.totalResult = Number(resp.details.totalResult);
         } else {
           this.totalResult = 0;
         }
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details?.viewTimestamp;
+        if (resp.details?.timestamp) {
+          this.viewTimestamp = resp.details?.timestamp;
         }
-        this.dataSource.data = resp.resultList;
+        this.dataSource.data = resp.result;
         this.loadingSubject.next(false);
       })
       .catch((error) => {
@@ -240,15 +257,20 @@ export class UserTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, this.searchQueries);
+    this.getData(
+      this.paginator.pageSize,
+      this.paginator.pageIndex * this.paginator.pageSize,
+      this.type,
+      this.searchQueries,
+    ).then();
   }
 
   public sortChange(sortState: Sort) {
     if (sortState.direction && sortState.active) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction} ending`);
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction} ending`).then();
       this.refreshPage();
     } else {
-      this._liveAnnouncer.announce('Sorting cleared');
+      this._liveAnnouncer.announce('Sorting cleared').then();
     }
   }
 
@@ -260,10 +282,10 @@ export class UserTableComponent implements OnInit {
       this.paginator ? this.paginator.pageIndex * this.paginator.pageSize : 0,
       this.type,
       searchQueries,
-    );
+    ).then();
   }
 
-  public deleteUser(user: User.AsObject): void {
+  public deleteUser(user: UserV2): void {
     const authUserData = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -286,9 +308,9 @@ export class UserTableComponent implements OnInit {
       confirmation: user.preferredLoginName,
     };
 
-    if (user && user.id) {
-      const authUser = this.authService.userSubject.getValue();
-      const isMe = authUser?.id === user.id;
+    if (user?.userId) {
+      const authUser = this.user();
+      const isMe = authUser?.id === user.userId;
 
       let dialogRef;
 
@@ -307,7 +329,7 @@ export class UserTableComponent implements OnInit {
       dialogRef.afterClosed().subscribe((resp) => {
         if (resp) {
           this.userService
-            .removeUser(user.id)
+            .deleteUser(user.userId)
             .then(() => {
               setTimeout(() => {
                 this.refreshPage();
@@ -325,11 +347,11 @@ export class UserTableComponent implements OnInit {
 
   public get multipleActivatePossible(): boolean {
     const selected = this.selection.selected;
-    return selected ? selected.findIndex((user) => user.state !== UserState.USER_STATE_ACTIVE) > -1 : false;
+    return selected ? selected.findIndex((user) => user.state !== UserState.ACTIVE) > -1 : false;
   }
 
   public get multipleDeactivatePossible(): boolean {
     const selected = this.selection.selected;
-    return selected ? selected.findIndex((user) => user.state !== UserState.USER_STATE_INACTIVE) > -1 : false;
+    return selected ? selected.findIndex((user) => user.state !== UserState.INACTIVE) > -1 : false;
   }
 }
