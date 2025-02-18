@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 49.sql
+	//go:embed 50.sql
 	addUsePKCE string
 )
 
@@ -23,5 +23,5 @@ func (mig *IDPTemplate6UsePKCE) Execute(ctx context.Context, _ eventstore.Event)
 }
 
 func (mig *IDPTemplate6UsePKCE) String() string {
-	return "49_idp_templates6_add_use_pkce"
+	return "50_idp_templates6_add_use_pkce"
 }
