@@ -27,7 +27,8 @@ func NewServer(
 	verifier *authz.ApiTokenVerifier,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	config *sconfig.Config,
-	middlewares ...zhttp_middlware.MiddlewareWithErrorFunc) http.Handler {
+	middlewares ...zhttp_middlware.MiddlewareWithErrorFunc,
+) http.Handler {
 	verifier.RegisterServer("SCIM-V2", schemas.HandlerPrefix, AuthMapping)
 	return buildHandler(command, query, userCodeAlg, config, middlewares...)
 }
@@ -37,28 +38,48 @@ func buildHandler(
 	query *query.Queries,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	cfg *sconfig.Config,
-	middlewares ...zhttp_middlware.MiddlewareWithErrorFunc) http.Handler {
+	middlewares ...zhttp_middlware.MiddlewareWithErrorFunc,
+) http.Handler {
 
 	router := mux.NewRouter()
+	middleware := buildMiddleware(cfg, query, middlewares)
 
+	usersHandler := sresources.NewResourceHandlerAdapter(sresources.NewUsersHandler(command, query, userCodeAlg, cfg))
+	mapResource(router, middleware, usersHandler)
+
+	bulkHandler := sresources.NewBulkHandler(cfg.Bulk, usersHandler)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Bulk", middleware(handleJsonResponse(bulkHandler.BulkFromHttp))).Methods(http.MethodPost)
+
+	serviceProviderHandler := newServiceProviderHandler(cfg, usersHandler)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ServiceProviderConfig", middleware(handleJsonResponse(serviceProviderHandler.GetConfig))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ResourceTypes", middleware(handleJsonResponse(serviceProviderHandler.ListResourceTypes))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ResourceTypes/{name}", middleware(handleResourceResponse(serviceProviderHandler.GetResourceType))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Schemas", middleware(handleJsonResponse(serviceProviderHandler.ListSchemas))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Schemas/{id}", middleware(handleResourceResponse(serviceProviderHandler.GetSchema))).Methods(http.MethodGet)
+
+	return router
+}
+
+func buildMiddleware(cfg *sconfig.Config, query *query.Queries, middlewares []zhttp_middlware.MiddlewareWithErrorFunc) zhttp_middlware.ErrorHandlerFunc {
 	// content type middleware needs to run at the very beginning to correctly set content types of errors
 	middlewares = append([]zhttp_middlware.MiddlewareWithErrorFunc{smiddleware.ContentTypeMiddleware}, middlewares...)
 	middlewares = append(middlewares, smiddleware.ScimContextMiddleware(query))
 	scimMiddleware := zhttp_middlware.ChainedWithErrorHandler(serrors.ErrorHandler, middlewares...)
-	mapResource(router, scimMiddleware, sresources.NewUsersHandler(command, query, userCodeAlg, cfg))
-	return router
+	return func(handler zhttp_middlware.HandlerFuncWithError) http.Handler {
+		return http.MaxBytesHandler(scimMiddleware(handler), cfg.MaxRequestBodySize)
+	}
 }
 
-func mapResource[T sresources.ResourceHolder](router *mux.Router, mw zhttp_middlware.ErrorHandlerFunc, handler sresources.ResourceHandler[T]) {
-	adapter := sresources.NewResourceHandlerAdapter[T](handler)
-	resourceRouter := router.PathPrefix("/" + path.Join(zhttp.OrgIdInPathVariable, string(handler.ResourceNamePlural()))).Subrouter()
+func mapResource[T sresources.ResourceHolder](router *mux.Router, mw zhttp_middlware.ErrorHandlerFunc, adapter *sresources.ResourceHandlerAdapter[T]) {
+	resourceRouter := router.PathPrefix("/" + path.Join(zhttp.OrgIdInPathVariable, string(adapter.Schema().PluralName))).Subrouter()
 
-	resourceRouter.Handle("", mw(handleResourceCreatedResponse(adapter.Create))).Methods(http.MethodPost)
-	resourceRouter.Handle("", mw(handleJsonResponse(adapter.List))).Methods(http.MethodGet)
-	resourceRouter.Handle("/.search", mw(handleJsonResponse(adapter.List))).Methods(http.MethodPost)
-	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.Get))).Methods(http.MethodGet)
-	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.Replace))).Methods(http.MethodPut)
-	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.Delete))).Methods(http.MethodDelete)
+	resourceRouter.Handle("", mw(handleResourceCreatedResponse(adapter.CreateFromHttp))).Methods(http.MethodPost)
+	resourceRouter.Handle("", mw(handleJsonResponse(adapter.ListFromHttp))).Methods(http.MethodGet)
+	resourceRouter.Handle("/.search", mw(handleJsonResponse(adapter.ListFromHttp))).Methods(http.MethodPost)
+	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.GetFromHttp))).Methods(http.MethodGet)
+	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.ReplaceFromHttp))).Methods(http.MethodPut)
+	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.UpdateFromHttp))).Methods(http.MethodPatch)
+	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.DeleteFromHttp))).Methods(http.MethodDelete)
 }
 
 func handleJsonResponse[T any](next func(r *http.Request) (T, error)) zhttp_middlware.HandlerFuncWithError {

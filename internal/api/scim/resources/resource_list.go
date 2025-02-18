@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"encoding/json"
 	"net/http"
 
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
@@ -13,6 +12,8 @@ import (
 )
 
 type ListRequest struct {
+	Schemas []schemas.ScimSchemaType `json:"schemas"`
+
 	// Count An integer indicating the desired maximum number of query results per page.
 	Count int64 `json:"count" schema:"count"`
 
@@ -27,7 +28,7 @@ type ListRequest struct {
 	SortOrder ListRequestSortOrder `json:"sortOrder" schema:"sortOrder"`
 }
 
-type ListResponse[T ResourceHolder] struct {
+type ListResponse[T any] struct {
 	Schemas      []schemas.ScimSchemaType `json:"schemas"`
 	ItemsPerPage uint64                   `json:"itemsPerPage"`
 	TotalResults uint64                   `json:"totalResults"`
@@ -42,10 +43,14 @@ const (
 	ListRequestSortOrderDsc ListRequestSortOrder = "descending"
 
 	defaultListCount = 100
-	maxListCount     = 100
+	MaxListCount     = 100
 )
 
 var parser = zhttp.NewParser()
+
+func (r *ListRequest) GetSchemas() []schemas.ScimSchemaType {
+	return r.Schemas
+}
 
 func (o ListRequestSortOrder) isDefined() bool {
 	switch o {
@@ -60,7 +65,7 @@ func (o ListRequestSortOrder) IsAscending() bool {
 	return o == ListRequestSortOrderAsc
 }
 
-func newListResponse[T ResourceHolder](totalResultCount uint64, q query.SearchRequest, resources []T) *ListResponse[T] {
+func NewListResponse[T any](totalResultCount uint64, q query.SearchRequest, resources []T) *ListResponse[T] {
 	return &ListResponse[T]{
 		Schemas:      []schemas.ScimSchemaType{schemas.IdListResponse},
 		ItemsPerPage: q.Limit,
@@ -70,7 +75,7 @@ func newListResponse[T ResourceHolder](totalResultCount uint64, q query.SearchRe
 	}
 }
 
-func readListRequest(r *http.Request) (*ListRequest, error) {
+func (adapter *ResourceHandlerAdapter[T]) readListRequest(r *http.Request) (*ListRequest, error) {
 	request := &ListRequest{
 		Count:      defaultListCount,
 		StartIndex: 1,
@@ -89,12 +94,8 @@ func readListRequest(r *http.Request) (*ListRequest, error) {
 			return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-ullform", "Could not decode form: "+err.Error())
 		}
 	case http.MethodPost:
-		if err := json.NewDecoder(r.Body).Decode(request); err != nil {
-			if serrors.IsScimOrZitadelError(err) {
-				return nil, err
-			}
-
-			return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-ulljson", "Could not decode json: "+err.Error())
+		if err := readSchema(r.Body, request, schemas.IdSearchRequest); err != nil {
+			return nil, err
 		}
 
 		// json deserialization initializes this field if an empty string is provided
@@ -118,7 +119,7 @@ func (r *ListRequest) toSearchRequest(defaultSortCol query.Column, fieldPathColu
 	if r.SortBy == "" {
 		// set a default sort to ensure consistent results
 		sr.SortingColumn = defaultSortCol
-	} else if sortCol, err := fieldPathColumnMapping.Resolve(r.SortBy); err != nil {
+	} else if sortCol, err := fieldPathColumnMapping.Resolve(r.SortBy); err != nil || sortCol.FieldType == filter.FieldTypeCustom {
 		return sr, serrors.ThrowInvalidValue(zerrors.ThrowInvalidArgument(err, "SCIM-SRT1", "SortBy field is unknown or not supported"))
 	} else {
 		sr.SortingColumn = sortCol.Column
@@ -136,8 +137,8 @@ func (r *ListRequest) validate() error {
 	// according to the spec values < 0 are treated as 0
 	if r.Count < 0 {
 		r.Count = 0
-	} else if r.Count > maxListCount {
-		return zerrors.ThrowInvalidArgumentf(nil, "SCIM-ucr", "Limit count exceeded, set a count <= %v", maxListCount)
+	} else if r.Count > MaxListCount {
+		return zerrors.ThrowInvalidArgumentf(nil, "SCIM-ucr", "Limit count exceeded, set a count <= %v", MaxListCount)
 	}
 
 	if !r.SortOrder.isDefined() {

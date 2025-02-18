@@ -2,18 +2,18 @@ import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 
 import {
-  GetInstanceFeaturesRequest,
-  GetInstanceFeaturesResponse,
-  ResetInstanceFeaturesRequest,
-  SetInstanceFeaturesRequest,
-  SetInstanceFeaturesResponse,
-} from '../proto/generated/zitadel/feature/v2beta/instance_pb';
-import {
   GetOrganizationFeaturesRequest,
   GetOrganizationFeaturesResponse,
 } from '../proto/generated/zitadel/feature/v2beta/organization_pb';
 import { GetUserFeaturesRequest, GetUserFeaturesResponse } from '../proto/generated/zitadel/feature/v2beta/user_pb';
 import { GetSystemFeaturesRequest, GetSystemFeaturesResponse } from '../proto/generated/zitadel/feature/v2beta/system_pb';
+import {
+  GetInstanceFeaturesRequest,
+  GetInstanceFeaturesResponse,
+  ResetInstanceFeaturesRequest,
+  SetInstanceFeaturesRequest,
+  SetInstanceFeaturesResponse,
+} from '../proto/generated/zitadel/feature/v2/instance_pb';
 
 @Injectable({
   providedIn: 'root',
