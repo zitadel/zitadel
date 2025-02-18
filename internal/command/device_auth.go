@@ -59,7 +59,64 @@ func (c *Commands) ApproveDeviceAuth(
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
+	if model.State != domain.DeviceAuthStateInitiated {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-GEJL3", "Errors.AuthRequest.AlreadyHandled")
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime, preferredLanguage, userAgent, sessionID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(model, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToObjectDetails(&model.WriteModel), nil
+}
+
+func (c *Commands) ApproveDeviceAuthWithSession(
+	ctx context.Context,
+	deviceCode,
+	sessionID,
+	sessionToken string,
+) (*domain.ObjectDetails, error) {
+	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
+	if err != nil {
+		return nil, err
+	}
+	if !model.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-D2hf2", "Errors.DeviceAuth.NotFound")
+	}
+	if model.State != domain.DeviceAuthStateInitiated {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-D30Jf", "Errors.DeviceAuth.AlreadyHandled")
+	}
+	if err := c.checkPermission(ctx, domain.PermissionSessionLink, model.ResourceOwner, ""); err != nil {
+		return nil, err
+	}
+
+	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
+	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	if err = sessionWriteModel.CheckIsActive(); err != nil {
+		return nil, err
+	}
+	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
+		return nil, err
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(
+		ctx,
+		model.aggregate,
+		sessionWriteModel.UserID,
+		sessionWriteModel.UserResourceOwner,
+		sessionWriteModel.AuthMethodTypes(),
+		sessionWriteModel.AuthenticationTime(),
+		sessionWriteModel.PreferredLanguage,
+		sessionWriteModel.UserAgent,
+		sessionID,
+	))
 	if err != nil {
 		return nil, err
 	}

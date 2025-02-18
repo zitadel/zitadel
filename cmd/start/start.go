@@ -560,7 +560,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, oidc_v2beta.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
+	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure, keys.OIDC)); err != nil {
 		return nil, err
 	}
 	// After SAML provider so that the callback endpoint can be used
