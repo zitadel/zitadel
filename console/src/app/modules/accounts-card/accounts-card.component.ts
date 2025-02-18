@@ -4,6 +4,7 @@ import { AuthConfig } from 'angular-oauth2-oidc';
 import { Session, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'cnsl-accounts-card',
@@ -18,6 +19,8 @@ export class AccountsCardComponent implements OnInit {
   public sessions: Session.AsObject[] = [];
   public loadingUsers: boolean = false;
   public UserState: any = UserState;
+  private labelpolicy = toSignal(this.userService.labelpolicy$, { initialValue: undefined });
+
   constructor(
     public authService: AuthenticationService,
     private router: Router,
@@ -68,7 +71,7 @@ export class AccountsCardComponent implements OnInit {
   }
 
   public logout(): void {
-    const lP = JSON.stringify(this.userService.labelpolicy.getValue());
+    const lP = JSON.stringify(this.labelpolicy());
     localStorage.setItem('labelPolicyOnSignout', lP);
 
     this.authService.signout();

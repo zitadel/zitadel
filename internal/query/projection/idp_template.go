@@ -40,7 +40,7 @@ const (
 	IDPTemplateGitLabSuffix           = "gitlab"
 	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
 	IDPTemplateGoogleSuffix           = "google"
-	IDPTemplateLDAPSuffix             = "ldap2"
+	IDPTemplateLDAPSuffix             = "ldap3"
 	IDPTemplateAppleSuffix            = "apple"
 	IDPTemplateSAMLSuffix             = "saml"
 
@@ -139,6 +139,7 @@ const (
 	LDAPUserObjectClassesCol          = "user_object_classes"
 	LDAPUserFiltersCol                = "user_filters"
 	LDAPTimeoutCol                    = "timeout"
+	LDAPRootCACol                     = "rootCA"
 	LDAPIDAttributeCol                = "id_attribute"
 	LDAPFirstNameAttributeCol         = "first_name_attribute"
 	LDAPLastNameAttributeCol          = "last_name_attribute"
@@ -330,6 +331,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(LDAPUserObjectClassesCol, handler.ColumnTypeTextArray),
 			handler.NewColumn(LDAPUserFiltersCol, handler.ColumnTypeTextArray),
 			handler.NewColumn(LDAPTimeoutCol, handler.ColumnTypeInt64),
+			handler.NewColumn(LDAPRootCACol, handler.ColumnTypeBytes, handler.Nullable()),
 			handler.NewColumn(LDAPIDAttributeCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LDAPFirstNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LDAPLastNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
@@ -1896,6 +1898,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(LDAPUserObjectClassesCol, database.TextArray[string](idpEvent.UserObjectClasses)),
 				handler.NewCol(LDAPUserFiltersCol, database.TextArray[string](idpEvent.UserFilters)),
 				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
+				handler.NewCol(LDAPRootCACol, idpEvent.RootCA),
 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
 				handler.NewCol(LDAPLastNameAttributeCol, idpEvent.LastNameAttribute),
@@ -2420,6 +2423,9 @@ func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.Timeout != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPTimeoutCol, *idpEvent.Timeout))
+	}
+	if idpEvent.RootCA != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPRootCACol, idpEvent.RootCA))
 	}
 	if idpEvent.IDAttribute != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPIDAttributeCol, *idpEvent.IDAttribute))

@@ -16,13 +16,14 @@ import { InfoSectionModule } from 'src/app/modules/info-section/info-section.mod
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
-import {
-  GetInstanceFeaturesResponse,
-  SetInstanceFeaturesRequest,
-} from 'src/app/proto/generated/zitadel/feature/v2beta/instance_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
+import {
+  GetInstanceFeaturesResponse,
+  SetInstanceFeaturesRequest,
+} from '../../proto/generated/zitadel/feature/v2/instance_pb';
+import { withIdentifier } from 'codelyzer/util/astQuery';
 
 enum ToggleState {
   ENABLED = 'ENABLED',
@@ -39,6 +40,7 @@ type ToggleStates = {
   oidcTokenExchange?: FeatureState;
   actions?: FeatureState;
   oidcSingleV1SessionTermination?: FeatureState;
+  consoleUseV2UserApi?: FeatureState;
 };
 
 @Component({
@@ -142,6 +144,7 @@ export class FeaturesComponent implements OnDestroy {
         );
         changed = true;
       }
+      req.setConsoleUseV2UserApi(this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED);
 
       if (changed) {
         this.featureService
@@ -231,6 +234,10 @@ export class FeaturesComponent implements OnDestroy {
               : !!this.featureData.oidcSingleV1SessionTermination?.enabled
                 ? ToggleState.ENABLED
                 : ToggleState.DISABLED,
+        },
+        consoleUseV2UserApi: {
+          source: this.featureData.consoleUseV2UserApi?.source || Source.SOURCE_INSTANCE,
+          state: this.featureData.consoleUseV2UserApi?.enabled ? ToggleState.ENABLED : ToggleState.DISABLED,
         },
       };
     });

@@ -4,12 +4,7 @@ issues:
   max-issues-per-linter: 0
   # Set to 0 to disable.
   max-same-issues: 0
-
-run:
-  concurrency: 4
-  timeout: 10m
-  go: '1.22'
-  skip-dirs:
+  exclude-dirs:
     - .artifacts
     - .backups
     - .codecov
@@ -25,6 +20,11 @@ run:
     - openapi
     - proto
     - tools
+
+run:
+  concurrency: 4
+  timeout: 10m
+  go: '1.22'
 linters:
   enable:
     # Simple linter to check that your code does not contain non-ASCII identifiers [fast: true, auto-fix: false]

@@ -809,6 +809,9 @@
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
       "PHONE_HINT": "Verwenden das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wähle das Land aus der Dropdown-Liste aus und gebe anschließend die Telefonnummer ein.",
+      "PHONE_VERIFIED": "Telefonnummer verifiziert",
+      "SEND_SMS": "Bestätigungs-SMS senden",
+      "SEND_EMAIL": "E-Mail senden",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -948,6 +951,14 @@
       "4": "Gesperrt",
       "5": "Suspendiert",
       "6": "Initialisiert"
+    },
+    "STATEV2": {
+      "0": "Unbekannt",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Gelöscht",
+      "4": "Gesperrt",
+      "5": "Initialisiert"
     },
     "SEARCH": {
       "ADDITIONAL": "Benutzer Name (eigene Organisation)",
@@ -1486,7 +1497,9 @@
         "ENABLED": "„Aktiviert“ wird vererbt",
         "DISABLED": "„Deaktiviert“ wird vererbt"
       },
-      "RESET": "Alle auf Erben setzen"
+      "RESET": "Alle auf Erben setzen",
+      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Konsole zur Erstellung von Benutzern",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand."
     },
     "DIALOG": {
       "RESET": {
