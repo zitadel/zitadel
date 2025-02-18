@@ -111,6 +111,7 @@ func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t assert.TestingT, ex
 		wantCD := time.Now()
 		assert.WithinRange(t, gotCD, wantCD.Add(-10*time.Minute), wantCD.Add(time.Minute))
 	}
+	assert.Equal(t, expected.GetDetails().GetTotalResult(), actual.GetDetails().GetTotalResult())
 }
 
 func AssertResourceListDetails[D ResourceListDetailsMsg](t assert.TestingT, expected, actual D) {
