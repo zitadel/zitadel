@@ -50,16 +50,16 @@ target "console" {
     "image"   = ["${REGISTRY}/console:${GITHUB_SHA}"]
   }[tgt]
   cache-to = {
-    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
+    "output" =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
+    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
+    "image"   = ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
   }[tgt]
     cache-from = {
-    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "build"  =  ["type=gha,scope=console-${tgt}"]
+    "output" =  ["type=gha,scope=console-${tgt}"]
+    "lint"   =  ["type=gha,scope=console-${tgt}"]
+    "image"   = ["type=gha,scope=console-${tgt}"]
   }[tgt]
   target = tgt
 }
@@ -96,16 +96,16 @@ target "core" {
     "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
   }[tgt]
     cache-to = {
-    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
+    "output" =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
+    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
+    "image"   = ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
   }[tgt]
     cache-from = {
-    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
-    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "build"  =  ["type=gha,scope=core-${tgt}"]
+    "output" =  ["type=gha,scope=core-${tgt}"]
+    "lint"   =  ["type=gha,scope=core-${tgt}"]
+    "image"   = ["type=gha,scope=core-${tgt}"]
   }[tgt]
   target = tgt
 }
