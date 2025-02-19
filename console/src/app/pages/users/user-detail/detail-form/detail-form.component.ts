@@ -1,116 +1,138 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Component, DestroyRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
+import { combineLatestWith, distinctUntilChanged, ReplaySubject } from 'rxjs';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import { Gender, Human, Profile } from 'src/app/proto/generated/zitadel/user_pb';
-
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
+import { Gender, HumanProfile, HumanProfileSchema } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { filter, startWith } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Profile } from '@zitadel/proto/zitadel/user_pb';
+import { create } from '@bufbuild/protobuf';
+
+function toHumanProfile(profile: HumanProfile | Profile): HumanProfile {
+  if (profile.$typeName === 'zitadel.user.v2.HumanProfile') {
+    return profile;
+  }
+  return create(HumanProfileSchema, {
+    givenName: profile.firstName,
+    familyName: profile.lastName,
+    nickName: profile.nickName,
+    displayName: profile.displayName,
+    preferredLanguage: profile.preferredLanguage,
+    gender: profile.gender,
+    avatarUrl: profile.avatarUrl,
+  });
+}
 
 @Component({
   selector: 'cnsl-detail-form',
   templateUrl: './detail-form.component.html',
   styleUrls: ['./detail-form.component.scss'],
 })
-export class DetailFormComponent implements OnDestroy, OnChanges {
+export class DetailFormComponent implements OnInit {
   @Input() public showEditImage: boolean = false;
   @Input() public preferredLoginName: string = '';
-  @Input() public username!: string;
-  @Input() public user!: Human.AsObject;
-  @Input() public disabled: boolean = true;
+  @Input({ required: true }) public set username(username: string) {
+    this.username$.next(username);
+  }
+  @Input({ required: true }) public set profile(profile: HumanProfile | Profile) {
+    this.profile$.next(toHumanProfile(profile));
+  }
+  @Input() public set disabled(disabled: boolean) {
+    this.disabled$.next(disabled);
+  }
   @Input() public genders: Gender[] = [];
   @Input() public languages: string[] = ['de', 'en'];
-  @Output() public submitData: EventEmitter<Profile.AsObject> = new EventEmitter<Profile.AsObject>();
   @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
   @Output() public changeUsernameClicked: EventEmitter<void> = new EventEmitter();
   @Output() public avatarChanged: EventEmitter<void> = new EventEmitter();
 
-  public profileForm!: UntypedFormGroup;
-
-  private sub: Subscription = new Subscription();
+  private username$ = new ReplaySubject<string>(1);
+  public profile$ = new ReplaySubject<HumanProfile>(1);
+  public profileForm!: ReturnType<typeof this.buildForm>;
+  public disabled$ = new ReplaySubject<boolean>(1);
+  @Output() public submitData = new EventEmitter<HumanProfile>();
 
   constructor(
-    private fb: UntypedFormBuilder,
-    private dialog: MatDialog,
+    private readonly fb: FormBuilder,
+    private readonly dialog: MatDialog,
+    private readonly destroyRef: DestroyRef,
   ) {
-    this.profileForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [requiredValidator]],
-      firstName: [{ value: '', disabled: this.disabled }, requiredValidator],
-      lastName: [{ value: '', disabled: this.disabled }, requiredValidator],
-      nickName: [{ value: '', disabled: this.disabled }],
-      displayName: [{ value: '', disabled: this.disabled }, requiredValidator],
-      gender: [{ value: 0, disabled: this.disabled }],
-      preferredLanguage: [{ value: '', disabled: this.disabled }],
-    });
+    this.profileForm = this.buildForm();
   }
 
-  public ngOnChanges(): void {
-    this.profileForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [requiredValidator]],
-      firstName: [{ value: '', disabled: this.disabled }, requiredValidator],
-      lastName: [{ value: '', disabled: this.disabled }, requiredValidator],
-      nickName: [{ value: '', disabled: this.disabled }],
-      displayName: [{ value: '', disabled: this.disabled }, requiredValidator],
-      gender: [{ value: 0, disabled: this.disabled }],
-      preferredLanguage: [{ value: '', disabled: this.disabled }],
+  ngOnInit(): void {
+    this.profileForm.controls.preferredLanguage.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => this.changedLanguage.emit(value));
+  }
+
+  private buildForm() {
+    const form = this.fb.group({
+      username: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      givenName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      familyName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      nickName: new FormControl('', { nonNullable: true }),
+      displayName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      preferredLanguage: new FormControl('', { nonNullable: true }),
+      gender: new FormControl(Gender.UNSPECIFIED, { nonNullable: true }),
     });
 
-    this.profileForm.patchValue({ userName: this.username, ...this.user.profile });
-
-    if (this.preferredLanguage) {
-      this.sub = this.preferredLanguage.valueChanges.subscribe((value) => {
-        this.changedLanguage.emit(value);
+    form.controls.username.disable();
+    this.disabled$
+      .pipe(startWith(true), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((disabled) => {
+        this.toggleFormControl(form.controls.givenName, disabled);
+        this.toggleFormControl(form.controls.familyName, disabled);
+        this.toggleFormControl(form.controls.nickName, disabled);
+        this.toggleFormControl(form.controls.displayName, disabled);
+        this.toggleFormControl(form.controls.gender, disabled);
+        this.toggleFormControl(form.controls.preferredLanguage, disabled);
       });
-    }
+
+    this.username$
+      .pipe(combineLatestWith(this.profile$), takeUntilDestroyed(this.destroyRef))
+      .subscribe(([username, profile]) => {
+        form.patchValue({
+          username: username,
+          ...profile,
+        });
+      });
+
+    return form;
   }
 
-  public ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
-  public submitForm(): void {
-    this.submitData.emit(this.profileForm.value);
+  public submitForm(profile: HumanProfile): void {
+    this.submitData.emit({ ...profile, ...this.profileForm.getRawValue() });
   }
 
   public changeUsername(): void {
     this.changeUsernameClicked.emit();
   }
 
-  public openUploadDialog(): void {
-    const dialogRef = this.dialog.open(ProfilePictureComponent, {
-      data: {
-        profilePic: this.user.profile?.avatarUrl,
-      },
+  public openUploadDialog(profile: HumanProfile): void {
+    const data = {
+      profilePic: profile.avatarUrl,
+    };
+
+    const dialogRef = this.dialog.open<ProfilePictureComponent, typeof data, boolean>(ProfilePictureComponent, {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((shouldReload) => {
-      if (shouldReload) {
+    dialogRef
+      .afterClosed()
+      .pipe(filter(Boolean))
+      .subscribe(() => {
         this.avatarChanged.emit();
-      }
-    });
+      });
   }
 
-  public get userName(): AbstractControl | null {
-    return this.profileForm.get('userName');
-  }
-
-  public get firstName(): AbstractControl | null {
-    return this.profileForm.get('firstName');
-  }
-  public get lastName(): AbstractControl | null {
-    return this.profileForm.get('lastName');
-  }
-  public get nickName(): AbstractControl | null {
-    return this.profileForm.get('nickName');
-  }
-  public get displayName(): AbstractControl | null {
-    return this.profileForm.get('displayName');
-  }
-  public get gender(): AbstractControl | null {
-    return this.profileForm.get('gender');
-  }
-  public get preferredLanguage(): AbstractControl | null {
-    return this.profileForm.get('preferredLanguage');
+  public toggleFormControl<T>(control: FormControl<T>, disabled: boolean) {
+    if (disabled) {
+      control.disable();
+      return;
+    }
+    control.enable();
   }
 }

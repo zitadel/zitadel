@@ -809,6 +809,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefonszám",
       "PHONE_HINT": "Használd a + szimbólumot az ország hívókódja előtt, vagy válaszd ki az országot a legördülő menüből, és végül add meg a telefonszámot",
+      "PHONE_VERIFIED": "Telefonszám ellenőrizve",
+      "SEND_SMS": "Ellenőrző SMS küldése",
+      "SEND_EMAIL": "E-mail küldése",
       "USERNAME": "Felhasználónév",
       "CHANGEUSERNAME": "módosít",
       "CHANGEUSERNAME_TITLE": "Felhasználónév megváltoztatása",
@@ -948,6 +951,14 @@
       "4": "Zárolt",
       "5": "Felfüggesztett",
       "6": "Kezdeti"
+    },
+    "STATEV2": {
+      "0": "Ismeretlen",
+      "1": "Aktív",
+      "2": "Inaktív",
+      "3": "Törölt",
+      "4": "Zárolt",
+      "5": "Kezdeti"
     },
     "SEARCH": {
       "ADDITIONAL": "Belépési név (jelenlegi szervezet)",
@@ -1484,7 +1495,9 @@
         "ENABLED": "\"Engedélyezve\" öröklődik",
         "DISABLED": "\"Letiltva\" öröklődik"
       },
-      "RESET": "Mindent állíts öröklésre"
+      "RESET": "Mindent állíts öröklésre",
+      "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a konzolban felhasználók létrehozásához",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak."
     },
     "DIALOG": {
       "RESET": {
