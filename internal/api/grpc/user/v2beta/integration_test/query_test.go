@@ -71,7 +71,7 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 		time.Sleep(10 * time.Second)
 	}
 
-	if flagSet == false {
+	if !flagSet {
 		require.NoError(t, errors.New("unable to set permission_check_v2 flag"))
 	}
 	permissionCheckV2SetFlagInital = true
