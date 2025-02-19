@@ -417,7 +417,6 @@ func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) 
 
 func TestServer_ListUsers(t *testing.T) {
 	defer func() {
-		fmt.Println("CLEANUP")
 		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
 		require.NoError(t, err)
 	}()
