@@ -140,5 +140,5 @@ core_lint:
 	golangci-lint run \
 		--timeout 10m \
 		--config ./.golangci.yaml \
-		--out-format=github-actions \
+		--out-format=colored-line-number \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
