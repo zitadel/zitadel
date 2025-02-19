@@ -13,7 +13,6 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 
@@ -276,52 +275,6 @@ func (i *Instance) setOrganization(ctx context.Context) {
 		i.DefaultOrg = resp.GetOrg()
 		return err
 	})
-}
-
-func (i *Instance) createHumanUser(ctx context.Context, userType UserType) (userID string) {
-	mustAwait(func() error {
-		username := gofakeit.Username()
-		userResp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
-			Username: &username,
-			Email: &user_v2.SetHumanEmail{
-				Email: gofakeit.Email(),
-			},
-			Profile: &user_v2.SetHumanProfile{
-				GivenName:  gofakeit.Name(),
-				FamilyName: gofakeit.LastName(),
-			},
-			PasswordType: &user_v2.AddHumanUserRequest_Password{
-				Password: &user_v2.Password{
-					Password:       UserPassword,
-					ChangeRequired: false,
-				},
-			},
-		})
-		if err != nil {
-			return err
-		}
-		userID = userResp.GetUserId()
-		createResp, err := i.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
-			Checks: &session.Checks{
-				User: &session.CheckUser{
-					Search: &session.CheckUser_UserId{UserId: userID},
-				},
-				Password: &session.CheckPassword{
-					Password: UserPassword,
-				},
-			},
-		})
-		if err != nil {
-			return err
-		}
-		i.Users.Set(userType, &User{
-			ID:       userID,
-			Username: username,
-			Token:    createResp.GetSessionToken(),
-		})
-		return nil
-	})
-	return userID
 }
 
 func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string) {
