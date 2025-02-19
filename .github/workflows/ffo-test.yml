@@ -20,4 +20,8 @@ jobs:
           source: .
           push: false
           targets: build
-          load: true
+      - uses: docker/bake-action@v6
+        with:
+          source: .
+          push: false
+          targets: lint

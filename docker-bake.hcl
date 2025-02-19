@@ -81,30 +81,34 @@ target "core" {
   name     = "core-${tgt}"
   inherits = ["_core"]
   matrix = {
-    tgt = ["build", "output", "lint", "image"]
+    tgt = ["build", "output", "lint", "image", "unit"]
   }
   output = {
     "build"  = ["type=cacheonly"]
     "output" = ["type=local,dest=.build/core"]
     "lint"   = ["type=cacheonly"]
+    "unit"   = ["type=cacheonly"]
     "image"   = ["type=docker"]
   }[tgt]
   tags = {
     "build"  = []
     "output" = []
     "lint"   = []
+    "unit"   = []
     "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
   }[tgt]
     cache-to = {
     "build"  =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
     "output" =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
     "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
+    "unit"   =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]    
     "image"   = ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
   }[tgt]
     cache-from = {
     "build"  =  ["type=gha,scope=core-${tgt}"]
     "output" =  ["type=gha,scope=core-${tgt}"]
     "lint"   =  ["type=gha,scope=core-${tgt}"]
+    "unit"   =  ["type=gha,scope=core-${tgt}"]
     "image"   = ["type=gha,scope=core-${tgt}"]
   }[tgt]
   target = tgt

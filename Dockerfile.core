@@ -24,7 +24,8 @@ RUN make core_lint
 FROM scratch AS output
 COPY --from=build /app/zitadel .
 
-FROM base AS unit-test
+FROM base AS unit
+COPY .git/ .git/
 RUN make core_unit_test
 
 FROM debian:latest AS base-image
