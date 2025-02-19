@@ -1,11 +1,11 @@
 <cnsl-refresh-table
-  [loading]="loading$ | async"
-  (refreshed)="refreshPage()"
-  [dataSize]="totalResult"
+  *ngIf="type$ | async as type"
+  [loading]="loading()"
+  (refreshed)="this.refresh$.next(true)"
+  [dataSize]="dataSize()"
   [hideRefresh]="true"
-  [timestamp]="viewTimestamp"
+  [timestamp]="(users$ | async)?.details?.timestamp"
   [selection]="selection"
-  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
   [showBorder]="true"
 >
   <div leftActions class="user-toggle-group">
@@ -60,12 +60,12 @@
   <cnsl-filter-user
     actions
     *ngIf="!selection.hasValue()"
-    (filterChanged)="applySearchQuery($any($event))"
+    (filterChanged)="this.searchQueries$.next($any($event))"
     (filterOpen)="filterOpen = $event"
   ></cnsl-filter-user>
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button
-      (click)="gotoRouterLink(['/users', type === Type.HUMAN ? 'create' : 'create-machine'])"
+      (click)="router.navigate(['/users', type === Type.HUMAN ? 'create' : 'create-machine'])"
       color="primary"
       mat-raised-button
       [disabled]="(canWrite$ | async) === false"
@@ -77,7 +77,7 @@
         <span>{{ 'ACTIONS.NEW' | translate }}</span>
         <cnsl-action-keys
           *ngIf="!filterOpen"
-          (actionTriggered)="gotoRouterLink(['/users', type === Type.HUMAN ? 'create' : 'create-machine'])"
+          (actionTriggered)="router.navigate(['/users', type === Type.HUMAN ? 'create' : 'create-machine'])"
         >
         </cnsl-action-keys>
       </div>
@@ -85,7 +85,7 @@
   </ng-template>
 
   <div class="table-wrapper">
-    <table class="table" mat-table [dataSource]="dataSource" matSort (matSortChange)="sortChange($event)">
+    <table class="table" mat-table [dataSource]="dataSource" matSort>
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <div class="selection">
@@ -137,7 +137,6 @@
           mat-header-cell
           *matHeaderCellDef
           mat-sort-header
-          [ngClass]="{ 'search-active': this.userSearchKey === UserListSearchKey.DISPLAY_NAME }"
         >
           {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
         </th>
@@ -152,7 +151,6 @@
           mat-header-cell
           *matHeaderCellDef
           mat-sort-header
-          [ngClass]="{ 'search-active': this.userSearchKey === UserListSearchKey.DISPLAY_NAME }"
         >
           {{ 'USER.PROFILE.PREFERREDLOGINNAME' | translate }}
         </th>
@@ -166,7 +164,6 @@
           mat-header-cell
           *matHeaderCellDef
           mat-sort-header
-          [ngClass]="{ 'search-active': this.userSearchKey === UserListSearchKey.USER_NAME }"
         >
           {{ 'USER.PROFILE.USERNAME' | translate }}
         </th>
@@ -180,7 +177,6 @@
           mat-header-cell
           *matHeaderCellDef
           mat-sort-header
-          [ngClass]="{ 'search-active': this.UserListSearchKey === UserListSearchKey.EMAIL }"
         >
           {{ 'USER.EMAIL' | translate }}
         </th>
@@ -250,17 +246,16 @@
     </table>
   </div>
 
-  <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
+  <div *ngIf="!loading() && !dataSource?.data?.length" class="no-content-row">
     <i class="las la-exclamation"></i>
     <span>{{ 'USER.TABLE.EMPTY' | translate }}</span>
   </div>
   <cnsl-paginator
-    #paginator
     class="paginator"
-    [length]="totalResult || 0"
+    [length]="dataSize()"
     [pageSize]="INITIAL_PAGE_SIZE"
-    [timestamp]="viewTimestamp"
+    [timestamp]="(users$ | async)?.details?.timestamp"
     [pageSizeOptions]="[10, 20, 50, 100]"
-    (page)="changePage($event)"
   ></cnsl-paginator>
+  <!--    (page)="changePage($event)"-->
 </cnsl-refresh-table>
