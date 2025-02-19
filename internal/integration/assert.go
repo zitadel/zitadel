@@ -19,6 +19,7 @@ import (
 type Details interface {
 	comparable
 	GetSequence() uint64
+	GetCreationDate() *timestamppb.Timestamp
 	GetChangeDate() *timestamppb.Timestamp
 	GetResourceOwner() string
 }
@@ -61,6 +62,12 @@ func AssertDetails[D Details, M DetailsMsg[D]](t assert.TestingT, expected, actu
 	}
 
 	assert.NotZero(t, gotDetails.GetSequence())
+
+	if wantDetails.GetCreationDate() != nil {
+		wantCreationDate := time.Now()
+		gotCreationDate := gotDetails.GetCreationDate().AsTime()
+		assert.WithinRange(t, gotCreationDate, wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
+	}
 
 	if wantDetails.GetChangeDate() != nil {
 		wantChangeDate := time.Now()
