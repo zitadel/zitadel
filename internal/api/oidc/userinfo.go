@@ -20,7 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -410,5 +412,115 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		}
 	}
 
+	function := exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreUserinfo.LocalizationKey())
+	executionTargets, err := queryExecutionTargets(ctx, s.query, function)
+	if err != nil {
+		return err
+	}
+	info := &ContextInfoPreUserinfo{
+		Function:     function,
+		UserInfo:     userInfo,
+		User:         qu.User,
+		UserMetadata: qu.Metadata,
+		Org:          qu.Org,
+		UserGrants:   qu.UserGrants,
+	}
+
+	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	if err != nil {
+		return err
+	}
+	contextInfoResponse := resp.(*ContextInfoPreUserinfoResponse)
+	claimLogs := make([]string, 0)
+	for _, metadata := range contextInfoResponse.SetUserMetadata {
+		if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+			claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
+		}
+	}
+	for _, claim := range contextInfoResponse.AppendClaims {
+		if strings.HasPrefix(claim.Key, ClaimPrefix) {
+			continue
+		}
+		if userInfo.Claims[claim.Key] == nil {
+			userInfo.AppendClaims(claim.Key, claim.Value)
+			continue
+		}
+		claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", claim.Key))
+	}
+	for _, log := range contextInfoResponse.AppendLogClaims {
+		claimLogs = append(claimLogs, log)
+	}
+	if len(claimLogs) > 0 {
+		userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, function), claimLogs)
+	}
 	return nil
+}
+
+type ContextInfoPreUserinfo struct {
+	Function     string                          `json:"function,omitempty"`
+	UserInfo     *oidc.UserInfo                  `json:"userinfo,omitempty"`
+	User         *query.User                     `json:"user,omitempty"`
+	UserMetadata []query.UserMetadata            `json:"user_metadata,omitempty"`
+	Org          *query.UserInfoOrg              `json:"org,omitempty"`
+	UserGrants   []query.UserGrant               `json:"user_grants,omitempty"`
+	Response     *ContextInfoPreUserinfoResponse `json:"response,omitempty"`
+}
+
+type ContextInfoPreUserinfoResponse struct {
+	SetUserMetadata []*domain.Metadata `json:"set_user_metadata,omitempty"`
+	AppendClaims    []*AppendClaim     `json:"append_claims,omitempty"`
+	AppendLogClaims []string           `json:"append_log_claims,omitempty"`
+}
+
+type AppendClaim struct {
+	Key   string `json:"key"`
+	Value any    `json:"value"`
+}
+
+func (c *ContextInfoPreUserinfo) GetHTTPRequestBody() []byte {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func (c *ContextInfoPreUserinfo) SetHTTPResponseBody(resp []byte) error {
+	if !json.Valid(resp) {
+		return zerrors.ThrowPreconditionFailed(nil, "ACTION-4m9s2", "Errors.Execution.ResponseIsNotValidJSON")
+	}
+	if c.Response == nil {
+		c.Response = &ContextInfoPreUserinfoResponse{}
+	}
+	return json.Unmarshal(resp, c.Response)
+}
+
+func (c *ContextInfoPreUserinfo) GetContent() interface{} {
+	return c.Response
+}
+
+func queryExecutionTargets(ctx context.Context, query *query.Queries, function string) ([]execution.Target, error) {
+	queriedActionsV2, err := query.TargetsByExecutionID(ctx, []string{function})
+	if err != nil {
+		return nil, err
+	}
+	executionTargets := make([]execution.Target, len(queriedActionsV2))
+	for i, action := range queriedActionsV2 {
+		executionTargets[i] = action
+	}
+	return executionTargets, nil
+}
+
+func (s *Server) queryOrgMetadata(ctx context.Context, organizationID string) ([]*query.OrgMetadata, error) {
+	metadata, err := s.query.SearchOrgMetadata(
+		ctx,
+		true,
+		organizationID,
+		&query.OrgMetadataSearchQueries{},
+		false,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return metadata.Metadata, nil
 }

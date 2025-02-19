@@ -460,7 +460,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, idp_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
+	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
