@@ -16,11 +16,47 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
+var permissionCheckV2SetFlag bool
+
+type permissionCheckV2SettingsStruct struct {
+	TestNamePrependString string
+	SetFlag               bool
+}
+
+var permissionCheckV2Settings []permissionCheckV2SettingsStruct = []permissionCheckV2SettingsStruct{
+	{
+		SetFlag:               true,
+		TestNamePrependString: "permission_check_v2 IS SET" + " ",
+	},
+	{
+		SetFlag:               false,
+		TestNamePrependString: "permission_check_v2 IS NOT SET" + " ",
+	},
+}
+
+func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
+	if permissionCheckV2SetFlag == setFlag {
+		return
+	}
+	_, err := Instance.Client.FeatureV2.SetInstanceFeatures(IamCTX, &feature.SetInstanceFeaturesRequest{
+		PermissionCheckV2: &setFlag,
+	})
+	require.NoError(t, err)
+	permissionCheckV2SetFlag = setFlag
+
+}
+
 func TestServer_GetUserByID(t *testing.T) {
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	})
+
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
@@ -148,41 +184,49 @@ func TestServer_GetUserByID(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			userAttr := tt.args.dep(IamCTX, tt.args.req)
+	for _, f := range permissionCheckV2Settings {
+		f := f
+		for _, tt := range tests {
+			t.Run(f.TestNamePrependString+tt.name, func(t *testing.T) {
+				setPermissionCheckV2Flag(t, f.SetFlag)
+				userAttr := tt.args.dep(IamCTX, tt.args.req)
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
-				if tt.wantErr {
-					assert.Error(ttt, err)
-					return
-				}
-				if !assert.NoError(ttt, err) {
-					return
-				}
-
-				tt.want.User.Details = userAttr.Details
-				tt.want.User.UserId = userAttr.UserID
-				tt.want.User.Username = userAttr.Username
-				tt.want.User.PreferredLoginName = userAttr.Username
-				tt.want.User.LoginNames = []string{userAttr.Username}
-				if human := tt.want.User.GetHuman(); human != nil {
-					human.Email.Email = userAttr.Username
-					human.Phone.Phone = userAttr.Phone
-					if tt.want.User.GetHuman().GetPasswordChanged() != nil {
-						human.PasswordChanged = userAttr.Changed
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
+					if tt.wantErr {
+						assert.Error(ttt, err)
+						return
 					}
-				}
-				assert.EqualExportedValues(ttt, tt.want.User, got.User)
-				integration.AssertDetails(ttt, tt.want, got)
-			}, retryDuration, tick)
-		})
+					if !assert.NoError(ttt, err) {
+						return
+					}
+
+					tt.want.User.Details = userAttr.Details
+					tt.want.User.UserId = userAttr.UserID
+					tt.want.User.Username = userAttr.Username
+					tt.want.User.PreferredLoginName = userAttr.Username
+					tt.want.User.LoginNames = []string{userAttr.Username}
+					if human := tt.want.User.GetHuman(); human != nil {
+						human.Email.Email = userAttr.Username
+						human.Phone.Phone = userAttr.Phone
+						if tt.want.User.GetHuman().GetPasswordChanged() != nil {
+							human.PasswordChanged = userAttr.Changed
+						}
+					}
+					assert.EqualExportedValues(ttt, tt.want.User, got.User)
+					integration.AssertDetails(ttt, tt.want, got)
+				}, retryDuration, tick)
+			})
+		}
 	}
 }
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	})
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
@@ -293,32 +337,36 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
-				if tt.wantErr {
-					assert.Error(ttt, err)
-					return
-				}
-				if !assert.NoError(ttt, err) {
-					return
-				}
+	for _, f := range permissionCheckV2Settings {
+		f := f
+		for _, tt := range tests {
+			t.Run(f.TestNamePrependString+tt.name, func(t *testing.T) {
+				setPermissionCheckV2Flag(t, f.SetFlag)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
+					if tt.wantErr {
+						assert.Error(ttt, err)
+						return
+					}
+					if !assert.NoError(ttt, err) {
+						return
+					}
 
-				tt.want.User.UserId = tt.args.req.GetUserId()
-				tt.want.User.Username = newOrgOwnerEmail
-				tt.want.User.PreferredLoginName = newOrgOwnerEmail
-				tt.want.User.LoginNames = []string{newOrgOwnerEmail}
-				if human := tt.want.User.GetHuman(); human != nil {
-					human.Email.Email = newOrgOwnerEmail
-				}
-				// details tested in GetUserByID
-				tt.want.User.Details = got.User.GetDetails()
+					tt.want.User.UserId = tt.args.req.GetUserId()
+					tt.want.User.Username = newOrgOwnerEmail
+					tt.want.User.PreferredLoginName = newOrgOwnerEmail
+					tt.want.User.LoginNames = []string{newOrgOwnerEmail}
+					if human := tt.want.User.GetHuman(); human != nil {
+						human.Email.Email = newOrgOwnerEmail
+					}
+					// details tested in GetUserByID
+					tt.want.User.Details = got.User.GetDetails()
 
-				assert.Equal(ttt, tt.want.User, got.User)
-			}, retryDuration, tick, "timeout waiting for expected user result")
-		})
+					assert.Equal(ttt, tt.want.User, got.User)
+				}, retryDuration, tick, "timeout waiting for expected user result")
+			})
+		}
 	}
 }
 
@@ -371,6 +419,10 @@ func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) 
 }
 
 func TestServer_ListUsers(t *testing.T) {
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	})
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
@@ -938,48 +990,52 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			infos := tt.args.dep(IamCTX, tt.args.req)
+	for _, f := range permissionCheckV2Settings {
+		f := f
+		for _, tt := range tests {
+			t.Run(f.TestNamePrependString+tt.name, func(t *testing.T) {
+				setPermissionCheckV2Flag(t, f.SetFlag)
+				infos := tt.args.dep(IamCTX, tt.args.req)
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
-				if tt.wantErr {
-					require.Error(ttt, err)
-					return
-				}
-				require.NoError(ttt, err)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
+					if tt.wantErr {
+						require.Error(ttt, err)
+						return
+					}
+					require.NoError(ttt, err)
 
-				// always only give back dependency infos which are required for the response
-				require.Len(ttt, tt.want.Result, len(infos))
-				// always first check length, otherwise its failed anyway
-				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
-					tt.want.Details.TotalResult = got.Details.TotalResult
+					// always only give back dependency infos which are required for the response
+					require.Len(ttt, tt.want.Result, len(infos))
+					// always first check length, otherwise its failed anyway
+					if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+						// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
+						tt.want.Details.TotalResult = got.Details.TotalResult
 
-					// fill in userid and username as it is generated
-					for i := range infos {
-						tt.want.Result[i].UserId = infos[i].UserID
-						tt.want.Result[i].Username = infos[i].Username
-						tt.want.Result[i].PreferredLoginName = infos[i].Username
-						tt.want.Result[i].LoginNames = []string{infos[i].Username}
-						if human := tt.want.Result[i].GetHuman(); human != nil {
-							human.Email.Email = infos[i].Username
-							human.Phone.Phone = infos[i].Phone
-							if tt.want.Result[i].GetHuman().GetPasswordChanged() != nil {
-								human.PasswordChanged = infos[i].Changed
+						// fill in userid and username as it is generated
+						for i := range infos {
+							tt.want.Result[i].UserId = infos[i].UserID
+							tt.want.Result[i].Username = infos[i].Username
+							tt.want.Result[i].PreferredLoginName = infos[i].Username
+							tt.want.Result[i].LoginNames = []string{infos[i].Username}
+							if human := tt.want.Result[i].GetHuman(); human != nil {
+								human.Email.Email = infos[i].Username
+								human.Phone.Phone = infos[i].Phone
+								if tt.want.Result[i].GetHuman().GetPasswordChanged() != nil {
+									human.PasswordChanged = infos[i].Changed
+								}
 							}
+							tt.want.Result[i].Details = infos[i].Details
 						}
-						tt.want.Result[i].Details = infos[i].Details
+						for i := range tt.want.Result {
+							assert.EqualExportedValues(ttt, got.Result[i], tt.want.Result[i])
+						}
 					}
-					for i := range tt.want.Result {
-						assert.EqualExportedValues(ttt, got.Result[i], tt.want.Result[i])
-					}
-				}
-				integration.AssertListDetails(ttt, tt.want, got)
-			}, retryDuration, tick, "timeout waiting for expected user result")
-		})
+					integration.AssertListDetails(ttt, tt.want, got)
+				}, retryDuration, tick, "timeout waiting for expected user result")
+			})
+		}
 	}
 }
 
