@@ -127,7 +127,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
       try {
         session = await createSessionAndUpdateCookie(
           checks,
-          undefined,
           command.requestId,
           loginSettings?.passwordCheckLifetime,
         );

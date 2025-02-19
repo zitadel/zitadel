@@ -71,7 +71,6 @@ export async function registerUser(command: RegisterUserCommand) {
 
   const session = await createSessionAndUpdateCookie(
     checks,
-    undefined,
     command.requestId,
     command.password ? loginSettings?.passwordCheckLifetime : undefined,
   );

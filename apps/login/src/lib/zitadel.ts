@@ -237,18 +237,16 @@ export async function getPasswordComplexitySettings({
 export async function createSessionFromChecks({
   serviceUrl,
   checks,
-  challenges,
   lifetime,
 }: {
   serviceUrl: string;
   checks: Checks;
-  challenges: RequestChallenges | undefined;
   lifetime?: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
 
-  return sessionService.createSession({ checks, challenges, lifetime }, {});
+  return sessionService.createSession({ checks, lifetime }, {});
 }
 
 export async function createSessionForUserIdAndIdpIntent({

@@ -48,7 +48,6 @@ const passwordAttemptsHandler = (error: ConnectError) => {
 
 export async function createSessionAndUpdateCookie(
   checks: Checks,
-  challenges: RequestChallenges | undefined,
   requestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
@@ -57,9 +56,7 @@ export async function createSessionAndUpdateCookie(
 
   const createdSession = await createSessionFromChecks({
     serviceUrl,
-
     checks,
-    challenges,
     lifetime,
   });
 

@@ -241,7 +241,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const session = await createSessionAndUpdateCookie(
       checks,
-      undefined,
       command.requestId,
     );
 

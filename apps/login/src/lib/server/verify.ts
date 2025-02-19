@@ -155,11 +155,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       },
     });
 
-    session = await createSessionAndUpdateCookie(
-      checks,
-      undefined,
-      command.requestId,
-    );
+    session = await createSessionAndUpdateCookie(checks, command.requestId);
   }
 
   if (!session?.factors?.user?.id) {
@@ -368,11 +364,7 @@ export async function sendVerificationRedirectWithoutCheck(
       },
     });
 
-    session = await createSessionAndUpdateCookie(
-      checks,
-      undefined,
-      command.requestId,
-    );
+    session = await createSessionAndUpdateCookie(checks, command.requestId);
   }
 
   if (!session?.factors?.user?.id) {
