@@ -25,7 +25,7 @@ jobs:
           targets: output
           no-cache: false
           load: false
-      - run: ls -latr
+      - run: ls -latr .build
       - uses: actions/upload-artifact@v4
         with:
-          path: .build/
+          path: .build
