@@ -51,7 +51,6 @@ const (
 	UserTypeOrgOwner
 	UserTypeLogin
 	UserTypeNoPermission
-	UserTypeHumanNoPermission
 )
 
 const (
@@ -201,7 +200,6 @@ func (i *Instance) setupInstance(ctx context.Context, token string) {
 	i.createLoginClient(ctx)
 	i.createMachineUserNoPermission(ctx)
 	i.createWebAuthNClient()
-	i.createHumanUserNoPermission(ctx)
 }
 
 // Host returns the primary Domain of the instance with the port.
@@ -250,10 +248,6 @@ func (i *Instance) createLoginClient(ctx context.Context) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func (i *Instance) createHumanUserNoPermission(ctx context.Context) {
-	i.createHumanUser(ctx, UserTypeHumanNoPermission)
 }
 
 func (i *Instance) createMachineUserNoPermission(ctx context.Context) {

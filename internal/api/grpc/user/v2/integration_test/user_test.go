@@ -32,7 +32,6 @@ var (
 	CTX       context.Context
 	IamCTX    context.Context
 	UserCTX   context.Context
-	HumanCTX  context.Context
 	SystemCTX context.Context
 	Instance  *integration.Instance
 	Client    user.UserServiceClient
@@ -46,7 +45,6 @@ func TestMain(m *testing.M) {
 		Instance = integration.NewInstance(ctx)
 
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
-		HumanCTX = Instance.WithAuthorization(ctx, integration.UserTypeHumanNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)

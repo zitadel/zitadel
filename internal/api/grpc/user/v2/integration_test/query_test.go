@@ -17,6 +17,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -322,40 +323,6 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 	}
 }
 
-func TestServer_Human_ListUsers(t *testing.T) {
-	tests := []struct {
-		name string
-		want *user.ListUsersResponse
-		err  error
-	}{
-		{
-			name: "list human user, no permission",
-			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
-					TotalResult: 1,
-				},
-				SortingColumn: 0,
-				Result: []*user.User{
-					{
-						UserId: Instance.Users.Get(integration.UserTypeHumanNoPermission).ID,
-					},
-				},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.ListUsers(HumanCTX, &user.ListUsersRequest{})
-			fmt.Printf("got = %+v\n", got)
-			assert.Equal(t, tt.err, err)
-			// TODO: fix below
-			// assert.Equal(t, tt.want.Details.TotalResult, got.Details.TotalResult)
-			assert.Equal(t, tt.want.Result[0].UserId, got.Result[0].UserId)
-		})
-	}
-}
-
 type userAttrs []userAttr
 
 func (u userAttrs) userIDs() []string {
@@ -418,7 +385,7 @@ func TestServer_ListUsers(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list user by id, no permission",
+			name: "list user by id, no permission machine user",
 			args: args{
 				UserCTX,
 				&user.ListUsersRequest{},
@@ -435,6 +402,68 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 				SortingColumn: 0,
 				Result:        []*user.User{},
+			},
+		},
+		{
+			name: "list user by id, no permission human user",
+			args: func() args {
+				info := createUser(IamCTX, orgResp.OrganizationId, true)
+				// create session to get token
+				userID := info.UserID
+				createResp, err := Instance.Client.SessionV2.CreateSession(IamCTX, &session.CreateSessionRequest{
+					Checks: &session.Checks{
+						User: &session.CheckUser{
+							Search: &session.CheckUser_UserId{UserId: userID},
+						},
+						Password: &session.CheckPassword{
+							Password: integration.UserPassword,
+						},
+					},
+				})
+				if err != nil {
+					require.NoError(t, err)
+				}
+				// use token to get ctx
+				HumanCTX := integration.WithAuthorizationToken(IamCTX, createResp.GetSessionToken())
+				return args{
+					HumanCTX,
+					&user.ListUsersRequest{},
+					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+						return []userAttr{info}
+					},
+				}
+			}(),
+			want: &user.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+								PasswordChangeRequired: true,
+								PasswordChanged:        timestamppb.Now(),
+							},
+						},
+					},
+				},
 			},
 		},
 		{
