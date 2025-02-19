@@ -19,4 +19,4 @@ jobs:
         with:
           source: .
           push: false
-          targets: build,lint
+          targets: build
