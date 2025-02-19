@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y npm && npm install -g sass@${SASS_VERSI
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANG_CI_VERSION}
 WORKDIR /app
 COPY go.mod go.sum Makefile buf.gen.yaml buf.work.yaml main.go .golangci.yaml ./
-COPY .git/ .git/
 COPY cmd/ cmd/
 COPY internal/ internal/
 COPY openapi/ openapi/
@@ -19,6 +18,7 @@ FROM base AS build
 RUN make compile_pipeline
 
 FROM base AS lint
+COPY .git/ .git/
 RUN make core_lint
 
 FROM scratch AS output
