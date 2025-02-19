@@ -18,7 +18,7 @@ FROM base AS build
 RUN make compile_pipeline
 
 FROM base AS lint
-COPY .git/ .git/
+COPY .git/ ./.git/
 RUN make core_lint
 
 FROM scratch AS output
