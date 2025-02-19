@@ -17,7 +17,6 @@ RUN make core_build
 
 FROM base AS build
 RUN make compile_pipeline
-RUN ls -la && pwd
 
 FROM base AS lint
 RUN make core_lint

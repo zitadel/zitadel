@@ -49,6 +49,18 @@ target "console" {
     "lint"   = []
     "image"   = ["${REGISTRY}/console:${GITHUB_SHA}"]
   }[tgt]
+  cache-to = {
+    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+  }[tgt]
+    cache-from = {
+    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+  }[tgt]
   target = tgt
 }
 
@@ -82,6 +94,18 @@ target "core" {
     "output" = []
     "lint"   = []
     "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
+  }[tgt]
+    cache-to = {
+    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+  }[tgt]
+    cache-from = {
+    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "output" =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
+    "image"   = ["type=gha,ignore-error=true,mode=max,scope=${tgt}"]
   }[tgt]
   target = tgt
 }

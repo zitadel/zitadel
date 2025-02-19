@@ -12,6 +12,8 @@ jobs:
       group: zitadel-public
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: docker/setup-buildx-action@v3
       - uses: docker/bake-action@v6
         with:
