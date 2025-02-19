@@ -19,4 +19,4 @@ jobs:
         with:
           source: .
           push: false
-          targets: build, test ,lint
+          targets: build, test ,core-unit
