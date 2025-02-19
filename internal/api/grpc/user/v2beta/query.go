@@ -33,7 +33,7 @@ func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*us
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries, filterOrgIds, true, s.checkPermission)
+	res, err := s.query.SearchUsers(ctx, queries, filterOrgIds, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
