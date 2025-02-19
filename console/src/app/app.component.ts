@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
-import { filter, map, takeUntil } from 'rxjs/operators';
+import { filter, map, startWith, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
@@ -275,7 +275,7 @@ export class AppComponent implements OnDestroy {
     const currentUrl = this.router.url;
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       // We use navigateByUrl as our urls may have queryParams
-      this.router.navigateByUrl(currentUrl);
+      this.router.navigateByUrl(currentUrl).then();
     });
   }
 
@@ -283,18 +283,16 @@ export class AppComponent implements OnDestroy {
     this.translate.addLangs(supportedLanguages);
     this.translate.setDefaultLang(fallbackLanguage);
 
-    this.authService.userSubject.pipe(takeUntil(this.destroy$)).subscribe((userprofile) => {
-      if (userprofile) {
-        const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
-        const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
+    this.authService.user.pipe(filter(Boolean), takeUntil(this.destroy$)).subscribe((userprofile) => {
+      const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
+      const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(supportedLanguagesRegexp)
-          ? userprofile.human.profile?.preferredLanguage
-          : fallbackLang;
-        this.translate.use(lang);
-        this.language = lang;
-        this.document.documentElement.lang = lang;
-      }
+      const lang = userprofile?.human?.profile?.preferredLanguage.match(supportedLanguagesRegexp)
+        ? userprofile.human.profile?.preferredLanguage
+        : fallbackLang;
+      this.translate.use(lang);
+      this.language = lang;
+      this.document.documentElement.lang = lang;
     });
   }
 
@@ -308,7 +306,7 @@ export class AppComponent implements OnDestroy {
   }
 
   private setFavicon(theme: string): void {
-    this.authService.labelpolicy.pipe(takeUntil(this.destroy$)).subscribe((lP) => {
+    this.authService.labelpolicy$.pipe(startWith(undefined), takeUntil(this.destroy$)).subscribe((lP) => {
       if (theme === 'dark-theme' && lP?.iconUrlDark) {
         // Check if asset url is stable, maybe it was deleted but still wasn't applied
         fetch(lP.iconUrlDark).then((response) => {

@@ -10387,6 +10387,11 @@ message AddSAMLAppRequest {
       bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
       string metadata_url = 4 [(validate.rules).string.max_len = 200];
   }
+  zitadel.app.v1.LoginVersion login_version = 5 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+      }
+  ];
 }
 
 message AddSAMLAppResponse {
@@ -10551,6 +10556,11 @@ message UpdateSAMLAppConfigRequest {
       bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
       string metadata_url = 4 [(validate.rules).string.max_len = 200];
   }
+  zitadel.app.v1.LoginVersion login_version = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+    }
+  ];
 }
 
 message UpdateSAMLAppConfigResponse {
@@ -14084,6 +14094,8 @@ message AddLDAPProviderRequest {
     google.protobuf.Duration timeout = 10;
     zitadel.idp.v1.LDAPAttributes attributes = 11;
     zitadel.idp.v1.Options provider_options = 12;
+    // Root_ca is for self signing certificates for TLS connections to LDAP servers it is intended to be filled with a .pem file.
+    bytes root_ca = 13 [(validate.rules).bytes.max_len = 12000];
 }
 
 message AddLDAPProviderResponse {
@@ -14105,6 +14117,8 @@ message UpdateLDAPProviderRequest {
     google.protobuf.Duration timeout = 11;
     zitadel.idp.v1.LDAPAttributes attributes = 12;
     zitadel.idp.v1.Options provider_options = 13;
+    // Root_ca is for self signing certificates for TLS connections to LDAP servers it is intended to be filled with a .pem file.
+    bytes root_ca = 14 [(validate.rules).bytes.max_len = 12000];
 }
 
 message UpdateLDAPProviderResponse {
@@ -14492,7 +14506,7 @@ message SetTriggerActionsRequest {
     * - Internal Authentication: 3
     * - Complement Token: 2
     * - Complement SAML Response: 4
-    */ 
+    */
     string flow_type = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
@@ -14503,11 +14517,11 @@ message SetTriggerActionsRequest {
     * - External Authentication:
     *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
     *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
-    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3
     * - Internal Authentication:
     *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
     *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
-    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3
     * - Complement Token:
     *   - Pre Userinfo Creation: 4
     *   - Pre Access Token Creation: 5

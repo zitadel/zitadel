@@ -1,18 +1,17 @@
-import { Directive, Input, OnDestroy, TemplateRef, ViewContainerRef } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { DestroyRef, Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[cnslHasRole]',
 })
-export class HasRoleDirective implements OnDestroy {
-  private destroy$: Subject<void> = new Subject();
+export class HasRoleDirective {
   private hasView: boolean = false;
   @Input() public set hasRole(roles: string[] | RegExp[] | undefined) {
     if (roles && roles.length > 0) {
       this.authService
         .isAllowed(roles)
-        .pipe(takeUntil(this.destroy$))
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((isAllowed) => {
           if (isAllowed && !this.hasView) {
             if (this.viewContainerRef.length !== 0) {
@@ -38,10 +37,6 @@ export class HasRoleDirective implements OnDestroy {
     private authService: GrpcAuthService,
     protected templateRef: TemplateRef<any>,
     protected viewContainerRef: ViewContainerRef,
+    private readonly destroyRef: DestroyRef,
   ) {}
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }
