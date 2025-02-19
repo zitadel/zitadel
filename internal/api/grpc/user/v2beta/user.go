@@ -371,11 +371,11 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.Star
 }
 
 func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
-	session, err := s.command.AuthFromProvider(ctx, idpID, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
 	}
-	_, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), session.PersistentParameters())
+	_, details, err := s.command.CreateIntent(ctx, state, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), session.PersistentParameters())
 	if err != nil {
 		return nil, err
 	}
@@ -385,18 +385,17 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 			Details:  object.DomainToDetailsPb(details),
 			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
 		}, nil
-	} else {
-		return &user.StartIdentityProviderIntentResponse{
-			Details: object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-				PostForm: []byte(content),
-			},
-		}, nil
 	}
+	return &user.StartIdentityProviderIntentResponse{
+		Details: object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
+			PostForm: []byte(content),
+		},
+	}, nil
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
 	if err != nil {
 		return nil, err
 	}
