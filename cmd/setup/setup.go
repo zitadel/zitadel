@@ -474,9 +474,11 @@ func initProjections(
 		config.DefaultInstance.SecretGenerators,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
-	q := queue.NewQueue(&queue.Config{
+	q, err := queue.NewQueue(&queue.Config{
 		Client: queryDBClient,
 	})
+	logging.OnError(err).Fatal("unable to start queue")
+
 	notify_handler.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],

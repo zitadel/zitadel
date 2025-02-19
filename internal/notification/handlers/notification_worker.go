@@ -9,6 +9,8 @@ import (
 
 	"github.com/riverqueue/river"
 
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -82,7 +84,6 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 		return river.JobCancel(errors.New("notification is too old"))
 	}
 	return err
-	// TODO: handle backoff
 }
 
 type WorkerConfig struct {
@@ -98,7 +99,19 @@ type WorkerConfig struct {
 	RetryDelayFactor    float32
 }
 
+// nowFunc makes [time.Now] mockable
 type nowFunc func() time.Time
+
+type Sent func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error
+
+var sentHandlers map[eventstore.EventType]Sent
+
+func RegisterSentHandler(eventType eventstore.EventType, sent Sent) {
+	if sentHandlers == nil {
+		sentHandlers = make(map[eventstore.EventType]Sent)
+	}
+	sentHandlers[eventType] = sent
+}
 
 func NewNotificationWorker(
 	config WorkerConfig,
@@ -182,11 +195,19 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 		args[OTP] = code
 	}
 
-	err = notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel)
-	if err != nil {
+	if err = notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
 		return err
 	}
-	w.commands.HumanEmailVerificationCodeSent()
+	// check early that a "sent" handler exists, otherwise we can cancel early
+	sentHandler, ok := sentHandlers[request.EventType]
+	if !ok {
+		logging.Errorf(`no "sent" handler registered for %s`, request.EventType)
+		return channels.NewCancelError(err)
+	}
+	err = sentHandler(authz.WithInstanceID(ctx, request.Aggregate.InstanceID), w.commands, request.Aggregate.ID, request.Aggregate.ResourceOwner, generatorInfo, args)
+	logging.WithFields("instanceID", request.Aggregate.InstanceID, "notification", request.Aggregate.ID).
+		OnError(err).Error("could not set notification event on aggregate")
+	return nil
 }
 
 func (w *NotificationWorker) exponentialBackOff(current time.Duration) time.Duration {

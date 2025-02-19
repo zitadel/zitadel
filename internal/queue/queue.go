@@ -24,8 +24,8 @@ type Config struct {
 	Client *database.DB `mapstructure:"-"`
 }
 
-func NewQueue(config *Config) *Queue {
-	return &Queue{
+func NewQueue(config *Config) (_ *Queue, err error) {
+	q := &Queue{
 		driver: riverpgxv5.New(config.Client.Pool),
 		config: &river.Config{
 			Workers:    river.NewWorkers(),
@@ -33,14 +33,18 @@ func NewQueue(config *Config) *Queue {
 			JobTimeout: -1,
 		},
 	}
+
+	return q, nil
 }
 
 func (q *Queue) Start(ctx context.Context) (err error) {
 	ctx = WithQueue(ctx)
+
 	q.client, err = river.NewClient(q.driver, q.config)
 	if err != nil {
 		return err
 	}
+
 	return q.client.Start(ctx)
 }
 
