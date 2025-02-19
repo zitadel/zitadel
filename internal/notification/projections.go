@@ -38,6 +38,10 @@ func Register(
 	client *database.DB,
 	queue *queue.Queue,
 ) {
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.ShouldStart()
+	}
+
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig.LegacyEnabled, queue))

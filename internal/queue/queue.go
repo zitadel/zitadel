@@ -17,7 +17,8 @@ type Queue struct {
 	driver riverdriver.Driver[pgx.Tx]
 	client *river.Client[pgx.Tx]
 
-	config *river.Config
+	config      *river.Config
+	shouldStart bool
 }
 
 type Config struct {
@@ -37,7 +38,14 @@ func NewQueue(config *Config) (_ *Queue, err error) {
 	return q, nil
 }
 
+func (q *Queue) ShouldStart() {
+	q.shouldStart = true
+}
+
 func (q *Queue) Start(ctx context.Context) (err error) {
+	if !q.shouldStart {
+		return nil
+	}
 	ctx = WithQueue(ctx)
 
 	q.client, err = river.NewClient(q.driver, q.config)
