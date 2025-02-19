@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"testing"
@@ -68,6 +69,10 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 			continue
 		}
 		time.Sleep(10 * time.Second)
+	}
+
+	if flagSet == false {
+		require.NoError(t, errors.New("unable to set permission_check_v2 flag"))
 	}
 	permissionCheckV2SetFlagInital = true
 	permissionCheckV2SetFlag = setFlag
