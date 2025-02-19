@@ -16,6 +16,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
+import { NavToggleModule } from 'src/app/modules/nav-toggle/nav-toggle.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -25,6 +26,7 @@ import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/pro
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { GroupGrantsModule } from 'src/app/modules/group-grants/group-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
@@ -37,6 +39,7 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
   imports: [
     CommonModule,
     UserGrantsModule,
+    GroupGrantsModule,
     GrantedProjectsRoutingModule,
     ContributorsModule,
     FormsModule,
@@ -47,6 +50,7 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
     PaginatorModule,
     InputModule,
     ChangesModule,
+    NavToggleModule,
     MatIconModule,
     MatSelectModule,
     MatButtonModule,

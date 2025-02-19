@@ -46,6 +46,7 @@ export class OwnedProjectDetailComponent implements OnInit {
 
   public ProjectState: any = ProjectState;
   public ChangeType: any = ChangeType;
+  public listType: any = 'default';
 
   public grid: boolean = true;
 
@@ -325,5 +326,17 @@ export class OwnedProjectDetailComponent implements OnInit {
     if (this.project) {
       this.router.navigate(['projects', this.project.id, 'members']);
     }
+  }
+
+  public setType(listType: any): void {
+    this.listType = listType;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        listType: listType,
+      },
+      replaceUrl: true,
+      skipLocationChange: false,
+    });
   }
 }

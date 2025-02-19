@@ -29,6 +29,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   public isZitadel: boolean = false;
   public UserGrantContext: any = UserGrantContext;
   private subscription: Subscription = new Subscription();
+  public listType: any = 'default';
 
   // members
   public totalMemberResult: number = 0;
@@ -154,5 +155,17 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     if (this.project) {
       this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
     }
+  }
+
+  public setType(listType: any): void {
+    this.listType = listType;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        listType: listType,
+      },
+      replaceUrl: true,
+      skipLocationChange: false,
+    });
   }
 }

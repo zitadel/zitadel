@@ -2,10 +2,17 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ListGroupGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
-import { GroupGrantQuery, GroupGrant } from 'src/app/proto/generated/zitadel/group_pb';
+import { GroupGrantQuery, GroupGrant, GroupGrantProjectIDQuery, GroupGrantProjectGrantIDQuery } from 'src/app/proto/generated/zitadel/group_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 type GroupGrantAsObject = GroupGrant.AsObject;
+
+export enum GroupGrantContext {
+  NONE = 'none',
+  OWNED_PROJECT = 'owned',
+  GRANTED_PROJECT = 'granted',
+}
+
 
 export class GroupGrantsDataSource extends DataSource<GroupGrantAsObject> {
   public totalResult: number = 0;
@@ -20,6 +27,7 @@ export class GroupGrantsDataSource extends DataSource<GroupGrantAsObject> {
   }
 
   public loadGrants(
+    context: GroupGrantContext,
     pageIndex: number,
     pageSize: number,
     data: {
@@ -29,9 +37,57 @@ export class GroupGrantsDataSource extends DataSource<GroupGrantAsObject> {
     },
     queries?: GroupGrantQuery[],
   ): void {
-    this.loadingSubject.next(true);
-    const promise3 = this.groupService.listGroupGrants(pageSize, pageSize * pageIndex, queries ?? []);
-    this.loadResponse(promise3);
+    switch (context) {
+      case GroupGrantContext.OWNED_PROJECT:
+        if (data && data.projectId) {
+          this.loadingSubject.next(true);
+
+          const projectfilter = new GroupGrantQuery();
+          const ugPfq = new GroupGrantProjectIDQuery();
+          ugPfq.setProjectId(data.projectId);
+          projectfilter.setProjectIdQuery(ugPfq);
+
+          if (queries) {
+            queries.push(projectfilter);
+          } else {
+            queries = [projectfilter];
+          }
+
+          const promise1 = this.groupService.listGroupGrants(pageSize, pageSize * pageIndex, queries);
+          this.loadResponse(promise1);
+        }
+        break;
+      case GroupGrantContext.GRANTED_PROJECT:
+        if (data && data.grantId && data.projectId) {
+          this.loadingSubject.next(true);
+
+          const grantfilter = new GroupGrantQuery();
+
+          const uggiq = new GroupGrantProjectGrantIDQuery();
+          uggiq.setProjectGrantId(data.grantId);
+          grantfilter.setProjectGrantIdQuery(uggiq);
+
+          const projectfilter = new GroupGrantQuery();
+          const ugPfq = new GroupGrantProjectIDQuery();
+          ugPfq.setProjectId(data.projectId);
+          projectfilter.setProjectIdQuery(ugPfq);
+
+          if (queries) {
+            queries.push(grantfilter);
+          } else {
+            queries = [grantfilter];
+          }
+
+          const promise2 = this.groupService.listGroupGrants(pageSize, pageSize * pageIndex, queries);
+          this.loadResponse(promise2);
+        }
+        break;
+      default:
+        this.loadingSubject.next(true);
+        const promise3 = this.groupService.listGroupGrants(pageSize, pageSize * pageIndex, queries ?? []);
+        this.loadResponse(promise3);
+        break;
+    }
   }
 
   private loadResponse(promise: Promise<ListGroupGrantResponse.AsObject>): void {
