@@ -133,11 +133,7 @@
       </ng-container>
 
       <ng-container matColumnDef="displayName">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          mat-sort-header
-        >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
         </th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.userId ? ['/users', user.userId] : null">
@@ -147,11 +143,7 @@
       </ng-container>
 
       <ng-container matColumnDef="preferredLoginName">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          mat-sort-header
-        >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'USER.PROFILE.PREFERREDLOGINNAME' | translate }}
         </th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.userId ? ['/users', user.userId] : null">
@@ -160,11 +152,7 @@
       </ng-container>
 
       <ng-container matColumnDef="username">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          mat-sort-header
-        >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'USER.PROFILE.USERNAME' | translate }}
         </th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.userId ? ['/users', user.userId] : null">
@@ -173,11 +161,7 @@
       </ng-container>
 
       <ng-container matColumnDef="email">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          mat-sort-header
-        >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'USER.EMAIL' | translate }}
         </th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.userId ? ['/users', user.userId] : null">

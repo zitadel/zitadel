@@ -32,6 +32,8 @@ import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
 import { UserState, User as UserV2 } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 type Query = Exclude<
   Exclude<MessageInitShape<typeof ListUsersRequestSchema>['queries'], undefined>[number]['query'],
@@ -107,6 +109,8 @@ export class UserTableComponent implements OnInit {
     private readonly dialog: MatDialog,
     private readonly route: ActivatedRoute,
     private readonly destroyRef: DestroyRef,
+    private readonly authenticationService: AuthenticationService,
+    private readonly authService: GrpcAuthService,
   ) {
     this.type$ = this.getType$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.users$ = this.getUsers(this.type$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
@@ -216,14 +220,17 @@ export class UserTableComponent implements OnInit {
   }
 
   private getQueries(type$: Observable<Type>): Observable<Query[]> {
+    const activeOrgId$ = this.getActiveOrgId();
+
     return this.searchQueries$.pipe(
       startWith([]),
-      combineLatestWith(type$),
-      switchMap(([queries, type]) =>
+      combineLatestWith(type$, activeOrgId$),
+      switchMap(([queries, type, organizationId]) =>
         from(queries).pipe(
           map((query) => this.searchQueryToV2(query.toObject())),
-          filter(Boolean),
           startWith({ case: 'typeQuery' as const, value: { type } }),
+          startWith(organizationId ? { case: 'organizationIdQuery' as const, value: { organizationId } } : undefined),
+          filter(Boolean),
           toArray(),
         ),
       ),
@@ -444,5 +451,21 @@ export class UserTableComponent implements OnInit {
   public get multipleDeactivatePossible(): boolean {
     const selected = this.selection.selected;
     return selected ? selected.findIndex((user) => user.state !== UserState.INACTIVE) > -1 : false;
+  }
+
+  private getActiveOrgId() {
+    return this.authenticationService.authenticationChanged.pipe(
+      startWith(true),
+      filter(Boolean),
+      switchMap(() =>
+        from(this.authService.getActiveOrg()).pipe(
+          catchError((err) => {
+            this.toast.showError(err);
+            return of(undefined);
+          }),
+        ),
+      ),
+      map((org) => org?.id),
+    );
   }
 }

@@ -11,7 +11,6 @@ import {
   DeactivateUserResponse,
   DeleteUserRequestSchema,
   DeleteUserResponse,
-  GetUserByIDRequestSchema,
   GetUserByIDResponse,
   ListAuthenticationFactorsRequestSchema,
   ListAuthenticationFactorsResponse,
@@ -145,7 +144,7 @@ export class UserService {
   }
 
   public getUserById(userId: string): Promise<GetUserByIDResponse> {
-    return this.grpcService.userNew.getUserByID(create(GetUserByIDRequestSchema, { userId }));
+    return this.grpcService.userNew.getUserByID({ userId });
   }
 
   public deactivateUser(userId: string): Promise<DeactivateUserResponse> {

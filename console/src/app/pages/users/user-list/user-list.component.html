@@ -7,10 +7,6 @@
       </a>
     </div>
     <p class="user-list-sub cnsl-secondary-text">{{ 'DESCRIPTIONS.USERS.DESCRIPTION' | translate }}</p>
-      <cnsl-user-table
-        [canWrite$]="['user.write$'] | hasRole"
-        [canDelete$]="['user.delete$'] | hasRole"
-      >
-      </cnsl-user-table>
+    <cnsl-user-table [canWrite$]="['user.write$'] | hasRole" [canDelete$]="['user.delete$'] | hasRole"> </cnsl-user-table>
   </div>
 </div>
