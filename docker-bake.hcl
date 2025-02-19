@@ -6,6 +6,10 @@ variable "REGISTRY" {
   default = "ghcr.io/zitadel"
 }
 
+group "all" {
+  targets = ["build", "output", "lint", "image", "unit"]
+}
+
 group "build" {
   targets = ["console-build", "core-build"]
 }
@@ -20,6 +24,10 @@ group "lint" {
 
 group "image" {
   targets = ["console-image", "core-image"]
+}
+
+group "unit" {
+  targets = ["core-unit"]
 }
 
 target "_console" {
