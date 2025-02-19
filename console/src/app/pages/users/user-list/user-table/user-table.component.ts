@@ -29,11 +29,12 @@ import { UserService } from 'src/app/services/user.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
-import { UserState, User as UserV2 } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { UserState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { UserState as UserStateV1 } from 'src/app/proto/generated/zitadel/user_pb';
 
 type Query = Exclude<
   Exclude<MessageInitShape<typeof ListUsersRequestSchema>['queries'], undefined>[number]['query'],
@@ -67,12 +68,12 @@ export class UserTableComponent implements OnInit {
 
   protected readonly INITIAL_PAGE_SIZE = 20;
 
-  protected readonly dataSource: MatTableDataSource<UserV2> = new MatTableDataSource<UserV2>();
-  protected readonly selection: SelectionModel<UserV2> = new SelectionModel<UserV2>(true, []);
+  protected readonly dataSource: MatTableDataSource<User> = new MatTableDataSource<User>();
+  protected readonly selection: SelectionModel<User> = new SelectionModel<User>(true, []);
   protected readonly users$: Observable<ListUsersResponse>;
   protected readonly type$: Observable<Type>;
   protected readonly searchQueries$ = new ReplaySubject<UserSearchQuery[]>(1);
-  protected readonly myUser: Signal<UserV2 | undefined>;
+  protected readonly myUser: Signal<User | undefined>;
 
   @Input() public displayedColumnsHuman: string[] = [
     'select',
@@ -94,7 +95,7 @@ export class UserTableComponent implements OnInit {
     'actions',
   ];
 
-  @Output() public changedSelection: EventEmitter<Array<UserV2>> = new EventEmitter();
+  @Output() public changedSelection: EventEmitter<Array<User>> = new EventEmitter();
 
   protected readonly UserState = UserState;
 
@@ -266,12 +267,28 @@ export class UserTableComponent implements OnInit {
       return {
         case: 'stateQuery' as const,
         value: {
-          // todo: fix these states
-          state: query.stateQuery.state as unknown as any,
+          state: this.toV2State(query.stateQuery.state),
         },
       };
     } else {
       return undefined;
+    }
+  }
+
+  private toV2State(state: UserStateV1) {
+    switch (state) {
+      case UserStateV1.USER_STATE_ACTIVE:
+        return UserState.ACTIVE;
+      case UserStateV1.USER_STATE_INACTIVE:
+        return UserState.INACTIVE;
+      case UserStateV1.USER_STATE_DELETED:
+        return UserState.DELETED;
+      case UserStateV1.USER_STATE_LOCKED:
+        return UserState.LOCKED;
+      case UserStateV1.USER_STATE_INITIAL:
+        return UserState.INITIAL;
+      default:
+        throw new Error(`Invalid UserState ${state}`);
     }
   }
 
@@ -382,7 +399,7 @@ export class UserTableComponent implements OnInit {
     }, 1000);
   }
 
-  public deleteUser(user: UserV2): void {
+  public deleteUser(user: User): void {
     const authUserData = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',

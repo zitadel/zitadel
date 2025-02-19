@@ -31,14 +31,12 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   private searchQueries: UserSearchQuery[] = [];
 
-  // todo: only have v2 compatible states
   public states: UserState[] = [
     UserState.USER_STATE_ACTIVE,
     UserState.USER_STATE_INACTIVE,
     UserState.USER_STATE_DELETED,
-    UserState.USER_STATE_INITIAL,
     UserState.USER_STATE_LOCKED,
-    UserState.USER_STATE_SUSPEND,
+    UserState.USER_STATE_INITIAL,
   ];
   constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
     super(router, route, destroyRef);
