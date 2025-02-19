@@ -40,7 +40,7 @@ func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallback
 	}
 }
 
-func (s *Server) GetDeviceAuthorization(ctx context.Context, req *oidc_pb.GetDeviceAuthorizationRequest) (*oidc_pb.GetDeviceAuthorizationResponse, error) {
+func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *oidc_pb.GetDeviceAuthorizationRequestRequest) (*oidc_pb.GetDeviceAuthorizationRequestResponse, error) {
 	deviceRequest, err := s.query.DeviceAuthRequestByUserCode(ctx, req.GetUserCode())
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (s *Server) GetDeviceAuthorization(ctx context.Context, req *oidc_pb.GetDev
 	if err != nil {
 		return nil, err
 	}
-	return &oidc_pb.GetDeviceAuthorizationResponse{
+	return &oidc_pb.GetDeviceAuthorizationRequestResponse{
 		DeviceAuthorizationRequest: &oidc_pb.DeviceAuthorizationRequest{
 			DeviceAuthorizationId: base64.RawStdEncoding.EncodeToString(encrypted),
 			ClientId:              deviceRequest.ClientID,
