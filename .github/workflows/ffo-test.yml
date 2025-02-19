@@ -73,3 +73,33 @@ jobs:
           targets: build, lint ,core-unit
           no-cache: false
           load: false
+
+  depot-gh-no-cache:
+    timeout-minutes: 20
+    runs-on: depot-ubuntu-22.04-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/bake-action@v6
+        with:
+          push: false
+          targets: build, lint ,core-unit
+          no-cache: true
+          load: false
+
+  depot-gh-cache:
+    timeout-minutes: 20
+    runs-on: depot-ubuntu-22.04-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/bake-action@v6
+        with:
+          push: false
+          targets: build, lint ,core-unit
+          no-cache: false
+          load: false
