@@ -13,7 +13,7 @@ import (
 const (
 	// eventstore.permitted_orgs(instanceid text, userid text, perm text, filter_orgs text)
 	wherePermittedOrgsClause              = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?))"
-	wherePermittedOrgsOrCurrentUserClause = "(" + wherePermittedOrgsClause + " OR %s = '%s'" + ")"
+	wherePermittedOrgsOrCurrentUserClause = "(" + wherePermittedOrgsClause + " OR %s = ?" + ")"
 )
 
 // wherePermittedOrgs sets a `WHERE` clause to the query that filters the orgs
@@ -43,10 +43,11 @@ func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "user_id_colum", userIdColum, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
 
 	return query.Where(
-		fmt.Sprintf(wherePermittedOrgsOrCurrentUserClause, orgIDColumn, userIdColum, userID),
+		fmt.Sprintf(wherePermittedOrgsOrCurrentUserClause, orgIDColumn, userIdColum),
 		authz.GetInstance(ctx).InstanceID(),
 		userID,
 		permission,
 		filterOrgIds,
+		userID,
 	)
 }
