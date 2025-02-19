@@ -29,3 +29,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           path: .build
+          include-hidden-files: true
