@@ -2,13 +2,10 @@
 package integration
 
 import (
-	"bytes"
 	"context"
 	_ "embed"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"

@@ -1,10 +1,7 @@
 package integration
 
 import (
-	"bytes"
 	_ "embed"
-	"os/exec"
-	"path/filepath"
 
 	"github.com/zitadel/logging"
 	"sigs.k8s.io/yaml"
