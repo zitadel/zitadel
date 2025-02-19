@@ -48,6 +48,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: depot/setup-action@v1
       - uses: depot/bake-action@v1
         with:
           project: w47wkxzdtw
@@ -64,6 +65,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: depot/setup-action@v1
       - uses: depot/bake-action@v1
         with:
           project: w47wkxzdtw
