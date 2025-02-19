@@ -25,3 +25,6 @@ jobs:
           targets: all
           no-cache: false
           load: false
+      - uses: actions/upload-artifact@v4
+        with:
+          path: .build/
