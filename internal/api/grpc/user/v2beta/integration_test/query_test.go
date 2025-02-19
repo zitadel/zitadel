@@ -395,7 +395,7 @@ func TestServer_ListUsers(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list user by id, no permission",
+			name: "list user by id, no permission machine user",
 			args: args{
 				UserCTX,
 				&user.ListUsersRequest{},
