@@ -1,0 +1,54 @@
+FROM golang AS base
+ARG SASS_VERSION=
+ARG GOLANG_CI_VERSION=
+RUN apt-get update && apt-get install -y npm && npm install -g sass@${SASS_VERSION}
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANG_CI_VERSION}
+WORKDIR /app
+COPY go.mod go.sum Makefile buf.gen.yaml buf.work.yaml main.go .golangci.yaml ./
+COPY .git/ .git/
+COPY cmd/ cmd/
+COPY internal/ internal/
+COPY openapi/ openapi/
+COPY pkg/ pkg/
+COPY proto/ proto/
+COPY statik/ statik/
+COPY --from=console ./ internal/api/ui/console/static
+RUN make core_build
+
+FROM base AS build
+RUN make compile_pipeline
+RUN ls -la && pwd
+
+FROM base AS lint
+RUN make core_lint
+
+FROM scratch AS output
+COPY --from=build /app/zitadel .
+
+FROM base AS unit-test
+RUN make core_unit_test
+
+FROM debian:latest AS base-image
+ENV ZITADEL_ARGS=
+ARG TARGETPLATFORM
+RUN apt-get update && apt-get install ca-certificates -y
+COPY build/entrypoint.sh /app/entrypoint.sh
+COPY --from=build /app/zitadel /app/zitadel
+RUN useradd -s "" --home / zitadel && \
+    chown zitadel /app/zitadel && \
+    chmod +x /app/zitadel && \
+    chown zitadel /app/entrypoint.sh && \
+    chmod +x /app/entrypoint.sh
+WORKDIR /app
+ENV PATH="/app:${PATH}"
+USER zitadel
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+FROM scratch AS image
+ARG TARGETPLATFORM
+COPY --from=base-image /etc/passwd /etc/passwd
+COPY --from=base-image /etc/ssl/certs /etc/ssl/certs
+COPY --from=base-image /app/zitadel /app/zitadel
+HEALTHCHECK NONE
+USER zitadel
+ENTRYPOINT ["/app/zitadel"]

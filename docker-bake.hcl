@@ -3,11 +3,7 @@ variable "GITHUB_SHA" {
 }
 
 variable "REGISTRY" {
-  default = "ghcr.io/fforootd"
-}
-
-group "generate" {
-  targets = ["console-base", "core-base"]
+  default = "ghcr.io/zitadel"
 }
 
 group "build" {
@@ -18,62 +14,70 @@ group "output" {
   targets = ["console-output", "core-output"]
 }
 
-group "unit-test" {
-  targets = ["core-unit-test"]
+group "image" {
+  targets = ["console-image", "core-image"]
 }
 
-group "lint" {
-  targets = ["console-lint", "core-lint"]
+target "_console" {
+  dockerfile = "Dockerfile.console"
+  context = "."
+  contexts = {
+    node = "docker-image://node:22"
+    nginx = "docker-image://nginx:1.27-alpine"
+  }
 }
 
-target "console-base" {
-  target = "console-base"
+target "console" {
+  name     = "console-${tgt}"
+  inherits = ["_console"]
+  matrix = {
+    tgt = ["build", "output", "lint", "image"]
+  }
+  output = {
+    "build"  = ["type=cacheonly"]
+    "output" = ["type=local,dest=.build/console"]
+    "lint"   = ["type=cacheonly"]
+    "image"   = ["type=docker"]
+  }[tgt]
+  tags = {
+    "build"  = []
+    "output" = []
+    "lint"   = []
+    "image"   = ["${REGISTRY}/console:latest"]
+  }[tgt]
+  target = tgt
 }
 
-target "console-build" {
-  target = "console-build"
+target "_core" {
+  dockerfile = "Dockerfile.core"
+  context = "."
+  contexts = {
+    node = "docker-image://golang:1.23"
+    console = "target:console-output"
+  }
+  args = {
+    SASS_VERSION      = "1.64.1"
+    GOLANG_CI_VERSION = "1.64.5"
+  }
 }
 
-target "console-lint" {
-  target = "console-lint"
-}
-
-target "console-image" {
-  target = "console-image"
-  tags = [
-    "${REGISTRY}/console:${GITHUB_SHA}",
-  ]
-}
-
-target "console-output" {
-  target = "console-output"
-  output = ["type=local,dest=.build/console"]
-}
-
-target "core-base" {
-  target = "core-base"
-}
-
-target "core-build" {
-  target = "core-build"
-}
-
-target "core-lint" {
-  target = "core-lint"
-}
-
-target "core-image" {
-  target = "core-image"
-  tags = [
-    "${REGISTRY}/zitadel:${GITHUB_SHA}",
-  ]
-}
-
-target "core-output" {
-  target = "core-output"
-  output = ["type=local,dest=.build/core"]
-}
-
-target "core-unit-test" {
-  target = "core-unit-test"
+target "core" {
+  name     = "core-${tgt}"
+  inherits = ["_core"]
+  matrix = {
+    tgt = ["build", "output", "lint", "image"]
+  }
+  output = {
+    "build"  = ["type=cacheonly"]
+    "output" = ["type=local,dest=.build/core"]
+    "lint"   = ["type=cacheonly"]
+    "image"   = ["type=docker"]
+  }[tgt]
+  tags = {
+    "build"  = []
+    "output" = []
+    "lint"   = []
+    "image"   = ["${REGISTRY}/zitadel:latest"]
+  }[tgt]
+  target = tgt
 }
