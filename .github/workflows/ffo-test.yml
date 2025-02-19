@@ -20,3 +20,4 @@ jobs:
           source: .
           push: false
           targets: build
+          load: true
