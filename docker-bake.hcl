@@ -6,6 +6,8 @@ variable "REGISTRY" {
   default = "ghcr.io/zitadel"
 }
 
+
+## TODO replace with matix groups
 group "build" {
   targets = ["console-build", "core-build"]
 }
