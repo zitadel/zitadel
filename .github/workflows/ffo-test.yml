@@ -6,7 +6,7 @@ on:
       - docker-bake
 
 jobs:
-  test:
+  unloaded:
     timeout-minutes: 20
     runs-on:
       group: zitadel-public
@@ -21,3 +21,21 @@ jobs:
           push: false
           targets: build, lint ,core-unit
           no-cache: true
+          load: true
+
+  loaded:
+    timeout-minutes: 20
+    runs-on:
+      group: zitadel-public
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/bake-action@v6
+        with:
+          source: .
+          push: false
+          targets: build, lint ,core-unit
+          no-cache: true
+          load: false
