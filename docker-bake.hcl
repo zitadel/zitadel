@@ -6,7 +6,6 @@ variable "REGISTRY" {
   default = "ghcr.io/zitadel"
 }
 
-## TODO replace with matix groups
 group "build" {
   targets = ["console-build", "core-build"]
 }
@@ -44,7 +43,7 @@ target "console" {
     "build"  = []
     "output" = []
     "lint"   = []
-    "image"   = ["${REGISTRY}/console:latest"]
+    "image"   = ["${REGISTRY}/console:${GITHUB_SHA}"]
   }[tgt]
   target = tgt
 }
@@ -78,7 +77,7 @@ target "core" {
     "build"  = []
     "output" = []
     "lint"   = []
-    "image"   = ["${REGISTRY}/zitadel:latest"]
+    "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
   }[tgt]
   target = tgt
 }

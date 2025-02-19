@@ -1,0 +1,20 @@
+name: "Docker Bake Test"
+
+on:
+  push:
+    branches:
+      - docker-bake
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on:
+      group: zitadel-public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/bake-action@v6
+        with:
+          source: .
+          push: false
+          targets: build,lint
