@@ -22,9 +22,10 @@ jobs:
         with:
           source: .
           push: false
-          targets: all
+          targets: output
           no-cache: false
           load: false
+      - run: ls -latr
       - uses: actions/upload-artifact@v4
         with:
           path: .build/
