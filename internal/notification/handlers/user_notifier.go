@@ -90,7 +90,7 @@ type userNotifier struct {
 	queries      *NotificationQueries
 	otpEmailTmpl string
 
-	queue       *queue.Queue
+	queue       Queue
 	maxAttempts uint8
 }
 
@@ -102,7 +102,7 @@ func NewUserNotifier(
 	channels types.ChannelChains,
 	otpEmailTmpl string,
 	legacyMode bool,
-	queue *queue.Queue,
+	queue Queue,
 ) *handler.Handler {
 	if legacyMode {
 		return NewUserNotifierLegacy(ctx, config, commands, queries, channels, otpEmailTmpl)
@@ -203,7 +203,6 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-EFe2f", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
 	}
-
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 		ctx := HandlerContext(event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,

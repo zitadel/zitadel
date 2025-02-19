@@ -62,21 +62,21 @@ func (q *Queue) AddWorkers(w ...Worker) {
 	}
 }
 
-type insertOpt func(*river.InsertOpts)
+type InsertOpt func(*river.InsertOpts)
 
-func WithMaxAttempts(maxAttempts uint8) insertOpt {
+func WithMaxAttempts(maxAttempts uint8) InsertOpt {
 	return func(opts *river.InsertOpts) {
 		opts.MaxAttempts = int(maxAttempts)
 	}
 }
 
-func WithQueueName(name string) insertOpt {
+func WithQueueName(name string) InsertOpt {
 	return func(opts *river.InsertOpts) {
 		opts.Queue = name
 	}
 }
 
-func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...insertOpt) error {
+func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...InsertOpt) error {
 	options := new(river.InsertOpts)
 	ctx = WithQueue(ctx)
 	for _, opt := range opts {
