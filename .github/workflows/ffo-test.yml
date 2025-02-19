@@ -5,25 +5,12 @@ on:
     branches:
       - docker-bake
 
-jobs:
-  unloaded:
-    timeout-minutes: 20
-    runs-on:
-      group: zitadel-public
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/bake-action@v6
-        with:
-          source: .
-          push: false
-          targets: build, lint ,core-unit
-          no-cache: true
-          load: true
+permissions:
+  id-token: write
+  contents: read
 
-  loaded:
+jobs:
+  github-no-cache:
     timeout-minutes: 20
     runs-on:
       group: zitadel-public
@@ -34,8 +21,53 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/bake-action@v6
         with:
-          source: .
           push: false
           targets: build, lint ,core-unit
           no-cache: true
+
+  github-cache:
+    timeout-minutes: 20
+    runs-on:
+      group: zitadel-public
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/bake-action@v6
+        with:
+          push: false
+          targets: build, lint ,core-unit
+          no-cache: false
+
+  depot-no-cache:
+    timeout-minutes: 20
+    runs-on:
+      group: zitadel-public
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: depot/bake-action@v1
+        with:
+          project: w47wkxzdtw
+          push: false
+          targets: build, lint ,core-unit
+          no-cache: true
+          load: false
+
+  depot-cache:
+    timeout-minutes: 20
+    runs-on:
+      group: zitadel-public
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: depot/bake-action@v1
+        with:
+          project: w47wkxzdtw
+          push: false
+          targets: build, lint ,core-unit
+          no-cache: false
           load: false
