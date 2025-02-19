@@ -20,6 +20,7 @@ func WithOrigin(fallBackToHttps bool, http1Header, http2Header string, instanceH
 				slices.Compact(append(instanceHostHeaders, http1Header, http2Header, http_util.Forwarded, http_util.ZitadelForwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto)),
 				publicDomainHeaders,
 			)
+			r.Host = origin.RequestedHost()
 			next.ServeHTTP(w, r.WithContext(http_util.WithDomainContext(r.Context(), origin)))
 		})
 	}
