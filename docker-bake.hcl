@@ -14,6 +14,10 @@ group "output" {
   targets = ["console-output", "core-output"]
 }
 
+group "lint" {
+  targets = ["console-lint", "core-lint"]
+}
+
 group "image" {
   targets = ["console-image", "core-image"]
 }
