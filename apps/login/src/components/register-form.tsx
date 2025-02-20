@@ -36,7 +36,7 @@ type Props = {
   lastname?: string;
   email?: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
   loginSettings?: LoginSettings;
 };
 
@@ -46,7 +46,7 @@ export function RegisterForm({
   firstname,
   lastname,
   organization,
-  authRequestId,
+  requestId,
   loginSettings,
 }: Props) {
   const t = useTranslations("register");
@@ -73,7 +73,7 @@ export function RegisterForm({
       firstName: values.firstname,
       lastName: values.lastname,
       organization: organization,
-      authRequestId: authRequestId,
+      requestId: requestId,
     })
       .catch(() => {
         setError("Could not register user");
@@ -105,8 +105,8 @@ export function RegisterForm({
       registerParams.organization = organization;
     }
 
-    if (authRequestId) {
-      registerParams.authRequestId = authRequestId;
+    if (requestId) {
+      registerParams.requestId = requestId;
     }
 
     // redirect user to /register/password if password is chosen

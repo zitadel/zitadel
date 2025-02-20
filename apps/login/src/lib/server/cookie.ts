@@ -30,7 +30,7 @@ type CustomCookieData = {
   creationTs: string;
   expirationTs: string;
   changeTs: string;
-  authRequestId?: string; // if its linked to an OIDC flow
+  requestId?: string; // if its linked to an OIDC flow
 };
 
 const passwordAttemptsHandler = (error: ConnectError) => {
@@ -48,8 +48,7 @@ const passwordAttemptsHandler = (error: ConnectError) => {
 
 export async function createSessionAndUpdateCookie(
   checks: Checks,
-  challenges: RequestChallenges | undefined,
-  authRequestId: string | undefined,
+  requestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
@@ -57,9 +56,7 @@ export async function createSessionAndUpdateCookie(
 
   const createdSession = await createSessionFromChecks({
     serviceUrl,
-
     checks,
-    challenges,
     lifetime,
   });
 
@@ -86,8 +83,8 @@ export async function createSessionAndUpdateCookie(
           loginName: response.session.factors.user.loginName ?? "",
         };
 
-        if (authRequestId) {
-          sessionCookie.authRequestId = authRequestId;
+        if (requestId) {
+          sessionCookie.requestId = requestId;
         }
 
         if (response.session.factors.user.organizationId) {
@@ -113,7 +110,7 @@ export async function createSessionForIdpAndUpdateCookie(
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   },
-  authRequestId: string | undefined,
+  requestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
@@ -165,8 +162,8 @@ export async function createSessionForIdpAndUpdateCookie(
     organization: session.factors.user.organizationId ?? "",
   };
 
-  if (authRequestId) {
-    sessionCookie.authRequestId = authRequestId;
+  if (requestId) {
+    sessionCookie.requestId = requestId;
   }
 
   if (session.factors.user.organizationId) {
@@ -186,7 +183,7 @@ export async function setSessionAndUpdateCookie(
   recentCookie: CustomCookieData,
   checks?: Checks,
   challenges?: RequestChallenges,
-  authRequestId?: string,
+  requestId?: string,
   lifetime?: Duration,
 ) {
   const _headers = await headers();
@@ -216,8 +213,8 @@ export async function setSessionAndUpdateCookie(
           organization: recentCookie.organization,
         };
 
-        if (authRequestId) {
-          sessionCookie.authRequestId = authRequestId;
+        if (requestId) {
+          sessionCookie.requestId = requestId;
         }
 
         return getSession({
@@ -241,8 +238,8 @@ export async function setSessionAndUpdateCookie(
               organization: session.factors?.user?.organizationId ?? "",
             };
 
-            if (sessionCookie.authRequestId) {
-              newCookie.authRequestId = sessionCookie.authRequestId;
+            if (sessionCookie.requestId) {
+              newCookie.requestId = sessionCookie.requestId;
             }
 
             return updateSessionCookie(sessionCookie.id, newCookie).then(() => {

@@ -16,7 +16,7 @@ import { Spinner } from "./spinner";
 type Props = {
   loginName?: string;
   sessionId: string;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
   checkAfter: boolean;
   loginSettings?: LoginSettings;
@@ -26,7 +26,7 @@ export function RegisterU2f({
   loginName,
   sessionId,
   organization,
-  authRequestId,
+  requestId,
   checkAfter,
   loginSettings,
 }: Props) {
@@ -166,18 +166,18 @@ export function RegisterU2f({
         if (organization) {
           paramsToContinue.append("organization", organization);
         }
-        if (authRequestId) {
-          paramsToContinue.append("authRequestId", authRequestId);
+        if (requestId) {
+          paramsToContinue.append("requestId", requestId);
         }
 
         return router.push(`/u2f?` + paramsToContinue);
       } else {
         const url =
-          authRequestId && sessionId
+          requestId && sessionId
             ? await getNextUrl(
                 {
                   sessionId: sessionId,
-                  authRequestId: authRequestId,
+                  requestId: requestId,
                   organization: organization,
                 },
                 loginSettings?.defaultRedirectUri,

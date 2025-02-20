@@ -15,13 +15,13 @@ import { Spinner } from "./spinner";
 export function VerifyRedirectButton({
   userId,
   loginName,
-  authRequestId,
+  requestId,
   authMethods,
   organization,
 }: {
   userId?: string;
   loginName?: string;
-  authRequestId: string;
+  requestId: string;
   authMethods: AuthenticationMethodType[] | null;
   organization?: string;
 }) {
@@ -35,7 +35,7 @@ export function VerifyRedirectButton({
 
     let command = {
       organization,
-      authRequestId,
+      requestId,
     } as SendVerificationRedirectWithoutCheckCommand;
 
     if (userId) {

@@ -12,7 +12,7 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
 
-  const authRequestId = searchParams?.authRequestId;
+  const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
 
   const _headers = await headers();
@@ -41,7 +41,7 @@ export default async function Page(props: {
         {identityProviders && (
           <SignInWithIdp
             identityProviders={identityProviders}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={organization}
           ></SignInWithIdp>
         )}

@@ -13,13 +13,13 @@ type Props = {
     idpIntentId: string;
     idpIntentToken: string;
   };
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export function IdpSignin({
   userId,
   idpIntent: { idpIntentId, idpIntentToken },
-  authRequestId,
+  requestId,
 }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export function IdpSignin({
         idpIntentId,
         idpIntentToken,
       },
-      authRequestId,
+      requestId,
     })
       .then((response) => {
         if (response && "error" in response && response?.error) {

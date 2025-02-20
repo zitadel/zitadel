@@ -15,7 +15,7 @@ export type Cookie = {
   creationTs: string;
   expirationTs: string;
   changeTs: string;
-  authRequestId?: string; // if its linked to an OIDC flow
+  requestId?: string; // if its linked to an OIDC flow
 };
 
 type SessionCookie<T> = Cookie & T;

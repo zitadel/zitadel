@@ -23,7 +23,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "password" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, organization, authRequestId, code, initial } =
+  const { userId, loginName, organization, requestId, code, initial } =
     searchParams;
 
   const _headers = await headers();
@@ -113,7 +113,7 @@ export default async function Page(props: {
             code={code}
             userId={userId ?? (session?.factors?.user?.id as string)}
             loginName={loginName ?? (user?.preferredLoginName as string)}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={organization}
             passwordComplexitySettings={passwordComplexity}
             codeRequired={!(initial === "true")}

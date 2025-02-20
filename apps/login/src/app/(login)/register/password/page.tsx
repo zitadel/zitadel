@@ -19,8 +19,7 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
 
-  let { firstname, lastname, email, organization, authRequestId } =
-    searchParams;
+  let { firstname, lastname, email, organization, requestId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -79,7 +78,7 @@ export default async function Page(props: {
             firstname={firstname}
             lastname={lastname}
             organization={organization}
-            authRequestId={authRequestId}
+            requestId={requestId}
           ></SetRegisterPasswordForm>
         )}
       </div>

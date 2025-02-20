@@ -20,7 +20,7 @@ export type SetOTPCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
   code: string;
   method: string;
 };
@@ -72,7 +72,7 @@ export async function setOTP(command: SetOTPCommand) {
     recentSession,
     checks,
     undefined,
-    command.authRequestId,
+    command.requestId,
     loginSettings?.secondFactorCheckLifetime,
   ).then((session) => {
     return {

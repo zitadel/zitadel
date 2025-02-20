@@ -21,7 +21,7 @@ import { Spinner } from "./spinner";
 type Props = {
   loginName?: string;
   sessionId?: string;
-  authRequestId?: string;
+  requestId?: string;
   altPassword: boolean;
   login?: boolean;
   organization?: string;
@@ -30,7 +30,7 @@ type Props = {
 export function LoginPasskey({
   loginName,
   sessionId,
-  authRequestId,
+  requestId,
   altPassword,
   organization,
   login = true,
@@ -96,7 +96,7 @@ export function LoginPasskey({
           userVerificationRequirement,
         },
       }),
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not request passkey challenge");
@@ -123,7 +123,7 @@ export function LoginPasskey({
       checks: {
         webAuthN: { credentialAssertionData: data },
       } as Checks,
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not verify passkey");
@@ -220,8 +220,8 @@ export function LoginPasskey({
                 params.sessionId = sessionId;
               }
 
-              if (authRequestId) {
-                params.authRequestId = authRequestId;
+              if (requestId) {
+                params.requestId = requestId;
               }
 
               if (organization) {
