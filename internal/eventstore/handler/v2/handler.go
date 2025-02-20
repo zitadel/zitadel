@@ -30,6 +30,11 @@ type EventStore interface {
 	FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) error
 }
 
+type NotifierConfig struct {
+	Config      `mapstructure:",squash"`
+	MaxAttempts uint8
+}
+
 type Config struct {
 	Client     *database.DB
 	Eventstore EventStore

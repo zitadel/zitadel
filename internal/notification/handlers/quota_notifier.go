@@ -36,7 +36,6 @@ func NewQuotaNotifier(
 		queries:  queries,
 		channels: channels,
 	})
-
 }
 
 func (*quotaNotifier) Name() string {

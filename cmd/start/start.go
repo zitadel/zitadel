@@ -92,6 +92,7 @@ import (
 	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -267,6 +268,13 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	if err != nil {
+		return err
+	}
+
 	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
@@ -289,8 +297,13 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		dbClient,
+		q,
 	)
 	notification.Start(ctx)
+
+	if err = q.Start(ctx); err != nil {
+		return err
+	}
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()

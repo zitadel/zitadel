@@ -7,7 +7,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
 	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/templates"
@@ -23,7 +22,6 @@ func generateEmail(
 	data templates.TemplateData,
 	args map[string]interface{},
 	lastEmail bool,
-	triggeringEvent eventstore.Event,
 ) error {
 	emailChannels, config, err := channels.Email(ctx)
 	logging.OnError(err).Error("could not create email channel")
@@ -38,10 +36,10 @@ func generateEmail(
 	}
 	if config.SMTPConfig != nil {
 		message := &messages.Email{
-			Recipients:      []string{recipient},
-			Subject:         data.Subject,
-			Content:         html.UnescapeString(template),
-			TriggeringEvent: triggeringEvent,
+			Recipients: []string{recipient},
+			Subject:    data.Subject,
+			Content:    html.UnescapeString(template),
+			// TriggeringEvent: triggeringEvent,
 		}
 		return emailChannels.HandleMessage(message)
 	}
@@ -52,8 +50,8 @@ func generateEmail(
 		}
 		contextInfo := map[string]interface{}{
 			"recipientEmailAddress": recipient,
-			"eventType":             triggeringEvent.Type(),
-			"provider":              config.ProviderConfig,
+			// "eventType":             triggeringEvent.Type(),
+			"provider": config.ProviderConfig,
 		}
 
 		message := &messages.JSON{
@@ -62,7 +60,7 @@ func generateEmail(
 				TemplateData: data,
 				Args:         caseArgs,
 			},
-			TriggeringEvent: triggeringEvent,
+			// TriggeringEvent: triggeringEvent,
 		}
 		webhookChannels, err := channels.Webhook(ctx, *config.WebhookConfig)
 		if err != nil {
