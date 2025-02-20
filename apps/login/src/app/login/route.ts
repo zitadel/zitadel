@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
   if (requestId && sessionId) {
     if (requestId.startsWith("oidc_")) {
       // this finishes the login process for OIDC
-      await loginWithOIDCandSession({
+      return loginWithOIDCandSession({
         serviceUrl,
         authRequest: requestId.replace("oidc_", ""),
         sessionId,
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
       });
     } else if (requestId.startsWith("saml_")) {
       // this finishes the login process for SAML
-      await loginWithSAMLandSession({
+      return loginWithSAMLandSession({
         serviceUrl,
         samlRequest: requestId.replace("saml_", ""),
         sessionId,
