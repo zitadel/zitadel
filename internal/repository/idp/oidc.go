@@ -16,6 +16,7 @@ type OIDCIDPAddedEvent struct {
 	ClientSecret     *crypto.CryptoValue `json:"clientSecret"`
 	Scopes           []string            `json:"scopes,omitempty"`
 	IsIDTokenMapping bool                `json:"idTokenMapping,omitempty"`
+	UsePKCE          bool                `json:"usePKCE,omitempty"`
 	Options
 }
 
@@ -27,7 +28,7 @@ func NewOIDCIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
-	isIDTokenMapping bool,
+	isIDTokenMapping, usePKCE bool,
 	options Options,
 ) *OIDCIDPAddedEvent {
 	return &OIDCIDPAddedEvent{
@@ -39,6 +40,7 @@ func NewOIDCIDPAddedEvent(
 		ClientSecret:     clientSecret,
 		Scopes:           scopes,
 		IsIDTokenMapping: isIDTokenMapping,
+		UsePKCE:          usePKCE,
 		Options:          options,
 	}
 }
@@ -74,6 +76,7 @@ type OIDCIDPChangedEvent struct {
 	ClientSecret     *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Scopes           []string            `json:"scopes,omitempty"`
 	IsIDTokenMapping *bool               `json:"idTokenMapping,omitempty"`
+	UsePKCE          *bool               `json:"usePKCE,omitempty"`
 	OptionChanges
 }
 
@@ -136,6 +139,12 @@ func ChangeOIDCScopes(scopes []string) func(*OIDCIDPChangedEvent) {
 func ChangeOIDCIsIDTokenMapping(idTokenMapping bool) func(*OIDCIDPChangedEvent) {
 	return func(e *OIDCIDPChangedEvent) {
 		e.IsIDTokenMapping = &idTokenMapping
+	}
+}
+
+func ChangeOIDCUsePKCE(usePKCE bool) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		e.UsePKCE = &usePKCE
 	}
 }
 

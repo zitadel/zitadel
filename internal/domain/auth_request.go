@@ -43,6 +43,7 @@ type AuthRequest struct {
 	ApplicationResourceOwner string
 	PrivateLabelingSetting   PrivateLabelingSetting
 	SelectedIDPConfigID      string
+	SelectedIDPConfigArgs    map[string]any
 	LinkingUsers             []*ExternalUser
 	PossibleSteps            []NextStep `json:"-"`
 	PasswordVerified         bool

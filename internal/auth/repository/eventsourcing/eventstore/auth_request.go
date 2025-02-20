@@ -255,14 +255,14 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, 
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) (err error) {
+func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string, idpArguments map[string]any) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
-	err = repo.checkSelectedExternalIDP(request, idpConfigID)
+	err = repo.checkSelectedExternalIDP(request, idpConfigID, idpArguments)
 	if err != nil {
 		return err
 	}
@@ -984,10 +984,11 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 	}
 }
 
-func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthRequest, idpConfigID string) error {
+func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthRequest, idpConfigID string, idpArguments map[string]any) error {
 	for _, externalIDP := range request.AllowedExternalIDPs {
 		if externalIDP.IDPConfigID == idpConfigID {
 			request.SelectedIDPConfigID = idpConfigID
+			request.SelectedIDPConfigArgs = idpArguments
 			return nil
 		}
 	}

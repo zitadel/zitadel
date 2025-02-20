@@ -149,14 +149,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID)
-	if err != nil {
-		l.externalAuthFailed(w, r, authReq, err)
-		return
-	}
 	var provider idp.Provider
-
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -194,6 +187,13 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	}
 	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
 	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
+	if err != nil {
+		l.externalAuthFailed(w, r, authReq, err)
+		return
+	}
+
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID, session.PersistentParameters())
 	if err != nil {
 		l.externalAuthFailed(w, r, authReq, err)
 		return
@@ -271,79 +271,78 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 		return
 	}
-	var provider idp.Provider
 	var session idp.Session
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
-		provider, err = l.oauthProvider(r.Context(), identityProvider)
+		provider, err := l.oauthProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*oauth.Provider), Code: data.Code}
+		session = oauth.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeOIDC:
-		provider, err = l.oidcProvider(r.Context(), identityProvider)
+		provider, err := l.oidcProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+		session = openid.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeAzureAD:
-		provider, err = l.azureProvider(r.Context(), identityProvider)
+		provider, err := l.azureProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &azuread.Session{Provider: provider.(*azuread.Provider), Code: data.Code}
+		session = azuread.NewSession(provider, data.Code)
 	case domain.IDPTypeGitHub:
-		provider, err = l.githubProvider(r.Context(), identityProvider)
+		provider, err := l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHubEnterprise:
-		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
+		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLab:
-		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLabSelfHosted:
-		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGoogle:
-		provider, err = l.googleProvider(r.Context(), identityProvider)
+		provider, err := l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeApple:
-		provider, err = l.appleProvider(r.Context(), identityProvider)
+		provider, err := l.appleProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
+		session = apple.NewSession(provider, data.Code, data.User)
 	case domain.IDPTypeSAML:
-		provider, err = l.samlProvider(r.Context(), identityProvider)
+		provider, err := l.samlProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session, err = saml.NewSession(provider.(*saml.Provider), authReq.SAMLRequestID, r)
+		session, err = saml.NewSession(provider, authReq.SAMLRequestID, r)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
@@ -440,7 +439,7 @@ func (l *Login) handleExternalUserAuthenticated(
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// ensure the linked IDP is added to the login policy
-	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID, authReq.SelectedIDPConfigArgs); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -1005,11 +1004,17 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 2)
+	opts := make([]openid.ProviderOpts, 1, 3)
 	opts[0] = openid.WithSelectAccount()
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
+
+	if identityProvider.OIDCIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, openid.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
+
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -1047,6 +1052,12 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
 		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
 	}
+
+	opts := make([]oauth.ProviderOpts, 0, 1)
+	if identityProvider.OAuthIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
 	return oauth.New(
 		config,
 		identityProvider.Name,
@@ -1054,6 +1065,7 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+		opts...,
 	)
 }
 

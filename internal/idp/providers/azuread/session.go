@@ -20,6 +20,10 @@ type Session struct {
 	OAuthSession *oauth.Session
 }
 
+func NewSession(provider *Provider, code string) *Session {
+	return &Session{Provider: provider, Code: code}
+}
+
 // GetAuth implements the [idp.Provider] interface by calling the wrapped [oauth.Session].
 func (s *Session) GetAuth(ctx context.Context) (content string, redirect bool) {
 	return s.oauth().GetAuth(ctx)
@@ -37,6 +41,11 @@ func (s *Session) RetrievePreviousID() (string, error) {
 		return "", err
 	}
 	return userinfo.Subject, nil
+}
+
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
 }
 
 // FetchUser implements the [idp.Session] interface.

@@ -18,6 +18,7 @@ type OAuthIDPAddedEvent struct {
 	UserEndpoint          string              `json:"userEndpoint,omitempty"`
 	Scopes                []string            `json:"scopes,omitempty"`
 	IDAttribute           string              `json:"idAttribute,omitempty"`
+	UsePKCE               bool                `json:"usePKCE,omitempty"`
 	Options
 }
 
@@ -32,6 +33,7 @@ func NewOAuthIDPAddedEvent(
 	userEndpoint,
 	idAttribute string,
 	scopes []string,
+	usePKCE bool,
 	options Options,
 ) *OAuthIDPAddedEvent {
 	return &OAuthIDPAddedEvent{
@@ -45,6 +47,7 @@ func NewOAuthIDPAddedEvent(
 		UserEndpoint:          userEndpoint,
 		Scopes:                scopes,
 		IDAttribute:           idAttribute,
+		UsePKCE:               usePKCE,
 		Options:               options,
 	}
 }
@@ -82,6 +85,7 @@ type OAuthIDPChangedEvent struct {
 	UserEndpoint          *string             `json:"userEndpoint,omitempty"`
 	Scopes                []string            `json:"scopes,omitempty"`
 	IDAttribute           *string             `json:"idAttribute,omitempty"`
+	UsePKCE               *bool               `json:"usePKCE,omitempty"`
 	OptionChanges
 }
 
@@ -155,6 +159,12 @@ func ChangeOAuthScopes(scopes []string) func(*OAuthIDPChangedEvent) {
 func ChangeOAuthIDAttribute(idAttribute string) func(*OAuthIDPChangedEvent) {
 	return func(e *OAuthIDPChangedEvent) {
 		e.IDAttribute = &idAttribute
+	}
+}
+
+func ChangeOAuthUsePKCE(usePKCE bool) func(*OAuthIDPChangedEvent) {
+	return func(e *OAuthIDPChangedEvent) {
+		e.UsePKCE = &usePKCE
 	}
 }
 

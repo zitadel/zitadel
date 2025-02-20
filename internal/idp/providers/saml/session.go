@@ -60,6 +60,11 @@ func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	return idp.Form(resp.content.String())
 }
 
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
+}
+
 // FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.RequestID == "" || s.Request == nil {

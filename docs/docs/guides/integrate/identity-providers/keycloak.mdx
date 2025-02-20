@@ -50,6 +50,9 @@ A useful default will be filled if you don't change anything.
 This information will be taken to create/update the user within ZITADEL.
 ZITADEL ensures that at least the `openid`-scope is always sent.
 
+**Use PKCE**: If enabled, the provider will use Proof Key for Code Exchange (PKCE) to secure the authorization code flow
+in addition to the client secret.
+
 <GeneralConfigDescription provider_account="Keycloak account" />
 
 ![Keycloak Provider](/img/guides/zitadel_keycloak_create_provider.png)

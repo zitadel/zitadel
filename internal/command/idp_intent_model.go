@@ -12,13 +12,14 @@ import (
 type IDPIntentWriteModel struct {
 	eventstore.WriteModel
 
-	SuccessURL  *url.URL
-	FailureURL  *url.URL
-	IDPID       string
-	IDPUser     []byte
-	IDPUserID   string
-	IDPUserName string
-	UserID      string
+	SuccessURL   *url.URL
+	FailureURL   *url.URL
+	IDPID        string
+	IDPArguments map[string]any
+	IDPUser      []byte
+	IDPUserID    string
+	IDPUserName  string
+	UserID       string
 
 	IDPAccessToken *crypto.CryptoValue
 	IDPIDToken     string
@@ -81,6 +82,7 @@ func (wm *IDPIntentWriteModel) reduceStartedEvent(e *idpintent.StartedEvent) {
 	wm.SuccessURL = e.SuccessURL
 	wm.FailureURL = e.FailureURL
 	wm.IDPID = e.IDPID
+	wm.IDPArguments = e.IDPArguments
 	wm.State = domain.IDPIntentStateStarted
 }
 

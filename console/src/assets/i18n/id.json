@@ -2006,7 +2006,9 @@
       "REMOVED": "Berhasil dihapus."
     },
     "ISIDTOKENMAPPING": "Peta dari token ID",
-    "ISIDTOKENMAPPING_DESC": "Jika dipilih, informasi penyedia akan dipetakan dari token ID, bukan dari titik akhir info pengguna."
+    "ISIDTOKENMAPPING_DESC": "Jika dipilih, informasi penyedia akan dipetakan dari token ID, bukan dari titik akhir info pengguna.",
+    "USEPKCE": "Gunakan PKCE",
+    "USEPKCE_DESC": "Menentukan apakah parameter code_challenge dan code_challenge_method disertakan dalam permintaan autentikasi"
   },
   "MFA": {
     "LIST": {

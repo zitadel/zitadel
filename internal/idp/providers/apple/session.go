@@ -17,6 +17,10 @@ type Session struct {
 	UserFormValue string
 }
 
+func NewSession(provider *Provider, code, userFormValue string) *Session {
+	return &Session{Session: oidc.NewSession(provider.Provider, code, nil), UserFormValue: userFormValue}
+}
+
 type userFormValue struct {
 	Name userNamesFormValue `json:"name,omitempty" schema:"name"`
 }
