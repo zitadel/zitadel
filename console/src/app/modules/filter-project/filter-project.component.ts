@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -23,8 +23,8 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
   public searchQueries: ProjectQuery[] = [];
 
   public states: ProjectState[] = [ProjectState.PROJECT_STATE_ACTIVE, ProjectState.PROJECT_STATE_INACTIVE];
-  constructor(router: Router, route: ActivatedRoute) {
-    super(router, route);
+  constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
+    super(router, route, destroyRef);
   }
 
   ngOnInit(): void {

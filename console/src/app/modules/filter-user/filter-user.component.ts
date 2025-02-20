@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -13,6 +13,7 @@ import {
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
+import { filter, map } from 'rxjs/operators';
 
 enum SubQuery {
   STATE,
@@ -28,25 +29,27 @@ enum SubQuery {
 })
 export class FilterUserComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
-  public searchQueries: UserSearchQuery[] = [];
+  private searchQueries: UserSearchQuery[] = [];
 
   public states: UserState[] = [
     UserState.USER_STATE_ACTIVE,
     UserState.USER_STATE_INACTIVE,
     UserState.USER_STATE_DELETED,
-    UserState.USER_STATE_INITIAL,
     UserState.USER_STATE_LOCKED,
-    UserState.USER_STATE_SUSPEND,
+    UserState.USER_STATE_INITIAL,
   ];
-  constructor(router: Router, route: ActivatedRoute) {
-    super(router, route);
+  constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
+    super(router, route, destroyRef);
   }
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      const { filter } = params;
-      if (filter) {
-        const stringifiedFilters = filter as string;
+    this.route.queryParamMap
+      .pipe(
+        take(1),
+        map((params) => params.get('filter')),
+        filter(Boolean),
+      )
+      .subscribe((stringifiedFilters) => {
         const filters: UserSearchQuery.AsObject[] = JSON.parse(stringifiedFilters) as UserSearchQuery.AsObject[];
 
         const userQueries = filters.map((filter) => {
@@ -94,8 +97,7 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
         this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         // this.showFilter = true;
         // this.filterOpen.emit(true);
-      }
-    });
+      });
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -27,9 +27,10 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
 
   constructor(
     router: Router,
+    destroyRef: DestroyRef,
     protected override route: ActivatedRoute,
   ) {
-    super(router, route);
+    super(router, route, destroyRef);
   }
 
   ngOnInit(): void {

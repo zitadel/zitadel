@@ -2,12 +2,11 @@
   <cnsl-top-view
     title="{{ userName$ | async }}"
     sub="{{ user(userQuery)?.preferredLoginName }}"
-    [isActive]="user(userQuery)?.state === UserState.USER_STATE_ACTIVE"
-    [isInactive]="user(userQuery)?.state === UserState.USER_STATE_INACTIVE"
+    [isActive]="user(userQuery)?.state === UserState.ACTIVE"
+    [isInactive]="user(userQuery)?.state === UserState.INACTIVE"
     stateTooltip="{{ 'USER.STATE.' + user(userQuery)?.state | translate }}"
     [hasBackButton]="['org.read'] | hasRole | async"
   >
-    <span *ngIf="userQuery.state === 'notfound'">{{ 'USER.PAGES.NOUSER' | translate }}</span>
     <cnsl-info-row
       topContent
       *ngIf="user(userQuery) as user"
@@ -42,7 +41,7 @@
               [disabled]="false"
               [genders]="genders"
               [languages]="(langSvc.supported$ | async) || []"
-              [username]="user.userName"
+              [username]="user.username"
               [profile]="profile"
               [showEditImage]="true"
               (changedLanguage)="changedLanguage($event)"
@@ -93,7 +92,7 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting === 'idp'">
-          <cnsl-external-idps [userId]="user.id" [service]="grpcAuthService"></cnsl-external-idps>
+          <cnsl-external-idps [userId]="user.userId" [service]="grpcAuthService"></cnsl-external-idps>
         </ng-container>
 
         <ng-container *ngIf="currentSetting === 'security'">
@@ -124,15 +123,14 @@
           <cnsl-auth-passwordless #mfaComponent></cnsl-auth-passwordless>
 
           <cnsl-auth-user-mfa
-            [phoneVerified]="humanUser(userQuery)?.type?.value?.phone?.isPhoneVerified ?? false"
-            #mfaComponent
+            [phoneVerified]="humanUser(userQuery)?.type?.value?.phone?.isVerified ?? false"
           ></cnsl-auth-user-mfa>
         </ng-container>
 
         <ng-container *ngIf="currentSetting === 'grants'">
           <cnsl-card title="{{ 'GRANTS.USER.TITLE' | translate }}" description="{{ 'GRANTS.USER.DESCRIPTION' | translate }}">
             <cnsl-user-grants
-              [userId]="user.id"
+              [userId]="user.userId"
               [context]="USERGRANTCONTEXT"
               [displayedColumns]="[
                 'org',
@@ -165,7 +163,7 @@
             *ngIf="metadataQuery.state !== 'error'"
             [metadata]="metadataQuery.value"
             [description]="'DESCRIPTIONS.USERS.SELF.METADATA' | translate"
-            [disabled]="(['user.write:' + user.id, 'user.write'] | hasRole | async) === false"
+            [disabled]="(['user.write:' + user.userId, 'user.write'] | hasRole | async) === false"
             (editClicked)="editMetadata(user, metadataQuery.value)"
             (refresh)="refreshMetadata$.next(true)"
             [loading]="metadataQuery.state === 'loading'"

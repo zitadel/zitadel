@@ -1,7 +1,6 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subject, takeUntil } from 'rxjs';
 import { SearchQuery as MemberSearchQuery } from 'src/app/proto/generated/zitadel/member_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
@@ -9,6 +8,7 @@ import { ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { SearchQuery as UserSearchQuery, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { ActionKeysType } from '../action-keys/action-keys.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type FilterSearchQuery = UserSearchQuery | MemberSearchQuery | UserGrantQuery | ProjectQuery | OrgQuery;
 type FilterSearchQueryAsObject =
@@ -23,7 +23,7 @@ type FilterSearchQueryAsObject =
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.scss'],
 })
-export class FilterComponent implements OnDestroy {
+export class FilterComponent {
   @Output() public filterChanged: EventEmitter<FilterSearchQuery[]> = new EventEmitter();
   @Output() public filterOpen: EventEmitter<boolean> = new EventEmitter<boolean>(false);
 
@@ -31,9 +31,6 @@ export class FilterComponent implements OnDestroy {
   @Output() public trigger: EventEmitter<void> = new EventEmitter();
 
   @Input() public queryCount: number = 0;
-
-  private destroy$: Subject<void> = new Subject();
-  public filterChanged$: Observable<FilterSearchQuery[]> = this.filterChanged.asObservable();
 
   public showFilter: boolean = false;
   public methods: TextQueryMethod[] = [
@@ -59,17 +56,13 @@ export class FilterComponent implements OnDestroy {
     this.trigger.emit();
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   constructor(
     private router: Router,
     protected route: ActivatedRoute,
+    destroyRef: DestroyRef,
   ) {
     const changes$ = this.filterChanged.asObservable();
-    changes$.pipe(takeUntil(this.destroy$)).subscribe((queries) => {
+    changes$.pipe(takeUntilDestroyed(destroyRef)).subscribe((queries) => {
       const filters: Array<FilterSearchQueryAsObject | {}> | undefined = queries
         ?.map((q) => q.toObject())
         .map((query) =>
@@ -81,15 +74,17 @@ export class FilterComponent implements OnDestroy {
         );
 
       if (filters && Object.keys(filters)) {
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: {
-            ['filter']: JSON.stringify(filters),
-          },
-          replaceUrl: true,
-          queryParamsHandling: 'merge',
-          skipLocationChange: false,
-        });
+        this.router
+          .navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+              ['filter']: JSON.stringify(filters),
+            },
+            replaceUrl: true,
+            queryParamsHandling: 'merge',
+            skipLocationChange: false,
+          })
+          .then();
       }
     });
   }
