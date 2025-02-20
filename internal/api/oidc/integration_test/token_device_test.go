@@ -38,8 +38,8 @@ func TestServer_DeviceAuth(t *testing.T) {
 				sessionID, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 				_, err = Instance.Client.OIDCv2.AuthorizeOrDenyDeviceAuthorization(CTXLOGIN, &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 					DeviceAuthorizationId: id,
-					Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
-						AuthorizeWithSession: &oidc_pb.Session{
+					Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+						Session: &oidc_pb.Session{
 							SessionId:    sessionID,
 							SessionToken: sessionToken,
 						},
@@ -55,8 +55,8 @@ func TestServer_DeviceAuth(t *testing.T) {
 				sessionID, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 				_, err = Instance.Client.OIDCv2.AuthorizeOrDenyDeviceAuthorization(CTXLOGIN, &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 					DeviceAuthorizationId: id,
-					Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
-						AuthorizeWithSession: &oidc_pb.Session{
+					Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+						Session: &oidc_pb.Session{
 							SessionId:    sessionID,
 							SessionToken: sessionToken,
 						},
