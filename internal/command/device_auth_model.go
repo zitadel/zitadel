@@ -82,6 +82,7 @@ func (m *DeviceAuthWriteModel) Query() *eventstore.SearchQueryBuilder {
 			deviceauth.AddedEventType,
 			deviceauth.ApprovedEventType,
 			deviceauth.CanceledEventType,
+			deviceauth.DoneEventType,
 		).
 		Builder()
 }

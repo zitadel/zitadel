@@ -466,3 +466,11 @@ func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *man
 
 	return machine, name, keyResp.GetKeyDetails(), nil
 }
+
+func (i *Instance) CreateDeviceAuthorizationRequest(ctx context.Context, clientID string, scopes ...string) (*oidc.DeviceAuthorizationResponse, error) {
+	provider, err := i.CreateRelyingParty(ctx, clientID, "", scopes...)
+	if err != nil {
+		return nil, err
+	}
+	return rp.DeviceAuthorization(ctx, scopes, provider, nil)
+}
