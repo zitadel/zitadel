@@ -264,12 +264,20 @@ func Test_setInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := setInstance(tt.args.ctx, tt.args.verifier)
+			r, err := http.NewRequest(http.MethodGet, "https://irrelevant-host", nil)
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+			got, err := setInstance(r.WithContext(tt.args.ctx), tt.args.verifier)
 			if (err != nil) != tt.res.err {
 				t.Errorf("setInstance() error = %v, wantErr %v", err, tt.res.err)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.res.want) {
+			var gotCtx context.Context
+			if got != nil {
+				gotCtx = got.Context()
+			}
+			if !reflect.DeepEqual(gotCtx, tt.res.want) {
 				t.Errorf("setInstance() got = %v, want %v", got, tt.res.want)
 			}
 		})

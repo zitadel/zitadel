@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -39,10 +38,9 @@ func (a *instanceInterceptor) Handler(next http.Handler) http.Handler {
 
 func (a *instanceInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, err := a.setInstanceIfNeeded(r.Context(), r)
+		instanceRequest, err := a.setInstanceIfNeeded(r)
 		if err == nil {
-			r = r.WithContext(ctx)
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(w, instanceRequest)
 			return
 		}
 
@@ -62,29 +60,27 @@ func (a *instanceInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 
 func (a *instanceInterceptor) HandlerFuncWithError(next HandlerFuncWithError) HandlerFuncWithError {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		ctx, err := a.setInstanceIfNeeded(r.Context(), r)
+		instanceRequest, err := a.setInstanceIfNeeded(r)
 		if err != nil {
 			origin := zitadel_http.DomainContext(r.Context())
 			logging.WithFields("origin", origin.Origin(), "externalDomain", a.externalDomain).WithError(err).Error("unable to set instance")
 			return err
 		}
-
-		r = r.WithContext(ctx)
-		return next(w, r)
+		return next(w, instanceRequest)
 	}
 }
 
-func (a *instanceInterceptor) setInstanceIfNeeded(ctx context.Context, r *http.Request) (context.Context, error) {
+func (a *instanceInterceptor) setInstanceIfNeeded(r *http.Request) (*http.Request, error) {
 	for _, prefix := range a.ignoredPrefixes {
 		if strings.HasPrefix(r.URL.Path, prefix) {
-			return ctx, nil
+			return r, nil
 		}
 	}
-
-	return setInstance(ctx, a.verifier)
+	return setInstance(r, a.verifier)
 }
 
-func setInstance(ctx context.Context, verifier authz.InstanceVerifier) (_ context.Context, err error) {
+func setInstance(r *http.Request, verifier authz.InstanceVerifier) (instanceRequest *http.Request, err error) {
+	ctx := r.Context()
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -97,7 +93,13 @@ func setInstance(ctx context.Context, verifier authz.InstanceVerifier) (_ contex
 		return nil, err
 	}
 	span.End()
-	return authz.WithInstance(ctx, instance), nil
+	instanceRequest = r.WithContext(authz.WithInstance(ctx, instance))
+	instanceRequest.Host = requestContext.PublicHost
+	if instanceRequest.Host == "" {
+		instanceRequest.Host = requestContext.InstanceHost
+	}
+	logging.WithFields("instance set", instance.InstanceID(), "instance host", instanceRequest.Host, "requested Host", r.Host).Debug("instance set")
+	return instanceRequest, nil
 }
 
 func newZitadelTranslator() *i18n.Translator {
