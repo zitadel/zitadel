@@ -1,0 +1,1413 @@
+Errors:
+  Internal: A apărut o eroare internă
+  NoChangesFound: Nicio modificare
+  OriginNotAllowed: Acest "Origin" nu este permis
+  IDMissing: ID lipsă
+  ResourceOwnerMissing: Organizația Proprietarului Resursei lipsă
+  RemoveFailed: Nu a putut fi eliminat
+  ProjectionName:
+    Invalid: Nume de proiecție invalid
+  Assets:
+    EmptyKey: Cheia activului este goală
+    Store:
+      NotInitialized: Stocarea activelor nu este inițializată
+      NotConfigured: Stocarea activelor nu este configurată
+    Bucket:
+      Internal: Eroare internă la crearea bucket-ului
+      AlreadyExists: Bucket-ul există deja
+      CreateFailed: Bucket-ul nu a fost creat
+      ListFailed: Bucket-urile nu au putut fi citite
+      RemoveFailed: Bucket-ul nu a fost șters
+      SetPublicFailed: Nu s-a putut seta bucket-ul ca public
+    Object:
+      PutFailed: Obiectul nu a fost creat
+      GetFailed: Obiectul nu a putut fi citit
+      NotFound: Obiectul nu a fost găsit
+      PresignedTokenFailed: Token-ul semnat nu a putut fi creat
+      ListFailed: Lista de obiecte nu a putut fi citită
+      RemoveFailed: Obiectul nu a putut fi eliminat
+  Limit:
+    ExceedsDefault: Limita depășește limita implicită
+  Limits:
+    NotFound: Limitele nu au fost găsite
+    NoneSpecified: Nu au fost specificate limite
+    Instance:
+      Blocked: Instanța este blocată
+  Restrictions:
+    NoneSpecified: Nu au fost specificate restricții
+    DefaultLanguageMustBeAllowed: Limba implicită trebuie să fie permisă
+  Language:
+    NotParsed: Nu s-a putut analiza limba
+    NotSupported: Limba nu este suportată
+    NotAllowed: Limba nu este permisă
+    Undefined: Limba este nedefinită
+    Duplicate: Există duplicate în liste de limbi
+  OIDCSettings:
+    NotFound: Configurația OIDC nu a fost găsită
+    AlreadyExists: Configurația OIDC există deja
+  SecretGenerator:
+    AlreadyExists: Generatorul de secrete există deja
+    TypeMissing: Tipul generatorului de secrete lipsește
+    NotFound: Generatorul de secrete nu a fost găsit
+  SMSConfig:
+    NotFound: Configurația SMS nu a fost găsită
+    AlreadyActive: Configurația SMS este deja activă
+    AlreadyDeactivated: Configurația SMS este deja dezactivată
+    NotExternalVerification: Configurația SMS nu suportă verificarea prin cod
+  SMTP:
+    NotEmailMessage: Mesajul nu este EmailMessage
+    RequiredAttributes: Subiectul, destinatarii și conținutul trebuie să fie setate, dar unele sau toate sunt goale
+    CouldNotSplit: Nu s-a putut împărți host și port pentru conectarea la smtp
+    CouldNotDial: Nu s-a putut contacta serverul SMTP, verificați portul, probleme de firewall...
+    CouldNotDialTLS: Nu s-a putut contacta serverul SMTP folosind TLS, verificați portul, probleme de firewall...
+    CouldNotCreateClient: Nu s-a putut crea clientul smtp
+    CouldNotStartTLS: Nu s-a putut porni tls
+    CouldNotAuth: Nu s-a putut adăuga autentificare smtp, verificați dacă numele de utilizator și parola sunt corecte, dacă sunt corecte, poate furnizorul dvs. necesită o metodă de autentificare nesuportată de ZITADEL
+    CouldNotSetSender: Nu s-a putut seta expeditorul
+    CouldNotSetRecipient: Nu s-a putut seta destinatarul
+  SMTPConfig:
+    TestPassword: Parola pentru test nu a fost găsită
+    NotFound: Configurația SMTP nu a fost găsită
+    AlreadyExists: Configurația SMTP există deja
+    AlreadyDeactivated: Configurația SMTP este deja dezactivată
+    SenderAdressNotCustomDomain: Adresa expeditorului trebuie configurată ca domeniu personalizat pe instanță.
+    TestEmailNotFound: Adresa de e-mail pentru test nu a fost găsită
+  Notification:
+    NoDomain: Niciun domeniu găsit pentru mesaj
+  User:
+    NotFound: Utilizatorul nu a putut fi găsit
+    AlreadyExists: Utilizatorul există deja
+    NotFoundOnOrg: Utilizatorul nu a putut fi găsit în organizația aleasă
+    NotAllowedOrg: Utilizatorul nu este membru al organizației cerute
+    UserIDMissing: ID-ul utilizatorului lipsește
+    UserIDWrong: "Utilizatorul din cerere nu este egal cu utilizatorul autentificat"
+    DomainPolicyNil: Politica organizației este goală
+    EmailAsUsernameNotAllowed: E-mailul nu este permis ca nume de utilizator
+    Invalid: Datele utilizatorului sunt invalide
+    DomainNotAllowedAsUsername: Domeniul este deja rezervat și nu poate fi folosit
+    AlreadyInactive: Utilizatorul este deja inactiv
+    NotInactive: Utilizatorul nu este inactiv
+    CantDeactivateInitial: Utilizatorul cu starea inițială poate fi doar șters, nu dezactivat
+    ShouldBeActiveOrInitial: Utilizatorul nu este activ sau inițial
+    AlreadyInitialised: Utilizatorul este deja inițializat
+    NotInitialised: Utilizatorul nu este încă inițializat
+    NotLocked: Utilizatorul nu este blocat
+    NoChanges: Nu au fost găsite modificări
+    InitCodeNotFound: Codul de inițializare nu a fost găsit
+    UsernameNotChanged: Numele de utilizator nu a fost schimbat
+    InvalidURLTemplate: Șablonul URL este invalid
+    Profile:
+      NotFound: Profilul nu a fost găsit
+      NotChanged: Profilul nu a fost schimbat
+      Empty: Profilul este gol
+      FirstNameEmpty: Prenumele în profil este gol
+      LastNameEmpty: Numele de familie în profil este gol
+      IDMissing: ID-ul profilului lipsește
+    Email:
+      NotFound: E-mailul nu a fost găsit
+      Invalid: E-mailul este invalid
+      AlreadyVerified: E-mailul este deja verificat
+      NotChanged: E-mailul nu a fost schimbat
+      Empty: E-mailul este gol
+      IDMissing: ID-ul e-mailului lipsește
+    Phone:
+      NotFound: Numărul de telefon nu a fost găsit
+      Invalid: Numărul de telefon este invalid
+      AlreadyVerified: Numărul de telefon este deja verificat
+      Empty: Numărul de telefon este gol
+      NotChanged: Numărul de telefon nu a fost schimbat
+    Address:
+      NotFound: Adresa nu a fost găsită
+      NotChanged: Adresa nu a fost schimbată
+    Machine:
+      Key:
+        NotFound: Cheia mașinii nu a fost găsită
+        AlreadyExisting: Cheia mașinii există deja
+        Invalid: Cheia publică nu este o cheie publică RSA validă în format PKIX cu codificare PEM
+      Secret:
+        NotExisting: Secretul nu există
+        Invalid: Secretul este invalid
+        CouldNotGenerate: Secretul nu a putut fi generat
+    PAT:
+      NotFound: Token-ul de acces personal nu a fost găsit
+    NotHuman: Utilizatorul trebuie să fie personal
+    NotMachine: Utilizatorul trebuie să fie tehnic
+    WrongType: Nu este permis pentru acest tip de utilizator
+    NotAllowedToLink: Utilizatorului nu i se permite să se conecteze cu un furnizor de autentificare extern
+    Username:
+      AlreadyExists: Numele de utilizator este deja folosit
+      Reserved: Numele de utilizator este deja luat
+      Empty: Numele de utilizator este gol
+    Code:
+      Empty: Codul este gol
+      NotFound: Codul nu a fost găsit
+      Expired: Codul a expirat
+      GeneratorAlgNotSupported: Algoritm de generator neacceptat
+      Invalid: Codul este invalid
+    Password:
+      NotFound: Parola nu a fost găsită
+      Empty: Parola este goală
+      Invalid: Parola este invalidă
+      NotSet: Utilizatorul nu a setat o parolă
+      NotChanged: Parola nouă nu poate fi aceeași cu parola curentă
+      NotSupported: Codificarea hash a parolei nu este acceptată. Consultați https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+    PasswordComplexityPolicy:
+      NotFound: Politica de parolă nu a fost găsită
+      MinLength: Parola este prea scurtă
+      MinLengthNotAllowed: Lungimea minimă dată nu este permisă
+      HasLower: Parola trebuie să conțină litere mici
+      HasUpper: Parola trebuie să conțină litere mari
+      HasNumber: Parola trebuie să conțină numere
+      HasSymbol: Parola trebuie să conțină simboluri
+    ExternalIDP:
+      Invalid: IDP extern invalid
+      IDPConfigNotExisting: Furnizorul IDP este invalid pentru această organizație
+      NotAllowed: IDP extern nepermis
+      MinimumExternalIDPNeeded: Trebuie adăugat cel puțin un IDP
+      AlreadyExists: IDP extern deja luat
+      NotFound: IDP extern nu a fost găsit
+      LoginFailed: Conectarea la IDP extern a eșuat
+    MFA:
+      OTP:
+        AlreadyReady: Multifactor OTP (Parolă Unică) este deja configurat
+        NotExisting: Multifactor OTP (Parolă Unică) nu există
+        NotReady: Multifactor OTP (Parolă Unică) nu este pregătit
+        InvalidCode: Cod invalid
+      U2F:
+        NotExisting: U2F nu există
+      Passwordless:
+        NotExisting: Fără parolă nu există
+    WebAuthN:
+      NotFound: Token-ul WebAuthN nu a putut fi găsit
+      BeginRegisterFailed: Înregistrarea WebAuthN a început, dar a eșuat
+      MarshalError: Eroare la serializarea datelor
+      ErrorOnParseCredential: Eroare la analiza datelor de acreditare
+      CreateCredentialFailed: Eroare la crearea acreditărilor
+      BeginLoginFailed: Autentificarea WebAuthN a început, dar a eșuat
+      ValidateLoginFailed: Eroare la validarea acreditărilor de autentificare
+      CloneWarning: Acreditările pot fi clonate
+    RefreshToken:
+      Invalid: Token-ul de reîmprospătare este invalid
+      NotFound: Token-ul de reîmprospătare nu a fost găsit
+  Instance:
+    NotFound: Instanța nu a fost găsită
+    AlreadyExists: Instanța există deja
+    NotChanged: Instanța nu a fost schimbată
+  Org:
+    AlreadyExists: Numele organizației este deja luat
+    Invalid: Organizația este invalidă
+    AlreadyDeactivated: Organizația este deja dezactivată
+    AlreadyActive: Organizația este deja activă
+    Empty: Organizația este goală
+    NotFound: Organizația nu a fost găsită
+    NotChanged: Organizația nu a fost schimbată
+    DefaultOrgNotDeletable: Organizația implicită nu trebuie să fie ștearsă
+    ZitadelOrgNotDeletable: Organizația cu proiectul ZITADEL nu trebuie să fie ștearsă
+    InvalidDomain: Domeniu invalid
+    DomainMissing: Domeniu lipsă
+    DomainNotOnOrg: Domeniul nu există în organizație
+    DomainNotVerified: Domeniul nu este verificat
+    DomainAlreadyVerified: Domeniul este deja verificat
+    DomainVerificationTypeInvalid: Tipul de verificare a domeniului este invalid
+    DomainVerificationMissing: Verificarea domeniului nu a fost încă începută
+    DomainVerificationFailed: Verificarea domeniului a eșuat
+    DomainVerificationTXTNotFound: Înregistrarea TXT _zitadel-challenge nu a fost găsită pentru domeniul dvs. Verificați dacă l-ați adăugat la serverul DNS sau așteptați până când noua înregistrare este propagată
+    DomainVerificationTXTNoMatch: Înregistrarea TXT _zitadel-challenge a fost găsită pentru domeniul dvs., dar nu conține textul corect al token-ului. Verificați dacă ați adăugat token-ul corect la serverul DNS sau așteptați până când noua înregistrare este propagată
+    DomainVerificationHTTPNotFound: Fișierul care conține provocarea nu a fost găsit în URL-ul așteptat. Verificați dacă ați încărcat fișierul în locul potrivit cu permisiuni de citire
+    DomainVerificationHTTPNoMatch: Fișierul care conține provocarea a fost găsit în URL-ul așteptat, dar nu conține textul corect al token-ului. Verificați conținutul acestuia
+    DomainVerificationTimeout: A existat o depășire a timpului de așteptare la interogarea serverului DNS
+    PrimaryDomainNotDeletable: Domeniul principal nu trebuie să fie șters
+    DomainNotFound: Domeniul nu a fost găsit
+    MemberIDMissing: ID-ul membrului lipsește
+    MemberNotFound: Membrul organizației nu a fost găsit
+    InvalidMember: Membrul organizației este invalid
+    UserIDMissing: ID-ul utilizatorului lipsește
+    PolicyAlreadyExists: Politica există deja
+    PolicyNotExisting: Politica nu există
+    IdpInvalid: Configurația IDP este invalidă
+    IdpNotExisting: Configurația IDP nu există
+    OIDCConfigInvalid: Configurația OIDC IDP este invalidă
+    IdpIsNotOIDC: Configurația IDP nu este de tip oidc
+    Domain:
+      AlreadyExists: Domeniul există deja
+      InvalidCharacter: Numai caractere alfanumerice, . și - sunt permise pentru un domeniu
+      EmptyString: Caracterele non-numerice și alfabetice invalide au fost înlocuite cu spații goale și domeniul rezultat este un șir gol
+    IDP:
+      InvalidSearchQuery: Interogare de căutare invalidă
+      ClientIDMissing: ClientID lipsă
+      TeamIDMissing: TeamID lipsă
+      KeyIDMissing: KeyID lipsă
+      PrivateKeyMissing: Cheie Privată lipsă
+    LoginPolicy:
+      NotFound: Politica de conectare nu a fost găsită
+      Invalid: Politica de conectare este invalidă
+      RedirectURIInvalid: URI-ul de redirecționare implicit este invalid
+      NotExisting: Politica de conectare nu există
+      AlreadyExists: Politica de conectare există deja
+      IdpProviderAlreadyExisting: Furnizorul de identitate există deja
+      IdpProviderNotExisting: Furnizorul de identitate nu există
+      RegistrationNotAllowed: Înregistrarea nu este permisă
+      UsernamePasswordNotAllowed: Conectarea cu nume de utilizator / parolă nu este permisă
+      MFA:
+        AlreadyExists: Multifactor există deja
+        NotExisting: Multifactor nu există
+        Unspecified: Multifactor invalid
+    MailTemplate:
+      NotFound: Șablonul de e-mail implicit nu a fost găsit
+      NotChanged: Șablonul de e-mail implicit nu a fost schimbat
+      AlreadyExists: Șablonul de e-mail implicit există deja
+      Invalid: Șablonul de e-mail implicit este invalid
+    CustomMessageText:
+      NotFound: Textul mesajului implicit nu a fost găsit
+      NotChanged: Textul mesajului implicit nu a fost schimbat
+      AlreadyExists: Textul mesajului implicit există deja
+      Invalid: Textul mesajului implicit este invalid
+    PasswordComplexityPolicy:
+      NotFound: Politica de complexitate a parolei nu a fost găsită
+      Empty: Politica de complexitate a parolei este goală
+      NotExisting: Politica de complexitate a parolei nu există
+      AlreadyExists: Politica de complexitate a parolei există deja
+    PasswordLockoutPolicy:
+      NotFound: Politica de blocare a parolei nu a fost găsită
+      Empty: Politica de blocare a parolei este goală
+      NotExisting: Politica de blocare a parolei nu există
+      AlreadyExists: Politica de blocare a parolei există deja
+    PasswordAgePolicy:
+      NotFound: Politica de vârstă a parolei nu a fost găsită
+      Empty: Politica de vârstă a parolei este goală
+      NotExisting: Politica de vârstă a parolei nu există
+      AlreadyExists: Politica de vârstă a parolei există deja
+    OrgIAMPolicy:
+      Empty: Politica IAM a organizației este goală
+      NotExisting: Politica IAM a organizației nu există
+      AlreadyExists: Politica IAM a organizației există deja
+    NotificationPolicy:
+      NotFound: Politica de notificare nu a fost găsită
+      NotChanged: Politica de notificare nu a fost schimbată
+      AlreadyExists: Politica de notificare există deja
+    LabelPolicy:
+      NotFound: Politica de etichete private nu a fost găsită
+      NotChanged: Politica de etichete private nu a fost schimbată
+  Project:
+    ProjectIDMissing: ID-ul proiectului lipsește
+    AlreadyExists: Proiectul există deja în organizație
+    OrgNotExisting: Organizația nu există
+    UserNotExisting: Utilizatorul nu există
+    CouldNotGenerateClientSecret: Nu s-a putut genera secretul clientului
+    Invalid: Proiectul este invalid
+    NotActive: Proiectul nu este activ
+    NotInactive: Proiectul nu este dezactivat
+    NotFound: Proiectul nu a fost găsit
+    UserIDMissing: ID-ul utilizatorului lipsește
+    Member:
+      NotFound: Membrul proiectului nu a fost găsit
+      Invalid: Membrul proiectului este invalid
+      AlreadyExists: Membrul proiectului există deja
+      NotExisting: Membrul proiectului nu există
+    MinimumOneRoleNeeded: Trebuie adăugat cel puțin un rol
+    Role:
+      AlreadyExists: Rolul există deja
+      Invalid: Rolul este invalid
+      NotExisting: Rolul nu există
+    IDMissing: ID lipsă
+    App:
+      AlreadyExists: Aplicația există deja
+      NotFound: Aplicația nu a fost găsită
+      Invalid: Aplicația este invalidă
+      NotExisting: Aplicația nu există
+      NotActive: Aplicația nu este activă
+      NotInactive: Aplicația nu este inactivă
+      OIDCConfigInvalid: Configurația OIDC este invalidă
+      APIConfigInvalid: Configurația API este invalidă
+      SAMLConfigInvalid: Configurația SAML este invalidă
+      IsNotOIDC: Aplicația nu este de tip OIDC
+      IsNotAPI: Aplicația nu este de tip API
+      IsNotSAML: Aplicația nu este de tip SAML
+      SAMLMetadataMissing: Lipsesc metadatele SAML
+      SAMLMetadataFormat: Eroare de formatare a metadatelor SAML
+      SAMLEntityIDAlreadyExisting: SAML EntityID există deja
+      OIDCAuthMethodNoSecret: Metoda de autentificare OIDC aleasă nu necesită un secret
+      APIAuthMethodNoSecret: Metoda de autentificare API aleasă nu necesită un secret
+      AuthMethodNoPrivateKeyJWT: Metoda de autentificare aleasă nu necesită o cheie
+      ClientSecretInvalid: Secretul clientului este invalid
+      Key:
+        AlreadyExisting: Cheia aplicației există deja
+        NotFound: Cheia aplicației nu a fost găsită
+    RequiredFieldsMissing: Unele câmpuri obligatorii lipsesc
+    Grant:
+      AlreadyExists: Acordarea proiectului există deja
+      NotFound: Acordarea nu a fost găsită
+      Invalid: Acordarea proiectului este invalidă
+      NotExisting: Acordarea proiectului nu există
+      HasNotExistingRole: Un rol nu există în proiect
+      NotActive: Acordarea proiectului nu este activă
+      NotInactive: Acordarea proiectului nu este inactivă
+  IAM:
+    NotFound: Instanța nu a fost găsită. Asigurați-vă că aveți domeniul corect. Consultați https://zitadel.com/docs/apis/introduction#domains
+    Member:
+      RolesNotChanged: Rolurile nu au fost schimbate
+    MemberInvalid: Membrul este invalid
+    MemberAlreadyExisting: Membrul există deja
+    MemberNotExisting: Membrul nu există
+    IDMissing: Id lipsă
+    IAMProjectIDMissing: ID-ul proiectului IAM lipsește
+    IamProjectAlreadySet: ID-ul proiectului IAM a fost deja setat
+    IdpInvalid: Configurația IDP este invalidă
+    IdpNotExisting: Configurația IDP nu există
+    OIDCConfigInvalid: Configurația OIDC IDP este invalidă
+    IdpIsNotOIDC: Configurația IDP nu este de tip oidc
+    LoginPolicyInvalid: Politica de conectare este invalidă
+    LoginPolicyNotExisting: Politica de conectare nu există
+    IdpProviderInvalid: Furnizorul de identitate este invalid
+    LoginPolicy:
+      NotFound: Politica de conectare implicită nu a fost găsită
+      NotChanged: Politica de conectare implicită nu a fost schimbată
+      NotExisting: Politica de conectare implicită nu există
+      AlreadyExists: Politica de conectare implicită există deja
+      RedirectURIInvalid: URI-ul de redirecționare implicit este invalid
+      MFA:
+        AlreadyExists: Multifactor există deja
+        NotExisting: Multifactor nu există
+        Unspecified: Multifactor invalid
+      IDP:
+        AlreadyExists: Furnizorul de identitate există deja
+        NotExisting: Furnizorul de identitate nu există
+        Invalid: Furnizorul de identitate este invalid
+      IDPConfig:
+        AlreadyExists: Configurația furnizorului de identitate există deja
+        NotInactive: Configurația furnizorului de identitate nu este inactivă
+        NotActive: Configurația furnizorului de identitate nu este activă
+    LabelPolicy:
+      NotFound: Politica de etichete private implicită nu a fost găsită
+      NotChanged: Politica de etichete private implicită nu a fost schimbată
+      MailTemplate:
+        NotFound: Șablonul de e-mail implicit nu a fost găsit
+        NotChanged: Șablonul de e-mail implicit nu a fost schimbat
+        AlreadyExists: Șablonul de e-mail implicit există deja
+        Invalid: Șablonul de e-mail implicit este invalid
+      CustomMessageText:
+        NotFound: Textul mesajului implicit nu a fost găsit
+        NotChanged: Textul mesajului implicit nu a fost schimbat
+        AlreadyExists: Textul mesajului implicit există deja
+        Invalid: Textul mesajului implicit este invalid
+      PasswordComplexityPolicy:
+        NotFound: Politica implicită de complexitate a parolei nu a fost găsită
+        NotExisting: Politica implicită de complexitate a parolei nu există
+        AlreadyExists: Politica implicită de complexitate a parolei există deja
+        Empty: Politica implicită de complexitate a parolei este goală
+        NotChanged: Politica implicită de complexitate a parolei nu a fost schimbată
+      PasswordAgePolicy:
+        NotFound: Politica implicită de vârstă a parolei nu a fost găsită
+        NotExisting: Politica implicită de vârstă a parolei nu există
+        AlreadyExists: Politica implicită de vârstă a parolei există deja
+        Empty: Politica implicită de vârstă a parolei este goală
+        NotChanged: Politica implicită de vârstă a parolei nu a fost schimbată
+      PasswordLockoutPolicy:
+        NotFound: Politica implicită de blocare a parolei nu a fost găsită
+        NotExisting: Politica implicită de blocare a parolei nu există
+        AlreadyExists: Politica implicită de blocare a parolei există deja
+        Empty: Politica implicită de blocare a parolei este goală
+        NotChanged: Politica implicită de blocare a parolei nu a fost schimbată
+      DomainPolicy:
+        NotFound: Politica IAM a organizației nu a fost găsită
+        Empty: Politica IAM a organizației este goală
+        NotExisting: Politica IAM a organizației nu există
+        AlreadyExists: Politica IAM a organizației există deja
+        NotChanged: Politica IAM a organizației nu a fost schimbată
+      NotificationPolicy:
+        NotFound: Politica de notificare implicită nu a fost găsită
+        NotChanged: Politica de notificare implicită nu a fost schimbată
+        AlreadyExists: Politica de notificare implicită există deja
+      Policy:
+        AlreadyExists: Politica există deja
+        Label:
+          Invalid:
+            PrimaryColor: Culoarea primară nu este o valoare de culoare Hex validă
+            BackgroundColor: Culoarea de fundal nu este o valoare de culoare Hex validă
+            WarnColor: Culoarea de avertizare nu este o valoare de culoare Hex validă
+            FontColor: Culoarea fontului nu este o valoare de culoare Hex validă
+            PrimaryColorDark: Culoarea primară (modul întunecat) nu este o valoare de culoare Hex validă
+            BackgroundColorDark: Culoarea de fundal (modul întunecat) nu este o valoare de culoare Hex validă
+            WarnColorDark: Culoarea de avertizare (modul întunecat) nu este o valoare de culoare Hex validă
+            FontColorDark: Culoarea fontului (modul întunecat) nu este o valoare de culoare Hex validă
+      UserGrant:
+        AlreadyExists: Acordarea utilizatorului există deja
+        NotFound: Acordarea utilizatorului nu a fost găsită
+        Invalid: Acordarea utilizatorului este invalidă
+        NotChanged: Acordarea utilizatorului nu a fost schimbată
+        IDMissing: Id lipsă
+        NotActive: Acordarea utilizatorului nu este activă
+        NotInactive: Acordarea utilizatorului nu este dezactivată
+        NoPermissionForProject: Utilizatorul nu are permisiuni pentru acest proiect
+        RoleKeyNotFound: Rolul nu a fost găsit
+      Member:
+        AlreadyExists: Membrul există deja
+      IDPConfig:
+        AlreadyExists: Configurația IDP cu acest nume există deja
+        NotExisting: Configurația furnizorului de identitate nu există
+      Changes:
+        NotFound: Niciun istoric găsit
+        AuditRetention: Istoricul este în afara perioadei de păstrare a jurnalului de audit
+      Token:
+        NotFound: Token-ul nu a fost găsit
+        Invalid: Token-ul este invalid
+      UserSession:
+        NotFound: Sesiunea utilizatorului nu a fost găsită
+      Key:
+        NotFound: Cheia nu a fost găsită
+        ExpireBeforeNow: Data de expirare este în trecut
+      Login:
+        LoginPolicy:
+          MFA:
+            ForceAndNotConfigured: Multifactor este configurat ca obligatoriu, dar nu sunt configurați furnizori posibili. Vă rugăm să contactați administratorul sistemului.
+      Step:
+        Started:
+          AlreadyExists: Pasul a început deja, există deja
+        Done:
+          AlreadyExists: Pasul a terminat deja, există deja
+      CustomText:
+        AlreadyExists: Textul personalizat există deja
+        Invalid: Textul personalizat este invalid
+        NotFound: Textul personalizat nu a fost găsit
+      TranslationFile:
+        ReadError: Eroare la citirea fișierului de traducere
+        MergeError: Fișierul de traducere nu a putut fi îmbinat cu traducerile personalizate
+        NotFound: Fișierul de traducere nu există
+      Metadata:
+        NotFound: Metadatele nu au fost găsite
+        NoData: Lista de metadate este goală
+        Invalid: Metadatele sunt invalide
+        KeyNotExisting: Una sau mai multe chei nu există
+      Action:
+        Invalid: Acțiunea este invalidă
+        NotFound: Acțiunea nu a fost găsită
+        NotActive: Acțiunea nu este activă
+        NotInactive: Acțiunea nu este inactivă
+        MaxAllowed: Nu sunt permise acțiuni active suplimentare
+        NotEnabled: Caracteristica "Acțiune" nu este activată
+      Flow:
+        FlowTypeMissing: FlowType lipsă
+        Empty: Fluxul este deja gol
+        WrongTriggerType: TriggerType este invalid
+        NoChanges: Nicio modificare
+        ActionIDsNotExist: ActionIDs nu există
+      Query:
+        CloseRows: Declarația SQL nu a putut fi terminată
+        SQLStatement: Declarația SQL nu a putut fi creată
+        InvalidRequest: Cererea este invalidă
+        TooManyNestingLevels: Prea multe niveluri de imbricare a interogărilor (Max 20)
+        LimitExceeded: Limita a fost depășită
+      Quota:
+        AlreadyExists: Cota există deja pentru această unitate
+        NotFound: Cota nu a fost găsită pentru această unitate
+        Invalid:
+          CallURL: URL-ul de apel al cotei este invalid
+          Percent: Procentul cotei este mai mic de 1
+          Unimplemented: Cotele nu sunt implementate pentru această unitate
+          Amount: Suma cotei este mai mică de 1
+          ResetInterval: Intervalul de resetare a cotei este mai scurt de un minut
+          Noop: O cotă nelimitată fără notificări nu are efect
+        Access:
+          Exhausted: Cota pentru cererile autentificate este epuizată
+        Execution:
+          Exhausted: Cota pentru secunde de execuție este epuizată
+      LogStore:
+        Access:
+          StorageFailed: Stocarea jurnalului de acces în baza de date a eșuat
+          ScanFailed: Interogarea utilizării pentru cererile autentificate a eșuat
+        Execution:
+          StorageFailed: Stocarea jurnalului de execuție a acțiunii în baza de date a eșuat
+          ScanFailed: Interogarea utilizării pentru secunde de execuție a acțiunii a eșuat
+      Session:
+        NotExisting: Sesiunea nu există
+        Terminated: Sesiunea a fost deja terminată
+        Expired: Sesiunea a expirat
+        PositiveLifetime: Durata de viață a sesiunii nu trebuie să fie mai mică de 0
+        Token:
+          Invalid: Token-ul de sesiune este invalid
+        WebAuthN:
+          NoChallenge: Sesiune fără provocare WebAuthN
+      Intent:
+        IDPMissing: ID-ul IDP lipsește în cerere
+        IDPInvalid: IDP invalid pentru cerere
+        ResponseInvalid: Răspunsul IDP este invalid
+        MissingSingleMappingAttribute: Răspunsul IDP nu conține atributul de mapare sau are mai mult de o valoare
+        SuccessURLMissing: URL-ul de succes lipsește în cerere
+        FailureURLMissing: URL-ul de eșec lipsește în cerere
+        StateMissing: Parametrul de stare lipsește în cerere
+        NotStarted: Intenția nu este pornită sau a fost deja terminată
+        NotSucceeded: Intenția nu a reușit
+        TokenCreationFailed: Crearea token-ului a eșuat
+        InvalidToken: Token-ul intenției este invalid
+        OtherUser: Intenția este destinată altui utilizator
+      AuthRequest:
+        AlreadyExists: Cererea de autentificare există deja
+        NotExisting: Cererea de autentificare nu există
+        WrongLoginClient: Cererea de autentificare a fost creată de alt client de autentificare
+      OIDCSession:
+        RefreshTokenInvalid: Token-ul de reîmprospătare este invalid
+        Token:
+          Invalid: Token-ul este invalid
+          Expired: Token-ul a expirat
+        InvalidClient: Token-ul nu a fost emis pentru acest client
+      SAMLRequest:
+        AlreadyExists: Cererea SAML există deja
+        NotExisting: Cererea SAML nu există
+        WrongLoginClient: Cererea SAML a fost creată de alt client de autentificare
+      SAMLSession:
+        InvalidClient: Răspunsul SAML nu a fost emis pentru acest client
+      Feature:
+        NotExisting: Caracteristica nu există
+        TypeNotSupported: Tipul caracteristicii nu este suportat
+        InvalidValue: Valoare invalidă pentru această caracteristică
+      Target:
+        Invalid: Ținta este invalidă
+        NoTimeout: Ținta nu are timp de așteptare
+        InvalidURL: Ținta are un URL invalid
+        NotFound: Ținta nu a fost găsită
+      Execution:
+        ConditionInvalid: Condiția de execuție este invalidă
+        Invalid: Execuția este invalidă
+        NotFound: Execuția nu a fost găsită
+        IncludeNotFound: Includerea nu a fost găsită
+        NoTargets: Nu sunt definite ținte
+        Failed: Execuția a eșuat
+        ResponseIsNotValidJSON: Răspunsul nu este un JSON valid
+      UserSchema:
+        NotEnabled: Caracteristica "Schema de utilizator" nu este activată
+        Type:
+          Missing: Tipul schemei de utilizator lipsește
+          AlreadyExists: Tipul schemei de utilizator există deja
+        Authenticator:
+          Invalid: Tip de autentificator invalid
+        NotActive: Schema de utilizator nu este activă
+        NotInactive: Schema de utilizator nu este inactivă
+        NotExists: Schema de utilizator nu există
+        ID:
+          Missing: ID-ul schemei de utilizator lipsește
+        Invalid: Schema de utilizator este invalidă
+        Data:
+          Invalid: Datele sunt invalide pentru schema de utilizator
+      TokenExchange:
+        FeatureDisabled: Caracteristica Token Exchange este dezactivată pentru instanța dvs. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+        Token:
+          Missing: Token-ul lipsește
+          Invalid: Token-ul este invalid
+          TypeMissing: Tipul token-ului lipsește
+          TypeNotAllowed: Tipul token-ului nu este permis
+          TypeNotSupported: Tipul token-ului nu este suportat
+          NotForAPI: Token-urile impersonate nu sunt permise pentru API
+        Impersonation:
+          PolicyDisabled: Impersonarea este dezactivată în politica de securitate a instanței
+      WebKey:
+        ActiveDelete: Nu se poate șterge o cheie web activă
+        Config: Configurație cheie web invalidă
+        Duplicate: ID-ul cheii web nu este unic
+        FeatureDisabled: Caracteristica cheie web este dezactivată
+        NoActive: Nu a fost găsită nicio cheie web activă
+        NotFound: Cheia web nu a fost găsită
+
+    AggregateTypes:
+      action: Acțiune
+      instance: Instanță
+      key_pair: Pereche de chei
+      org: Organizație
+      project: Proiect
+      user: Utilizator
+      usergrant: Acordare de utilizator
+      quota: Cotă
+      feature: Caracteristică
+      target: Țintă
+      execution: Execuție
+      user_schema: Schema de utilizator
+      auth_request: Cerere de autentificare
+      device_auth: Autentificare dispozitiv
+      idpintent: Intenție IDP
+      limits: Limite
+      milestone: Piatră de hotar
+      oidc_session: Sesiune OIDC
+      restrictions: Restricții
+      system: Sistem
+      session: Sesiune
+      web_key: Cheie web
+      saml_request: Cerere SAML
+      saml_session: Sesiune SAML
+
+    EventTypes:
+      execution:
+        set: Execuție setată
+        removed: Execuție ștearsă
+      target:
+        added: Țintă creată
+        changed: Țintă schimbată
+        removed: Țintă ștearsă
+      user:
+        added: Utilizator adăugat
+        selfregistered: Utilizator s-a înregistrat singur
+        initialization:
+          code:
+            added: Cod de inițializare generat
+            sent: Cod de inițializare trimis
+          check:
+            succeeded: Verificarea inițializării a reușit
+            failed: Verificarea inițializării a eșuat
+        token:
+          added: Token de acces creat
+          v2.added: Token de acces creat
+          removed: Token de acces șters
+        impersonated: Utilizator impersonat
+        username:
+          reserved: Nume de utilizator rezervat
+          released: Nume de utilizator eliberat
+          changed: Nume de utilizator schimbat
+        email:
+          reserved: Adresă de e-mail rezervată
+          released: Adresă de e-mail eliberată
+          changed: Adresă de e-mail schimbată
+          verified: Adresă de e-mail verificată
+          verification:
+            failed: Verificarea adresei de e-mail a eșuat
+          code:
+            added: Cod de verificare a adresei de e-mail generat
+            sent: Cod de verificare a adresei de e-mail trimis
+        machine:
+          added: Utilizator tehnic adăugat
+          changed: Utilizator tehnic schimbat
+          key:
+            added: Cheie adăugată
+            removed: Cheie ștearsă
+          secret:
+            set: Secret setat
+            updated: Hash secret actualizat
+            removed: Secret șters
+            check:
+              succeeded: Verificarea secretului a reușit
+              failed: Verificarea secretului a eșuat
+        human:
+          added: Persoană adăugată
+          selfregistered: Persoană s-a înregistrat singură
+          avatar:
+            added: Avatar adăugat
+            removed: Avatar șters
+          initialization:
+            code:
+              added: Cod de inițializare generat
+              sent: Cod de inițializare trimis
+            check:
+              succeeded: Verificarea inițializării a reușit
+              failed: Verificarea inițializării a eșuat
+          invite:
+            code:
+              added: Cod de invitație generat
+              sent: Cod de invitație trimis
+            check:
+              succeeded: Verificarea invitației a reușit
+              failed: Verificarea invitației a eșuat
+          username:
+            reserved: Nume de utilizator rezervat
+            released: Nume de utilizator eliberat
+          email:
+            changed: Adresă de e-mail schimbată
+            verified: Adresă de e-mail verificată
+            verification:
+              failed: Verificarea adresei de e-mail a eșuat
+            code:
+              added: Cod de verificare a adresei de e-mail generat
+              sent: Cod de verificare a adresei de e-mail trimis
+          password:
+            changed: Parolă schimbată
+            code:
+              added: Cod de parolă generat
+              sent: Cod de parolă trimis
+            check:
+              succeeded: Verificarea parolei a reușit
+              failed: Verificarea parolei a eșuat
+            change:
+              sent: Schimbare de parolă trimisă
+            hash:
+              updated: Hash de parolă actualizat
+          externallogin:
+            check:
+              succeeded: Autentificare externă a reușit
+          externalidp:
+            added: IDP extern adăugat
+            removed: IDP extern șters
+            cascade:
+              removed: IDP extern cascadă șters
+            id:
+              migrated: UserID extern al IDP a fost migrat
+          phone:
+            changed: Număr de telefon schimbat
+            verified: Număr de telefon verificat
+            verification:
+              failed: Verificarea numărului de telefon a eșuat
+            code:
+              added: Cod de număr de telefon generat
+              sent: Cod de număr de telefon trimis
+            removed: Număr de telefon șters
+          profile:
+            changed: Profil de utilizator schimbat
+          address:
+            changed: Adresă de utilizator schimbată
+          mfa:
+            otp:
+              added: Multifactor OTP adăugat
+              verified: Multifactor OTP verificat
+              removed: Multifactor OTP șters
+              check:
+                succeeded: Verificarea Multifactor OTP a reușit
+                failed: Verificarea Multifactor OTP a eșuat
+              sms:
+                added: Multifactor OTP SMS adăugat
+                removed: Multifactor OTP SMS șters
+                code:
+                  added: Cod Multifactor OTP SMS adăugat
+                  sent: Cod Multifactor OTP SMS trimis
+                check:
+                  succeeded: Verificarea Multifactor OTP SMS a reușit
+                  failed: Verificarea Multifactor OTP SMS a eșuat
+              email:
+                added: Multifactor OTP Email adăugat
+                removed: Multifactor OTP Email șters
+                code:
+                  added: Cod Multifactor OTP Email adăugat
+                  sent: Cod Multifactor OTP Email trimis
+                check:
+                  succeeded: Verificarea Multifactor OTP Email a reușit
+                  failed: Verificarea Multifactor OTP Email a eșuat
+            u2f:
+              token:
+                added: Token pentru Multifactor U2F adăugat
+                verified: Token pentru Multifactor U2F verificat
+                removed: Token pentru Multifactor U2F șters
+              begin:
+                login: Verificarea Multifactor U2F a început
+              check:
+                succeeded: Verificarea Multifactor U2F a reușit
+                failed: Verificarea Multifactor U2F a eșuat
+              signcount:
+                changed: Suma de control a token-ului Multifactor U2F a fost schimbată
+            init:
+              skipped: Inițializarea Multifactor a fost omisă
+            passwordless:
+              token:
+                added: Token pentru conectare fără parolă adăugat
+                verified: Token pentru conectare fără parolă verificat
+                removed: Token pentru conectare fără parolă șters
+              begin:
+                login: Verificarea conectării fără parolă a început
+              check:
+                succeeded: Verificarea conectării fără parolă a reușit
+                failed: Verificarea conectării fără parolă a eșuat
+              signcount:
+                changed: Suma de control a token-ului de conectare fără parolă a fost schimbată
+            initialization:
+              code:
+                added: Cod de inițializare fără parolă adăugat
+                sent: Cod de inițializare fără parolă trimis
+                requested: Cod de inițializare fără parolă solicitat
+                check:
+                  succeeded: Codul de inițializare fără parolă a fost verificat cu succes
+                  failed: Verificarea codului de inițializare fără parolă a eșuat
+            signed:
+              out: Utilizator deconectat
+            refresh:
+              token:
+                added: Token de reîmprospătare creat
+                renewed: Token de reîmprospătare reînnoit
+                removed: Token de reîmprospătare șters
+        locked: Utilizator blocat
+        unlocked: Utilizator deblocat
+        deactivated: Utilizator dezactivat
+        reactivated: Utilizator reactivat
+        removed: Utilizator șters
+        password:
+          changed: Parolă schimbată
+          code:
+            added: Cod de parolă generat
+            sent: Cod de parolă trimis
+          check:
+            succeeded: Verificarea parolei a reușit
+            failed: Verificarea parolei a eșuat
+        phone:
+          changed: Număr de telefon schimbat
+          verified: Număr de telefon verificat
+          verification:
+            failed: Verificarea numărului de telefon a eșuat
+          code:
+            added: Cod de număr de telefon generat
+            sent: Cod de număr de telefon trimis
+
+        profile:
+          changed: Profil de utilizator schimbat
+        address:
+          changed: Adresă de utilizator schimbată
+        mfa:
+          otp:
+            added: Multifactor OTP adăugat
+            verified: Multifactor OTP verificat
+            removed: Multifactor OTP șters
+            check:
+              succeeded: Verificarea Multifactor OTP a reușit
+              failed: Verificarea Multifactor OTP a eșuat
+            init:
+              skipped: Inițializarea Multifactor OTP a fost omisă
+          init:
+            skipped: Inițializarea Multifactor a fost omisă
+        signed:
+          out: Utilizator deconectat
+        grant:
+          added: Autorizație adăugată
+          changed: Autorizație schimbată
+          removed: Autorizație ștearsă
+          deactivated: Autorizație dezactivată
+          reactivated: Autorizație reactivată
+          reserved: Autorizație rezervată
+          released: Autorizație eliberată
+          cascade:
+            removed: Autorizație ștearsă
+            changed: Autorizație schimbată
+        metadata:
+          set: Metadate de utilizator setate
+          removed: Metadate de utilizator șterse
+          removed.all: Toate metadatele de utilizator au fost șterse
+        domain:
+          claimed: Domeniu revendicat
+          claimed.sent: Notificarea de revendicare a domeniului a fost trimisă
+        pat:
+          added: Token de acces personal adăugat
+          removed: Token de acces personal șters
+      org:
+        added: Organizație adăugată
+        changed: Organizație schimbată
+        deactivated: Organizație dezactivată
+        reactivated: Organizație reactivată
+        removed: Organizație ștearsă
+        domain:
+          added: Domeniu adăugat
+          verification:
+            added: Verificare de domeniu adăugată
+            failed: Verificare de domeniu eșuată
+          verified: Domeniu verificat
+          removed: Domeniu șters
+          primary:
+            set: Domeniu principal setat
+          reserved: Domeniu rezervat
+          released: Domeniu eliberat
+        name:
+          reserved: Nume de organizație rezervat
+          released: Nume de organizație eliberat
+        member:
+          added: Membru al organizației adăugat
+          changed: Membru al organizației schimbat
+          removed: Membru al organizației șters
+          cascade:
+            removed: Membru al organizației cascadă șters
+        iam:
+          policy:
+            added: Politică de sistem adăugată
+            changed: Politică de sistem schimbată
+            removed: Politică de sistem ștearsă
+        idp:
+          config:
+            added: Configurație IDP adăugată
+            changed: Configurație IDP schimbată
+            removed: Configurație IDP ștearsă
+            deactivated: Configurație IDP dezactivată
+            reactivated: Configurație IDP reactivată
+          oidc:
+            config:
+              added: Configurație OIDC IDP adăugată
+              changed: Configurație OIDC IDP schimbată
+          saml:
+            config:
+              added: Configurație SAML IDP adăugată
+              changed: Configurație SAML IDP schimbată
+          jwt:
+            config:
+              added: Configurație JWT IDP adăugată
+              changed: Configurație JWT IDP schimbată
+        customtext:
+          set: Text personalizat setat
+          removed: Text personalizat șters
+          template:
+            removed: Șablon de text personalizat șters
+        policy:
+          login:
+            added: Politică de conectare adăugată
+            changed: Politică de conectare schimbată
+            removed: Politică de conectare ștearsă
+            idpprovider:
+              added: Furnizor de identitate adăugat la politica de conectare
+              removed: Furnizor de identitate șters din politica de conectare
+              cascade:
+                removed: Furnizor de identitate cascadă șters din politica de conectare
+            secondfactor:
+              added: Al doilea factor adăugat la politica de conectare
+              removed: Al doilea factor șters din politica de conectare
+            multifactor:
+              added: Multi-factor adăugat la politica de conectare
+              removed: Multi-factor șters din politica de conectare
+          password:
+            complexity:
+              added: Politică de complexitate a parolei adăugată
+              changed: Politică de complexitate a parolei schimbată
+              removed: Politică de complexitate a parolei ștearsă
+            age:
+              added: Politică de vârstă a parolei adăugată
+              changed: Politică de vârstă a parolei schimbată
+              removed: Politică de vârstă a parolei ștearsă
+            lockout:
+              added: Politică de blocare a parolei adăugată
+              changed: Politică de blocare a parolei schimbată
+              removed: Politică de blocare a parolei ștearsă
+          label:
+            added: Politică de etichete adăugată
+            changed: Politică de etichete schimbată
+            activated: Politică de etichete activată
+            removed: Politică de etichete ștearsă
+            logo:
+              added: Logo adăugat la politica de etichete
+              removed: Logo șters din politica de etichete
+              dark:
+                added: Logo (modul întunecat) adăugat la politica de etichete
+                removed: Logo (modul întunecat) șters din politica de etichete
+            icon:
+              added: Icon adăugat la politica de etichete
+              removed: Icon șters din politica de etichete
+              dark:
+                added: Icon (modul întunecat) adăugat la politica de etichete
+                removed: Icon (modul întunecat) șters din politica de etichete
+            font:
+              added: Font adăugat la politica de etichete
+              removed: Font șters din politica de etichete
+            assets:
+              removed: Active șterse din politica de etichete
+          privacy:
+            added: Politică de confidențialitate și TOS adăugate
+            changed: Politică de confidențialitate și TOS schimbate
+            removed: Politică de confidențialitate și TOS șterse
+          domain:
+            added: Politică de domeniu adăugată
+            changed: Politică de domeniu schimbată
+            removed: Politică de domeniu ștearsă
+          lockout:
+            added: Politică de blocare adăugată
+            changed: Politică de blocare schimbată
+            removed: Politică de blocare ștearsă
+          notification:
+            added: Politică de notificare adăugată
+            changed: Politică de notificare schimbată
+            removed: Politică de notificare ștearsă
+        flow:
+          trigger_actions:
+            set: Acțiune setată
+            cascade:
+              removed: Acțiuni cascadă șterse
+            removed: Acțiuni șterse
+          cleared: Flux șters
+        mail:
+          template:
+            added: Șablon de e-mail adăugat
+            changed: Șablon de e-mail schimbat
+            removed: Șablon de e-mail șters
+          text:
+            added: Text de e-mail adăugat
+            changed: Text de e-mail schimbat
+            removed: Text de e-mail șters
+        metadata:
+          removed: Metadate șterse
+          removed.all: Toate metadatele au fost șterse
+          set: Metadate setate
+      project:
+        added: Proiect adăugat
+        changed: Proiect schimbat
+        deactivated: Proiect dezactivat
+        reactivated: Proiect reactivat
+        removed: Proiect șters
+        member:
+          added: Membru al proiectului adăugat
+          changed: Membru al proiectului schimbat
+          removed: Membru al proiectului șters
+          cascade:
+            removed: Membru al proiectului cascadă șters
+        role:
+          added: Rol de proiect adăugat
+          changed: Rol de proiect schimbat
+          removed: Rol de proiect șters
+        grant:
+          added: Acces de gestionare adăugat
+          changed: Acces de gestionare schimbat
+          removed: Acces de gestionare șters
+          deactivated: Acces de gestionare dezactivat
+          reactivated: Acces de gestionare reactivat
+          cascade:
+            changed: Acces de gestionare schimbat
+          member:
+            added: Membru de acces de gestionare adăugat
+            changed: Membru de acces de gestionare schimbat
+            removed: Membru de acces de gestionare șters
+            cascade:
+              removed: Acces de gestionare cascadă șters
+        application:
+          added: Aplicație adăugată
+          changed: Aplicație schimbată
+          removed: Aplicație ștearsă
+          deactivated: Aplicație dezactivată
+          reactivated: Aplicație reactivată
+          oidc:
+            secret:
+              check:
+                succeeded: Verificarea secretului clientului OIDC a reușit
+                failed: Verificarea secretului clientului OIDC a eșuat
+            key:
+              added: Cheie de aplicație OIDC adăugată
+              removed: Cheie de aplicație OIDC ștearsă
+          api:
+            secret:
+              check:
+                succeeded: Verificarea secretului API a reușit
+                failed: Verificarea secretului API a eșuat
+            key:
+              added: Cheie de aplicație adăugată
+              removed: Cheie de aplicație ștearsă
+          config:
+            saml:
+              added: Configurație SAML adăugată
+              changed: Configurație SAML schimbată
+            oidc:
+              added: Configurație OIDC adăugată
+              changed: Configurație OIDC schimbată
+              secret:
+                changed: Secret OIDC schimbat
+                updated: Hash secret OIDC actualizat
+            api:
+              added: Configurație API adăugată
+              changed: Configurație API schimbată
+              secret:
+                changed: Secret API schimbat
+                updated: Hash secret API actualizat
+      policy:
+        password:
+          complexity:
+            added: Politică de complexitate a parolei adăugată
+            changed: Politică de complexitate a parolei schimbată
+          age:
+            added: Politică de vârstă a parolei adăugată
+            changed: Politică de vârstă a parolei schimbată
+          lockout:
+            added: Politică de blocare a parolei adăugată
+            changed: Politică de blocare a parolei schimbată
+      iam:
+        setup:
+          started: Configurarea ZITADEL a început
+          done: Configurarea ZITADEL a fost finalizată
+        global:
+          org:
+            set: Organizație globală setată
+        project:
+          iam:
+            set: Proiect ZITADEL setat
+        member:
+          added: Membru ZITADEL adăugat
+          changed: Membru ZITADEL schimbat
+          removed: Membru ZITADEL șters
+          cascade:
+            removed: Membru ZITADEL cascadă șters
+        idp:
+          config:
+            added: Configurație IDP adăugată
+            changed: Configurație IDP schimbată
+            removed: Configurație IDP ștearsă
+            deactivated: Configurație IDP dezactivată
+            reactivated: Configurație IDP reactivată
+          oidc:
+            config:
+              added: Configurație OIDC IDP adăugată
+              changed: Configurație OIDC IDP schimbată
+          saml:
+            config:
+              added: Configurație SAML IDP adăugată
+              changed: Configurație SAML IDP schimbată
+          jwt:
+            config:
+              added: Configurație JWT adăugată la furnizorul de identitate
+              changed: Configurație JWT ștearsă din furnizorul de identitate
+        customtext:
+          set: Text a fost setat
+          removed: Text a fost șters
+        policy:
+          login:
+            added: Politică de conectare implicită adăugată
+            changed: Politică de conectare implicită schimbată
+            idpprovider:
+              added: Furnizor de identitate adăugat la politica de conectare implicită
+              removed: Furnizor de identitate șters din politica de conectare implicită
+          label:
+            added: Politică de etichete adăugată
+            changed: Politică de etichete schimbată
+            activated: Politică de etichete activată
+            logo:
+              added: Logo adăugat la politica de etichete
+              removed: Logo șters din politica de etichete
+              dark:
+                added: Logo (modul întunecat) adăugat la politica de etichete
+                removed: Logo (modul întunecat) șters din politica de etichete
+            icon:
+              added: Icon adăugat la politica de etichete
+              removed: Icon șters din politica de etichete
+          dark:
+            added: Icon (modul întunecat) adăugat la politica de etichete
+            removed: Icon (modul întunecat) șters din politica de etichete
+        font:
+          added: Font adăugat la politica de etichete
+          removed: Font șters din politica de etichete
+          assets:
+            removed: Active șterse din politica de etichete
+          default:
+            language:
+              set: Limba implicită setată
+          oidc:
+            settings:
+              added: Configurație OIDC adăugată
+              changed: Configurație OIDC schimbată
+              removed: Configurație OIDC ștearsă
+          secret:
+            generator:
+              added: Generator de secrete adăugat
+              changed: Generator de secrete schimbat
+              removed: Generator de secrete șters
+          smtp:
+            config:
+              added: Configurație SMTP adăugată
+              changed: Configurație SMTP schimbată
+              activated: Configurație SMTP activată
+              deactivated: Configurație SMTP dezactivată
+              removed: Configurație SMTP ștearsă
+              password:
+                changed: Secretul configurației SMTP a fost schimbat
+          sms:
+            config:
+              twilio:
+                added: Furnizor SMS Twilio adăugat
+                changed: Furnizor SMS Twilio schimbat
+                token:
+                  changed: Token furnizor SMS Twilio schimbat
+                removed: Furnizor SMS Twilio șters
+                activated: Furnizor SMS Twilio activat
+                deactivated: Furnizor SMS Twilio dezactivat
+          key_pair:
+            added: Pereche de chei adăugată
+            certificate:
+              added: Certificat adăugat
+          action:
+            added: Acțiune adăugată
+            changed: Acțiune schimbată
+            deactivated: Acțiune dezactivată
+            reactivated: Acțiune reactivată
+            removed: Acțiune ștearsă
+          instance:
+            added: Instanță adăugată
+            changed: Instanță schimbată
+            customtext:
+              removed: Text personalizat șters
+              set: Text personalizat setat
+              template:
+                removed: Șablon de text personalizat șters
+            default:
+              language:
+                set: Limba implicită setată
+              org:
+                set: Organizația implicită setată
+            domain:
+              added: Domeniu adăugat
+              primary:
+                set: Domeniu principal setat
+              removed: Domeniu șters
+            iam:
+              console:
+                set: Aplicația ZITADEL Console setată
+              project:
+                set: Proiectul ZITADEL setat
+            mail:
+              template:
+                added: Șablon de e-mail adăugat
+                changed: Șablon de e-mail schimbat
+              text:
+                added: Text de e-mail adăugat
+                changed: Text de e-mail schimbat
+            member:
+              added: Membru al instanței adăugat
+              changed: Membru al instanței schimbat
+              removed: Membru al instanței șters
+              cascade:
+                removed: Membru al instanței cascadă șters
+            notification:
+              provider:
+                debug:
+                  fileadded: Furnizor de notificări de depanare a fișierelor adăugat
+                  filechanged: Furnizor de notificări de depanare a fișierelor schimbat
+                  fileremoved: Furnizor de notificări de depanare a fișierelor șters
+                  logadded: Furnizor de notificări de depanare a jurnalelor adăugat
+                  logchanged: Furnizor de notificări de depanare a jurnalelor schimbat
+                  logremoved: Furnizor de notificări de depanare a jurnalelor șters
+            oidc:
+              settings:
+                added: Setări OIDC adăugate
+                changed: Setări OIDC schimbate
+            policy:
+              domain:
+                added: Politică de domeniu adăugată
+                changed: Politică de domeniu schimbată
+              label:
+                activated: Politică de etichete activată
+                added: Politică de etichete adăugată
+                assets:
+                  removed: Activ șters din politica de etichete
+                changed: Politică de etichete schimbată
+                font:
+                  added: Font adăugat la politica de etichete
+                  removed: Font șters din politica de etichete
+                icon:
+                  added: Icon adăugat la politica de etichete
+                  removed: Icon șters din politica de etichete
+                  dark:
+                    added: Icon adăugat la politica de etichete întunecate
+                    removed: Icon șters din politica de etichete întunecate
+                logo:
+                  added: Logo adăugat la politica de etichete
+                  removed: Logo șters din politica de etichete
+                  dark:
+                    added: Logo adăugat la politica de etichete întunecate
+                    removed: Logo șters din politica de etichete întunecate
+              lockout:
+                added: Politică de blocare adăugată
+                changed: Politică de blocare schimbată
+              login:
+                added: Politică de conectare adăugată
+                changed: Politică de conectare schimbată
+                idpprovider:
+                  added: Furnizor de identitate adăugat la politica de conectare
+                  cascade:
+                    removed: Furnizor de identitate cascadă șters din politica de conectare
+                  removed: Furnizor de identitate șters din politica de conectare
+                multifactor:
+                  added: Multifactor adăugat la politica de conectare
+                  removed: Multifactor șters din politica de conectare
+                secondfactor:
+                  added: Al doilea factor adăugat la politica de conectare
+                  removed: Al doilea factor șters din politica de conectare
+              password:
+                age:
+                  added: Politică de vârstă a parolei adăugată
+                  changed: Politică de vârstă a parolei schimbată
+                complexity:
+                  added: Politică de complexitate a parolei adăugată
+                  changed: Politică de complexitate a parolei schimbată
+              privacy:
+                added: Politică de confidențialitate adăugată
+                changed: Politică de confidențialitate schimbată
+              security:
+                set: Politică de securitate setată
+
+            removed: Instanță ștearsă
+            secret:
+              generator:
+                added: Generator de secrete adăugat
+                changed: Generator de secrete schimbat
+                removed: Generator de secrete șters
+            sms:
+              configtwilio:
+                activated: Configurație Twilio SMS activată
+                added: Configurație Twilio SMS adăugată
+                changed: Configurație Twilio SMS schimbată
+                deactivated: Configurație Twilio SMS dezactivată
+                removed: Configurație Twilio SMS ștearsă
+                token:
+                  changed: Token al configurației Twilio SMS schimbat
+            smtp:
+              config:
+                added: Configurație SMTP adăugată
+                changed: Configurație SMTP schimbată
+                activated: Configurație SMTP activată
+                deactivated: Configurație SMTP dezactivată
+                password:
+                  changed: Parolă a configurației SMTP schimbată
+                removed: Configurație SMTP ștearsă
+          user_schema:
+            created: Schemă de utilizator creată
+            updated: Schemă de utilizator actualizată
+            deactivated: Schemă de utilizator dezactivată
+            reactivated: Schemă de utilizator reactivată
+            deleted: Schemă de utilizator ștearsă
+            user:
+              created: Utilizator creat
+              updated: Utilizator actualizat
+              deleted: Utilizator șters
+              email:
+                updated: Adresă de e-mail schimbată
+                verified: Adresă de e-mail verificată
+                verification:
+                  failed: Verificarea adresei de e-mail a eșuat
+                code:
+                  added: Cod de verificare a adresei de e-mail generat
+                  sent: Cod de verificare a adresei de e-mail trimis
+              phone:
+                updated: Număr de telefon schimbat
+                verified: Număr de telefon verificat
+                verification:
+                  failed: Verificarea numărului de telefon a eșuat
+                code:
+                  added: Cod de număr de telefon generat
+                  sent: Cod de număr de telefon trimis
+
+          web_key:
+            added: Cheie Web adăugată
+            activated: Cheie Web activată
+            deactivated: Cheie Web dezactivată
+            removed: Cheie Web ștearsă
+
+        Application:
+          OIDC:
+            UnsupportedVersion: Versiunea dvs. OIDC nu este suportată
+            V1:
+              NotCompliant: Configurația dvs. nu este conformă și diferă de standardul OIDC 1.0.
+              NoRedirectUris: Trebuie înregistrat cel puțin un URI de redirecționare.
+              NotAllCombinationsAreAllowed: Configurația este conformă, dar nu toate combinațiile posibile sunt permise.
+              Code:
+                RedirectUris:
+                  HttpOnlyForWeb: Tipul de acordare code permite doar URI-uri de redirecționare http pentru tipul de aplicație web.
+                  CustomOnlyForNative: Tipul de acordare code permite doar URI-uri de redirecționare personalizate pentru tipul de aplicație nativă (de exemplu, appname://)
+              Implicit:
+                RedirectUris:
+                  CustomNotAllowed: Tipul de acordare implicit nu permite URI-uri de redirecționare personalizate
+                  HttpNotAllowed: Tipul de acordare implicit nu permite URI-uri de redirecționare http
+                  HttpLocalhostOnlyForNative: URI-ul de redirecționare Http://localhost este permis doar pentru aplicațiile native.
+              Native:
+                AuthMethodType:
+                  NotNone: Aplicațiile native ar trebui să aibă authmethodtype none.
+                RedirectUris:
+                  MustBeHttpLocalhost: URI-urile de redirecționare trebuie să înceapă cu propriul dvs. protocol, http://127.0.0.1, http://[::1] sau http://localhost.
+              UserAgent:
+                AuthMethodType:
+                  NotNone: Aplicația agentului utilizator ar trebui să aibă authmethodtype none.
+              GrantType:
+                Refresh:
+                  NoAuthCode: Token-ul de reîmprospătare este permis doar în combinație cu codul de autorizare.
+
+        Action:
+          Flow:
+            Type:
+              Unspecified: Nespecificat
+              ExternalAuthentication: Autentificare externă
+              CustomiseToken: Completare Token
+              InternalAuthentication: Autentificare internă
+              CustomizeSAMLResponse: Completează SAMLResponse
+            TriggerType:
+              Unspecified: Nespecificat
+              PostAuthentication: Post Autentificare
+              PreCreation: Pre Creare
+              PostCreation: Post Creare
+              PreUserinfoCreation: Pre Creare Userinfo
+              PreAccessTokenCreation: Pre Creare Token de Acces
+              PreSAMLResponseCreation: Pre Creare Răspuns SAML

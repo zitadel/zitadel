@@ -1,0 +1,528 @@
+Login:
+  Title: Bine ați revenit!
+  Description: Introduceți datele de autentificare.
+  TitleLinking: Autentificare pentru asocierea utilizatorului
+  DescriptionLinking: Introduceți datele de autentificare pentru a vă asocia utilizatorul extern.
+  LoginNameLabel: Nume de utilizator
+  UsernamePlaceHolder: nume de utilizator
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: Autentificare cu un utilizator extern.
+  MustBeMemberOfOrg: Utilizatorul trebuie să fie membru al organizației {{.OrgName}}.
+  RegisterButtonText: Înregistrare
+  NextButtonText: Următorul
+
+LDAP:
+  Title: Autentificare
+  Description: Introduceți datele de autentificare.
+  LoginNameLabel: Nume de utilizator
+  PasswordLabel: Parola
+  NextButtonText: Următorul
+
+SelectAccount:
+  Title: Selectați contul
+  Description: Utilizați contul dvs.
+  TitleLinking: Selectați contul pentru asocierea utilizatorului
+  DescriptionLinking: Selectați contul dvs. pentru a-l asocia cu utilizatorul dvs. extern.
+  OtherUser: Alt utilizator
+  SessionState0: activ
+  SessionState1: Deconectat
+  MustBeMemberOfOrg: Utilizatorul trebuie să fie membru al organizației {{.OrgName}}.
+
+Password:
+  Title: Parola
+  Description: Introduceți datele de autentificare.
+  PasswordLabel: Parola
+  MinLength: Trebuie să aibă cel puțin
+  MinLengthp2: caractere.
+  MaxLength: Trebuie să aibă mai puțin de 70 de caractere.
+  HasUppercase: Trebuie să includă o literă mare.
+  HasLowercase: Trebuie să includă o literă mică.
+  HasNumber: Trebuie să includă un număr.
+  HasSymbol: Trebuie să includă un simbol.
+  Confirmation: Confirmarea parolei se potrivește.
+  ResetLinkText: Resetează parola
+  BackButtonText: Înapoi
+  NextButtonText: Următorul
+
+UsernameChange:
+  Title: Schimbă numele de utilizator
+  Description: Setează noul tău nume de utilizator
+  UsernameLabel: Nume de utilizator
+  CancelButtonText: Anulare
+  NextButtonText: Următorul
+
+UsernameChangeDone:
+  Title: Nume de utilizator schimbat
+  Description: Numele tău de utilizator a fost schimbat cu succes.
+  NextButtonText: Următorul
+
+InitPassword:
+  Title: Setează parola
+  Description: Ați primit un cod, pe care trebuie să-l introduceți în formularul de mai jos, pentru a vă seta noua parolă.
+  CodeLabel: Cod
+  NewPasswordLabel: Parolă nouă
+  NewPasswordConfirmLabel: Confirmă parola
+  ResendButtonText: Retrimite codul
+  NextButtonText: Următorul
+
+InitPasswordDone:
+  Title: Parola setată
+  Description: Parola a fost setată cu succes
+  NextButtonText: Următorul
+  CancelButtonText: Anulare
+
+InitUser:
+  Title: Activează utilizatorul
+  Description: Verifică-ți adresa de e-mail cu codul de mai jos și setează-ți parola.
+  CodeLabel: Cod
+  NewPasswordLabel: Parolă nouă
+  NewPasswordConfirm: Confirmă parola
+  NextButtonText: Următorul
+  ResendButtonText: Retrimite codul
+
+InitUserDone:
+  Title: Utilizator activat
+  Description: E-mail verificat și parola setată cu succes
+  NextButtonText: Următorul
+  CancelButtonText: Anulare
+
+InviteUser:
+  Title: Activează utilizatorul
+  Description: Verifică-ți adresa de e-mail cu codul de mai jos și setează-ți parola.
+  CodeLabel: Cod
+  NewPasswordLabel: Parolă nouă
+  NewPasswordConfirm: Confirmă parola
+  NextButtonText: Următorul
+  ResendButtonText: Retrimite codul
+
+InitMFAPrompt:
+  Title: Configurare 2-Factori
+  Description: Autentificarea cu 2 factori vă oferă o securitate suplimentară pentru contul dvs. de utilizator. Acest lucru asigură că numai tu ai acces la contul tău.
+  Provider0: Aplicație de autentificare (de exemplu, Google/Microsoft Authenticator, Authy)
+  Provider1: Dependent de dispozitiv (de exemplu, FaceID, Windows Hello, Amprentă)
+  Provider3: SMS OTP
+  Provider4: E-mail OTP
+  NextButtonText: Următorul
+  SkipButtonText: Omite
+
+InitMFAOTP:
+  Title: Verificare în 2 pași
+  Description: Creează-ți autentificarea cu 2 factori. Descarcă o aplicație de autentificare dacă nu ai deja una.
+  OTPDescription: Scanează codul cu aplicația de autentificare (de exemplu, Google/Microsoft Authenticator, Authy) sau copiază secretul și introdu codul generat mai jos.
+  SecretLabel: Secret
+  CodeLabel: Cod
+  NextButtonText: Următorul
+  CancelButtonText: Anulare
+
+InitMFAOTPSMS:
+  Title: Verificare în 2 pași
+  DescriptionPhone: Creează-ți autentificarea cu 2 factori. Introdu numărul tău de telefon pentru a-l verifica.
+  DescriptionCode: Creează-ți autentificarea cu 2 factori. Introdu codul primit pentru a-ți verifica numărul de telefon.
+  PhoneLabel: Telefon
+  CodeLabel: Cod
+  EditButtonText: Editează
+  ResendButtonText: Retrimite codul
+  NextButtonText: Următorul
+
+InitMFAU2F:
+  Title: Adaugă cheie de securitate
+  Description: O cheie de securitate este o metodă de verificare care poate fi încorporată în telefonul tău, folosește Bluetooth sau se conectează direct la portul USB al computerului tău.
+  TokenNameLabel: Numele cheii de securitate / dispozitivului
+  NotSupported: WebAuthN nu este acceptat de browserul dvs. Asigurați-vă că este actualizat sau utilizați altul (de exemplu, Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Adaugă cheie de securitate
+  ErrorRetry: Reîncearcă, creează o nouă provocare sau alege o altă metodă.
+
+InitMFADone:
+  Title: 2-Factori Verificat
+  Description: Super! Tocmai ai configurat cu succes autentificarea cu 2 factori și ți-ai securizat contul mult mai mult. Factorul trebuie introdus la fiecare autentificare.
+  NextButtonText: Următorul
+  CancelButtonText: Anulare
+
+MFAProvider:
+  Provider0: Aplicație de autentificare (de exemplu, Google/Microsoft Authenticator, Authy)
+  Provider1: Dependent de dispozitiv (de exemplu, FaceID, Windows Hello, Amprentă)
+  Provider3: SMS OTP
+  Provider4: E-mail OTP
+  ChooseOther: sau alege o altă opțiune
+
+VerifyMFAOTP:
+  Title: Verifică 2-Factori
+  Description: Verifică-ți al doilea factor
+  CodeLabel: Cod
+  NextButtonText: Următorul
+
+VerifyOTP:
+  Title: Verifică 2-Factori
+  Description: Verifică-ți al doilea factor
+  CodeLabel: Cod
+  ResendButtonText: Retrimite codul
+  NextButtonText: Următorul
+
+VerifyMFAU2F:
+  Title: Verificare în 2 pași
+  Description: Verifică-ți autentificarea cu 2 factori cu dispozitivul înregistrat (de exemplu, FaceID, Windows Hello, Amprentă)
+  NotSupported: WebAuthN nu este acceptat de browserul tău. Asigură-te că folosești cea mai recentă versiune sau schimbă browserul cu unul acceptat (Chrome, Safari, Firefox)
+  ErrorRetry: Reîncearcă, creează o nouă cerere sau alege o altă metodă.
+  ValidateTokenButtonText: Verifică 2-Factori
+
+Passwordless:
+  Title: Autentificare fără parolă
+  Description: Autentificare cu metode de autentificare furnizate de dispozitivul tău, cum ar fi FaceID, Windows Hello sau Amprentă.
+  NotSupported: WebAuthN nu este acceptat de browserul tău. Asigură-te că este actualizat sau utilizează altul (de exemplu, Chrome, Safari, Firefox)
+  ErrorRetry: Reîncearcă, creează o nouă provocare sau alege o altă metodă.
+  LoginWithPwButtonText: Autentificare cu parolă
+  ValidateTokenButtonText: Autentificare fără parolă
+
+PasswordlessPrompt:
+  Title: Configurare fără parolă
+  Description: Doriți să configurați autentificarea fără parolă? (Metode de autentificare ale dispozitivului dvs., cum ar fi FaceID, Windows Hello sau Amprentă)
+  DescriptionInit: Trebuie să configurați autentificarea fără parolă. Folosește linkul pe care l-ai primit pentru a-ți înregistra dispozitivul.
+  PasswordlessButtonText: Treci la autentificare fără parolă
+  NextButtonText: Următorul
+  SkipButtonText: Omite
+
+PasswordlessRegistration:
+  Title: Configurare fără parolă
+  Description: Adaugă autentificarea ta furnizând un nume (de exemplu, MyMobilePhone, MacBook, etc.) și apoi dând clic pe butonul „Înregistrează autentificare fără parolă” de mai jos.
+  TokenNameLabel: Numele dispozitivului
+  NotSupported: WebAuthN nu este acceptat de browserul tău. Asigură-te că este actualizat sau utilizează altul (de exemplu, Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Înregistrează autentificare fără parolă
+  ErrorRetry: Reîncearcă, creează o nouă provocare sau alege o altă metodă.
+
+PasswordlessRegistrationDone:
+  Title: Autentificare fără parolă configurată
+  Description: Dispozitivul pentru autentificare fără parolă a fost adăugat cu succes.
+  DescriptionClose: Acum puteți închide această fereastră.
+  NextButtonText: Următorul
+  CancelButtonText: Anulare
+
+PasswordChange:
+  Title: Schimbă parola
+  Description: Schimbă-ți parola. Introdu parola veche și noua parolă.
+  ExpiredDescription: Parola ta a expirat și trebuie schimbată. Introdu parola veche și noua parolă.
+  OldPasswordLabel: Parola veche
+  NewPasswordLabel: Parolă nouă
+  NewPasswordConfirmLabel: Confirmă parola
+  CancelButtonText: Anulare
+  NextButtonText: Următorul
+  Footer: Subsol
+
+PasswordChangeDone:
+  Title: Schimbă parola
+  Description: Parola ta a fost schimbată cu succes.
+  NextButtonText: Următorul
+
+PasswordResetDone:
+  Title: Link de resetare a parolei trimis
+  Description: Verifică-ți e-mailul pentru a reseta parola.
+  NextButtonText: Următorul
+
+EmailVerification:
+  Title: Verificare E-mail
+  Description: Ți-am trimis un e-mail pentru a-ți verifica adresa. Introdu codul în formularul de mai jos.
+  CodeLabel: Cod
+  NextButtonText: Următorul
+  ResendButtonText: Retrimite codul
+
+EmailVerificationDone:
+  Title: Verificare E-mail
+  Description: Adresa ta de e-mail a fost verificată cu succes.
+  NextButtonText: Următorul
+  CancelButtonText: Anulare
+  LoginButtonText: Autentificare
+
+RegisterOption:
+  Title: Opțiuni de înregistrare
+  Description: Alege cum vrei să te înregistrezi
+  RegisterUsernamePasswordButtonText: Cu nume de utilizator și parolă
+  ExternalLoginDescription: sau înregistrează-te cu un utilizator extern
+  LoginButtonText: Autentificare
+
+RegistrationUser:
+  Title: Înregistrare
+  Description: Introduceți datele dvs. de utilizator. Adresa dvs. de e-mail va fi folosită ca nume de utilizator.
+  DescriptionOrgRegister: Introduceți datele dvs. de utilizator.
+  EmailLabel: E-Mail
+  UsernameLabel: Nume de utilizator
+  FirstnameLabel: Prenume
+  LastnameLabel: Nume de familie
+  LanguageLabel: Limba
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  GenderLabel: Gen
+  Female: Femeie
+  Male: Bărbat
+  Diverse: divers / X
+  PasswordLabel: Parola
+  PasswordConfirmLabel: Confirmă parola
+  TosAndPrivacyLabel: Termeni și condiții
+  TosConfirm: Accept
+  TosLinkText: TOS
+  PrivacyConfirm: Accept
+  PrivacyLinkText: politica de confidențialitate
+  ExternalLogin: sau înregistrează-te cu un utilizator extern
+  BackButtonText: Autentificare
+  NextButtonText: Următorul
+
+ExternalRegistrationUserOverview:
+  Title: Înregistrare utilizator extern
+  Description: Am preluat detaliile dvs. de utilizator de la furnizorul selectat. Acum le puteți schimba sau completa.
+  EmailLabel: E-Mail
+  UsernameLabel: Nume de utilizator
+  FirstnameLabel: Prenume
+  LastnameLabel: Nume de familie
+  NicknameLabel: Poreclă
+  PhoneLabel: Număr de telefon
+  LanguageLabel: Limba
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  TosAndPrivacyLabel: Termeni și condiții
+  TosConfirm: Accept
+  TosLinkText: TOS
+  PrivacyConfirm: Accept
+  PrivacyLinkText: politica de confidențialitate
+  ExternalLogin: sau înregistrează-te cu un utilizator extern
+  BackButtonText: Înapoi
+  NextButtonText: Salvează
+
+RegistrationOrg:
+  Title: Înregistrare organizație
+  Description: Introduceți numele organizației și datele de utilizator.
+  OrgNameLabel: Numele organizației
+  EmailLabel: E-Mail
+  UsernameLabel: Nume de utilizator
+  FirstnameLabel: Prenume
+  LastnameLabel: Nume de familie
+  PasswordLabel: Parola
+  PasswordConfirmLabel: Confirmă parola
+  TosAndPrivacyLabel: Termeni și condiții
+  TosConfirm: Accept
+  TosLinkText: TOS
+  PrivacyConfirm: Accept
+  PrivacyLinkText: politica de confidențialitate
+  SaveButtonText: Creează organizația
+
+LoginSuccess:
+  Title: Autentificare reușită
+  AutoRedirectDescription: Veți fi redirecționat automat înapoi la aplicația dvs. Dacă nu, dați clic pe butonul de mai jos. Puteți închide fereastra ulterior.
+  RedirectedDescription: Acum puteți închide această fereastră.
+  NextButtonText: Următorul
+
+LogoutDone:
+  Title: Deconectat
+  Description: V-ați deconectat cu succes.
+  LoginButtonText: Autentificare
+
+LinkingUserPrompt:
+  Title: Utilizator existent găsit
+  Description: "Doriți să asociați contul dvs. existent:"
+  LinkButtonText: Asociază
+  OtherButtonText: Alte opțiuni
+
+LinkingUsersDone:
+  Title: Asociere utilizator
+  Description: Utilizator asociat.
+  CancelButtonText: Anulare
+  NextButtonText: Următorul
+
+ExternalNotFound:
+  Title: Utilizator extern nu a fost găsit
+  Description: Utilizatorul extern nu a fost găsit. Doriți să vă asociați utilizatorul sau să înregistrați automat unul nou?
+  LinkButtonText: Asociază
+  AutoRegisterButtonText: Înregistrare
+  TosAndPrivacyLabel: Termeni și condiții
+  TosConfirm: Accept
+  TosLinkText: TOS
+  PrivacyConfirm: Accept
+  PrivacyLinkText: politica de confidențialitate
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+DeviceAuth:
+  Title: Autorizare dispozitiv
+  UserCode:
+    Label: Cod utilizator
+    Description: Introduceți codul de utilizator prezentat pe dispozitiv.
+    ButtonNext: Următorul
+  Action:
+    Description: Acordă acces dispozitivului.
+    GrantDevice: urmează să acordați acces dispozitivului
+    AccessToScopes: acces la următoarele domenii de aplicare
+    Button:
+      Allow: Permite
+      Deny: Refuză
+  Done:
+    Description: Finalizat.
+    Approved: Autorizarea dispozitivului a fost aprobată. Acum puteți reveni la dispozitiv.
+    Denied: Autorizarea dispozitivului a fost refuzată. Acum puteți reveni la dispozitiv.
+
+Footer:
+  PoweredBy: Susținut de
+  Tos: TOS
+  PrivacyPolicy: Politica de confidențialitate
+  Help: Ajutor
+  SupportEmail: E-mail de asistență
+
+SignIn: Conectează-te cu {{.Provider}}
+
+Errors:
+  Internal: A apărut o eroare internă
+  AuthRequest:
+    NotFound: Nu s-a putut găsi cererea de autentificare
+    UserAgentNotCorresponding: Agentul utilizator nu corespunde
+    UserAgentNotFound: ID-ul agentului utilizator nu a fost găsit
+    TokenNotFound: Tokenul nu a fost găsit
+    RequestTypeNotSupported: Tipul de cerere nu este acceptat
+    MissingParameters: Lipsesc parametrii obligatorii
+  User:
+    NotFound: Utilizatorul nu a putut fi găsit
+    AlreadyExists: Utilizatorul există deja
+    Inactive: Utilizatorul este inactiv
+    NotFoundOnOrg: Utilizatorul nu a putut fi găsit în organizația aleasă
+    NotAllowedOrg: Utilizatorul nu este membru al organizației cerute
+    NotMatchingUserID: Utilizatorul și utilizatorul din cererea de autentificare nu se potrivesc
+    UserIDMissing: UserID este gol
+    Invalid: Datele de utilizator sunt nevalide
+    DomainNotAllowedAsUsername: Domeniul este deja rezervat și nu poate fi utilizat
+    NotAllowedToLink: Utilizatorul nu are voie să se asocieze cu furnizorul de autentificare externă
+    Profile:
+      NotFound: Profilul nu a fost găsit
+      NotChanged: Profilul nu a fost schimbat
+      Empty: Profilul este gol
+      FirstNameEmpty: Prenumele în profil este gol
+      LastNameEmpty: Numele de familie în profil este gol
+      IDMissing: Lipsește ID-ul profilului
+    Email:
+      NotFound: E-mailul nu a fost găsit
+      Invalid: E-mailul este nevalid
+      AlreadyVerified: E-mailul este deja verificat
+      NotChanged: E-mailul nu a fost schimbat
+      Empty: E-mailul este gol
+      IDMissing: Lipsește ID-ul e-mailului
+    Phone:
+      NotFound: Telefonul nu a fost găsit
+      Invalid: Telefonul este nevalid
+      AlreadyVerified: Telefonul deja verificat
+      Empty: Telefonul este gol
+      NotChanged: Telefonul nu a fost schimbat
+    Address:
+      NotFound: Adresa nu a fost găsită
+      NotChanged: Adresa nu a fost schimbată
+    Username:
+      AlreadyExists: Numele de utilizator este deja luat
+      Reserved: Numele de utilizator este deja luat
+      Empty: Numele de utilizator este gol
+    Password:
+      ConfirmationWrong: Confirmarea parolei este greșită
+      Empty: Parola este goală
+      Invalid: Parola este nevalidă
+      InvalidAndLocked: Parola este nevalidă și utilizatorul este blocat, contactați administratorul.
+      NotChanged: Parola nouă nu poate fi aceeași cu parola actuală
+    UsernameOrPassword:
+      Invalid: Numele de utilizator sau parola sunt nevalide
+    PasswordComplexityPolicy:
+      NotFound: Politica de parolă nu a fost găsită
+      MinLength: Parola este prea scurtă
+      HasLower: Parola trebuie să conțină o literă mică
+      HasUpper: Parola trebuie să conțină o literă mare
+      HasNumber: Parola trebuie să conțină un număr
+      HasSymbol: Parola trebuie să conțină un simbol
+    Code:
+      Expired: Codul a expirat
+      Invalid: Codul este nevalid
+      Empty: Codul este gol
+      CryptoCodeNil: Codul cripto este nul
+      NotFound: Nu s-a putut găsi codul
+      GeneratorAlgNotSupported: Algoritmul generator nesuportat
+    EmailVerify:
+      UserIDEmpty: UserID este gol
+    ExternalData:
+      CouldNotRead: Datele externe nu au putut fi citite corect
+    MFA:
+      NoProviders: Nu există furnizori multifactoriali disponibili
+      OTP:
+        AlreadyReady: MFA OTP (OneTimePassword) este deja configurat
+        NotExisting: Multifactor OTP (OneTimePassword) nu există
+        InvalidCode: Cod nevalid
+        NotReady: Multifactor OTP (OneTimePassword) nu este gata
+    Locked: Utilizatorul este blocat
+    SomethingWentWrong: Ceva nu a mers bine
+    NotActive: Utilizatorul nu este activ
+    ExternalIDP:
+      IDPTypeNotImplemented: Tipul IDP nu este implementat
+      NotAllowed: Furnizorul extern de autentificare nu este permis
+      IDPConfigIDEmpty: ID-ul de configurare al furnizorului de identitate este gol
+      ExternalUserIDEmpty: ID-ul utilizatorului extern este gol
+      UserDisplayNameEmpty: Numele de afișare al utilizatorului este gol
+      NoExternalUserData: Nu s-au primit date externe de utilizator
+      CreationNotAllowed: Crearea unui nou utilizator nu este permisă la acest furnizor
+      LinkingNotAllowed: Asocierea unui utilizator nu este permisă la acest furnizor
+      NoOptionAllowed: Nici crearea, nici asocierea nu sunt permise la acest furnizor. Vă rugăm să contactați administratorul.
+      LoginFailedSwitchLocal: |
+        Autentificarea la IDP extern a eșuat. Se revine la autentificarea locală.
+
+        Detalii despre eroare: {{.Details}}
+    GrantRequired: Autentificarea nu este posibilă. Utilizatorul trebuie să aibă cel puțin un drept de acces la aplicație. Vă rugăm să contactați administratorul.
+    ProjectRequired: Autentificarea nu este posibilă. Organizația utilizatorului trebuie să fie autorizată pentru proiect. Vă rugăm să contactați administratorul.
+  IdentityProvider:
+    InvalidConfig: Configurația furnizorului de identitate este nevalidă
+  IAM:
+    LockoutPolicy:
+      NotExisting: Politica de blocare nu există
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Înregistrarea nu este permisă
+  DeviceAuth:
+    NotExisting: Codul de utilizator nu există
+
+optional: (opțional)
