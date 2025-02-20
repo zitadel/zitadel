@@ -517,6 +517,7 @@
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
     "ORG_ADMIN_IMPERSONATOR": "有权模拟组织的管理员和最终用户",
     "ORG_END_USER_IMPERSONATOR": "有权模拟组织的最终用户",
+    "ORG_USER_SELF_MANAGER": "有权管理自己的用户",
     "PROJECT_OWNER": "拥有整个项目的权限",
     "PROJECT_OWNER_VIEWER": "有权审查整个项目",
     "PROJECT_OWNER_GLOBAL": "拥有整个项目的权限",

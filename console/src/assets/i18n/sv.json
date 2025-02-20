@@ -517,6 +517,7 @@
     "ORG_PROJECT_CREATOR": "Har behörighet att skapa egna projekt och underliggande inställningar",
     "ORG_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från organisationen",
     "ORG_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från organisationen",
+    "ORG_USER_SELF_MANAGER": "Har behörighet att hantera sin egen användare",
     "PROJECT_OWNER": "Har behörighet över hela projektet",
     "PROJECT_OWNER_VIEWER": "Har behörighet att granska hela projektet",
     "PROJECT_OWNER_GLOBAL": "Har behörighet över hela projektet",

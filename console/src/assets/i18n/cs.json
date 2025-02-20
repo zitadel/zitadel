@@ -517,6 +517,7 @@
     "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
     "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
     "ORG_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele z organizace",
+    "ORG_USER_SELF_MANAGER": "Má oprávnění spravovat svůj vlastní uživatelský účet",
     "PROJECT_OWNER": "Má oprávnění nad celým projektem",
     "PROJECT_OWNER_VIEWER": "Má oprávnění prohlížet celý projekt",
     "PROJECT_OWNER_GLOBAL": "Má oprávnění nad celým projektem",
