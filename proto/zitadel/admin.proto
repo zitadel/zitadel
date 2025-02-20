@@ -6842,6 +6842,8 @@ message AddLDAPProviderRequest {
     google.protobuf.Duration timeout = 10;
     zitadel.idp.v1.LDAPAttributes attributes = 11;
     zitadel.idp.v1.Options provider_options = 12;
+    // Root_ca is for self signing certificates for TLS connections to LDAP servers it is intended to be filled with a .pem file.
+    bytes root_ca = 13 [(validate.rules).bytes.max_len = 12000];
 }
 
 message AddLDAPProviderResponse {
@@ -6863,6 +6865,8 @@ message UpdateLDAPProviderRequest {
     google.protobuf.Duration timeout = 11;
     zitadel.idp.v1.LDAPAttributes attributes = 12;
     zitadel.idp.v1.Options provider_options = 13;
+    // Root_ca is for self signing certificates for TLS connections to LDAP servers it is intended to be filled with a .pem file.
+    bytes root_ca = 14 [(validate.rules).bytes.max_len = 12000];
 }
 
 message UpdateLDAPProviderResponse {

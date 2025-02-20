@@ -622,6 +622,7 @@ func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPI
 			UserObjectClasses: template.UserObjectClasses,
 			UserFilters:       template.UserFilters,
 			Timeout:           timeout,
+			RootCa:            template.RootCA,
 			Attributes:        ldapAttributesToPb(template.LDAPAttributes),
 		},
 	}

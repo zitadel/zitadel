@@ -109,6 +109,7 @@ type LDAPProvider struct {
 	UserObjectClasses []string
 	UserFilters       []string
 	Timeout           time.Duration
+	RootCA            []byte
 	LDAPAttributes    idp.LDAPAttributes
 	IDPOptions        idp.Options
 }

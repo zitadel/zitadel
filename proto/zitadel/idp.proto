@@ -464,6 +464,7 @@ message LDAPConfig {
     repeated string user_filters = 7;
     google.protobuf.Duration timeout = 8;
     LDAPAttributes attributes = 9;
+    bytes root_ca = 10;
 }
 
 message SAMLConfig {

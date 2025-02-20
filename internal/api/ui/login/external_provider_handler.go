@@ -975,6 +975,7 @@ func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTem
 		identityProvider.UserObjectClasses,
 		identityProvider.UserFilters,
 		identityProvider.Timeout,
+		identityProvider.RootCA,
 		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
 		opts...,
 	), nil
