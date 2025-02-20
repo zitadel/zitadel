@@ -4,11 +4,12 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
-
 import { AuthFactorDialogComponent } from '../auth-factor-dialog/auth-factor-dialog.component';
+
 
 export interface WebAuthNOptions {
   challenge: string;
@@ -38,6 +39,10 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
 
   public error: string = '';
+  public otpAvailable$ = new BehaviorSubject<boolean>(false);
+  public u2fAvailable$ = new BehaviorSubject<boolean>(false);
+  public otpSmsAvailable$ = new BehaviorSubject<boolean>(false);
+  public otpEmailAvailable$ = new BehaviorSubject<boolean>(false);
   public otpDisabled$ = new BehaviorSubject<boolean>(true);
   public otpSmsDisabled$ = new BehaviorSubject<boolean>(true);
   public otpEmailDisabled$ = new BehaviorSubject<boolean>(true);
@@ -50,6 +55,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.getMFAs();
+    this.applyOrgPolicy();
   }
 
   public ngOnDestroy(): void {
@@ -59,6 +65,10 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public addAuthFactor(): void {
     const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
       data: {
+        otp$: this.otpAvailable$,
+        u2f$: this.u2fAvailable$,
+        otpSms$: this.otpSmsAvailable$,
+        otpEmail$: this.otpEmailAvailable$,
         otpDisabled$: this.otpDisabled$,
         otpSmsDisabled$: this.otpSmsDisabled$,
         otpEmailDisabled$: this.otpEmailDisabled$,
@@ -75,45 +85,33 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     this.service
       .listMyMultiFactors()
       .then((mfas) => {
-        const list = mfas.resultList;
+        const list: AuthFactor.AsObject[] = mfas.resultList;
         this.dataSource = new MatTableDataSource(list);
         this.dataSource.sort = this.sort;
 
-        const index = list.findIndex((mfa) => mfa.otp);
-        if (index === -1) {
-          this.otpDisabled$.next(false);
-        }
-
-        const sms = list.findIndex((mfa) => mfa.otpSms);
-        if (sms === -1) {
-          this.otpSmsDisabled$.next(false);
-        }
-
-        const email = list.findIndex((mfa) => mfa.otpEmail);
-        if (email === -1) {
-          this.otpEmailDisabled$.next(false);
-        }
+        this.disableAuthFactor(list, 'otp', this.otpDisabled$);
+        this.disableAuthFactor(list, 'otpSms', this.otpSmsDisabled$);
+        this.disableAuthFactor(list, 'otpEmail', this.otpEmailDisabled$);
       })
       .catch((error) => {
         this.error = error.message;
       });
   }
 
-  private cleanupList(): void {
-    const totp = this.dataSource.data.findIndex((mfa) => !!mfa.otp);
-    if (totp > -1) {
-      this.dataSource.data.splice(totp, 1);
-    }
-
-    const sms = this.dataSource.data.findIndex((mfa) => !!mfa.otpSms);
-    if (sms > -1) {
-      this.dataSource.data.splice(sms, 1);
-    }
-
-    const email = this.dataSource.data.findIndex((mfa) => !!mfa.otpEmail);
-    if (email > -1) {
-      this.dataSource.data.splice(email, 1);
-    }
+  public applyOrgPolicy(): void {
+    this.service.getMyLoginPolicy().then((resp) => {
+      if (resp && resp.policy) {
+        const secondFactors = resp.policy?.secondFactorsList;
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP, this.otpAvailable$);
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_U2F, this.u2fAvailable$);
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL, this.otpEmailAvailable$);
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS, this.otpSmsAvailable$);
+      }
+    });
   }
 
   public deleteMFA(factor: AuthFactor.AsObject): void {
@@ -180,5 +178,27 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  private cleanupList(): void {
+    this.dataSource.data = this.dataSource.data.filter((mfa: AuthFactor.AsObject) => {
+      return !mfa.otp && !mfa.otpSms && !mfa.otpEmail;
+    });
+  }
+
+  private disableAuthFactor(
+    mfas: AuthFactor.AsObject[],
+    key: keyof AuthFactor.AsObject,
+    subject: BehaviorSubject<boolean>
+  ): void {
+    subject.next(mfas.some(mfa => !!mfa[key]));
+  }
+
+  private displayAuthFactorBasedOnPolicy(
+    factors: SecondFactorType[],
+    factor: SecondFactorType,
+    subject: BehaviorSubject<boolean>
+  ): void {
+    subject.next(factors.some(f => f === factor));
   }
 }
