@@ -261,65 +261,65 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					}, w
 			},
 		},
-		// {
-		// 	name: "send failed, retry",
-		// 	test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-		// 		givenTemplate := "{{.LogoURL}}"
-		// 		expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-		// 		w.message = &messages.Email{
-		// 			Recipients: []string{lastEmail},
-		// 			Subject:    "Invitation to APP",
-		// 			Content:    expectContent,
-		// 		}
-		// 		w.sendError = sendError
-		// 		w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
-		// 			return errors.Is(err, sendError)
-		// 		}
-		// 		codeAlg, code := cryptoValue(t, ctrl, "testcode")
-		// 		expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-		// 		return fieldsWorker{
-		// 				queries:  queries,
-		// 				commands: commands,
-		// 				es: eventstore.NewEventstore(&eventstore.Config{
-		// 					Querier: es_repo_mock.NewRepo(t).MockQuerier,
-		// 				}),
-		// 				userDataCrypto: codeAlg,
-		// 				now:            testNow,
-		// 				backOff:        testBackOff,
-		// 				maxAttempts:    2,
-		// 			},
-		// 			argsWorker{
-		// 				job: &river.Job[*notification.Request]{
-		// 					JobRow: &rivertype.JobRow{
-		// 						CreatedAt: time.Now(),
-		// 					},
-		// 					Args: &notification.Request{
-		// 						Aggregate: &eventstore.Aggregate{
-		// 							InstanceID:    instanceID,
-		// 							ID:            notificationID,
-		// 							ResourceOwner: instanceID,
-		// 						},
-		// 						UserID:                        userID,
-		// 						UserResourceOwner:             orgID,
-		// 						TriggeredAtOrigin:             eventOrigin,
-		// 						EventType:                     user.HumanInviteCodeAddedType,
-		// 						MessageType:                   domain.InviteUserMessageType,
-		// 						NotificationType:              domain.NotificationTypeEmail,
-		// 						URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-		// 						CodeExpiry:                    1 * time.Hour,
-		// 						Code:                          code,
-		// 						UnverifiedNotificationChannel: true,
-		// 						IsOTP:                         false,
-		// 						RequiresPreviousDomain:        false,
-		// 						Args: &domain.NotificationArguments{
-		// 							ApplicationName: "APP",
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 			w
-		// 	},
-		// },
+		{
+			name: "send failed, retry",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
+				givenTemplate := "{{.LogoURL}}"
+				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
+				w.message = &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    "Invitation to APP",
+					Content:    expectContent,
+				}
+				w.sendError = sendError
+				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
+					return errors.Is(err, sendError)
+				}
+				codeAlg, code := cryptoValue(t, ctrl, "testcode")
+				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+				return fieldsWorker{
+						queries:  queries,
+						commands: commands,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+						}),
+						userDataCrypto: codeAlg,
+						now:            testNow,
+						backOff:        testBackOff,
+						maxAttempts:    2,
+					},
+					argsWorker{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								CreatedAt: time.Now(),
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            notificationID,
+									ResourceOwner: instanceID,
+								},
+								UserID:                        userID,
+								UserResourceOwner:             orgID,
+								TriggeredAtOrigin:             eventOrigin,
+								EventType:                     user.HumanInviteCodeAddedType,
+								MessageType:                   domain.InviteUserMessageType,
+								NotificationType:              domain.NotificationTypeEmail,
+								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
+								CodeExpiry:                    1 * time.Hour,
+								Code:                          code,
+								UnverifiedNotificationChannel: true,
+								IsOTP:                         false,
+								RequiresPreviousDomain:        false,
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
+								},
+							},
+						},
+					},
+					w
+			},
+		},
 		{
 			name: "send failed (max attempts), cancel",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
@@ -477,18 +477,18 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
-	if w.err == nil {
-		if w.message != nil {
-			// w.message.TriggeringEvent = a.event
-			channel.EXPECT().HandleMessage(w.message).Return(w.sendError)
-		}
-		if w.messageSMS != nil {
-			// w.messageSMS.TriggeringEvent = a.event
-			channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
-				message.VerificationID = gu.Ptr(verificationID)
-				return w.sendError
-			})
-		}
+	// if w.err == nil {
+	if w.message != nil {
+		// w.message.TriggeringEvent = a.event
+		channel.EXPECT().HandleMessage(w.message).Return(w.sendError)
+	}
+	if w.messageSMS != nil {
+		// w.messageSMS.TriggeringEvent = a.event
+		channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
+			message.VerificationID = gu.Ptr(verificationID)
+			return w.sendError
+		})
+		// }
 	}
 	return &NotificationWorker{
 		commands: f.commands,
