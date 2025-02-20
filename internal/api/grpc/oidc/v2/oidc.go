@@ -51,9 +51,11 @@ func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *oidc_pb
 	}
 	return &oidc_pb.GetDeviceAuthorizationRequestResponse{
 		DeviceAuthorizationRequest: &oidc_pb.DeviceAuthorizationRequest{
-			Id:       base64.RawStdEncoding.EncodeToString(encrypted),
-			ClientId: deviceRequest.ClientID,
-			Scope:    deviceRequest.Scopes,
+			Id:          base64.RawStdEncoding.EncodeToString(encrypted),
+			ClientId:    deviceRequest.ClientID,
+			Scope:       deviceRequest.Scopes,
+			AppName:     deviceRequest.AppName,
+			ProjectName: deviceRequest.ProjectName,
 		},
 	}, nil
 }
@@ -64,8 +66,8 @@ func (s *Server) AuthorizeOrDenyDeviceAuthorization(ctx context.Context, req *oi
 		return nil, err
 	}
 	switch req.GetDecision().(type) {
-	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession:
-		_, err = s.command.ApproveDeviceAuthWithSession(ctx, deviceCode, req.GetAuthorizeWithSession().GetSessionId(), req.GetAuthorizeWithSession().GetSessionToken())
+	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session:
+		_, err = s.command.ApproveDeviceAuthWithSession(ctx, deviceCode, req.GetSession().GetSessionId(), req.GetSession().GetSessionToken())
 	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny:
 		_, err = s.command.CancelDeviceAuth(ctx, deviceCode, domain.DeviceAuthCanceledDenied)
 	}

@@ -686,6 +686,8 @@ func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
 			assert.NotEmpty(t, authRequest.GetId())
 			assert.Equal(t, client.GetClientId(), authRequest.GetClientId())
 			assert.Contains(t, authRequest.GetScope(), "openid")
+			assert.NotEmpty(t, authRequest.GetAppName())
+			assert.NotEmpty(t, authRequest.GetProjectName())
 		})
 	}
 }
@@ -711,8 +713,8 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			ctx:  CTX,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: "123",
-				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
-					AuthorizeWithSession: &oidc_pb.Session{
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
 					},
@@ -733,8 +735,8 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
-				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
-					AuthorizeWithSession: &oidc_pb.Session{
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
 						SessionId:    "foo",
 						SessionToken: "bar",
 					},
@@ -755,8 +757,8 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
-				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
-					AuthorizeWithSession: &oidc_pb.Session{
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: "bar",
 					},
@@ -795,8 +797,8 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
-				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
-					AuthorizeWithSession: &oidc_pb.Session{
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
 					},
@@ -817,8 +819,8 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
-				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
-					AuthorizeWithSession: &oidc_pb.Session{
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
 					},

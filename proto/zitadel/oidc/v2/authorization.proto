@@ -123,4 +123,8 @@ message DeviceAuthorizationRequest {
   string client_id = 2;
   // The scopes requested by the application.
   repeated string scope = 3;
+  // Name of the client application.
+  string app_name = 4;
+  // Name of the project the client application is part of.
+  string project_name = 5;
 }

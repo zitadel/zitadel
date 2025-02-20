@@ -179,7 +179,7 @@ service OIDCService {
   // Authorize or deny the device authorization request based on the provided device authorization id.
   rpc AuthorizeOrDenyDeviceAuthorization(AuthorizeOrDenyDeviceAuthorizationRequest) returns (AuthorizeOrDenyDeviceAuthorizationResponse) {
     option (google.api.http) = {
-      post: "/v2/oidc/device_authorization/{device_authorization_id}"
+      post: "/v2/oidc/device_authorization"
       body: "*"
     };
 
@@ -299,7 +299,7 @@ message AuthorizeOrDenyDeviceAuthorizationRequest {
   oneof decision {
     option (validate.required) = true;
     // To authorize the device authorization request, the user's session must be provided.
-    Session authorize_with_session = 2;
+    Session session = 2;
     // Deny the device authorization request.
     Deny deny = 3;
   }
