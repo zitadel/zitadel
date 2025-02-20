@@ -1,15 +1,15 @@
-import { getAllSessions } from "@/lib/cookies";
+import { Cookie, getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
-import { loginWithOIDCandSession } from "@/lib/oidc";
 import { loginWithSAMLandSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { getServiceUrlFromHeaders } from "@/lib/service";
-import { findValidSession } from "@/lib/session";
+import { findValidSession, isSessionValid } from "@/lib/session";
 import {
   createCallback,
   createResponse,
   getActiveIdentityProviders,
   getAuthRequest,
+  getLoginSettings,
   getOrgsByDomain,
   getSAMLRequest,
   listSessions,
@@ -526,5 +526,126 @@ export async function GET(request: NextRequest) {
       { error: "No authRequest nor samlRequest provided" },
       { status: 500 },
     );
+  }
+}
+
+type LoginWithOIDCandSession = {
+  serviceUrl: string;
+  authRequest: string;
+  sessionId: string;
+  sessions: Session[];
+  sessionCookies: Cookie[];
+  request: NextRequest;
+};
+
+export async function loginWithOIDCandSession({
+  serviceUrl,
+  authRequest,
+  sessionId,
+  sessions,
+  sessionCookies,
+  request,
+}: LoginWithOIDCandSession) {
+  console.log(
+    `Login with session: ${sessionId} and authRequest: ${authRequest}`,
+  );
+
+  const selectedSession = sessions.find((s) => s.id === sessionId);
+
+  if (selectedSession && selectedSession.id) {
+    console.log(`Found session ${selectedSession.id}`);
+
+    const isValid = await isSessionValid({
+      serviceUrl,
+      session: selectedSession,
+    });
+
+    console.log("Session is valid:", isValid);
+
+    if (!isValid && selectedSession.factors?.user) {
+      // if the session is not valid anymore, we need to redirect the user to re-authenticate /
+      // TODO: handle IDP intent direcly if available
+      const command: SendLoginnameCommand = {
+        loginName: selectedSession.factors.user?.loginName,
+        organization: selectedSession.factors?.user?.organizationId,
+        requestId: `oidc_${authRequest}`,
+      };
+
+      const res = await sendLoginname(command);
+
+      if (res && "redirect" in res && res?.redirect) {
+        const absoluteUrl = new URL(res.redirect, request.url);
+        return NextResponse.redirect(absoluteUrl.toString());
+      }
+    }
+
+    const cookie = sessionCookies.find(
+      (cookie) => cookie.id === selectedSession?.id,
+    );
+
+    if (cookie && cookie.id && cookie.token) {
+      const session = {
+        sessionId: cookie?.id,
+        sessionToken: cookie?.token,
+      };
+
+      // works not with _rsc request
+      try {
+        const { callbackUrl } = await createCallback({
+          serviceUrl,
+          req: create(CreateCallbackRequestSchema, {
+            authRequestId: authRequest,
+            callbackKind: {
+              case: "session",
+              value: create(SessionSchema, session),
+            },
+          }),
+        });
+        if (callbackUrl) {
+          return NextResponse.redirect(callbackUrl);
+        } else {
+          return NextResponse.json(
+            { error: "An error occurred!" },
+            { status: 500 },
+          );
+        }
+      } catch (error: unknown) {
+        // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
+        console.error(error);
+        if (
+          error &&
+          typeof error === "object" &&
+          "code" in error &&
+          error?.code === 9
+        ) {
+          const loginSettings = await getLoginSettings({
+            serviceUrl,
+            organization: selectedSession.factors?.user?.organizationId,
+          });
+
+          if (loginSettings?.defaultRedirectUri) {
+            return NextResponse.redirect(loginSettings.defaultRedirectUri);
+          }
+
+          const signedinUrl = new URL("/signedin", request.url);
+
+          if (selectedSession.factors?.user?.loginName) {
+            signedinUrl.searchParams.set(
+              "loginName",
+              selectedSession.factors?.user?.loginName,
+            );
+          }
+          if (selectedSession.factors?.user?.organizationId) {
+            signedinUrl.searchParams.set(
+              "organization",
+              selectedSession.factors?.user?.organizationId,
+            );
+          }
+          return NextResponse.redirect(signedinUrl);
+        } else {
+          return NextResponse.json({ error }, { status: 500 });
+        }
+      }
+    }
   }
 }
