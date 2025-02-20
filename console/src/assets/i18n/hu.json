@@ -1396,7 +1396,8 @@
         "sv": "Svéd",
         "id": "Indonéz",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1634,7 +1635,8 @@
         "nl": "Holland",
         "sv": "Svéd",
         "id": "Indonéz",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",

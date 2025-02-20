@@ -1400,7 +1400,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1640,7 +1641,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -2612,7 +2614,8 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "ko": "한국어",
+        "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",

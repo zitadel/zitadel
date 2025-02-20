@@ -1396,7 +1396,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1636,7 +1637,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2608,7 +2610,8 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "ko": "한국어",
+        "ro": "Română"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

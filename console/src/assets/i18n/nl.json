@@ -1634,7 +1634,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -2599,7 +2600,8 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "ko": "한국어",
+        "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",
