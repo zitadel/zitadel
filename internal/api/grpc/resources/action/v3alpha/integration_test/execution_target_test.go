@@ -4,11 +4,7 @@ package action_test
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
-	"reflect"
 	"testing"
 	"time"
 
@@ -23,6 +19,7 @@ import (
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func TestServer_ExecutionTarget(t *testing.T) {
@@ -35,7 +32,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		dep     func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) (func(), error)
+		dep     func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) (func(), func() bool, error)
 		clean   func(context.Context)
 		req     *action.GetTargetRequest
 		want    *action.GetTargetResponse
@@ -44,7 +41,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		{
 			name: "GetTarget, request and response, ok",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool, error) {
 
 				orgID := instance.DefaultOrg.Id
 				projectID := ""
@@ -60,7 +57,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetDetails().GetId()}
 				// replace original request with different targetID
-				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
+				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusOK, changedRequest)
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, false)
 
@@ -77,7 +74,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 									InterruptOnError: false,
 								},
 							},
-							Timeout: durationpb.New(10 * time.Second),
+							Timeout: durationpb.New(5 * time.Second),
 						},
 						Details: targetCreated.GetDetails(),
 					},
@@ -92,7 +89,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout:  durationpb.New(10 * time.Second),
+						Timeout:  durationpb.New(5 * time.Second),
 						Endpoint: targetCreatedURL,
 					},
 				}
@@ -117,14 +114,22 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					Response:   expectedResponse,
 				}
 				// after request with different targetID, return changed response
-				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
+				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusOK, changedResponse)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, false)
 				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 				return func() {
-					closeRequest()
-					closeResponse()
-				}, nil
+						closeRequest()
+						closeResponse()
+					}, func() bool {
+						if calledRequest() != 1 {
+							return false
+						}
+						if calledResponse() != 1 {
+							return false
+						}
+						return true
+					}, nil
 			},
 			clean: func(ctx context.Context) {
 				instance.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
@@ -148,7 +153,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		{
 			name: "GetTarget, request, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool, error) {
 
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := instance.DefaultOrg.Id
@@ -157,15 +162,17 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
-				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
+				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, true)
 				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 				// GetTarget with used target
 				request.Id = targetRequest.GetDetails().GetId()
 				return func() {
-					closeRequest()
-				}, nil
+						closeRequest()
+					}, func() bool {
+						return calledRequest() == 1
+					}, nil
 			},
 			clean: func(ctx context.Context) {
 				instance.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
@@ -176,7 +183,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		{
 			name: "GetTarget, response, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool, error) {
 
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := instance.DefaultOrg.Id
@@ -204,7 +211,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 									InterruptOnError: false,
 								},
 							},
-							Timeout: durationpb.New(10 * time.Second),
+							Timeout: durationpb.New(5 * time.Second),
 						},
 					},
 				}
@@ -228,13 +235,15 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					Response:   expectedResponse,
 				}
 				// after request with different targetID, return changed response
-				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
+				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, true)
 				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 				return func() {
-					closeResponse()
-				}, nil
+						closeResponse()
+					}, func() bool {
+						return calledResponse() == 1
+					}, nil
 			},
 			clean: func(ctx context.Context) {
 				instance.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
@@ -245,12 +254,11 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.dep != nil {
-				close, err := tt.dep(tt.ctx, tt.req, tt.want)
-				require.NoError(t, err)
-				defer close()
-			}
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
+			close, called, err := tt.dep(tt.ctx, tt.req, tt.want)
+			require.NoError(t, err)
+			defer close()
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
@@ -268,6 +276,191 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			if tt.clean != nil {
 				tt.clean(tt.ctx)
 			}
+			require.True(t, called())
+		})
+	}
+}
+
+func TestServer_ExecutionTarget_Event(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	event := "session.added"
+	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 0, http.StatusOK, nil)
+	defer closeF()
+
+	targetRequest := instance.CreateTarget(isolatedIAMOwnerCTX, t, "session-added-target-"+gofakeit.AppName(), urlRequest, domain.TargetTypeWebhook, true)
+	instance.SetExecution(isolatedIAMOwnerCTX, t, conditionEvent(event), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+	defer func() {
+		instance.DeleteExecution(isolatedIAMOwnerCTX, t, conditionEvent(event))
+	}()
+
+	tests := []struct {
+		name          string
+		ctx           context.Context
+		eventCount    int
+		expectedCalls int
+		clean         func(context.Context)
+		wantErr       bool
+	}{
+		{
+			name:          "event, 1 session.added, ok",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    1,
+			expectedCalls: 1,
+		},
+		{
+			name:          "event, 10 session.added, ok",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    10,
+			expectedCalls: 10,
+		},
+		{
+			name:          "event, 50 session.added, ok",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    50,
+			expectedCalls: 50,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// reset the count of the target
+			resetF()
+
+			for i := 0; i < tt.eventCount; i++ {
+				_, err := instance.Client.SessionV2.CreateSession(tt.ctx, &session.CreateSessionRequest{})
+				require.NoError(t, err)
+			}
+
+			// wait for called target
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.True(ttt, calledF() == tt.expectedCalls)
+			}, retryDuration, tick, "timeout waiting for expected execution result")
+		})
+	}
+}
+
+func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	event := "session.added"
+	// call takes longer than timeout of target
+	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 10*time.Second, http.StatusOK, nil)
+	defer closeF()
+
+	targetRequest := instance.CreateTarget(isolatedIAMOwnerCTX, t, "session-added-target-"+gofakeit.AppName(), urlRequest, domain.TargetTypeWebhook, true)
+	instance.SetExecution(isolatedIAMOwnerCTX, t, conditionEvent(event), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+	defer func() {
+		instance.DeleteExecution(isolatedIAMOwnerCTX, t, conditionEvent(event))
+	}()
+
+	tests := []struct {
+		name          string
+		ctx           context.Context
+		eventCount    int
+		expectedCalls int
+		clean         func(context.Context)
+		wantErr       bool
+	}{
+		{
+			name:          "event, 1 session.added, error logs",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    1,
+			expectedCalls: 1,
+		},
+		{
+			name:          "event, 5 session.added, error logs",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    5,
+			expectedCalls: 5,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// reset the count of the target
+			resetF()
+
+			for i := 0; i < tt.eventCount; i++ {
+				_, err := instance.Client.SessionV2.CreateSession(tt.ctx, &session.CreateSessionRequest{})
+				require.NoError(t, err)
+			}
+
+			// wait for called target
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.True(ttt, calledF() == tt.expectedCalls)
+			}, retryDuration, tick, "timeout waiting for expected execution result")
+		})
+	}
+}
+
+func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	event := "session.added"
+	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 1*time.Second, http.StatusOK, nil)
+	defer closeF()
+
+	targetRequest := instance.CreateTarget(isolatedIAMOwnerCTX, t, "session-added-target-"+gofakeit.AppName(), urlRequest, domain.TargetTypeWebhook, true)
+	instance.SetExecution(isolatedIAMOwnerCTX, t, conditionEvent(event), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+	defer func() {
+		instance.DeleteExecution(isolatedIAMOwnerCTX, t, conditionEvent(event))
+	}()
+
+	tests := []struct {
+		name          string
+		ctx           context.Context
+		eventCount    int
+		expectedCalls int
+		clean         func(context.Context)
+		wantErr       bool
+	}{
+		{
+			name:          "event, 1 session.added, ok",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    1,
+			expectedCalls: 1,
+		},
+		{
+			name:          "event, 5 session.added, ok",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    5,
+			expectedCalls: 5,
+		},
+		{
+			name:          "event, 10 session.added, ok",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    10,
+			expectedCalls: 10,
+		},
+		{
+			name:          "event, 20 session.added, ok",
+			ctx:           isolatedIAMOwnerCTX,
+			eventCount:    20,
+			expectedCalls: 20,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// reset the count of the target
+			resetF()
+
+			for i := 0; i < tt.eventCount; i++ {
+				_, err := instance.Client.SessionV2.CreateSession(tt.ctx, &session.CreateSessionRequest{})
+				require.NoError(t, err)
+			}
+
+			// wait for called target
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.True(ttt, calledF() == tt.expectedCalls)
+			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}
 }
@@ -363,48 +556,14 @@ func conditionResponseFullMethod(fullMethod string) *action.Condition {
 	}
 }
 
-func testServerCall(
-	reqBody interface{},
-	sleep time.Duration,
-	statusCode int,
-	respBody interface{},
-) (string, func()) {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		data, err := json.Marshal(reqBody)
-		if err != nil {
-			http.Error(w, "error, marshall: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		sentBody, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "error, read body: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if !reflect.DeepEqual(data, sentBody) {
-			http.Error(w, "error, equal:\n"+string(data)+"\nsent:\n"+string(sentBody), http.StatusInternalServerError)
-			return
-		}
-		if statusCode != http.StatusOK {
-			http.Error(w, "error, statusCode", statusCode)
-			return
-		}
-
-		time.Sleep(sleep)
-
-		w.Header().Set("Content-Type", "application/json")
-		resp, err := json.Marshal(respBody)
-		if err != nil {
-			http.Error(w, "error", http.StatusInternalServerError)
-			return
-		}
-		if _, err := io.WriteString(w, string(resp)); err != nil {
-			http.Error(w, "error", http.StatusInternalServerError)
-			return
-		}
+func conditionEvent(event string) *action.Condition {
+	return &action.Condition{
+		ConditionType: &action.Condition_Event{
+			Event: &action.EventExecution{
+				Condition: &action.EventExecution_Event{
+					Event: event,
+				},
+			},
+		},
 	}
-
-	server := httptest.NewServer(http.HandlerFunc(handler))
-
-	return server.URL, server.Close
 }
