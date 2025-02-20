@@ -1394,7 +1394,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "tr": "Turks"
       }
     },
     "SMTP": {
