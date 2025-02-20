@@ -683,7 +683,7 @@ func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
 			require.NoError(t, err)
 			authRequest := got.GetDeviceAuthorizationRequest()
 			assert.NotNil(t, authRequest)
-			assert.NotEmpty(t, authRequest.GetDeviceAuthorizationId())
+			assert.NotEmpty(t, authRequest.GetId())
 			assert.Equal(t, client.GetClientId(), authRequest.GetClientId())
 			assert.Contains(t, authRequest.GetScope(), "openid")
 		})
@@ -731,7 +731,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 						UserCode: req.UserCode,
 					})
 					require.NoError(t, err)
-					return resp.GetDeviceAuthorizationRequest().GetDeviceAuthorizationId()
+					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
 					AuthorizeWithSession: &oidc_pb.Session{
@@ -753,7 +753,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 						UserCode: req.UserCode,
 					})
 					require.NoError(t, err)
-					return resp.GetDeviceAuthorizationRequest().GetDeviceAuthorizationId()
+					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
 					AuthorizeWithSession: &oidc_pb.Session{
@@ -775,7 +775,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 						UserCode: req.UserCode,
 					})
 					require.NoError(t, err)
-					return resp.GetDeviceAuthorizationRequest().GetDeviceAuthorizationId()
+					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny{},
 			},
@@ -793,7 +793,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 						UserCode: req.UserCode,
 					})
 					require.NoError(t, err)
-					return resp.GetDeviceAuthorizationRequest().GetDeviceAuthorizationId()
+					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
 					AuthorizeWithSession: &oidc_pb.Session{
@@ -815,7 +815,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 						UserCode: req.UserCode,
 					})
 					require.NoError(t, err)
-					return resp.GetDeviceAuthorizationRequest().GetDeviceAuthorizationId()
+					return resp.GetDeviceAuthorizationRequest().GetId()
 				}(),
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_AuthorizeWithSession{
 					AuthorizeWithSession: &oidc_pb.Session{

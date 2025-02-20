@@ -51,9 +51,9 @@ func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *oidc_pb
 	}
 	return &oidc_pb.GetDeviceAuthorizationRequestResponse{
 		DeviceAuthorizationRequest: &oidc_pb.DeviceAuthorizationRequest{
-			DeviceAuthorizationId: base64.RawStdEncoding.EncodeToString(encrypted),
-			ClientId:              deviceRequest.ClientID,
-			Scope:                 deviceRequest.Scopes,
+			Id:       base64.RawStdEncoding.EncodeToString(encrypted),
+			ClientId: deviceRequest.ClientID,
+			Scope:    deviceRequest.Scopes,
 		},
 	}, nil
 }

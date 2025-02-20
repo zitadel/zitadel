@@ -118,7 +118,7 @@ enum ErrorReason {
 
 message DeviceAuthorizationRequest {
   // The unique identifier of the device authorization request to be used for authorizing or denying the request.
-  string device_authorization_id = 1;
+  string id = 1;
   // The client_id of the application that initiated the device authorization request.
   string client_id = 2;
   // The scopes requested by the application.
