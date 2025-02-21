@@ -476,7 +476,6 @@ func (l *Login) handleExternalUserAuthenticated(
 	// if action is done and no user linked then link or register
 	if zerrors.IsNotFound(externalErr) {
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
-		return
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
@@ -557,6 +556,7 @@ func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *do
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	authReq.UserID = user.ID
 	l.renderNextStep(w, r, authReq)
 }
 
