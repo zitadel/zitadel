@@ -8,6 +8,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -161,39 +163,63 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 	}
 	if idpIntent.UserId == "" {
 		provider, err := s.command.GetProvider(ctx, idpIntent.IdpInformation.IdpId, "", "")
-		if err != nil {
+		if err != nil && !errors.Is(err, oidc_pkg.ErrDiscoveryFailed) {
 			return nil, err
 		}
 		var idpUser idp.User
-		switch provider.(type) {
+		switch p := provider.(type) {
 		case *apple.Provider:
-			idpUser = &apple.User{}
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &apple.User{})
 		case *oauth.Provider:
-
-			idpUser = &oauth.UserMapper{}
+			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *oidc.Provider:
-			idpUser = &oidc.User{}
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
 		case *jwt.Provider:
-			idpUser = &jwt.User{}
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &jwt.User{})
 		case *azuread.Provider:
-			idpUser = &azuread.User{}
+			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *github.Provider:
-			idpUser = &github.User{}
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
 		case *gitlab.Provider:
-			idpUser = &oidc.User{}
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
 		case *google.Provider:
-			idpUser = &oidc.User{}
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
 		case *saml.Provider:
-			idpUser = &saml.UserMapper{}
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
+		case *ldap.Provider:
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &ldap.User{})
 		default:
 			return nil, zerrors.ThrowInvalidArgument(nil, "IDP-7rPBbls4Zn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 		}
-		if err := json.Unmarshal(intent.IDPUser, idpUser); err != nil {
+		if err != nil {
 			return nil, err
 		}
 		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId)
 	}
 	return idpIntent, nil
+}
+
+type rawUserMapper struct {
+	RawInfo map[string]interface{}
+}
+
+func unmarshalRawIdpUser(idpUserData []byte, idpUser idp.User) (idp.User, error) {
+	userMapper := &rawUserMapper{}
+	if err := json.Unmarshal(idpUserData, userMapper); err != nil {
+		return nil, err
+	}
+	idpUserData, err := json.Marshal(userMapper.RawInfo)
+	if err != nil {
+		return nil, err
+	}
+	return unmarshalIdpUser(idpUserData, idpUser)
+}
+
+func unmarshalIdpUser(idpUserData []byte, idpUser idp.User) (idp.User, error) {
+	if err := json.Unmarshal(idpUserData, idpUser); err != nil {
+		return nil, err
+	}
+	return idpUser, nil
 }
 
 func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
@@ -318,7 +344,7 @@ func idpUserToAddHumanUser(idpUser idp.User, idpID string) *user.AddHumanUserReq
 		},
 	}
 	if username := idpUser.GetPreferredUsername(); username != "" {
-		addHumanUser.UserId = &username
+		addHumanUser.Username = &username
 	}
 	if nickName := idpUser.GetNickname(); nickName != "" {
 		addHumanUser.Profile.NickName = &nickName

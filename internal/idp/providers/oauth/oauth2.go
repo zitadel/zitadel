@@ -128,3 +128,7 @@ func (p *Provider) IsAutoCreation() bool {
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }
+
+func (p *Provider) User() idp.User {
+	return p.userMapper()
+}

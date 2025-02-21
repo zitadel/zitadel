@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/client/rs"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -452,19 +453,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
 
-	userEmail := gofakeit.Email()
-	userPhone := "+41" + gofakeit.Phone()
-	userResp := instance.CreateHumanUserVerified(isolatedIAMCtx, instance.DefaultOrg.Id, userEmail, userPhone)
-	sessionResp, err := instance.Client.SessionV2.CreateSession(ctxLoginClient, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{
-					UserId: userResp.GetUserId(),
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
+	preUserInfoFunction := conditionFunction("preuserinfo")
 
 	type want struct {
 		resp            *oidc_pb.CreateCallbackResponse
@@ -475,7 +464,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		dep     func(ctx context.Context, t *testing.T) func()
+		dep     func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func())
 		req     *oidc_pb.CreateCallbackRequest
 		want    want
 		wantErr bool
@@ -483,20 +472,32 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 		{
 			name: "append claim",
 			ctx:  ctxLoginClient,
-			dep: func(ctx context.Context, t *testing.T) func() {
-				changedRequest := &oidc_api.ContextInfoPreUserinfoResponse{
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+
+				changedRequest := &oidc_api.ContextInfoResponse{
 					AppendClaims: []*oidc_api.AppendClaim{
 						{Key: "added", Value: "value"},
 					},
 				}
-				expectedContextInfo := contextInfoPreUserinfoForUser(instance, userResp, userEmail, userPhone)
+				expectedContextInfo := contextInfoForUser(instance, "function/preuserinfo", userResp, userEmail, userPhone)
 
 				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
 
 				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, preUserInfoFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
-				return closeF
+				return userResp.GetUserId(), closeF
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -504,12 +505,6 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-					Session: &oidc_pb.Session{
-						SessionId:    sessionResp.GetSessionId(),
-						SessionToken: sessionResp.GetSessionToken(),
-					},
-				},
 			},
 			want: want{
 				resp: &oidc_pb.CreateCallbackResponse{
@@ -528,20 +523,31 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 		{
 			name: "append log claim",
 			ctx:  ctxLoginClient,
-			dep: func(ctx context.Context, t *testing.T) func() {
-				changedRequest := &oidc_api.ContextInfoPreUserinfoResponse{
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+				changedRequest := &oidc_api.ContextInfoResponse{
 					AppendLogClaims: []string{
 						"addedLog",
 					},
 				}
-				expectedContextInfo := contextInfoPreUserinfoForUser(instance, userResp, userEmail, userPhone)
+				expectedContextInfo := contextInfoForUser(instance, "function/preuserinfo", userResp, userEmail, userPhone)
 
 				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
 
 				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, preUserInfoFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
-				return closeF
+				return userResp.GetUserId(), closeF
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -549,12 +555,6 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-					Session: &oidc_pb.Session{
-						SessionId:    sessionResp.GetSessionId(),
-						SessionToken: sessionResp.GetSessionToken(),
-					},
-				},
 			},
 			want: want{
 				resp: &oidc_pb.CreateCallbackResponse{
@@ -573,20 +573,31 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 		{
 			name: "set user metadata",
 			ctx:  ctxLoginClient,
-			dep: func(ctx context.Context, t *testing.T) func() {
-				changedRequest := &oidc_api.ContextInfoPreUserinfoResponse{
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(isolatedIAMCtx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+				changedRequest := &oidc_api.ContextInfoResponse{
 					SetUserMetadata: []*domain.Metadata{
 						{Key: "key", Value: []byte("value")},
 					},
 				}
-				expectedContextInfo := contextInfoPreUserinfoForUser(instance, userResp, userEmail, userPhone)
+				expectedContextInfo := contextInfoForUser(instance, "function/preuserinfo", userResp, userEmail, userPhone)
 
 				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
 
 				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, preUserInfoFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
-				return closeF
+				return userResp.GetUserId(), closeF
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -594,12 +605,6 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-					Session: &oidc_pb.Session{
-						SessionId:    sessionResp.GetSessionId(),
-						SessionToken: sessionResp.GetSessionToken(),
-					},
-				},
 			},
 			want: want{
 				resp: &oidc_pb.CreateCallbackResponse{
@@ -618,8 +623,20 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 		{
 			name: "full usage",
 			ctx:  ctxLoginClient,
-			dep: func(ctx context.Context, t *testing.T) func() {
-				changedRequest := &oidc_api.ContextInfoPreUserinfoResponse{
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(isolatedIAMCtx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+
+				changedRequest := &oidc_api.ContextInfoResponse{
 					SetUserMetadata: []*domain.Metadata{
 						{Key: "key1", Value: []byte("value1")},
 						{Key: "key2", Value: []byte("value2")},
@@ -636,14 +653,14 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						{Key: "added3", Value: "value3"},
 					},
 				}
-				expectedContextInfo := contextInfoPreUserinfoForUser(instance, userResp, userEmail, userPhone)
+				expectedContextInfo := contextInfoForUser(instance, "function/preuserinfo", userResp, userEmail, userPhone)
 
 				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
 
 				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, preUserInfoFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
-				return closeF
+				return userResp.GetUserId(), closeF
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -651,12 +668,6 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-					Session: &oidc_pb.Session{
-						SessionId:    sessionResp.GetSessionId(),
-						SessionToken: sessionResp.GetSessionToken(),
-					},
-				},
 			},
 			want: want{
 				resp: &oidc_pb.CreateCallbackResponse{
@@ -685,7 +696,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			closeF := tt.dep(isolatedIAMCtx, t)
+			userID, closeF := tt.dep(isolatedIAMCtx, t, tt.req)
 			defer closeF()
 
 			got, err := instance.Client.OIDCv2.CreateCallback(tt.ctx, tt.req)
@@ -701,28 +712,42 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 
 				callbackUrl, err := url.Parse(strings.Replace(got.GetCallbackUrl(), "#", "?", 1))
 				require.NoError(t, err)
-				claims := getClaimsFromCallbackURL(tt.ctx, t, instance, client.GetClientId(), callbackUrl)
+				claims := getIDTokenClaimsFromCallbackURL(tt.ctx, t, instance, client.GetClientId(), callbackUrl)
 
 				for k, v := range tt.want.addedClaims {
-					value, ok := claims.Claims[k]
+					value, ok := claims[k]
 					if !assert.True(t, ok) {
 						return
 					}
 					assert.Equal(t, v, value)
 				}
 				for k, v := range tt.want.addedLogClaims {
-					value, ok := claims.Claims[k]
+					value, ok := claims[k]
 					if !assert.True(t, ok) {
 						return
 					}
 					assert.ElementsMatch(t, v, value)
 				}
 				if len(tt.want.setUserMetadata) > 0 {
-					checkForSetMetadata(isolatedIAMCtx, t, instance, userResp.GetUserId(), tt.want.setUserMetadata)
+					checkForSetMetadata(isolatedIAMCtx, t, instance, userID, tt.want.setUserMetadata)
 				}
 			}
 		})
 	}
+}
+
+func createSession(ctx context.Context, t *testing.T, instance *integration.Instance, userID string) *session.CreateSessionResponse {
+	sessionResp, err := instance.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: userID,
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	return sessionResp
 }
 
 func checkForSetMetadata(ctx context.Context, t *testing.T, instance *integration.Instance, userID string, metadataExpected []*metadata.Metadata) {
@@ -751,7 +776,7 @@ func checkForSetMetadata(ctx context.Context, t *testing.T, instance *integratio
 	}, retryDuration, tick)
 }
 
-func getClaimsFromCallbackURL(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, callbackURL *url.URL) *oidc.IDTokenClaims {
+func getIDTokenClaimsFromCallbackURL(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, callbackURL *url.URL) map[string]any {
 	accessToken := callbackURL.Query().Get("access_token")
 	idToken := callbackURL.Query().Get("id_token")
 
@@ -759,12 +784,19 @@ func getClaimsFromCallbackURL(ctx context.Context, t *testing.T, instance *integ
 	require.NoError(t, err)
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), accessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
-	return claims
+	return claims.Claims
 }
 
-func contextInfoPreUserinfoForUser(instance *integration.Instance, userResp *user.AddHumanUserResponse, email, phone string) *oidc_api.ContextInfoPreUserinfo {
-	return &oidc_api.ContextInfoPreUserinfo{
-		Function: "function/preuserinfo",
+func getAccessTokenClaimsFromCallbackURL(ctx context.Context, t *testing.T, server rs.ResourceServer, callbackURL *url.URL) map[string]any {
+	accessToken := callbackURL.Query().Get("access_token")
+	resp, err := rs.Introspect[*oidc.IntrospectionResponse](ctx, server, accessToken)
+	require.NoError(t, err)
+	return resp.Claims
+}
+
+func contextInfoForUser(instance *integration.Instance, function string, userResp *user.AddHumanUserResponse, email, phone string) *oidc_api.ContextInfo {
+	return &oidc_api.ContextInfo{
+		Function: function,
 		UserInfo: &oidc.UserInfo{
 			Subject: userResp.GetUserId(),
 		},
@@ -803,4 +835,306 @@ func contextInfoPreUserinfoForUser(instance *integration.Instance, userResp *use
 		UserGrants: nil,
 		Response:   nil,
 	}
+}
+
+func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+
+	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, redirectURIImplicit, loginV2)
+	require.NoError(t, err)
+
+	//resourceServer := rsFromInstance(isolatedIAMCtx, t, instance)
+
+	preAccessTokenFunction := conditionFunction("preaccesstoken")
+
+	type want struct {
+		resp            *oidc_pb.CreateCallbackResponse
+		addedClaims     map[string]any
+		addedLogClaims  map[string][]string
+		setUserMetadata []*metadata.Metadata
+	}
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		dep     func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func())
+		req     *oidc_pb.CreateCallbackRequest
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "append claim",
+			ctx:  ctxLoginClient,
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+
+				changedRequest := &oidc_api.ContextInfoResponse{
+					AppendClaims: []*oidc_api.AppendClaim{
+						{Key: "added", Value: "value"},
+					},
+				}
+				expectedContextInfo := contextInfoForUser(instance, "function/preaccesstoken", userResp, userEmail, userPhone)
+
+				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
+
+				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
+				waitForExecutionOnCondition(ctx, t, instance, preAccessTokenFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+
+				return userResp.GetUserId(), closeF
+			},
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := instance.CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(isolatedIAMCtx, client.GetClientId(), redirectURIImplicit)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+			},
+			want: want{
+				resp: &oidc_pb.CreateCallbackResponse{
+					CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
+					Details: &object_v2.Details{
+						ChangeDate:    timestamppb.Now(),
+						ResourceOwner: instance.ID(),
+					},
+				},
+				addedClaims: map[string]any{
+					"added": "value",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "append log claim",
+			ctx:  ctxLoginClient,
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+				changedRequest := &oidc_api.ContextInfoResponse{
+					AppendLogClaims: []string{
+						"addedLog",
+					},
+				}
+				expectedContextInfo := contextInfoForUser(instance, "function/preaccesstoken", userResp, userEmail, userPhone)
+
+				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
+
+				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
+				waitForExecutionOnCondition(ctx, t, instance, preAccessTokenFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+
+				return userResp.GetUserId(), closeF
+			},
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := instance.CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(isolatedIAMCtx, client.GetClientId(), redirectURIImplicit)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+			},
+			want: want{
+				resp: &oidc_pb.CreateCallbackResponse{
+					CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
+					Details: &object_v2.Details{
+						ChangeDate:    timestamppb.Now(),
+						ResourceOwner: instance.ID(),
+					},
+				},
+				addedLogClaims: map[string][]string{
+					"urn:zitadel:iam:action:function/preaccesstoken:log": {"addedLog"},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "set user metadata",
+			ctx:  ctxLoginClient,
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(isolatedIAMCtx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+				changedRequest := &oidc_api.ContextInfoResponse{
+					SetUserMetadata: []*domain.Metadata{
+						{Key: "key", Value: []byte("value")},
+					},
+				}
+				expectedContextInfo := contextInfoForUser(instance, "function/preaccesstoken", userResp, userEmail, userPhone)
+
+				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
+
+				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
+				waitForExecutionOnCondition(ctx, t, instance, preAccessTokenFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+
+				return userResp.GetUserId(), closeF
+			},
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := instance.CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(isolatedIAMCtx, client.GetClientId(), redirectURIImplicit)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+			},
+			want: want{
+				resp: &oidc_pb.CreateCallbackResponse{
+					CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
+					Details: &object_v2.Details{
+						ChangeDate:    timestamppb.Now(),
+						ResourceOwner: instance.ID(),
+					},
+				},
+				setUserMetadata: []*metadata.Metadata{
+					{Key: "key", Value: []byte("value")},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "full usage",
+			ctx:  ctxLoginClient,
+			dep: func(ctx context.Context, t *testing.T, req *oidc_pb.CreateCallbackRequest) (string, func()) {
+				userEmail := gofakeit.Email()
+				userPhone := "+41" + gofakeit.Phone()
+				userResp := instance.CreateHumanUserVerified(isolatedIAMCtx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+				sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
+				req.CallbackKind = &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				}
+
+				changedRequest := &oidc_api.ContextInfoResponse{
+					SetUserMetadata: []*domain.Metadata{
+						{Key: "key1", Value: []byte("value1")},
+						{Key: "key2", Value: []byte("value2")},
+						{Key: "key3", Value: []byte("value3")},
+					},
+					AppendLogClaims: []string{
+						"addedLog1",
+						"addedLog2",
+						"addedLog3",
+					},
+					AppendClaims: []*oidc_api.AppendClaim{
+						{Key: "added1", Value: "value1"},
+						{Key: "added2", Value: "value2"},
+						{Key: "added3", Value: "value3"},
+					},
+				}
+				expectedContextInfo := contextInfoForUser(instance, "function/preaccesstoken", userResp, userEmail, userPhone)
+
+				targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, changedRequest)
+
+				targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
+				waitForExecutionOnCondition(ctx, t, instance, preAccessTokenFunction, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+
+				return userResp.GetUserId(), closeF
+			},
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := instance.CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(isolatedIAMCtx, client.GetClientId(), redirectURIImplicit)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+			},
+			want: want{
+				resp: &oidc_pb.CreateCallbackResponse{
+					CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
+					Details: &object_v2.Details{
+						ChangeDate:    timestamppb.Now(),
+						ResourceOwner: instance.ID(),
+					},
+				},
+				addedClaims: map[string]any{
+					"added1": "value1",
+					"added2": "value2",
+					"added3": "value3",
+				},
+				setUserMetadata: []*metadata.Metadata{
+					{Key: "key1", Value: []byte("value1")},
+					{Key: "key2", Value: []byte("value2")},
+					{Key: "key3", Value: []byte("value3")},
+				},
+				addedLogClaims: map[string][]string{
+					"urn:zitadel:iam:action:function/preaccesstoken:log": {"addedLog1", "addedLog2", "addedLog3"},
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			userID, closeF := tt.dep(isolatedIAMCtx, t, tt.req)
+			defer closeF()
+
+			got, err := instance.Client.OIDCv2.CreateCallback(tt.ctx, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			if tt.want.resp != nil {
+				if !assert.Regexp(t, regexp.MustCompile(tt.want.resp.CallbackUrl), got.GetCallbackUrl()) {
+					return
+				}
+
+				callbackUrl, err := url.Parse(strings.Replace(got.GetCallbackUrl(), "#", "?", 1))
+				require.NoError(t, err)
+				claims := getIDTokenClaimsFromCallbackURL(tt.ctx, t, instance, client.GetClientId(), callbackUrl)
+
+				for k, v := range tt.want.addedClaims {
+					value, ok := claims[k]
+					if !assert.True(t, ok) {
+						return
+					}
+					assert.Equal(t, v, value)
+				}
+				for k, v := range tt.want.addedLogClaims {
+					value, ok := claims[k]
+					if !assert.True(t, ok) {
+						return
+					}
+					assert.ElementsMatch(t, v, value)
+				}
+				if len(tt.want.setUserMetadata) > 0 {
+					checkForSetMetadata(isolatedIAMCtx, t, instance, userID, tt.want.setUserMetadata)
+				}
+			}
+		})
+	}
+}
+
+func rsFromInstance(ctx context.Context, t *testing.T, instance *integration.Instance) rs.ResourceServer {
+	_, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx)
+	require.NoError(t, err)
+	resourceServer, err := instance.CreateResourceServerJWTProfile(CTX, keyData)
+	require.NoError(t, err)
+	return resourceServer
 }
