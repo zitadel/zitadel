@@ -99,6 +99,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
 			},
@@ -144,6 +145,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
 			},
@@ -231,6 +233,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -269,6 +272,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -364,6 +368,8 @@ func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) 
 	phone := "+41" + gofakeit.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
 	info := userAttr{resp.GetUserId(), username, phone, nil, resp.GetDetails()}
+	// as the change date of the creation is the creation date
+	resp.Details.CreationDate = resp.GetDetails().GetChangeDate()
 	if passwordChangeRequired {
 		details := Instance.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
 		info.Changed = details.GetChangeDate()
