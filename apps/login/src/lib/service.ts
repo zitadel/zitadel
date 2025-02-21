@@ -44,6 +44,18 @@ export async function createServiceForHost<T extends ServiceClass>(
 
   const transport = createServerTransport(token, {
     baseUrl: serviceUrl,
+    interceptors: !process.env.CUSTOM_REQUEST_HEADERS ? undefined :[
+      (next) => {
+        return (req) => {
+          process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
+            const kv = header.split(":")
+            req.header.set(kv[0], kv[1]);
+          })
+          return next(req);
+        };
+      },
+    ]
+    ,
   });
 
   return createClientFor<T>(service)(transport);
