@@ -144,10 +144,6 @@ type Server struct {
 func startZitadel(ctx context.Context, config *Config, masterKey string, server chan<- *Server) error {
 	showBasicInformation(config)
 
-	// sink Server is stubbed out in production builds, see function's godoc.
-	closeSink := sink.StartServer()
-	defer closeSink()
-
 	i18n.MustLoadSupportedLanguagesFromDir()
 
 	dbClient, err := database.Connect(config.Database, false)
@@ -254,6 +250,10 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 	defer commands.Close(ctx) // wait for background jobs
+
+	// sink Server is stubbed out in production builds, see function's godoc.
+	closeSink := sink.StartServer(commands)
+	defer closeSink()
 
 	clock := clockpkg.New()
 	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())

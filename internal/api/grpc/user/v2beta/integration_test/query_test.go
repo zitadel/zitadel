@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	object_v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
@@ -394,7 +395,7 @@ func TestServer_ListUsers(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list user by id, no permission",
+			name: "list user by id, no permission machine user",
 			args: args{
 				UserCTX,
 				&user.ListUsersRequest{},
@@ -411,6 +412,68 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 				SortingColumn: 0,
 				Result:        []*user.User{},
+			},
+		},
+		{
+			name: "list user by id, no permission human user",
+			args: func() args {
+				info := createUser(IamCTX, orgResp.OrganizationId, true)
+				// create session to get token
+				userID := info.UserID
+				createResp, err := Instance.Client.SessionV2.CreateSession(IamCTX, &session.CreateSessionRequest{
+					Checks: &session.Checks{
+						User: &session.CheckUser{
+							Search: &session.CheckUser_UserId{UserId: userID},
+						},
+						Password: &session.CheckPassword{
+							Password: integration.UserPassword,
+						},
+					},
+				})
+				if err != nil {
+					require.NoError(t, err)
+				}
+				// use token to get ctx
+				HumanCTX := integration.WithAuthorizationToken(IamCTX, createResp.GetSessionToken())
+				return args{
+					HumanCTX,
+					&user.ListUsersRequest{},
+					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+						return []userAttr{info}
+					},
+				}
+			}(),
+			want: &user.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
+				Details: &object_v2beta.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+								PasswordChangeRequired: true,
+								PasswordChanged:        timestamppb.Now(),
+							},
+						},
+					},
+				},
 			},
 		},
 		{
