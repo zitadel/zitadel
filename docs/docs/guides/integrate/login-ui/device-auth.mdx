@@ -3,7 +3,7 @@ title: Support for the Device Authorization Grant in a Custom Login UI
 sidebar_label: Device Authorization
 ---
 
-In case one of your applications requires the OAuth2 Device Authorization Grant this guide will show you how to implement
+In case one of your applications requires the [OAuth2 Device Authorization Grant](/docs/guides/integrate/login/oidc/device-authorization) this guide will show you how to implement
 this in your application as well as the custom login UI.
 
 The following flow shows you the different components you need to enable OAuth2 Device Authorization Grant for your login.
@@ -13,7 +13,7 @@ The following flow shows you the different components you need to enable OAuth2 
 2. The login UI proxies the request to ZITADEL.
 3. ZITADEL parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
 4. ZITADEL returns the device authorization response
-5. Your application presents the user_code and verification_uri or maybe even renders a QR code with the verification_uri_complete for the user to scan
+5. Your application presents the `user_code` and `verification_uri` or maybe even renders a QR code with the `verification_uri_complete` for the user to scan
 6. Your application starts a polling mechanism to check if the user has approved the device authorization request on the token endpoint
 7. When the user opens the browser at the verification_uri, he can enter the user_code, or it's automatically filled in, if they scan the QR code
 8. Request the device authorization request from the ZITADEL API using the user_code
@@ -40,7 +40,7 @@ POST /oauth/v2/device_authorization HTTP/1.1
 Host: login.example.com
 Content-type: application/x-www-form-urlencoded
 
-client_id=170086824411201793%40yourapp&
+client_id=170086824411201793&
 scope=openid%20email%20profile
 ```
 
@@ -65,9 +65,9 @@ The endpoint will return the device authorization response:
 }
 ```
 
-Present the user_code and verification_uri or maybe even render a QR code with the verification_uri_complete for the user to scan.
+The device presents the `user_code` and `verification_uri` or maybe even render a QR code with the `verification_uri_complete` for the user to scan.
 
-Your login will have to provide a page on the verification_uri where the user can enter the user_code, or it's automatically filled in, if they scan the QR code.
+Your login will have to provide a page on the `verification_uri` where the user can enter the `user_code`, or it's automatically filled in, if they scan the QR code.
 
 ### Get the Device Authorization Request by User Code
 
@@ -86,7 +86,7 @@ Response Example:
 {
   "deviceAuthorizationRequest": {
     "id": "uEwFVs5e5OOHrXuS/02WpwkN/2pucoIgHsFkktgMjDNl9gz/dt8",
-    "clientId": "170086824411201793@yourapp",
+    "clientId": "170086824411201793",
     "scope": [
       "openid",
       "profile"
