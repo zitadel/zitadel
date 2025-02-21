@@ -20,6 +20,7 @@ import (
 type MockNotificationChannel struct {
 	ctrl     *gomock.Controller
 	recorder *MockNotificationChannelMockRecorder
+	isgomock struct{}
 }
 
 // MockNotificationChannelMockRecorder is the mock recorder for MockNotificationChannel.
@@ -40,15 +41,15 @@ func (m *MockNotificationChannel) EXPECT() *MockNotificationChannelMockRecorder 
 }
 
 // HandleMessage mocks base method.
-func (m *MockNotificationChannel) HandleMessage(arg0 channels.Message) error {
+func (m *MockNotificationChannel) HandleMessage(message channels.Message) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HandleMessage", arg0)
+	ret := m.ctrl.Call(m, "HandleMessage", message)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HandleMessage indicates an expected call of HandleMessage.
-func (mr *MockNotificationChannelMockRecorder) HandleMessage(arg0 any) *gomock.Call {
+func (mr *MockNotificationChannelMockRecorder) HandleMessage(message any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleMessage", reflect.TypeOf((*MockNotificationChannel)(nil).HandleMessage), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleMessage", reflect.TypeOf((*MockNotificationChannel)(nil).HandleMessage), message)
 }

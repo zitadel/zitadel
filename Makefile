@@ -39,10 +39,10 @@ core_static:
 
 .PHONY: core_generate_all
 core_generate_all:
-	go install github.com/dmarkham/enumer@v1.5.10 		# https://pkg.go.dev/github.com/dmarkham/enumer?tab=versions
+	go install github.com/dmarkham/enumer@v1.5.11 		# https://pkg.go.dev/github.com/dmarkham/enumer?tab=versions
 	go install github.com/rakyll/statik@v0.1.7			# https://pkg.go.dev/github.com/rakyll/statik?tab=versions
-	go install go.uber.org/mock/mockgen@v0.4.0			# https://pkg.go.dev/go.uber.org/mock/mockgen?tab=versions
-	go install golang.org/x/tools/cmd/stringer@v0.22.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
+	go install go.uber.org/mock/mockgen@v0.5.0			# https://pkg.go.dev/go.uber.org/mock/mockgen?tab=versions
+	go install golang.org/x/tools/cmd/stringer@v0.30.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
 	go generate ./...
 
 .PHONY: core_assets
@@ -63,12 +63,12 @@ endif
 
 .PHONY: core_grpc_dependencies
 core_grpc_dependencies:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1 						# https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go?tab=versions
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.5 						# https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go?tab=versions
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1 						# https://pkg.go.dev/google.golang.org/grpc/cmd/protoc-gen-go-grpc?tab=versions
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0	# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway?tab=versions
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
-	go install github.com/envoyproxy/protoc-gen-validate@v1.1.0								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
-	go install github.com/bufbuild/buf/cmd/buf@v1.45.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.26.1	# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway?tab=versions
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.26.1 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
+	go install github.com/envoyproxy/protoc-gen-validate@v1.2.1								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
+	go install github.com/bufbuild/buf/cmd/buf@v1.50.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies

@@ -19,6 +19,7 @@ import (
 type MockCodeGenerator struct {
 	ctrl     *gomock.Controller
 	recorder *MockCodeGeneratorMockRecorder
+	isgomock struct{}
 }
 
 // MockCodeGeneratorMockRecorder is the mock recorder for MockCodeGenerator.
@@ -39,15 +40,15 @@ func (m *MockCodeGenerator) EXPECT() *MockCodeGeneratorMockRecorder {
 }
 
 // VerifyCode mocks base method.
-func (m *MockCodeGenerator) VerifyCode(arg0, arg1 string) error {
+func (m *MockCodeGenerator) VerifyCode(verificationID, code string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "VerifyCode", arg0, arg1)
+	ret := m.ctrl.Call(m, "VerifyCode", verificationID, code)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // VerifyCode indicates an expected call of VerifyCode.
-func (mr *MockCodeGeneratorMockRecorder) VerifyCode(arg0, arg1 any) *gomock.Call {
+func (mr *MockCodeGeneratorMockRecorder) VerifyCode(verificationID, code any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyCode", reflect.TypeOf((*MockCodeGenerator)(nil).VerifyCode), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyCode", reflect.TypeOf((*MockCodeGenerator)(nil).VerifyCode), verificationID, code)
 }

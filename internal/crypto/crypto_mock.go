@@ -19,6 +19,7 @@ import (
 type MockEncryptionAlgorithm struct {
 	ctrl     *gomock.Controller
 	recorder *MockEncryptionAlgorithmMockRecorder
+	isgomock struct{}
 }
 
 // MockEncryptionAlgorithmMockRecorder is the mock recorder for MockEncryptionAlgorithm.
