@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix-docker-build
 
 jobs:
   build:
@@ -59,6 +60,18 @@ jobs:
 
       - name: Build for Docker
         run: NEXT_PUBLIC_BASE_PATH=/new-login pnpm build:docker
+
+      - name: Debug
+        run: ls -la .
+
+      - name: Debug
+        run: ls -la ./docker
+
+      - name: Debug
+        run: ls -la ./docker/apps
+
+      - name: Debug
+        run: ls -la ./docker/apps/login
 
       - name: Build and Push Image
         id: build
