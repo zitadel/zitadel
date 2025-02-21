@@ -209,6 +209,7 @@ func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderReques
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -223,6 +224,7 @@ func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProvider
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -234,6 +236,7 @@ func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest)
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -246,6 +249,7 @@ func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRe
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }

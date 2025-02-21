@@ -504,6 +504,7 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 			UserEndpoint:          template.UserEndpoint,
 			Scopes:                template.Scopes,
 			IdAttribute:           template.IDAttribute,
+			UsePkce:               template.UsePKCE,
 		},
 	}
 }
@@ -515,6 +516,7 @@ func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCI
 			Issuer:           template.Issuer,
 			Scopes:           template.Scopes,
 			IsIdTokenMapping: template.IsIDTokenMapping,
+			UsePkce:          template.UsePKCE,
 		},
 	}
 }

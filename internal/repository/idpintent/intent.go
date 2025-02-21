@@ -21,9 +21,10 @@ const (
 type StartedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	SuccessURL *url.URL `json:"successURL"`
-	FailureURL *url.URL `json:"failureURL"`
-	IDPID      string   `json:"idpId"`
+	SuccessURL   *url.URL       `json:"successURL"`
+	FailureURL   *url.URL       `json:"failureURL"`
+	IDPID        string         `json:"idpId"`
+	IDPArguments map[string]any `json:"idpArguments,omitempty"`
 }
 
 func NewStartedEvent(
@@ -32,6 +33,7 @@ func NewStartedEvent(
 	successURL,
 	failureURL *url.URL,
 	idpID string,
+	idpArguments map[string]any,
 ) *StartedEvent {
 	return &StartedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -39,9 +41,10 @@ func NewStartedEvent(
 			aggregate,
 			StartedEventType,
 		),
-		SuccessURL: successURL,
-		FailureURL: failureURL,
-		IDPID:      idpID,
+		SuccessURL:   successURL,
+		FailureURL:   failureURL,
+		IDPID:        idpID,
+		IDPArguments: idpArguments,
 	}
 }
 
