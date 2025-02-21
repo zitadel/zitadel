@@ -3,11 +3,12 @@
 package oidc_test
 
 import (
+	"context"
 	"slices"
-	"sync"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -87,24 +88,28 @@ func TestServer_DeviceAuth(t *testing.T) {
 			deviceAuthorization, err := rp.DeviceAuthorization(CTX, tt.scope, provider, nil)
 			require.NoError(t, err)
 
-			wg := &sync.WaitGroup{}
-			wg.Add(1)
-			var tokens *oidc.AccessTokenResponse
+			deviceAccessToken := make(chan *oidc.AccessTokenResponse)
 			go func() {
-				tokens, err = rp.DeviceAccessToken(CTX, deviceAuthorization.DeviceCode, time.Duration(deviceAuthorization.Interval)*time.Second, provider)
+				ctx, cancel := context.WithTimeout(CTX, 1*time.Minute)
+				defer cancel()
+				tokens, err := rp.DeviceAccessToken(ctx, deviceAuthorization.DeviceCode, time.Duration(deviceAuthorization.Interval)*time.Second, provider)
 				require.ErrorIs(t, err, tt.wantErr)
-				wg.Done()
+				deviceAccessToken <- tokens
 			}()
 
-			req, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
-				UserCode: deviceAuthorization.UserCode,
-			})
-			require.NoError(t, err)
+			var req *oidc_pb.GetDeviceAuthorizationRequestResponse
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+				req, err = Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+					UserCode: deviceAuthorization.UserCode,
+				})
+				assert.NoError(collectT, err)
+			}, retryDuration, tick)
 
 			tt.decision(t, req.GetDeviceAuthorizationRequest().GetId())
 
 			// wait on the token response
-			wg.Wait()
+			tokens := <-deviceAccessToken
 
 			_, err = Instance.Client.Auth.GetMyUser(integration.WithAuthorizationToken(CTX, tokens.AccessToken), &auth.GetMyUserRequest{})
 			if slices.Contains(tt.scope, domain.ProjectScopeZITADEL) {
