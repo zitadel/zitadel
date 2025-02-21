@@ -15,14 +15,6 @@ declare namespace NodeJS {
     ZITADEL_API_URL: string;
 
     /**
-     * Takes effect only if ZITADEL_API_URL is not empty.
-     * This is only relevant if Zitadels runtime has the ZITADEL_INSTANCEHOSTHEADERS config changed.
-     * The default is x-zitadel-instance-host.
-     * Most users don't need to set this variable.
-     */
-    ZITADEL_INSTANCE_HOST_HEADER: string;
-
-    /**
      * Self hosting: The service user id
      */
     ZITADEL_SERVICE_USER_ID: string;
