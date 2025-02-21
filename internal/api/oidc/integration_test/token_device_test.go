@@ -78,6 +78,7 @@ func TestServer_DeviceAuth(t *testing.T) {
 				})
 				require.NoError(t, err)
 			},
+			wantErr: oidc.ErrAccessDenied(),
 		},
 	}
 	for _, tt := range tests {
@@ -88,13 +89,25 @@ func TestServer_DeviceAuth(t *testing.T) {
 			deviceAuthorization, err := rp.DeviceAuthorization(CTX, tt.scope, provider, nil)
 			require.NoError(t, err)
 
-			deviceAccessToken := make(chan *oidc.AccessTokenResponse)
+			relyingPartyDone := make(chan struct{})
 			go func() {
 				ctx, cancel := context.WithTimeout(CTX, 1*time.Minute)
-				defer cancel()
+				defer func() {
+					cancel()
+					relyingPartyDone <- struct{}{}
+				}()
 				tokens, err := rp.DeviceAccessToken(ctx, deviceAuthorization.DeviceCode, time.Duration(deviceAuthorization.Interval)*time.Second, provider)
 				require.ErrorIs(t, err, tt.wantErr)
-				deviceAccessToken <- tokens
+
+				if tokens == nil {
+					return
+				}
+				_, err = Instance.Client.Auth.GetMyUser(integration.WithAuthorizationToken(CTX, tokens.AccessToken), &auth.GetMyUserRequest{})
+				if slices.Contains(tt.scope, domain.ProjectScopeZITADEL) {
+					require.NoError(t, err)
+				} else {
+					require.Error(t, err)
+				}
 			}()
 
 			var req *oidc_pb.GetDeviceAuthorizationRequestResponse
@@ -108,15 +121,7 @@ func TestServer_DeviceAuth(t *testing.T) {
 
 			tt.decision(t, req.GetDeviceAuthorizationRequest().GetId())
 
-			// wait on the token response
-			tokens := <-deviceAccessToken
-
-			_, err = Instance.Client.Auth.GetMyUser(integration.WithAuthorizationToken(CTX, tokens.AccessToken), &auth.GetMyUserRequest{})
-			if slices.Contains(tt.scope, domain.ProjectScopeZITADEL) {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
+			<-relyingPartyDone
 		})
 	}
 }
