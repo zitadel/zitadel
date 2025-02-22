@@ -517,6 +517,7 @@
     "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und dessen Einstellungen zu erstellen",
     "ORG_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer der Organisation auszugeben",
     "ORG_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer der Organisation auszugeben",
+    "ORG_USER_SELF_MANAGER": "Hat die Berechtigung, seinen eigenen Benutzer zu verwalten",
     "PROJECT_OWNER": "Hat die Berechtigung für das gesamte Projekt",
     "PROJECT_OWNER_VIEWER": "Hat die Leseberechtigung, das gesamte Projekt zu überprüfen",
     "PROJECT_OWNER_GLOBAL": "Hat die Berechtigung für das gesamte Projekt",

@@ -517,6 +517,7 @@
     "ORG_PROJECT_CREATOR": "Engedélye van saját projektek és alapbeállítások létrehozására",
     "ORG_ADMIN_IMPERSONATOR": "Engedélye van a szervezet adminisztrátorainak és véghasználóinak megszemélyesítésére",
     "ORG_END_USER_IMPERSONATOR": "Engedélye van a szervezet véghasználóinak megszemélyesítésére",
+    "ORG_USER_SELF_MANAGER": "Engedélye van a saját felhasználói fiókjaidat kezelésére",
     "PROJECT_OWNER": "Engedélye van az egész projekt fölött",
     "PROJECT_OWNER_VIEWER": "Jogosultságod van a teljes projekt átnézésére.",
     "PROJECT_OWNER_GLOBAL": "Jogosultságod van a teljes projektre.",
