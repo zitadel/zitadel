@@ -4,8 +4,20 @@ import { create } from '@bufbuild/protobuf';
 import {
   AddMyAuthFactorOTPSMSRequestSchema,
   AddMyAuthFactorOTPSMSResponse,
+  GetMyLoginPolicyResponse,
+  GetMyLoginPolicyRequestSchema,
   GetMyUserRequestSchema,
   GetMyUserResponse,
+  ListMyAuthFactorsRequestSchema,
+  ListMyAuthFactorsResponse,
+  RemoveMyAuthFactorOTPEmailRequestSchema,
+  RemoveMyAuthFactorOTPEmailResponse,
+  RemoveMyAuthFactorOTPRequestSchema,
+  RemoveMyAuthFactorOTPResponse,
+  RemoveMyAuthFactorU2FRequestSchema,
+  RemoveMyAuthFactorU2FResponse,
+  RemoveMyAuthFactorOTPSMSRequestSchema,
+  RemoveMyAuthFactorOTPSMSResponse,
   VerifyMyPhoneRequestSchema,
   VerifyMyPhoneResponse,
 } from '@zitadel/proto/zitadel/auth_pb';
@@ -26,5 +38,32 @@ export class NewAuthService {
 
   public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse> {
     return this.grpcService.authNew.addMyAuthFactorOTPSMS(create(AddMyAuthFactorOTPSMSRequestSchema));
+  }
+
+  public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse> {
+    return this.grpcService.authNew.listMyAuthFactors(create(ListMyAuthFactorsRequestSchema), null);
+  }
+
+  public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse> {
+    return this.grpcService.authNew.getMyLoginPolicy(create(GetMyLoginPolicyRequestSchema), null);
+  }
+
+  public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse> {
+    return this.grpcService.authNew
+      .removeMyAuthFactorOTP(create(RemoveMyAuthFactorOTPRequestSchema), null);
+  }
+
+  public removeMyMultiFactorU2F(tokenId: string): Promise<RemoveMyAuthFactorU2FResponse> {
+    return this.grpcService.authNew.removeMyAuthFactorU2F(create(RemoveMyAuthFactorU2FRequestSchema, {tokenId}), null);
+  }
+
+  public removeMyAuthFactorOTPEmail(): Promise<RemoveMyAuthFactorOTPEmailResponse> {
+    return this.grpcService.authNew
+      .removeMyAuthFactorOTPEmail(create(RemoveMyAuthFactorOTPEmailRequestSchema), null);
+  }
+
+  public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse> {
+    return this.grpcService.authNew
+      .removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema), null);
   }
 }

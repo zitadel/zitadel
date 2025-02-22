@@ -4,13 +4,12 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
-import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
+import { NewAuthService } from 'src/app/services/new-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { AuthFactorDialogComponent } from '../auth-factor-dialog/auth-factor-dialog.component';
-
-
+import { AddAuthFactorDialogData, AuthFactorDialogComponent } from '../auth-factor-dialog/auth-factor-dialog.component';
+import { AuthFactor } from '@zitadel/proto/zitadel/user_pb';
+import { SecondFactorType } from '@zitadel/proto/zitadel/policy_pb';
 export interface WebAuthNOptions {
   challenge: string;
   rp: { name: string; id: string };
@@ -31,10 +30,10 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  @ViewChild(MatTable) public table!: MatTable<AuthFactor.AsObject>;
+  @ViewChild(MatTable) public table!: MatTable<AuthFactor>;
   @ViewChild(MatSort) public sort!: MatSort;
   @Input() public phoneVerified: boolean = false;
-  public dataSource: MatTableDataSource<AuthFactor.AsObject> = new MatTableDataSource<AuthFactor.AsObject>([]);
+  public dataSource: MatTableDataSource<AuthFactor> = new MatTableDataSource<AuthFactor>([]);
 
   public AuthFactorState: any = AuthFactorState;
 
@@ -48,7 +47,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public otpEmailDisabled$ = new BehaviorSubject<boolean>(true);
 
   constructor(
-    private service: GrpcAuthService,
+    private service: NewAuthService,
     private toast: ToastService,
     private dialog: MatDialog,
   ) {}
@@ -63,17 +62,19 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   }
 
   public addAuthFactor(): void {
+    const data: AddAuthFactorDialogData = {
+      otp$: this.otpAvailable$,
+      u2f$: this.u2fAvailable$,
+      otpSms$: this.otpSmsAvailable$,
+      otpEmail$: this.otpEmailAvailable$,
+      otpDisabled$: this.otpDisabled$,
+      otpSmsDisabled$: this.otpSmsDisabled$,
+      otpEmailDisabled$: this.otpEmailDisabled$,
+      phoneVerified: this.phoneVerified,
+    } as const;
+
     const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
-      data: {
-        otp$: this.otpAvailable$,
-        u2f$: this.u2fAvailable$,
-        otpSms$: this.otpSmsAvailable$,
-        otpEmail$: this.otpEmailAvailable$,
-        otpDisabled$: this.otpDisabled$,
-        otpSmsDisabled$: this.otpSmsDisabled$,
-        otpEmailDisabled$: this.otpEmailDisabled$,
-        phoneVerified: this.phoneVerified,
-      },
+      data: data,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -85,7 +86,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     this.service
       .listMyMultiFactors()
       .then((mfas) => {
-        const list: AuthFactor.AsObject[] = mfas.resultList;
+        const list: AuthFactor[] = mfas.result;
         this.dataSource = new MatTableDataSource(list);
         this.dataSource.sort = this.sort;
 
@@ -101,20 +102,20 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public applyOrgPolicy(): void {
     this.service.getMyLoginPolicy().then((resp) => {
       if (resp && resp.policy) {
-        const secondFactors = resp.policy?.secondFactorsList;
+        const secondFactors = resp.policy?.secondFactors;
           this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP, this.otpAvailable$);
+            secondFactors, SecondFactorType.OTP, this.otpAvailable$);
           this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_U2F, this.u2fAvailable$);
+            secondFactors, SecondFactorType.U2F, this.u2fAvailable$);
           this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL, this.otpEmailAvailable$);
+            secondFactors, SecondFactorType.OTP_EMAIL, this.otpEmailAvailable$);
           this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS, this.otpSmsAvailable$);
+            secondFactors, SecondFactorType.OTP_SMS, this.otpSmsAvailable$);
       }
     });
   }
 
-  public deleteMFA(factor: AuthFactor.AsObject): void {
+  public deleteMFA(factor: AuthFactor): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
@@ -127,7 +128,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        if (factor.otp) {
+        if (factor.type.case === 'otp') {
           this.service
             .removeMyMultiFactorOTP()
             .then(() => {
@@ -139,9 +140,9 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             .catch((error) => {
               this.toast.showError(error);
             });
-        } else if (factor.u2f) {
+        } else if (factor.type.case === 'u2f') {
           this.service
-            .removeMyMultiFactorU2F(factor.u2f.id)
+            .removeMyMultiFactorU2F(factor.type.value.id)
             .then(() => {
               this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
@@ -151,7 +152,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             .catch((error) => {
               this.toast.showError(error);
             });
-        } else if (factor.otpEmail) {
+        } else if (factor.type.case === 'otpEmail') {
           this.service
             .removeMyAuthFactorOTPEmail()
             .then(() => {
@@ -163,7 +164,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             .catch((error) => {
               this.toast.showError(error);
             });
-        } else if (factor.otpSms) {
+        } else if (factor.type.case === 'otpSms') {
           this.service
             .removeMyAuthFactorOTPSMS()
             .then(() => {
@@ -181,17 +182,17 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   }
 
   private cleanupList(): void {
-    this.dataSource.data = this.dataSource.data.filter((mfa: AuthFactor.AsObject) => {
-      return !mfa.otp && !mfa.otpSms && !mfa.otpEmail;
+    this.dataSource.data = this.dataSource.data.filter((mfa: AuthFactor) => {
+      return mfa.type.case;
     });
   }
 
   private disableAuthFactor(
-    mfas: AuthFactor.AsObject[],
-    key: keyof AuthFactor.AsObject,
+    mfas: AuthFactor[],
+    key: string,
     subject: BehaviorSubject<boolean>
   ): void {
-    subject.next(mfas.some(mfa => !!mfa[key]));
+    subject.next(mfas.some(mfa => mfa.type.case === key));
   }
 
   private displayAuthFactorBasedOnPolicy(

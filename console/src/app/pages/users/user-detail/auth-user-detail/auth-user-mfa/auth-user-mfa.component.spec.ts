@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { AuthUserMfaComponent } from './auth-user-mfa.component';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
+import { NewAuthService } from 'src/app/services/new-auth.service';
 import { SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { CardComponent } from '../../../../../modules/card/card.component';
 import { RefreshTableComponent } from '../../../../../modules/refresh-table/refresh-table.component';
@@ -13,11 +12,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AuthFactor, AuthFactorState } from '@zitadel/proto/zitadel/user_pb';
 
 describe('AuthUserMfaComponent', () => {
   let component: AuthUserMfaComponent;
   let fixture: ComponentFixture<AuthUserMfaComponent>;
-  let serviceStub: Partial<GrpcAuthService>;
+  let serviceStub: Partial<NewAuthService>;
   let toastStub: Partial<ToastService>;
   let dialogStub: Partial<MatDialog>;
 
@@ -26,10 +26,9 @@ describe('AuthUserMfaComponent', () => {
     serviceStub = {
       listMyMultiFactors: jasmine.createSpy('listMyMultiFactors').and.returnValue(Promise.resolve({
         resultList: [
-          { otp: true, state: AuthFactorState.AUTH_FACTOR_STATE_READY } as AuthFactor.AsObject,
-          { otpSms: true, state: AuthFactorState.AUTH_FACTOR_STATE_READY } as AuthFactor.AsObject,
-          { otpEmail: true, state: AuthFactorState.AUTH_FACTOR_STATE_READY } as AuthFactor.AsObject,
-          { state: AuthFactorState.AUTH_FACTOR_STATE_NOT_READY } as AuthFactor.AsObject
+          { type: {case: 'otp'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor,
+          { type: {case: 'otpSms'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor' } as AuthFactor,
+          { type: {case: 'otpEmail'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor,
         ]
       })),
       getMyLoginPolicy: jasmine.createSpy('getMyLoginPolicy').and.returnValue(Promise.resolve({
@@ -64,7 +63,7 @@ describe('AuthUserMfaComponent', () => {
       declarations: [AuthUserMfaComponent, CardComponent, RefreshTableComponent],
       imports: [MatIconModule, TranslateModule.forRoot(), MatTooltipModule, MatTableModule, BrowserAnimationsModule],
       providers: [
-        { provide: GrpcAuthService, useValue: serviceStub },
+        { provide: NewAuthService, useValue: serviceStub },
         { provide: ToastService, useValue: toastStub },
         { provide: MatDialog, useValue: dialogStub },
       ]
@@ -106,7 +105,7 @@ describe('AuthUserMfaComponent', () => {
 
   it('should call deleteMFA and remove OTP factor', async () => {
     // OTP is set
-    const factor = { otp: true, state: AuthFactorState.AUTH_FACTOR_STATE_READY } as AuthFactor.AsObject;
+    const factor = { type: {case: 'otp'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor;
     await component.deleteMFA(factor);
 
     // Verify that the service method for OTP removal was called

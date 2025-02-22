@@ -34,8 +34,6 @@ import {
   GetMyEmailRequest,
   GetMyEmailResponse,
   GetMyLabelPolicyRequest,
-  GetMyLoginPolicyRequest,
-  GetMyLoginPolicyResponse,
   GetMyPasswordComplexityPolicyRequest,
   GetMyPasswordComplexityPolicyResponse,
   GetMyPhoneRequest,
@@ -45,8 +43,6 @@ import {
   GetMyProfileResponse,
   GetMyUserRequest,
   GetMyUserResponse,
-  ListMyAuthFactorsRequest,
-  ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
   ListMyLinkedIDPsResponse,
   ListMyMembershipsRequest,
@@ -65,14 +61,6 @@ import {
   ListMyUserSessionsResponse,
   ListMyZitadelPermissionsRequest,
   ListMyZitadelPermissionsResponse,
-  RemoveMyAuthFactorOTPEmailRequest,
-  RemoveMyAuthFactorOTPEmailResponse,
-  RemoveMyAuthFactorOTPRequest,
-  RemoveMyAuthFactorOTPResponse,
-  RemoveMyAuthFactorOTPSMSRequest,
-  RemoveMyAuthFactorOTPSMSResponse,
-  RemoveMyAuthFactorU2FRequest,
-  RemoveMyAuthFactorU2FResponse,
   RemoveMyAvatarRequest,
   RemoveMyAvatarResponse,
   RemoveMyLinkedIDPRequest,
@@ -372,10 +360,6 @@ export class GrpcAuthService {
     return this.grpcService.auth.getMyUser(new GetMyUserRequest(), null).then((resp) => resp.toObject());
   }
 
-  public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse.AsObject> {
-    return this.grpcService.auth.listMyAuthFactors(new ListMyAuthFactorsRequest(), null).then((resp) => resp.toObject());
-  }
-
   public async revalidateOrgs() {
     const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
     this.cachedOrgs.next(orgs);
@@ -503,11 +487,6 @@ export class GrpcAuthService {
     return this.grpcService.auth.resendMyEmailVerification(req, null).then((resp) => resp.toObject());
   }
 
-  public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {
-    const req = new GetMyLoginPolicyRequest();
-    return this.grpcService.auth.getMyLoginPolicy(req, null).then((resp) => resp.toObject());
-  }
-
   public removeMyPhone(): Promise<RemoveMyPhoneResponse.AsObject> {
     return this.grpcService.auth.removeMyPhone(new RemoveMyPhoneRequest(), null).then((resp) => resp.toObject());
   }
@@ -591,12 +570,6 @@ export class GrpcAuthService {
     return this.grpcService.auth.addMyAuthFactorU2F(new AddMyAuthFactorU2FRequest(), null).then((resp) => resp.toObject());
   }
 
-  public removeMyMultiFactorU2F(tokenId: string): Promise<RemoveMyAuthFactorU2FResponse.AsObject> {
-    const req = new RemoveMyAuthFactorU2FRequest();
-    req.setTokenId(tokenId);
-    return this.grpcService.auth.removeMyAuthFactorU2F(req, null).then((resp) => resp.toObject());
-  }
-
   public verifyMyMultiFactorU2F(credential: string, tokenname: string): Promise<VerifyMyAuthFactorU2FResponse.AsObject> {
     const req = new VerifyMyAuthFactorU2FRequest();
     const verification = new WebAuthNVerification();
@@ -639,24 +612,6 @@ export class GrpcAuthService {
   public addMyPasswordlessLink(): Promise<AddMyPasswordlessLinkResponse.AsObject> {
     const req = new AddMyPasswordlessLinkRequest();
     return this.grpcService.auth.addMyPasswordlessLink(req, null).then((resp) => resp.toObject());
-  }
-
-  public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse.AsObject> {
-    return this.grpcService.auth
-      .removeMyAuthFactorOTP(new RemoveMyAuthFactorOTPRequest(), null)
-      .then((resp) => resp.toObject());
-  }
-
-  public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse.AsObject> {
-    return this.grpcService.auth
-      .removeMyAuthFactorOTPSMS(new RemoveMyAuthFactorOTPSMSRequest(), null)
-      .then((resp) => resp.toObject());
-  }
-
-  public removeMyAuthFactorOTPEmail(): Promise<RemoveMyAuthFactorOTPEmailResponse.AsObject> {
-    return this.grpcService.auth
-      .removeMyAuthFactorOTPEmail(new RemoveMyAuthFactorOTPEmailRequest(), null)
-      .then((resp) => resp.toObject());
   }
 
   public verifyMyMultiFactorOTP(code: string): Promise<VerifyMyAuthFactorOTPResponse.AsObject> {
