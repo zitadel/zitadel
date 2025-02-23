@@ -8,10 +8,6 @@ plugins:
     out: .artifacts/grpc
     opt: 
     - allow_delete_body=true
-  - plugin: openapiv2
-    out: .artifacts/grpc
-    opt: 
-    - allow_delete_body=true
   - plugin: validate
     out: .artifacts/grpc
     opt: lang=go
@@ -19,3 +15,7 @@ plugins:
     out: .artifacts/grpc
   - plugin: zitadel
     out: .artifacts/grpc
+  - plugin: openapiv2
+    out: openapi/v2/zitadel
+    opt: 
+    - allow_delete_body=true

@@ -1,0 +1,32 @@
+name: "Docker Bake Test"
+
+on:
+  push:
+    branches:
+      - docker-bake
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  depot-gh-cache:
+    timeout-minutes: 20
+    runs-on: depot-ubuntu-22.04-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/bake-action@v6
+        with:
+          source: .
+          push: false
+          targets: output
+          no-cache: false
+          load: false
+      - run: ls -latr .build
+      - uses: actions/upload-artifact@v4
+        with:
+          path: .build
+          include-hidden-files: true

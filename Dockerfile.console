@@ -1,0 +1,22 @@
+FROM node AS base
+WORKDIR /app
+COPY console/package.json console/yarn.lock console/buf.gen.yaml  ./
+COPY proto/ ../proto/
+RUN yarn install && yarn generate
+COPY console/ .
+COPY docs/frameworks.json ../docs/frameworks.json
+
+FROM base AS build
+RUN yarn build
+
+FROM base AS lint
+RUN yarn lint
+
+FROM nginx AS image
+RUN rm -rf /usr/share/nginx/html/*
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
+
+FROM scratch AS output
+COPY --from=build /app/dist/console .
