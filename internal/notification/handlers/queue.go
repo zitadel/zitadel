@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/riverqueue/river"
+
 	"github.com/zitadel/zitadel/internal/queue"
 )
 
