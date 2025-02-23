@@ -1,19 +1,6 @@
+configuredversion: 2025.2.23
 database:
-    cockroach:
-        host: localhost
-        port: 26257
-    gosql:
-        fieldname: gosql
-        default: null
-        value: null
-        description: Configuration for connection string for gosql
-        version: 1
-    postgres:
-        fieldname: postgres
-        default: null
-        value: null
-        description: Configuration for connection string for postgres
-        version: 1
+    postgres: host=local
 step001:
-    databasename: zitadel
-    username: zitadel
+    databasename: zita
+    username: adel

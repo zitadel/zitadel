@@ -5,7 +5,8 @@ import (
 	"embed"
 	"fmt"
 
-	"github.com/zitadel/zitadel/backend/cmd/config"
+	"github.com/Masterminds/semver/v3"
+
 	"github.com/zitadel/zitadel/backend/cmd/configure"
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
@@ -18,26 +19,24 @@ var (
 type Step001 struct {
 	Database database.Pool `mapstructure:"-"`
 
-	DatabaseName string `configure:"added:"v3",default:"zitadel"`
-	Username     string `configure:"added:"v3",default:"zitadel"`
+	DatabaseName string
+	Username     string
 }
 
 // Fields implements configure.StructUpdater.
 func (v Step001) Fields() []configure.Updater {
 	return []configure.Updater{
-		configure.Field[string]{
+		&configure.Field[string]{
 			FieldName:   "databaseName",
-			Default:     "zitadel",
-			Value:       &v.DatabaseName,
+			Value:       "zitadel",
 			Description: "The name of the database Zitadel will store its data in",
-			Version:     config.V3,
+			Version:     semver.MustParse("3"),
 		},
-		configure.Field[string]{
+		&configure.Field[string]{
 			FieldName:   "username",
-			Default:     "zitadel",
-			Value:       &v.Username,
+			Value:       "zitadel",
 			Description: "The username Zitadel will use to connect to the database",
-			Version:     config.V3,
+			Version:     semver.MustParse("3"),
 		},
 	}
 }

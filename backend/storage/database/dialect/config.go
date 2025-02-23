@@ -20,6 +20,7 @@ type Hook struct {
 	Match  func(string) bool
 	Decode func(name string, config any) (database.Connector, error)
 	Name   string
+	Field  configure.Updater
 }
 
 var hooks = make([]Hook, 0)
@@ -30,11 +31,13 @@ func init() {
 			Match:  postgres.NameMatcher,
 			Decode: postgres.DecodeConfig,
 			Name:   postgres.Name,
+			Field:  postgres.Field,
 		},
 		Hook{
 			Match:  gosql.NameMatcher,
 			Decode: gosql.DecodeConfig,
 			Name:   gosql.Name,
+			Field:  gosql.Field,
 		},
 	)
 }
@@ -48,18 +51,17 @@ type Config struct {
 // Fields implements [configure.StructUpdater].
 func (c *Config) Fields() []configure.Updater {
 	dialects := configure.OneOf{
-		FieldName:   "dialect",
 		Description: "The database dialect Zitadel connects to",
 		SubFields:   []configure.Updater{},
 	}
 	for _, hook := range hooks {
-		value := c.Dialects[hook.Name]
-		dialects.SubFields = append(dialects.SubFields, &configure.Field[any]{
+		if hook.Field == nil {
+			panic("hook must configure its config fields")
+		}
+		dialects.SubFields = append(dialects.SubFields, &configure.Struct{
 			FieldName:   hook.Name,
-			Default:     nil,
-			Description: fmt.Sprintf("Configuration for connection string for %s", hook.Name),
-			Version:     config.V3,
-			Value:       &value,
+			Description: fmt.Sprintf("Configuration for %s", hook.Name),
+			SubFields:   []configure.Updater{hook.Field},
 		})
 	}
 

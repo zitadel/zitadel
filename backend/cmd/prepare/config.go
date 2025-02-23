@@ -1,6 +1,7 @@
 package prepare
 
 import (
+	"github.com/Masterminds/semver/v3"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -65,7 +66,10 @@ func (c *Config) Name() string {
 }
 
 // ShouldUpdate implements configure.StructUpdater.
-func (c *Config) ShouldUpdate(version config.Version) bool {
+func (c *Config) ShouldUpdate(version *semver.Version) bool {
+	if version == nil {
+		return true
+	}
 	for _, field := range c.Fields() {
 		if field.ShouldUpdate(version) {
 			return true
@@ -77,12 +81,12 @@ func (c *Config) ShouldUpdate(version config.Version) bool {
 // Fields implements configure.UpdateConfig.
 func (c Config) Fields() []configure.Updater {
 	return []configure.Updater{
-		configure.Struct{
+		&configure.Struct{
 			FieldName:   "step001",
 			Description: "The configuration for the first step of the prepare command",
 			SubFields:   c.Step001.Fields(),
 		},
-		configure.Struct{
+		&configure.Struct{
 			FieldName:   "database",
 			Description: "The configuration for the database connection",
 			SubFields:   c.Database.Fields(),

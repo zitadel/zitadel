@@ -2,6 +2,7 @@ package prepare
 
 import (
 	"github.com/spf13/cobra"
+
 	step001 "github.com/zitadel/zitadel/backend/cmd/prepare/001"
 )
 

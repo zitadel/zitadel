@@ -100,6 +100,7 @@ require (
 	cloud.google.com/go/auth v0.6.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.0 // indirect
+	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/bmatcuk/doublestar/v4 v4.7.1 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect

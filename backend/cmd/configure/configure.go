@@ -1,9 +1,9 @@
 package configure
 
 import (
+	"github.com/Masterminds/semver/v3"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/zitadel/backend/cmd/config"
 )
 
 var (
@@ -70,24 +70,21 @@ func (s sub) Fields() []Updater {
 	return []Updater{
 		Field[string]{
 			FieldName:   "f1",
-			Value:       &s.F1,
-			Default:     "",
+			Value:       "",
 			Description: "field 1",
-			Version:     config.V3,
+			Version:     semver.MustParse("3"),
 		},
 		Field[int]{
 			FieldName:   "f2",
-			Value:       &s.F2,
-			Default:     0,
+			Value:       0,
 			Description: "field 2",
-			Version:     config.V3,
+			Version:     semver.MustParse("3"),
 		},
 		Field[*bool]{
 			FieldName:   "f3",
-			Value:       &s.F3,
-			Default:     nil,
+			Value:       nil,
 			Description: "field 3",
-			Version:     config.V3,
+			Version:     semver.MustParse("3"),
 		},
 	}
 }
@@ -101,10 +98,9 @@ func (t test) Fields() []Updater {
 	return []Updater{
 		Field[string]{
 			FieldName:   "f1",
-			Value:       &t.F1,
-			Default:     "",
+			Value:       "",
 			Description: "field 1",
-			Version:     config.V3,
+			Version:     semver.MustParse("3"),
 		},
 		Struct{
 			FieldName:   "sub",
