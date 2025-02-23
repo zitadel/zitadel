@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
 	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
@@ -27,7 +28,7 @@ func generateSms(
 	data templates.TemplateData,
 	args map[string]interface{},
 	lastPhone bool,
-	// triggeringEvent eventstore.Event,
+	triggeringEvent eventstore.Event,
 	generatorInfo *senders.CodeGeneratorInfo,
 ) error {
 	smsChannels, config, err := channels.SMS(ctx)
@@ -50,7 +51,7 @@ func generateSms(
 			SenderPhoneNumber:    number,
 			RecipientPhoneNumber: recipient,
 			Content:              data.Text,
-			// TriggeringEvent:      triggeringEvent,
+			TriggeringEvent:      triggeringEvent,
 		}
 		err = smsChannels.HandleMessage(message)
 		if err != nil {
@@ -69,8 +70,8 @@ func generateSms(
 		}
 		contextInfo := map[string]interface{}{
 			"recipientPhoneNumber": recipient,
-			// "eventType":            triggeringEvent.Type(),
-			"provider": config.ProviderConfig,
+			"eventType":            triggeringEvent.Type(),
+			"provider":             config.ProviderConfig,
 		}
 
 		message := &messages.JSON{
@@ -79,7 +80,7 @@ func generateSms(
 				Args:         caseArgs,
 				ContextInfo:  contextInfo,
 			},
-			// TriggeringEvent: triggeringEvent,
+			TriggeringEvent: triggeringEvent,
 		}
 		webhookChannels, err := channels.Webhook(ctx, *config.WebhookConfig)
 		if err != nil {

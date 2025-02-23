@@ -183,9 +183,9 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 		if err != nil {
 			return err
 		}
-		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors)
+		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, nil)
 	case domain.NotificationTypeSms:
-		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, generatorInfo)
+		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, nil, generatorInfo)
 	}
 
 	args := request.Args.ToMap()

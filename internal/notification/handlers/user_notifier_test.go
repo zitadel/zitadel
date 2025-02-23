@@ -26,7 +26,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/repository/notification"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -1904,7 +1903,6 @@ type fields struct {
 	es             *eventstore.Eventstore
 	userDataCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto crypto.EncryptionAlgorithm
-	query          *queue.Queue
 }
 type fieldsWorker struct {
 	queries        *mock.MockQueries
