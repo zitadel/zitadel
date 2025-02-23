@@ -76,13 +76,14 @@ target "_core" {
   dockerfile = "Dockerfile.core"
   context = "."
   contexts = {
-    node = "docker-image://golang:1.23"
+    golang = "docker-image://golang:1.24"
     console = "target:console-output"
   }
   args = {
     SASS_VERSION      = "1.64.1"
     GOLANG_CI_VERSION = "1.64.5"
   }
+  #platforms = ["linux/amd64", "linux/arm64"]
 }
 
 target "core" {

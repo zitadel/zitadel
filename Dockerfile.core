@@ -1,10 +1,13 @@
 FROM golang AS base
 ARG SASS_VERSION=
 ARG GOLANG_CI_VERSION=
+ARG COMMIT_SHA=
+ARG VERSION=
 RUN apt-get update && apt-get install -y npm && npm install -g sass@${SASS_VERSION}
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANG_CI_VERSION}
 WORKDIR /app
-COPY go.mod go.sum Makefile buf.gen.yaml buf.work.yaml main.go ./
+COPY go.mod go.sum buf.gen.yaml buf.work.yaml main.go ./
+COPY docs/apis/assets/assets.md docs/apis/assets/assets.md
 COPY cmd/ cmd/
 COPY internal/ internal/
 COPY openapi/ openapi/
@@ -12,10 +15,19 @@ COPY pkg/ pkg/
 COPY proto/ proto/
 COPY statik/ statik/
 COPY --from=console ./ internal/api/ui/console/static
-RUN make core_build
+RUN go version
+RUN go mod download \
+    && go install tool \
+    && go install github.com/goreleaser/goreleaser/v2@latest \
+    && buf generate && cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/ \
+    && go generate ./... \
+    && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
 FROM base AS build
-RUN make compile_pipeline
+COPY .goreleaser.yaml ./
+RUN goreleaser release --snapshot --clean
+# RUN CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
+#     && chmod +x zitadel
 
 FROM base AS lint
 COPY .golangci.yaml ./
