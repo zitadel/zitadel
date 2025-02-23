@@ -388,7 +388,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			err := newNotificationWorker(t, ctrl, queries, f, a, w).Work(
+			err := newNotificationWorker(t, ctrl, queries, f, w).Work(
 				authz.WithInstanceID(context.Background(), instanceID),
 				a.job,
 			)
@@ -473,7 +473,7 @@ func TestNotificationWorker_exponentialBackOff(t *testing.T) {
 	}
 }
 
-func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fieldsWorker, a argsWorker, w wantWorker) *NotificationWorker {
+func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fieldsWorker, w wantWorker) *NotificationWorker {
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)

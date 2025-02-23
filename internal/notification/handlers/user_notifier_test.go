@@ -182,7 +182,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceInitCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceInitCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -356,7 +356,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceEmailCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceEmailCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -591,7 +591,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePasswordCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -725,7 +725,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceDomainClaimed(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceDomainClaimed(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -896,7 +896,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordlessCodeRequested(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePasswordlessCodeRequested(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1060,7 +1060,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordChanged(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePasswordChanged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1319,7 +1319,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceSessionOTPEmailChallenged(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceSessionOTPEmailChallenged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1580,7 +1580,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceSessionOTPSMSChallenged(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceSessionOTPSMSChallenged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1876,7 +1876,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceInviteCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceInviteCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1931,7 +1931,7 @@ type wantWorker struct {
 	err        assert.ErrorAssertionFunc
 }
 
-func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w want) *userNotifier {
+func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields) *userNotifier {
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	return &userNotifier{
