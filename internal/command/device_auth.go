@@ -60,7 +60,7 @@ func (c *Commands) ApproveDeviceAuth(
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
 	if model.State != domain.DeviceAuthStateInitiated {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-GEJL3", "Errors.AuthRequest.AlreadyHandled")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-GEJL3", "Errors.DeviceAuth.AlreadyHandled")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime, preferredLanguage, userAgent, sessionID))
 	if err != nil {

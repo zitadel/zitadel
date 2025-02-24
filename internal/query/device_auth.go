@@ -116,7 +116,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&projectName,
 			)
 			if errors.Is(err, sql.ErrNoRows) {
-				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
+				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotFound")
 			}
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
