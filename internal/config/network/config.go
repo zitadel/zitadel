@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -31,6 +32,7 @@ type TLS struct {
 	cachedCert        *tls.Certificate
 	cachedCertModTime time.Time
 	cachedKeyModTime  time.Time
+	mtx               *sync.RWMutex
 }
 
 func (t *TLS) getCert() ([]byte, error) {
@@ -71,6 +73,11 @@ func (t *TLS) Config() (_ *tls.Config, err error) {
 	if !t.Enabled {
 		return nil, nil
 	}
+	if t.mtx == nil {
+		t.mtx = &sync.RWMutex{}
+	}
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	if err := t.updateCachedKeyPair(); err != nil {
 		return nil, err
 	}
@@ -82,9 +89,14 @@ func (t *TLS) Config() (_ *tls.Config, err error) {
 				if err != nil {
 					return nil, err
 				}
+				t.mtx.RLock()
 				if info.ModTime() != t.cachedCertModTime {
+					t.mtx.RUnlock()
+					t.mtx.Lock()
 					updated = true
 					t.cachedCertModTime = info.ModTime()
+				} else {
+					t.mtx.RUnlock()
 				}
 			}
 			if t.KeyPath != "" {
@@ -92,12 +104,18 @@ func (t *TLS) Config() (_ *tls.Config, err error) {
 				if err != nil {
 					return nil, err
 				}
+				t.mtx.RLock()
 				if info.ModTime() != t.cachedKeyModTime {
+					t.mtx.RUnlock()
+					t.mtx.Lock()
 					updated = true
 					t.cachedKeyModTime = info.ModTime()
+				} else {
+					t.mtx.RUnlock()
 				}
 			}
 			if updated {
+				defer t.mtx.Unlock()
 				if err := t.updateCachedKeyPair(); err != nil {
 					return nil, err
 				}
