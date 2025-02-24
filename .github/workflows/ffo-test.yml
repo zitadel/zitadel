@@ -22,7 +22,7 @@ jobs:
         with:
           source: .
           push: false
-          targets: output
+          targets: build
           no-cache: false
           load: false
       - run: ls -latr .build
