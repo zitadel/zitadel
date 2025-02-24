@@ -77,7 +77,7 @@ target "_core" {
   context = "."
   contexts = {
     golang = "docker-image://golang:1.24"
-    console = "target:console-output"
+    console = "target:console-build"
   }
   args = {
     SASS_VERSION      = "1.64.1"
