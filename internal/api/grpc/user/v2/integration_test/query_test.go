@@ -22,8 +22,10 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-var permissionCheckV2SetFlagInital bool
-var permissionCheckV2SetFlag bool
+var (
+	permissionCheckV2SetFlagInital bool
+	permissionCheckV2SetFlag       bool
+)
 
 type permissionCheckV2SettingsStruct struct {
 	TestNamePrependString string
@@ -70,7 +72,6 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
@@ -462,14 +463,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by id, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{info}
 				},
@@ -509,14 +507,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by id, passwordChangeRequired, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, true)
 					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{info}
 				},
@@ -558,14 +553,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by id multiple, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
 					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
 					return infos
 				},
@@ -618,7 +610,8 @@ func TestServer_ListUsers(t *testing.T) {
 								},
 							},
 						},
-					}, {
+					},
+					{
 						State: user.UserState_USER_STATE_ACTIVE,
 						Type: &user.User_Human{
 							Human: &user.HumanUser{
@@ -646,14 +639,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by username, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, UsernameQuery(info.Username))
 					return []userAttr{info}
 				},
@@ -693,14 +683,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery([]string{info.Username}))
 					return []userAttr{info}
 				},
@@ -740,14 +727,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails multiple, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
 					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
 					return infos
 				},
@@ -827,10 +811,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails no found, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{Queries: []*user.SearchQuery{
-					OrganizationIdQuery(orgResp.OrganizationId),
-					InUserEmailsQuery([]string{"notfound"}),
-				},
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
+					},
 				},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					return []userAttr{}
@@ -849,14 +834,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user phone, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, PhoneQuery(info.Phone))
 					return []userAttr{info}
 				},
@@ -896,10 +878,11 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails no found, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{Queries: []*user.SearchQuery{
-					OrganizationIdQuery(orgResp.OrganizationId),
-					InUserEmailsQuery([]string{"notfound"}),
-				},
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
+					},
 				},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					return []userAttr{}
@@ -1000,6 +983,51 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "list user with org query",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
+					return []userAttr{info, {}}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+					nil,
+				},
+			},
+		},
 	}
 	for _, f := range permissionCheckV2Settings {
 		f := f
@@ -1019,13 +1047,14 @@ func TestServer_ListUsers(t *testing.T) {
 
 					// always only give back dependency infos which are required for the response
 					require.Len(ttt, tt.want.Result, len(infos))
-					// always first check length, otherwise its failed anyway
 					if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-						// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
 						tt.want.Details.TotalResult = got.Details.TotalResult
 
 						// fill in userid and username as it is generated
 						for i := range infos {
+							if tt.want.Result[i] == nil {
+								continue
+							}
 							tt.want.Result[i].UserId = infos[i].UserID
 							tt.want.Result[i].Username = infos[i].Username
 							tt.want.Result[i].PreferredLoginName = infos[i].Username
@@ -1040,6 +1069,9 @@ func TestServer_ListUsers(t *testing.T) {
 							tt.want.Result[i].Details = infos[i].Details
 						}
 						for i := range tt.want.Result {
+							if tt.want.Result[i] == nil {
+								continue
+							}
 							assert.EqualExportedValues(ttt, got.Result[i], tt.want.Result[i])
 						}
 					}
@@ -1051,46 +1083,51 @@ func TestServer_ListUsers(t *testing.T) {
 }
 
 func InUserIDsQuery(ids []string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_InUserIdsQuery{
-		InUserIdsQuery: &user.InUserIDQuery{
-			UserIds: ids,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_InUserIdsQuery{
+			InUserIdsQuery: &user.InUserIDQuery{
+				UserIds: ids,
+			},
 		},
-	},
 	}
 }
 
 func InUserEmailsQuery(emails []string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_InUserEmailsQuery{
-		InUserEmailsQuery: &user.InUserEmailsQuery{
-			UserEmails: emails,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_InUserEmailsQuery{
+			InUserEmailsQuery: &user.InUserEmailsQuery{
+				UserEmails: emails,
+			},
 		},
-	},
 	}
 }
 
 func PhoneQuery(number string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_PhoneQuery{
-		PhoneQuery: &user.PhoneQuery{
-			Number: number,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_PhoneQuery{
+			PhoneQuery: &user.PhoneQuery{
+				Number: number,
+			},
 		},
-	},
 	}
 }
 
 func UsernameQuery(username string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_UserNameQuery{
-		UserNameQuery: &user.UserNameQuery{
-			UserName: username,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_UserNameQuery{
+			UserNameQuery: &user.UserNameQuery{
+				UserName: username,
+			},
 		},
-	},
 	}
 }
 
 func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_OrganizationIdQuery{
-		OrganizationIdQuery: &user.OrganizationIdQuery{
-			OrganizationId: resourceowner,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_OrganizationIdQuery{
+			OrganizationIdQuery: &user.OrganizationIdQuery{
+				OrganizationId: resourceowner,
+			},
 		},
-	},
 	}
 }
