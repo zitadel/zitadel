@@ -309,7 +309,7 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		}
 
 		for i := range instanceIDs {
-			instanceIDs[i] = dialect.DBPurposeEventPusher.AppName() + "_" + instanceIDs[i]
+			instanceIDs[i] = "zitadel_es_pusher_" + instanceIDs[i]
 		}
 
 		clauses += awaitOpenTransactions(useV1)

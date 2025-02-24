@@ -29,6 +29,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
 		LoginV2:                         loginV2,
+		PermissionCheckV2:               req.PermissionCheckV2,
 	}, nil
 }
 
@@ -46,6 +47,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
 		LoginV2:                             loginV2ToLoginV2FlagPb(f.LoginV2),
+		PermissionCheckV2:                   featureSourceToFlagPb(&f.PermissionCheckV2),
 	}
 }
 
@@ -68,6 +70,8 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
 		LoginV2:                         loginV2,
+		PermissionCheckV2:               req.PermissionCheckV2,
+		ConsoleUseV2UserApi:             req.ConsoleUseV2UserApi,
 	}, nil
 }
 
@@ -87,6 +91,8 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
 		LoginV2:                             loginV2ToLoginV2FlagPb(f.LoginV2),
+		PermissionCheckV2:                   featureSourceToFlagPb(&f.PermissionCheckV2),
+		ConsoleUseV2UserApi:                 featureSourceToFlagPb(&f.ConsoleUseV2UserApi),
 	}
 }
 

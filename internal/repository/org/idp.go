@@ -852,6 +852,7 @@ func NewLDAPIDPAddedEvent(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
+	rootCA []byte,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
 ) *LDAPIDPAddedEvent {
@@ -874,6 +875,7 @@ func NewLDAPIDPAddedEvent(
 			userObjectClasses,
 			userFilters,
 			timeout,
+			rootCA,
 			attributes,
 			options,
 		),

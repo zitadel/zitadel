@@ -56,7 +56,9 @@ var (
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
 		` projections.apps7_saml_configs.metadata,` +
-		` projections.apps7_saml_configs.metadata_url` +
+		` projections.apps7_saml_configs.metadata_url,` +
+		` projections.apps7_saml_configs.login_version,` +
+		` projections.apps7_saml_configs.login_base_uri` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
@@ -103,6 +105,8 @@ var (
 		` projections.apps7_saml_configs.entity_id,` +
 		` projections.apps7_saml_configs.metadata,` +
 		` projections.apps7_saml_configs.metadata_url,` +
+		` projections.apps7_saml_configs.login_version,` +
+		` projections.apps7_saml_configs.login_base_uri,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
@@ -178,6 +182,8 @@ var (
 		"entity_id",
 		"metadata",
 		"metadata_url",
+		"login_version",
+		"login_base_uri",
 	}
 	appsCols = append(appCols, "count")
 )
@@ -252,6 +258,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -317,6 +325,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -393,6 +403,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersionUnspecified,
+							nil,
 						},
 					},
 				),
@@ -463,6 +475,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -559,6 +573,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -647,6 +663,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -743,6 +761,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -831,6 +851,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -927,6 +949,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1019,6 +1043,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 						{
 							"api-app-id",
@@ -1055,6 +1081,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1099,6 +1127,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersion2,
+							"https://login.ch/",
 						},
 					},
 				),
@@ -1165,9 +1195,11 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ProjectID:     "project-id",
 						SAMLConfig: &SAMLApp{
-							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-							MetadataURL: "https://test.com/saml/metadata",
-							EntityID:    "https://test.com/saml/metadata",
+							Metadata:     []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							MetadataURL:  "https://test.com/saml/metadata",
+							EntityID:     "https://test.com/saml/metadata",
+							LoginVersion: domain.LoginVersion2,
+							LoginBaseURI: gu.Ptr("https://login.ch/"),
 						},
 					},
 				},
@@ -1280,6 +1312,8 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1339,6 +1373,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1407,6 +1443,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1498,6 +1536,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1585,6 +1625,8 @@ func Test_AppPrepare(t *testing.T) {
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersionUnspecified,
+							nil,
 						},
 					},
 				),
@@ -1599,9 +1641,11 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ProjectID:     "project-id",
 				SAMLConfig: &SAMLApp{
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-					MetadataURL: "https://test.com/saml/metadata",
-					EntityID:    "https://test.com/saml/metadata",
+					Metadata:     []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					MetadataURL:  "https://test.com/saml/metadata",
+					EntityID:     "https://test.com/saml/metadata",
+					LoginVersion: domain.LoginVersionUnspecified,
+					LoginBaseURI: nil,
 				},
 			},
 		},
@@ -1650,6 +1694,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1741,6 +1787,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1828,6 +1876,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1911,6 +1961,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
