@@ -36,11 +36,10 @@ import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogData, EditDialogResult, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { LanguagesService } from 'src/app/services/languages.service';
-import { Gender, HumanProfile } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { Gender, HumanProfile, HumanUser, User, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { catchError, filter, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
 import { pairwiseStartWith } from 'src/app/utils/pairwiseStartWith';
 import { NewAuthService } from 'src/app/services/new-auth.service';
-import { Human, User, UserState } from '@zitadel/proto/zitadel/user_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewMgmtService } from 'src/app/services/new-mgmt.service';
 import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
@@ -48,18 +47,14 @@ import { UserService } from 'src/app/services/user.service';
 import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { query } from '@angular/animations';
 
-type UserQuery =
-  | { state: 'success'; value: User }
-  | { state: 'error'; value: string }
-  | { state: 'loading'; value?: User }
-  | { state: 'notfound' };
+type UserQuery = { state: 'success'; value: User } | { state: 'error'; value: string } | { state: 'loading'; value?: User };
 
 type MetadataQuery =
   | { state: 'success'; value: Metadata[] }
   | { state: 'loading'; value: Metadata[] }
   | { state: 'error'; value: string };
 
-type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: Human } };
+type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: HumanUser } };
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -67,17 +62,17 @@ type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: Hu
   styleUrls: ['./auth-user-detail.component.scss'],
 })
 export class AuthUserDetailComponent implements OnInit {
-  public genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
+  protected readonly genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
 
-  public ChangeType: any = ChangeType;
+  protected readonly ChangeType = ChangeType;
   public userLoginMustBeDomain: boolean = false;
-  public UserState: any = UserState;
+  protected readonly UserState = UserState;
 
-  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
-  public refreshChanges$: EventEmitter<void> = new EventEmitter();
-  public refreshMetadata$ = new Subject<true>();
+  protected USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
+  protected readonly refreshChanges$: EventEmitter<void> = new EventEmitter();
+  protected readonly refreshMetadata$ = new Subject<true>();
 
-  public settingsList: SidenavSetting[] = [
+  protected readonly settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
     { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' },
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
@@ -92,9 +87,9 @@ export class AuthUserDetailComponent implements OnInit {
   protected readonly user$: Observable<UserQuery>;
   protected readonly metadata$: Observable<MetadataQuery>;
   private readonly savedLanguage$: Observable<string>;
-  protected currentSetting$: Observable<string | undefined>;
-  public loginPolicy$: Observable<LoginPolicy>;
-  protected userName$: Observable<string>;
+  protected readonly currentSetting$: Observable<string | undefined>;
+  protected readonly loginPolicy$: Observable<LoginPolicy>;
+  protected readonly userName$: Observable<string>;
 
   constructor(
     public translate: TranslateService,
@@ -209,13 +204,8 @@ export class AuthUserDetailComponent implements OnInit {
   }
 
   private getMyUser(): Observable<UserQuery> {
-    return defer(() => this.newAuthService.getMyUser()).pipe(
-      map(({ user }) => {
-        if (user) {
-          return { state: 'success', value: user } as const;
-        }
-        return { state: 'notfound' } as const;
-      }),
+    return defer(() => this.userService.getMyUser()).pipe(
+      map((user) => ({ state: 'success' as const, value: user })),
       catchError((error) => of({ state: 'error', value: error.message ?? '' } as const)),
       startWith({ state: 'loading' } as const),
     );
@@ -232,7 +222,7 @@ export class AuthUserDetailComponent implements OnInit {
         if (!user.value) {
           return EMPTY;
         }
-        return this.getMetadataById(user.value.id);
+        return this.getMetadataById(user.value.userId);
       }),
       pairwiseStartWith(undefined),
       map(([prev, curr]) => {
@@ -259,7 +249,7 @@ export class AuthUserDetailComponent implements OnInit {
       labelKey: 'ACTIONS.NEWVALUE' as const,
       titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE' as const,
       descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC' as const,
-      value: user.userName,
+      value: user.username,
     };
     const dialogRef = this.dialog.open<EditDialogComponent, typeof data, EditDialogResult>(EditDialogComponent, {
       data,
@@ -271,8 +261,8 @@ export class AuthUserDetailComponent implements OnInit {
       .pipe(
         map((value) => value?.value),
         filter(Boolean),
-        filter((value) => user.userName != value),
-        switchMap((username) => this.userService.updateUser({ userId: user.id, username })),
+        filter((value) => user.username != value),
+        switchMap((username) => this.userService.updateUser({ userId: user.userId, username })),
       )
       .subscribe({
         next: () => {
@@ -288,7 +278,7 @@ export class AuthUserDetailComponent implements OnInit {
   public saveProfile(user: User, profile: HumanProfile): void {
     this.userService
       .updateUser({
-        userId: user.id,
+        userId: user.userId,
         profile: {
           givenName: profile.givenName,
           familyName: profile.familyName,
@@ -350,7 +340,7 @@ export class AuthUserDetailComponent implements OnInit {
 
   public resendEmailVerification(user: User): void {
     this.newMgmtService
-      .resendHumanEmailVerification(user.id)
+      .resendHumanEmailVerification(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
         this.refreshChanges$.emit();
@@ -362,7 +352,7 @@ export class AuthUserDetailComponent implements OnInit {
 
   public resendPhoneVerification(user: User): void {
     this.newMgmtService
-      .resendHumanPhoneVerification(user.id)
+      .resendHumanPhoneVerification(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
         this.refreshChanges$.emit();
@@ -374,7 +364,7 @@ export class AuthUserDetailComponent implements OnInit {
 
   public deletePhone(user: User): void {
     this.userService
-      .removePhone(user.id)
+      .removePhone(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
         this.refreshChanges$.emit();
@@ -417,7 +407,7 @@ export class AuthUserDetailComponent implements OnInit {
         filter((resp): resp is Required<EditDialogResult> => !!resp?.value),
         switchMap(({ value, isVerified }) =>
           this.userService.setEmail({
-            userId: user.id,
+            userId: user.userId,
             email: value,
             verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
           }),
@@ -453,7 +443,7 @@ export class AuthUserDetailComponent implements OnInit {
       .pipe(
         map((resp) => formatPhone(resp?.value)),
         filter(Boolean),
-        switchMap(({ phone }) => this.userService.setPhone({ userId: user.id, phone })),
+        switchMap(({ phone }) => this.userService.setPhone({ userId: user.userId, phone })),
       )
       .subscribe({
         next: () => {
@@ -482,7 +472,7 @@ export class AuthUserDetailComponent implements OnInit {
       .afterClosed()
       .pipe(
         filter(Boolean),
-        switchMap(() => this.userService.deleteUser(user.id)),
+        switchMap(() => this.userService.deleteUser(user.userId)),
       )
       .subscribe({
         next: () => {
@@ -498,9 +488,9 @@ export class AuthUserDetailComponent implements OnInit {
       this.newMgmtService.setUserMetadata({
         key,
         value: Buffer.from(value),
-        id: user.id,
+        id: user.userId,
       });
-    const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.id });
+    const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
 
     const dialogRef = this.dialog.open<MetadataDialogComponent, MetadataDialogData>(MetadataDialogComponent, {
       data: {
