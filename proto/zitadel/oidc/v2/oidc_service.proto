@@ -179,7 +179,7 @@ service OIDCService {
   // Authorize or deny the device authorization request based on the provided device authorization id.
   rpc AuthorizeOrDenyDeviceAuthorization(AuthorizeOrDenyDeviceAuthorizationRequest) returns (AuthorizeOrDenyDeviceAuthorizationResponse) {
     option (google.api.http) = {
-      post: "/v2/oidc/device_authorization"
+      post: "/v2/oidc/device_authorization/{device_authorization_id}"
       body: "*"
     };
 

@@ -51,7 +51,7 @@ func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *oidc_pb
 	}
 	return &oidc_pb.GetDeviceAuthorizationRequestResponse{
 		DeviceAuthorizationRequest: &oidc_pb.DeviceAuthorizationRequest{
-			Id:          base64.RawStdEncoding.EncodeToString(encrypted),
+			Id:          base64.RawURLEncoding.EncodeToString(encrypted),
 			ClientId:    deviceRequest.ClientID,
 			Scope:       deviceRequest.Scopes,
 			AppName:     deviceRequest.AppName,
@@ -255,7 +255,7 @@ func errorReasonToOIDC(reason oidc_pb.ErrorReason) string {
 }
 
 func (s *Server) deviceCodeFromID(deviceAuthID string) (string, error) {
-	decoded, err := base64.RawStdEncoding.DecodeString(deviceAuthID)
+	decoded, err := base64.RawURLEncoding.DecodeString(deviceAuthID)
 	if err != nil {
 		return "", err
 	}

@@ -85,7 +85,7 @@ Response Example:
 ```json
 {
   "deviceAuthorizationRequest": {
-    "id": "uEwFVs5e5OOHrXuS/02WpwkN/2pucoIgHsFkktgMjDNl9gz/dt8",
+    "id": "XzNejv6NxqVU8Qur5uxEh7f_Wi1p0qUu4PJTJ6JUIx0xtJ2uqmU",
     "clientId": "170086824411201793@yourapp",
     "scope": [
       "openid",
@@ -122,12 +122,11 @@ Read more about the [Authorize or Deny Device Authorization Request Documentatio
 Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization \
+  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization/XzNejv6NxqVU8Qur5uxEh7f_Wi1p0qUu4PJTJ6JUIx0xtJ2uqmU \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
   --data '{
-  "device_authorization_id": "uEwFVs5e5OOHrXuS/02WpwkN/2pucoIgHsFkktgMjDNl9gz/dt8",
   "session": {
     "sessionId": "225307381909694508",
     "sessionToken": "7N5kQCvC4jIf2OuBjwfyWSX2FUKbQqg4iG3uWT-TBngMhlS9miGUwpyUaN0HJ8OcbSzk4QHZy_Bvvv"
@@ -143,12 +142,11 @@ If the user denies the device authorization request, you can deny the request by
 
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization \
+  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization/ \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
   --data '{
-  "device_authorization_id": "uEwFVs5e5OOHrXuS/02WpwkN/2pucoIgHsFkktgMjDNl9gz/dt8",
   "deny": {}
 }'
 ```
