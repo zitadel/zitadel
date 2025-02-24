@@ -455,7 +455,7 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 				for i, result := range tt.want.GetIdentityProviders() {
 					assert.EqualExportedValues(ct, result, got.GetIdentityProviders()[i])
 				}
-				integration.AssertListDetails(ct, tt.want, got)
+				integration.AssertListDetails(ct, tt.want, got, true)
 			}, retryDuration, tick)
 		})
 	}

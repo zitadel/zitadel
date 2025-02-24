@@ -462,7 +462,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						assert.Contains(ttt, got.Result, tt.want.Result[i])
 					}
 				}
-				integration.AssertListDetails(t, tt.want, got)
+				integration.AssertListDetails(t, tt.want, got, true)
 			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}

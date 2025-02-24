@@ -1261,7 +1261,6 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -2515,7 +2514,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 					return
 				}
 				assert.Equal(ttt, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
-				integration.AssertListDetails(ttt, tt.want, got)
+				integration.AssertListDetails(ttt, tt.want, got, true)
 			}, retryDuration, tick, "timeout waiting for expected auth methods result")
 		})
 	}

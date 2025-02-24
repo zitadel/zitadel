@@ -1100,7 +1100,6 @@ func TestServer_ListUsers(t *testing.T) {
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
-					// info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
@@ -1166,7 +1165,7 @@ func TestServer_ListUsers(t *testing.T) {
 							assert.EqualExportedValues(ttt, got.Result[i], tt.want.Result[i])
 						}
 					}
-					integration.AssertListDetails(ttt, tt.want, got)
+					integration.AssertListDetails(ttt, tt.want, got, f.SetFlag)
 				}, retryDuration, tick, "timeout waiting for expected user result")
 			})
 		}

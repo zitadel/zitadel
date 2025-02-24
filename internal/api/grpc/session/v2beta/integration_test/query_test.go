@@ -520,7 +520,7 @@ func TestServer_ListSessions(t *testing.T) {
 					assert.True(t, found)
 				}
 
-				integration.AssertListDetails(ttt, tt.want, got)
+				integration.AssertListDetails(ttt, tt.want, got, true)
 			}, retryDuration, tick)
 		})
 	}
