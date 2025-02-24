@@ -17,16 +17,6 @@ if [ -z "${PAT}" ]; then
   PAT=$(cat ${PAT_FILE})
 fi
 
-# if [ -z "${ZITADEL_SERVICE_USER_ID}" ]; then
-#   echo "Reading ZITADEL_SERVICE_USER_ID from userinfo endpoint"
-#   USERINFO_RESPONSE=$(curl -s --request POST \
-#     --url "${ZITADEL_API_INTERNAL_URL}/oidc/v1/userinfo" \
-#     --header "Authorization: Bearer ${PAT}" \
-#     --header "Host: ${ZITADEL_API_DOMAIN}")
-#   echo "Received userinfo response: ${USERINFO_RESPONSE}"
-#   ZITADEL_SERVICE_USER_ID=$(echo "${USERINFO_RESPONSE}" | jq --raw-output '.sub')
-# fi
-
 #################################################################
 # Environment files
 #################################################################
