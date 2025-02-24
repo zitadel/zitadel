@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
@@ -20,6 +21,7 @@ type Server struct {
 
 	op             *oidc.Server
 	externalSecure bool
+	encryption     crypto.EncryptionAlgorithm
 }
 
 type Config struct{}
@@ -29,12 +31,14 @@ func CreateServer(
 	query *query.Queries,
 	op *oidc.Server,
 	externalSecure bool,
+	encryption crypto.EncryptionAlgorithm,
 ) *Server {
 	return &Server{
 		command:        command,
 		query:          query,
 		op:             op,
 		externalSecure: externalSecure,
+		encryption:     encryption,
 	}
 }
 

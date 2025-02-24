@@ -544,6 +544,7 @@ Errors:
     AlreadyExists: AuthRequestはすでに存在する
     NotExisting: AuthRequest が存在しません
     WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
+    AlreadyHandled: 認証リクエストは既に処理済みです
   OIDCSession:
     RefreshTokenInvalid: 無効なリフレッシュトークンです
     Token:
@@ -554,8 +555,12 @@ Errors:
     AlreadyExists: SAMLリクエストはすでに存在します
     NotExisting: SAMLリクエストが存在しません
     WrongLoginClient: 他のログイン クライアントによって作成された SAMLRequest
+    AlreadyHandled: SAMLリクエストは既に処理済みです
   SAMLSession:
     InvalidClient: このクライアントに対してSAMLResponseは発行されませんでした
+  DeviceAuth:
+    NotFound: デバイス認証リクエストが存在しません
+    AlreadyHandled: デバイス認証リクエストは既に処理済みです
   Feature:
     NotExisting: 機能が存在しません
     TypeNotSupported: 機能タイプはサポートされていません

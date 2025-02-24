@@ -561,6 +561,7 @@ Errors:
     AlreadyExists: Auth Request вече съществува
     NotExisting: Auth Request не съществува
     WrongLoginClient: Auth Request, създаден от друг клиент за влизане
+    AlreadyHandled: Заявката за удостоверяване вече е обработена
   OIDCSession:
     RefreshTokenInvalid: Токенът за опресняване е невалиден
     Token:
@@ -571,8 +572,12 @@ Errors:
     AlreadyExists: SAMLRequest вече съществува
     NotExisting: SAMLRequest не съществува
     WrongLoginClient: SAMLRequest, създаден от друг клиент за влизане
+    AlreadyHandled: SAML заявката вече е обработена
   SAMLSession:
     InvalidClient: SAMLResponse не е издаден за този клиент
+  DeviceAuth:
+    NotFound: Заявката за авторизация на устройство не съществува
+    AlreadyHandled: Заявката за авторизация на устройство вече е обработена
   Feature:
     NotExisting: Функцията не съществува
     TypeNotSupported: Типът функция не се поддържа

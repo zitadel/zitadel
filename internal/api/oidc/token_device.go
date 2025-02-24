@@ -42,6 +42,9 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 		if state == domain.DeviceAuthStateExpired {
 			return nil, oidc.ErrExpiredDeviceCode()
 		}
+		if state == domain.DeviceAuthStateDenied {
+			return nil, oidc.ErrAccessDenied()
+		}
 	}
-	return nil, oidc.ErrAccessDenied().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
+	return nil, oidc.ErrInvalidGrant().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 }
