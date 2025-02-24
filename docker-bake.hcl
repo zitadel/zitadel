@@ -14,6 +14,10 @@ group "build" {
   targets = ["console-build", "core-build"]
 }
 
+group "generate" {
+  targets = ["console-generate" , "core-generate"]
+}
+
 group "output" {
   targets = ["console-output", "core-output"]
 }
@@ -43,31 +47,35 @@ target "console" {
   name     = "console-${tgt}"
   inherits = ["_console"]
   matrix = {
-    tgt = ["build", "output", "lint", "image"]
+    tgt = ["build", "output", "lint", "image", "generate"]
   }
   output = {
     "build"  = ["type=cacheonly"]
     "output" = ["type=local,dest=.build/console"]
     "lint"   = ["type=cacheonly"]
     "image"   = ["type=docker"]
+    "generate" = ["type=local,dest=./"]
   }[tgt]
   tags = {
     "build"  = []
     "output" = []
     "lint"   = []
     "image"   = ["${REGISTRY}/console:${GITHUB_SHA}"]
+    "generate" = []
   }[tgt]
   cache-to = {
     "build"  =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
     "output" =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
     "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
     "image"   = ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
+    "generate"   = ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
   }[tgt]
     cache-from = {
     "build"  =  ["type=gha,scope=console-${tgt}"]
     "output" =  ["type=gha,scope=console-${tgt}"]
     "lint"   =  ["type=gha,scope=console-${tgt}"]
     "image"   = ["type=gha,scope=console-${tgt}"]
+    "generate" = ["type=gha,scope=console-${tgt}"]
   }[tgt]
   target = tgt
 }
@@ -90,7 +98,7 @@ target "core" {
   name     = "core-${tgt}"
   inherits = ["_core"]
   matrix = {
-    tgt = ["build", "output", "lint", "image", "unit"]
+    tgt = ["build", "output", "lint", "image", "generate", "unit"]
   }
   output = {
     "build"  = ["type=cacheonly"]
@@ -98,6 +106,7 @@ target "core" {
     "lint"   = ["type=cacheonly"]
     "unit"   = ["type=cacheonly"]
     "image"   = ["type=docker"]
+    "generate" = ["type=local,dest=./"]
   }[tgt]
   tags = {
     "build"  = []
@@ -105,6 +114,7 @@ target "core" {
     "lint"   = []
     "unit"   = []
     "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
+    "generate"   = []
   }[tgt]
     cache-to = {
     "build"  =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
@@ -112,6 +122,7 @@ target "core" {
     "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
     "unit"   =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]    
     "image"   = ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
+    "generate"   = ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
   }[tgt]
     cache-from = {
     "build"  =  ["type=gha,scope=core-${tgt}"]
@@ -119,6 +130,7 @@ target "core" {
     "lint"   =  ["type=gha,scope=core-${tgt}"]
     "unit"   =  ["type=gha,scope=core-${tgt}"]
     "image"   = ["type=gha,scope=core-${tgt}"]
+    "generate"   = ["type=gha,scope=core-${tgt}"]
   }[tgt]
   target = tgt
 }

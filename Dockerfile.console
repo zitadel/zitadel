@@ -6,6 +6,9 @@ RUN yarn install && yarn generate
 COPY console/ .
 COPY docs/frameworks.json ../docs/frameworks.json
 
+FROM scratch AS generate
+COPY --from=base /app/src/app/proto/generated/ /console/src/app/proto/generated/
+
 FROM base AS build
 RUN yarn build
 

@@ -14,22 +14,27 @@ COPY openapi/ openapi/
 COPY pkg/ pkg/
 COPY proto/ proto/
 COPY statik/ statik/
-COPY --from=console ./ internal/api/ui/console/static
 RUN go version
 RUN go mod download \
     && go install tool \
-    && go install github.com/goreleaser/goreleaser/v2@latest \
     && buf generate && cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/ \
     && go generate ./... \
     && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
+FROM scratch AS generate
+COPY --from=base /app/pkg/grpc/ /pkg/grpc/
+COPY --from=base /app/openapi/ /openapi/
+COPY --from=base /app/internal/api/assets/generator/ /internal/api/assets/generator/
+
 FROM base AS build
+COPY --from=console ./ internal/api/ui/console/static
 COPY .goreleaser.yaml ./
 RUN goreleaser release --snapshot --clean
 # RUN CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
 #     && chmod +x zitadel
 
 FROM base AS lint
+COPY --from=console ./ internal/api/ui/console/static
 COPY .golangci.yaml ./
 COPY .git/ ./.git/
 RUN make core_lint
@@ -38,7 +43,8 @@ FROM scratch AS output
 COPY --from=build /app/zitadel .
 
 FROM base AS unit
-RUN make core_unit_test
+COPY --from=console ./ internal/api/ui/console/static
+RUN go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./...
 
 FROM debian:latest AS base-image
 ENV ZITADEL_ARGS=
