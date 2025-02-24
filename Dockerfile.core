@@ -73,22 +73,19 @@ COPY --from=unit-test /app/profile.cov .
 
 FROM debian:latest AS base-image
 ENV ZITADEL_ARGS=
-ARG TARGETPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 RUN apt-get update && apt-get install ca-certificates -y
-COPY build/entrypoint.sh /app/entrypoint.sh
-COPY --from=build /app/zitadel /app/zitadel
+COPY --from=build /zitadel-${TARGETOS}-${TARGETARCH} /app/zitadel
+RUN echo hodor /zitadel-${TARGETOS}-${TARGETARCH}
 RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \
-    chmod +x /app/zitadel && \
-    chown zitadel /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
+    chmod +x /app/zitadel
 WORKDIR /app
 ENV PATH="/app:${PATH}"
-USER zitadel
-ENTRYPOINT ["/app/entrypoint.sh"]
+USER zitadel 
 
 FROM scratch AS image
-ARG TARGETPLATFORM
 COPY --from=base-image /etc/passwd /etc/passwd
 COPY --from=base-image /etc/ssl/certs /etc/ssl/certs
 COPY --from=base-image /app/zitadel /app/zitadel

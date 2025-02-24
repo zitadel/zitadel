@@ -83,7 +83,6 @@ target "_core" {
     SASS_VERSION      = "1.64.1"
     GOLANG_CI_VERSION = "1.64.5"
   }
-  #platforms = ["linux/amd64", "linux/arm64"]
 }
 
 target "core" {
@@ -103,7 +102,7 @@ target "core" {
     "build"  = []
     "lint"   = []
     "unit"   = []
-    "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
+    "image"   = ["${REGISTRY}/hodor:${GITHUB_SHA}"]
     "generate"   = []
   }[tgt]
     cache-to = {
@@ -119,6 +118,13 @@ target "core" {
     "unit"   =  ["type=gha,scope=core-${tgt}"]
     "image"   = ["type=gha,scope=core-${tgt}"]
     "generate"   = ["type=gha,scope=core-${tgt}"]
+  }[tgt]
+    platforms = {
+    "build"  =  []
+    "lint"   =  []
+    "unit"   =  []
+    "image"   = ["linux/amd64", "linux/arm64"]
+    "generate"   = []
   }[tgt]
   target = tgt
 }

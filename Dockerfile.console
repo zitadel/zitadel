@@ -20,5 +20,5 @@ RUN yarn lint
 FROM nginx AS image
 RUN rm -rf /usr/share/nginx/html/*
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
