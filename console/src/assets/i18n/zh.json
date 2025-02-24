@@ -512,6 +512,7 @@
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
+    "ORG_SETTINGS_MANAGER": "有权管理组织的设置",
     "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
     "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",

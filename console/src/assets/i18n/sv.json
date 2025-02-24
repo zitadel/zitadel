@@ -512,6 +512,7 @@
     "ORG_OWNER": "Har behörighet över hela organisationen",
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
+    "ORG_SETTINGS_MANAGER": "Har behörighet att hantera organisationens inställningar",
     "ORG_USER_PERMISSION_EDITOR": "Har behörighet att hantera användarbehörigheter",
     "ORG_PROJECT_PERMISSION_EDITOR": "Har behörighet att hantera projektbehörigheter",
     "ORG_PROJECT_CREATOR": "Har behörighet att skapa egna projekt och underliggande inställningar",

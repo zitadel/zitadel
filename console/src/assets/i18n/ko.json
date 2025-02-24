@@ -512,6 +512,7 @@
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
+    "ORG_SETTINGS_MANAGER": "조직 설정을 관리할 수 있는 권한이 있습니다",
     "ORG_USER_PERMISSION_EDITOR": "사용자 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_PERMISSION_EDITOR": "프로젝트 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_CREATOR": "자신의 프로젝트와 하위 설정을 생성할 수 있는 권한이 있습니다",
