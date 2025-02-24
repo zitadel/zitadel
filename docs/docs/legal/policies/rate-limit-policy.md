@@ -31,7 +31,7 @@ Please [get in touch](https://zitadel.com/contact) with us to discuss your requi
 
 ## What rate limits do apply
 
-For ZITADEL Cloud, we have a dedicated rate limits for the user interfaces (login, register, console,...) and the APIs.
+For ZITADEL Cloud, we have dedicated rate limits for the user interfaces (login, register, console,...) and the APIs.
 
 Rate limits are implemented with the following rules:
 
