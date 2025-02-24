@@ -31,14 +31,14 @@ Please [get in touch](https://zitadel.com/contact) with us to discuss your requi
 
 ## What rate limits do apply
 
-For ZITADEL Cloud, we have a rate limiting rule for user interface paths (login, register and reset features, console) and for API paths each.
+For ZITADEL Cloud, we have a dedicated rate limits for the user interfaces (login, register, console,...) and the APIs.
 
 Rate limits are implemented with the following rules:
 
 | Path                 | Description                                                             | Rate Limiting                        | One Minute Banning                    |
 |----------------------|-------------------------------------------------------------------------|--------------------------------------|---------------------------------------|
 | /ui/\*               | Global Login, Register and Reset Limit                                  | 10 requests per second over a minute | 15 requests per second over 3 minutes |
-| All other paths      | All gRPC-, REST and OAuth APIs as well as the ZITADEL Customer Portal   | 50 requests per second over a minute | 50 requests per second over 3 minutes |
+| All other paths      | All gRPC-, REST and OAuth APIs  | 50 requests per second over a minute | 50 requests per second over 3 minutes |
 
 ## Load Testing
 
