@@ -22,6 +22,7 @@ import (
 type MockQuerier struct {
 	ctrl     *gomock.Controller
 	recorder *MockQuerierMockRecorder
+	isgomock struct{}
 }
 
 // MockQuerierMockRecorder is the mock recorder for MockQuerier.
@@ -56,67 +57,68 @@ func (mr *MockQuerierMockRecorder) Client() *gomock.Call {
 }
 
 // FilterToReducer mocks base method.
-func (m *MockQuerier) FilterToReducer(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder, arg2 eventstore.Reducer) error {
+func (m *MockQuerier) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, r eventstore.Reducer) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FilterToReducer", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "FilterToReducer", ctx, searchQuery, r)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // FilterToReducer indicates an expected call of FilterToReducer.
-func (mr *MockQuerierMockRecorder) FilterToReducer(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockQuerierMockRecorder) FilterToReducer(ctx, searchQuery, r any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterToReducer", reflect.TypeOf((*MockQuerier)(nil).FilterToReducer), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterToReducer", reflect.TypeOf((*MockQuerier)(nil).FilterToReducer), ctx, searchQuery, r)
 }
 
 // Health mocks base method.
-func (m *MockQuerier) Health(arg0 context.Context) error {
+func (m *MockQuerier) Health(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Health", arg0)
+	ret := m.ctrl.Call(m, "Health", ctx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Health indicates an expected call of Health.
-func (mr *MockQuerierMockRecorder) Health(arg0 any) *gomock.Call {
+func (mr *MockQuerierMockRecorder) Health(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockQuerier)(nil).Health), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockQuerier)(nil).Health), ctx)
 }
 
 // InstanceIDs mocks base method.
-func (m *MockQuerier) InstanceIDs(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder) ([]string, error) {
+func (m *MockQuerier) InstanceIDs(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InstanceIDs", arg0, arg1)
+	ret := m.ctrl.Call(m, "InstanceIDs", ctx, queryFactory)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // InstanceIDs indicates an expected call of InstanceIDs.
-func (mr *MockQuerierMockRecorder) InstanceIDs(arg0, arg1 any) *gomock.Call {
+func (mr *MockQuerierMockRecorder) InstanceIDs(ctx, queryFactory any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDs", reflect.TypeOf((*MockQuerier)(nil).InstanceIDs), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDs", reflect.TypeOf((*MockQuerier)(nil).InstanceIDs), ctx, queryFactory)
 }
 
 // LatestSequence mocks base method.
-func (m *MockQuerier) LatestSequence(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder) (float64, error) {
+func (m *MockQuerier) LatestSequence(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) (float64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LatestSequence", arg0, arg1)
+	ret := m.ctrl.Call(m, "LatestSequence", ctx, queryFactory)
 	ret0, _ := ret[0].(float64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // LatestSequence indicates an expected call of LatestSequence.
-func (mr *MockQuerierMockRecorder) LatestSequence(arg0, arg1 any) *gomock.Call {
+func (mr *MockQuerierMockRecorder) LatestSequence(ctx, queryFactory any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LatestSequence", reflect.TypeOf((*MockQuerier)(nil).LatestSequence), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LatestSequence", reflect.TypeOf((*MockQuerier)(nil).LatestSequence), ctx, queryFactory)
 }
 
 // MockPusher is a mock of Pusher interface.
 type MockPusher struct {
 	ctrl     *gomock.Controller
 	recorder *MockPusherMockRecorder
+	isgomock struct{}
 }
 
 // MockPusherMockRecorder is the mock recorder for MockPusher.
@@ -151,24 +153,24 @@ func (mr *MockPusherMockRecorder) Client() *gomock.Call {
 }
 
 // Health mocks base method.
-func (m *MockPusher) Health(arg0 context.Context) error {
+func (m *MockPusher) Health(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Health", arg0)
+	ret := m.ctrl.Call(m, "Health", ctx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Health indicates an expected call of Health.
-func (mr *MockPusherMockRecorder) Health(arg0 any) *gomock.Call {
+func (mr *MockPusherMockRecorder) Health(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockPusher)(nil).Health), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockPusher)(nil).Health), ctx)
 }
 
 // Push mocks base method.
-func (m *MockPusher) Push(arg0 context.Context, arg1 database.ContextQueryExecuter, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
+func (m *MockPusher) Push(ctx context.Context, client database.ContextQueryExecuter, commands ...eventstore.Command) ([]eventstore.Event, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, client}
+	for _, a := range commands {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Push", varargs...)
@@ -178,8 +180,8 @@ func (m *MockPusher) Push(arg0 context.Context, arg1 database.ContextQueryExecut
 }
 
 // Push indicates an expected call of Push.
-func (mr *MockPusherMockRecorder) Push(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockPusherMockRecorder) Push(ctx, client any, commands ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, client}, commands...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockPusher)(nil).Push), varargs...)
 }
