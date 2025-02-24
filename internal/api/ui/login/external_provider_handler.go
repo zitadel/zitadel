@@ -550,7 +550,7 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 }
 
 func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) {
-	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID); err != nil {
+	if err := l.authRepo.SelectUser(r.Context(), authReq, user.ID, authReq.AgentID); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -558,7 +558,6 @@ func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *do
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	authReq.UserID = user.ID
 	l.renderNextStep(w, r, authReq)
 }
 
