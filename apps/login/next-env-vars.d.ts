@@ -23,10 +23,6 @@ declare namespace NodeJS {
     ZITADEL_INSTANCE_HOST_HEADER: string;
 
     /**
-     * Self hosting: The service user id
-     */
-    ZITADEL_SERVICE_USER_ID: string;
-    /**
      * Self hosting: The service user token
      */
     ZITADEL_SERVICE_USER_TOKEN: string;
