@@ -15,6 +15,9 @@ func writeModelToObjectDetails(writeModel *eventstore.WriteModel) *domain.Object
 }
 
 func pushedEventsToObjectDetails(events []eventstore.Event) *domain.ObjectDetails {
+	if len(events) == 0 {
+		return &domain.ObjectDetails{}
+	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreatedAt(),
