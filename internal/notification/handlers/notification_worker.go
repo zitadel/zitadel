@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand/v2"
 	"strings"
 	"time"
@@ -152,6 +153,13 @@ func (w *NotificationWorker) Register(workers *river.Workers, queues map[string]
 }
 
 func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request *notification.Request, notifyUser *query.NotifyUser) error {
+	// check early that a "sent" handler exists, otherwise we can cancel early
+	sentHandler, ok := sentHandlers[request.EventType]
+	if !ok {
+		logging.Errorf(`no "sent" handler registered for %s`, request.EventType)
+		return channels.NewCancelError(fmt.Errorf("no sent handler registered for %s", request.EventType))
+	}
+
 	ctx, err := enrichCtx(ctx, request.TriggeredAtOrigin)
 	if err != nil {
 		return channels.NewCancelError(err)
@@ -198,12 +206,7 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 	if err = notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
 		return err
 	}
-	// check early that a "sent" handler exists, otherwise we can cancel early
-	sentHandler, ok := sentHandlers[request.EventType]
-	if !ok {
-		logging.Errorf(`no "sent" handler registered for %s`, request.EventType)
-		return channels.NewCancelError(err)
-	}
+
 	err = sentHandler(authz.WithInstanceID(ctx, request.Aggregate.InstanceID), w.commands, request.Aggregate.ID, request.Aggregate.ResourceOwner, generatorInfo, args)
 	logging.WithFields("instanceID", request.Aggregate.InstanceID, "notification", request.Aggregate.ID).
 		OnError(err).Error("could not set notification event on aggregate")

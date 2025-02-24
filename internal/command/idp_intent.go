@@ -65,9 +65,6 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 		return nil, nil, err
 	}
 	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
-	if err != nil {
-		return nil, nil, err
-	}
 
 	//nolint: staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))

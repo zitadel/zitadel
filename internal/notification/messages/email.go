@@ -62,7 +62,7 @@ func (msg *Email) GetContent() (string, error) {
 }
 
 func (msg *Email) GetTriggeringEvent() eventstore.Event {
-	return nil
+	return msg.TriggeringEvent
 }
 
 func isHTML(input string) bool {

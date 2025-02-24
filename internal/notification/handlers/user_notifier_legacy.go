@@ -171,7 +171,7 @@ func (u *userNotifierLegacy) reduceInitCodeAdded(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
 			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {

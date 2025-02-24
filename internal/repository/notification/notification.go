@@ -9,12 +9,6 @@ import (
 )
 
 const (
-	notificationEventPrefix = "notification."
-	RequestedType           = notificationEventPrefix + "requested"
-	RetryRequestedType      = notificationEventPrefix + "retry.requested"
-	SentType                = notificationEventPrefix + "sent"
-	CanceledType            = notificationEventPrefix + "canceled"
-
 	QueueName = "notification"
 )
 
