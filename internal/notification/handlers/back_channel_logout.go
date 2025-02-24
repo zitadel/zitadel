@@ -247,7 +247,7 @@ func (b *backChannelLogoutSession) AppendEvents(events ...eventstore.Event) {
 				BackChannelLogoutURI: e.BackChannelLogoutURI,
 			})
 		case *sessionlogout.BackChannelLogoutSentEvent:
-			slices.DeleteFunc(b.sessions, func(session backChannelLogoutOIDCSessions) bool {
+			b.sessions = slices.DeleteFunc(b.sessions, func(session backChannelLogoutOIDCSessions) bool {
 				return session.OIDCSessionID == e.OIDCSessionID
 			})
 		}

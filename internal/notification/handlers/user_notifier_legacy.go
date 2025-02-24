@@ -232,7 +232,7 @@ func (u *userNotifierLegacy) reduceEmailCodeAdded(event eventstore.Event) (*hand
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event).
 			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -296,7 +296,7 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event)
 		if e.NotificationType == domain.NotificationTypeSms {
 			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo)
 		}
@@ -576,7 +576,7 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event).
 			SendDomainClaimed(ctx, notifyUser, e.UserName)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -634,7 +634,7 @@ func (u *userNotifierLegacy) reducePasswordlessCodeRequested(event eventstore.Ev
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event).
 			SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -697,7 +697,7 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event).
 			SendPasswordChange(ctx, notifyUser)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -814,7 +814,7 @@ func (u *userNotifierLegacy) reduceInviteCodeAdded(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event)
 		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
