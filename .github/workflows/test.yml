@@ -66,17 +66,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'pnpm'
-
-      - name: Setup Cypress binary cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-binary-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-cypress-binary-
-        # The Cypress binary cache needs to be updated together with the pnpm dependencies cache.
-        # That's why we don't conditionally cache it using if: ${{ matrix.command == 'test:integration' }}
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile

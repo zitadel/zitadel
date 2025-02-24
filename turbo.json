@@ -12,7 +12,7 @@
     "ZITADEL_API_URL",
     "ZITADEL_SERVICE_USER_TOKEN",
     "NEXT_PUBLIC_BASE_PATH",
-    "ZITADEL_INSTANCE_HOST_HEADER"
+    "CUSTOM_REQUEST_HEADERS"
   ],
   "tasks": {
     "generate": {
