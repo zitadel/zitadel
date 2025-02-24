@@ -475,7 +475,9 @@ func (l *Login) handleExternalUserAuthenticated(
 	}
 	// if action is done and no user linked then link or register
 	if zerrors.IsNotFound(externalErr) {
-		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
+		if !l.createOrLinkUser(w, r, authReq, provider, externalUser, externalUserChange) {
+			return
+		}
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
@@ -560,14 +562,14 @@ func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *do
 	l.renderNextStep(w, r, authReq)
 }
 
-// externalUserNotExisting is called if an externalAuthentication couldn't find a corresponding externalID
+// createOrLinkUser is called if an externalAuthentication couldn't find a corresponding externalID
 // possible solutions are:
 //
 // * auto creation
 // * external not found overview:
 //   - creation by user
 //   - linking to existing user
-func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) {
+func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) (userLinked bool) {
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	orgIAMPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
@@ -579,6 +581,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
 		if l.checkAutoLinking(w, r, authReq, provider, externalUser) {
+			userLinked = true
 			return
 		}
 	}
@@ -603,6 +606,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 	l.autoCreateExternalUser(w, r, authReq)
+	return
 }
 
 // autoCreateExternalUser takes the externalUser and creates it automatically (without user interaction)
