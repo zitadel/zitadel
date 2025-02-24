@@ -7,6 +7,7 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
 )
@@ -26,24 +27,25 @@ type Config struct {
 }
 
 func NewQueue(config *Config) (_ *Queue, err error) {
-	q := &Queue{
+	return &Queue{
 		driver: riverpgxv5.New(config.Client.Pool),
 		config: &river.Config{
 			Workers:    river.NewWorkers(),
 			Queues:     make(map[string]river.QueueConfig),
 			JobTimeout: -1,
 		},
-	}
-
-	return q, nil
+	}, nil
 }
 
 func (q *Queue) ShouldStart() {
+	if q == nil {
+		return
+	}
 	q.shouldStart = true
 }
 
 func (q *Queue) Start(ctx context.Context) (err error) {
-	if !q.shouldStart {
+	if q == nil || !q.shouldStart {
 		return nil
 	}
 	ctx = WithQueue(ctx)
@@ -57,6 +59,10 @@ func (q *Queue) Start(ctx context.Context) (err error) {
 }
 
 func (q *Queue) AddWorkers(w ...Worker) {
+	if q == nil {
+		logging.Info("skip adding workers because queue is not set")
+		return
+	}
 	for _, worker := range w {
 		worker.Register(q.config.Workers, q.config.Queues)
 	}
