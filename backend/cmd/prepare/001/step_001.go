@@ -19,8 +19,8 @@ var (
 type Step001 struct {
 	Database database.Pool `mapstructure:"-"`
 
-	DatabaseName string
-	Username     string
+	DatabaseName string `configure:"default=zitadel"`
+	Username     string `configure:"default=zitadel"`
 }
 
 // Fields implements configure.StructUpdater.
