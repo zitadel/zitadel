@@ -35,10 +35,10 @@ For ZITADEL Cloud, we have a dedicated rate limits for the user interfaces (logi
 
 Rate limits are implemented with the following rules:
 
-| Path                 | Description                                                             | Rate Limiting                        | One Minute Banning                    |
-|----------------------|-------------------------------------------------------------------------|--------------------------------------|---------------------------------------|
-| /ui/\*               | Global Login, Register and Reset Limit                                  | 10 requests per second over a minute | 15 requests per second over 3 minutes |
-| All other paths      | All gRPC-, REST and OAuth APIs  | 50 requests per second over a minute | 50 requests per second over 3 minutes |
+| Path                 | Description                            | Rate Limiting                        | One Minute Banning                    |
+|----------------------|----------------------------------------|--------------------------------------|---------------------------------------|
+| /ui/\*               | Global Login, Register and Reset Limit | 10 requests per second over a minute | 15 requests per second over 3 minutes |
+| All other paths      | All gRPC-, REST and OAuth APIs         | 50 requests per second over a minute | 50 requests per second over 3 minutes |
 
 ## Load Testing
 
