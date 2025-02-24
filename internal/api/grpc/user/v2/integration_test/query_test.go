@@ -1024,6 +1024,34 @@ func TestServer_ListUsers(t *testing.T) {
 							},
 						},
 					},
+					// this is the admin of the org craated in Instance.CreateOrganization()
+					nil,
+				},
+			},
+		},
+		{
+			name: "list user with wrong org query",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+					// info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
+					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
+					return []userAttr{{}}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					// this is the admin of the org craated in Instance.CreateOrganization()
 					nil,
 				},
 			},
