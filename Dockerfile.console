@@ -9,8 +9,10 @@ COPY docs/frameworks.json ../docs/frameworks.json
 FROM scratch AS generate
 COPY --from=base /app/src/app/proto/generated/ /console/src/app/proto/generated/
 
-FROM base AS build
+FROM base AS builder
 RUN yarn build
+FROM scratch AS build
+COPY --from=builder /app/dist/console .
 
 FROM base AS lint
 RUN yarn lint
@@ -20,6 +22,3 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
-
-FROM scratch AS output
-COPY --from=build /app/dist/console .
