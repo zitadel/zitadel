@@ -48,7 +48,7 @@ target "console" {
   output = {
     "build"  = ["type=local,dest=.build/console"]
     "lint"   = ["type=cacheonly"]
-    "image"   = ["type=docker"]
+    "image"   = ["type=image"]
     "generate" = ["type=local,dest=./"]
   }[tgt]
   tags = {
@@ -68,6 +68,13 @@ target "console" {
     "lint"   =  ["type=gha,scope=console-${tgt}"]
     "image"   = ["type=gha,scope=console-${tgt}"]
     "generate" = ["type=gha,scope=console-${tgt}"]
+  }[tgt]
+  platforms = {
+    "build"  =  []
+    "lint"   =  []
+    "unit"   =  []
+    "image"   = ["linux/amd64", "linux/arm64"]
+    "generate"   = []
   }[tgt]
   target = tgt
 }
@@ -95,14 +102,14 @@ target "core" {
     "build"  = ["type=local,dest=.build/core"]
     "lint"   = ["type=cacheonly"]
     "unit"   = ["type=local,dest=./.build/core"]
-    "image"   = ["type=docker"]
+    "image"   = ["type=image"]
     "generate" = ["type=local,dest=./"]
   }[tgt]
   tags = {
     "build"  = []
     "lint"   = []
     "unit"   = []
-    "image"   = ["${REGISTRY}/hodor:${GITHUB_SHA}"]
+    "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
     "generate"   = []
   }[tgt]
     cache-to = {
