@@ -52,7 +52,7 @@ require (
 	github.com/muesli/gamut v0.3.1
 	github.com/muhlemmer/gu v0.3.1
 	github.com/muhlemmer/httpforwarded v0.1.0
-	github.com/nicksnyder/go-i18n/v2 v2.5.1
+	github.com/nicksnyder/go-i18n/v2 v2.4.1
 	github.com/pashagolub/pgxmock/v4 v4.3.0
 	github.com/pquerna/otp v1.4.0
 	github.com/rakyll/statik v0.1.7
