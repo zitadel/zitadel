@@ -206,7 +206,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 						grpc.AllFieldsEqual(ttt, wantSchema.ProtoReflect(), gotSchema.ProtoReflect(), grpc.CustomMappers)
 					}
 				}
-				integration.AssertListDetails(ttt, tt.want, got)
+				integration.AssertListDetails(ttt, tt.want, got, true)
 			}, retryDuration, tick, "timeout waiting for expected user schema result")
 		})
 	}

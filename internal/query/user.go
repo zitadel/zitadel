@@ -642,7 +642,6 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, f
 	}
 	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		usersCheckPermission(ctx, users, permissionCheck)
-		users.SearchResponse.Count = uint64(len(users.Users))
 	}
 	return users, nil
 }
@@ -738,15 +737,19 @@ func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 func NewUserOrSearchQuery(values []SearchQuery) (SearchQuery, error) {
 	return NewOrQuery(values...)
 }
+
 func NewUserAndSearchQuery(values []SearchQuery) (SearchQuery, error) {
 	return NewAndQuery(values...)
 }
+
 func NewUserNotSearchQuery(value SearchQuery) (SearchQuery, error) {
 	return NewNotQuery(value)
 }
+
 func NewUserInUserIdsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(UserIDCol, values)
 }
+
 func NewUserInUserEmailsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(HumanEmailCol, values)
 }
@@ -808,7 +811,7 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 }
 
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	//linking queries for the subselect
+	// linking queries for the subselect
 	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
 	if err != nil {
 		return nil, err
@@ -817,12 +820,12 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	//text query to select data from the linked sub select
+	// text query to select data from the linked sub select
 	loginNameQuery, err := NewTextQuery(LoginNameNameCol, value, comparison)
 	if err != nil {
 		return nil, err
 	}
-	//full definition of the sub select
+	// full definition of the sub select
 	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, loginNameQuery})
 	if err != nil {
 		return nil, err

@@ -246,7 +246,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 						assert.Contains(ttt, got.Result, tt.want.Result[i])
 					}
 				}
-				integration.AssertListDetails(t, tt.want, got)
+				integration.AssertListDetails(t, tt.want, got, true)
 			}, retryDuration, tick, "timeout waiting for expected idplinks result")
 		})
 	}
