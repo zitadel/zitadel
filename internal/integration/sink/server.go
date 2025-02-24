@@ -15,6 +15,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	crewjam_saml "github.com/crewjam/saml"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -22,8 +23,6 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
-
-	crewjam_saml "github.com/crewjam/saml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
