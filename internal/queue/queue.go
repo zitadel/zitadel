@@ -23,7 +23,7 @@ type Queue struct {
 }
 
 type Config struct {
-	Client *database.DB `mapstructure:"-"`
+	Client *database.DB `mapstructure:"-"` // mapstructure is needed if we would like to use viper to configure the queue
 }
 
 func NewQueue(config *Config) (_ *Queue, err error) {

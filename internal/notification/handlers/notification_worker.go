@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand/v2"
+	"strconv"
 	"strings"
 	"time"
 
@@ -59,10 +60,9 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 		return river.JobCancel(errors.New("notification is too old"))
 	}
 
-	// Get the notify user first, so if anything fails afterward we have the current state of the user
-	// and can pass that to the retry request.
 	// We do not trigger the projection to reduce load on the database. By the time the notification is processed,
 	// the user should be projected anyway. If not, it will just wait for the next run.
+	// We are aware that the user can change during the time the notification is in the queue.
 	notifyUser, err := w.queries.GetNotifyUserByID(ctx, false, job.Args.UserID)
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 		job.Args.Args.Domain = notifyUser.LastEmail[index+1:]
 	}
 
-	err = w.sendNotificationQueue(ctx, job.Args, notifyUser)
+	err = w.sendNotificationQueue(ctx, job.Args, strconv.Itoa(int(job.ID)), notifyUser)
 	if err == nil {
 		return nil
 	}
@@ -152,7 +152,7 @@ func (w *NotificationWorker) Register(workers *river.Workers, queues map[string]
 	}
 }
 
-func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request *notification.Request, notifyUser *query.NotifyUser) error {
+func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request *notification.Request, jobID string, notifyUser *query.NotifyUser) error {
 	// check early that a "sent" handler exists, otherwise we can cancel early
 	sentHandler, ok := sentHandlers[request.EventType]
 	if !ok {
@@ -191,9 +191,9 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 		if err != nil {
 			return err
 		}
-		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, nil)
+		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, request.EventType)
 	case domain.NotificationTypeSms:
-		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, nil, generatorInfo)
+		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, request.EventType, request.Aggregate.InstanceID, jobID, generatorInfo)
 	}
 
 	args := request.Args.ToMap()

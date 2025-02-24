@@ -191,7 +191,7 @@ func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSes
 	if err != nil {
 		return err
 	}
-	err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: oidcSession.BackChannelLogoutURI}, u.channels, &LogoutTokenMessage{LogoutToken: token}, e).WithoutTemplate()
+	err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: oidcSession.BackChannelLogoutURI}, u.channels, &LogoutTokenMessage{LogoutToken: token}, e.Type()).WithoutTemplate()
 	if err != nil {
 		return err
 	}

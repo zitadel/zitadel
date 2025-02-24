@@ -101,9 +101,10 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
+					Recipients:          []string{lastEmail},
+					Subject:             "Invitation to APP",
+					Content:             expectContent,
+					TriggeringEventType: user.HumanInviteCodeAddedType,
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -160,6 +161,9 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					SenderPhoneNumber:    "senderNumber",
 					RecipientPhoneNumber: verifiedPhone,
 					Content:              expectContent,
+					TriggeringEventType:  session.OTPSMSChallengedType,
+					InstanceID:           instanceID,
+					JobID:                "1",
 				}
 				codeAlg, code := cryptoValue(t, ctrl, testCode)
 				expectTemplateWithNotifyUserQueriesSMS(queries)
@@ -180,6 +184,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						job: &river.Job[*notification.Request]{
 							JobRow: &rivertype.JobRow{
 								CreatedAt: time.Now(),
+								ID:        1,
 							},
 							Args: &notification.Request{
 								Aggregate: &eventstore.Aggregate{
@@ -215,9 +220,10 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{verifiedEmail},
-					Subject:    "Domain has been claimed",
-					Content:    expectContent,
+					Recipients:          []string{verifiedEmail},
+					Subject:             "Domain has been claimed",
+					Content:             expectContent,
+					TriggeringEventType: user.UserDomainClaimedType,
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
@@ -267,9 +273,10 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
+					Recipients:          []string{lastEmail},
+					Subject:             "Invitation to APP",
+					Content:             expectContent,
+					TriggeringEventType: user.HumanInviteCodeAddedType,
 				}
 				w.sendError = sendError
 				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
@@ -291,6 +298,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					argsWorker{
 						job: &river.Job[*notification.Request]{
 							JobRow: &rivertype.JobRow{
+								ID:        1,
 								CreatedAt: time.Now(),
 							},
 							Args: &notification.Request{
@@ -326,9 +334,10 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
+					Recipients:          []string{lastEmail},
+					Subject:             "Invitation to APP",
+					Content:             expectContent,
+					TriggeringEventType: user.HumanInviteCodeAddedType,
 				}
 				w.sendError = sendError
 				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
@@ -337,7 +346,6 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				// commands.EXPECT().NotificationCanceled(gomock.Any(), gomock.Any(), notificationID, instanceID, sendError).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -477,18 +485,14 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
-	// if w.err == nil {
 	if w.message != nil {
-		// w.message.TriggeringEvent = a.event
 		channel.EXPECT().HandleMessage(w.message).Return(w.sendError)
 	}
 	if w.messageSMS != nil {
-		// w.messageSMS.TriggeringEvent = a.event
 		channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
 			message.VerificationID = gu.Ptr(verificationID)
 			return w.sendError
 		})
-		// }
 	}
 	return &NotificationWorker{
 		commands: f.commands,

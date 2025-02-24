@@ -1774,131 +1774,135 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 	tests := []struct {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)
-	}{{
-		name: "asset url with event trigger url",
-		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
-			testCode := ""
-			expiry := 0 * time.Hour
-			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+	}{
+		{
+			name: "asset url with event trigger url",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+				testCode := ""
+				expiry := 0 * time.Hour
+				expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, eventOriginDomain, expiry)
-			w.messageSMS = &wantLegacySMS{
-				sms: &messages.SMS{
-					SenderPhoneNumber:    "senderNumber",
-					RecipientPhoneNumber: verifiedPhone,
-					Content:              expectContent,
-				},
-			}
-			expectTemplateWithNotifyUserQueriesSMS(queries)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
-			commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
-			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
-					}),
-				}, args{
-					event: &session.OTPSMSChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              nil,
-						Expiry:            expiry,
-						CodeReturned:      false,
-						GeneratorID:       smsProviderID,
-						TriggeredAtOrigin: eventOrigin,
+				w.messageSMS = &wantLegacySMS{
+					sms: &messages.SMS{
+						SenderPhoneNumber:    "senderNumber",
+						RecipientPhoneNumber: verifiedPhone,
+						Content:              expectContent,
+						JobID:                userID,
 					},
-				}, w
-		},
-	}, {
-		name: "asset url without event trigger url",
-		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
-			testCode := ""
-			expiry := 0 * time.Hour
-			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+				}
+				expectTemplateWithNotifyUserQueriesSMS(queries)
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
+				commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+				return fields{
+						queries:  queries,
+						commands: commands,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+						}),
+					}, args{
+						event: &session.OTPSMSChallengedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								AggregateID:   userID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  time.Now().UTC(),
+							}),
+							Code:              nil,
+							Expiry:            expiry,
+							CodeReturned:      false,
+							GeneratorID:       smsProviderID,
+							TriggeredAtOrigin: eventOrigin,
+						},
+					}, w
+			},
+		}, {
+			name: "asset url without event trigger url",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+				testCode := ""
+				expiry := 0 * time.Hour
+				expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
-			w.messageSMS = &wantLegacySMS{
-				sms: &messages.SMS{
-					SenderPhoneNumber:    "senderNumber",
-					RecipientPhoneNumber: verifiedPhone,
-					Content:              expectContent,
-				},
-			}
-			expectTemplateWithNotifyUserQueriesSMS(queries)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
-			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
-				Domains: []*query.InstanceDomain{{
-					Domain:    instancePrimaryDomain,
-					IsPrimary: true,
-				}},
-			}, nil)
-			commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
-			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
-					}),
-				}, args{
-					event: &session.OTPSMSChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:         nil,
-						Expiry:       expiry,
-						CodeReturned: false,
-						GeneratorID:  smsProviderID,
+				w.messageSMS = &wantLegacySMS{
+					sms: &messages.SMS{
+						SenderPhoneNumber:    "senderNumber",
+						RecipientPhoneNumber: verifiedPhone,
+						Content:              expectContent,
+						JobID:                userID,
 					},
-				}, w
-		},
-	}, {
-		name: "cancel error, no reduce error expected",
-		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
-			testCode := ""
-			expiry := 0 * time.Hour
-			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+				}
+				expectTemplateWithNotifyUserQueriesSMS(queries)
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
+				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+					Domains: []*query.InstanceDomain{{
+						Domain:    instancePrimaryDomain,
+						IsPrimary: true,
+					}},
+				}, nil)
+				commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+				return fields{
+						queries:  queries,
+						commands: commands,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+						}),
+					}, args{
+						event: &session.OTPSMSChallengedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								AggregateID:   userID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  time.Now().UTC(),
+							}),
+							Code:         nil,
+							Expiry:       expiry,
+							CodeReturned: false,
+							GeneratorID:  smsProviderID,
+						},
+					}, w
+			},
+		}, {
+			name: "cancel error, no reduce error expected",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+				testCode := ""
+				expiry := 0 * time.Hour
+				expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
-			w.messageSMS = &wantLegacySMS{
-				sms: &messages.SMS{
-					SenderPhoneNumber:    "senderNumber",
-					RecipientPhoneNumber: verifiedPhone,
-					Content:              expectContent,
-				},
-				err: channels.NewCancelError(nil),
-			}
-			expectTemplateWithNotifyUserQueriesSMS(queries)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
-			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
-				Domains: []*query.InstanceDomain{{
-					Domain:    instancePrimaryDomain,
-					IsPrimary: true,
-				}},
-			}, nil)
-			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
-					}),
-				}, args{
-					event: &session.OTPSMSChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:         nil,
-						Expiry:       expiry,
-						CodeReturned: false,
-						GeneratorID:  smsProviderID,
+				w.messageSMS = &wantLegacySMS{
+					sms: &messages.SMS{
+						SenderPhoneNumber:    "senderNumber",
+						RecipientPhoneNumber: verifiedPhone,
+						Content:              expectContent,
+						JobID:                userID,
 					},
-				}, w
+					err: channels.NewCancelError(nil),
+				}
+				expectTemplateWithNotifyUserQueriesSMS(queries)
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
+				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+					Domains: []*query.InstanceDomain{{
+						Domain:    instancePrimaryDomain,
+						IsPrimary: true,
+					}},
+				}, nil)
+				return fields{
+						queries:  queries,
+						commands: commands,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+						}),
+					}, args{
+						event: &session.OTPSMSChallengedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								AggregateID:   userID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  time.Now().UTC(),
+							}),
+							Code:         nil,
+							Expiry:       expiry,
+							CodeReturned: false,
+							GeneratorID:  smsProviderID,
+						},
+					}, w
+			},
 		},
-	},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1938,11 +1942,11 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
 	if w.err == nil {
 		if w.message != nil {
-			w.message.email.TriggeringEvent = a.event
+			w.message.email.TriggeringEventType = a.event.Type()
 			channel.EXPECT().HandleMessage(w.message.email).Return(w.message.err)
 		}
 		if w.messageSMS != nil {
-			w.messageSMS.sms.TriggeringEvent = a.event
+			w.messageSMS.sms.TriggeringEventType = a.event.Type()
 			channel.EXPECT().HandleMessage(w.messageSMS.sms).DoAndReturn(func(message *messages.SMS) error {
 				message.VerificationID = gu.Ptr(verificationID)
 				return w.messageSMS.err
