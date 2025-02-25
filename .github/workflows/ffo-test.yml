@@ -28,6 +28,7 @@ jobs:
       - run: ls -latr .build
       - uses: actions/upload-artifact@v4
         with:
+          name: depot-gh-cache
           path: .build
           include-hidden-files: true
 
@@ -49,6 +50,7 @@ jobs:
       - run: ls -latr .build
       - uses: actions/upload-artifact@v4
         with:
+          name: depot-cache
           path: .build
           include-hidden-files: true
 
@@ -71,5 +73,6 @@ jobs:
       - run: ls -latr .build
       - uses: actions/upload-artifact@v4
         with:
+          name: gh-runner-cache
           path: .build
           include-hidden-files: true
