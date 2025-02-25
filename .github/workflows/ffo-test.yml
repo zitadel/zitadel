@@ -30,3 +30,46 @@ jobs:
         with:
           path: .build
           include-hidden-files: true
+
+  depot-cache:
+    timeout-minutes: 20
+    runs-on: depot-ubuntu-22.04-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: depot/setup-action@v1
+      - uses: depot/bake-action@v1
+        with:
+          project: w47wkxzdtw
+          push: false
+          targets: ci
+          no-cache: false
+          load: false
+      - run: ls -latr .build
+      - uses: actions/upload-artifact@v4
+        with:
+          path: .build
+          include-hidden-files: true
+
+  gh-runner-cache:
+    timeout-minutes: 20
+    runs-on:
+      group: zitadel-public
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/bake-action@v6
+        with:
+          source: .
+          push: false
+          targets: ci
+          no-cache: false
+          load: false
+      - run: ls -latr .build
+      - uses: actions/upload-artifact@v4
+        with:
+          path: .build
+          include-hidden-files: true
