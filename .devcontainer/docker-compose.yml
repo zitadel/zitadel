@@ -1,7 +1,9 @@
 version: '3.8'
 services:
   devcontainer:
-    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    build:
+      context: .
+      dockerfile: ../Dockerfile.devcontainer
     volumes:
       - ../..:/workspaces:cached
       - /var/run/docker.sock:/var/run/docker.sock

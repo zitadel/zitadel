@@ -30,11 +30,18 @@ group "unit" {
   targets = ["core-unit"]
 }
 
+target "devcontainer" {
+  dockerfile = "Dockerfile.devcontainer"
+  context = "."
+  tags = ["${REGISTRY}/base:${GITHUB_SHA}"]
+  push = false
+}
+
 target "_console" {
   dockerfile = "Dockerfile.console"
   context = "."
   contexts = {
-    node = "docker-image://node:22"
+    devcontainer = "target:devcontainer"
     nginx = "docker-image://nginx:1.27-alpine"
   }
 }
@@ -59,11 +66,7 @@ target "_core" {
   dockerfile = "Dockerfile.core"
   context = "."
   contexts = {
-    golang = "docker-image://golang:1.24"
-  }
-  args = {
-    SASS_VERSION      = "1.64.1"
-    GOLANG_CI_VERSION = "1.64.5"
+    devcontainer = "target:devcontainer"
   }
 }
 

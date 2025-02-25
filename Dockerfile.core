@@ -1,10 +1,6 @@
-FROM golang AS base
-ARG SASS_VERSION=
-ARG GOLANG_CI_VERSION=
+FROM devcontainer AS base
 ARG COMMIT_SHA=
 ARG VERSION=
-RUN apt-get update && apt-get install -y npm && npm install -g sass@${SASS_VERSION}
-RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANG_CI_VERSION}
 WORKDIR /app
 COPY go.mod go.sum buf.gen.yaml buf.work.yaml main.go ./
 COPY docs/apis/assets/assets.md docs/apis/assets/assets.md
@@ -15,6 +11,7 @@ COPY pkg/ pkg/
 COPY proto/ proto/
 COPY statik/ statik/
 RUN go version
+RUN go env
 RUN go mod download \
     && go install tool \
     && buf generate && cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/ \

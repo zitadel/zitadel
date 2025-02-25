@@ -1,4 +1,4 @@
-FROM node AS base
+FROM devcontainer AS base
 WORKDIR /app
 COPY console/package.json console/yarn.lock console/buf.gen.yaml  ./
 COPY proto/ ../proto/

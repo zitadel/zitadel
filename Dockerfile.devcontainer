@@ -1,0 +1,35 @@
+# filepath: Dockerfile.base
+FROM ubuntu:22.04
+ARG NODE_VERSION=22
+ARG GO_VERSION=1.24.0
+ARG SASS_VERSION=1.64.1
+ARG GOLANG_CI_VERSION=1.64.5
+ARG BIN="/usr/local/bin"
+ARG VERSION="1.50.0"
+ARG TARGETOS
+ARG TARGETARCH
+
+# Install common dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    ca-certificates && \
+    update-ca-certificates
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x -o nodesource_setup.sh \
+    && bash nodesource_setup.sh \
+    && apt-get install -y nodejs \
+    && npm install -g yarn sass@${SASS_VERSION} \
+    && node -v
+
+# Install Go
+ENV PATH="/usr/local/go/bin:${PATH}"
+ENV GOPATH=/go
+ENV PATH="$GOPATH/bin:${PATH}"
+RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.${TARGETOS}-${TARGETARCH}.tar.gz -o go.tar.gz \
+    && tar -C /usr/local -xzf go.tar.gz
+
+# Set common environment variables
+ENV APP_HOME=/app
