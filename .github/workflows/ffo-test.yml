@@ -12,7 +12,7 @@ permissions:
 jobs:
   depot-gh-cache:
     timeout-minutes: 20
-    runs-on: depot-ubuntu-22.04-16
+    runs-on: depot-ubuntu-22.04-8
     steps:
       - uses: actions/checkout@v4
         with:
