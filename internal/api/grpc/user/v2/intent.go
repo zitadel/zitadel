@@ -229,7 +229,6 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 		return nil, err
 	}
 	information := &user.RetrieveIdentityProviderIntentResponse{
-		Details: intentToDetailsPb(intent),
 		IdpInformation: &user.IDPInformation{
 			IdpId:          intent.IDPID,
 			UserId:         intent.IDPUserID,
@@ -238,6 +237,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 		},
 		UserId: intent.UserID,
 	}
+	information.Details = intentToDetailsPb(intent)
 	// OAuth / OIDC
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
 		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)

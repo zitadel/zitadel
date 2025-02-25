@@ -3,6 +3,7 @@ package saml
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -26,7 +27,9 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -380,7 +383,94 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 			return nil, err
 		}
 	}
+
+	function := exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreSAMLResponse.LocalizationKey())
+	executionTargets, err := queryExecutionTargets(ctx, p.query, function)
+	if err != nil {
+		return nil, err
+	}
+
+	// correct time for utc
+	user.CreationDate = user.CreationDate.UTC()
+	user.ChangeDate = user.ChangeDate.UTC()
+
+	info := &ContextInfo{
+		Function:   function,
+		User:       user,
+		UserGrants: userGrants.UserGrants,
+	}
+
+	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	if err != nil {
+		return nil, err
+	}
+	contextInfoResponse, ok := resp.(*ContextInfoResponse)
+	if ok && contextInfoResponse != nil {
+		claimLogs := make([]string, 0)
+		for _, metadata := range contextInfoResponse.SetUserMetadata {
+			if _, err = p.command.SetUserMetadata(ctx, metadata, user.ID, user.ResourceOwner); err != nil {
+				claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
+			}
+		}
+		for _, attribute := range contextInfoResponse.AppendAttribute {
+			customAttributes = appendCustomAttribute(customAttributes, attribute.Name, attribute.NameFormat, attribute.Value)
+
+		}
+	}
+
 	return customAttributes, nil
+}
+
+type ContextInfo struct {
+	Function   string               `json:"function,omitempty"`
+	User       *query.User          `json:"user,omitempty"`
+	UserGrants []*query.UserGrant   `json:"user_grants,omitempty"`
+	Response   *ContextInfoResponse `json:"response,omitempty"`
+}
+
+type ContextInfoResponse struct {
+	SetUserMetadata []*domain.Metadata `json:"set_user_metadata,omitempty"`
+	AppendAttribute []*AppendAttribute `json:"append_attribute,omitempty"`
+}
+
+type AppendAttribute struct {
+	Name       string   `json:"name"`
+	NameFormat string   `json:"name_format"`
+	Value      []string `json:"value"`
+}
+
+func (c *ContextInfo) GetHTTPRequestBody() []byte {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func (c *ContextInfo) SetHTTPResponseBody(resp []byte) error {
+	if !json.Valid(resp) {
+		return zerrors.ThrowPreconditionFailed(nil, "ACTION-4m9s2", "Errors.Execution.ResponseIsNotValidJSON")
+	}
+	if c.Response == nil {
+		c.Response = &ContextInfoResponse{}
+	}
+	return json.Unmarshal(resp, c.Response)
+}
+
+func (c *ContextInfo) GetContent() interface{} {
+	return c.Response
+}
+
+func queryExecutionTargets(ctx context.Context, query *query.Queries, function string) ([]execution.Target, error) {
+	queriedActionsV2, err := query.TargetsByExecutionID(ctx, []string{function})
+	if err != nil {
+		return nil, err
+	}
+	executionTargets := make([]execution.Target, len(queriedActionsV2))
+	for i, action := range queriedActionsV2 {
+		executionTargets[i] = action
+	}
+	return executionTargets, nil
 }
 
 func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (*query.UserGrants, error) {
