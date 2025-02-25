@@ -23,9 +23,6 @@ jobs:
           source: .
           push: false
           targets: ci
-          no-cache: false
-          load: false
-      - run: ls -latr .build
       - uses: actions/upload-artifact@v4
         with:
           name: depot-gh-cache
@@ -34,7 +31,7 @@ jobs:
 
   depot-cache:
     timeout-minutes: 20
-    runs-on: depot-ubuntu-22.04-8
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,9 +42,6 @@ jobs:
           project: w47wkxzdtw
           push: false
           targets: ci
-          no-cache: false
-          load: false
-      - run: ls -latr .build
       - uses: actions/upload-artifact@v4
         with:
           name: depot-cache
@@ -68,9 +62,6 @@ jobs:
           source: .
           push: false
           targets: ci
-          no-cache: false
-          load: false
-      - run: ls -latr .build
       - uses: actions/upload-artifact@v4
         with:
           name: gh-runner-cache
