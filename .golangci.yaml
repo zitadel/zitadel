@@ -24,7 +24,7 @@ issues:
 run:
   concurrency: 4
   timeout: 10m
-  go: '1.22'
+  go: '1.24'
 linters:
   enable:
     # Simple linter to check that your code does not contain non-ASCII identifiers [fast: true, auto-fix: false]
