@@ -28,7 +28,7 @@ ARG COMMIT_SHA=
 ARG VERSION=
 COPY --from=console ./ internal/api/ui/console/static
 RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -o zitadel-${OS}-${ARCH} -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
-    && chmod +x zitadel
+    && chmod +x zitadel-${OS}-${ARCH}
 
 FROM scratch AS build
 ARG OS=
