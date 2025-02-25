@@ -207,8 +207,8 @@ Before you reconfigure Zitadel, we recommend you to create a service user with a
         Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/managers)
         3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) at the bottom of the readme in our [repository](https://github.com/zitadel/typescript)
         4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
-        - PAT
-        - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
+           - PAT
+           - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
         5. Add the domain where your login UI is hosted to the [trusted domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
         6. Use the new login in your application. You have three different options on how to achieve this
             1. Enable the new login on your application configuration and add the URL of your login UI. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
