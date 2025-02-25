@@ -688,8 +688,8 @@ message RemoveInstanceResponse {
 message ListIAMMembersRequest {
   zitadel.v1.ListQuery query = 1;
   string instance_id = 2;
-  repeated zitadel.member.v1.SearchQuery queries = 3 ;
-  zitadel.member.v1.MemberFieldColumnName sorting_column=4;
+  repeated zitadel.member.v1.SearchQuery queries = 3;
+  zitadel.member.v1.MemberFieldColumnName sorting_column = 4;
 }
 
 message ListIAMMembersResponse {
