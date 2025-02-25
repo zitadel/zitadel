@@ -263,12 +263,16 @@ func (h *Handler) triggerInstances(ctx context.Context, instances []string, trig
 
 		// simple implementation of do while
 		_, err := h.Trigger(instanceCtx, triggerOpts...)
-		h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
+		// skip retry if everything is fine
+		if err == nil {
+			continue
+		}
+		h.log().WithField("instance", instance).WithError(err).Debug("trigger failed")
 		time.Sleep(h.retryFailedAfter)
 		// retry if trigger failed
 		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
 			time.Sleep(h.retryFailedAfter)
-			h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
+			h.log().WithField("instance", instance).WithError(err).Debug("trigger failed")
 		}
 	}
 }
@@ -491,6 +495,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
+	stateStart := time.Now()
 	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
 		if errors.Is(err, errJustUpdated) {
