@@ -4,22 +4,24 @@ package integration_test
 
 import (
 	"context"
-	"github.com/brianvoe/gofakeit/v6"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/integration/scim"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	"google.golang.org/grpc/codes"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/scim"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestDeleteUser_errors(t *testing.T) {
 	tests := []struct {
 		name        string
 		ctx         context.Context
+		orgID       string
 		errorStatus int
 	}{
 		{
@@ -36,6 +38,17 @@ func TestDeleteUser_errors(t *testing.T) {
 			name:        "unknown user id",
 			errorStatus: http.StatusNotFound,
 		},
+		{
+			name:        "another org",
+			orgID:       SecondaryOrganization.OrganizationId,
+			errorStatus: http.StatusNotFound,
+		},
+		{
+			name:        "another org with permissions",
+			orgID:       SecondaryOrganization.OrganizationId,
+			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
+			errorStatus: http.StatusNotFound,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -44,7 +57,11 @@ func TestDeleteUser_errors(t *testing.T) {
 				ctx = CTX
 			}
 
-			err := Instance.Client.SCIM.Users.Delete(ctx, Instance.DefaultOrg.Id, "1")
+			orgID := tt.orgID
+			if orgID == "" {
+				orgID = Instance.DefaultOrg.Id
+			}
+			err := Instance.Client.SCIM.Users.Delete(ctx, orgID, "1")
 
 			statusCode := tt.errorStatus
 			if statusCode == 0 {
@@ -78,11 +95,4 @@ func TestDeleteUser_ensureReallyDeleted(t *testing.T) {
 		_, err = Instance.Client.UserV2.GetUserByID(CTX, &user.GetUserByIDRequest{UserId: createUserResp.UserId})
 		integration.AssertGrpcStatus(tt, codes.NotFound, err)
 	}, retryDuration, tick)
-}
-
-func TestDeleteUser_anotherOrg(t *testing.T) {
-	createUserResp := Instance.CreateHumanUser(CTX)
-	org := Instance.CreateOrganization(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), gofakeit.Name(), gofakeit.Email())
-	err := Instance.Client.SCIM.Users.Delete(CTX, org.OrganizationId, createUserResp.UserId)
-	scim.RequireScimError(t, http.StatusNotFound, err)
 }

@@ -1,0 +1,14 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
+  ],
+  "meta": {
+    "resourceType": "User",
+    "location": "http://{domain}:8080/scim/v2/{orgId}/ResourceTypes/User"
+  },
+  "id": "User",
+  "name": "User",
+  "endpoint": "Users",
+  "schema": "urn:ietf:params:scim:schemas:core:2.0:User",
+  "description": "User Account"
+}

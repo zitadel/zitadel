@@ -1,0 +1,41 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+  ],
+  "meta": {
+    "resourceType": "ServiceProviderConfig",
+    "location": "http://{domain}:8080/scim/v2/{orgId}/ServiceProviderConfig"
+  },
+  "documentationUri": "https://zitadel.com/docs/guides/manage/user/scim2",
+  "patch": {
+    "supported": true
+  },
+  "bulk": {
+    "supported": true,
+    "maxOperations": 100,
+    "maxPayloadSize": 1000000
+  },
+  "filter": {
+    "supported": true,
+    "maxResults": 100
+  },
+  "changePassword": {
+    "supported": true
+  },
+  "sort": {
+    "supported": true
+  },
+  "etag": {
+    "supported": false
+  },
+  "authenticationSchemes": [
+    {
+      "name": "Zitadel authentication token",
+      "description": "Authentication scheme using the OAuth Bearer Token Standard",
+      "specUri": "https://www.rfc-editor.org/info/rfc6750",
+      "documentationUri": "https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users",
+      "type": "oauthbearertoken",
+      "primary": false
+    }
+  ]
+}

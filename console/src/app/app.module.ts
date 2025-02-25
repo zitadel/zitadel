@@ -74,6 +74,7 @@ import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
+import { PosthogService } from './services/posthog.service';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
@@ -242,6 +243,7 @@ const authConfig: AuthConfig = {
     ToastService,
     NavigationService,
     LanguagesService,
+    PosthogService,
     { provide: 'windowObject', useValue: window },
   ],
   bootstrap: [AppComponent],

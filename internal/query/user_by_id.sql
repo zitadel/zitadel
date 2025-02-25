@@ -20,8 +20,8 @@ WITH login_names AS (SELECT
     WHERE
       u.instance_id = p.instance_id
       AND (
-        (p.is_default IS TRUE AND p.instance_id = $2)
-        OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
+        (p.is_default IS TRUE AND p.instance_id = $3)
+        OR (p.instance_id = $3 AND p.resource_owner = u.resource_owner)
       )
     ORDER BY is_default
     LIMIT 1
@@ -32,8 +32,9 @@ WITH login_names AS (SELECT
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
   WHERE
-    u.instance_id = $2
-    AND u.id = $1
+      u.id = $1
+    AND (u.resource_owner = $2 OR $2 = '')
+    AND u.instance_id = $3
 )
 SELECT 
   u.id
@@ -60,25 +61,27 @@ SELECT
   , h.is_phone_verified
   , h.password_change_required
   , h.password_changed
+  , h.mfa_init_skipped
   , m.user_id
   , m.name
   , m.description
   , m.secret
   , m.access_token_type
   , count(*) OVER ()
-FROM projections.users13 u
+FROM projections.users14 u
 LEFT JOIN
-  projections.users13_humans h
+  projections.users14_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users13_machines m
+  projections.users14_machines m
   ON
     u.id = m.user_id
     AND u.instance_id = m.instance_id
 WHERE 
   u.id = $1
-  AND u.instance_id = $2
+  AND (u.resource_owner = $2 OR $2 = '')
+  AND u.instance_id = $3
 LIMIT 1
 ;

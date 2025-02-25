@@ -9,11 +9,13 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/scim/metadata"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*command.AddHuman, error) {
@@ -27,8 +29,10 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 		human.SetInactive = true
 	}
 
-	if email := h.mapPrimaryEmail(scimUser); email != nil {
-		human.Email = *email
+	if email, err := h.mapPrimaryEmail(scimUser); err != nil {
+		return nil, err
+	} else {
+		human.Email = email
 	}
 
 	if phone := h.mapPrimaryPhone(scimUser); phone != nil {
@@ -70,14 +74,24 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 
 func (h *UsersHandler) mapToChangeHuman(ctx context.Context, scimUser *ScimUser) (*command.ChangeHuman, error) {
 	human := &command.ChangeHuman{
-		ID:       scimUser.ID,
-		Username: &scimUser.UserName,
+		ID:            scimUser.ID,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		Username:      &scimUser.UserName,
 		Profile: &command.Profile{
 			NickName:    &scimUser.NickName,
 			DisplayName: &scimUser.DisplayName,
 		},
-		Email: h.mapPrimaryEmail(scimUser),
 		Phone: h.mapPrimaryPhone(scimUser),
+	}
+
+	if human.Phone == nil {
+		human.Phone = &command.Phone{Remove: true}
+	}
+
+	if email, err := h.mapPrimaryEmail(scimUser); err != nil {
+		return nil, err
+	} else {
+		human.Email = &email
 	}
 
 	if scimUser.Active != nil {
@@ -114,6 +128,12 @@ func (h *UsersHandler) mapToChangeHuman(ctx context.Context, scimUser *ScimUser)
 			// update user to match the actual stored value
 			scimUser.Name.Formatted = *human.Profile.DisplayName
 		}
+
+		if scimUser.Name.GivenName == "" || scimUser.Name.FamilyName == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-USN1", "The name of a user is mandatory")
+		}
+	} else {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-USN2", "The name of a user is mandatory")
 	}
 
 	if err := domain.LanguageIsDefined(scimUser.PreferredLanguage); err != nil {
@@ -124,19 +144,28 @@ func (h *UsersHandler) mapToChangeHuman(ctx context.Context, scimUser *ScimUser)
 	return human, nil
 }
 
-func (h *UsersHandler) mapPrimaryEmail(scimUser *ScimUser) *command.Email {
+func (h *UsersHandler) mapPrimaryEmail(scimUser *ScimUser) (command.Email, error) {
 	for _, email := range scimUser.Emails {
 		if !email.Primary {
 			continue
 		}
 
-		return &command.Email{
+		return command.Email{
 			Address:  domain.EmailAddress(email.Value),
 			Verified: h.config.EmailVerified,
-		}
+		}, nil
 	}
 
-	return nil
+	// if no primary email was found, the first email will be used
+	for _, email := range scimUser.Emails {
+		email.Primary = true
+		return command.Email{
+			Address:  domain.EmailAddress(email.Value),
+			Verified: h.config.EmailVerified,
+		}, nil
+	}
+
+	return command.Email{}, zerrors.ThrowInvalidArgument(nil, "SCIM-EM19", "Errors.User.Email.Empty")
 }
 
 func (h *UsersHandler) mapPrimaryPhone(scimUser *ScimUser) *command.Phone {
@@ -145,6 +174,15 @@ func (h *UsersHandler) mapPrimaryPhone(scimUser *ScimUser) *command.Phone {
 			continue
 		}
 
+		return &command.Phone{
+			Number:   domain.PhoneNumber(phone.Value),
+			Verified: h.config.PhoneVerified,
+		}
+	}
+
+	// if no primary phone was found, the first phone will be used
+	for _, phone := range scimUser.PhoneNumbers {
+		phone.Primary = true
 		return &command.Phone{
 			Number:   domain.PhoneNumber(phone.Value),
 			Verified: h.config.PhoneVerified,
@@ -208,108 +246,167 @@ func (h *UsersHandler) mapChangeCommandToScimUser(ctx context.Context, user *Sci
 	}
 }
 
+func (h *UsersHandler) mapToScimUsers(ctx context.Context, users []*query.User, md map[string]map[metadata.ScopedKey][]byte) []*ScimUser {
+	result := make([]*ScimUser, len(users))
+	for i, user := range users {
+		userMetadata, ok := md[user.ID]
+		if !ok {
+			userMetadata = make(map[metadata.ScopedKey][]byte)
+		}
+
+		result[i] = h.mapToScimUser(ctx, user, userMetadata)
+	}
+
+	return result
+}
+
 func (h *UsersHandler) mapToScimUser(ctx context.Context, user *query.User, md map[metadata.ScopedKey][]byte) *ScimUser {
 	scimUser := &ScimUser{
-		Resource:     h.buildResourceForQuery(ctx, user),
-		ID:           user.ID,
-		ExternalID:   extractScalarMetadata(ctx, md, metadata.KeyExternalId),
-		UserName:     user.Username,
-		ProfileUrl:   extractHttpURLMetadata(ctx, md, metadata.KeyProfileUrl),
-		Title:        extractScalarMetadata(ctx, md, metadata.KeyTitle),
-		Locale:       extractScalarMetadata(ctx, md, metadata.KeyLocale),
-		Timezone:     extractScalarMetadata(ctx, md, metadata.KeyTimezone),
-		Active:       gu.Ptr(user.State.IsEnabled()),
-		Ims:          make([]*ScimIms, 0),
-		Addresses:    make([]*ScimAddress, 0),
-		Photos:       make([]*ScimPhoto, 0),
-		Entitlements: make([]*ScimEntitlement, 0),
-		Roles:        make([]*ScimRole, 0),
+		Resource:          h.buildResourceForQuery(ctx, user),
+		ID:                user.ID,
+		UserName:          user.Username,
+		DisplayName:       user.Human.DisplayName,
+		NickName:          user.Human.NickName,
+		PreferredLanguage: user.Human.PreferredLanguage,
+		Name: &ScimUserName{
+			Formatted:  user.Human.DisplayName,
+			FamilyName: user.Human.LastName,
+			GivenName:  user.Human.FirstName,
+		},
+		Active: schemas.NewRelaxedBool(user.State.IsEnabled()),
 	}
 
-	if scimUser.Locale != "" {
-		_, err := language.Parse(scimUser.Locale)
-		if err != nil {
-			logging.OnError(err).Warn("Failed to load locale of scim user")
-			scimUser.Locale = ""
+	if string(user.Human.Email) != "" {
+		scimUser.Emails = []*ScimEmail{
+			{
+				Value:   string(user.Human.Email),
+				Primary: true,
+			},
 		}
 	}
 
-	if scimUser.Timezone != "" {
-		_, err := time.LoadLocation(scimUser.Timezone)
-		if err != nil {
-			logging.OnError(err).Warn("Failed to load timezone of scim user")
-			scimUser.Timezone = ""
+	if string(user.Human.Phone) != "" {
+		scimUser.PhoneNumbers = []*ScimPhoneNumber{
+			{
+				Value:   string(user.Human.Phone),
+				Primary: true,
+			},
 		}
 	}
 
-	if err := extractJsonMetadata(ctx, md, metadata.KeyIms, &scimUser.Ims); err != nil {
-		logging.OnError(err).Warn("Could not deserialize scim ims metadata")
-	}
-
-	if err := extractJsonMetadata(ctx, md, metadata.KeyAddresses, &scimUser.Addresses); err != nil {
-		logging.OnError(err).Warn("Could not deserialize scim addresses metadata")
-	}
-
-	if err := extractJsonMetadata(ctx, md, metadata.KeyPhotos, &scimUser.Photos); err != nil {
-		logging.OnError(err).Warn("Could not deserialize scim photos metadata")
-	}
-
-	if err := extractJsonMetadata(ctx, md, metadata.KeyEntitlements, &scimUser.Entitlements); err != nil {
-		logging.OnError(err).Warn("Could not deserialize scim entitlements metadata")
-	}
-
-	if err := extractJsonMetadata(ctx, md, metadata.KeyRoles, &scimUser.Roles); err != nil {
-		logging.OnError(err).Warn("Could not deserialize scim roles metadata")
-	}
-
-	if user.Human != nil {
-		mapHumanToScimUser(ctx, user.Human, scimUser, md)
-	}
-
+	h.mapAndValidateMetadata(ctx, scimUser, md)
 	return scimUser
 }
 
-func mapHumanToScimUser(ctx context.Context, human *query.Human, user *ScimUser, md map[metadata.ScopedKey][]byte) {
-	user.DisplayName = human.DisplayName
-	user.NickName = human.NickName
-	user.PreferredLanguage = human.PreferredLanguage
-	user.Name = &ScimUserName{
-		Formatted:       human.DisplayName,
-		FamilyName:      human.LastName,
-		GivenName:       human.FirstName,
-		MiddleName:      extractScalarMetadata(ctx, md, metadata.KeyMiddleName),
-		HonorificPrefix: extractScalarMetadata(ctx, md, metadata.KeyHonorificPrefix),
-		HonorificSuffix: extractScalarMetadata(ctx, md, metadata.KeyHonorificSuffix),
+func (h *UsersHandler) mapWriteModelToScimUser(ctx context.Context, user *command.UserV2WriteModel) *ScimUser {
+	scimUser := &ScimUser{
+		Resource:          h.buildResourceForWriteModel(ctx, user),
+		ID:                user.AggregateID,
+		UserName:          user.UserName,
+		DisplayName:       user.DisplayName,
+		NickName:          user.NickName,
+		PreferredLanguage: user.PreferredLanguage,
+		Name: &ScimUserName{
+			Formatted:  user.DisplayName,
+			FamilyName: user.LastName,
+			GivenName:  user.FirstName,
+		},
+		Active: schemas.NewRelaxedBool(user.UserState.IsEnabled()),
 	}
 
-	if string(human.Email) != "" {
-		user.Emails = []*ScimEmail{
+	if string(user.Email) != "" {
+		scimUser.Emails = []*ScimEmail{
 			{
-				Value:   string(human.Email),
+				Value:   string(user.Email),
 				Primary: true,
 			},
 		}
 	}
 
-	if string(human.Phone) != "" {
-		user.PhoneNumbers = []*ScimPhoneNumber{
+	if string(user.Phone) != "" {
+		scimUser.PhoneNumbers = []*ScimPhoneNumber{
 			{
-				Value:   string(human.Phone),
+				Value:   string(user.Phone),
 				Primary: true,
 			},
 		}
+	}
+
+	md := metadata.MapToScopedKeyMap(user.Metadata)
+	h.mapAndValidateMetadata(ctx, scimUser, md)
+	return scimUser
+}
+
+func (h *UsersHandler) mapAndValidateMetadata(ctx context.Context, user *ScimUser, md map[metadata.ScopedKey][]byte) {
+	user.ExternalID = extractScalarMetadata(ctx, md, metadata.KeyExternalId)
+	user.ProfileUrl = extractHttpURLMetadata(ctx, md, metadata.KeyProfileUrl)
+	user.Title = extractScalarMetadata(ctx, md, metadata.KeyTitle)
+	user.Locale = extractScalarMetadata(ctx, md, metadata.KeyLocale)
+	user.Timezone = extractScalarMetadata(ctx, md, metadata.KeyTimezone)
+	user.Name.MiddleName = extractScalarMetadata(ctx, md, metadata.KeyMiddleName)
+	user.Name.HonorificPrefix = extractScalarMetadata(ctx, md, metadata.KeyHonorificPrefix)
+	user.Name.HonorificSuffix = extractScalarMetadata(ctx, md, metadata.KeyHonorificSuffix)
+
+	if user.Locale != "" {
+		_, err := language.Parse(user.Locale)
+		if err != nil {
+			logging.OnError(err).Warn("Failed to load locale of scim user")
+			user.Locale = ""
+		}
+	}
+
+	if user.Timezone != "" {
+		_, err := time.LoadLocation(user.Timezone)
+		if err != nil {
+			logging.OnError(err).Warn("Failed to load timezone of scim user")
+			user.Timezone = ""
+		}
+	}
+
+	if err := extractJsonMetadata(ctx, md, metadata.KeyIms, &user.Ims); err != nil {
+		logging.OnError(err).Warn("Could not deserialize scim ims metadata")
+	}
+
+	if err := extractJsonMetadata(ctx, md, metadata.KeyAddresses, &user.Addresses); err != nil {
+		logging.OnError(err).Warn("Could not deserialize scim addresses metadata")
+	}
+
+	if err := extractJsonMetadata(ctx, md, metadata.KeyPhotos, &user.Photos); err != nil {
+		logging.OnError(err).Warn("Could not deserialize scim photos metadata")
+	}
+
+	if err := extractJsonMetadata(ctx, md, metadata.KeyEntitlements, &user.Entitlements); err != nil {
+		logging.OnError(err).Warn("Could not deserialize scim entitlements metadata")
+	}
+
+	if err := extractJsonMetadata(ctx, md, metadata.KeyRoles, &user.Roles); err != nil {
+		logging.OnError(err).Warn("Could not deserialize scim roles metadata")
 	}
 }
 
-func (h *UsersHandler) buildResourceForQuery(ctx context.Context, user *query.User) *Resource {
-	return &Resource{
+func (h *UsersHandler) buildResourceForQuery(ctx context.Context, user *query.User) *schemas.Resource {
+	return &schemas.Resource{
+		ID:      user.ID,
 		Schemas: []schemas.ScimSchemaType{schemas.IdUser},
-		Meta: &ResourceMeta{
+		Meta: &schemas.ResourceMeta{
 			ResourceType: schemas.UserResourceType,
-			Created:      user.CreationDate.UTC(),
-			LastModified: user.ChangeDate.UTC(),
+			Created:      gu.Ptr(user.CreationDate.UTC()),
+			LastModified: gu.Ptr(user.ChangeDate.UTC()),
 			Version:      strconv.FormatUint(user.Sequence, 10),
-			Location:     buildLocation(ctx, h, user.ID),
+			Location:     schemas.BuildLocationForResource(ctx, h.schema.PluralName, user.ID),
+		},
+	}
+}
+
+func (h *UsersHandler) buildResourceForWriteModel(ctx context.Context, user *command.UserV2WriteModel) *schemas.Resource {
+	return &schemas.Resource{
+		Schemas: []schemas.ScimSchemaType{schemas.IdUser},
+		Meta: &schemas.ResourceMeta{
+			ResourceType: schemas.UserResourceType,
+			Created:      gu.Ptr(user.CreationDate.UTC()),
+			LastModified: gu.Ptr(user.ChangeDate.UTC()),
+			Version:      strconv.FormatUint(user.ProcessedSequence, 10),
+			Location:     schemas.BuildLocationForResource(ctx, h.schema.PluralName, user.AggregateID),
 		},
 	}
 }
@@ -363,4 +460,12 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 		converted[i] = grant.ID
 	}
 	return converted
+}
+
+func usersToIDs(users []*query.User) []string {
+	ids := make([]string, len(users))
+	for i, user := range users {
+		ids[i] = user.ID
+	}
+	return ids
 }

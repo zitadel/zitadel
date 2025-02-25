@@ -809,6 +809,9 @@
       "EMAIL": "Email",
       "PHONE": "Número de teléfono",
       "PHONE_HINT": "Usa el símbolo + seguido del prefijo del país o selecciona el país del menú desplegable y finalmente introduce el número de teléfono",
+      "PHONE_VERIFIED": "Número de teléfono verificado",
+      "SEND_SMS": "Enviar SMS de verificación",
+      "SEND_EMAIL": "Enviar correo electrónico",
       "USERNAME": "Nombre de usuario",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Cambiar nombre de usuario",
@@ -948,6 +951,14 @@
       "4": "Bloqueado",
       "5": "Suspendido",
       "6": "Inicial"
+    },
+    "STATEV2": {
+      "0": "Desconocido",
+      "1": "Activo",
+      "2": "Inactivo",
+      "3": "Borrado",
+      "4": "Bloqueado",
+      "5": "Inicial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nombre de inicio de sesión (organización actual)",
@@ -1487,7 +1498,9 @@
         "ENABLED": "\"Habilitado\" se hereda",
         "DISABLED": "\"Deshabilitado\" se hereda"
       },
-      "RESET": "Establecer todo a heredado"
+      "RESET": "Establecer todo a heredado",
+      "CONSOLEUSEV2USERAPI": "Utilice la API V2 en la consola para la creación de usuarios",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial."
     },
     "DIALOG": {
       "RESET": {

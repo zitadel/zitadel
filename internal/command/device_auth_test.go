@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -259,6 +260,310 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 				eventstore: tt.fields.eventstore(t),
 			}
 			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime, tt.args.preferredLanguage, tt.args.userAgent, tt.args.sessionID)
+			require.ErrorIs(t, err, tt.wantErr)
+			assertObjectDetails(t, tt.wantDetails, gotDetails)
+		})
+	}
+}
+
+func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
+	ctx := authz.WithInstanceID(context.Background(), "instance1")
+	now := time.Now()
+	pushErr := errors.New("pushErr")
+
+	type fields struct {
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		checkPermission domain.PermissionCheck
+	}
+	type args struct {
+		ctx          context.Context
+		deviceCode   string
+		sessionID    string
+		sessionToken string
+	}
+	tests := []struct {
+		name        string
+		fields      fields
+		args        args
+		wantDetails *domain.ObjectDetails
+		wantErr     error
+	}{
+		{
+			name: "not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx,
+				"notfound",
+				"sessionID",
+				"sessionToken",
+			},
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-D2hf2", "Errors.DeviceAuth.NotFound"),
+		},
+		{
+			name: "not initialized, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							deviceauth.NewAddedEvent(
+								ctx,
+								deviceauth.NewAggregate("deviceCode", "instance1"),
+								"client_id", "deviceCode", "456", now,
+								[]string{"a", "b", "c"},
+								[]string{"projectID", "clientID"}, true,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							deviceauth.NewCanceledEvent(
+								ctx,
+								deviceauth.NewAggregate("deviceCode", "instance1"),
+								domain.DeviceAuthCanceledDenied,
+							)),
+					),
+				),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"sessionToken",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-D30Jf", "Errors.DeviceAuth.AlreadyHandled"),
+		},
+		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("deviceCode", "instance1"),
+							"client_id", "deviceCode", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true,
+						),
+					)),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"sessionToken",
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
+			name: "session not active, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("deviceCode", "instance1"),
+							"client_id", "deviceCode", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true,
+						),
+					)),
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"sessionToken",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting"),
+		},
+		{
+			name: "invalid session token, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("deviceCode", "instance1"),
+							"client_id", "deviceCode", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true,
+						),
+					)),
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						session.NewAddedEvent(ctx,
+							&session.NewAggregate("sessionID", "instance1").Aggregate,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						)),
+					)),
+				tokenVerifier:   newMockTokenVerifierInvalid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"invalidToken",
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
+		},
+		{
+			name: "push error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("deviceCode", "instance1"),
+							"client_id", "deviceCode", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true,
+						),
+					)),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(ctx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "orgID", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+					expectPushFailed(pushErr,
+						deviceauth.NewApprovedEvent(
+							ctx, deviceauth.NewAggregate("deviceCode", "instance1"), "userID", "orgID",
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							testNow, &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+							"sessionID",
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"sessionToken",
+			},
+			wantErr: pushErr,
+		},
+		{
+			name: "authorized",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("deviceCode", "instance1"),
+							"client_id", "deviceCode", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true,
+						),
+					)),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(ctx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "orgID", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+					expectPush(
+						deviceauth.NewApprovedEvent(
+							ctx, deviceauth.NewAggregate("deviceCode", "instance1"), "userID", "orgID",
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							testNow, &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+							"sessionID",
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"sessionToken",
+			},
+			wantDetails: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:           tt.fields.eventstore(t),
+				sessionTokenVerifier: tt.fields.tokenVerifier,
+				checkPermission:      tt.fields.checkPermission,
+			}
+			gotDetails, err := c.ApproveDeviceAuthWithSession(tt.args.ctx, tt.args.deviceCode, tt.args.sessionID, tt.args.sessionToken)
 			require.ErrorIs(t, err, tt.wantErr)
 			assertObjectDetails(t, tt.wantDetails, gotDetails)
 		})

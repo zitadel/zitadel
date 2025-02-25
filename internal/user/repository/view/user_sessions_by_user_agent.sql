@@ -20,8 +20,8 @@ SELECT s.creation_date,
        s.instance_id,
        s.id
 FROM auth.user_sessions s
-         LEFT JOIN projections.users13 u ON s.user_id = u.id AND s.instance_id = u.instance_id
-         LEFT JOIN projections.users13_humans h ON s.user_id = h.user_id AND s.instance_id = h.instance_id
+         LEFT JOIN projections.users14 u ON s.user_id = u.id AND s.instance_id = u.instance_id
+         LEFT JOIN projections.users14_humans h ON s.user_id = h.user_id AND s.instance_id = h.instance_id
          LEFT JOIN projections.login_names3 l ON s.user_id = l.user_id AND s.instance_id = l.instance_id AND l.is_primary = true
 WHERE (s.user_agent_id = $1 and s.user_agent_id <> '')
   AND (s.instance_id = $2)

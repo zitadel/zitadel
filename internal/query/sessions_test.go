@@ -32,7 +32,7 @@ var (
 		` projections.sessions8.user_resource_owner,` +
 		` projections.sessions8.user_checked_at,` +
 		` projections.login_names3.login_name,` +
-		` projections.users13_humans.display_name,` +
+		` projections.users14_humans.display_name,` +
 		` projections.sessions8.password_checked_at,` +
 		` projections.sessions8.intent_checked_at,` +
 		` projections.sessions8.webauthn_checked_at,` +
@@ -49,8 +49,8 @@ var (
 		` projections.sessions8.expiration` +
 		` FROM projections.sessions8` +
 		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
-		` LEFT JOIN projections.users13_humans ON projections.sessions8.user_id = projections.users13_humans.user_id AND projections.sessions8.instance_id = projections.users13_humans.instance_id` +
-		` LEFT JOIN projections.users13 ON projections.sessions8.user_id = projections.users13.id AND projections.sessions8.instance_id = projections.users13.instance_id` +
+		` LEFT JOIN projections.users14_humans ON projections.sessions8.user_id = projections.users14_humans.user_id AND projections.sessions8.instance_id = projections.users14_humans.instance_id` +
+		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions8.id,` +
 		` projections.sessions8.creation_date,` +
@@ -63,7 +63,7 @@ var (
 		` projections.sessions8.user_resource_owner,` +
 		` projections.sessions8.user_checked_at,` +
 		` projections.login_names3.login_name,` +
-		` projections.users13_humans.display_name,` +
+		` projections.users14_humans.display_name,` +
 		` projections.sessions8.password_checked_at,` +
 		` projections.sessions8.intent_checked_at,` +
 		` projections.sessions8.webauthn_checked_at,` +
@@ -80,8 +80,8 @@ var (
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions8` +
 		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
-		` LEFT JOIN projections.users13_humans ON projections.sessions8.user_id = projections.users13_humans.user_id AND projections.sessions8.instance_id = projections.users13_humans.instance_id` +
-		` LEFT JOIN projections.users13 ON projections.sessions8.user_id = projections.users13.id AND projections.sessions8.instance_id = projections.users13.instance_id` +
+		` LEFT JOIN projections.users14_humans ON projections.sessions8.user_id = projections.users14_humans.user_id AND projections.sessions8.instance_id = projections.users14_humans.instance_id` +
+		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 
 	sessionCols = []string{
