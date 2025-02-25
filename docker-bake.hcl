@@ -39,44 +39,20 @@ target "_console" {
   }
 }
 
-target "console" {
-  name     = "console-${tgt}"
+target "console-generate" {
   inherits = ["_console"]
-  matrix = {
-    tgt = ["build", "lint", "image", "generate"]
-  }
-  output = {
-    "build"  = ["type=local,dest=.build/console"]
-    "lint"   = ["type=cacheonly"]
-    "image"   = ["type=image"]
-    "generate" = ["type=local,dest=./"]
-  }[tgt]
-  tags = {
-    "build"  = []
-    "lint"   = []
-    "image"   = ["${REGISTRY}/console:${GITHUB_SHA}"]
-    "generate" = []
-  }[tgt]
-  cache-to = {
-    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
-    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
-    "image"   = ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
-    "generate"   = ["type=gha,ignore-error=true,mode=max,scope=console-${tgt}"]
-  }[tgt]
-    cache-from = {
-    "build"  =  ["type=gha,scope=console-${tgt}"]
-    "lint"   =  ["type=gha,scope=console-${tgt}"]
-    "image"   = ["type=gha,scope=console-${tgt}"]
-    "generate" = ["type=gha,scope=console-${tgt}"]
-  }[tgt]
-  platforms = {
-    "build"  =  []
-    "lint"   =  []
-    "unit"   =  []
-    "image"   = ["linux/amd64", "linux/arm64"]
-    "generate"   = []
-  }[tgt]
-  target = tgt
+  output = ["type=local,dest=./"]
+  target = "generate"
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=console-generate"]
+  cache-from = ["type=gha,scope=console-generate"]
+}
+
+target "console-build" {
+  inherits = ["_console"]
+  output = ["type=local,dest=.build/console"]
+  target = "build"
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=console-build"]
+  cache-from = ["type=gha,scope=console-build"]
 }
 
 target "_core" {
@@ -84,7 +60,6 @@ target "_core" {
   context = "."
   contexts = {
     golang = "docker-image://golang:1.24"
-    console = "target:console-build"
   }
   args = {
     SASS_VERSION      = "1.64.1"
@@ -92,46 +67,21 @@ target "_core" {
   }
 }
 
-target "core" {
-  name     = "core-${tgt}"
+target "core-generate" {
   inherits = ["_core"]
-  matrix = {
-    tgt = ["build", "lint", "image", "generate", "unit"]
+  output = ["type=local,dest=./"]
+  target = "generate"
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=core-generate"]
+  cache-from = ["type=gha,scope=core-generate"]
+}
+
+target "core-build" {
+  inherits = ["_core"]
+  output = ["type=local,dest=.build/core"]
+  contexts = {
+    console = "target:console-build"
   }
-  output = {
-    "build"  = ["type=local,dest=.build/core"]
-    "lint"   = ["type=cacheonly"]
-    "unit"   = ["type=local,dest=./.build/core"]
-    "image"   = ["type=image"]
-    "generate" = ["type=local,dest=./"]
-  }[tgt]
-  tags = {
-    "build"  = []
-    "lint"   = []
-    "unit"   = []
-    "image"   = ["${REGISTRY}/zitadel:${GITHUB_SHA}"]
-    "generate"   = []
-  }[tgt]
-    cache-to = {
-    "build"  =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
-    "lint"   =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
-    "unit"   =  ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]    
-    "image"   = ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
-    "generate"   = ["type=gha,ignore-error=true,mode=max,scope=core-${tgt}"]
-  }[tgt]
-    cache-from = {
-    "build"  =  ["type=gha,scope=core-${tgt}"]
-    "lint"   =  ["type=gha,scope=core-${tgt}"]
-    "unit"   =  ["type=gha,scope=core-${tgt}"]
-    "image"   = ["type=gha,scope=core-${tgt}"]
-    "generate"   = ["type=gha,scope=core-${tgt}"]
-  }[tgt]
-    platforms = {
-    "build"  =  []
-    "lint"   =  []
-    "unit"   =  []
-    "image"   = ["linux/amd64", "linux/arm64"]
-    "generate"   = []
-  }[tgt]
-  target = tgt
+  target = "build"
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=core-build"]
+  cache-from = ["type=gha,scope=core-build"]
 }

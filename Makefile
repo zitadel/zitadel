@@ -1,2 +1,5 @@
+generate:
+	docker buildx bake generate
+
 build:
-	docker buildx bake output
+	docker buildx bake build
