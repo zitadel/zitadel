@@ -9,7 +9,7 @@
 	},
 	"customizations": {
 		"vscode": {
-		  "extensions": ["golang.go"]
+		  "extensions": ["golang.go", "hashicorp.hcl", "zxh404.vscode-proto3"]
 		}
 	},
 	"forwardPorts": [

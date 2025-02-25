@@ -6,28 +6,28 @@ variable "REGISTRY" {
   default = "ghcr.io/zitadel"
 }
 
-group "all" {
-  targets = ["build", "lint", "image", "unit"]
-}
-
-group "build" {
-  targets = ["console-build", "core-build"]
+group "ci" {
+  targets = ["build", "lint", "unit"]
 }
 
 group "generate" {
   targets = ["console-generate" , "core-generate"]
 }
 
+group "build" {
+  targets = ["console-build", "core-build"]
+}
+
 group "lint" {
   targets = ["console-lint", "core-lint"]
 }
 
-group "image" {
-  targets = ["console-image", "core-image"]
-}
-
 group "unit" {
   targets = ["core-unit"]
+}
+
+group "image" {
+  targets = ["console-image", "core-image"]
 }
 
 target "devcontainer" {
@@ -60,6 +60,14 @@ target "console-build" {
   target = "build"
   cache-to = ["type=gha,ignore-error=true,mode=max,scope=console-build"]
   cache-from = ["type=gha,scope=console-build"]
+}
+
+target "console-lint" {
+  inherits = ["_console"]
+  output = ["type=cacheonly"]
+  target = "lint"
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=console-lint"]
+  cache-from = ["type=gha,scope=console-lint"]
 }
 
 target "_core" {
@@ -96,4 +104,23 @@ target "core-build" {
   target = "build"
   cache-to = ["type=gha,ignore-error=true,mode=max,scope=core-build"]
   cache-from = ["type=gha,scope=core-build"]
+}
+
+target "core-lint" {
+  inherits = ["_core"]
+  output = ["type=cacheonly"]
+  target = "lint"
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=core-lint"]
+  cache-from = ["type=gha,scope=core-lint"]
+}
+
+target "core-unit" {
+  inherits = ["_core"]
+  output = ["type=local,dest=.build/core"]
+  contexts = {
+    console = "target:console-build"
+  }
+  target = "unit"
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=core-unit"]
+  cache-from = ["type=gha,scope=core-unit"]
 }

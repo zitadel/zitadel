@@ -36,14 +36,14 @@ ARG ARCH=
 COPY --from=builder /app/zitadel-${OS}-${ARCH} zitadel-${OS}-${ARCH}
 
 FROM base AS lint
-COPY --from=console ./ internal/api/ui/console/static
+#COPY --from=console ./ internal/api/ui/console/static
 COPY .golangci.yaml ./
 COPY .git/ ./.git/
 RUN golangci-lint run \
     --timeout 10m \
     --config ./.golangci.yaml \
     --out-format=github-actions \
-    --concurrency=$$(getconf _NPROCESSORS_ONLN)
+    --concurrency=$(getconf _NPROCESSORS_ONLN)
 
 FROM base AS unit-test
 COPY --from=console ./ internal/api/ui/console/static
