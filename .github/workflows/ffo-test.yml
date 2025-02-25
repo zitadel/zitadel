@@ -12,7 +12,7 @@ permissions:
 jobs:
   depot-gh-cache:
     timeout-minutes: 20
-    runs-on: depot-ubuntu-22.04-8
+    runs-on: depot-ubuntu-22.04-16
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,25 +45,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: depot-cache
-          path: .build
-          include-hidden-files: true
-
-  gh-runner-cache:
-    timeout-minutes: 20
-    runs-on:
-      group: zitadel-public
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/bake-action@v6
-        with:
-          source: .
-          push: false
-          targets: ci
-      - uses: actions/upload-artifact@v4
-        with:
-          name: gh-runner-cache
           path: .build
           include-hidden-files: true
