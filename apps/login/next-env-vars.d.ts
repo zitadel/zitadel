@@ -10,16 +10,12 @@ declare namespace NodeJS {
     SYSTEM_USER_PRIVATE_KEY: string; // The fallback service user private key
 
     /**
-     * Self hosting: The Zitadel API url
+     * The Zitadel API url
      */
     ZITADEL_API_URL: string;
 
     /**
-     * Self hosting: The service user id
-     */
-    ZITADEL_SERVICE_USER_ID: string;
-    /**
-     * Self hosting: The service user token
+     * The service user token
      */
     ZITADEL_SERVICE_USER_TOKEN: string;
 
