@@ -896,6 +896,7 @@ module.exports = {
           },
           items: [
             "apis/benchmarks/v2.70.0/machine_jwt_profile_grant/index",
+            "apis/benchmarks/v2.70.0/oidc_session/index",
           ],
         },
       ],
