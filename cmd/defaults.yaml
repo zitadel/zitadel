@@ -1321,6 +1321,9 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "session.read"
+        - "session.link"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1356,6 +1359,7 @@ InternalAuthZ:
         - "action.target.read"
         - "action.execution.read"
         - "userschema.read"
+        - "session.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
