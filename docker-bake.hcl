@@ -102,8 +102,8 @@ target "core-build" {
     console = "target:console-build"
   }
   target = "build"
-  cache-to = ["type=gha,ignore-error=true,mode=max,scope=core-build"]
-  cache-from = ["type=gha,scope=core-build"]
+  cache-to = ["type=gha,ignore-error=true,mode=max,scope=core-build-${os}-${arch}"]
+  cache-from = ["type=gha,scope=core-build-${os}-${arch}"]
 }
 
 target "core-lint" {
