@@ -80,6 +80,15 @@ target "core-generate" {
 
 target "core-build" {
   inherits = ["_core"]
+  name = "core-build-${os}-${arch}"
+    matrix = {
+    os = ["linux", "darwin", "windows"]
+    arch = ["amd64", "arm64"]
+  }
+  args = {
+    OS = os
+    ARCH = arch
+  }
   output = ["type=local,dest=.build/core"]
   contexts = {
     console = "target:console-build"

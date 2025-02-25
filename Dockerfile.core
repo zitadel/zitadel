@@ -1,6 +1,4 @@
 FROM devcontainer AS base
-ARG COMMIT_SHA=
-ARG VERSION=
 WORKDIR /app
 COPY go.mod go.sum buf.gen.yaml buf.work.yaml main.go ./
 COPY docs/apis/assets/assets.md docs/apis/assets/assets.md
@@ -23,37 +21,19 @@ COPY --from=base /app/pkg/grpc/ /pkg/grpc/
 COPY --from=base /app/openapi/ /openapi/
 COPY --from=base /app/internal/api/assets/generator/ /internal/api/assets/generator/
 
-FROM base AS build-linux-amd64
+FROM base AS builder
+ARG OS=
+ARG ARCH=
+ARG COMMIT_SHA=
+ARG VERSION=
 COPY --from=console ./ internal/api/ui/console/static
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
+RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -o zitadel-${OS}-${ARCH} -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
     && chmod +x zitadel
-FROM base AS build-linux-arm64
-COPY --from=console ./ internal/api/ui/console/static
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
-    && chmod +x zitadel
-FROM base AS build-darwin-amd64
-COPY --from=console ./ internal/api/ui/console/static
-RUN CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
-    && chmod +x zitadel
-FROM base AS build-darwin-arm64
-COPY --from=console ./ internal/api/ui/console/static
-RUN CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
-    && chmod +x zitadel
-FROM base AS build-windows-amd64
-COPY --from=console ./ internal/api/ui/console/static
-RUN CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
-    && chmod +x zitadel
-FROM base AS build-windows-arm64
-COPY --from=console ./ internal/api/ui/console/static
-RUN CGO_ENABLED=0 GOOS=windows GOARCH=arm64 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
-    && chmod +x zitadel
+
 FROM scratch AS build
-COPY --from=build-linux-amd64 /app/zitadel zitadel-linux-amd64
-COPY --from=build-linux-arm64 /app/zitadel zitadel-linux-arm64
-COPY --from=build-darwin-amd64 /app/zitadel zitadel-darwin-amd64
-COPY --from=build-darwin-arm64 /app/zitadel zitadel-darwin-arm64
-COPY --from=build-windows-amd64 /app/zitadel zitadel-windows-amd64
-COPY --from=build-windows-arm64 /app/zitadel zitadel-windows-arm64
+ARG OS=
+ARG ARCH=
+COPY --from=builder /app/zitadel-${OS}-${ARCH} zitadel-${OS}-${ARCH}
 
 FROM base AS lint
 COPY --from=console ./ internal/api/ui/console/static
