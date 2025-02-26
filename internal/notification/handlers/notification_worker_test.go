@@ -293,7 +293,6 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						userDataCrypto: codeAlg,
 						now:            testNow,
 						backOff:        testBackOff,
-						maxAttempts:    2,
 					},
 					argsWorker{
 						job: &river.Job[*notification.Request]{
@@ -355,7 +354,6 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						userDataCrypto: codeAlg,
 						now:            testNow,
 						backOff:        testBackOff,
-						maxAttempts:    1,
 					},
 					argsWorker{
 						job: &river.Job[*notification.Request]{
@@ -405,78 +403,6 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-		})
-	}
-}
-
-func TestNotificationWorker_exponentialBackOff(t *testing.T) {
-	type fields struct {
-		config WorkerConfig
-	}
-	type args struct {
-		current time.Duration
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantMin time.Duration
-		wantMax time.Duration
-	}{
-		{
-			name: "less than min, min - 1.5*min",
-			fields: fields{
-				config: WorkerConfig{
-					MinRetryDelay:    1 * time.Second,
-					MaxRetryDelay:    5 * time.Second,
-					RetryDelayFactor: 1.5,
-				},
-			},
-			args: args{
-				current: 0,
-			},
-			wantMin: 1000 * time.Millisecond,
-			wantMax: 1500 * time.Millisecond,
-		},
-		{
-			name: "current, 1.5*current - max",
-			fields: fields{
-				config: WorkerConfig{
-					MinRetryDelay:    1 * time.Second,
-					MaxRetryDelay:    5 * time.Second,
-					RetryDelayFactor: 1.5,
-				},
-			},
-			args: args{
-				current: 4 * time.Second,
-			},
-			wantMin: 4000 * time.Millisecond,
-			wantMax: 5000 * time.Millisecond,
-		},
-		{
-			name: "max, max",
-			fields: fields{
-				config: WorkerConfig{
-					MinRetryDelay:    1 * time.Second,
-					MaxRetryDelay:    5 * time.Second,
-					RetryDelayFactor: 1.5,
-				},
-			},
-			args: args{
-				current: 5 * time.Second,
-			},
-			wantMin: 5000 * time.Millisecond,
-			wantMax: 5000 * time.Millisecond,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			w := &NotificationWorker{
-				config: tt.fields.config,
-			}
-			b := w.exponentialBackOff(tt.args.current)
-			assert.GreaterOrEqual(t, b, tt.wantMin)
-			assert.LessOrEqual(t, b, tt.wantMax)
 		})
 	}
 }
@@ -542,15 +468,10 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 		},
 		config: WorkerConfig{
 			Workers:             1,
-			RequeueEvery:        2 * time.Second,
 			TransactionDuration: 5 * time.Second,
-			MaxAttempts:         f.maxAttempts,
 			MaxTtl:              5 * time.Minute,
-			MinRetryDelay:       1 * time.Second,
-			MaxRetryDelay:       10 * time.Second,
 			RetryDelayFactor:    2,
 		},
-		now:     f.now,
-		backOff: f.backOff,
+		now: f.now,
 	}
 }

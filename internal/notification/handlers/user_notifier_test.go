@@ -1912,7 +1912,6 @@ type fieldsWorker struct {
 	SMSTokenCrypto crypto.EncryptionAlgorithm
 	now            nowFunc
 	backOff        func(current time.Duration) time.Duration
-	maxAttempts    uint8
 }
 type args struct {
 	event eventstore.Event

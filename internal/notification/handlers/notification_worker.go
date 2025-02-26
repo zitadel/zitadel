@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand/v2"
 	"strconv"
 	"strings"
 	"time"
@@ -40,11 +39,6 @@ type NotificationWorker struct {
 	channels types.ChannelChains
 	config   WorkerConfig
 	now      nowFunc
-	backOff  func(current time.Duration) time.Duration
-}
-
-func (w *NotificationWorker) NextRetry(job *river.Job[*notification.Request]) time.Time {
-	return w.now().Add(job.CreatedAt.Sub(w.now()))
 }
 
 func (w *NotificationWorker) Timeout(*river.Job[*notification.Request]) time.Duration {
@@ -79,10 +73,9 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 	if err == nil {
 		return nil
 	}
-	// if retries are disabled or if the error explicitly specifies, we cancel the notification
-	// TODO: move max attempts to job config
-	if w.config.MaxAttempts <= 1 || errors.Is(err, &channels.CancelError{}) {
-		return river.JobCancel(errors.New("notification is too old"))
+	// if the error explicitly specifies, we cancel the notification
+	if errors.Is(err, &channels.CancelError{}) {
+		return river.JobCancel(err)
 	}
 	return err
 }
@@ -90,13 +83,8 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 type WorkerConfig struct {
 	LegacyEnabled       bool
 	Workers             uint8
-	RequeueEvery        time.Duration
-	RetryRequeueEvery   time.Duration
 	TransactionDuration time.Duration
-	MaxAttempts         uint8
 	MaxTtl              time.Duration
-	MinRetryDelay       time.Duration
-	MaxRetryDelay       time.Duration
 	RetryDelayFactor    float32
 }
 
@@ -139,7 +127,6 @@ func NewNotificationWorker(
 	if !config.LegacyEnabled {
 		queue.AddWorkers(w)
 	}
-	w.backOff = w.exponentialBackOff
 	return w
 }
 
@@ -211,18 +198,4 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 	logging.WithFields("instanceID", request.Aggregate.InstanceID, "notification", request.Aggregate.ID).
 		OnError(err).Error("could not set notification event on aggregate")
 	return nil
-}
-
-func (w *NotificationWorker) exponentialBackOff(current time.Duration) time.Duration {
-	if current >= w.config.MaxRetryDelay {
-		return w.config.MaxRetryDelay
-	}
-	if current < w.config.MinRetryDelay {
-		current = w.config.MinRetryDelay
-	}
-	t := time.Duration(rand.Int64N(int64(w.config.RetryDelayFactor*float32(current.Nanoseconds()))-current.Nanoseconds()) + current.Nanoseconds())
-	if t > w.config.MaxRetryDelay {
-		return w.config.MaxRetryDelay
-	}
-	return t
 }
