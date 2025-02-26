@@ -16,7 +16,7 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { ConnectError, create } from "@zitadel/client";
 import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import {
@@ -267,7 +267,8 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Could not verify password!" };
   }
 
-  const mfaFactorCheck = checkMFAFactors(
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
     session,
     loginSettings,
     authMethods,
@@ -433,7 +434,7 @@ export async function checkSessionAndSetPassword({
         },
         {},
       )
-      .catch((error) => {
+      .catch((error: ConnectError) => {
         console.log(error);
         if (error.code === 7) {
           return { error: "Session is not valid." };

@@ -5,6 +5,7 @@ import { PasswordExpirySettings } from "@zitadel/proto/zitadel/settings/v2/passw
 import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import moment from "moment";
+import { getUserByID } from "./zitadel";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -100,7 +101,8 @@ export function checkEmailVerification(
   }
 }
 
-export function checkMFAFactors(
+export async function checkMFAFactors(
+  serviceUrl: string,
   session: Session,
   loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[],
@@ -190,29 +192,40 @@ export function checkMFAFactors(
 
     // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
+  } else if (
+    loginSettings?.mfaInitSkipLifetime &&
+    (loginSettings.mfaInitSkipLifetime.nanos > 0 ||
+      loginSettings.mfaInitSkipLifetime.seconds > 0) &&
+    !availableMultiFactors.length &&
+    session?.factors?.user?.id
+  ) {
+    const user = await getUserByID({
+      serviceUrl,
+      userId: session.factors?.user?.id,
+    });
+    if (
+      user.user?.type?.case === "human" &&
+      user.user?.type?.value.mfaInitSkipped
+    ) {
+    }
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+      force: "false", // this defines if the mfa is not forced in the settings and can be skipped
+      checkAfter: "true", // this defines if the check is directly made after the setup
+    });
+
+    if (requestId) {
+      params.append("requestId", requestId);
+    }
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        organization ?? (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    // TODO: provide a way to setup passkeys on mfa page?
+    return { redirect: `/mfa/set?` + params };
   }
-
-  // TODO: implement passkey setup
-
-  //  else if (
-  //   submitted.factors &&
-  //   !submitted.factors.webAuthN && // if session was not verified with a passkey
-  //   promptPasswordless && // if explicitly prompted due policy
-  //   !isAlternative // escaped if password was used as an alternative method
-  // ) {
-  //   const params = new URLSearchParams({
-  //     loginName: submitted.factors.user.loginName,
-  //     prompt: "true",
-  //   });
-
-  //   if (requestId) {
-  //     params.append("requestId", requestId);
-  //   }
-
-  //   if (organization) {
-  //     params.append("organization", organization);
-  //   }
-
-  //   return router.push(`/passkey/set?` + params);
-  // }
 }
