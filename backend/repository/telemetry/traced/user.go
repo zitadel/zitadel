@@ -3,7 +3,7 @@ package traced
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/backend/storage/repository"
+	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 

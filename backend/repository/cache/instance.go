@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/storage/cache"
-	"github.com/zitadel/zitadel/backend/storage/repository"
 )
 
 type Instance struct {

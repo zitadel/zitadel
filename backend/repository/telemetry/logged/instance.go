@@ -4,16 +4,17 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/zitadel/zitadel/backend/storage/repository"
+	"github.com/zitadel/zitadel/backend/repository"
+	"github.com/zitadel/zitadel/backend/telemetry/logging"
 )
 
 type Instance struct {
-	*slog.Logger
+	*logging.Logger
 
 	next repository.InstanceRepository
 }
 
-func NewInstance(logger *slog.Logger, next repository.InstanceRepository) *Instance {
+func NewInstance(logger *logging.Logger, next repository.InstanceRepository) *Instance {
 	return &Instance{Logger: logger, next: next}
 }
 

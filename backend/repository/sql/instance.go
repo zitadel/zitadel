@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/storage/database"
-	"github.com/zitadel/zitadel/backend/storage/repository"
 )
 
 func NewInstance(client database.QueryExecutor) repository.InstanceRepository {

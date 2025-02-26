@@ -3,8 +3,8 @@ package cache
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/storage/cache"
-	"github.com/zitadel/zitadel/backend/storage/repository"
 )
 
 type User struct {

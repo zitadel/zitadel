@@ -2,27 +2,27 @@ package domain
 
 import (
 	"context"
-	"log/slog"
 
+	"github.com/zitadel/zitadel/backend/repository"
+	"github.com/zitadel/zitadel/backend/repository/cache"
+	"github.com/zitadel/zitadel/backend/repository/event"
+	"github.com/zitadel/zitadel/backend/repository/sql"
+	"github.com/zitadel/zitadel/backend/repository/telemetry/logged"
+	"github.com/zitadel/zitadel/backend/repository/telemetry/traced"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/eventstore"
-	"github.com/zitadel/zitadel/backend/storage/repository"
-	"github.com/zitadel/zitadel/backend/storage/repository/cache"
-	"github.com/zitadel/zitadel/backend/storage/repository/event"
-	"github.com/zitadel/zitadel/backend/storage/repository/sql"
-	"github.com/zitadel/zitadel/backend/storage/repository/telemetry/logged"
-	"github.com/zitadel/zitadel/backend/storage/repository/telemetry/traced"
+	"github.com/zitadel/zitadel/backend/telemetry/logging"
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 
 type Instance struct {
 	db     database.Pool
 	tracer *tracing.Tracer
-	logger *slog.Logger
+	logger *logging.Logger
 	cache  *cache.Instance
 }
 
-func NewInstance(db database.Pool, tracer *tracing.Tracer, logger *slog.Logger) *Instance {
+func NewInstance(db database.Pool, tracer *tracing.Tracer, logger *logging.Logger) *Instance {
 	b := &Instance{
 		db:     db,
 		tracer: tracer,

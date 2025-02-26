@@ -1,13 +1,13 @@
 package domain
 
 import (
+	"github.com/zitadel/zitadel/backend/repository"
+	"github.com/zitadel/zitadel/backend/repository/event"
+	"github.com/zitadel/zitadel/backend/repository/sql"
+	"github.com/zitadel/zitadel/backend/repository/telemetry/logged"
+	"github.com/zitadel/zitadel/backend/repository/telemetry/traced"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/eventstore"
-	"github.com/zitadel/zitadel/backend/storage/repository"
-	"github.com/zitadel/zitadel/backend/storage/repository/event"
-	"github.com/zitadel/zitadel/backend/storage/repository/sql"
-	"github.com/zitadel/zitadel/backend/storage/repository/telemetry/logged"
-	"github.com/zitadel/zitadel/backend/storage/repository/telemetry/traced"
 )
 
 func (b *Instance) userCommandRepo(tx database.Transaction) repository.UserRepository {

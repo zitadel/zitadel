@@ -3,8 +3,8 @@ package event
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/storage/eventstore"
-	"github.com/zitadel/zitadel/backend/storage/repository"
 )
 
 var _ repository.UserRepository = (*User)(nil)
