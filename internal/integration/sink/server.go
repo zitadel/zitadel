@@ -15,6 +15,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	crewjam_saml "github.com/crewjam/saml"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -22,8 +23,6 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
-
-	crewjam_saml "github.com/crewjam/saml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -327,7 +326,7 @@ func successfulIntentHandler(cmd *command.Commands, createIntent func(ctx contex
 }
 
 func createIntent(ctx context.Context, cmd *command.Commands, instanceID, idpID string) (string, error) {
-	writeModel, _, err := cmd.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", instanceID)
+	writeModel, _, err := cmd.CreateIntent(ctx, "", idpID, "https://example.com/success", "https://example.com/failure", instanceID, nil)
 	if err != nil {
 		return "", err
 	}
