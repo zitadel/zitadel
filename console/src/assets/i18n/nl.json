@@ -809,6 +809,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefoonnummer",
       "PHONE_HINT": "Gebruik het + symbool gevolgd door de landcode, of selecteer het land uit de dropdown en voer ten slotte het telefoonnummer in",
+      "PHONE_VERIFIED": "Telefoonnummer geverifieerd",
+      "SEND_SMS": "Verificatie-SMS verzenden",
+      "SEND_EMAIL": "E-mail verzenden",
       "USERNAME": "Gebruikersnaam",
       "CHANGEUSERNAME": "wijzigen",
       "CHANGEUSERNAME_TITLE": "Gebruikersnaam wijzigen",
@@ -948,6 +951,14 @@
       "4": "Vergrendeld",
       "5": "Opgeschort",
       "6": "Initieel"
+    },
+    "STATEV2": {
+      "0": "Onbekend",
+      "1": "Actief",
+      "2": "Inactief",
+      "3": "Verwijderd",
+      "4": "Vergrendeld",
+      "5": "Initieel"
     },
     "SEARCH": {
       "ADDITIONAL": "Loginnaam (huidige organisatie)",
@@ -1484,7 +1495,9 @@
         "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
         "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
       },
-      "RESET": "Alles instellen op overgenomen"
+      "RESET": "Alles instellen op overgenomen",
+      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de console voor het aanmaken van gebruikers",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status."
     },
     "DIALOG": {
       "RESET": {
@@ -2207,7 +2220,9 @@
       "REMOVED": "Succesvol verwijderd."
     },
     "ISIDTOKENMAPPING": "Kaart van de ID token",
-    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt."
+    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
+    "USEPKCE": "Gebruik PKCE",
+    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
   },
   "MFA": {
     "LIST": {

@@ -289,6 +289,7 @@ func ldapConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.LDAPIDPTemplate
 			UserObjectClasses: template.UserObjectClasses,
 			UserFilters:       template.UserFilters,
 			Timeout:           timeout,
+			RootCa:            template.RootCA,
 			Attributes:        ldapAttributesToPb(template.LDAPAttributes),
 		},
 	}
