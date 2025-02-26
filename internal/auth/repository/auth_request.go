@@ -20,7 +20,7 @@ type AuthRequestRepository interface {
 	SetExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *domain.ExternalUser) error
 	SetLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error
 	SelectUser(ctx context.Context, authReqID, userID, userAgentID string) error
-	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
+	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string, idpArguments map[string]any) error
 	VerifyPassword(ctx context.Context, id, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) error
 
 	VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) error

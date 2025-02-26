@@ -129,6 +129,7 @@ func organizationToPb(organization *query.Org) *org.Organization {
 			Sequence:      organization.Sequence,
 			EventDate:     organization.ChangeDate,
 			ResourceOwner: organization.ResourceOwner,
+			CreationDate:  organization.CreationDate,
 		}),
 		State: orgStateToPb(organization.State),
 	}
