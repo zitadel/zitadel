@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { DestroyRef, Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddHumanUserRequestSchema,
@@ -11,7 +11,6 @@ import {
   DeactivateUserResponse,
   DeleteUserRequestSchema,
   DeleteUserResponse,
-  GetUserByIDRequestSchema,
   GetUserByIDResponse,
   ListAuthenticationFactorsRequestSchema,
   ListAuthenticationFactorsResponse,
@@ -65,60 +64,87 @@ import {
 } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { create } from '@bufbuild/protobuf';
 import { Timestamp as TimestampV2, TimestampSchema } from '@bufbuild/protobuf/wkt';
-import { Details, DetailsSchema, ListQuerySchema } from '@zitadel/proto/zitadel/object/v2/object_pb';
-import { SearchQuery, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
-import { SortDirection } from '@angular/material/sort';
+import { Details, DetailsSchema } from '@zitadel/proto/zitadel/object/v2/object_pb';
 import { Human, Machine, Phone, Profile, User } from '../proto/generated/zitadel/user_pb';
 import { ObjectDetails } from '../proto/generated/zitadel/object_pb';
 import { Timestamp } from '../proto/generated/google/protobuf/timestamp_pb';
 import { HumanPhone, HumanPhoneSchema } from '@zitadel/proto/zitadel/user/v2/phone_pb';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { firstValueFrom, Observable, shareReplay } from 'rxjs';
+import { filter, map, startWith, tap, timeout } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private readonly grpcService: GrpcService) {}
+  private readonly userId$: Observable<string>;
+  private user: UserV2 | undefined;
+
+  constructor(
+    private readonly grpcService: GrpcService,
+    private readonly oauthService: OAuthService,
+    destroyRef: DestroyRef,
+  ) {
+    this.userId$ = this.getUserId().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+
+    // this preloads the userId and deletes the cache everytime the userId changes
+    this.userId$.pipe(takeUntilDestroyed(destroyRef)).subscribe(async () => {
+      this.user = undefined;
+      try {
+        await this.getMyUser();
+      } catch (error) {
+        console.warn(error);
+      }
+    });
+  }
+
+  private getUserId() {
+    return this.oauthService.events.pipe(
+      filter((event) => event.type === 'token_received'),
+      startWith(this.oauthService.getIdToken),
+      map(() => this.oauthService.getIdToken()),
+      filter(Boolean),
+      // split jwt and get base64 encoded payload
+      map((token) => token.split('.')[1]),
+      // decode payload
+      map(atob),
+      // parse payload
+      map((payload) => JSON.parse(payload)),
+      map((payload: unknown) => {
+        // check if sub is in payload and is a string
+        if (payload && typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string') {
+          return payload.sub;
+        }
+        throw new Error('Invalid payload');
+      }),
+    );
+  }
 
   public addHumanUser(req: MessageInitShape<typeof AddHumanUserRequestSchema>): Promise<AddHumanUserResponse> {
     return this.grpcService.userNew.addHumanUser(create(AddHumanUserRequestSchema, req));
   }
 
-  public listUsers(
-    limit: number,
-    offset: number,
-    queriesList?: SearchQuery[],
-    sortingColumn?: UserFieldName,
-    sortingDirection?: SortDirection,
-  ): Promise<ListUsersResponse> {
-    const query = create(ListQuerySchema);
-
-    if (limit) {
-      query.limit = limit;
-    }
-    if (offset) {
-      query.offset = BigInt(offset);
-    }
-    if (sortingDirection) {
-      query.asc = sortingDirection === 'asc';
-    }
-
-    const req = create(ListUsersRequestSchema, {
-      query,
-    });
-
-    if (sortingColumn) {
-      req.sortingColumn = sortingColumn;
-    }
-
-    if (queriesList) {
-      req.queries = queriesList;
-    }
-
+  public listUsers(req: MessageInitShape<typeof ListUsersRequestSchema>): Promise<ListUsersResponse> {
     return this.grpcService.userNew.listUsers(req);
   }
 
+  public async getMyUser(): Promise<UserV2> {
+    const userId = await firstValueFrom(this.userId$.pipe(timeout(2000)));
+    if (this.user) {
+      return this.user;
+    }
+    const resp = await this.getUserById(userId);
+    if (!resp.user) {
+      throw new Error("Couldn't find user");
+    }
+
+    this.user = resp.user;
+    return resp.user;
+  }
+
   public getUserById(userId: string): Promise<GetUserByIDResponse> {
-    return this.grpcService.userNew.getUserByID(create(GetUserByIDRequestSchema, { userId }));
+    return this.grpcService.userNew.getUserByID({ userId });
   }
 
   public deactivateUser(userId: string): Promise<DeactivateUserResponse> {
