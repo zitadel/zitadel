@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Další
   CancelButtonText: Zrušit
 
+InviteUser:
+  Title: Aktivace uživatele
+  Description: Ověřte svůj e-mail pomocí níže uvedeného kódu a nastavte si heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirm: Potvrďte heslo
+  NextButtonText: Další
+  ResendButtonText: Odeslat kód znovu
+
 InitMFAPrompt:
   Title: Nastavení 2-faktorové autentizace
   Description: 2-faktorová autentizace vám poskytuje další zabezpečení pro váš uživatelský účet. Tím je zajištěno, že k vašemu účtu máte přístup pouze vy.
@@ -253,6 +262,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -293,6 +305,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -367,6 +382,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:
@@ -487,6 +505,10 @@ Errors:
       CreationNotAllowed: Vytvoření nového uživatele není na tomto poskytovateli povoleno
       LinkingNotAllowed: Propojení uživatele není na tomto poskytovateli povoleno
       NoOptionAllowed:   Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
+      LoginFailedSwitchLocal: |
+        Přihlášení u externího poskytovatele identit selhalo. Vracíme se k místnímu přihlášení.
+
+        Podrobnosti o chybě: {{.Details}}
     GrantRequired: Přihlášení není možné. Uživatel musí mít alespoň jeden oprávnění na aplikaci. Prosím, kontaktujte svého správce.
     ProjectRequired: Přihlášení není možné. Organizace uživatele musí být přidělena k projektu. Prosím, kontaktujte svého správce.
   IdentityProvider:

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -16,6 +17,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -25,7 +28,11 @@ import (
 )
 
 const (
-	LoginClientHeader = "x-zitadel-login-client"
+	LoginClientHeader            = "x-zitadel-login-client"
+	LoginPostLogoutRedirectParam = "post_logout_redirect"
+	LoginPath                    = "/login"
+	LogoutPath                   = "/logout"
+	LogoutDonePath               = "/logout/done"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -35,12 +42,36 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 		span.EndWithError(err)
 	}()
 
+	// for backwards compatibility we pass the login client if set
 	headers, _ := http_utils.HeadersFromCtx(ctx)
-	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
+	loginClient := headers.Get(LoginClientHeader)
+
+	// for backwards compatibility we'll use the new login if the header is set (no matter the other configs)
+	if loginClient != "" {
 		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
 	}
 
-	return o.createAuthRequest(ctx, req, userID)
+	// if the instance requires the v2 login, use it no matter what the application configured
+	if authz.GetFeatures(ctx).LoginV2.Required {
+		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
+	}
+
+	version, err := o.query.OIDCClientLoginVersion(ctx, req.ClientID)
+	if err != nil {
+		return nil, err
+	}
+
+	switch version {
+	case domain.LoginVersion1:
+		return o.createAuthRequest(ctx, req, userID)
+	case domain.LoginVersion2:
+		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
+	case domain.LoginVersionUnspecified:
+		fallthrough
+	default:
+		// since we already checked for a login header, we can fall back to the v1 login
+		return o.createAuthRequest(ctx, req, userID)
+	}
 }
 
 func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, err error) {
@@ -214,18 +245,18 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 		logging.Error("no user agent id")
 		return zerrors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
-	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
+	sessions, err := o.repo.UserSessionsByAgentID(ctx, userAgentID)
 	if err != nil {
 		logging.WithError(err).Error("error retrieving user sessions")
 		return err
 	}
-	if len(userIDs) == 0 {
+	if len(sessions) == 0 {
 		return nil
 	}
 	data := authz.CtxData{
 		UserID: userID,
 	}
-	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, userIDs)
+	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, sessions)
 	logging.OnError(err).Error("error signing out")
 	return err
 }
@@ -239,23 +270,92 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 
 	// check for the login client header
 	headers, _ := http_utils.HeadersFromCtx(ctx)
-	// in case there is no id_token_hint, redirect to the UI and let it decide which session to terminate
-	if headers.Get(LoginClientHeader) != "" && endSessionRequest.IDTokenHintClaims == nil {
-		return o.defaultLogoutURLV2 + endSessionRequest.RedirectURI, nil
+
+	// V2:
+	// In case there is no id_token_hint and login V2 is either required by feature
+	// or requested via header (backwards compatibility),
+	// we'll redirect to the UI (V2) and let it decide which session to terminate
+	//
+	// If there's no id_token_hint and for v1 logins, we handle them separately
+	if endSessionRequest.IDTokenHintClaims == nil &&
+		(authz.GetFeatures(ctx).LoginV2.Required || headers.Get(LoginClientHeader) != "") {
+		redirectURI := v2PostLogoutRedirectURI(endSessionRequest.RedirectURI)
+		// if no base uri is set, fallback to the default configured in the runtime config
+		if authz.GetFeatures(ctx).LoginV2.BaseURI == nil || authz.GetFeatures(ctx).LoginV2.BaseURI.String() == "" {
+			return o.defaultLogoutURLV2 + redirectURI, nil
+		}
+		return buildLoginV2LogoutURL(authz.GetFeatures(ctx).LoginV2.BaseURI, redirectURI), nil
 	}
 
-	// If there is no login client header and no id_token_hint or the id_token_hint does not have a session ID,
-	// do a v1 Terminate session.
+	// V1:
+	// We check again for the id_token_hint param and if a session is set in it.
+	// All explicit V2 sessions with empty id_token_hint are handled above and all V2 session contain a sessionID
+	// So if any condition is not met, we handle the request as a V1 request and do a (v1) TerminateSession,
+	// which terminates all sessions of the user agent, identified by cookie.
 	if endSessionRequest.IDTokenHintClaims == nil || endSessionRequest.IDTokenHintClaims.SessionID == "" {
 		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
 	}
 
-	// terminate the v2 session of the id_token_hint
+	// V1:
+	// If the sessionID is prefixed by V1, we also terminate a v1 session, but based on the SingleV1SessionTermination feature flag,
+	// we either terminate all sessions of the user agent or only the specific session
+	if strings.HasPrefix(endSessionRequest.IDTokenHintClaims.SessionID, handler.IDPrefixV1) {
+		err = o.terminateV1Session(ctx, endSessionRequest.UserID, endSessionRequest.IDTokenHintClaims.SessionID)
+		if err != nil {
+			return "", err
+		}
+		return endSessionRequest.RedirectURI, nil
+	}
+
+	// V2:
+	// Terminate the v2 session of the id_token_hint
 	_, err = o.command.TerminateSessionWithoutTokenCheck(ctx, endSessionRequest.IDTokenHintClaims.SessionID)
 	if err != nil {
 		return "", err
 	}
-	return endSessionRequest.RedirectURI, nil
+	return v2PostLogoutRedirectURI(endSessionRequest.RedirectURI), nil
+}
+
+func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI string) string {
+	baseURI.JoinPath(LogoutPath)
+	q := baseURI.Query()
+	q.Set(LoginPostLogoutRedirectParam, redirectURI)
+	baseURI.RawQuery = q.Encode()
+	return baseURI.String()
+}
+
+// v2PostLogoutRedirectURI will take care that the post_logout_redirect_uri is correctly set for v2 logins.
+// The default value set by the [op.SessionEnder] only handles V1 logins. In case the redirect_uri is set to the default
+// we'll return the path for the v2 login.
+func v2PostLogoutRedirectURI(redirectURI string) string {
+	if redirectURI != login.DefaultLoggedOutPath {
+		return redirectURI
+	}
+	return LogoutDonePath
+}
+
+// terminateV1Session terminates "v1" sessions created through the login UI.
+// Depending on the flag, we either terminate a single session or all of the user agent
+func (o *OPStorage) terminateV1Session(ctx context.Context, userID, sessionID string) error {
+	ctx = authz.SetCtxData(ctx, authz.CtxData{UserID: userID})
+	// if the flag is active we only terminate the specific session
+	if authz.GetFeatures(ctx).OIDCSingleV1SessionTermination {
+		userAgentID, err := o.repo.UserAgentIDBySessionID(ctx, sessionID)
+		if err != nil {
+			return err
+		}
+		return o.command.HumansSignOut(ctx, userAgentID, []command.HumanSignOutSession{{ID: sessionID, UserID: userID}})
+	}
+	// otherwise we search for all active sessions within the same user agent of the current session id
+	userAgentID, sessions, err := o.repo.ActiveUserSessionsBySessionID(ctx, sessionID)
+	if err != nil {
+		logging.WithError(err).Error("error retrieving user sessions")
+		return err
+	}
+	if len(sessions) == 0 {
+		return nil
+	}
+	return o.command.HumansSignOut(ctx, userAgentID, sessions)
 }
 
 func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) (err *oidc.Error) {
@@ -554,6 +654,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		authReq.UserID,
 		authReq.UserOrgID,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		authReq.Audience,
 		authReq.AuthMethods(),
@@ -564,6 +665,8 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		domain.TokenReasonAuthRequest,
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		authReq.SessionID,
+		authReq.oidc().ResponseType,
 	)
 	if err != nil {
 		op.AuthRequestError(w, r, authReq, err, authorizer)

@@ -543,12 +543,23 @@ Errors:
     AlreadyExists: Auth Request existe déjà
     NotExisting: Auth Request n'existe pas
     WrongLoginClient: Auth Request créé par un autre client de connexion
+    AlreadyHandled: Auth Request a déjà été traitée
   OIDCSession:
     RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
     Token:
       Invalid: Le jeton n'est pas valide
       Expired: Le jeton est expiré
     InvalidClient: Le token n'a pas été émis pour ce client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest existe déjà
+    NotExisting: SAMLRequest n'existe pas
+    WrongLoginClient: SAMLRequest créé par un autre client de connexion
+    AlreadyHandled: SAMLRequest a déjà été traitée
+  SAMLSession:
+    InvalidClient: SAMLResponse n'a pas été émise pour ce client
+  DeviceAuth:
+    NotFound: La demande d'autorisation de l'appareil n'existe pas
+    AlreadyHandled: La demande d'autorisation de l'appareil a déjà été traitée
   Feature:
     NotExisting: La fonctionnalité n'existe pas
     TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge
@@ -623,6 +634,8 @@ AggregateTypes:
   system: Système
   session: Session
   web_key: Clé Web
+  saml_request: Requête SAML
+  saml_session: Session SAML
 
 EventTypes:
   execution:
@@ -685,6 +698,13 @@ EventTypes:
         check:
           succeeded: Vérification de l'initialisation réussie
           failed: La vérification de l'initialisation a échoué
+      invite:
+        code:
+          added: Code d'invitation généré
+          sent: Code d'invitation envoyé
+        check:
+          succeeded: Vérification de l'invitation réussie
+          failed: Vérification de l'invitation échouée
       username:
         reserved: Nom d'utilisateur réservé
         released: Nom d'utilisateur libéré

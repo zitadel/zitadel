@@ -197,7 +197,8 @@
           "VE": "当用户更改其电子邮件地址时，他们将收到一封带有验证新地址链接的电子邮件。",
           "VP": "当用户更改其电话号码时，他们将收到一条带有验证新号码的代码的短信。",
           "VEO": "当用户通过电子邮件方式添加一次性密码时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
-          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。"
+          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。",
+          "IU": "当创建用户邀请代码时，他们将收到一封包含设置其身份验证方法的链接的电子邮件。"
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
       "PHONE_HINT": "使用+号，后跟呼叫者的国家/地区代码，或从下拉列表中选择国家/地区，最后输入电话号码",
+      "PHONE_VERIFIED": "电话号码已验证",
+      "SEND_SMS": "发送验证短信",
+      "SEND_EMAIL": "发送电子邮件",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -947,6 +951,14 @@
       "4": "已锁定",
       "5": "已暂停",
       "6": "初始化"
+    },
+    "STATEV2": {
+      "0": "未知",
+      "1": "启用",
+      "2": "停用",
+      "3": "已删除",
+      "4": "已锁定",
+      "5": "初始化"
     },
     "SEARCH": {
       "ADDITIONAL": "登录名 (当前组织)",
@@ -1381,7 +1393,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1418,6 +1433,8 @@
         "SID": "Sid",
         "TOKEN": "令牌",
         "SENDERNUMBER": "发件人号码",
+        "VERIFYSERVICESID": "验证服务 SID",
+        "VERIFYSERVICESID_DESCRIPTION": "设置验证服务 SID，允许使用 Twilio 验证服务而不是消息服务来验证电话号码和 OTP SMS。",
         "ADDED": "Twilio 添加成功。",
         "UPDATED": "Twilio 更新成功。",
         "REMOVED": "Twilio 已删除",
@@ -1468,6 +1485,8 @@
       "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
       "ACTIONS": "操作",
       "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 终止会话",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",
@@ -1478,7 +1497,9 @@
         "ENABLED": "“已启用” 是继承的",
         "DISABLED": "“已禁用” 是继承的"
       },
-      "RESET": "全部设置为继承"
+      "RESET": "全部设置为继承",
+      "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。"
     },
     "DIALOG": {
       "RESET": {
@@ -1612,7 +1633,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1662,7 +1685,8 @@
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "无密码身份验证",
-        "PC": "修改密码"
+        "PC": "修改密码",
+        "IU": "邀请用户"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1682,7 +1706,8 @@
         "tempUsername": "临时用户名",
         "otp": "一次性密码",
         "verifyUrl": "验证一次性密码的URL",
-        "expiry": "过期时间"
+        "expiry": "过期时间",
+        "applicationName": "应用程序名称"
       },
       "TOAST": {
         "UPDATED": "自定义文本已保存。"
@@ -1710,8 +1735,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "允许使用用户名和密码进行登录。",
       "ALLOWEXTERNALIDP_DESC": "允许外部身份提供者进行登录",
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
-      "FORCEMFA": "强制使用 MFA",
-      "FORCEMFALOCALONLY": "对本地用户强制执行 MFA",
+      "FORCEMFA": "强制所有用户使用 MFA",
+      "FORCEMFALOCALONLY": "仅强制本地认证用户使用 MFA",
       "FORCEMFALOCALONLY_DESC": "如果选择该选项，本地经过身份验证的用户必须配置第二个登录因素。",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
@@ -2179,7 +2204,9 @@
       "REMOVED": "成功删除。"
     },
     "ISIDTOKENMAPPING": "从ID令牌映射",
-    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。"
+    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。",
+    "USEPKCE": "使用PKCE",
+    "USEPKCE_DESC": "确定 auth 请求中是否包含 code_challenge 和 code_challenge_method 参数"
   },
   "MFA": {
     "LIST": {
@@ -2529,6 +2556,10 @@
       "CLIENTSECRETREGENERATED": "客户端秘钥已生成。",
       "DELETED": "应用已删除。",
       "CONFIGCHANGED": "检测到变化！"
+    },
+    "LOGINV2": {
+      "USEV2": "使用新的登录UI",
+      "BASEURL": "新的登录UI的自定义基本URL"
     }
   },
   "GENDERS": {
@@ -2552,7 +2583,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "添加管理者",

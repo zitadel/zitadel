@@ -2,6 +2,7 @@ package login
 
 import (
 	"encoding/base64"
+	"errors"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -22,13 +23,15 @@ type passwordlessFormData struct {
 }
 
 func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, passwordSet bool, err error) {
-	var errID, errMessage, credentialData string
+	var credentialData string
 	var webAuthNLogin *domain.WebAuthNLogin
-	if err == nil {
-		webAuthNLogin, err = l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID)
-	}
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
+	if err == nil || errors.Is(err, &IdPError{}) { // make sure we still proceed with the webauthn login even if the idp login failed
+		var creationErr error
+		webAuthNLogin, creationErr = l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID)
+		// and only overwrite the error if the webauthn creation failed
+		if creationErr != nil {
+			err = creationErr
+		}
 	}
 	if webAuthNLogin != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData)
@@ -39,7 +42,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &passwordlessData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, translator, "Passwordless.Title", "Passwordless.Description", errID, errMessage),
+			userData:               l.getUserData(r, authReq, translator, "Passwordless.Title", "Passwordless.Description", err),
 			CredentialCreationData: credentialData,
 		},
 		passwordSet,

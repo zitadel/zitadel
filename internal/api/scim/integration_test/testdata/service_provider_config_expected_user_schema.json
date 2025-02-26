@@ -1,0 +1,591 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:Schema"
+  ],
+  "meta": {
+    "resourceType": "Schema",
+    "location": "http://{domain}:8080/scim/v2/{orgId}/Schemas/urn:ietf:params:scim:schemas:core:2.0:User"
+  },
+  "id": "urn:ietf:params:scim:schemas:core:2.0:User",
+  "name": "User",
+  "description": "User Account",
+  "attributes": [
+    {
+      "name": "externalId",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "userName",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": true,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "server"
+    },
+    {
+      "name": "name",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "formatted",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "familyName",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": true,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "givenName",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": true,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "middleName",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "honorificPrefix",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "honorificSuffix",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": false,
+      "required": true,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "displayName",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "nickName",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "profileUrl",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "title",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "preferredLanguage",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "locale",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "timezone",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "active",
+      "description": "For details see RFC7643",
+      "type": "boolean",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "emails",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "value",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": true,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "primary",
+          "description": "For details see RFC7643",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": true,
+      "required": true,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "phoneNumbers",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "value",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "primary",
+          "description": "For details see RFC7643",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": true,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "password",
+      "description": "For details see RFC7643",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": true,
+      "mutability": "writeOnly",
+      "returned": "never",
+      "uniqueness": "none"
+    },
+    {
+      "name": "ims",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "value",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "type",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": true,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "addresses",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "type",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "streetAddress",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "locality",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "region",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "postalCode",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "country",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "formatted",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "primary",
+          "description": "For details see RFC7643",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": true,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "photos",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "value",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "display",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "type",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "primary",
+          "description": "For details see RFC7643",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": true,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "entitlements",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "value",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "display",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "type",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "primary",
+          "description": "For details see RFC7643",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": true,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    },
+    {
+      "name": "roles",
+      "description": "For details see RFC7643",
+      "type": "complex",
+      "subAttributes": [
+        {
+          "name": "value",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "display",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "type",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        },
+        {
+          "name": "primary",
+          "description": "For details see RFC7643",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
+        }
+      ],
+      "multiValued": true,
+      "required": false,
+      "caseExact": true,
+      "mutability": "readWrite",
+      "returned": "always",
+      "uniqueness": "none"
+    }
+  ]
+}

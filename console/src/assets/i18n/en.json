@@ -37,7 +37,7 @@
       "DESCRIPTION": "A project hosts one or more applications, that you can use to authenticate your users. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the projects owner or someone with the corresponding rights to gain access.",
       "OWNED": {
         "TITLE": "Owned Projects",
-        "DESCRIPTION": "These are the projects you own. You can manage theses projects settings, authorizations and applications."
+        "DESCRIPTION": "These are the projects you own. You can manage these project settings, authorizations and applications."
       },
       "GRANTED": {
         "TITLE": "Granted Projects",
@@ -197,7 +197,8 @@
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
           "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number."
+          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
         }
       },
       "LOGIN_TEXTS": {
@@ -235,11 +236,11 @@
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "External Login Check",
-            "DESCRIPTION": "Your users are redirected to their external identity proviers in theses periods."
+            "DESCRIPTION": "Your users are redirected to their external identity providers after this periods."
           },
           "MULTI_FACTOR_INIT": {
             "TITLE": "Multifactor Init Check",
-            "DESCRIPTION": "Your users will be prompted to set up a second factor or a Multifactor in these periods, if they haven't done so already. A lifetime of 0 deactivates this prompt."
+            "DESCRIPTION": "Your users will be prompted to set up a second factor or a Multifactor after this periods if they haven't done so already. A lifetime of 0 deactivates this prompt."
           },
           "SECOND_FACTOR_CHECK": {
             "TITLE": "Second Factor Check",
@@ -759,7 +760,7 @@
         "3": "Deleted"
       },
       "DIALOG": {
-        "MFA_DELETE_TITLE": "Remove Secondfactor",
+        "MFA_DELETE_TITLE": "Remove Second factor",
         "MFA_DELETE_DESCRIPTION": "You are about to delete a second factor. Are you sure?",
         "ADD_MFA_TITLE": "Add Second Factor",
         "ADD_MFA_DESCRIPTION": "Select one of the following options."
@@ -772,9 +773,9 @@
       "IDPNAME": "IDP Name",
       "USERDISPLAYNAME": "External Name",
       "EXTERNALUSERID": "External User ID",
-      "EMPTY": "No external IDP found",
+      "EMPTY": "No external IdP found",
       "DIALOG": {
-        "DELETE_TITLE": "Remove IDP",
+        "DELETE_TITLE": "Remove IdP",
         "DELETE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
       }
     },
@@ -808,6 +809,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
       "PHONE_HINT": "Use the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
+      "PHONE_VERIFIED": "Phone Number Verified",
+      "SEND_SMS": "Send Verification SMS",
+      "SEND_EMAIL": "Send E-Mail",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
@@ -947,6 +951,14 @@
       "4": "Locked",
       "5": "Suspended",
       "6": "Initial"
+    },
+    "STATEV2": {
+      "0": "Unknown",
+      "1": "Active",
+      "2": "Inactive",
+      "3": "Deleted",
+      "4": "Locked",
+      "5": "Initial"
     },
     "SEARCH": {
       "ADDITIONAL": "Loginname (current organization)",
@@ -1381,7 +1393,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1418,6 +1433,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
+        "VERIFYSERVICESID": "Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Setting a Verification Service Sid, allows using the Twilio Verify Service instead of the Messages Service for verification of phone numbers and OTP SMS",
         "ADDED": "Twilio added successfully.",
         "UPDATED": "Twilio updated successfully.",
         "REMOVED": "Twilio removed",
@@ -1468,6 +1485,8 @@
       "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features.",
       "ACTIONS": "Actions",
       "ACTIONS_DESCRIPTION": "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session Termination",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.",
       "STATES": {
         "INHERITED": "Inherit",
         "ENABLED": "Enabled",
@@ -1478,7 +1497,9 @@
         "ENABLED": "\"Enabled\" is inherited",
         "DISABLED": "\"Disabled\" is inherited"
       },
-      "RESET": "Set all to inherit"
+      "RESET": "Set all to inherit",
+      "CONSOLEUSEV2USERAPI": "Use V2 Api in Console for User creation",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state."
     },
     "DIALOG": {
       "RESET": {
@@ -1613,7 +1634,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1663,7 +1686,8 @@
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passwordless",
-        "PC": "Password Change"
+        "PC": "Password Change",
+        "IU": "Invite User"
       },
       "CHIPS": {
         "firstname": "Given name",
@@ -1682,8 +1706,9 @@
         "username": "Username",
         "tempUsername": "Temp username",
         "otp": "One-time password",
-        "verifyUrl": "Verify One-time-password URL",
-        "expiry": "Expiry"
+        "verifyUrl": "Verify One-time password URL",
+        "expiry": "Expiry",
+        "applicationName": "Application name"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."
@@ -1711,8 +1736,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
-      "FORCEMFA": "Force MFA",
-      "FORCEMFALOCALONLY": "Force MFA for local authenticated users",
+      "FORCEMFA": "Force MFA for all users",
+      "FORCEMFALOCALONLY": "Force MFA for local authenticated users only",
       "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login.",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
@@ -2144,7 +2169,7 @@
     "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
     "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
     "PROFILEATTRIBUTE": "Profile attribute",
-    "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
+    "IDPDISPLAYNAMMAPPING": "IdP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",
     "CREATIONDATE": "Created At",
@@ -2152,13 +2177,13 @@
     "DEACTIVATE": "Deactivate",
     "ACTIVATE": "Activate",
     "DELETE": "Delete",
-    "DELETE_TITLE": "Delete IDP",
+    "DELETE_TITLE": "Delete IdP",
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "REMOVE_WARN_TITLE": "Remove IDP",
-    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IDP for your users and already registered users won't be able to login again. Are you sure to continue?",
-    "DELETE_SELECTION_TITLE": "Delete IDP",
+    "REMOVE_WARN_TITLE": "Remove IdP",
+    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
+    "DELETE_SELECTION_TITLE": "Delete IdP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "EMPTY": "No IDP available",
+    "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",
       "TITLE": "OIDC Configuration",
@@ -2200,7 +2225,9 @@
       "REMOVED": "Removed successfully."
     },
     "ISIDTOKENMAPPING": "Map from the ID token",
-    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint.",
+    "USEPKCE": "Use PKCE",
+    "USEPKCE_DESC": "Determines whether the code_challenge and code_challenge_method params are included in the auth request"
   },
   "MFA": {
     "LIST": {
@@ -2554,6 +2581,10 @@
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",
       "CONFIGCHANGED": "Changes detected!"
+    },
+    "LOGINV2": {
+      "USEV2": "Use new Login UI",
+      "BASEURL": "Custom base URL for the new Login UI"
     }
   },
   "GENDERS": {
@@ -2577,7 +2608,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

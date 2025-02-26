@@ -35,7 +35,7 @@ func (s *Server) SearchUserSchemas(ctx context.Context, req *schema.SearchUserSc
 	}, nil
 }
 
-func (s *Server) GetUserSchemaByID(ctx context.Context, req *schema.GetUserSchemaByIDRequest) (*schema.GetUserSchemaByIDResponse, error) {
+func (s *Server) GetUserSchema(ctx context.Context, req *schema.GetUserSchemaRequest) (*schema.GetUserSchemaResponse, error) {
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
@@ -47,8 +47,8 @@ func (s *Server) GetUserSchemaByID(ctx context.Context, req *schema.GetUserSchem
 	if err != nil {
 		return nil, err
 	}
-	return &schema.GetUserSchemaByIDResponse{
-		Schema: userSchema,
+	return &schema.GetUserSchemaResponse{
+		UserSchema: userSchema,
 	}, nil
 }
 
@@ -94,8 +94,8 @@ func userSchemaFieldNameToSortingColumn(field *schema.FieldName) query.Column {
 	}
 }
 
-func userSchemasToPb(schemas []*query.UserSchema) (_ []*schema.UserSchema, err error) {
-	userSchemas := make([]*schema.UserSchema, len(schemas))
+func userSchemasToPb(schemas []*query.UserSchema) (_ []*schema.GetUserSchema, err error) {
+	userSchemas := make([]*schema.GetUserSchema, len(schemas))
 	for i, userSchema := range schemas {
 		userSchemas[i], err = userSchemaToPb(userSchema)
 		if err != nil {
@@ -105,18 +105,22 @@ func userSchemasToPb(schemas []*query.UserSchema) (_ []*schema.UserSchema, err e
 	return userSchemas, nil
 }
 
-func userSchemaToPb(userSchema *query.UserSchema) (*schema.UserSchema, error) {
+func userSchemaToPb(userSchema *query.UserSchema) (*schema.GetUserSchema, error) {
 	s := new(structpb.Struct)
 	if err := s.UnmarshalJSON(userSchema.Schema); err != nil {
 		return nil, err
 	}
-	return &schema.UserSchema{
-		Details:                resource_object.DomainToDetailsPb(&userSchema.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, userSchema.ResourceOwner),
-		Type:                   userSchema.Type,
-		State:                  userSchemaStateToPb(userSchema.State),
-		Revision:               userSchema.Revision,
-		Schema:                 s,
-		PossibleAuthenticators: authenticatorTypesToPb(userSchema.PossibleAuthenticators),
+	return &schema.GetUserSchema{
+		Details: resource_object.DomainToDetailsPb(&userSchema.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, userSchema.ResourceOwner),
+		Config: &schema.UserSchema{
+			Type: userSchema.Type,
+			DataType: &schema.UserSchema_Schema{
+				Schema: s,
+			},
+			PossibleAuthenticators: authenticatorTypesToPb(userSchema.PossibleAuthenticators),
+		},
+		State:    userSchemaStateToPb(userSchema.State),
+		Revision: userSchema.Revision,
 	}, nil
 }
 

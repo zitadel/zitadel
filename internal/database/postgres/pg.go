@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
@@ -72,15 +73,45 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	return connector, nil
 }
 
-func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
+func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
+	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
+
+	config, err := pgxpool.ParseConfig(c.String(useAdmin))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
-	if err != nil {
-		return nil, err
+	if len(connConfig.AfterConnect) > 0 {
+		config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			for _, f := range connConfig.AfterConnect {
+				if err := f(ctx, conn); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}
+
+	if len(connConfig.BeforeAcquire) > 0 {
+		config.BeforeAcquire = func(ctx context.Context, conn *pgx.Conn) bool {
+			for _, f := range connConfig.BeforeAcquire {
+				if err := f(ctx, conn); err != nil {
+					return false
+				}
+			}
+			return true
+		}
+	}
+
+	if len(connConfig.AfterRelease) > 0 {
+		config.AfterRelease = func(conn *pgx.Conn) bool {
+			for _, f := range connConfig.AfterRelease {
+				if err := f(conn); err != nil {
+					return false
+				}
+			}
+			return true
+		}
 	}
 
 	if connConfig.MaxOpenConns != 0 {
@@ -95,14 +126,14 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 		config,
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := pool.Ping(context.Background()); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return stdlib.OpenDBFromPool(pool), nil
+	return stdlib.OpenDBFromPool(pool), pool, nil
 }
 
 func (c *Config) DatabaseName() string {
@@ -167,7 +198,7 @@ func (s *Config) checkSSL(user User) {
 	}
 }
 
-func (c Config) String(useAdmin bool, appName string) string {
+func (c Config) String(useAdmin bool) string {
 	user := c.User
 	if useAdmin {
 		user = c.Admin.User
@@ -177,7 +208,7 @@ func (c Config) String(useAdmin bool, appName string) string {
 		"host=" + c.Host,
 		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + user.Username,
-		"application_name=" + appName,
+		"application_name=" + dialect.DefaultAppName,
 		"sslmode=" + user.SSL.Mode,
 	}
 	if c.Options != "" {

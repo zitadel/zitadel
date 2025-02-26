@@ -168,7 +168,7 @@ service UserService {
 
   // Search Users
   //
-  // Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination..
+  // Search for users. By default, we will return all users of your instance that you have permission to read. Make sure to include a limit and sorting for pagination.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
       post: "/v2/users"
@@ -252,9 +252,34 @@ service UserService {
     };
   }
 
+  // Send code to verify user email
+  //
+  // Send code to verify user email.
+  rpc SendEmailCode (SendEmailCodeRequest) returns (SendEmailCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/email/send"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   // Verify the email
   //
-  // Verify the email with the generated code..
+  // Verify the email with the generated code.
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/verify"
@@ -385,6 +410,7 @@ service UserService {
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
       put: "/v2/users/human/{user_id}"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -770,7 +796,7 @@ service UserService {
 
   // Remove TOTP generator from a user
   //
-  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward..
+  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second factor afterward.
   rpc RemoveTOTP (RemoveTOTPRequest) returns (RemoveTOTPResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/totp"
@@ -793,7 +819,7 @@ service UserService {
 
   // Add OTP SMS for a user
   //
-  // Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
+  // Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_sms"
@@ -815,9 +841,9 @@ service UserService {
     };
   }
 
-  // Remove One-Time-Password (OTP) SMS from a user
+  // Remove One-Time Password (OTP) SMS from a user
   //
-  // Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward..
+  // Remove the configured One-Time Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
   rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/otp_sms"
@@ -840,7 +866,7 @@ service UserService {
 
   // Add OTP Email for a user
   //
-  // Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
+  // Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_email"
@@ -862,9 +888,9 @@ service UserService {
     };
   }
 
-  // Remove One-Time-Password (OTP) Email from a user
+  // Remove One-Time Password (OTP) Email from a user
   //
-  // Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward..
+  // Remove the configured One-Time Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
   rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/otp_email"
@@ -1083,6 +1109,129 @@ service UserService {
       };
     };
   }
+
+  rpc ListAuthenticationFactors(ListAuthenticationFactorsRequest) returns (ListAuthenticationFactorsResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/authentication_factors/_search"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+
+  }
+
+  // Create an invite code for a user
+  //
+  // Create an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
+  rpc CreateInviteCode (CreateInviteCodeRequest) returns (CreateInviteCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/invite_code"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Resend an invite code for a user
+  //
+  // Resend an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
+  // A resend is only possible if a code has been created previously and sent to the user. If there is no code or it was directly returned, an error will be returned.
+  rpc ResendInviteCode (ResendInviteCodeRequest) returns (ResendInviteCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/invite_code/resend"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Verify an invite code for a user
+  //
+  // Verify the invite code of a user previously issued. This will set their email to a verified state and
+  // allow the user to set up their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
+  rpc VerifyInviteCode (VerifyInviteCodeRequest) returns (VerifyInviteCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/invite_code/verify"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // MFA Init Skipped
+  //
+  // Update the last time the user has skipped MFA initialization. The server timestamp is used.
+  rpc HumanMFAInitSkipped(HumanMFAInitSkippedRequest) returns (HumanMFAInitSkippedResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/mfa_init_skipped"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
 }
 
 message AddHumanUserRequest{
@@ -1229,6 +1378,29 @@ message ResendEmailCodeRequest{
 }
 
 message ResendEmailCodeResponse{
+  zitadel.object.v2.Details details = 1;
+  // in case the verification was set to return_code, the code will be returned
+  optional string verification_code = 2;
+}
+
+message SendEmailCodeRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendEmailVerificationCode send_code = 2;
+    ReturnEmailVerificationCode return_code = 3;
+  }
+}
+
+message SendEmailCodeResponse{
   zitadel.object.v2.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
@@ -2059,6 +2231,21 @@ message ListAuthenticationMethodTypesRequest{
       example: "\"69629026806489455\"";
     }
   ];
+  optional DomainQuery domain_query = 2;
+}
+
+message DomainQuery {
+  // List also auth method types without domain information like passkey and U2F added through V1 APIs / Login UI.
+  bool include_without_domain = 1;
+  // List only auth methods with specific domain.
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"example.com\"";
+    }
+  ];
 }
 
 message ListAuthenticationMethodTypesResponse{
@@ -2075,4 +2262,119 @@ enum AuthenticationMethodType {
   AUTHENTICATION_METHOD_TYPE_U2F = 5;
   AUTHENTICATION_METHOD_TYPE_OTP_SMS = 6;
   AUTHENTICATION_METHOD_TYPE_OTP_EMAIL = 7;
+}
+
+message ListAuthenticationFactorsRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  repeated AuthFactors auth_factors = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the Auth Factors you are interested in"
+      default: "All Auth Factors"
+    }
+  ];
+  repeated AuthFactorState states = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the state of the Auth Factors"
+      default: "Auth Factors that are ready"
+    }
+  ];
+}
+
+enum AuthFactors {
+  OTP = 0;
+  OTP_SMS = 1;
+  OTP_EMAIL = 2;
+  U2F = 3;
+}
+
+message ListAuthenticationFactorsResponse {
+  repeated zitadel.user.v2.AuthFactor result = 1;
+}
+
+message CreateInviteCodeRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url and application name (ZITADEL)
+  oneof verification {
+    SendInviteCode send_code = 2;
+    ReturnInviteCode return_code = 3;
+  }
+}
+
+message CreateInviteCodeResponse {
+  zitadel.object.v2.Details details = 1;
+  // The invite code is returned if the verification was set to return_code.
+  optional string invite_code = 2;
+}
+message ResendInviteCodeRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ResendInviteCodeResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message VerifyInviteCodeRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string verification_code = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 20},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 20;
+      example: "\"SKJd342k\"";
+      description: "\"the verification code generated during the invite code request\"";
+    }
+  ];
+}
+
+message VerifyInviteCodeResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message HumanMFAInitSkippedRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+}
+
+message HumanMFAInitSkippedResponse {
+  zitadel.object.v2.Details details = 1;
 }

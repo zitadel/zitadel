@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Fortsätt
   CancelButtonText: Avbryt
 
+InviteUser:
+  Title: Aktivera användare
+  Description: Verifiera din e-post med koden nedan och sätt ditt lösenord.
+  CodeLabel: Kod
+  NewPasswordLabel: Nytt lösenord
+  NewPasswordConfirm: Bekräfta lösenord
+  NextButtonText: Nästa
+  ResendButtonText: Skicka koden igen
+
 InitMFAPrompt:
   Title: tvåfaktorinställningar
   Description: 2-factor-identifiering ökar säkerheten för ditt konto. Enbart du som har tillgång till enheten kan logga in.
@@ -253,6 +262,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Kön
   Female: Man
   Male: Kvinna
@@ -293,6 +305,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Användarvillkor
   TosConfirm: Jag accepterar
   TosLinkText: Användarvillkoren
@@ -367,6 +382,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 DeviceAuth:
   Title: Tillgång från hårdvaruenhet
   UserCode:
@@ -487,6 +505,10 @@ Errors:
       CreationNotAllowed: Det är inte tillåtet att skapa nya konton från den här externa leverantören
       LinkingNotAllowed: Det är inte tillåtet att koppla ihop konton från den här externa leverantören
       NoOptionAllowed: Varken skapande eller länkande är tillåtet för denna leverantör. Kontakta administratören.
+      LoginFailedSwitchLocal: |
+        Inloggning vid extern identitetsprovider misslyckades. Återgår till lokal inloggning.
+
+        Felaktighetsdetaljer: {{.Details}}
     GrantRequired: Det går inte att logga in just nu. Användarkontot har inte tillgång till någonting i tjänsten. Ta kontakt med systemansvarig.
     ProjectRequired: Det går inte att logga in just nu. Användarkontots organisation har inte tillgång till tjänsten. Ta kontakt med systemansvarig.
   IdentityProvider:

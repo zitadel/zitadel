@@ -197,7 +197,8 @@
           "VE": "ユーザーがメールアドレスを変更すると、新しいアドレスを検証するリンクが記載されたメールを受け取ります。",
           "VP": "ユーザーが電話番号を変更すると、新しい番号を検証するコードが記載されたSMSを受け取ります。",
           "VEO": "ユーザーがメール経由でワンタイムパスワードの方法を追加すると、それをアクティブにするためにメールに送信されたコードを入力する必要があります。",
-          "VSO": "ユーザーがSMS経由でワンタイムパスワードの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。"
+          "VSO": "ユーザーがSMS経由でワンタイムパスワードの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。",
+          "IU": "ユーザー招待コードが作成されると、認証方法を設定するためのリンクを含むメールが送信されます。"
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "Eメール",
       "PHONE": "電話番号",
       "PHONE_HINT": "+ マークに続いて電話をかけたい国コードを入力するか、ドロップダウンから国を選択して電話番号を入力します。",
+      "PHONE_VERIFIED": "電話番号が確認されました",
+      "SEND_SMS": "認証SMSを送信",
+      "SEND_EMAIL": "メールを送信",
       "USERNAME": "ユーザー名",
       "CHANGEUSERNAME": "変更",
       "CHANGEUSERNAME_TITLE": "ユーザー名の変更",
@@ -947,6 +951,14 @@
       "4": "ロック",
       "5": "停止",
       "6": "初期化待ち"
+    },
+    "STATEV2": {
+      "0": "不明",
+      "1": "アクティブ",
+      "2": "非アクティブ",
+      "3": "削除",
+      "4": "ロック",
+      "5": "初期化待ち"
     },
     "SEARCH": {
       "ADDITIONAL": "ログインネーム（現在の組織）",
@@ -1381,7 +1393,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1418,6 +1433,8 @@
         "SID": "Sid",
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
+        "VERIFYSERVICESID": "検証サービス SID",
+        "VERIFYSERVICESID_DESCRIPTION": "検証サービス SID を設定すると、電話番号と OTP SMS の検証にメッセージサービスの代わりに Twilio Verify サービスを使用できるようになります。",
         "ADDED": "Twilioは正常に追加されました。",
         "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",
@@ -1468,6 +1485,8 @@
       "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "ACTIONS": "アクション",
       "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 セッション終了",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
@@ -1478,7 +1497,9 @@
         "ENABLED": "有効は継承されます",
         "DISABLED": "無効は継承されます"
       },
-      "RESET": "すべて継承に設定"
+      "RESET": "すべて継承に設定",
+      "CONSOLEUSEV2USERAPI": "コンソールでユーザー作成のためにV2 APIを使用してください。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。"
     },
     "DIALOG": {
       "RESET": {
@@ -1526,6 +1547,10 @@
       "MAXSIZEEXCEEDED": "最大サイズの524KBを超えました。",
       "NOSVGSUPPORTED": "SVGはサポートされていません！",
       "FONTINLOGINONLY": "フォントは現在、ログインインターフェイスにのみ表示されます。",
+      "BACKGROUNDCOLOR": "背景色",
+      "PRIMARYCOLOR": "プライマリカラー",
+      "WARNCOLOR": "警告色",
+      "FONTCOLOR": "フォントカラー",
       "VIEWS": {
         "PREVIEW": "プレビュー",
         "CURRENT": "現在の構成"
@@ -1609,7 +1634,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1659,7 +1686,8 @@
         "PR": "パスワードのリセット",
         "DC": "ドメインクレーム",
         "PL": "パスワードレス",
-        "PC": "パスワードの変更"
+        "PC": "パスワードの変更",
+        "IU": "ユーザーの招待"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1679,7 +1707,8 @@
         "tempUsername": "一時ユーザー名",
         "otp": "ワンタイムパスワード",
         "verifyUrl": "ワンタイムパスワードを確認するURL",
-        "expiry": "有効期限"
+        "expiry": "有効期限",
+        "applicationName": "アプリケーション名"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
@@ -1707,8 +1736,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
       "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
-      "FORCEMFA": "MFAを強制する",
-      "FORCEMFALOCALONLY": "ローカル ユーザーに MFA を強制する",
+      "FORCEMFA": "すべてのユーザーに MFA を強制する",
+      "FORCEMFALOCALONLY": "ローカル認証ユーザーのみに MFA を強制する",
       "FORCEMFALOCALONLY_DESC": "オプションが選択されている場合、ローカル認証されたユーザーはログインの 2 番目の要素を構成する必要があります。",
       "HIDEPASSWORDRESET_DESC": "このオプションが選択されている場合、ユーザーはログイン過程ででパスワードをリセットできません。",
       "HIDELOGINNAMESUFFIX": "ログイン名の接尾辞を非表示にする",
@@ -2040,6 +2069,14 @@
       "LDAP": {
         "TITLE": "LDAPプロバイダー",
         "DESCRIPTION": "LDAPプロバイダーのクレデンシャルを入力してください。"
+      },
+      "APPLE": {
+        "TITLE": "Appleプロバイダー",
+        "DESCRIPTION": "Appleプロバイダーのクレデンシャルを入力してください。"
+      },
+      "SAML": {
+        "TITLE": "SAMLプロバイダー",
+        "DESCRIPTION": "SAMLプロバイダーのクレデンシャルを入力してください。"
       }
     },
     "DETAIL": {
@@ -2159,6 +2196,23 @@
       "JWTENDPOINT": "JWTエンドポイント",
       "JWTKEYSENDPOINT": "JWTキーエンドポイント"
     },
+    "APPLE": {
+      "TEAMID": "チームID",
+      "KEYID": "キーID",
+      "PRIVATEKEY": "秘密鍵",
+      "UPDATEPRIVATEKEY": "秘密鍵の更新",
+      "UPLOADPRIVATEKEY": "秘密鍵のアップロード",
+      "KEYMAXSIZEEXCEEDED": "最大サイズの5kBを超えています"
+    },
+    "SAML": {
+      "METADATAXML": "Metadata XML",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "署名付きリクエスト",
+      "NAMEIDFORMAT": "NameIDフォーマット",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "カスタム属性名",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)"
+    },
     "TOAST": {
       "SAVED": "正常に保存されました。",
       "REACTIVATED": "IDPがアクティブになりました。",
@@ -2171,7 +2225,9 @@
       "REMOVED": "正常に削除されました。"
     },
     "ISIDTOKENMAPPING": "IDトークンからのマッピング",
-    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。",
+    "USEPKCE": "PKCEを使用する",
+    "USEPKCE_DESC": "code_challenge パラメータと code_challenge_method パラメータが認証リクエストに含まれるかどうかを決定します。"
   },
   "MFA": {
     "LIST": {
@@ -2243,7 +2299,11 @@
         "DELETE_TITLE": "SMTP設定を削除する",
         "DELETE_DESCRIPTION": "構成を削除しようとしています。送信者名を入力してこのアクションを確認します",
         "DELETED": "SMTP設定が削除されました",
-        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。"
+        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。",
+        "TEST_TITLE": "SMTP設定をテストする",
+        "TEST_DESCRIPTION": "テスト用のメールアドレスを指定してください",
+        "TEST_EMAIL": "メールアドレス",
+        "TEST_RESULT": "テスト結果"
       }
     },
     "CREATE": {
@@ -2521,6 +2581,10 @@
       "CLIENTSECRETREGENERATED": "クライアントシークレットが生成されました。",
       "DELETED": "アプリが削除されました。",
       "CONFIGCHANGED": "変更を検出しました！"
+    },
+    "LOGINV2": {
+      "USEV2": "新しいログインUIを使用する",
+      "BASEURL": "新しいログインUIのカスタムベースURL"
     }
   },
   "GENDERS": {
@@ -2544,7 +2608,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

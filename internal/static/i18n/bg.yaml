@@ -561,11 +561,23 @@ Errors:
     AlreadyExists: Auth Request вече съществува
     NotExisting: Auth Request не съществува
     WrongLoginClient: Auth Request, създаден от друг клиент за влизане
+    AlreadyHandled: Заявката за удостоверяване вече е обработена
   OIDCSession:
     RefreshTokenInvalid: Токенът за опресняване е невалиден
     Token:
       Invalid: Токенът е невалиден
       Expired: Токенът е изтекъл
+    InvalidClient: Токенът не е издаден за този клиент
+  SAMLRequest:
+    AlreadyExists: SAMLRequest вече съществува
+    NotExisting: SAMLRequest не съществува
+    WrongLoginClient: SAMLRequest, създаден от друг клиент за влизане
+    AlreadyHandled: SAML заявката вече е обработена
+  SAMLSession:
+    InvalidClient: SAMLResponse не е издаден за този клиент
+  DeviceAuth:
+    NotFound: Заявката за авторизация на устройство не съществува
+    AlreadyHandled: Заявката за авторизация на устройство вече е обработена
   Feature:
     NotExisting: Функцията не съществува
     TypeNotSupported: Типът функция не се поддържа
@@ -640,6 +652,8 @@ AggregateTypes:
   system: Система
   session: Сесия
   web_key: Уеб ключ
+  saml_request: SAML заявка
+  saml_session: SAML сесия
 
 EventTypes:
   execution:
@@ -704,6 +718,13 @@ EventTypes:
         check:
           succeeded: Проверката за инициализация е успешна
           failed: Проверката на инициализацията е неуспешна
+      invite:
+        code:
+          added: Генериран е код за покана
+          sent: Изпратен е код за покана
+        check:
+          succeeded: Проверката на поканата е успешна
+          failed: Проверката на поканата е неуспешна
       username:
         reserved: Потребителското име е запазено
         released: Потребителското име е освободено

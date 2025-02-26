@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"encoding/json"
 	"errors"
+	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -21,6 +23,7 @@ type OIDCClient struct {
 	AppID                    string                     `json:"app_id,omitempty"`
 	State                    domain.AppState            `json:"state,omitempty"`
 	ClientID                 string                     `json:"client_id,omitempty"`
+	BackChannelLogoutURI     string                     `json:"back_channel_logout_uri,omitempty"`
 	HashedSecret             string                     `json:"client_secret,omitempty"`
 	RedirectURIs             []string                   `json:"redirect_uris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"response_types,omitempty"`
@@ -38,14 +41,36 @@ type OIDCClient struct {
 	PublicKeys               map[string][]byte          `json:"public_keys,omitempty"`
 	ProjectID                string                     `json:"project_id,omitempty"`
 	ProjectRoleAssertion     bool                       `json:"project_role_assertion,omitempty"`
+	LoginVersion             domain.LoginVersion        `json:"login_version,omitempty"`
+	LoginBaseURI             *URL                       `json:"login_base_uri,omitempty"`
 	ProjectRoleKeys          []string                   `json:"project_role_keys,omitempty"`
 	Settings                 *OIDCSettings              `json:"settings,omitempty"`
+}
+
+type URL url.URL
+
+func (c *URL) URL() *url.URL {
+	return (*url.URL)(c)
+}
+
+func (c *URL) UnmarshalJSON(src []byte) error {
+	var s string
+	err := json.Unmarshal(src, &s)
+	if err != nil {
+		return err
+	}
+	u, err := url.Parse(s)
+	if err != nil {
+		return err
+	}
+	*c = URL(*u)
+	return nil
 }
 
 //go:embed oidc_client_by_id.sql
 var oidcClientQuery string
 
-func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string, getKeys bool) (client *OIDCClient, err error) {
+func (q *Queries) ActiveOIDCClientByID(ctx context.Context, clientID string, getKeys bool) (client *OIDCClient, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -58,7 +83,13 @@ func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string, getKey
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-ieR7R", "Errors.Internal")
 	}
-	if authz.GetInstance(ctx).ConsoleClientID() == clientID {
+	instance := authz.GetInstance(ctx)
+	loginV2 := instance.Features().LoginV2
+	if loginV2.Required {
+		client.LoginVersion = domain.LoginVersion2
+		client.LoginBaseURI = (*URL)(loginV2.BaseURI)
+	}
+	if instance.ConsoleClientID() == clientID {
 		client.RedirectURIs = append(client.RedirectURIs, http_util.DomainContext(ctx).Origin()+path.RedirectPath)
 		client.PostLogoutRedirectURIs = append(client.PostLogoutRedirectURIs, http_util.DomainContext(ctx).Origin()+path.PostLogoutPath)
 	}

@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	AggregateType    = "user"
-	AggregateVersion = "v3"
+	AggregateType    = "schemauser"
+	AggregateVersion = "v1"
 )
 
 type Aggregate struct {

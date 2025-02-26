@@ -20,3 +20,26 @@ body {
 .text-align-center {
     text-align: center;
 }
+
+.dialog_overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 1001;
+    -moz-opacity: 0.8;
+    opacity: .80;
+    filter: alpha(opacity=80);
+}
+
+.dialog_overlay.show {
+    display: block;
+}
+
+.dialog_content {
+    position: relative;
+    z-index: 1002;
+}

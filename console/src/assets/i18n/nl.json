@@ -197,7 +197,8 @@
           "VE": "Wanneer een gebruiker zijn e-mailadres wijzigt, ontvangt hij een e-mail met een link om het nieuwe adres te verifiëren.",
           "VP": "Wanneer een gebruiker zijn telefoonnummer wijzigt, ontvangt hij een SMS met een code om het nieuwe nummer te verifiëren.",
           "VEO": "Wanneer een gebruiker een eenmalig wachtwoord via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
-          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden."
+          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden.",
+          "IU": "Wanneer een uitnodigingscode voor gebruikers wordt gemaakt, ontvangt de gebruiker een e-mail met een link om zijn verificatiemethode in te stellen."
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefoonnummer",
       "PHONE_HINT": "Gebruik het + symbool gevolgd door de landcode, of selecteer het land uit de dropdown en voer ten slotte het telefoonnummer in",
+      "PHONE_VERIFIED": "Telefoonnummer geverifieerd",
+      "SEND_SMS": "Verificatie-SMS verzenden",
+      "SEND_EMAIL": "E-mail verzenden",
       "USERNAME": "Gebruikersnaam",
       "CHANGEUSERNAME": "wijzigen",
       "CHANGEUSERNAME_TITLE": "Gebruikersnaam wijzigen",
@@ -947,6 +951,14 @@
       "4": "Vergrendeld",
       "5": "Opgeschort",
       "6": "Initieel"
+    },
+    "STATEV2": {
+      "0": "Onbekend",
+      "1": "Actief",
+      "2": "Inactief",
+      "3": "Verwijderd",
+      "4": "Vergrendeld",
+      "5": "Initieel"
     },
     "SEARCH": {
       "ADDITIONAL": "Loginnaam (huidige organisatie)",
@@ -1381,7 +1393,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1418,6 +1431,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Verzender Nummer",
+        "VERIFYSERVICESID": "Verificatieservice-SID",
+        "VERIFYSERVICESID_DESCRIPTION": "Het instellen van een Verificatieservice-SID maakt het mogelijk om de Twilio Verify-service te gebruiken in plaats van de Berichten-service voor het verifiëren van telefoonnummers en OTP-SMS.",
         "ADDED": "Twilio succesvol toegevoegd.",
         "UPDATED": "Twilio succesvol bijgewerkt.",
         "REMOVED": "Twilio verwijderd",
@@ -1468,6 +1483,8 @@
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1478,7 +1495,9 @@
         "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
         "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
       },
-      "RESET": "Alles instellen op overgenomen"
+      "RESET": "Alles instellen op overgenomen",
+      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de console voor het aanmaken van gebruikers",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status."
     },
     "DIALOG": {
       "RESET": {
@@ -1613,7 +1632,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1663,7 +1684,8 @@
         "PR": "Wachtwoord Reset",
         "DC": "Domein Claim",
         "PL": "Wachtwoordloos",
-        "PC": "Wachtwoord Verandering"
+        "PC": "Wachtwoord Verandering",
+        "IU": "Gebruiker uitnodigen"
       },
       "CHIPS": {
         "firstname": "Voornaam",
@@ -1683,7 +1705,8 @@
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
         "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
-        "expiry": "Vervaldatum"
+        "expiry": "Vervaldatum",
+        "applicationName": "Toepassingsnaam"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."
@@ -1711,8 +1734,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
       "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
       "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",
-      "FORCEMFA": "Forceer MFA",
-      "FORCEMFALOCALONLY": "Forceer MFA voor lokaal geauthenticeerde gebruikers",
+      "FORCEMFA": "MFA afdwingen voor alle gebruikers",
+      "FORCEMFALOCALONLY": "MFA alleen afdwingen voor lokaal geverifieerde gebruikers",
       "FORCEMFALOCALONLY_DESC": "Als de optie is geselecteerd, moeten lokaal geauthenticeerde gebruikers een tweede factor configureren voor login.",
       "HIDEPASSWORDRESET_DESC": "Als de optie is geselecteerd, kan de gebruiker zijn wachtwoord niet resetten in het login proces.",
       "HIDELOGINNAMESUFFIX": "Verberg Inlognaam achtervoegsel",
@@ -2197,7 +2220,9 @@
       "REMOVED": "Succesvol verwijderd."
     },
     "ISIDTOKENMAPPING": "Kaart van de ID token",
-    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt."
+    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
+    "USEPKCE": "Gebruik PKCE",
+    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
   },
   "MFA": {
     "LIST": {
@@ -2547,6 +2572,10 @@
       "CLIENTSECRETREGENERATED": "client geheim gegenereerd.",
       "DELETED": "App verwijderd.",
       "CONFIGCHANGED": "Wijzigingen gedetecteerd!"
+    },
+    "LOGINV2": {
+      "USEV2": "Nieuwe login-gebruikersinterface gebruiken",
+      "BASEURL": "Aangepaste basis-URL voor de nieuwe login-gebruikersinterface"
     }
   },
   "GENDERS": {
@@ -2570,7 +2599,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

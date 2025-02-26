@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Next
   CancelButtonText: Cancel
 
+InviteUser:
+  Title: Activate User
+  Description: Verify your e-mail with the code below and set your password.
+  CodeLabel: Code
+  NewPasswordLabel: New Password
+  NewPasswordConfirm: Confirm Password
+  NextButtonText: Next
+  ResendButtonText: Resend Code
+
 InitMFAPrompt:
   Title: 2-Factor Setup
   Description: 2-factor authentication gives you an additional security for your user account. This ensures that only you have access to your account.
@@ -253,6 +262,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -293,6 +305,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -344,7 +359,7 @@ LinkingUsersDone:
 
 ExternalNotFound:
   Title: External User Not Found
-  Description: External user not found. Do you want to link your user or auto register a new one.
+  Description: External user not found. Do you want to link your user or auto-register a new one?
   LinkButtonText: Link
   AutoRegisterButtonText: Register
   TosAndPrivacyLabel: Terms and conditions
@@ -367,6 +382,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 DeviceAuth:
   Title: Device Authorization
   UserCode:
@@ -487,6 +505,10 @@ Errors:
       CreationNotAllowed: Creation of a new user is not allowed on this provider
       LinkingNotAllowed: Linking of a user is not allowed on this provider
       NoOptionAllowed: Neither creation of linking is allowed on this provider. Please contact your administrator.
+      LoginFailedSwitchLocal: |
+        Login at External IDP failed. Falling back to local login.
+                
+        Error details: {{.Details}}
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
     ProjectRequired: Login not possible. The organization of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:

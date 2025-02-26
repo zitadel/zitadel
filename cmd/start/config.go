@@ -15,9 +15,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/saml"
+	scim_config "github.com/zitadel/zitadel/internal/api/scim/config"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
@@ -48,15 +50,18 @@ type Config struct {
 	HTTP1HostHeader     string
 	WebAuthNName        string
 	Database            database.Config
+	Caches              *connector.CachesConfig
 	Tracing             tracing.Config
 	Metrics             metrics.Config
 	Profiler            profiler.Config
 	Projections         projection.Config
+	Notifications       handlers.WorkerConfig
 	Auth                auth_es.Config
 	Admin               admin_es.Config
 	UserAgentCookie     *middleware.UserAgentCookieConfig
 	OIDC                oidc.Config
 	SAML                saml.Config
+	SCIM                scim_config.Config
 	Login               login.Config
 	Console             console.Config
 	AssetStorage        static_config.AssetStorageConfig
@@ -121,6 +126,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	id.Configure(config.Machine)
 	actions.SetHTTPConfig(&config.Actions.HTTP)
+
+	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
+	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
 
 	return config
 }

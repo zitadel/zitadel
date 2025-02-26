@@ -28,6 +28,7 @@ type DeviceAuthWriteModel struct {
 	PreferredLanguage *language.Tag
 	UserAgent         *domain.UserAgent
 	NeedRefreshToken  bool
+	SessionID         string
 }
 
 func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteModel {
@@ -60,6 +61,7 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 			m.AuthTime = e.AuthTime
 			m.PreferredLanguage = e.PreferredLanguage
 			m.UserAgent = e.UserAgent
+			m.SessionID = e.SessionID
 		case *deviceauth.CanceledEvent:
 			m.State = e.Reason.State()
 		case *deviceauth.DoneEvent:
@@ -80,6 +82,7 @@ func (m *DeviceAuthWriteModel) Query() *eventstore.SearchQueryBuilder {
 			deviceauth.AddedEventType,
 			deviceauth.ApprovedEventType,
 			deviceauth.CanceledEventType,
+			deviceauth.DoneEventType,
 		).
 		Builder()
 }

@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -9,13 +10,16 @@ import (
 	"testing"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps7.id,` +
+	expectedAppQueryBase = `SELECT projections.apps7.id,` +
 		` projections.apps7.name,` +
 		` projections.apps7.project_id,` +
 		` projections.apps7.creation_date,` +
@@ -45,16 +49,24 @@ var (
 		` projections.apps7_oidc_configs.clock_skew,` +
 		` projections.apps7_oidc_configs.additional_origins,` +
 		` projections.apps7_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
+		` projections.apps7_oidc_configs.login_version,` +
+		` projections.apps7_oidc_configs.login_base_uri,` +
 		//saml config
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
 		` projections.apps7_saml_configs.metadata,` +
-		` projections.apps7_saml_configs.metadata_url` +
+		` projections.apps7_saml_configs.metadata_url,` +
+		` projections.apps7_saml_configs.login_version,` +
+		` projections.apps7_saml_configs.login_base_uri` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`
+	expectedAppQuery       = regexp.QuoteMeta(expectedAppQueryBase)
+	expectedActiveAppQuery = regexp.QuoteMeta(expectedAppQueryBase +
+		` LEFT JOIN projections.projects4 ON projections.apps7.project_id = projections.projects4.id AND projections.apps7.instance_id = projections.projects4.instance_id` +
+		` LEFT JOIN projections.orgs1 ON projections.apps7.resource_owner = projections.orgs1.id AND projections.apps7.instance_id = projections.orgs1.instance_id`)
 	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps7.id,` +
 		` projections.apps7.name,` +
 		` projections.apps7.project_id,` +
@@ -85,11 +97,16 @@ var (
 		` projections.apps7_oidc_configs.clock_skew,` +
 		` projections.apps7_oidc_configs.additional_origins,` +
 		` projections.apps7_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
+		` projections.apps7_oidc_configs.login_version,` +
+		` projections.apps7_oidc_configs.login_base_uri,` +
 		//saml config
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
 		` projections.apps7_saml_configs.metadata,` +
 		` projections.apps7_saml_configs.metadata_url,` +
+		` projections.apps7_saml_configs.login_version,` +
+		` projections.apps7_saml_configs.login_base_uri,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
@@ -157,11 +174,16 @@ var (
 		"clock_skew",
 		"additional_origins",
 		"skip_native_app_success_page",
+		"back_channel_logout_uri",
+		"login_version",
+		"login_base_uri",
 		//saml config
 		"app_id",
 		"entity_id",
 		"metadata",
 		"metadata_url",
+		"login_version",
+		"login_base_uri",
 	}
 	appsCols = append(appCols, "count")
 )
@@ -228,7 +250,12 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -294,7 +321,12 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -363,11 +395,16 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
 							"app-id",
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersionUnspecified,
+							nil,
 						},
 					},
 				),
@@ -434,7 +471,12 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -476,6 +518,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -520,7 +565,12 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -562,6 +612,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -606,7 +659,12 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -648,6 +706,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -692,7 +753,12 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -734,6 +800,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -778,7 +847,12 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -820,6 +894,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -864,7 +941,12 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							true,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -906,6 +988,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: true,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -950,7 +1035,12 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersion2,
+							"https://login.ch/",
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -987,7 +1077,12 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1024,11 +1119,16 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
 							"saml-app-id",
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersion2,
+							"https://login.ch/",
 						},
 					},
 				),
@@ -1066,6 +1166,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersion2,
+							LoginBaseURI:             gu.Ptr("https://login.ch/"),
 						},
 					},
 					{
@@ -1092,9 +1195,11 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ProjectID:     "project-id",
 						SAMLConfig: &SAMLApp{
-							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-							MetadataURL: "https://test.com/saml/metadata",
-							EntityID:    "https://test.com/saml/metadata",
+							Metadata:     []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							MetadataURL:  "https://test.com/saml/metadata",
+							EntityID:     "https://test.com/saml/metadata",
+							LoginVersion: domain.LoginVersion2,
+							LoginBaseURI: gu.Ptr("https://login.ch/"),
 						},
 					},
 				},
@@ -1140,8 +1245,10 @@ func Test_AppPrepare(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareAppQuery no result",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery no result",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueriesScanErr(
 					expectedAppQuery,
@@ -1158,8 +1265,10 @@ func Test_AppPrepare(t *testing.T) {
 			object: (*App)(nil),
 		},
 		{
-			name:    "prepareAppQuery found",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery found",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					expectedAppQuery,
@@ -1195,7 +1304,12 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
 						// saml config
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1215,8 +1329,10 @@ func Test_AppPrepare(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareAppQuery api app",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery api app",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1253,7 +1369,12 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1278,8 +1399,10 @@ func Test_AppPrepare(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1316,7 +1439,12 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1353,11 +1481,106 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
-		}, {
-			name:    "prepareAppQuery saml app",
-			prepare: prepareAppQuery,
+		},
+		{
+			name: "prepareAppQuery oidc app active only",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, true)
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedActiveAppQuery,
+					appCols,
+					[][]driver.Value{
+						{
+							"app-id",
+							"app-name",
+							"project-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.AppStateActive,
+							uint64(20211109),
+							// api config
+							nil,
+							nil,
+							nil,
+							// oidc config
+							"app-id",
+							domain.OIDCVersionV1,
+							"oidc-client-id",
+							database.TextArray[string]{"https://redirect.to/me"},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							domain.OIDCApplicationTypeUserAgent,
+							domain.OIDCAuthMethodTypeNone,
+							database.TextArray[string]{"post.logout.ch"},
+							true,
+							domain.OIDCTokenTypeJWT,
+							true,
+							true,
+							true,
+							1 * time.Second,
+							database.TextArray[string]{"additional.origin"},
+							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+					},
+				),
+			},
+			object: &App{
+				ID:            "app-id",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				State:         domain.AppStateActive,
+				Sequence:      20211109,
+				Name:          "app-name",
+				ProjectID:     "project-id",
+				OIDCConfig: &OIDCApp{
+					Version:                  domain.OIDCVersionV1,
+					ClientID:                 "oidc-client-id",
+					RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
+					ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+					GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+					AppType:                  domain.OIDCApplicationTypeUserAgent,
+					AuthMethodType:           domain.OIDCAuthMethodTypeNone,
+					PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
+					IsDevMode:                true,
+					AccessTokenType:          domain.OIDCTokenTypeJWT,
+					AssertAccessTokenRole:    true,
+					AssertIDTokenRole:        true,
+					AssertIDTokenUserinfo:    true,
+					ClockSkew:                1 * time.Second,
+					AdditionalOrigins:        database.TextArray[string]{"additional.origin"},
+					ComplianceProblems:       nil,
+					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
+					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
+				},
+			},
+		},
+		{
+			name: "prepareAppQuery saml app",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1394,11 +1617,16 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
 							"app-id",
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersionUnspecified,
+							nil,
 						},
 					},
 				),
@@ -1413,15 +1641,19 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ProjectID:     "project-id",
 				SAMLConfig: &SAMLApp{
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-					MetadataURL: "https://test.com/saml/metadata",
-					EntityID:    "https://test.com/saml/metadata",
+					Metadata:     []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					MetadataURL:  "https://test.com/saml/metadata",
+					EntityID:     "https://test.com/saml/metadata",
+					LoginVersion: domain.LoginVersionUnspecified,
+					LoginBaseURI: nil,
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app IsDevMode inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app IsDevMode inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1458,7 +1690,12 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1495,12 +1732,17 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app AssertAccessTokenRole inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app AssertAccessTokenRole inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1537,7 +1779,12 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1574,12 +1821,17 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app AssertIDTokenRole inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app AssertIDTokenRole inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1616,7 +1868,12 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1653,12 +1910,17 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app AssertIDTokenUserinfo inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app AssertIDTokenUserinfo inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1695,7 +1957,12 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1732,12 +1999,17 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery sql err",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery sql err",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					expectedAppQuery,

@@ -543,12 +543,23 @@ Errors:
     AlreadyExists: AuthRequest已经存在
     NotExisting: AuthRequest不存在
     WrongLoginClient: 其他登录客户端创建的AuthRequest
+    AlreadyHandled: 身份验证请求已被处理
   OIDCSession:
     RefreshTokenInvalid: Refresh Token 无效
     Token:
       Invalid: 令牌无效
       Expired: 令牌已过期
     InvalidClient: 没有为该客户发放令牌
+  SAMLRequest:
+    AlreadyExists: SAMLRequest 已存在
+    NotExisting: SAMLRequest不存在
+    WrongLoginClient: 其他登录客户端创建的 SAMLRequest
+    AlreadyHandled: SAML请求已被处理
+  SAMLSession:
+    InvalidClient: 未向该客户端发出 SAMLResponse
+  DeviceAuth:
+    NotFound: 设备授权请求不存在
+    AlreadyHandled: 设备授权请求已被处理
   Feature:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
@@ -623,6 +634,8 @@ AggregateTypes:
   system: 系统
   session: 会话
   web_key: Web 密钥
+  saml_request: SAML 请求
+  saml_session: SAML 会话
 
 EventTypes:
   execution:
@@ -686,6 +699,13 @@ EventTypes:
         check:
           succeeded: 初始化检查成功
           failed: 初始化检查失败
+      invite:
+        code:
+          added: 生成了邀请码
+          sent: 发送了邀请码
+        check:
+          succeeded: 邀请检查成功
+          failed: 邀请检查失败
       username:
         reserved: 保留用户名
         released: 用户名已发布

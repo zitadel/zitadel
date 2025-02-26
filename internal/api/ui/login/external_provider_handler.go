@@ -2,7 +2,10 @@ package login
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/crewjam/saml/samlsp"
@@ -36,6 +39,9 @@ import (
 
 const (
 	queryIDPConfigID           = "idpConfigID"
+	queryState                 = "state"
+	queryRelayState            = "RelayState"
+	queryMethod                = "method"
 	tmplExternalNotFoundOption = "externalnotfoundoption"
 )
 
@@ -143,14 +149,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID)
-	if err != nil {
-		l.renderLogin(w, r, authReq, err)
-		return
-	}
 	var provider idp.Provider
-
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -179,17 +178,24 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
-		l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+		l.externalAuthFailed(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
 	if err != nil {
-		l.renderLogin(w, r, authReq, err)
+		l.externalAuthFailed(w, r, authReq, err)
 		return
 	}
 	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
 	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
 	if err != nil {
-		l.renderLogin(w, r, authReq, err)
+		l.externalAuthFailed(w, r, authReq, err)
+		return
+	}
+
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID, session.PersistentParameters())
+	if err != nil {
+		l.externalAuthFailed(w, r, authReq, err)
 		return
 	}
 
@@ -211,117 +217,134 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		l.renderLogin(w, r, nil, err)
+		l.externalAuthFailed(w, r, nil, err)
 		return
 	}
-	r.Form.Add("Method", http.MethodPost)
-	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
+	state := r.Form.Get(queryState)
+	if state == "" {
+		state = r.Form.Get(queryRelayState)
+	}
+	if state == "" {
+		l.externalAuthFailed(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-dsg3f", "Errors.AuthRequest.NotFound"))
+		return
+	}
+	l.caches.idpFormCallbacks.Set(r.Context(), &idpFormCallback{
+		InstanceID: authz.GetInstance(r.Context()).InstanceID(),
+		State:      state,
+		Form:       r.Form,
+	})
+	v := url.Values{}
+	v.Set(queryMethod, http.MethodPost)
+	v.Set(queryState, state)
+	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+v.Encode(), 302)
 }
 
 // handleExternalLoginCallback handles the callback from a IDP
 // and tries to extract the user with the provided data
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
+	// workaround because of CSRF on external identity provider flows using form_post
+	if r.URL.Query().Get(queryMethod) == http.MethodPost {
+		if err := l.setDataFromFormCallback(r, r.URL.Query().Get(queryState)); err != nil {
+			l.externalAuthFailed(w, r, nil, err)
+			return
+		}
+	}
+
 	data := new(externalIDPCallbackData)
 	err := l.getParseData(r, data)
 	if err != nil {
-		l.renderLogin(w, r, nil, err)
+		l.externalAuthFailed(w, r, nil, err)
 		return
 	}
 	if data.State == "" {
 		data.State = data.RelayState
 	}
-	// workaround because of CSRF on external identity provider flows
-	if data.Method == http.MethodPost {
-		r.Method = http.MethodPost
-		r.PostForm = r.Form
-	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
-		l.externalAuthFailed(w, r, authReq, nil, nil, err)
+		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 		return
 	}
 	identityProvider, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
 	if err != nil {
-		l.externalAuthFailed(w, r, authReq, nil, nil, err)
+		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 		return
 	}
-	var provider idp.Provider
 	var session idp.Session
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
-		provider, err = l.oauthProvider(r.Context(), identityProvider)
+		provider, err := l.oauthProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*oauth.Provider), Code: data.Code}
+		session = oauth.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeOIDC:
-		provider, err = l.oidcProvider(r.Context(), identityProvider)
+		provider, err := l.oidcProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+		session = openid.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeAzureAD:
-		provider, err = l.azureProvider(r.Context(), identityProvider)
+		provider, err := l.azureProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &azuread.Session{Provider: provider.(*azuread.Provider), Code: data.Code}
+		session = azuread.NewSession(provider, data.Code)
 	case domain.IDPTypeGitHub:
-		provider, err = l.githubProvider(r.Context(), identityProvider)
+		provider, err := l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHubEnterprise:
-		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
+		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLab:
-		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLabSelfHosted:
-		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGoogle:
-		provider, err = l.googleProvider(r.Context(), identityProvider)
+		provider, err := l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeApple:
-		provider, err = l.appleProvider(r.Context(), identityProvider)
+		provider, err := l.appleProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
+		session = apple.NewSession(provider, data.Code, data.User)
 	case domain.IDPTypeSAML:
-		provider, err = l.samlProvider(r.Context(), identityProvider)
+		provider, err := l.samlProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session, err = saml.NewSession(provider.(*saml.Provider), authReq.SAMLRequestID, r)
+		session, err = saml.NewSession(provider, authReq.SAMLRequestID, r)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
 	case domain.IDPTypeJWT,
@@ -329,7 +352,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
-		l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+		l.externalAuthFailed(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
 
@@ -339,10 +362,29 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			"instance", authz.GetInstance(r.Context()).InstanceID(),
 			"providerID", identityProvider.ID,
 		).WithError(err).Info("external authentication failed")
-		l.externalAuthFailed(w, r, authReq, tokens(session), user, err)
+		l.externalAuthCallbackFailed(w, r, authReq, tokens(session), user, err)
 		return
 	}
 	l.handleExternalUserAuthenticated(w, r, authReq, identityProvider, session, user, l.renderNextStep)
+}
+
+func (l *Login) setDataFromFormCallback(r *http.Request, state string) error {
+	r.Method = http.MethodPost
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+	// fallback to the form data in case the request was started before the cache was implemented
+	r.PostForm = r.Form
+	idpCallback, ok := l.caches.idpFormCallbacks.Get(r.Context(), idpFormCallbackIndexRequestID,
+		idpFormCallbackKey(authz.GetInstance(r.Context()).InstanceID(), state))
+	if ok {
+		r.PostForm = idpCallback.Form
+		// We need to set the form as well to make sure the data is parsed correctly.
+		// Form precedes PostForm in the parsing order.
+		r.Form = idpCallback.Form
+	}
+	return nil
 }
 
 func (l *Login) tryMigrateExternalUserID(r *http.Request, session idp.Session, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) (previousIDMatched bool, err error) {
@@ -397,7 +439,7 @@ func (l *Login) handleExternalUserAuthenticated(
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// ensure the linked IDP is added to the login policy
-	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID, authReq.SelectedIDPConfigArgs); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -525,12 +567,7 @@ func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *do
 //   - creation by user
 //   - linking to existing user
 func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) {
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		resourceOwner = authReq.RequestedOrgID
-	}
-
+	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	orgIAMPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
@@ -583,39 +620,21 @@ func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, a
 // renderExternalNotFoundOption renders a page, where the user is able to edit the IDP data,
 // create a new externalUser of link to existing on (based on the IDP template)
 func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idpLink *domain.UserIDPLink, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
+	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	if orgIAMPolicy == nil {
-		resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-		if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-			resourceOwner = authReq.RequestedOrgID
-		}
-
 		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
 		}
-
 	}
 
 	if human == nil || idpLink == nil {
-
 		// TODO (LS): how do we get multiple and why do we use the last of them (taken as is)?
 		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 		human, idpLink, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
 	}
 
-	var resourceOwner string
-	if authReq != nil {
-		resourceOwner = authReq.RequestedOrgID
-	}
-	if resourceOwner == "" {
-		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
-	}
 	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -634,7 +653,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "ExternalNotFound.Description", err),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
 			externalRegisterFormData: externalRegisterFormData{
 				Email:     human.EmailAddress,
@@ -718,11 +737,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 //
 // it is called from either the [autoCreateExternalUser] or [handleExternalNotFoundOptionCheck]
 func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		resourceOwner = authReq.RequestedOrgID
-	}
+	resourceOwner := determineResourceOwner(r.Context(), authReq)
 
 	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
@@ -960,6 +975,7 @@ func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTem
 		identityProvider.UserObjectClasses,
 		identityProvider.UserFilters,
 		identityProvider.Timeout,
+		identityProvider.RootCA,
 		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
 		opts...,
 	), nil
@@ -988,11 +1004,17 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 2)
+	opts := make([]openid.ProviderOpts, 1, 3)
 	opts[0] = openid.WithSelectAccount()
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
+
+	if identityProvider.OIDCIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, openid.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
+
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -1030,6 +1052,12 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
 		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
 	}
+
+	opts := make([]oauth.ProviderOpts, 0, 1)
+	if identityProvider.OAuthIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
 	return oauth.New(
 		config,
 		identityProvider.Name,
@@ -1037,6 +1065,7 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+		opts...,
 	)
 }
 
@@ -1197,7 +1226,7 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 	return nil
 }
 
-func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens[*oidc.IDTokenClaims], user idp.User, err error) {
+func (l *Login) externalAuthCallbackFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens[*oidc.IDTokenClaims], user idp.User, err error) {
 	if authReq == nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -1205,7 +1234,37 @@ func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authR
 	if _, _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}
-	l.renderLogin(w, r, authReq, err)
+	l.externalAuthFailed(w, r, authReq, err)
+}
+
+func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+	if authReq == nil || authReq.LoginPolicy == nil || !authReq.LoginPolicy.AllowUsernamePassword || authReq.UserID == "" {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	authMethods, authMethodsError := l.query.ListUserAuthMethodTypes(setUserContext(r.Context(), authReq.UserID, ""), authReq.UserID, true, false, "")
+	if authMethodsError != nil {
+		logging.WithFields("userID", authReq.UserID).WithError(authMethodsError).Warn("unable to load user's auth methods for idp login error")
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	passwordless := slices.Contains(authMethods.AuthMethodTypes, domain.UserAuthMethodTypePasswordless)
+	password := slices.Contains(authMethods.AuthMethodTypes, domain.UserAuthMethodTypePassword)
+	if !passwordless && !password {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	localAuthError := l.authRepo.RequestLocalAuth(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.AgentID)
+	if localAuthError != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	err = WrapIdPError(err)
+	if passwordless {
+		l.renderPasswordlessVerification(w, r, authReq, password, err)
+		return
+	}
+	l.renderPassword(w, r, authReq, err)
 }
 
 // tokens extracts the oidc.Tokens for backwards compatibility of PostExternalAuthenticationActions
@@ -1340,4 +1399,35 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 			},
 		}, nil,
 	)
+}
+
+// IdPError wraps an error from an external IDP to be able to distinguish it from other errors and to display it
+// more prominent (popup style) .
+// It's used if an error occurs during the login process with an external IDP and local authentication is allowed,
+// respectively used as fallback.
+type IdPError struct {
+	err *zerrors.ZitadelError
+}
+
+func (e *IdPError) Error() string {
+	return e.err.Error()
+}
+
+func (e *IdPError) Unwrap() error {
+	return e.err
+}
+
+func (e *IdPError) Is(target error) bool {
+	_, ok := target.(*IdPError)
+	return ok
+}
+
+func WrapIdPError(err error) *IdPError {
+	zErr := new(zerrors.ZitadelError)
+	id := "LOGIN-JWo3f"
+	// keep the original error id if there is one
+	if errors.As(err, &zErr) {
+		id = zErr.ID
+	}
+	return &IdPError{err: zerrors.CreateZitadelError(err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal")}
 }

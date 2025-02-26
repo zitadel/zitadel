@@ -9,6 +9,7 @@ const (
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
 	ProjectIDScopeZITADEL = "zitadel"
 	AudSuffix             = ":aud"
+	ProjectScopeZITADEL   = ProjectIDScope + ProjectIDScopeZITADEL + AudSuffix
 	SelectIDPScope        = "urn:zitadel:iam:org:idp:id:"
 )
 
@@ -61,11 +62,13 @@ func (a *AuthRequestSAML) IsValid() bool {
 }
 
 type AuthRequestDevice struct {
-	ClientID   string
-	DeviceCode string
-	UserCode   string
-	Scopes     []string
-	Audience   []string
+	ClientID    string
+	DeviceCode  string
+	UserCode    string
+	Scopes      []string
+	Audience    []string
+	AppName     string
+	ProjectName string
 }
 
 func (*AuthRequestDevice) Type() AuthRequestType {

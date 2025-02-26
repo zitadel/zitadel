@@ -6,6 +6,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2/settings.proto";
+import "zitadel/idp/v2/idp.proto";
 import "google/protobuf/duration.proto";
 
 message LoginSettings {
@@ -70,7 +71,7 @@ message LoginSettings {
   ];
   google.protobuf.Duration second_factor_check_lifetime = 12 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Defines after how long the second-factor check is valid.";
+      description: "Defines after how long the second factor check is valid.";
       example: "\"64800s\"";
     }
   ];
@@ -134,6 +135,7 @@ message IdentityProvider {
   string id = 1;
   string name = 2;
   IdentityProviderType type = 3;
+  zitadel.idp.v2.Options options = 4;
 }
 
 enum IdentityProviderType {
@@ -148,5 +150,6 @@ enum IdentityProviderType {
   IDENTITY_PROVIDER_TYPE_GITLAB = 8;
   IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
   IDENTITY_PROVIDER_TYPE_GOOGLE = 10;
-  IDENTITY_PROVIDER_TYPE_SAML=11;
+  IDENTITY_PROVIDER_TYPE_SAML = 11;
+  IDENTITY_PROVIDER_TYPE_APPLE = 12;
 }

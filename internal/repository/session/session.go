@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -323,6 +324,7 @@ type OTPSMSChallengedEvent struct {
 	Code              *crypto.CryptoValue `json:"code"`
 	Expiry            time.Duration       `json:"expiry"`
 	CodeReturned      bool                `json:"codeReturned,omitempty"`
+	GeneratorID       string              `json:"generatorId,omitempty"`
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
@@ -348,6 +350,7 @@ func NewOTPSMSChallengedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	codeReturned bool,
+	generatorID string,
 ) *OTPSMSChallengedEvent {
 	return &OTPSMSChallengedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -358,12 +361,15 @@ func NewOTPSMSChallengedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		CodeReturned:      codeReturned,
+		GeneratorID:       generatorID,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
 type OTPSMSSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
 func (e *OTPSMSSentEvent) Payload() interface{} {
@@ -381,6 +387,7 @@ func (e *OTPSMSSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 func NewOTPSMSSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	generatorInfo *senders.CodeGeneratorInfo,
 ) *OTPSMSSentEvent {
 	return &OTPSMSSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -388,6 +395,7 @@ func NewOTPSMSSentEvent(
 			aggregate,
 			OTPSMSSentType,
 		),
+		GeneratorInfo: generatorInfo,
 	}
 }
 
@@ -651,6 +659,8 @@ func NewLifetimeSetEvent(
 
 type TerminateEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	TriggerOrigin string `json:"triggerOrigin,omitempty"`
 }
 
 func (e *TerminateEvent) Payload() interface{} {

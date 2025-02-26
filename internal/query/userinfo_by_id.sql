@@ -1,15 +1,15 @@
 with usr as (
 	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name as preferred_login_name
-	from projections.users13 u
+	from projections.users14 u
 	left join projections.login_names3 n on u.id = n.user_id and u.instance_id = n.instance_id
-	where u.id = $1
+	where u.id = $1 and u.state = 1 -- only allow active users
 	and u.instance_id = $2
 	and n.is_primary = true
 ),
 human as (
 	select $1 as user_id, row_to_json(r) as human from (
 		select first_name, last_name, nick_name, display_name, avatar_key, preferred_language, gender, email, is_email_verified, phone, is_phone_verified
-		from projections.users13_humans
+		from projections.users14_humans
 		where user_id = $1
 		and instance_id = $2
 	) r
@@ -17,7 +17,7 @@ human as (
 machine as (
 	select $1 as user_id, row_to_json(r) as machine from (
 		select name, description
-		from projections.users13_machines
+		from projections.users14_machines
 		where user_id = $1
 		and instance_id = $2
 	) r
@@ -38,6 +38,7 @@ user_grants as (
 	where user_id = $1
 	and instance_id = $2
 	and project_id = any($3)
+    and state = 1
 	{{ if . -}}
 	and resource_owner = any($4)
 	{{- end }}

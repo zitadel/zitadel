@@ -348,21 +348,21 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 		return nil, err
 	}
 	if len(keys.Keys) > 0 {
-		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
+		return PrivateKeyToSigningKey(SelectSigningKey(keys.Keys), o.encAlg)
 	}
 	var position float64
 	if keys.State != nil {
 		position = keys.State.Position
 	}
-	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, position)
+	return nil, o.refreshSigningKey(ctx, position)
 }
 
-func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, position float64) error {
+func (o *OPStorage) refreshSigningKey(ctx context.Context, position float64) error {
 	ok, err := o.ensureIsLatestKey(ctx, position)
 	if err != nil || !ok {
 		return zerrors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
 	}
-	err = o.lockAndGenerateSigningKeyPair(ctx, algorithm)
+	err = o.lockAndGenerateSigningKeyPair(ctx)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "OIDC-ADh31", "could not create signing key")
 	}
@@ -377,8 +377,8 @@ func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bo
 	return position >= maxSequence, nil
 }
 
-func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
-	keyData, err := crypto.Decrypt(key.Key(), o.encAlg)
+func PrivateKeyToSigningKey(key query.PrivateKey, algorithm crypto.EncryptionAlgorithm) (_ op.SigningKey, err error) {
+	keyData, err := crypto.Decrypt(key.Key(), algorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +393,7 @@ func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKe
 	}, nil
 }
 
-func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm string) error {
+func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context) error {
 	logging.Info("lock and generate signing key pair")
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -409,7 +409,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 		return err
 	}
 
-	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), algorithm)
+	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), "RS256")
 }
 
 func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
@@ -430,7 +430,7 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	)
 }
 
-func selectSigningKey(keys []query.PrivateKey) query.PrivateKey {
+func SelectSigningKey(keys []query.PrivateKey) query.PrivateKey {
 	return keys[len(keys)-1]
 }
 

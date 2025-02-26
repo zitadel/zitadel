@@ -47,18 +47,23 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		ClockSkew:                writeModel.ClockSkew,
 		AdditionalOrigins:        writeModel.AdditionalOrigins,
 		SkipNativeAppSuccessPage: writeModel.SkipNativeAppSuccessPage,
+		BackChannelLogoutURI:     writeModel.BackChannelLogoutURI,
+		LoginVersion:             writeModel.LoginVersion,
+		LoginBaseURI:             writeModel.LoginBaseURI,
 	}
 }
 
 func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.SAMLApp {
 	return &domain.SAMLApp{
-		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
-		AppID:       writeModel.AppID,
-		AppName:     writeModel.AppName,
-		State:       writeModel.State,
-		Metadata:    writeModel.Metadata,
-		MetadataURL: writeModel.MetadataURL,
-		EntityID:    writeModel.EntityID,
+		ObjectRoot:   writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:        writeModel.AppID,
+		AppName:      writeModel.AppName,
+		State:        writeModel.State,
+		Metadata:     writeModel.Metadata,
+		MetadataURL:  writeModel.MetadataURL,
+		EntityID:     writeModel.EntityID,
+		LoginVersion: writeModel.LoginVersion,
+		LoginBaseURI: writeModel.LoginBaseURI,
 	}
 }
 

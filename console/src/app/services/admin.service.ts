@@ -72,6 +72,8 @@ import {
   GetCustomPasswordChangeMessageTextResponse,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextResponse,
+  GetCustomInviteUserMessageTextRequest,
+  GetCustomInviteUserMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
@@ -96,6 +98,8 @@ import {
   GetDefaultPasswordChangeMessageTextResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextResponse,
+  GetDefaultInviteUserMessageTextRequest,
+  GetDefaultInviteUserMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
@@ -224,6 +228,8 @@ import {
   SetDefaultPasswordChangeMessageTextResponse,
   SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultPasswordlessRegistrationMessageTextResponse,
+  SetDefaultInviteUserMessageTextRequest,
+  SetDefaultInviteUserMessageTextResponse,
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultPasswordResetMessageTextResponse,
   SetDefaultVerifyEmailMessageTextRequest,
@@ -311,6 +317,8 @@ import {
   ResetCustomPasswordChangeMessageTextToDefaultResponse,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
+  ResetCustomInviteUserMessageTextToDefaultRequest,
+  ResetCustomInviteUserMessageTextToDefaultResponse,
   ResetCustomPasswordResetMessageTextToDefaultRequest,
   ResetCustomPasswordResetMessageTextToDefaultResponse,
   ResetCustomVerifyEmailMessageTextToDefaultRequest,
@@ -720,6 +728,32 @@ export class AdminService {
     const req = new ResetCustomPasswordChangeMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.admin.resetCustomPasswordChangeMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultInviteUserMessageText(
+    req: GetDefaultInviteUserMessageTextRequest,
+  ): Promise<GetDefaultInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomInviteUserMessageText(
+    req: GetCustomInviteUserMessageTextRequest,
+  ): Promise<GetCustomInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultInviteUserMessageText(
+    req: SetDefaultInviteUserMessageTextRequest,
+  ): Promise<SetDefaultInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomInviteUserMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomInviteUserMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomInviteUserMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomInviteUserMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
   public SetUpOrg(org: SetUpOrgRequest.Org, human: SetUpOrgRequest.Human): Promise<SetUpOrgResponse.AsObject> {

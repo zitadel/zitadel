@@ -2,6 +2,7 @@ package login
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"slices"
@@ -52,6 +53,15 @@ func MailVerificationLink(origin, userID, code, orgID, authRequestID string) str
 	return externalLink(origin) + EndpointMailVerification + "?" + v.Encode()
 }
 
+func MailVerificationLinkTemplate(origin, userID, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointMailVerification,
+		queryUserID, userID,
+		queryCode, "{{.Code}}",
+		queryOrgID, orgID,
+		QueryAuthRequestID, authRequestID)
+}
+
 func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryUserID)
@@ -72,7 +82,7 @@ func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) checkUserNoFirstFactor(ctx context.Context, userID string) bool {
-	authMethods, err := l.query.ListUserAuthMethodTypes(setUserContext(ctx, userID, ""), userID, false)
+	authMethods, err := l.query.ListUserAuthMethodTypes(setUserContext(ctx, userID, ""), userID, false, false, "")
 	if err != nil {
 		logging.WithFields("userID", userID).OnError(err).Warn("unable to load user's auth methods for mail verification")
 		return false
@@ -135,17 +145,13 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 }
 
 func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, passwordInit bool, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:     l.getBaseData(r, authReq, translator, "EmailVerification.Title", "EmailVerification.Description", errID, errMessage),
+		baseData:     l.getBaseData(r, authReq, translator, "EmailVerification.Title", "EmailVerification.Description", err),
 		UserID:       userID,
 		profileData:  l.getProfileData(authReq),
 		Code:         code,
@@ -181,7 +187,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, translator, "EmailVerificationDone.Title", "EmailVerificationDone.Description", "", ""),
+		baseData:    l.getBaseData(r, authReq, translator, "EmailVerificationDone.Title", "EmailVerificationDone.Description", nil),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq == nil {

@@ -197,7 +197,8 @@
           "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
           "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
           "VEO": "När en användare lägger till en engångslösenord via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
-          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer."
+          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
+          "IU": "När en inbjudningskod för användare skapas, får de ett e-mail med en länk för att ställa in sin autentiseringsmetod."
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "E-post",
       "PHONE": "Telefonnummer",
       "PHONE_HINT": "Använd + symbolen följt av landskoden, eller välj landet från rullgardinsmenyn och ange sedan telefonnumret",
+      "PHONE_VERIFIED": "Telefonnummer verifierat",
+      "SEND_SMS": "Skicka verifierings-SMS",
+      "SEND_EMAIL": "Skicka E-post",
       "USERNAME": "Användarnamn",
       "CHANGEUSERNAME": "ändra",
       "CHANGEUSERNAME_TITLE": "Ändra användarnamn",
@@ -947,6 +951,14 @@
       "4": "Låst",
       "5": "Suspenderad",
       "6": "Initial"
+    },
+    "STATEV2": {
+      "0": "Okänd",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Raderad",
+      "4": "Låst",
+      "5": "Initial"
     },
     "SEARCH": {
       "ADDITIONAL": "Inloggningsnamn (nuvarande organisation)",
@@ -1385,7 +1397,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1422,6 +1437,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Avsändarnummer",
+        "VERIFYSERVICESID": "Verifieringstjänst-SID",
+        "VERIFYSERVICESID_DESCRIPTION": "Inställning av en Verifieringstjänst-SID gör det möjligt att använda Twilio Verify-tjänsten istället för Meddelandetjänsten för verifiering av telefonnummer och OTP-SMS.",
         "ADDED": "Twilio tillagd framgångsrikt.",
         "UPDATED": "Twilio uppdaterad framgångsrikt.",
         "REMOVED": "Twilio borttagen",
@@ -1472,6 +1489,8 @@
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
@@ -1482,7 +1501,9 @@
         "ENABLED": "\"Aktiverad\" ärvs",
         "DISABLED": "\"Inaktiverad\" ärvs"
       },
-      "RESET": "Återställ allt till arv"
+      "RESET": "Återställ allt till arv",
+      "CONSOLEUSEV2USERAPI": "Använd V2 API i konsolen för att skapa användare",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd."
     },
     "DIALOG": {
       "RESET": {
@@ -1617,7 +1638,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -1667,7 +1690,8 @@
         "PR": "Återställ Lösenord",
         "DC": "Domänkrav",
         "PL": "lösenordsfri",
-        "PC": "Lösenordsändring"
+        "PC": "Lösenordsändring",
+        "IU": "Bjud in användare"
       },
       "CHIPS": {
         "firstname": "Förnamn",
@@ -1687,7 +1711,8 @@
         "tempUsername": "Tillfälligt användarnamn",
         "otp": "Engångslösenord",
         "verifyUrl": "Verifiera Engångslösenord URL",
-        "expiry": "Utgångsdatum"
+        "expiry": "Utgångsdatum",
+        "applicationName": "Applikationsnamn"
       },
       "TOAST": {
         "UPDATED": "Anpassade Texter sparade."
@@ -1715,8 +1740,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Den konventionella inloggningen med användarnamn och lösenord är tillåten.",
       "ALLOWEXTERNALIDP_DESC": "Inloggning är tillåten för de underliggande identitetsleverantörerna",
       "ALLOWREGISTER_DESC": "Om alternativet är valt visas ett ytterligare steg för att registrera en användare i inloggningen.",
-      "FORCEMFA": "Tvinga MFA",
-      "FORCEMFALOCALONLY": "Tvinga MFA för lokalt autentiserade användare",
+      "FORCEMFA": "Tvinga MFA för alla användare",
+      "FORCEMFALOCALONLY": "Tvinga MFA endast för lokalt autentiserade användare",
       "FORCEMFALOCALONLY_DESC": "Om alternativet är valt måste lokalt autentiserade användare konfigurera en andra faktor för inloggning.",
       "HIDEPASSWORDRESET_DESC": "Om alternativet är valt kan användaren inte återställa sitt lösenord i inloggningsprocessen.",
       "HIDELOGINNAMESUFFIX": "Dölj inloggningsnamn suffix",
@@ -2204,7 +2229,9 @@
       "REMOVED": "Borttagen framgångsrikt."
     },
     "ISIDTOKENMAPPING": "Mappa från ID-token",
-    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten."
+    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten.",
+    "USEPKCE": "Använd PKCE",
+    "USEPKCE_DESC": "Avgör om parametrarna code_challenge och code_challenge_method ingår i autentiseringsbegäran"
   },
   "MFA": {
     "LIST": {
@@ -2558,6 +2585,10 @@
       "CLIENTSECRETREGENERATED": "Klienthemlighet genererad.",
       "DELETED": "App raderad.",
       "CONFIGCHANGED": "Ändringar upptäckta!"
+    },
+    "LOGINV2": {
+      "USEV2": "Använd nya inloggningsgränssnittet",
+      "BASEURL": "Anpassad bas-URL för det nya inloggningsgränssnittet"
     }
   },
   "GENDERS": {
@@ -2576,12 +2607,14 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
-    "pt": "Português",
+    "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",

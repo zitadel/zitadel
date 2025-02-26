@@ -80,12 +80,10 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 }
 
 type Statement struct {
-	AggregateType eventstore.AggregateType
-	AggregateID   string
-	Sequence      uint64
-	Position      float64
-	CreationDate  time.Time
-	InstanceID    string
+	Aggregate    *eventstore.Aggregate
+	Sequence     uint64
+	Position     float64
+	CreationDate time.Time
 
 	offset uint32
 
@@ -108,13 +106,11 @@ var (
 
 func NewStatement(event eventstore.Event, e Exec) *Statement {
 	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		Position:      event.Position(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreatedAt(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       e,
+		Aggregate:    event.Aggregate(),
+		Sequence:     event.Sequence(),
+		Position:     event.Position(),
+		CreationDate: event.CreatedAt(),
+		Execute:      e,
 	}
 }
 
@@ -146,18 +142,17 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []Column, values []
 		conflictTarget[i] = col.Name
 	}
 
-	config := execConfig{
-		args: args,
-	}
+	config := execConfig{}
 
 	if len(values) == 0 {
 		config.err = ErrNoValues
 	}
 
-	updateCols, updateVals := getUpdateCols(values, conflictTarget)
+	updateCols, updateVals, args := getUpdateCols(values, conflictTarget, params, args)
 	if len(updateCols) == 0 || len(updateVals) == 0 {
 		config.err = ErrNoValues
 	}
+	config.args = args
 
 	q := func(config execConfig) string {
 		var updateStmt string
@@ -194,18 +189,78 @@ func OnlySetValueOnInsert(table string, value interface{}) *onlySetValueOnInsert
 	}
 }
 
-func getUpdateCols(cols []Column, conflictTarget []string) (updateCols, updateVals []string) {
+type onlySetValueInCase struct {
+	Table     string
+	Value     interface{}
+	Condition Condition
+}
+
+func (c *onlySetValueInCase) GetValue() interface{} {
+	return c.Value
+}
+
+// ColumnChangedCondition checks the current value and if it changed to a specific new value
+func ColumnChangedCondition(table, column string, currentValue, newValue interface{}) Condition {
+	return func(param string) (string, []any) {
+		index, _ := strconv.Atoi(param)
+		return fmt.Sprintf("%[1]s.%[2]s = $%[3]d AND EXCLUDED.%[2]s = $%[4]d", table, column, index, index+1), []any{currentValue, newValue}
+	}
+}
+
+// ColumnIsNullCondition checks if the current value is null
+func ColumnIsNullCondition(table, column string) Condition {
+	return func(param string) (string, []any) {
+		return fmt.Sprintf("%[1]s.%[2]s IS NULL", table, column), nil
+	}
+}
+
+// ConditionOr links multiple Conditions by OR
+func ConditionOr(conditions ...Condition) Condition {
+	return func(param string) (_ string, args []any) {
+		if len(conditions) == 0 {
+			return "", nil
+		}
+		b := strings.Builder{}
+		s, arg := conditions[0](param)
+		b.WriteString(s)
+		args = append(args, arg...)
+		for i := 1; i < len(conditions); i++ {
+			b.WriteString(" OR ")
+			s, condArgs := conditions[i](param)
+			b.WriteString(s)
+			args = append(args, condArgs...)
+		}
+		return b.String(), args
+	}
+}
+
+// OnlySetValueInCase will only update to the desired value if the condition applies
+func OnlySetValueInCase(table string, value interface{}, condition Condition) *onlySetValueInCase {
+	return &onlySetValueInCase{
+		Table:     table,
+		Value:     value,
+		Condition: condition,
+	}
+}
+
+func getUpdateCols(cols []Column, conflictTarget, params []string, args []interface{}) (updateCols, updateVals []string, updatedArgs []interface{}) {
 	updateCols = make([]string, len(cols))
 	updateVals = make([]string, len(cols))
+	updatedArgs = args
 
 	for i := len(cols) - 1; i >= 0; i-- {
 		col := cols[i]
-		table := "EXCLUDED"
-		if onlyOnInsert, ok := col.Value.(*onlySetValueOnInsert); ok {
-			table = onlyOnInsert.Table
-		}
 		updateCols[i] = col.Name
-		updateVals[i] = table + "." + col.Name
+		switch v := col.Value.(type) {
+		case *onlySetValueOnInsert:
+			updateVals[i] = v.Table + "." + col.Name
+		case *onlySetValueInCase:
+			s, condArgs := v.Condition(strconv.Itoa(len(params) + 1))
+			updatedArgs = append(updatedArgs, condArgs...)
+			updateVals[i] = fmt.Sprintf("CASE WHEN %[1]s THEN EXCLUDED.%[2]s ELSE %[3]s.%[2]s END", s, col.Name, v.Table)
+		default:
+			updateVals[i] = "EXCLUDED" + "." + col.Name
+		}
 		for _, conflict := range conflictTarget {
 			if conflict == col.Name {
 				copy(updateCols[i:], updateCols[i+1:])
@@ -221,7 +276,7 @@ func getUpdateCols(cols []Column, conflictTarget []string) (updateCols, updateVa
 		}
 	}
 
-	return updateCols, updateVals
+	return updateCols, updateVals, updatedArgs
 }
 
 func NewUpdateStatement(event eventstore.Event, values []Column, conditions []Condition, opts ...execOption) *Statement {
@@ -278,6 +333,21 @@ func NewNoOpStatement(event eventstore.Event) *Statement {
 	return NewStatement(event, nil)
 }
 
+func NewSleepStatement(event eventstore.Event, d time.Duration, opts ...execOption) *Statement {
+	return NewStatement(
+		event,
+		exec(
+			execConfig{
+				args: []any{float64(d) / float64(time.Second)},
+			},
+			func(_ execConfig) string {
+				return "SELECT pg_sleep($1);"
+			},
+			opts,
+		),
+	)
+}
+
 func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Exec) *Statement {
 	if len(opts) == 0 {
 		return NewNoOpStatement(event)
@@ -322,6 +392,12 @@ func AddDeleteStatement(conditions []Condition, opts ...execOption) func(eventst
 func AddCopyStatement(conflict, from, to []Column, conditions []NamespacedCondition, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
 		return NewCopyStatement(event, conflict, from, to, conditions, opts...).Execute
+	}
+}
+
+func AddSleepStatement(d time.Duration, opts ...execOption) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
+		return NewSleepStatement(event, d, opts...).Execute
 	}
 }
 
@@ -525,6 +601,12 @@ func NewCond(name string, value interface{}) Condition {
 	}
 }
 
+func NewUnequalCond(name string, value any) Condition {
+	return func(param string) (string, []any) {
+		return name + " <> " + param, []any{value}
+	}
+}
+
 func NewNamespacedCondition(name string, value interface{}) NamespacedCondition {
 	return func(namespace string) Condition {
 		return NewCond(namespace+"."+name, value)
@@ -601,18 +683,6 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 			opt(&config)
 		}
 
-		_, err = ex.Exec("SAVEPOINT stmt_exec")
-		if err != nil {
-			return zerrors.ThrowInternal(err, "CRDB-YdOXD", "create savepoint failed")
-		}
-		defer func() {
-			if err != nil {
-				_, rollbackErr := ex.Exec("ROLLBACK TO SAVEPOINT stmt_exec")
-				logging.OnError(rollbackErr).Debug("rollback failed")
-				return
-			}
-			_, err = ex.Exec("RELEASE SAVEPOINT stmt_exec")
-		}()
 		_, err = ex.Exec(q(config), config.args...)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")

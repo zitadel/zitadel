@@ -11,6 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/notification/senders/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -19,9 +21,9 @@ import (
 
 func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 	type fields struct {
-		userID     string
-		eventstore func(*testing.T) *eventstore.Eventstore
-		createCode encryptedCodeWithDefaultFunc
+		userID          string
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		createPhoneCode encryptedCodeGeneratorWithDefaultFunc
 	}
 	type res struct {
 		err        error
@@ -66,7 +68,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 						),
 					),
 				),
-				createCode: mockEncryptedCodeWithDefault("1234567", 5*time.Minute),
+				createPhoneCode: mockEncryptedCodeGeneratorWithDefault("1234567", 5*time.Minute),
 			},
 			res: res{
 				returnCode: "1234567",
@@ -80,6 +82,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 						},
 						5*time.Minute,
 						true,
+						"",
 					),
 				},
 			},
@@ -107,7 +110,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 				sessionCommands:   []SessionCommand{cmd},
 				sessionWriteModel: sessionModel,
 				eventstore:        tt.fields.eventstore(t),
-				createCode:        tt.fields.createCode,
+				createPhoneCode:   tt.fields.createPhoneCode,
 				now:               time.Now,
 			}
 
@@ -122,9 +125,9 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 
 func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 	type fields struct {
-		userID     string
-		eventstore func(*testing.T) *eventstore.Eventstore
-		createCode encryptedCodeWithDefaultFunc
+		userID          string
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		createPhoneCode encryptedCodeGeneratorWithDefaultFunc
 	}
 	type res struct {
 		err      error
@@ -168,7 +171,7 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 						),
 					),
 				),
-				createCode: mockEncryptedCodeWithDefault("1234567", 5*time.Minute),
+				createPhoneCode: mockEncryptedCodeGeneratorWithDefault("1234567", 5*time.Minute),
 			},
 			res: res{
 				commands: []eventstore.Command{
@@ -181,6 +184,31 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 						},
 						5*time.Minute,
 						false,
+						"",
+					),
+				},
+			},
+		},
+		{
+			name: "generate code externally",
+			fields: fields{
+				userID: "userID",
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org").Aggregate),
+						),
+					),
+				),
+				createPhoneCode: mockEncryptedCodeGeneratorWithDefaultExternal("generatorID"),
+			},
+			res: res{
+				commands: []eventstore.Command{
+					session.NewOTPSMSChallengedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+						nil,
+						0,
+						false,
+						"generatorID",
 					),
 				},
 			},
@@ -208,7 +236,7 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 				sessionCommands:   []SessionCommand{cmd},
 				sessionWriteModel: sessionModel,
 				eventstore:        tt.fields.eventstore(t),
-				createCode:        tt.fields.createCode,
+				createPhoneCode:   tt.fields.createPhoneCode,
 				now:               time.Now,
 			}
 
@@ -228,6 +256,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 		ctx           context.Context
 		sessionID     string
 		resourceOwner string
+		generatorInfo *senders.CodeGeneratorInfo
 	}
 	tests := []struct {
 		name    string
@@ -246,6 +275,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 				ctx:           context.Background(),
 				sessionID:     "sessionID",
 				resourceOwner: "instanceID",
+				generatorInfo: &senders.CodeGeneratorInfo{},
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-G3t31", "Errors.User.Code.NotFound"),
 		},
@@ -264,11 +294,12 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 								},
 								5*time.Minute,
 								false,
+								"",
 							),
 						),
 					),
 					expectPush(
-						session.NewOTPSMSSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
+						session.NewOTPSMSSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, &senders.CodeGeneratorInfo{}),
 					),
 				),
 			},
@@ -276,6 +307,37 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 				ctx:           context.Background(),
 				sessionID:     "sessionID",
 				resourceOwner: "instanceID",
+				generatorInfo: &senders.CodeGeneratorInfo{},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "challenged and sent (externally)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewOTPSMSChallengedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+								nil,
+								0,
+								false,
+								"",
+							),
+						),
+					),
+					expectPush(
+						session.NewOTPSMSSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, &senders.CodeGeneratorInfo{ID: "generatorID", VerificationID: "verificationID"}),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				sessionID:     "sessionID",
+				resourceOwner: "instanceID",
+				generatorInfo: &senders.CodeGeneratorInfo{
+					ID:             "generatorID",
+					VerificationID: "verificationID",
+				},
 			},
 			wantErr: nil,
 		},
@@ -285,7 +347,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := c.OTPSMSSent(tt.args.ctx, tt.args.sessionID, tt.args.resourceOwner)
+			err := c.OTPSMSSent(tt.args.ctx, tt.args.sessionID, tt.args.resourceOwner, tt.args.generatorInfo)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -702,6 +764,7 @@ func TestCheckOTPSMS(t *testing.T) {
 		userID           string
 		otpCodeChallenge *OTPCode
 		otpAlg           crypto.EncryptionAlgorithm
+		getCodeVerifier  func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	}
 	type args struct {
 		code string
@@ -888,6 +951,41 @@ func TestCheckOTPSMS(t *testing.T) {
 			},
 		},
 		{
+			name: "check ok (external)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
+					),
+					expectFilter(), // recheck
+				),
+				userID: "userID",
+				otpCodeChallenge: &OTPCode{
+					Code:           nil,
+					Expiry:         0,
+					GeneratorID:    "generatorID",
+					VerificationID: "verificationID",
+					CreationDate:   testNow,
+				},
+				getCodeVerifier: func(ctx context.Context, id string) (senders.CodeGenerator, error) {
+					sender := mock.NewMockCodeGenerator(gomock.NewController(t))
+					sender.EXPECT().VerifyCode("verificationID", "code").Return(nil)
+					return sender, nil
+				},
+			},
+			args: args{
+				code: "code",
+			},
+			res: res{
+				commands: []eventstore.Command{
+					user.NewHumanOTPSMSCheckSucceededEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, nil),
+					session.NewOTPSMSCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+						testNow,
+					),
+				},
+			},
+		},
+		{
 			name: "check ok, locked in the meantime",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -935,6 +1033,7 @@ func TestCheckOTPSMS(t *testing.T) {
 				sessionWriteModel: sessionModel,
 				eventstore:        tt.fields.eventstore(t),
 				otpAlg:            tt.fields.otpAlg,
+				getCodeVerifier:   tt.fields.getCodeVerifier,
 				now: func() time.Time {
 					return testNow
 				},

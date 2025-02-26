@@ -1,8 +1,8 @@
-<form [formGroup]="machineForm" *ngIf="machineForm" (ngSubmit)="submitForm()">
+<form [formGroup]="machineForm" (ngSubmit)="submitForm()">
   <div class="content">
     <cnsl-form-field class="formfield">
       <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}</cnsl-label>
-      <input cnslInput formControlName="userName" required />
+      <input cnslInput formControlName="username" required />
     </cnsl-form-field>
     <cnsl-form-field class="formfield">
       <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}</cnsl-label>

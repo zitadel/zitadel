@@ -21,7 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
+func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
@@ -210,6 +210,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							nil,
+							false,
 							idp.Options{},
 						),
 					),
@@ -256,6 +257,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							[]string{"user"},
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -280,6 +282,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 					UserEndpoint:          "user",
 					Scopes:                []string{"user"},
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -520,6 +523,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -536,6 +540,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					IDAttribute:           "idAttribute",
+					UsePKCE:               false,
 				},
 			},
 			res: res{
@@ -563,6 +568,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -585,6 +591,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 									idp.ChangeOAuthUserEndpoint("new user"),
 									idp.ChangeOAuthScopes([]string{"openid", "profile"}),
 									idp.ChangeOAuthIDAttribute("newAttribute"),
+									idp.ChangeOAuthUsePKCE(true),
 									idp.ChangeOAuthOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -612,6 +619,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 					UserEndpoint:          "new user",
 					Scopes:                []string{"openid", "profile"},
 					IDAttribute:           "newAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -763,6 +771,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 							},
 							nil,
 							false,
+							false,
 							idp.Options{},
 						),
 					),
@@ -804,6 +813,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 							},
 							[]string{openid.ScopeOpenID},
 							true,
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -826,6 +836,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "clientSecret",
 					Scopes:           []string{openid.ScopeOpenID},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -995,6 +1006,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1033,6 +1045,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1053,6 +1066,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 									}),
 									idp.ChangeOIDCScopes([]string{"openid", "profile"}),
 									idp.ChangeOIDCIsIDTokenMapping(true),
+									idp.ChangeOIDCUsePKCE(true),
 									idp.ChangeOIDCOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -1078,6 +1092,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "newSecret",
 					Scopes:           []string{"openid", "profile"},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -1225,6 +1240,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1283,6 +1299,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 									Crypted:    []byte("clientSecret"),
 								},
 								nil,
+								false,
 								false,
 								idp.Options{},
 							)),
@@ -1452,6 +1469,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1504,6 +1522,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 									Crypted:    []byte("clientSecret"),
 								},
 								nil,
+								false,
 								false,
 								idp.Options{},
 							)),
@@ -4328,6 +4347,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
+							nil,
 							idp.LDAPAttributes{},
 							idp.Options{},
 						),
@@ -4380,6 +4400,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
+							[]byte("certificate"),
 							idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "firstName",
@@ -4421,6 +4442,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "firstName",
@@ -4706,6 +4728,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
+								[]byte("certificate"),
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4725,6 +4748,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 					UserFilters:       []string{"filter"},
 					UserBase:          "user",
 					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
 				},
 			},
 			res: res{
@@ -4754,6 +4778,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
+								[]byte("certificate"),
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4823,6 +4848,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"new object"},
 					UserFilters:       []string{"new filter"},
 					Timeout:           time.Second * 20,
+					RootCA:            []byte("certificate"),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "new id",
 						FirstNameAttribute:         "new firstName",
@@ -5348,7 +5374,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		resourceOwner string
-		provider      SAMLProvider
+		provider      *SAMLProvider
 	}
 	type res struct {
 		id   string
@@ -5370,7 +5396,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider:      SAMLProvider{},
+				provider:      &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5379,7 +5405,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5387,13 +5413,33 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-78isv6m53a", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata, fail on error",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5406,7 +5452,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 							"id1",
 							"name",
-							[]byte("metadata"),
+							validSAMLMetadata,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5428,9 +5474,9 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
@@ -5447,7 +5493,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 							"id1",
 							"name",
-							[]byte("metadata"),
+							validSAMLMetadata,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5475,9 +5521,9 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "name",
-					Metadata:                      []byte("metadata"),
+					Metadata:                      validSAMLMetadata,
 					Binding:                       "binding",
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
@@ -5528,7 +5574,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		ctx           context.Context
 		resourceOwner string
 		id            string
-		provider      SAMLProvider
+		provider      *SAMLProvider
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -5548,7 +5594,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider:      SAMLProvider{},
+				provider:      &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5565,7 +5611,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider:      SAMLProvider{},
+				provider:      &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5574,7 +5620,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore: expectEventstore(),
 			},
@@ -5582,13 +5628,33 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: &SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SFqqh42", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5603,9 +5669,9 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
@@ -5623,7 +5689,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
 								"name",
-								[]byte("metadata"),
+								validSAMLMetadata,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5644,9 +5710,9 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
@@ -5684,7 +5750,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								"id1",
 								[]idp.SAMLIDPChanges{
 									idp.ChangeSAMLName("new name"),
-									idp.ChangeSAMLMetadata([]byte("new metadata")),
+									idp.ChangeSAMLMetadata(validSAMLMetadata),
 									idp.ChangeSAMLBinding("new binding"),
 									idp.ChangeSAMLWithSignedRequest(true),
 									idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
@@ -5707,9 +5773,9 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "new name",
-					Metadata:                      []byte("new metadata"),
+					Metadata:                      validSAMLMetadata,
 					Binding:                       "new binding",
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),

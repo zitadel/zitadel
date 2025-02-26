@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 	"time"
 
@@ -59,12 +60,17 @@ type OIDCApp struct {
 	AdditionalOrigins        database.TextArray[string]
 	AllowedOrigins           database.TextArray[string]
 	SkipNativeAppSuccessPage bool
+	BackChannelLogoutURI     string
+	LoginVersion             domain.LoginVersion
+	LoginBaseURI             *string
 }
 
 type SAMLApp struct {
-	Metadata    []byte
-	MetadataURL string
-	EntityID    string
+	Metadata     []byte
+	MetadataURL  string
+	EntityID     string
+	LoginVersion domain.LoginVersion
+	LoginBaseURI *string
 }
 
 type APIApp struct {
@@ -133,6 +139,10 @@ var (
 		name:          projection.AppSAMLTable,
 		instanceIDCol: projection.AppSAMLConfigColumnInstanceID,
 	}
+	AppSAMLConfigColumnInstanceID = Column{
+		name:  projection.AppSAMLConfigColumnInstanceID,
+		table: appSAMLConfigsTable,
+	}
 	AppSAMLConfigColumnAppID = Column{
 		name:  projection.AppSAMLConfigColumnAppID,
 		table: appSAMLConfigsTable,
@@ -147,6 +157,14 @@ var (
 	}
 	AppSAMLConfigColumnMetadataURL = Column{
 		name:  projection.AppSAMLConfigColumnMetadataURL,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnLoginVersion = Column{
+		name:  projection.AppSAMLConfigColumnLoginVersion,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnLoginBaseURI = Column{
+		name:  projection.AppSAMLConfigColumnLoginBaseURI,
 		table: appSAMLConfigsTable,
 	}
 )
@@ -177,6 +195,10 @@ var (
 	}
 	AppOIDCConfigColumnAppID = Column{
 		name:  projection.AppOIDCConfigColumnAppID,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnInstanceID = Column{
+		name:  projection.AppOIDCConfigColumnInstanceID,
 		table: appOIDCConfigsTable,
 	}
 	AppOIDCConfigColumnVersion = Column{
@@ -243,6 +265,18 @@ var (
 		name:  projection.AppOIDCConfigColumnSkipNativeAppSuccessPage,
 		table: appOIDCConfigsTable,
 	}
+	AppOIDCConfigColumnBackChannelLogoutURI = Column{
+		name:  projection.AppOIDCConfigColumnBackChannelLogoutURI,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnLoginVersion = Column{
+		name:  projection.AppOIDCConfigColumnLoginVersion,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnLoginBaseURI = Column{
+		name:  projection.AppOIDCConfigColumnLoginBaseURI,
+		table: appOIDCConfigsTable,
+	}
 )
 
 func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string) (app *App, err error) {
@@ -256,7 +290,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareAppQuery(ctx, q.client)
+	stmt, scan := prepareAppQuery(ctx, q.client, false)
 	eq := sq.Eq{
 		AppColumnID.identifier():         appID,
 		AppColumnProjectID.identifier():  projectID,
@@ -274,39 +308,23 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return app, err
 }
 
-func (q *Queries) AppByID(ctx context.Context, appID string) (app *App, err error) {
+func (q *Queries) AppByID(ctx context.Context, appID string, activeOnly bool) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery(ctx, q.client)
+	stmt, scan := prepareAppQuery(ctx, q.client, activeOnly)
 	eq := sq.Eq{
 		AppColumnID.identifier():         appID,
 		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
+	if activeOnly {
+		eq[AppColumnState.identifier()] = domain.AppStateActive
+		eq[ProjectColumnState.identifier()] = domain.ProjectStateActive
+		eq[OrgColumnState.identifier()] = domain.OrgStateActive
+	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		app, err = scan(row)
-		return err
-	}, query, args...)
-	return app, err
-}
-
-func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (app *App, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	stmt, scan := prepareSAMLAppQuery(ctx, q.client)
-	eq := sq.Eq{
-		AppSAMLConfigColumnEntityID.identifier(): entityID,
-		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
-	}
-	query, args, err := stmt.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -339,6 +357,77 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project 
 		return err
 	}, query, args...)
 	return project, err
+}
+
+//go:embed app_oidc_project_permission.sql
+var appOIDCProjectPermissionQuery string
+
+func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID, userID string) (_ *projectPermission, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	var p *projectPermission
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		p, err = scanProjectPermissionByClientID(row)
+		return err
+	}, appOIDCProjectPermissionQuery,
+		authz.GetInstance(ctx).InstanceID(),
+		clientID,
+		domain.AppStateActive,
+		domain.ProjectStateActive,
+		userID,
+		domain.UserStateActive,
+		domain.ProjectGrantStateActive,
+		domain.UserGrantStateActive,
+	)
+	return p, err
+}
+
+//go:embed app_saml_project_permission.sql
+var appSAMLProjectPermissionQuery string
+
+func (q *Queries) CheckProjectPermissionByEntityID(ctx context.Context, entityID, userID string) (_ *projectPermission, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	var p *projectPermission
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		p, err = scanProjectPermissionByClientID(row)
+		return err
+	}, appSAMLProjectPermissionQuery,
+		authz.GetInstance(ctx).InstanceID(),
+		entityID,
+		domain.AppStateActive,
+		domain.ProjectStateActive,
+		userID,
+		domain.UserStateActive,
+		domain.ProjectGrantStateActive,
+		domain.UserGrantStateActive,
+	)
+	return p, err
+}
+
+type projectPermission struct {
+	HasProjectChecked  bool
+	ProjectRoleChecked bool
+}
+
+func scanProjectPermissionByClientID(row *sql.Row) (*projectPermission, error) {
+	var hasProjectChecked, projectRoleChecked sql.NullBool
+	err := row.Scan(
+		&hasProjectChecked,
+		&projectRoleChecked,
+	)
+	if err != nil || !hasProjectChecked.Valid || !projectRoleChecked.Valid {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-4tq8wCTCgf", "Errors.App.NotFound")
+		}
+		return nil, zerrors.ThrowInternal(err, "QUERY-NwH4lAqlZC", "Errors.Internal")
+	}
+	return &projectPermission{
+		HasProjectChecked:  hasProjectChecked.Bool,
+		ProjectRoleChecked: projectRoleChecked.Bool,
+	}, nil
 }
 
 func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id string, err error) {
@@ -413,8 +502,13 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery(ctx, q.client)
-	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	stmt, scan := prepareAppQuery(ctx, q.client, true)
+	eq := sq.Eq{
+		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		AppColumnState.identifier():      domain.AppStateActive,
+		ProjectColumnState.identifier():  domain.ProjectStateActive,
+		OrgColumnState.identifier():      domain.OrgStateActive,
+	}
 	query, args, err := stmt.Where(sq.And{
 		eq,
 		sq.Or{
@@ -449,7 +543,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-h9TeF", "Errors.Internal")
 	}
 	apps.State, err = q.latestState(ctx, appsTable)
 	return apps, err
@@ -483,6 +577,54 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 	return ids, nil
 }
 
+func (q *Queries) OIDCClientLoginVersion(ctx context.Context, clientID string) (loginVersion domain.LoginVersion, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareLoginVersionByOIDCClientID(ctx, q.client)
+	eq := sq.Eq{
+		AppOIDCConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		AppOIDCConfigColumnClientID.identifier():   clientID,
+	}
+	stmt, args, err := query.Where(eq).ToSql()
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInvalidArgument(err, "QUERY-WEh31", "Errors.Query.InvalidRequest")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		loginVersion, err = scan(row)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-W2gsa", "Errors.Internal")
+	}
+	return loginVersion, nil
+}
+
+func (q *Queries) SAMLAppLoginVersion(ctx context.Context, appID string) (loginVersion domain.LoginVersion, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareLoginVersionBySAMLAppID(ctx, q.client)
+	eq := sq.Eq{
+		AppSAMLConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		AppSAMLConfigColumnAppID.identifier():      appID,
+	}
+	stmt, args, err := query.Where(eq).ToSql()
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInvalidArgument(err, "QUERY-TnaciwZfp3", "Errors.Query.InvalidRequest")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		loginVersion, err = scan(row)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-lvDDwRzIoP", "Errors.Internal")
+	}
+	return loginVersion, nil
+}
+
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnName, value, method)
 }
@@ -491,107 +633,131 @@ func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
 }
 
-func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-	return sq.Select(
-			AppColumnID.identifier(),
-			AppColumnName.identifier(),
-			AppColumnProjectID.identifier(),
-			AppColumnCreationDate.identifier(),
-			AppColumnChangeDate.identifier(),
-			AppColumnResourceOwner.identifier(),
-			AppColumnState.identifier(),
-			AppColumnSequence.identifier(),
+func prepareAppQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+	query := sq.Select(
+		AppColumnID.identifier(),
+		AppColumnName.identifier(),
+		AppColumnProjectID.identifier(),
+		AppColumnCreationDate.identifier(),
+		AppColumnChangeDate.identifier(),
+		AppColumnResourceOwner.identifier(),
+		AppColumnState.identifier(),
+		AppColumnSequence.identifier(),
 
-			AppAPIConfigColumnAppID.identifier(),
-			AppAPIConfigColumnClientID.identifier(),
-			AppAPIConfigColumnAuthMethod.identifier(),
+		AppAPIConfigColumnAppID.identifier(),
+		AppAPIConfigColumnClientID.identifier(),
+		AppAPIConfigColumnAuthMethod.identifier(),
 
-			AppOIDCConfigColumnAppID.identifier(),
-			AppOIDCConfigColumnVersion.identifier(),
-			AppOIDCConfigColumnClientID.identifier(),
-			AppOIDCConfigColumnRedirectUris.identifier(),
-			AppOIDCConfigColumnResponseTypes.identifier(),
-			AppOIDCConfigColumnGrantTypes.identifier(),
-			AppOIDCConfigColumnApplicationType.identifier(),
-			AppOIDCConfigColumnAuthMethodType.identifier(),
-			AppOIDCConfigColumnPostLogoutRedirectUris.identifier(),
-			AppOIDCConfigColumnDevMode.identifier(),
-			AppOIDCConfigColumnAccessTokenType.identifier(),
-			AppOIDCConfigColumnAccessTokenRoleAssertion.identifier(),
-			AppOIDCConfigColumnIDTokenRoleAssertion.identifier(),
-			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
-			AppOIDCConfigColumnClockSkew.identifier(),
-			AppOIDCConfigColumnAdditionalOrigins.identifier(),
-			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+		AppOIDCConfigColumnAppID.identifier(),
+		AppOIDCConfigColumnVersion.identifier(),
+		AppOIDCConfigColumnClientID.identifier(),
+		AppOIDCConfigColumnRedirectUris.identifier(),
+		AppOIDCConfigColumnResponseTypes.identifier(),
+		AppOIDCConfigColumnGrantTypes.identifier(),
+		AppOIDCConfigColumnApplicationType.identifier(),
+		AppOIDCConfigColumnAuthMethodType.identifier(),
+		AppOIDCConfigColumnPostLogoutRedirectUris.identifier(),
+		AppOIDCConfigColumnDevMode.identifier(),
+		AppOIDCConfigColumnAccessTokenType.identifier(),
+		AppOIDCConfigColumnAccessTokenRoleAssertion.identifier(),
+		AppOIDCConfigColumnIDTokenRoleAssertion.identifier(),
+		AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
+		AppOIDCConfigColumnClockSkew.identifier(),
+		AppOIDCConfigColumnAdditionalOrigins.identifier(),
+		AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
+		AppOIDCConfigColumnLoginVersion.identifier(),
+		AppOIDCConfigColumnLoginBaseURI.identifier(),
 
-			AppSAMLConfigColumnAppID.identifier(),
-			AppSAMLConfigColumnEntityID.identifier(),
-			AppSAMLConfigColumnMetadata.identifier(),
-			AppSAMLConfigColumnMetadataURL.identifier(),
-		).From(appsTable.identifier()).
+		AppSAMLConfigColumnAppID.identifier(),
+		AppSAMLConfigColumnEntityID.identifier(),
+		AppSAMLConfigColumnMetadata.identifier(),
+		AppSAMLConfigColumnMetadataURL.identifier(),
+		AppSAMLConfigColumnLoginVersion.identifier(),
+		AppSAMLConfigColumnLoginBaseURI.identifier(),
+	).From(appsTable.identifier()).
+		PlaceholderFormat(sq.Dollar)
+
+	if activeOnly {
+		return query.
+				LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
+				LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+				LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+				LeftJoin(join(ProjectColumnID, AppColumnProjectID)).
+				LeftJoin(join(OrgColumnID, AppColumnResourceOwner) + db.Timetravel(call.Took(ctx))),
+			scanApp
+	}
+	return query.
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
-			app := new(App)
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))),
+		scanApp
+}
 
-			var (
-				apiConfig  = sqlAPIConfig{}
-				oidcConfig = sqlOIDCConfig{}
-				samlConfig = sqlSAMLConfig{}
-			)
+func scanApp(row *sql.Row) (*App, error) {
+	app := new(App)
 
-			err := row.Scan(
-				&app.ID,
-				&app.Name,
-				&app.ProjectID,
-				&app.CreationDate,
-				&app.ChangeDate,
-				&app.ResourceOwner,
-				&app.State,
-				&app.Sequence,
+	var (
+		apiConfig  = sqlAPIConfig{}
+		oidcConfig = sqlOIDCConfig{}
+		samlConfig = sqlSAMLConfig{}
+	)
 
-				&apiConfig.appID,
-				&apiConfig.clientID,
-				&apiConfig.authMethod,
+	err := row.Scan(
+		&app.ID,
+		&app.Name,
+		&app.ProjectID,
+		&app.CreationDate,
+		&app.ChangeDate,
+		&app.ResourceOwner,
+		&app.State,
+		&app.Sequence,
 
-				&oidcConfig.appID,
-				&oidcConfig.version,
-				&oidcConfig.clientID,
-				&oidcConfig.redirectUris,
-				&oidcConfig.responseTypes,
-				&oidcConfig.grantTypes,
-				&oidcConfig.applicationType,
-				&oidcConfig.authMethodType,
-				&oidcConfig.postLogoutRedirectUris,
-				&oidcConfig.devMode,
-				&oidcConfig.accessTokenType,
-				&oidcConfig.accessTokenRoleAssertion,
-				&oidcConfig.iDTokenRoleAssertion,
-				&oidcConfig.iDTokenUserinfoAssertion,
-				&oidcConfig.clockSkew,
-				&oidcConfig.additionalOrigins,
-				&oidcConfig.skipNativeAppSuccessPage,
+		&apiConfig.appID,
+		&apiConfig.clientID,
+		&apiConfig.authMethod,
 
-				&samlConfig.appID,
-				&samlConfig.entityID,
-				&samlConfig.metadata,
-				&samlConfig.metadataURL,
-			)
+		&oidcConfig.appID,
+		&oidcConfig.version,
+		&oidcConfig.clientID,
+		&oidcConfig.redirectUris,
+		&oidcConfig.responseTypes,
+		&oidcConfig.grantTypes,
+		&oidcConfig.applicationType,
+		&oidcConfig.authMethodType,
+		&oidcConfig.postLogoutRedirectUris,
+		&oidcConfig.devMode,
+		&oidcConfig.accessTokenType,
+		&oidcConfig.accessTokenRoleAssertion,
+		&oidcConfig.iDTokenRoleAssertion,
+		&oidcConfig.iDTokenUserinfoAssertion,
+		&oidcConfig.clockSkew,
+		&oidcConfig.additionalOrigins,
+		&oidcConfig.skipNativeAppSuccessPage,
+		&oidcConfig.backChannelLogoutURI,
+		&oidcConfig.loginVersion,
+		&oidcConfig.loginBaseURI,
 
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-4SJlx", "Errors.Internal")
-			}
+		&samlConfig.appID,
+		&samlConfig.entityID,
+		&samlConfig.metadata,
+		&samlConfig.metadataURL,
+		&samlConfig.loginVersion,
+		&samlConfig.loginBaseURI,
+	)
 
-			apiConfig.set(app)
-			oidcConfig.set(app)
-			samlConfig.set(app)
-
-			return app, nil
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
 		}
+		return nil, zerrors.ThrowInternal(err, "QUERY-4SJlx", "Errors.Internal")
+	}
+
+	apiConfig.set(app)
+	oidcConfig.set(app)
+	samlConfig.set(app)
+
+	return app, nil
 }
 
 func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
@@ -622,6 +788,9 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
+			AppOIDCConfigColumnLoginVersion.identifier(),
+			AppOIDCConfigColumnLoginBaseURI.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
@@ -658,6 +827,9 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.clockSkew,
 				&oidcConfig.additionalOrigins,
 				&oidcConfig.skipNativeAppSuccessPage,
+				&oidcConfig.backChannelLogoutURI,
+				&oidcConfig.loginVersion,
+				&oidcConfig.loginBaseURI,
 			)
 
 			if err != nil {
@@ -668,59 +840,6 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			}
 
 			oidcConfig.set(app)
-
-			return app, nil
-		}
-}
-
-func prepareSAMLAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-	return sq.Select(
-			AppColumnID.identifier(),
-			AppColumnName.identifier(),
-			AppColumnProjectID.identifier(),
-			AppColumnCreationDate.identifier(),
-			AppColumnChangeDate.identifier(),
-			AppColumnResourceOwner.identifier(),
-			AppColumnState.identifier(),
-			AppColumnSequence.identifier(),
-
-			AppSAMLConfigColumnAppID.identifier(),
-			AppSAMLConfigColumnEntityID.identifier(),
-			AppSAMLConfigColumnMetadata.identifier(),
-			AppSAMLConfigColumnMetadataURL.identifier(),
-		).From(appsTable.identifier()).
-			Join(join(AppSAMLConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
-
-			app := new(App)
-			var (
-				samlConfig = sqlSAMLConfig{}
-			)
-
-			err := row.Scan(
-				&app.ID,
-				&app.Name,
-				&app.ProjectID,
-				&app.CreationDate,
-				&app.ChangeDate,
-				&app.ResourceOwner,
-				&app.State,
-				&app.Sequence,
-
-				&samlConfig.appID,
-				&samlConfig.entityID,
-				&samlConfig.metadata,
-				&samlConfig.metadataURL,
-			)
-
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-d6TO1", "Errors.App.NotExisting")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-NAtPg", "Errors.Internal")
-			}
-
-			samlConfig.set(app)
 
 			return app, nil
 		}
@@ -867,11 +986,16 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
+			AppOIDCConfigColumnLoginVersion.identifier(),
+			AppOIDCConfigColumnLoginBaseURI.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
 			AppSAMLConfigColumnMetadata.identifier(),
 			AppSAMLConfigColumnMetadataURL.identifier(),
+			AppSAMLConfigColumnLoginVersion.identifier(),
+			AppSAMLConfigColumnLoginBaseURI.identifier(),
 			countColumn.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
@@ -919,11 +1043,16 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					&oidcConfig.clockSkew,
 					&oidcConfig.additionalOrigins,
 					&oidcConfig.skipNativeAppSuccessPage,
+					&oidcConfig.backChannelLogoutURI,
+					&oidcConfig.loginVersion,
+					&oidcConfig.loginBaseURI,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
 					&samlConfig.metadata,
 					&samlConfig.metadataURL,
+					&samlConfig.loginVersion,
+					&samlConfig.loginBaseURI,
 
 					&apps.Count,
 				)
@@ -973,6 +1102,36 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
+func prepareLoginVersionByOIDCClientID(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+	return sq.Select(
+			AppOIDCConfigColumnLoginVersion.identifier(),
+		).From(appOIDCConfigsTable.identifier()).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (domain.LoginVersion, error) {
+			var loginVersion sql.NullInt16
+			if err := row.Scan(
+				&loginVersion,
+			); err != nil {
+				return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-KL2io", "Errors.Internal")
+			}
+			return domain.LoginVersion(loginVersion.Int16), nil
+		}
+}
+
+func prepareLoginVersionBySAMLAppID(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+	return sq.Select(
+			AppSAMLConfigColumnLoginVersion.identifier(),
+		).From(appSAMLConfigsTable.identifier()).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (domain.LoginVersion, error) {
+			var loginVersion sql.NullInt16
+			if err := row.Scan(
+				&loginVersion,
+			); err != nil {
+				return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-KbzaCnaziI", "Errors.Internal")
+			}
+			return domain.LoginVersion(loginVersion.Int16), nil
+		}
+}
+
 type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
@@ -991,6 +1150,9 @@ type sqlOIDCConfig struct {
 	responseTypes            database.NumberArray[domain.OIDCResponseType]
 	grantTypes               database.NumberArray[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool
+	backChannelLogoutURI     sql.NullString
+	loginVersion             sql.NullInt16
+	loginBaseURI             sql.NullString
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -1014,6 +1176,11 @@ func (c sqlOIDCConfig) set(app *App) {
 		ResponseTypes:            c.responseTypes,
 		GrantTypes:               c.grantTypes,
 		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
+		BackChannelLogoutURI:     c.backChannelLogoutURI.String,
+		LoginVersion:             domain.LoginVersion(c.loginVersion.Int16),
+	}
+	if c.loginBaseURI.Valid {
+		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems
@@ -1024,10 +1191,12 @@ func (c sqlOIDCConfig) set(app *App) {
 }
 
 type sqlSAMLConfig struct {
-	appID       sql.NullString
-	entityID    sql.NullString
-	metadataURL sql.NullString
-	metadata    []byte
+	appID        sql.NullString
+	entityID     sql.NullString
+	metadataURL  sql.NullString
+	metadata     []byte
+	loginVersion sql.NullInt16
+	loginBaseURI sql.NullString
 }
 
 func (c sqlSAMLConfig) set(app *App) {
@@ -1035,9 +1204,13 @@ func (c sqlSAMLConfig) set(app *App) {
 		return
 	}
 	app.SAMLConfig = &SAMLApp{
-		MetadataURL: c.metadataURL.String,
-		Metadata:    c.metadata,
-		EntityID:    c.entityID.String,
+		EntityID:     c.entityID.String,
+		MetadataURL:  c.metadataURL.String,
+		Metadata:     c.metadata,
+		LoginVersion: domain.LoginVersion(c.loginVersion.Int16),
+	}
+	if c.loginBaseURI.Valid {
+		app.SAMLConfig.LoginBaseURI = &c.loginBaseURI.String
 	}
 }
 

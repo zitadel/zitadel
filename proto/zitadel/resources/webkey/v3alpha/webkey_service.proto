@@ -43,7 +43,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/grpc-web+proto";
 
   host: "$CUSTOM-DOMAIN";
-  base_path: "/resources/v3alpha/web_keys";
+  base_path: "/";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -106,7 +106,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service ZITADELWebKeys {
   rpc CreateWebKey(CreateWebKeyRequest) returns (CreateWebKeyResponse) {
     option (google.api.http) = {
-      post: "/"
+      post: "/resources/v3alpha/web_keys"
       body: "key"
     };
 
@@ -133,7 +133,7 @@ service ZITADELWebKeys {
   
   rpc ActivateWebKey(ActivateWebKeyRequest) returns (ActivateWebKeyResponse) {
     option (google.api.http) = {
-      post: "/{id}/_activate"
+      post: "/resources/v3alpha/web_keys/{id}/_activate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -159,7 +159,7 @@ service ZITADELWebKeys {
   
   rpc DeleteWebKey(DeleteWebKeyRequest) returns (DeleteWebKeyResponse) {
     option (google.api.http) = {
-      delete: "/{id}"
+      delete: "/resources/v3alpha/web_keys/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -185,7 +185,7 @@ service ZITADELWebKeys {
   
   rpc ListWebKeys(ListWebKeysRequest) returns (ListWebKeysResponse) {
     option (google.api.http) = {
-      get: "/"
+      get: "/resources/v3alpha/web_keys"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {

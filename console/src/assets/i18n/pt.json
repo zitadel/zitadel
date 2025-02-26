@@ -197,7 +197,8 @@
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
           "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
-          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone."
+          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
+          "IU": "Quando um código de convite de usuário é criado, eles receberão um e-mail com um link para configurar seu método de autenticação."
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Número de Telefone",
       "PHONE_HINT": "Use o símbolo + seguido do código de chamada do país, ou selecione o país na lista suspensa e, em seguida, insira o número de telefone",
+      "PHONE_VERIFIED": "Número de telefone verificado",
+      "SEND_SMS": "Enviar SMS de verificação",
+      "SEND_EMAIL": "Enviar E-mail",
       "USERNAME": "Nome de Usuário",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Alterar nome de usuário",
@@ -947,6 +951,14 @@
       "4": "Bloqueado",
       "5": "Suspenso",
       "6": "Inicial"
+    },
+    "STATEV2": {
+      "0": "Desconhecido",
+      "1": "Ativo",
+      "2": "Inativo",
+      "3": "Excluído",
+      "4": "Bloqueado",
+      "5": "Inicial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nome de usuário (organização atual)",
@@ -1382,7 +1394,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1419,6 +1434,8 @@
         "SID": "SID",
         "TOKEN": "Token",
         "SENDERNUMBER": "Número do remetente",
+        "VERIFYSERVICESID": "SID do serviço de verificação",
+        "VERIFYSERVICESID_DESCRIPTION": "Configurar um SID do serviço de verificação permite usar o serviço Twilio Verify em vez do serviço de mensagens para a verificação de números de telefone e SMS OTP.",
         "ADDED": "Twilio adicionado com sucesso.",
         "UPDATED": "Twilio atualizado com sucesso.",
         "REMOVED": "Twilio removido",
@@ -1469,6 +1486,8 @@
       "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
       "ACTIONS": "Ações",
       "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Término de sessão",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
       "STATES": {
         "INHERITED": "Herdade",
         "ENABLED": "Habilitado",
@@ -1479,7 +1498,9 @@
         "ENABLED": "\"Habilitado\" é herdado",
         "DISABLED": "\"Desabilitado\" é herdado"
       },
-      "RESET": "Definir tudo para herdar"
+      "RESET": "Definir tudo para herdar",
+      "CONSOLEUSEV2USERAPI": "Use a API V2 no console para criação de usuários",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial."
     },
     "DIALOG": {
       "RESET": {
@@ -1614,7 +1635,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -1664,7 +1687,8 @@
         "PR": "Redefinição de Senha",
         "DC": "Reivindicação de Domínio",
         "PL": "Sem senha",
-        "PC": "Alteração de Senha"
+        "PC": "Alteração de Senha",
+        "IU": "Convidar usuário"
       },
       "CHIPS": {
         "firstname": "Nome próprio",
@@ -1684,7 +1708,8 @@
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
         "verifyUrl": "URL para verificar a senha de uso único",
-        "expiry": "Data de expiração"
+        "expiry": "Data de expiração",
+        "applicationName": "Nome do aplicativo"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."
@@ -1712,7 +1737,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "O login convencional com nome de usuário e senha é permitido.",
       "ALLOWEXTERNALIDP_DESC": "O login é permitido para os provedores de identidade subjacentes",
       "ALLOWREGISTER_DESC": "Se a opção estiver selecionada, uma etapa adicional para registrar um usuário aparecerá no login.",
-      "FORCEMFA": "Forçar MFA",
+      "FORCEMFA": "Forçar MFA para todos os utilizadores",
+      "FORCEMFALOCALONLY": "Forçar MFA apenas para utilizadores autenticados localmente",
       "HIDEPASSWORDRESET_DESC": "Se a opção estiver selecionada, o usuário não poderá redefinir sua senha no processo de login.",
       "HIDELOGINNAMESUFFIX": "Ocultar sufixo do nome de login",
       "HIDELOGINNAMESUFFIX_DESC": "Oculta o sufixo do nome de login na interface de login",
@@ -2174,7 +2200,9 @@
       "REMOVED": "Removido com sucesso."
     },
     "ISIDTOKENMAPPING": "Mapeamento do token ID",
-    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo."
+    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo.",
+    "USEPKCE": "Usar PKCE",
+    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação"
   },
   "MFA": {
     "LIST": {
@@ -2524,6 +2552,10 @@
       "CLIENTSECRETREGENERATED": "segredo do cliente gerado.",
       "DELETED": "Aplicativo excluído.",
       "CONFIGCHANGED": "Alterações detectadas!"
+    },
+    "LOGINV2": {
+      "USEV2": "Usar a nova interface de usuário de login",
+      "BASEURL": "URL base personalizado para a nova interface de usuário de login"
     }
   },
   "GENDERS": {
@@ -2547,7 +2579,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

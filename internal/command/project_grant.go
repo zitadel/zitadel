@@ -27,7 +27,7 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGra
 	if !grant.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-3b8fs", "Errors.Project.Grant.Invalid")
 	}
-	err = c.checkProjectGrantPreCondition(ctx, grant)
+	err = c.checkProjectGrantPreCondition(ctx, grant, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 		return nil, err
 	}
 	grant.GrantedOrgID = existingGrant.GrantedOrgID
-	err = c.checkProjectGrantPreCondition(ctx, grant)
+	err = c.checkProjectGrantPreCondition(ctx, grant, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -205,12 +205,6 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
 	}
-
-	err = c.checkProjectExists(ctx, projectID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
@@ -255,11 +249,11 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 	return writeModel, nil
 }
 
-func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant) error {
+func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant, resourceOwner string) error {
 	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
-		return c.checkProjectGrantPreConditionOld(ctx, projectGrant)
+		return c.checkProjectGrantPreConditionOld(ctx, projectGrant, resourceOwner)
 	}
-	existingRoleKeys, err := c.searchProjectGrantState(ctx, projectGrant.AggregateID, projectGrant.GrantedOrgID)
+	existingRoleKeys, err := c.searchProjectGrantState(ctx, projectGrant.AggregateID, projectGrant.GrantedOrgID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -270,11 +264,12 @@ func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGra
 	return nil
 }
 
-func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grantedOrgID string) (existingRoleKeys []string, err error) {
+func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grantedOrgID, resourceOwner string) (existingRoleKeys []string, err error) {
 	results, err := c.eventstore.Search(
 		ctx,
 		// project state query
 		map[eventstore.FieldType]any{
+			eventstore.FieldTypeResourceOwner: resourceOwner,
 			eventstore.FieldTypeAggregateType: project.AggregateType,
 			eventstore.FieldTypeAggregateID:   projectID,
 			eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
@@ -289,6 +284,7 @@ func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grant
 		},
 		// role query
 		map[eventstore.FieldType]any{
+			eventstore.FieldTypeResourceOwner: resourceOwner,
 			eventstore.FieldTypeAggregateType: project.AggregateType,
 			eventstore.FieldTypeAggregateID:   projectID,
 			eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,

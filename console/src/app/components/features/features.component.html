@@ -348,6 +348,89 @@
         </div>
         <cnsl-info-section class="feature-info">{{ 'SETTING.FEATURES.ACTIONS_DESCRIPTION' | translate }}</cnsl-info-section>
       </div>
+
+      <div class="feature-row" *ngIf="toggleStates.oidcSingleV1SessionTermination">
+        <span>{{ 'SETTING.FEATURES.OIDCSINGLEV1SESSIONTERMINATION' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.oidcSingleV1SessionTermination.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.INHERITED">
+              <div class="toggle-row">
+                <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
+                <i
+                  class="info-i las la-question-circle"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
+                ></i>
+                <div
+                  *ngIf="
+                    !!featureData.oidcSingleV1SessionTermination?.enabled &&
+                    (featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot enabled"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
+                ></div>
+                <div
+                  *ngIf="
+                    !featureData.oidcSingleV1SessionTermination?.enabled &&
+                    (featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot disabled"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.DISABLED' | translate }}"
+                ></div>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <cnsl-info-section class="feature-info">{{
+          'SETTING.FEATURES.OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION' | translate
+        }}</cnsl-info-section>
+      </div>
+
+      <div class="feature-row" *ngIf="toggleStates.consoleUseV2UserApi">
+        <span>{{ 'SETTING.FEATURES.CONSOLEUSEV2USERAPI' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.consoleUseV2UserApi.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <cnsl-info-section class="feature-info">{{
+          'SETTING.FEATURES.CONSOLEUSEV2USERAPI_DESCRIPTION' | translate
+        }}</cnsl-info-section>
+      </div>
     </div>
   </cnsl-card>
 </div>

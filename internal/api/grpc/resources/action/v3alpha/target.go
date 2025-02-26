@@ -25,7 +25,8 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 		return nil, err
 	}
 	return &action.CreateTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		Details:    resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		SigningKey: add.SigningKey,
 	}, nil
 }
 
@@ -34,12 +35,14 @@ func (s *Server) PatchTarget(ctx context.Context, req *action.PatchTargetRequest
 		return nil, err
 	}
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	details, err := s.command.ChangeTarget(ctx, patchTargetToCommand(req), instanceID)
+	patch := patchTargetToCommand(req)
+	details, err := s.command.ChangeTarget(ctx, patch, instanceID)
 	if err != nil {
 		return nil, err
 	}
 	return &action.PatchTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		Details:    resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		SigningKey: patch.SigningKey,
 	}, nil
 }
 
@@ -83,6 +86,12 @@ func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 }
 
 func patchTargetToCommand(req *action.PatchTargetRequest) *command.ChangeTarget {
+	expirationSigningKey := false
+	// TODO handle expiration, currently only immediate expiration is supported
+	if req.GetTarget().GetExpirationSigningKey() != nil {
+		expirationSigningKey = true
+	}
+
 	reqTarget := req.GetTarget()
 	if reqTarget == nil {
 		return nil
@@ -91,8 +100,9 @@ func patchTargetToCommand(req *action.PatchTargetRequest) *command.ChangeTarget 
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.GetId(),
 		},
-		Name:     reqTarget.Name,
-		Endpoint: reqTarget.Endpoint,
+		Name:                 reqTarget.Name,
+		Endpoint:             reqTarget.Endpoint,
+		ExpirationSigningKey: expirationSigningKey,
 	}
 	if reqTarget.TargetType != nil {
 		switch t := reqTarget.GetTargetType().(type) {

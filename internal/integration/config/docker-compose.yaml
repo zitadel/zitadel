@@ -14,7 +14,7 @@ services:
       - PGUSER=zitadel
       - POSTGRES_DB=zitadel
       - POSTGRES_HOST_AUTH_METHOD=trust
-    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c shared_buffers=1GB -c work_mem=16MB -c effective_io_concurrency=100 -c wal_level=minimal -c archive_mode=off -c max_wal_senders=0
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: '10s'
@@ -23,3 +23,9 @@ services:
       start_period: '20s'
     ports:
       - 5432:5432
+
+  cache:
+    restart: 'always'
+    image: 'redis:latest'
+    ports:
+      - 6379:6379

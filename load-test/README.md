@@ -20,6 +20,8 @@ The use cases under tests are defined in `src/use_cases`. The implementation of 
 - `VUS`: Amount of parallel processes execute the test (default is 20)
 - `DURATION`: Defines how long the tests are executed (default is `200s`)
 - `ZITADEL_HOST`: URL of ZITADEL (default is `http://localhost:8080`)
+- `ADMIN_LOGIN_NAME`: Loginanme of a human user with `IAM_OWNER`-role
+- `ADMIN_PASSWORD`: password of the human user
 
 To setup the tests we use the credentials of console and log in using an admin. The user must be able to create organizations and all resources inside organizations.
 
@@ -50,6 +52,18 @@ Before you run the tests you need an initialized user. The tests don't implement
 * `make add_session`  
   setup: creates human users  
   test: creates new sessions with user id check
+* `make oidc_session`  
+  setup: creates a machine user to create the auth request and session.  
+  test: creates an auth request, a session and links the session to the auth request. Implementation of [this flow](https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard).
+* `make otp_session`  
+  setup: creates 1 human user for each VU and adds email OTP to it  
+  test: creates a session based on the login name of the user, sets the email OTP challenge to the session and afterwards checks the OTP code
+* `make password_session`  
+  setup: creates 1 human user for each VU and adds email OTP to it  
+  test: creates a session based on the login name of the user and checks for the password on a second step
 * `make machine_jwt_profile_grant`  
   setup: generates private/public key, creates machine users, adds a key  
   test: creates a token and calls user info 
+* `make machine_jwt_profile_grant_single_user`  
+  setup: generates private/public key, creates machine user, adds a key  
+  test: creates a token and calls user info in parallel for the same user

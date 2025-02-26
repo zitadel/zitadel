@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 var (
@@ -59,7 +58,7 @@ The user provided by flags needs privileges to
 }
 
 func InitAll(ctx context.Context, config *Config) {
-	err := initialise(config.Database,
+	err := initialise(ctx, config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
 		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
@@ -71,7 +70,7 @@ func InitAll(ctx context.Context, config *Config) {
 	logging.OnError(err).Fatal("unable to initialize ZITADEL")
 }
 
-func initialise(config database.Config, steps ...func(*database.DB) error) error {
+func initialise(ctx context.Context, config database.Config, steps ...func(context.Context, *database.DB) error) error {
 	logging.Info("initialization started")
 
 	err := ReadStmts(config.Type())
@@ -79,18 +78,18 @@ func initialise(config database.Config, steps ...func(*database.DB) error) error
 		return err
 	}
 
-	db, err := database.Connect(config, true, dialect.DBPurposeQuery)
+	db, err := database.Connect(config, true)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	return Init(db, steps...)
+	return Init(ctx, db, steps...)
 }
 
-func Init(db *database.DB, steps ...func(*database.DB) error) error {
+func Init(ctx context.Context, db *database.DB, steps ...func(context.Context, *database.DB) error) error {
 	for _, step := range steps {
-		if err := step(db); err != nil {
+		if err := step(ctx, db); err != nil {
 			return err
 		}
 	}

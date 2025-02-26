@@ -209,6 +209,7 @@ func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderReques
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -223,6 +224,7 @@ func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProvider
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -234,6 +236,7 @@ func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest)
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -246,6 +249,7 @@ func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRe
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -416,6 +420,7 @@ func addLDAPProviderToCommand(req *mgmt_pb.AddLDAPProviderRequest) command.LDAPP
 		UserObjectClasses: req.UserObjectClasses,
 		UserFilters:       req.UserFilters,
 		Timeout:           req.Timeout.AsDuration(),
+		RootCA:            req.RootCa,
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
@@ -435,6 +440,7 @@ func updateLDAPProviderToCommand(req *mgmt_pb.UpdateLDAPProviderRequest) command
 		Timeout:           req.Timeout.AsDuration(),
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		RootCA:            req.RootCa,
 	}
 }
 
@@ -462,12 +468,12 @@ func updateAppleProviderToCommand(req *mgmt_pb.UpdateAppleProviderRequest) comma
 	}
 }
 
-func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) command.SAMLProvider {
+func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) *command.SAMLProvider {
 	var nameIDFormat *domain.SAMLNameIDFormat
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
-	return command.SAMLProvider{
+	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
@@ -479,12 +485,12 @@ func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) command.SAMLP
 	}
 }
 
-func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
+func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) *command.SAMLProvider {
 	var nameIDFormat *domain.SAMLNameIDFormat
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
-	return command.SAMLProvider{
+	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),

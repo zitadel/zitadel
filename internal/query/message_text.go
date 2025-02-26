@@ -33,6 +33,7 @@ type MessageTexts struct {
 	DomainClaimed            MessageText
 	PasswordlessRegistration MessageText
 	PasswordChange           MessageText
+	InviteUser               MessageText
 }
 
 type MessageText struct {
@@ -346,6 +347,8 @@ func (m *MessageTexts) GetMessageTextByType(msgType string) *MessageText {
 		return &m.PasswordlessRegistration
 	case domain.PasswordChangeMessageType:
 		return &m.PasswordChange
+	case domain.InviteUserMessageType:
+		return &m.InviteUser
 	}
 	return nil
 }

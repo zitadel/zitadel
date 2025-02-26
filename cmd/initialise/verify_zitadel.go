@@ -2,6 +2,7 @@ package initialise
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
+	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 func newZitadel() *cobra.Command {
@@ -36,38 +37,44 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 		return err
 	}
 
+	conn, err := db.Conn(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
 	logging.WithFields().Info("verify system")
-	if err := exec(db, fmt.Sprintf(createSystemStmt, config.Username()), nil); err != nil {
+	if err := exec(ctx, conn, fmt.Sprintf(createSystemStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
 	logging.WithFields().Info("verify encryption keys")
-	if err := createEncryptionKeys(ctx, db); err != nil {
+	if err := createEncryptionKeys(ctx, conn); err != nil {
 		return err
 	}
 
 	logging.WithFields().Info("verify projections")
-	if err := exec(db, fmt.Sprintf(createProjectionsStmt, config.Username()), nil); err != nil {
+	if err := exec(ctx, conn, fmt.Sprintf(createProjectionsStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
 	logging.WithFields().Info("verify eventstore")
-	if err := exec(db, fmt.Sprintf(createEventstoreStmt, config.Username()), nil); err != nil {
+	if err := exec(ctx, conn, fmt.Sprintf(createEventstoreStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
 	logging.WithFields().Info("verify events tables")
-	if err := createEvents(ctx, db); err != nil {
+	if err := createEvents(ctx, conn); err != nil {
 		return err
 	}
 
 	logging.WithFields().Info("verify system sequence")
-	if err := exec(db, createSystemSequenceStmt, nil); err != nil {
+	if err := exec(ctx, conn, createSystemSequenceStmt, nil); err != nil {
 		return err
 	}
 
 	logging.WithFields().Info("verify unique constraints")
-	if err := exec(db, createUniqueConstraints, nil); err != nil {
+	if err := exec(ctx, conn, createUniqueConstraints, nil); err != nil {
 		return err
 	}
 
@@ -77,7 +84,7 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 func verifyZitadel(ctx context.Context, config database.Config) error {
 	logging.WithFields("database", config.DatabaseName()).Info("verify zitadel")
 
-	db, err := database.Connect(config, false, dialect.DBPurposeQuery)
+	db, err := database.Connect(config, false)
 	if err != nil {
 		return err
 	}
@@ -89,7 +96,7 @@ func verifyZitadel(ctx context.Context, config database.Config) error {
 	return db.Close()
 }
 
-func createEncryptionKeys(ctx context.Context, db *database.DB) error {
+func createEncryptionKeys(ctx context.Context, db database.Beginner) error {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -103,8 +110,8 @@ func createEncryptionKeys(ctx context.Context, db *database.DB) error {
 	return tx.Commit()
 }
 
-func createEvents(ctx context.Context, db *database.DB) (err error) {
-	tx, err := db.BeginTx(ctx, nil)
+func createEvents(ctx context.Context, conn *sql.Conn) (err error) {
+	tx, err := conn.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -127,5 +134,8 @@ func createEvents(ctx context.Context, db *database.DB) (err error) {
 		return row.Err()
 	}
 	_, err = tx.Exec(createEventsStmt)
-	return err
+	if err != nil {
+		return err
+	}
+	return es_v3.CheckExecutionPlan(ctx, conn)
 }

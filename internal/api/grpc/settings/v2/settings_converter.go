@@ -5,9 +5,11 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	idp_api "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
@@ -189,6 +191,13 @@ func identityProviderToPb(idp *query.IDPLoginPolicyLink) *settings.IdentityProvi
 		Id:   idp.IDPID,
 		Name: domain.IDPName(idp.IDPName, idp.IDPType),
 		Type: idpTypeToPb(idp.IDPType),
+		Options: &idp_pb.Options{
+			IsLinkingAllowed:  idp.IsLinkingAllowed,
+			IsCreationAllowed: idp.IsCreationAllowed,
+			IsAutoCreation:    idp.IsAutoCreation,
+			IsAutoUpdate:      idp.IsAutoUpdate,
+			AutoLinking:       idp_api.AutoLinkingOptionToPb(idp.AutoLinking),
+		},
 	}
 }
 
@@ -216,6 +225,8 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED
 	case domain.IDPTypeGoogle:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeApple:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML
 	default:

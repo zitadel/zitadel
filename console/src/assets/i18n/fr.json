@@ -197,7 +197,8 @@
           "VE": "Lorsqu'un utilisateur change son adresse e-mail, il recevra un e-mail avec un lien pour vérifier la nouvelle adresse.",
           "VP": "Lorsqu'un utilisateur change son numéro de téléphone, il recevra un SMS avec un code pour vérifier le nouveau numéro.",
           "VEO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via e-mail, il doit l'activer en entrant un code envoyé à son adresse e-mail.",
-          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone."
+          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone.",
+          "IU": "Lorsqu'un code d'invitation d'utilisateur est créé, il recevra un e-mail avec un lien pour configurer sa méthode d'authentification."
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
       "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone.",
+      "PHONE_VERIFIED": "Numéro de téléphone vérifié",
+      "SEND_SMS": "Envoyer un SMS de vérification",
+      "SEND_EMAIL": "Envoyer un Courriel",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -947,6 +951,14 @@
       "4": "Verrouillé",
       "5": "Suspendu",
       "6": "Initial"
+    },
+    "STATEV2": {
+      "0": "Inconnu",
+      "1": "Actif",
+      "2": "Inactif",
+      "3": "Supprimé",
+      "4": "Verrouillé",
+      "5": "Initial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nom de connexion (organisation actuelle)",
@@ -1381,7 +1393,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1418,6 +1433,8 @@
         "SID": "Sid",
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
+        "VERIFYSERVICESID": "SID du service de vérification",
+        "VERIFYSERVICESID_DESCRIPTION": "Le réglage d'un SID du service de vérification permet d'utiliser le service Twilio Verify au lieu du service de messagerie pour la vérification des numéros de téléphone et des SMS OTP.",
         "ADDED": "Twilio a été ajouté avec succès.",
         "UPDATED": "Twilio a été mis à jour avec succès.",
         "REMOVED": "Twilio a été supprimé avec succès",
@@ -1468,6 +1485,8 @@
       "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "ACTIONS": "Actions",
       "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Fin de session",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
       "STATES": {
         "INHERITED": "Hérité",
         "ENABLED": "Activé",
@@ -1478,7 +1497,9 @@
         "ENABLED": "\"Activé\" est hérité",
         "DISABLED": "\"Désactivé\" est hérité"
       },
-      "RESET": "Réinitialiser tout sur hérité"
+      "RESET": "Réinitialiser tout sur hérité",
+      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console pour la création d'utilisateurs",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial."
     },
     "DIALOG": {
       "RESET": {
@@ -1613,7 +1634,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -1663,7 +1686,8 @@
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
         "PL": "Sans mot de passe",
-        "PC": "Modification du mot de passe"
+        "PC": "Modification du mot de passe",
+        "IU": "Inviter un utilisateur"
       },
       "CHIPS": {
         "firstname": "Prénom",
@@ -1683,7 +1707,8 @@
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
         "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
-        "expiry": "Expiration"
+        "expiry": "Expiration",
+        "applicationName": "Nom de l'application"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."
@@ -1711,8 +1736,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "La connexion classique avec nom d'utilisateur et mot de passe est autorisée.",
       "ALLOWEXTERNALIDP_DESC": "La connexion est autorisée pour les fournisseurs d'identité sous-jacents",
       "ALLOWREGISTER_DESC": "Si l'option est sélectionnée, une étape supplémentaire pour l'enregistrement d'un utilisateur apparaît dans la connexion.",
-      "FORCEMFA": "Forcer MFA",
-      "FORCEMFALOCALONLY": "Forcer MFA pour les utilisateurs locaux",
+      "FORCEMFA": "Forcer MFA pour tous les utilisateurs",
+      "FORCEMFALOCALONLY": "Forcer MFA uniquement pour les utilisateurs authentifiés localement",
       "FORCEMFALOCALONLY_DESC": "Si l'option est sélectionnée, les utilisateurs locaux authentifiés doivent configurer un deuxième facteur pour la connexion.",
       "HIDEPASSWORDRESET_DESC": "Si l'option est sélectionnée, l'utilisateur ne peut pas réinitialiser son mot de passe lors du processus de connexion.",
       "HIDELOGINNAMESUFFIX": "Masquer le suffixe du nom de connexion",
@@ -2180,7 +2205,9 @@
       "REMOVED": "Suppression réussie."
     },
     "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
-    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo."
+    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo.",
+    "USEPKCE": "Utiliser PKCE",
+    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification"
   },
   "MFA": {
     "LIST": {
@@ -2530,6 +2557,10 @@
       "CLIENTSECRETREGENERATED": "secret client généré.",
       "DELETED": "Application supprimée.",
       "CONFIGCHANGED": "Changements détectés !"
+    },
+    "LOGINV2": {
+      "USEV2": "Utiliser la nouvelle interface utilisateur de connexion",
+      "BASEURL": "URL de base personnalisée pour la nouvelle interface utilisateur de connexion"
     }
   },
   "GENDERS": {
@@ -2553,7 +2584,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",

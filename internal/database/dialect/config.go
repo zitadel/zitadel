@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"sync"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Dialect struct {
@@ -24,36 +26,11 @@ type Matcher interface {
 }
 
 const (
-	QueryAppName             = "zitadel_queries"
-	EventstorePusherAppName  = "zitadel_es_pusher"
-	ProjectionSpoolerAppName = "zitadel_projection_spooler"
-	defaultAppName           = "zitadel"
+	DefaultAppName = "zitadel"
 )
-
-// DBPurpose is what the resulting connection pool is used for.
-type DBPurpose int
-
-const (
-	DBPurposeQuery DBPurpose = iota
-	DBPurposeEventPusher
-	DBPurposeProjectionSpooler
-)
-
-func (p DBPurpose) AppName() string {
-	switch p {
-	case DBPurposeQuery:
-		return QueryAppName
-	case DBPurposeEventPusher:
-		return EventstorePusherAppName
-	case DBPurposeProjectionSpooler:
-		return ProjectionSpoolerAppName
-	default:
-		return defaultAppName
-	}
-}
 
 type Connector interface {
-	Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose DBPurpose) (*sql.DB, error)
+	Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error)
 	Password() string
 	Database
 }

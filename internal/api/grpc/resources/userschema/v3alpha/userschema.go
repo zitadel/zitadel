@@ -3,6 +3,8 @@ package userschema
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
@@ -102,20 +104,28 @@ func createUserSchemaToCommand(req *schema.CreateUserSchemaRequest, resourceOwne
 }
 
 func patchUserSchemaToCommand(req *schema.PatchUserSchemaRequest, resourceOwner string) (*command.ChangeUserSchema, error) {
-	schema, err := req.GetSchema().MarshalJSON()
+	schema, err := req.GetUserSchema().GetSchema().MarshalJSON()
 	if err != nil {
 		return nil, err
+	}
+
+	var ty *string
+	if req.GetUserSchema() != nil && req.GetUserSchema().GetType() != "" {
+		ty = gu.Ptr(req.GetUserSchema().GetType())
 	}
 	return &command.ChangeUserSchema{
 		ID:                     req.GetId(),
 		ResourceOwner:          resourceOwner,
-		Type:                   req.Type,
+		Type:                   ty,
 		Schema:                 schema,
-		PossibleAuthenticators: authenticatorsToDomain(req.GetPossibleAuthenticators()),
+		PossibleAuthenticators: authenticatorsToDomain(req.GetUserSchema().GetPossibleAuthenticators()),
 	}, nil
 }
 
 func authenticatorsToDomain(authenticators []schema.AuthenticatorType) []domain.AuthenticatorType {
+	if authenticators == nil {
+		return nil
+	}
 	types := make([]domain.AuthenticatorType, len(authenticators))
 	for i, authenticator := range authenticators {
 		types[i] = authenticatorTypeToDomain(authenticator)

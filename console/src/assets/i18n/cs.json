@@ -197,7 +197,8 @@
           "VE": "Když uživatel změní svou e-mailovou adresu, obdrží e-mail s odkazem na ověření nové adresy.",
           "VP": "Když uživatel změní své telefonní číslo, obdrží SMS s kódem pro ověření nového čísla.",
           "VEO": "Když uživatel přidá metodu jednorázového hesla přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
-          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo."
+          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo.",
+          "IU": "Když se vytvoří pozvánka pro uživatele, obdrží e-mail s odkazem na nastavení své metody ověřování."
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefonní číslo",
       "PHONE_HINT": "Použijte symbol + následovaný mezinárodním kódem země, nebo ze seznamu vyberte zemi a nakonec zadejte telefonní číslo",
+      "PHONE_VERIFIED": "Telefonní číslo ověřeno",
+      "SEND_SMS": "Odeslat ověřovací SMS",
+      "SEND_EMAIL": "Odeslat E-mail",
       "USERNAME": "Uživatelské jméno",
       "CHANGEUSERNAME": "upravit",
       "CHANGEUSERNAME_TITLE": "Změna uživatelského jména",
@@ -947,6 +951,14 @@
       "4": "Uzamčený",
       "5": "Pozastavený",
       "6": "Počáteční"
+    },
+    "STATEV2": {
+      "0": "Neznámý",
+      "1": "Aktivní",
+      "2": "Neaktivní",
+      "3": "Smazaný",
+      "4": "Uzamčený",
+      "5": "Počáteční"
     },
     "SEARCH": {
       "ADDITIONAL": "Přihlašovací jméno (současná organizace)",
@@ -1381,7 +1393,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1418,6 +1433,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Číslo odesílatele",
+        "VERIFYSERVICESID": "ID služby ověření",
+        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a SMS OTP.",
         "ADDED": "Twilio bylo úspěšně přidáno.",
         "UPDATED": "Twilio bylo úspěšně aktualizováno.",
         "REMOVED": "Twilio bylo odebráno",
@@ -1468,6 +1485,8 @@
       "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
       "ACTIONS": "Akce",
       "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 ukončení relace",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",
@@ -1478,7 +1497,9 @@
         "ENABLED": "„Povoleno“ je zděděno",
         "DISABLED": "„Zakázáno“ je zděděno"
       },
-      "RESET": "Nastavit vše na děděné"
+      "RESET": "Nastavit vše na děděné",
+      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro vytvoření uživatele",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu."
     },
     "DIALOG": {
       "RESET": {
@@ -1613,7 +1634,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -1663,7 +1686,8 @@
         "PR": "Reset hesla",
         "DC": "Nárok na doménu",
         "PL": "Bezheslový",
-        "PC": "Změna hesla"
+        "PC": "Změna hesla",
+        "IU": "Pozvat uživatele"
       },
       "CHIPS": {
         "firstname": "Křestní jméno",
@@ -1683,7 +1707,8 @@
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
         "verifyUrl": "Ověřovací URL jednorázového hesla",
-        "expiry": "Expirace"
+        "expiry": "Expirace",
+        "applicationName": "Název aplikace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."
@@ -1712,8 +1737,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
       "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
       "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",
-      "FORCEMFA": "Vynutit MFA",
-      "FORCEMFALOCALONLY": "Vynutit MFA pouze pro lokálně ověřené uživatele",
+      "FORCEMFA": "Vynuti MFA pro všechny uživatele",
+      "FORCEMFALOCALONLY": "Vynutit MFA pouze pro místně ověřené uživatele",
       "FORCEMFALOCALONLY_DESC": "Pokud je možnost vybrána, lokálně ověření uživatelé musí pro přihlášení nastavit druhý faktor.",
       "HIDEPASSWORDRESET_DESC": "Pokud je možnost vybrána, uživatel nemůže během přihlašovacího procesu resetovat své heslo.",
       "HIDELOGINNAMESUFFIX": "Skrýt příponu přihlašovacího jména",
@@ -2188,7 +2213,9 @@
       "REMOVED": "Úspěšně odebráno."
     },
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
-    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo."
+    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
+    "USEPKCE": "Použijte PKCE",
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
   },
   "MFA": {
     "LIST": {
@@ -2538,6 +2565,10 @@
       "CLIENTSECRETREGENERATED": "klient tajemství regenerováno.",
       "DELETED": "Aplikace smazána.",
       "CONFIGCHANGED": "Zjištěny změny!"
+    },
+    "LOGINV2": {
+      "USEV2": "Použít nové uživatelské rozhraní pro přihlášení",
+      "BASEURL": "Vlastní základní adresa URL pro nové uživatelské rozhraní pro přihlášení"
     }
   },
   "GENDERS": {
@@ -2561,7 +2592,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

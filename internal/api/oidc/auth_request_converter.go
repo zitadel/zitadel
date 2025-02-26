@@ -158,7 +158,7 @@ func IpFromContext(ctx context.Context) net.IP {
 }
 
 func PromptToBusiness(oidcPrompt []string) []domain.Prompt {
-	prompts := make([]domain.Prompt, len(oidcPrompt))
+	prompts := make([]domain.Prompt, 0, len(oidcPrompt))
 	for _, oidcPrompt := range oidcPrompt {
 		switch oidcPrompt {
 		case oidc.PromptNone:

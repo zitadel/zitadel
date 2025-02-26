@@ -50,12 +50,9 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-	client, err := o.query.GetOIDCClientByID(ctx, id, false)
+	client, err := o.query.ActiveOIDCClientByID(ctx, id, false)
 	if err != nil {
 		return nil, err
-	}
-	if client.State != domain.AppStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2), nil
 }
@@ -332,6 +329,9 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return err
+	}
+	if user.State != domain.UserStateActive {
+		return zerrors.ThrowUnauthenticated(nil, "OIDC-S3tha", "Errors.Users.NotActive")
 	}
 	var allRoles bool
 	roles := make([]string, 0)
@@ -802,19 +802,24 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if projectID != "" {
 		roleAudience = append(roleAudience, projectID)
 	}
-	queries := make([]query.SearchQuery, 0, 2)
 	projectQuery, err := query.NewUserGrantProjectIDsSearchQuery(roleAudience)
 	if err != nil {
 		return nil, nil, err
 	}
-	queries = append(queries, projectQuery)
 	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
 		return nil, nil, err
 	}
-	queries = append(queries, userIDQuery)
+	activeQuery, err := query.NewUserGrantStateQuery(domain.UserGrantStateActive)
+	if err != nil {
+		return nil, nil, err
+	}
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: queries,
+		Queries: []query.SearchQuery{
+			projectQuery,
+			userIDQuery,
+			activeQuery,
+		},
 	}, true)
 	if err != nil {
 		return nil, nil, err
@@ -979,15 +984,12 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 	if err != nil {
 		return nil, err
 	}
-	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
+	client, err := s.query.ActiveOIDCClientByID(ctx, clientID, assertion)
 	if zerrors.IsNotFound(err) {
-		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("client not found")
+		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("no active client not found")
 	}
 	if err != nil {
 		return nil, err // defaults to server error
-	}
-	if client.State != domain.AppStateActive {
-		return nil, oidc.ErrInvalidClient().WithDescription("client is not active")
 	}
 	if client.Settings == nil {
 		client.Settings = &query.OIDCSettings{
@@ -1043,11 +1045,11 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	return nil
 }
 
-func (s *Server) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
+func (s *Server) checkOrgScopes(ctx context.Context, resourceOwner string, scopes []string) ([]string, error) {
 	if slices.ContainsFunc(scopes, func(scope string) bool {
 		return strings.HasPrefix(scope, domain.OrgDomainPrimaryScope)
 	}) {
-		org, err := s.query.OrgByID(ctx, false, user.ResourceOwner)
+		org, err := s.query.OrgByID(ctx, false, resourceOwner)
 		if err != nil {
 			return nil, err
 		}
@@ -1060,7 +1062,7 @@ func (s *Server) checkOrgScopes(ctx context.Context, user *query.User, scopes []
 	}
 	return slices.DeleteFunc(scopes, func(scope string) bool {
 		if orgID, ok := strings.CutPrefix(scope, domain.OrgIDScope); ok {
-			return orgID != user.ResourceOwner
+			return orgID != resourceOwner
 		}
 		return false
 	}), nil

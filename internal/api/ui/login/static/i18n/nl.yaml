@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Volgende
   CancelButtonText: Annuleren
 
+InviteUser:
+  Title: Gebruiker activeren
+  Description: Verifieer uw e-mail met de onderstaande code en stel uw wachtwoord in.
+  CodeLabel: Code
+  NewPasswordLabel: Nieuw wachtwoord
+  NewPasswordConfirm: Wachtwoord bevestigen
+  NextButtonText: Volgende
+  ResendButtonText: Code opnieuw verzenden
+
 InitMFAPrompt:
   Title: 2-Factor Setup
   Description: 2-factor authenticatie geeft u extra beveiliging voor uw gebruikersaccount. Hierdoor bent u de enige die toegang heeft tot uw account.
@@ -253,6 +262,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -293,6 +305,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Nederlands: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -367,6 +382,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:
@@ -487,6 +505,10 @@ Errors:
       CreationNotAllowed: Creatie van een nieuwe gebruiker is niet toegestaan op deze Provider
       LinkingNotAllowed: Koppeling van een gebruiker is niet toegestaan op deze Provider
       NoOptionAllowed: Noch aanmaak noch koppeling is toegestaan voor deze provider. Neem contact op met uw beheerder.
+      LoginFailedSwitchLocal: |
+        Aanmelding bij externe identiteitsprovider is mislukt. Terug naar lokale aanmelding.
+
+        Foutdetails: {{.Details}}
     GrantRequired: Inloggen niet mogelijk. De gebruiker moet minimaal één grant hebben op de applicatie. Neem contact op met uw beheerder.
     ProjectRequired: Inloggen niet mogelijk. De organisatie van de gebruiker moet toegekend zijn aan het project. Neem contact op met uw beheerder.
   IdentityProvider:

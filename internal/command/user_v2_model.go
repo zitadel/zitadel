@@ -15,6 +15,8 @@ import (
 type UserV2WriteModel struct {
 	eventstore.WriteModel
 
+	CreationDate time.Time
+
 	UserName string
 
 	MachineWriteModel bool
@@ -42,13 +44,15 @@ type UserV2WriteModel struct {
 	InitCodeExpiry       time.Duration
 	InitCheckFailedCount uint64
 
-	PasswordWriteModel       bool
-	PasswordEncodedHash      string
-	PasswordChangeRequired   bool
-	PasswordCode             *crypto.CryptoValue
-	PasswordCodeCreationDate time.Time
-	PasswordCodeExpiry       time.Duration
-	PasswordCheckFailedCount uint64
+	PasswordWriteModel         bool
+	PasswordEncodedHash        string
+	PasswordChangeRequired     bool
+	PasswordCode               *crypto.CryptoValue
+	PasswordCodeCreationDate   time.Time
+	PasswordCodeExpiry         time.Duration
+	PasswordCheckFailedCount   uint64
+	PasswordCodeGeneratorID    string
+	PasswordCodeVerificationID string
 
 	EmailWriteModel       bool
 	Email                 domain.EmailAddress
@@ -71,6 +75,9 @@ type UserV2WriteModel struct {
 
 	IDPLinkWriteModel bool
 	IDPLinks          []*domain.UserIDPLink
+
+	MetadataWriteModel bool
+	Metadata           map[string][]byte
 }
 
 func NewUserExistsWriteModel(userID, resourceOwner string) *UserV2WriteModel {
@@ -85,7 +92,7 @@ func NewUserRemoveWriteModel(userID, resourceOwner string) *UserV2WriteModel {
 	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState(), WithIDPLinks())
 }
 
-func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinks bool) *UserV2WriteModel {
+func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinks, metadataListWM bool) *UserV2WriteModel {
 	opts := []UserV2WMOption{WithHuman(), WithState()}
 	if profileWM {
 		opts = append(opts, WithProfile())
@@ -104,6 +111,9 @@ func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, ph
 	}
 	if idpLinks {
 		opts = append(opts, WithIDPLinks())
+	}
+	if metadataListWM {
+		opts = append(opts, WithMetadata())
 	}
 	return newUserV2WriteModel(userID, resourceOwner, opts...)
 }
@@ -167,6 +177,12 @@ func WithAvatar() UserV2WMOption {
 func WithIDPLinks() UserV2WMOption {
 	return func(o *UserV2WriteModel) {
 		o.IDPLinkWriteModel = true
+	}
+}
+
+func WithMetadata() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.MetadataWriteModel = true
 	}
 }
 
@@ -270,13 +286,26 @@ func (wm *UserV2WriteModel) Reduce() error {
 			wm.PasswordChangeRequired = e.ChangeRequired
 			wm.EmptyPasswordCode()
 		case *user.HumanPasswordCodeAddedEvent:
-			wm.SetPasswordCode(e.Code, e.Expiry, e.CreationDate())
+			wm.SetPasswordCode(e)
+		case *user.HumanPasswordCodeSentEvent:
+			wm.SetPasswordCodeSent(e)
 		case *user.UserIDPLinkAddedEvent:
 			wm.AddIDPLink(e.IDPConfigID, e.DisplayName, e.ExternalUserID)
 		case *user.UserIDPLinkRemovedEvent:
 			wm.RemoveIDPLink(e.IDPConfigID, e.ExternalUserID)
 		case *user.UserIDPLinkCascadeRemovedEvent:
 			wm.RemoveIDPLink(e.IDPConfigID, e.ExternalUserID)
+		case *user.MetadataSetEvent:
+			if wm.Metadata == nil {
+				wm.Metadata = make(map[string][]byte)
+			}
+
+			wm.Metadata[e.Key] = e.Value
+		case *user.MetadataRemovedEvent:
+			wm.Metadata[e.Key] = nil
+			delete(wm.Metadata, e.Key)
+		case *user.MetadataRemovedAllEvent:
+			wm.Metadata = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -337,10 +366,16 @@ func (wm *UserV2WriteModel) EmptyPasswordCode() {
 	wm.PasswordCodeExpiry = 0
 	wm.PasswordCodeCreationDate = time.Time{}
 }
-func (wm *UserV2WriteModel) SetPasswordCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
-	wm.PasswordCode = code
-	wm.PasswordCodeExpiry = expiry
-	wm.PasswordCodeCreationDate = creationDate
+func (wm *UserV2WriteModel) SetPasswordCode(e *user.HumanPasswordCodeAddedEvent) {
+	wm.PasswordCode = e.Code
+	wm.PasswordCodeExpiry = e.Expiry
+	wm.PasswordCodeCreationDate = e.CreationDate()
+	wm.PasswordCodeGeneratorID = e.GeneratorID
+}
+
+func (wm *UserV2WriteModel) SetPasswordCodeSent(e *user.HumanPasswordCodeSentEvent) {
+	wm.PasswordCodeGeneratorID = e.GeneratorInfo.GetID()
+	wm.PasswordCodeVerificationID = e.GeneratorInfo.GetVerificationID()
 }
 
 func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -447,6 +482,13 @@ func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
 		)
 	}
 
+	if wm.MetadataWriteModel {
+		eventTypes = append(eventTypes,
+			user.MetadataSetType,
+			user.MetadataRemovedType,
+			user.MetadataRemovedAllType)
+	}
+
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
@@ -472,6 +514,7 @@ func (wm *UserV2WriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.UserState = domain.UserStateActive
 	wm.PasswordEncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
+	wm.CreationDate = e.Creation
 }
 
 func (wm *UserV2WriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEvent) {

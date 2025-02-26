@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: próximo
   CancelButtonText: cancelar
 
+InviteUser:
+  Title: Ativar usuário
+  Description: Verifique seu e-mail com o código abaixo e defina sua senha.
+  CodeLabel: Código
+  NewPasswordLabel: Nova senha
+  NewPasswordConfirm: Confirmar senha
+  NextButtonText: Próximo
+  ResendButtonText: Reenviar código
+
 InitMFAPrompt:
   Title: Configuração de 2 fatores
   Description: A autenticação de 2 fatores fornece uma segurança adicional para sua conta de usuário. Isso garante que apenas você tenha acesso à sua conta.
@@ -249,6 +258,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -289,6 +301,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -363,6 +378,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 
 DeviceAuth:
   Title: Autorização de dispositivo
@@ -484,6 +502,10 @@ Errors:
       CreationNotAllowed: A criação de um novo usuário não é permitida neste provedor
       LinkingNotAllowed: A vinculação de um usuário não é permitida neste provedor
       NoOptionAllowed: Nem criação nem vinculação são permitidas neste fornecedor. Contate o seu administrador.
+      LoginFailedSwitchLocal: |
+        Falha no login no provedor de identidade externo. Retornando ao login local.
+
+        Detalhes do erro: {{.Details}}
     GrantRequired: Login não é possível. O usuário precisa ter pelo menos uma permissão no aplicativo. Entre em contato com o administrador.
     ProjectRequired: Login não é possível. A organização do usuário precisa ser concedida ao projeto. Entre em contato com o administrador.
   IdentityProvider:

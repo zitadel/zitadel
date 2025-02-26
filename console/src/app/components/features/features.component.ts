@@ -16,13 +16,14 @@ import { InfoSectionModule } from 'src/app/modules/info-section/info-section.mod
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
-import {
-  GetInstanceFeaturesResponse,
-  SetInstanceFeaturesRequest,
-} from 'src/app/proto/generated/zitadel/feature/v2beta/instance_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
+import {
+  GetInstanceFeaturesResponse,
+  SetInstanceFeaturesRequest,
+} from '../../proto/generated/zitadel/feature/v2/instance_pb';
+import { withIdentifier } from 'codelyzer/util/astQuery';
 
 enum ToggleState {
   ENABLED = 'ENABLED',
@@ -38,6 +39,8 @@ type ToggleStates = {
   userSchema?: FeatureState;
   oidcTokenExchange?: FeatureState;
   actions?: FeatureState;
+  oidcSingleV1SessionTermination?: FeatureState;
+  consoleUseV2UserApi?: FeatureState;
 };
 
 @Component({
@@ -135,6 +138,13 @@ export class FeaturesComponent implements OnDestroy {
         req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
         changed = true;
       }
+      if (this.toggleStates?.oidcSingleV1SessionTermination?.state !== ToggleState.INHERITED) {
+        req.setOidcSingleV1SessionTermination(
+          this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
+        );
+        changed = true;
+      }
+      req.setConsoleUseV2UserApi(this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED);
 
       if (changed) {
         this.featureService
@@ -215,6 +225,20 @@ export class FeaturesComponent implements OnDestroy {
                 ? ToggleState.ENABLED
                 : ToggleState.DISABLED,
         },
+        oidcSingleV1SessionTermination: {
+          source: this.featureData.oidcSingleV1SessionTermination?.source || Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_UNSPECIFIED
+              ? ToggleState.INHERITED
+              : !!this.featureData.oidcSingleV1SessionTermination?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
+        consoleUseV2UserApi: {
+          source: this.featureData.consoleUseV2UserApi?.source || Source.SOURCE_INSTANCE,
+          state: this.featureData.consoleUseV2UserApi?.enabled ? ToggleState.ENABLED : ToggleState.DISABLED,
+        },
       };
     });
   }
@@ -231,25 +255,5 @@ export class FeaturesComponent implements OnDestroy {
       .catch((error) => {
         this.toast.showError(error);
       });
-  }
-
-  public saveFeatures(): void {
-    if (this.featureData) {
-      const req = new SetInstanceFeaturesRequest();
-      req.setLoginDefaultOrg(!!this.featureData.loginDefaultOrg?.enabled);
-      req.setOidcLegacyIntrospection(!!this.featureData.oidcLegacyIntrospection?.enabled);
-      req.setOidcTokenExchange(!!this.featureData.oidcTokenExchange?.enabled);
-      req.setOidcTriggerIntrospectionProjections(!!this.featureData.oidcTriggerIntrospectionProjections?.enabled);
-      req.setUserSchema(!!this.featureData.userSchema?.enabled);
-
-      this.featureService
-        .setInstanceFeatures(req)
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
   }
 }

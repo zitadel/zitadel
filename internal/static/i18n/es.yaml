@@ -543,12 +543,23 @@ Errors:
     AlreadyExists: Auth Request ya existe
     NotExisting: Auth Request no existe
     WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+    AlreadyHandled: Auth Request ya ha sido procesada
   OIDCSession:
     RefreshTokenInvalid: El token de refresco no es válido
     Token:
       Invalid: El token no es válido
       Expired: El token ha caducado
     InvalidClient: El token no ha sido emitido para este cliente
+  SAMLRequest:
+    AlreadyExists: SAMLRequest ya existe
+    NotExisting: SAMLRequest no existe
+    WrongLoginClient: SAMLRequest creado por otro cliente de inicio de sesión
+    AlreadyHandled: SAMLRequest ya ha sido procesada
+  SAMLSession:
+    InvalidClient: SAMLResponse no ha sido emitido para este cliente
+  DeviceAuth:
+    NotFound: La solicitud de autorización del dispositivo no existe
+    AlreadyHandled: La solicitud de autorización del dispositivo ya ha sido procesada
   Feature:
     NotExisting: La característica no existe
     TypeNotSupported: El tipo de característica no es compatible
@@ -623,6 +634,8 @@ AggregateTypes:
   system: Sistema
   session: Sesión
   web_key: Clave web
+  saml_request: Solicitud SAML
+  saml_session: Sesión SAML
 
 EventTypes:
   execution:
@@ -687,6 +700,13 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la inicialización
           failed: Fallo en la comprobación de la inicialización
+      invite:
+        code:
+          added: Código de invitación generado
+          sent: Código de invitación enviado
+        check:
+          succeeded: Comprobación de invitación correcta
+          failed: Comprobación de invitación fallida
       username:
         reserved: Nombre de usuario reservado
         released: Nombre de usuario liberado
@@ -930,8 +950,8 @@ EventTypes:
           added: Doble factor añadido a la política de inicio de sesión
           removed: Doble factor eliminado de la política de inicio de sesión
         multifactor:
-          added: Multi factor añadido a la política de inicio de sesión
-          removed: Multi factor eliminado de la política de inicio de sesión
+          added: Multi-factor añadido a la política de inicio de sesión
+          removed: Multi-factor eliminado de la política de inicio de sesión
       password:
         complexity:
           added: Política de complejidad de la contraseña añadida

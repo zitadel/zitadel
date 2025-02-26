@@ -205,16 +205,50 @@ make core_unit_test
 
 #### Run Local Integration Tests
 
-To test the database-connected gRPC API, run PostgreSQL and CockroachDB, set up a ZITADEL instance and run the tests including integration tests:
+Integration tests are run as gRPC clients against a running ZITADEL server binary.
+The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
+It is also possible to run a ZITADEL sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
+
+The database flavor can **optionally** be set in the environment to `cockroach` or `postgres`. The default is `postgres`.
 
 ```bash
-export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
-docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
-make core_integration_test
-docker compose -f internal/integration/config/docker-compose.yaml down
+export INTEGRATION_DB_FLAVOR="cockroach"
 ```
 
-Repeat the above with `INTEGRATION_DB_FLAVOR="postgres"`.
+In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
+
+```bash
+make core_integration_db_up core_integration_server_start
+```
+
+When this job is finished, you can run individual package integration test through your IDE or command-line. The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test. Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
+Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results. Pas `-count 1` to disable test caching.
+
+Example command to run a single package integration test:
+
+```bash
+go test -count 1 -tags integration ./internal/api/grpc/management/integration_test
+```
+
+To run all available integration tests:
+
+```bash
+make core_integration_test_packages
+```
+
+When you change any ZITADEL server code, be sure to rebuild and restart the server before the next test run.
+
+```bash
+make core_integration_server_stop core_integration_server_start
+```
+
+To cleanup after testing (deletes the database!):
+
+```bash
+make core_integration_server_stop core_integration_db_down
+```
+
+The test binary has the race detector enabled. `core_core_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
 
 #### Run Local End-to-End Tests
 

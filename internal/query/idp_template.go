@@ -64,6 +64,7 @@ type OAuthIDPTemplate struct {
 	UserEndpoint          string
 	Scopes                database.TextArray[string]
 	IDAttribute           string
+	UsePKCE               bool
 }
 
 type OIDCIDPTemplate struct {
@@ -73,6 +74,7 @@ type OIDCIDPTemplate struct {
 	Issuer           string
 	Scopes           database.TextArray[string]
 	IsIDTokenMapping bool
+	UsePKCE          bool
 }
 
 type JWTIDPTemplate struct {
@@ -142,6 +144,7 @@ type LDAPIDPTemplate struct {
 	UserObjectClasses []string
 	UserFilters       []string
 	Timeout           time.Duration
+	RootCA            []byte
 	idp.LDAPAttributes
 }
 
@@ -277,6 +280,10 @@ var (
 		name:  projection.OAuthIDAttributeCol,
 		table: oauthIdpTemplateTable,
 	}
+	OAuthUsePKCECol = Column{
+		name:  projection.OAuthUsePKCECol,
+		table: oauthIdpTemplateTable,
+	}
 )
 
 var (
@@ -310,6 +317,10 @@ var (
 	}
 	OIDCIDTokenMappingCol = Column{
 		name:  projection.OIDCIDTokenMappingCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCUsePKCECol = Column{
+		name:  projection.OIDCUsePKCECol,
 		table: oidcIdpTemplateTable,
 	}
 )
@@ -580,6 +591,10 @@ var (
 		name:  projection.LDAPTimeoutCol,
 		table: ldapIdpTemplateTable,
 	}
+	LDAPRootCACol = Column{
+		name:  projection.LDAPRootCACol,
+		table: ldapIdpTemplateTable,
+	}
 	LDAPIDAttributeCol = Column{
 		name:  projection.LDAPIDAttributeCol,
 		table: ldapIdpTemplateTable,
@@ -825,6 +840,22 @@ func NewIDPTemplateResourceOwnerListSearchQuery(ids ...string) (SearchQuery, err
 	return NewListQuery(IDPTemplateResourceOwnerCol, list, ListIn)
 }
 
+func NewIDPTemplateIsCreationAllowedSearchQuery(value bool) (SearchQuery, error) {
+	return NewBoolQuery(IDPTemplateIsCreationAllowedCol, value)
+}
+
+func NewIDPTemplateIsLinkingAllowedSearchQuery(value bool) (SearchQuery, error) {
+	return NewBoolQuery(IDPTemplateIsLinkingAllowedCol, value)
+}
+
+func NewIDPTemplateIsAutoCreationSearchQuery(value bool) (SearchQuery, error) {
+	return NewBoolQuery(IDPTemplateIsAutoCreationCol, value)
+}
+
+func NewIDPTemplateAutoLinkingSearchQuery(value int, method NumberComparison) (SearchQuery, error) {
+	return NewNumberQuery(IDPTemplateAutoLinkingCol, value, method)
+}
+
 func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -858,6 +889,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthUsePKCECol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -865,6 +897,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCUsePKCECol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -927,6 +960,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LDAPUserObjectClassesCol.identifier(),
 			LDAPUserFiltersCol.identifier(),
 			LDAPTimeoutCol.identifier(),
+			LDAPRootCACol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -974,6 +1008,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oauthUserEndpoint := sql.NullString{}
 			oauthScopes := database.TextArray[string]{}
 			oauthIDAttribute := sql.NullString{}
+			oauthUserPKCE := sql.NullBool{}
 
 			oidcID := sql.NullString{}
 			oidcIssuer := sql.NullString{}
@@ -981,6 +1016,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
+			oidcUserPKCE := sql.NullBool{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
@@ -1043,6 +1079,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			ldapUserObjectClasses := database.TextArray[string]{}
 			ldapUserFilters := database.TextArray[string]{}
 			ldapTimeout := sql.NullInt64{}
+			var ldapRootCA []byte
 			ldapIDAttribute := sql.NullString{}
 			ldapFirstNameAttribute := sql.NullString{}
 			ldapLastNameAttribute := sql.NullString{}
@@ -1088,6 +1125,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oauthUserEndpoint,
 				&oauthScopes,
 				&oauthIDAttribute,
+				&oauthUserPKCE,
 				// oidc
 				&oidcID,
 				&oidcIssuer,
@@ -1095,6 +1133,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oidcClientSecret,
 				&oidcScopes,
 				&oidcIDTokenMapping,
+				&oidcUserPKCE,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
@@ -1157,6 +1196,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&ldapUserObjectClasses,
 				&ldapUserFilters,
 				&ldapTimeout,
+				&ldapRootCA,
 				&ldapIDAttribute,
 				&ldapFirstNameAttribute,
 				&ldapLastNameAttribute,
@@ -1197,6 +1237,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserEndpoint:          oauthUserEndpoint.String,
 					Scopes:                oauthScopes,
 					IDAttribute:           oauthIDAttribute.String,
+					UsePKCE:               oauthUserPKCE.Bool,
 				}
 			}
 			if oidcID.Valid {
@@ -1207,6 +1248,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Issuer:           oidcIssuer.String,
 					Scopes:           oidcScopes,
 					IsIDTokenMapping: oidcIDTokenMapping.Bool,
+					UsePKCE:          oidcUserPKCE.Bool,
 				}
 			}
 			if jwtID.Valid {
@@ -1296,6 +1338,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserObjectClasses: ldapUserObjectClasses,
 					UserFilters:       ldapUserFilters,
 					Timeout:           time.Duration(ldapTimeout.Int64),
+					RootCA:            ldapRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                ldapIDAttribute.String,
 						FirstNameAttribute:         ldapFirstNameAttribute.String,
@@ -1353,6 +1396,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthUsePKCECol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -1360,6 +1404,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCUsePKCECol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1422,6 +1467,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LDAPUserObjectClassesCol.identifier(),
 			LDAPUserFiltersCol.identifier(),
 			LDAPTimeoutCol.identifier(),
+			LDAPRootCACol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -1474,6 +1520,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oauthUserEndpoint := sql.NullString{}
 				oauthScopes := database.TextArray[string]{}
 				oauthIDAttribute := sql.NullString{}
+				oauthUserPKCE := sql.NullBool{}
 
 				oidcID := sql.NullString{}
 				oidcIssuer := sql.NullString{}
@@ -1481,6 +1528,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
+				oidcUserPKCE := sql.NullBool{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
@@ -1543,6 +1591,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				ldapUserObjectClasses := database.TextArray[string]{}
 				ldapUserFilters := database.TextArray[string]{}
 				ldapTimeout := sql.NullInt64{}
+				var ldapRootCA []byte
 				ldapIDAttribute := sql.NullString{}
 				ldapFirstNameAttribute := sql.NullString{}
 				ldapLastNameAttribute := sql.NullString{}
@@ -1588,6 +1637,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oauthUserEndpoint,
 					&oauthScopes,
 					&oauthIDAttribute,
+					&oauthUserPKCE,
 					// oidc
 					&oidcID,
 					&oidcIssuer,
@@ -1595,6 +1645,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oidcClientSecret,
 					&oidcScopes,
 					&oidcIDTokenMapping,
+					&oidcUserPKCE,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
@@ -1657,6 +1708,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&ldapUserObjectClasses,
 					&ldapUserFilters,
 					&ldapTimeout,
+					&ldapRootCA,
 					&ldapIDAttribute,
 					&ldapFirstNameAttribute,
 					&ldapLastNameAttribute,
@@ -1696,6 +1748,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserEndpoint:          oauthUserEndpoint.String,
 						Scopes:                oauthScopes,
 						IDAttribute:           oauthIDAttribute.String,
+						UsePKCE:               oauthUserPKCE.Bool,
 					}
 				}
 				if oidcID.Valid {
@@ -1706,6 +1759,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						Issuer:           oidcIssuer.String,
 						Scopes:           oidcScopes,
 						IsIDTokenMapping: oidcIDTokenMapping.Bool,
+						UsePKCE:          oidcUserPKCE.Bool,
 					}
 				}
 				if jwtID.Valid {
@@ -1795,6 +1849,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserObjectClasses: ldapUserObjectClasses,
 						UserFilters:       ldapUserFilters,
 						Timeout:           time.Duration(ldapTimeout.Int64),
+						RootCA:            ldapRootCA,
 						LDAPAttributes: idp.LDAPAttributes{
 							IDAttribute:                ldapIDAttribute.String,
 							FirstNameAttribute:         ldapFirstNameAttribute.String,

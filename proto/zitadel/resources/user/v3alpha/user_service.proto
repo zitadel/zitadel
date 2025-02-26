@@ -46,7 +46,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/grpc-web+proto";
 
   host: "$CUSTOM-DOMAIN";
-  base_path: "/resources/v3alpha/users";
+  base_path: "/";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -114,7 +114,7 @@ service ZITADELUsers {
   // Make sure to include a limit and sorting for pagination.
   rpc SearchUsers (SearchUsersRequest) returns (SearchUsersResponse) {
     option (google.api.http) = {
-      post: "/_search"
+      post: "/resources/v3alpha/users/_search"
       body: "filters"
     };
 
@@ -150,7 +150,7 @@ service ZITADELUsers {
   // Returns the user identified by the requested ID.
   rpc GetUser (GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
-      get: "/{user_id}"
+      get: "/resources/v3alpha/users/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -174,7 +174,7 @@ service ZITADELUsers {
   // Create a new user with an optional data schema.
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
-      post: "/"
+      post: "/resources/v3alpha/users"
       body: "user"
     };
 
@@ -208,7 +208,7 @@ service ZITADELUsers {
   // Patch an existing user with data based on a user schema.
   rpc PatchUser (PatchUserRequest) returns (PatchUserResponse) {
     option (google.api.http) = {
-      patch: "/{user_id}"
+      patch: "/resources/v3alpha/users/{id}"
       body: "user"
     };
 
@@ -238,7 +238,7 @@ service ZITADELUsers {
   // The endpoint returns an error if the user is already in the state 'deactivated'.
   rpc DeactivateUser (DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/_deactivate"
+      post: "/resources/v3alpha/users/{id}/_deactivate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -257,15 +257,15 @@ service ZITADELUsers {
     };
   }
 
-  // Reactivate a user
+  // Activate a user
   //
-  // Reactivate a previously deactivated user and change the state to 'active'.
+  // Activate a previously deactivated user and change the state to 'active'.
   // The user will be able to log in again.
   //
   // The endpoint returns an error if the user is not in the state 'deactivated'.
-  rpc ReactivateUser (ReactivateUserRequest) returns (ReactivateUserResponse) {
+  rpc ActivateUser (ActivateUserRequest) returns (ActivateUserResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/_reactivate"
+      post: "/resources/v3alpha/users/{id}/_activate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -278,7 +278,7 @@ service ZITADELUsers {
       responses: {
         key: "200";
         value: {
-          description: "User successfully reactivated";
+          description: "User successfully activated";
         };
       };
     };
@@ -294,7 +294,7 @@ service ZITADELUsers {
   // The endpoint returns an error if the user is already in the state 'locked'.
   rpc LockUser (LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/_lock"
+      post: "/resources/v3alpha/users/{id}/_lock"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -321,7 +321,7 @@ service ZITADELUsers {
   // The endpoint returns an error if the user is not in the state 'locked'.
   rpc UnlockUser (UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/_unlock"
+      post: "/resources/v3alpha/users/{id}/_unlock"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -346,7 +346,7 @@ service ZITADELUsers {
   // The user will be able to log in anymore.
   rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
-      delete: "/{user_id}"
+      delete: "/resources/v3alpha/users/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -372,7 +372,7 @@ service ZITADELUsers {
   // which can be either returned or will be sent to the user by email.
   rpc SetContactEmail (SetContactEmailRequest) returns (SetContactEmailResponse) {
     option (google.api.http) = {
-      put: "/{user_id}/email"
+      put: "/resources/v3alpha/users/{id}/email"
       body: "email"
     };
 
@@ -397,7 +397,7 @@ service ZITADELUsers {
   // Verify the contact email with the provided code.
   rpc VerifyContactEmail (VerifyContactEmailRequest) returns (VerifyContactEmailResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/email/_verify"
+      post: "/resources/v3alpha/users/{id}/email/_verify"
       body: "verification_code"
     };
 
@@ -422,7 +422,7 @@ service ZITADELUsers {
   // Resend the email with the verification code for the contact email address.
   rpc ResendContactEmailCode (ResendContactEmailCodeRequest) returns (ResendContactEmailCodeResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/email/_resend"
+      post: "/resources/v3alpha/users/{id}/email/_resend"
       body: "*"
     };
 
@@ -449,7 +449,7 @@ service ZITADELUsers {
   // which can be either returned or will be sent to the user by SMS.
   rpc SetContactPhone (SetContactPhoneRequest) returns (SetContactPhoneResponse) {
     option (google.api.http) = {
-      put: "/{user_id}/phone"
+      put: "/resources/v3alpha/users/{id}/phone"
       body: "phone"
     };
 
@@ -474,7 +474,7 @@ service ZITADELUsers {
   // Verify the contact phone with the provided code.
   rpc VerifyContactPhone (VerifyContactPhoneRequest) returns (VerifyContactPhoneResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/phone/_verify"
+      post: "/resources/v3alpha/users/{id}/phone/_verify"
       body: "verification_code"
     };
 
@@ -499,7 +499,7 @@ service ZITADELUsers {
   // Resend the phone with the verification code for the contact phone number.
   rpc ResendContactPhoneCode (ResendContactPhoneCodeRequest) returns (ResendContactPhoneCodeResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/phone/_resend"
+      post: "/resources/v3alpha/users/{id}/phone/_resend"
       body: "*"
     };
 
@@ -524,7 +524,7 @@ service ZITADELUsers {
   // Add a new unique username to a user. The username will be used to identify the user on authentication.
   rpc AddUsername (AddUsernameRequest) returns (AddUsernameResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/username"
+      post: "/resources/v3alpha/users/{id}/username"
       body: "username"
     };
 
@@ -549,7 +549,7 @@ service ZITADELUsers {
   // Remove an existing username of a user, so it cannot be used for authentication anymore.
   rpc RemoveUsername (RemoveUsernameRequest) returns (RemoveUsernameResponse) {
     option (google.api.http) = {
-      delete: "/{user_id}/username/{username_id}"
+      delete: "/resources/v3alpha/users/{id}/username/{username_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -573,7 +573,7 @@ service ZITADELUsers {
   // Add, update or reset a user's password with either a verification code or the current password.
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/password"
+      post: "/resources/v3alpha/users/{id}/password"
       body: "new_password"
     };
 
@@ -598,7 +598,7 @@ service ZITADELUsers {
   // Request a code to be able to set a new password.
   rpc RequestPasswordReset (RequestPasswordResetRequest) returns (RequestPasswordResetResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/password/_reset"
+      post: "/resources/v3alpha/users/{id}/password/_reset"
       body: "*"
     };
 
@@ -625,7 +625,7 @@ service ZITADELUsers {
   // which are used to verify the device.
   rpc StartWebAuthNRegistration (StartWebAuthNRegistrationRequest) returns (StartWebAuthNRegistrationResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/webauthn"
+      post: "/resources/v3alpha/users/{id}/webauthn"
       body: "registration"
     };
 
@@ -650,7 +650,7 @@ service ZITADELUsers {
   // Verify the WebAuthN registration started by StartWebAuthNRegistration with the public key credential.
   rpc VerifyWebAuthNRegistration (VerifyWebAuthNRegistrationRequest) returns (VerifyWebAuthNRegistrationResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/webauthn/{web_auth_n_id}/_verify"
+      post: "/resources/v3alpha/users/{id}/webauthn/{web_auth_n_id}/_verify"
       body: "verify"
     };
 
@@ -675,7 +675,7 @@ service ZITADELUsers {
   // The code will allow the user to start a new WebAuthN registration.
   rpc CreateWebAuthNRegistrationLink (CreateWebAuthNRegistrationLinkRequest) returns (CreateWebAuthNRegistrationLinkResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/webauthn/registration_link"
+      post: "/resources/v3alpha/users/{id}/webauthn/registration_link"
       body: "*"
     };
 
@@ -699,7 +699,7 @@ service ZITADELUsers {
   // Remove an existing WebAuthN authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveWebAuthNAuthenticator (RemoveWebAuthNAuthenticatorRequest) returns (RemoveWebAuthNAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/{user_id}/webauthn/{web_auth_n_id}"
+      delete: "/resources/v3alpha/users/{id}/webauthn/{web_auth_n_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -719,11 +719,11 @@ service ZITADELUsers {
 
   // Start a TOTP registration
   //
-  // Start the registration of a new time-based one-time-password (TOTP) generator for a user.
+  // Start the registration of a new time-based one-time password (TOTP) generator for a user.
   // As a response a secret is returned, which is used to initialize a TOTP app or device.
   rpc StartTOTPRegistration (StartTOTPRegistrationRequest) returns (StartTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/totp"
+      post: "/resources/v3alpha/users/{id}/totp"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -743,10 +743,10 @@ service ZITADELUsers {
 
   // Verify a TOTP registration
   //
-  // Verify the time-based one-time-password (TOTP) registration with the generated code.
+  // Verify the time-based one-time password (TOTP) registration with the generated code.
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/totp/{totp_id}/_verify"
+      post: "/resources/v3alpha/users/{id}/totp/{totp_id}/_verify"
       body: "code"
     };
 
@@ -767,10 +767,10 @@ service ZITADELUsers {
 
   // Remove a TOTP authenticator
   //
-  // Remove an existing time-based one-time-password (TOTP) authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing time-based one-time password (TOTP) authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveTOTPAuthenticator (RemoveTOTPAuthenticatorRequest) returns (RemoveTOTPAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/{user_id}/totp/{totp_id}"
+      delete: "/resources/v3alpha/users/{id}/totp/{totp_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -790,12 +790,12 @@ service ZITADELUsers {
 
   // Add a OTP SMS authenticator
   //
-  // Add a new one-time-password (OTP) SMS authenticator to a user.
+  // Add a new one-time password (OTP) SMS authenticator to a user.
   // If the phone is not passed as verified, a verification code will be generated,
   // which can be either returned or will be sent to the user by SMS.
   rpc AddOTPSMSAuthenticator (AddOTPSMSAuthenticatorRequest) returns (AddOTPSMSAuthenticatorResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/otp_sms"
+      post: "/resources/v3alpha/users/{id}/otp_sms"
       body: "phone"
     };
 
@@ -819,7 +819,7 @@ service ZITADELUsers {
   // Verify the OTP SMS registration with the provided code.
   rpc VerifyOTPSMSRegistration (VerifyOTPSMSRegistrationRequest) returns (VerifyOTPSMSRegistrationResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/otp_sms/{otp_sms_id}/_verify"
+      post: "/resources/v3alpha/users/{id}/otp_sms/{otp_sms_id}/_verify"
       body: "code"
     };
 
@@ -841,10 +841,10 @@ service ZITADELUsers {
 
   // Remove a OTP SMS authenticator
   //
-  // Remove an existing one-time-password (OTP) SMS authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing one-time password (OTP) SMS authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPSMSAuthenticator (RemoveOTPSMSAuthenticatorRequest) returns (RemoveOTPSMSAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/{user_id}/otp_sms/{otp_sms_id}"
+      delete: "/resources/v3alpha/users/{id}/otp_sms/{otp_sms_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -864,12 +864,12 @@ service ZITADELUsers {
 
   // Add a OTP Email authenticator
   //
-  // Add a new one-time-password (OTP) Email authenticator to a user.
+  // Add a new one-time password (OTP) Email authenticator to a user.
   // If the email is not passed as verified, a verification code will be generated,
   // which can be either returned or will be sent to the user by email.
   rpc AddOTPEmailAuthenticator (AddOTPEmailAuthenticatorRequest) returns (AddOTPEmailAuthenticatorResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/otp_email"
+      post: "/resources/v3alpha/users/{id}/otp_email"
       body: "email"
     };
 
@@ -893,7 +893,7 @@ service ZITADELUsers {
   // Verify the OTP Email registration with the provided code.
   rpc VerifyOTPEmailRegistration (VerifyOTPEmailRegistrationRequest) returns (VerifyOTPEmailRegistrationResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/otp_email/{otp_email_id}/_verify"
+      post: "/resources/v3alpha/users/{id}/otp_email/{otp_email_id}/_verify"
       body: "code"
     };
 
@@ -915,10 +915,10 @@ service ZITADELUsers {
 
   // Remove a OTP Email authenticator
   //
-  // Remove an existing one-time-password (OTP) Email authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing one-time password (OTP) Email authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPEmailAuthenticator (RemoveOTPEmailAuthenticatorRequest) returns (RemoveOTPEmailAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/{user_id}/otp_email/{otp_email_id}"
+      delete: "/resources/v3alpha/users/{id}/otp_email/{otp_email_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -941,7 +941,7 @@ service ZITADELUsers {
   // Start a new authentication intent on configured identity provider (IDP) for external login, registration or linking.
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/idp_intents"
+      post: "/resources/v3alpha/idp_intents"
       body: "*"
     };
 
@@ -966,7 +966,7 @@ service ZITADELUsers {
   // Get the information returned by the identity provider (IDP) for registration or updating an existing user with new information.
   rpc GetIdentityProviderIntent (GetIdentityProviderIntentRequest) returns (GetIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      get: "/v3alpha/idp_intents/{idp_intent_id}"
+      get: "/resources/v3alpha/idp_intents/{idp_intent_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -991,7 +991,7 @@ service ZITADELUsers {
   // This will allow the user to authenticate with the provided IDP.
   rpc AddIDPAuthenticator (AddIDPAuthenticatorRequest) returns (AddIDPAuthenticatorResponse) {
     option (google.api.http) = {
-      post: "/{user_id}/idps"
+      post: "/resources/v3alpha/users/{id}/idps"
       body: "authenticator"
     };
 
@@ -1016,7 +1016,7 @@ service ZITADELUsers {
   // Remove an existing identity provider (IDP) authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveIDPAuthenticator (RemoveIDPAuthenticatorRequest) returns (RemoveIDPAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/{user_id}/idps/{idp_id}"
+      delete: "/resources/v3alpha/users/{id}/idps/{idp_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1069,7 +1069,7 @@ message GetUserRequest {
     }
   ];
   // unique identifier of the user.
-  string user_id = 2 [
+  string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1123,7 +1123,7 @@ message PatchUserRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   //  unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
     }
@@ -1156,7 +1156,7 @@ message DeactivateUserRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1172,7 +1172,7 @@ message DeactivateUserResponse {
 }
 
 
-message ReactivateUserRequest {
+message ActivateUserRequest {
   optional zitadel.object.v3alpha.Instance instance = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       default: "\"domain from HOST or :authority header\""
@@ -1181,7 +1181,7 @@ message ReactivateUserRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1192,7 +1192,7 @@ message ReactivateUserRequest {
   ];
 }
 
-message ReactivateUserResponse {
+message ActivateUserResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
 }
 
@@ -1205,7 +1205,7 @@ message LockUserRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1229,7 +1229,7 @@ message UnlockUserRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1253,7 +1253,7 @@ message DeleteUserRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1277,7 +1277,7 @@ message SetContactEmailRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1309,7 +1309,7 @@ message VerifyContactEmailRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1343,7 +1343,7 @@ message ResendContactEmailCodeRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1376,7 +1376,7 @@ message SetContactPhoneRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1392,7 +1392,7 @@ message SetContactPhoneRequest {
 message SetContactPhoneResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
   // The phone verification code will be set if a contact phone was set with a return_code verification option.
-  optional string email_code = 3 [
+  optional string verification_code = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"SKJd342k\"";
     }
@@ -1408,7 +1408,7 @@ message VerifyContactPhoneRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1442,7 +1442,7 @@ message ResendContactPhoneCodeRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1475,7 +1475,7 @@ message AddUsernameRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1507,7 +1507,7 @@ message RemoveUsernameRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1541,7 +1541,7 @@ message SetPasswordRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1567,7 +1567,7 @@ message RequestPasswordResetRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1606,7 +1606,7 @@ message StartWebAuthNRegistrationRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1645,7 +1645,7 @@ message VerifyWebAuthNRegistrationRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1680,7 +1680,7 @@ message CreateWebAuthNRegistrationLinkRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1713,7 +1713,7 @@ message RemoveWebAuthNAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1747,7 +1747,7 @@ message StartTOTPRegistrationRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1789,7 +1789,7 @@ message VerifyTOTPRegistrationRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1833,7 +1833,7 @@ message RemoveTOTPAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1867,7 +1867,7 @@ message AddOTPSMSAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1906,7 +1906,7 @@ message VerifyOTPSMSRegistrationRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1950,7 +1950,7 @@ message RemoveOTPSMSAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1984,7 +1984,7 @@ message AddOTPEmailAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2022,7 +2022,7 @@ message VerifyOTPEmailRegistrationRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2066,7 +2066,7 @@ message RemoveOTPEmailAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2170,7 +2170,7 @@ message GetIdentityProviderIntentResponse {
   // and detailed / profile information.
   IDPInformation idp_information = 2;
   // If the user was already federated and linked to a ZITADEL user, it's id will be returned.
-  optional string user_id = 3 [
+  optional string id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432345\"";
     }
@@ -2186,7 +2186,7 @@ message AddIDPAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2211,7 +2211,7 @@ message RemoveIDPAuthenticatorRequest {
   // Optionally expect the user to be in this organization.
   optional zitadel.object.v3alpha.Organization organization = 2;
   // unique identifier of the user.
-  string user_id = 3 [
+  string id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

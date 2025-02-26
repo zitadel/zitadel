@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Weiter
   CancelButtonText: Abbrechen
 
+InviteUser:
+  Title: Benutzer aktivieren
+  Description: Bestätige deine E-Mail-Adresse mit dem unten stehenden Code und lege dein Passwort fest.
+  CodeLabel: Code
+  NewPasswordLabel: Neues Passwort
+  NewPasswordConfirm: Passwort bestätigen
+  NextButtonText: Weiter
+  ResendButtonText: Code erneut senden
+
 InitMFAPrompt:
   Title: Zweitfaktor hinzufügen
   Description: Die Zwei-Faktor-Authentifizierung gibt dir eine zusätzliche Sicherheit für dein Benutzerkonto. Damit stellst du sicher, dass nur du Zugriff auf dein Konto hast.
@@ -99,7 +108,7 @@ InitMFAPrompt:
 InitMFAOTP:
   Title: Zwei-Faktor-Authentifizierung
   Description: Erstelle deinen Zweitfaktor. Installiere eine Authentifizierungs-App, wenn du noch keine hast.
-  OTPDescription: Scanne den Code mit einer Authentifizierungs-App (z.B. Google/Mircorsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
+  OTPDescription: Scanne den Code mit einer Authentifizierungs-App (z.B. Google/Microsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: Weiter
@@ -252,6 +261,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -292,6 +304,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -366,6 +381,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 DeviceAuth:
   Title: Gerät verbinden
   UserCode:
@@ -486,6 +504,10 @@ Errors:
       CreationNotAllowed: Erstellen eines neuen Benutzers mit diesem Provider ist nicht erlaubt
       LinkingNotAllowed: Verknüpfen eines Benutzers mit diesem Provider ist nicht erlaubt
       NoOptionAllowed: Weder Erstellung noch Verknüpfung ist für diesen Provider erlaubt. Bitte wenden Sie sich an Ihren Administrator.
+      LoginFailedSwitchLocal: |
+        Anmeldung beim externen Identitätsanbieter fehlgeschlagen. Zurück zur lokalen Anmeldung.
+
+        Fehlerdetails: {{.Details}}
     GrantRequired: Die Anmeldung an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte wende dich an deinen Administrator.
     ProjectRequired: Die Anmeldung an dieser Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte wende dich an deinen Administrator.
   IdentityProvider:

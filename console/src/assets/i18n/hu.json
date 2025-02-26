@@ -1,0 +1,2688 @@
+{
+  "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metaadatok",
+    "HOME": {
+      "TITLE": "Kezdd el a ZITADEL használatát",
+      "NEXT": {
+        "TITLE": "A következő lépések",
+        "DESCRIPTION": "Teljesítsd a következő lépéseket az alkalmazásod biztonságáért.",
+        "CREATE_PROJECT": {
+          "TITLE": "Projekt létrehozása",
+          "DESCRIPTION": "Adj hozzá egy projektet, és határozd meg annak szerepeit és jogosultságait."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Kezdjük el",
+          "DESCRIPTION": "Kövesd a gyorsindítás lépésről lépésre útmutatót, és kezdj azonnal építeni."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentáció",
+          "DESCRIPTION": "Fedezd fel a ZITADEL tudásbázisát, hogy megismerkedj az alapvető fogalmakkal és ötletekkel. Tanuld meg, hogyan működik a ZITADEL, és hogyan használd."
+        },
+        "EXAMPLES": {
+          "TITLE": "Példák és Software Development Kit-ek",
+          "DESCRIPTION": "Böngészd példáinkat és SDK-jainkat, hogy a ZITADEL-t a kedvenc programozási nyelveiddel és eszközeiddel együtt használd."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Szervezet",
+      "DESCRIPTION": "Egy szervezet felhasználókat, projekteket alkalmazásokkal, identitásszolgáltatókat és olyan beállításokat tartalmaz, mint a céges arculat. Szeretnéd megosztani a beállításokat több szervezet között? Állítsd be az alapértelmezett beállításokat.",
+      "METADATA": "Adj hozzá egyedi attribútumokat a szervezethez, mint például annak helyét vagy egy azonosítót egy másik rendszerben. Ez az információ hasznos lehet a műveleteid során."
+    },
+    "PROJECTS": {
+      "TITLE": "Projektek",
+      "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyeket a felhasználók hitelesítésére használhatsz. Emellett a projektjeiddel felhatalmazhatod a felhasználóidat. Ha azt szeretnéd, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaidba, adj nekik hozzáférést a projekthez.<br/><br/>Ha nem találsz egy projektet, vedd fel a kapcsolatot a projekt tulajdonosával vagy valakivel, akinek megvannak a megfelelő jogai, hogy hozzáférést kapj.",
+      "OWNED": {
+        "TITLE": "Tulajdonolt Projektek",
+        "DESCRIPTION": "Ezek a te tulajdonodban lévő projektek. Ezeknek a projekteknek a beállításait, jogosultságait és alkalmazásait te menedzselheted."
+      },
+      "GRANTED": {
+        "TITLE": "Odaítélt projektek",
+        "DESCRIPTION": "Ezek azok a projektek, amelyeket más szervezetek ítéltek oda neked. Az odaítélt projektekkel hozzáférést adhatsz a felhasználóidnak más szervezetek alkalmazásaihoz."
+      }
+    },
+    "USERS": {
+      "TITLE": "Felhasználók",
+      "DESCRIPTION": "A felhasználó lehet ember vagy gép, amely hozzáfér az alkalmazásaidhoz.",
+      "HUMANS": {
+        "TITLE": "Felhasználók",
+        "DESCRIPTION": "A felhasználók interaktívan hitelesítik magukat egy böngésző munkamenetben egy bejelentkezési felhívással.",
+        "METADATA": "Adj hozzá egyéni attribútumokat a felhasználóhoz, mint például az osztály. Ezt az információt felhasználhatod a műveleteid során."
+      },
+      "MACHINES": {
+        "TITLE": "Szolgáltatásfelhasználók",
+        "DESCRIPTION": "A szolgáltatásfelhasználók nem interaktívan hitelesítik magukat egy privát kulccsal aláírt JWT hordozó tokennel. Személyes hozzáférési tokent is használhatnak.",
+        "METADATA": "Adj hozzá egyéni attribútumokat a felhasználóhoz, mint például a hitelesítő rendszer. Ezt az információt felhasználhatod a műveleteid során."
+      },
+      "SELF": {
+        "METADATA": "Adj hozzá egyéni attribútumokat a felhasználódhoz, mint például az osztályod. Ezt az információt felhasználhatod a szervezeted műveleteiben."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Engedélyek",
+      "DESCRIPTION": "Az engedélyek meghatározzák a felhasználók hozzáférési jogait egy projekthez. Hozzáférést adhatsz egy projekthez egy felhasználónak és definiálhatod a felhasználó szerepköreit a projektben."
+    },
+    "ACTIONS": {
+      "TITLE": "Műveletek",
+      "DESCRIPTION": "Futtass egyéni kódot az események során, amikor a felhasználóid a ZITADEL-nél hitelesítenek. Automatizáld a folyamataidat, gazdagítsd a felhasználóid metaadatait és tokeneit, vagy értesíts külső rendszereket.",
+      "SCRIPTS": {
+        "TITLE": "Scriptek",
+        "DESCRIPTION": "Írd meg a JavaScript kódodat egyszer, és használd több folyamatban."
+      },
+      "FLOWS": {
+        "TITLE": "Folyamatok",
+        "DESCRIPTION": "Válassz egy hitelesítési folyamatot, és váltasd ki a műveletedet egy adott esemény bekövetkezésekor ebben a folyamatban."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Alapértelmezett beállítások",
+        "DESCRIPTION": "Alapértelmezett beállítások minden szervezet számára. A megfelelő jogosultságok birtokában némelyik felülbírálható a szervezet beállításaiban."
+      },
+      "ORG": {
+        "TITLE": "Szervezet beállításai",
+        "DESCRIPTION": "Testreszabhatod a szervezeted beállításait."
+      },
+      "FEATURES": {
+        "TITLE": "Funkció beállításai",
+        "DESCRIPTION": "Oldd fel a funkciókat az instance-odhoz."
+      },
+      "IDPS": {
+        "TITLE": "Identitásszolgáltatók",
+        "DESCRIPTION": "Hozz létre és aktiválj külső identitásszolgáltatókat. Válassz egy ismert szolgáltatót, vagy konfigurálj bármely más OIDC-, OAuth- vagy SAML-kompatibilis szolgáltatót. Még a meglévő JWT tokeneket is használhatod federált identitásként, ha beállítasz egy JWT identitásszolgáltatót.",
+        "NEXT": "Mi most?",
+        "SAML": {
+          "TITLE": "Konfiguráld a SAML identitásszolgáltatódat",
+          "DESCRIPTION": "A ZITADEL konfigurálva van. Most a SAML identitásszolgáltatódnak van szüksége némi konfigurációra. A legtöbb szolgáltatónál elég, ha feltöltöd a teljes ZITADEL metadat XML-t. Más szolgáltatók csak néhány külön URL megadását kérik, például az entitásazonosítót (metadata URL), az Assertion Consumer Service (ACS) URL-t vagy a Single Logout URL-t."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfiguráld a {{ provider }} Identity Providered",
+          "DESCRIPTION": "Mielőtt konfigurálnád a ZITADEL-t, add meg ezt az URL-t az Identity Providerednek, hogy engedélyezze a böngésző visszairányítását a ZITADEL-hez hitelesítés után."
+        },
+        "JWT": {
+          "TITLE": "Használd a JWT-ket mint federált identitások",
+          "DESCRIPTION": "A JWT Identity Provider lehetővé teszi, hogy a meglévő JWT tokenjeidet federált identitásként használd. Ez a funkció praktikus, ha már van kibocsátód a JWT-khez. A JWT IdP-vel ezeket a JWT-ket használhatod felhasználók létrehozására és frissítésére ZITADEL-ben menet közben."
+        },
+        "LDAP": {
+          "TITLE": "Konfiguráld a ZITADEL-t, hogy csatlakozzon az LDAP Identity Provideredhez",
+          "DESCRIPTION": "Add meg a kapcsolódási adatokat az LDAP szerveredhez és konfiguráld az LDAP attribútumaid ZITADEL attribútumokká való leképezését."
+        },
+        "AUTOFILL": {
+          "TITLE": "Felhasználói adatok automatikus kitöltése",
+          "DESCRIPTION": "Használj műveletet a felhasználói élmény javítására. Előre kitöltheted a ZITADEL regisztrációs űrlapját az identity provider értékeivel."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktiváld az IdP-t",
+          "DESCRIPTION": "Az IdP-d még nem aktív. Aktiváld, hogy a felhasználóid be tudjanak jelentkezni."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Jelszókomplexitás",
+        "DESCRIPTION": "Biztosítsd, hogy a felhasználók erős jelszavakat használjanak összetettségi szabályok meghatározásával."
+      },
+      "BRANDING": {
+        "TITLE": "Arculat",
+        "DESCRIPTION": "Testreszabhatod a bejelentkezési űrlap kinézetét és hangulatát. Ne feledd alkalmazni a beállításaidat, miután elkészültél."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Külső linkek",
+        "DESCRIPTION": "Irányítsd felhasználóidat egyedi külső forrásokhoz, amelyek a bejelentkezési oldalon jelennek meg. A felhasználóknak el kell fogadniuk a Szolgáltatási feltételeket és az Adatvédelmi irányelveket, mielőtt regisztrálhatnának. Módosítsd a linket a dokumentációdra, vagy állítsd be üres szövegre, hogy elrejtsd a dokumentáció gombot a konzolból. Adj hozzá egyedi külső linket és egyedi szöveget ehhez a linkhez a konzolban, vagy állítsd be üresre, hogy elrejtsd ezt a gombot."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP beállítások",
+        "DESCRIPTION": "Konfiguráld az SMTP szerveredet, hogy egy olyan domain nevet használj a feladó címeként, amelyet a felhasználóid ismernek és megbíznak benne."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS beállítások",
+        "DESCRIPTION": "A ZITADEL összes funkciójának eléréséhez konfiguráld a Twilio-t SMS üzenetek küldésére a felhasználóidnak."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Események",
+        "DESCRIPTION": "Ez az oldal megmutatja az összes állapotváltozást a példányodban az audit trail határáig visszamenőleg. Szűrd le a listát időtartomány szerint hibakeresési célból, vagy szűrd le egy összesítő szerint auditálási célból."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Sikertelen események",
+        "DESCRIPTION": "Ez az oldal megmutatja az összes sikertelen eseményt a példányodban. Ha a ZITADEL nem úgy viselkedik, ahogy várnád, mindig nézd meg először ezt a listát."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Nézetek",
+        "DESCRIPTION": "Ez az oldal megmutatja az összes adatbázis nézeted és hogy mikor dolgozták fel legutóbbi eseményüket. Ha hiányzik néhány adat, ellenőrizd, hogy a nézet naprakész-e."
+      },
+      "LANGUAGES": {
+        "TITLE": "Nyelvek",
+        "DESCRIPTION": "Korlátozd a bejelentkezési űrlap és az értesítési üzenetek lefordított nyelveit. Ha szeretnél bizonyos nyelveket letiltani, húzd őket a Nem engedélyezett nyelvek szakaszba. Megadhatsz egy engedélyezett nyelvet alapértelmezett nyelvként. Ha egy felhasználó által preferált nyelv nem engedélyezett, az alapértelmezett nyelv kerül használatra."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Titok generátorok",
+        "DESCRIPTION": "Határozd meg a titkaid komplexitását és élettartamát. A magasabb komplexitás és élettartam javítja a biztonságot, az alacsonyabb komplexitás és élettartam pedig javítja a titkosítási teljesítményt."
+      },
+      "SECURITY": {
+        "TITLE": "Biztonsági beállítások",
+        "DESCRIPTION": "Engedélyezd a ZITADEL funkciókat, amelyek biztonsági kockázatot jelenthetnek. Tényleg tudnod kell, mit csinálsz, mielőtt ezeket a beállításokat módosítod."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect beállítások",
+        "DESCRIPTION": "Állítsd be az OIDC token élettartalmait. Használj rövidebb élettartamot a felhasználóid biztonságának növelése érdekében, és hosszabb élettartamot a kényelmük növelésére.",
+        "LABEL_HOURS": "Maximális élettartam órában",
+        "LABEL_DAYS": "Maximális élettartam napban",
+        "ACCESS_TOKEN": {
+          "TITLE": "Hozzáférési token",
+          "DESCRIPTION": "A hozzáférési tokent a felhasználó hitelesítésére használják. Ez egy rövid élettartamú token, amelyet a felhasználó adataihoz való hozzáférésre használnak. Használj rövid élettartamot az illetéktelen hozzáférés kockázatának minimalizálása érdekében. A hozzáférési tokenek automatikusan frissíthetők egy frissítési token használatával."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID token",
+          "DESCRIPTION": "Az ID token egy JSON Web Token (JWT), amely a felhasználóra vonatkozó állításokat tartalmaz. Az ID token élettartama nem haladhatja meg a hozzáférési token élettartamát."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Frissítő Token",
+          "DESCRIPTION": "A frissítő token egy új hozzáférési token megszerzésére szolgál. Ez egy hosszú élettartamú token, amelyet a hozzáférési token frissítésére használnak. A felhasználónak manuálisan újra kell hitelesítenie magát, amikor a frissítő token lejár."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Tétlen Frissítő Token",
+          "DESCRIPTION": "A tétlen frissítő token élettartama az a maximális idő, ameddig a frissítő token használaton kívül maradhat."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Üzenet Szövegek",
+        "DESCRIPTION": "Testreszabhatod az értesítési e-mailjeid vagy SMS üzeneteid szövegeit. Ha le szeretnél tiltani néhány nyelvet, korlátozd azokat az instance nyelvi beállításaiban.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Amikor lefoglalod a domain nevet a szervezet számára, azok a felhasználók, akik nem ezt a domaint használják bejelentkezési névként, felszólítást kapnak a login nevük megváltoztatására, hogy az egyezzen a lefoglalt domainnel.",
+          "INIT": "Amikor létrehozol egy felhasználót, kapni fog egy e-mailt egy linkkel, amin megadhatja a jelszavát.",
+          "PC": "Amikor egy felhasználó megváltoztatja a jelszavát, értesítést kap a változásról, ha ezt engedélyezted az értesítési beállításokban.",
+          "PL": "Amikor egy felhasználó hozzáad egy jelszó nélküli hitelesítési módot, aktiválnia kell azt egy e-mailben kapott linkre kattintva.",
+          "PR": "Amikor egy felhasználó visszaállítja a jelszavát, kap egy e-mailt egy linkkel az új jelszó beállításához.",
+          "VE": "Amikor egy felhasználó megváltoztatja az e-mail címét, kap egy e-mailt egy linkkel az új cím megerősítéséhez.",
+          "VP": "Amikor egy felhasználó megváltoztatja a telefonszámát, kap egy SMS-t egy kóddal az új szám megerősítéséhez.",
+          "VEO": "Amikor egy felhasználó egy egyszeri jelszót ad hozzá e-mail módszerrel, aktiválnia kell azt az e-mail címére küldött kód megadásával.",
+          "VSO": "Amikor egy felhasználó egy egyszeri jelszót ad hozzá SMS módszerrel, aktiválnia kell azt a telefonszámára küldött kód megadásával.",
+          "IU": "Amikor egy felhasználói meghívó kód létrejön, kap egy e-mailt egy linkkel az azonosítási módszer beállításához."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Bejelentkezési felület szövegei",
+        "DESCRIPTION": "Testreszabhatod a bejelentkezési űrlap szövegeit. Ha egy szöveg üres, a helyőrző az alapértelmezett értéket mutatja. Ha le akarod tiltani egyes nyelveket, korlátozd azokat az példányod nyelvi beállításaiban."
+      },
+      "DOMAINS": {
+        "TITLE": "Domain beállítások",
+        "DESCRIPTION": "Határozd meg a korlátozásokat a domaineken és állítsd be a bejelentkezési név mintákat.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Egyedi domainek ellenőrzésének követelménye",
+          "DESCRIPTION": "Ha ez aktiválva van, a szervezeti domaineket ellenőrizni kell, mielőtt használhatók lennének domain kereséshez vagy felhasználónév utótagoláshoz."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Bejelentkezési név mintája",
+          "DESCRIPTION": "Irányítsd felhasználóid bejelentkezési neveinek mintáját. A ZITADEL kiválasztja a felhasználóid szervezetét, amint beírják bejelentkezési nevüket. Ezért a bejelentkezési neveknek egyedinek kell lenniük az összes szervezet között. Ha vannak felhasználóid, akik több domainben rendelkeznek fiókkal, az egyediség biztosítható a bejelentkezési nevek szervezeti domainnal való utótagolásával."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domain ellenőrzés",
+          "DESCRIPTION": "Csak azokat a domaineket engedélyezd szervezeted számára, amelyeket valóban irányítanak. Ha aktiválva van, a szervezeti domaineket rendszeresen ellenőrzik DNS vagy HTTP kihívás révén, mielőtt használhatók lennének. Ez egy biztonsági funkció a domain eltérítés megakadályozására."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP feladó cím",
+          "DESCRIPTION": "Csak akkor engedélyezd az SMTP feladó címet, ha az egyezik valamelyik példányod domainjével."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Bejelentkezési élettartamok",
+          "DESCRIPTION": "Erősítsd meg a biztonságot bizonyos bejelentkezéssel kapcsolatos maximális élettartamok csökkentésével.",
+          "LABEL": "Maximális élettartam órában",
+          "PW_CHECK": {
+            "TITLE": "Jelszó ellenőrzés",
+            "DESCRIPTION": "A felhasználóknak újra kell hitelesíteniük magukat a jelszavukkal ezen időszak után."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Külső bejelentkezés ellenőrzés",
+            "DESCRIPTION": "A felhasználóid ezen időszak után átirányításra kerülnek a külső azonosítószolgáltatójukhoz."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Többfaktoros kezdeményezés ellenőrzés",
+            "DESCRIPTION": "A felhasználóid felkérést kapnak, hogy állítsanak be egy második faktort vagy egy Többfaktort ezen időszak után, ha ezt még nem tették meg. A 0 élettartam deaktiválja ezt a felkérést."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Második faktor ellenőrzés",
+            "DESCRIPTION": "A felhasználóidnak újra kell érvényesíteniük a második faktorukat ezen időszakokban."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Multifactor Check",
+            "DESCRIPTION": "A felhasználóidnak ezekben az időszakokban újra kell érvényesíteniük a többlépcsős azonosítást."
+          }
+        },
+        "FORM": {
+          "TITLE": "Bejelentkező űrlap",
+          "DESCRIPTION": "Szabd testre a bejelentkező űrlapot.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Felhasználónév és jelszó engedélyezve",
+            "DESCRIPTION": "Engedd meg a felhasználóidnak, hogy felhasználónévvel és jelszóval jelentkezzenek be. Ha ez nincs engedélyezve, a felhasználóid csak jelszó nélküli azonosítással vagy külső identitásszolgáltatóval tudnak bejelentkezni."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Felhasználói regisztráció engedélyezve",
+            "DESCRIPTION": "Engedd meg a névtelen felhasználóknak, hogy fiókot hozzanak létre."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Szervezeti regisztráció engedélyezve",
+            "DESCRIPTION": "Engedd meg a névtelen felhasználóknak, hogy szervezetet hozzanak létre."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Külső bejelentkezés engedélyezve",
+            "DESCRIPTION": "Engedd meg a felhasználóidnak, hogy egy külső azonosítószolgáltatóval jelentkezzenek be ahelyett, hogy a ZITADEL felhasználót használják a bejelentkezéshez."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Jelszó visszaállítás elrejtve",
+            "DESCRIPTION": "Ne engedd, hogy a felhasználóid visszaállítsák a jelszavukat."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domain felfedezés engedélyezve",
+            "DESCRIPTION": "Találd meg a felhasználóid szervezeteit a bejelentkezési neveik domainje alapján, például az email címük alapján."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ismeretlen felhasználóneveket figyelmen kívül hagy",
+            "DESCRIPTION": "Ha ez aktiválva van, a bejelentkezési űrlap nem mutat hibajelzést, ha a felhasználónév ismeretlen. Ez segít megakadályozni a felhasználónév kitalálását."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Email bejelentkezés letiltása",
+            "DESCRIPTION": "Ha ez aktiválva van, a felhasználóid nem használhatják az email címüket a bejelentkezéshez. Legyen óvatos, mert ha ezt kikapcsolod, a felhasználóid email címeinek egyedinek kell lenniük az összes szervezeten belül a bejelentkezéshez."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Telefonos bejelentkezés letiltása",
+            "DESCRIPTION": "Ha ezt aktiválod, a felhasználóid nem használhatják a telefonszámukat a bejelentkezéshez. Figyelj arra, hogy ha deaktiválod ezt, akkor a felhasználóid telefonszámának egyedinek kell lennie az összes szervezet között, hogy be tudjanak jelentkezni."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Előző",
+    "NEXT": "Következő",
+    "COUNT": "Összes Eredmény",
+    "MORE": "Több"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kapcsolat",
+      "TOS": "Szolgáltatási Feltételek",
+      "PP": "Adatvédelmi Irányelvek"
+    },
+    "THEME": {
+      "DARK": "Sötét",
+      "LIGHT": "Világos"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Kezdd el a ZITADEL használatát",
+    "DISCLAIMER": "A ZITADEL bizalmasan és biztonságosan kezeli az adataidat.",
+    "DISCLAIMERLINK": "További információ",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Kezdd el gyorsan a ZITADEL használatát."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Kezdd el gyorsan a ZITADEL használatát."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Első lépések",
+      "DESCRIPTION": "Kezdd el gyorsan a ZITADEL használatát."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Gyorsbillentyűk",
+      "SETTINGS": "Elérhető gyorsbillentyűk",
+      "PROJECTS": "Projektek",
+      "REORDER": "Tartsd lenyomva és húzd a csempét, hogy áthelyezd",
+      "ADD": "Tartsd lenyomva és húzd a csempét, hogy hozzáadd"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "A következő lépéseid",
+    "MOREDESCRIPTION": "több gyorsbillentyű",
+    "COMPLETED": "befejezve",
+    "DISMISS": "Nem, kösz, profi vagyok.",
+    "CARD": {
+      "TITLE": "Indítsd el a ZITADEL-t",
+      "DESCRIPTION": "Ez az ellenőrzőlista segít beállítani az instanciádat és végigvezet a legfontosabb lépéseken"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Állítsd be a márkádat",
+        "description": "Határozd meg a bejelentkezési felületed színét és alakját, és töltsd fel a logódat és ikonjaidat.",
+        "action": "Állítsd be a brandinget"
+      },
+      "instance.smtp.config.added": {
+        "title": "Állítsd be az SMTP beállításaidat",
+        "description": "Állítsd be saját levelezőszerver beállításaidat.",
+        "action": "SMTP beállítása"
+      },
+      "PROJECT_CREATED": {
+        "title": "Projekt létrehozása",
+        "description": "Adj hozzá egy projektet és határozd meg annak szerepeit és jogosultságait.",
+        "action": "Projekt létrehozása"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Regisztráld az alkalmazásodat",
+        "description": "Regisztráld a webes, natív, api vagy saml alkalmazásodat és állítsd be az autentikációs folyamatot.",
+        "action": "Alkalmazás regisztrálása"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Jelentkezz be az alkalmazásodba",
+        "description": "Integráld az alkalmazásodat a ZITADEL-lel az autentikációhoz, és teszteld az admin felhasználóddal történő bejelentkezéssel.",
+        "action": "Bejelentkezés"
+      },
+      "user.human.added": {
+        "title": "Felhasználók hozzáadása",
+        "description": "Alkalmazás felhasználóinak hozzáadása",
+        "action": "Felhasználó hozzáadása"
+      },
+      "user.grant.added": {
+        "title": "Felhasználók engedélyezése",
+        "description": "Engedélyezd a felhasználóknak az alkalmazásodhoz való hozzáférést, és állítsd be a szerepkörüket.",
+        "action": "Felhasználó engedélyezése"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Alapértelmezett beállítások",
+    "DASHBOARD": "Kezdőlap",
+    "PERSONAL_INFO": "Személyes információk",
+    "DOCUMENTATION": "Dokumentáció",
+    "INSTANCEOVERVIEW": "Példány",
+    "ORGS": "Szervezetek",
+    "VIEWS": "Nézetek",
+    "EVENTS": "Események",
+    "FAILEDEVENTS": "Sikertelen események",
+    "ORGANIZATION": "Szervezet",
+    "PROJECT": "Projektek",
+    "PROJECTOVERVIEW": "Áttekintés",
+    "PROJECTGRANTS": "Támogatások",
+    "ROLES": "Szerepkörök",
+    "GRANTEDPROJECT": "Megadott Projektek",
+    "HUMANUSERS": "Felhasználók",
+    "MACHINEUSERS": "Szolgáltatási Felhasználók",
+    "LOGOUT": "Minden Felhasználó Kijelentkezése",
+    "NEWORG": "Új Szervezet",
+    "IAMADMIN": "Te egy IAM Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
+    "SHOWORGS": "Show All Organizations",
+    "GRANTS": "Engedélyek",
+    "ACTIONS": "Műveletek",
+    "PRIVACY": "Adatvédelem",
+    "TOS": "Szolgáltatási feltételek",
+    "OPENSHORTCUTSTOOLTIP": "Írd be a ? jelet a billentyűparancsok megjelenítéséhez",
+    "SETTINGS": "Beállítások",
+    "CUSTOMERPORTAL": "Ügyfélportál"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integráld a ZITADEL szolgáltatást az alkalmazásodba",
+    "DESCRIPTION": "Integráld a ZITADEL szolgáltatást az alkalmazásodba, vagy használd egy mintánkat, hogy percek alatt elindulhass.",
+    "BTN_START": "Alkalmazás létrehozása",
+    "BTN_LEARNMORE": "Tudj meg többet",
+    "CREATEPROJECTFORAPP": "Projekt létrehozása {{value}}",
+    "SELECT_FRAMEWORK": "Keret kiválasztása",
+    "FRAMEWORK": "Keret",
+    "FRAMEWORK_OTHER": "Egyéb (OIDC, SAML, API)",
+    "ALMOSTDONE": "Már majdnem kész vagy.",
+    "REVIEWCONFIGURATION": "Konfiguráció áttekintése",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Létrehoztunk egy alapkonfigurációt a(z) {{value}} alkalmazások számára. Ezt a konfigurációt a létrehozás után igényeidhez igazíthatod.",
+    "REDIRECTS": "Átirányítások beállítása",
+    "DEVMODEWARN": "A fejlesztői mód alapértelmezetten engedélyezve van. A termelési értékeket később frissítheted.",
+    "GUIDE": "Útmutató",
+    "BROWSEEXAMPLES": "Példák és SDK-k böngészése",
+    "DUPLICATEAPPRENAME": "Már létezik egy alkalmazás ugyanezzel a névvel. Kérlek, válassz másik nevet.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Keret megváltoztatása",
+        "DESCRIPTION": "Válassz egyet az elérhető keretrendszerek közül az alkalmazásod gyors beállításához."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Műveletek",
+    "FILTER": "Szűrő",
+    "RENAME": "Átnevezés",
+    "SET": "Beállítás",
+    "COPY": "Másolás a vágólapra",
+    "COPIED": "Vágólapra másolva.",
+    "RESET": "Visszaállítás",
+    "RESETDEFAULT": "Alapértelmezettre állítás",
+    "RESETTO": "Visszaállítás erre: ",
+    "RESETCURRENT": "Visszaállítás jelenlegire",
+    "SHOW": "Megjelenítés",
+    "HIDE": "Elrejtés",
+    "SAVE": "Mentés",
+    "SAVENOW": "Mentés most",
+    "NEW": "Új",
+    "ADD": "Hozzáadás",
+    "CREATE": "Létrehozás",
+    "CONTINUE": "Folytatás",
+    "CONTINUEWITH": "Folytatás ezzel: {{value}}",
+    "BACK": "Vissza",
+    "CLOSE": "Bezárás",
+    "CLEAR": "Törlés",
+    "CANCEL": "Mégse",
+    "INFO": "Infó",
+    "OK": "Rendben",
+    "SELECT": "Kiválaszt",
+    "VIEW": "Megjelenít",
+    "SELECTIONDELETE": "Kijelölés törlése",
+    "DELETE": "Törlés",
+    "REMOVE": "Eltávolít",
+    "VERIFY": "Ellenőriz",
+    "FINISH": "Befejez",
+    "FINISHED": "Bezár",
+    "CHANGE": "Változtat",
+    "REACTIVATE": "Újraaktivál",
+    "ACTIVATE": "Aktivál",
+    "DEACTIVATE": "Inaktivál",
+    "REFRESH": "Frissít",
+    "LOGIN": "Bejelentkezés",
+    "EDIT": "Szerkesztés",
+    "PIN": "Rögzít / Old",
+    "CONFIGURE": "Beállít",
+    "SEND": "Küld",
+    "NEWVALUE": "Új érték",
+    "RESTORE": "Visszaállít",
+    "CONTINUEWITHOUTSAVE": "Folytatás mentés nélkül",
+    "OF": "a",
+    "PREVIOUS": "Előző",
+    "NEXT": "Következő",
+    "MORE": "több",
+    "STEP": "Lépés",
+    "SETUP": "Beállítás",
+    "TEST": "Teszt",
+    "UNSAVEDCHANGES": "Nem mentett változtatások",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Biztos vagy benne, hogy el akarod vetni ezt az új műveletet? A műveleted elveszik",
+        "CANCEL": "Mégse",
+        "DISCARD": "Elvetés"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Felhasználó megjelenítése {{value}}"
+    },
+    "DOWNLOAD": "Letöltés",
+    "APPLY": "Alkalmaz"
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Teljes irányítása van az egész példány felett, beleértve minden szervezetet",
+    "IAM_OWNER_VIEWER": "Jogosultsága van az egész példány átnézésére, beleértve minden szervezetet",
+    "IAM_ORG_MANAGER": "Jogosultsága van szervezetek létrehozására és kezelésére",
+    "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
+    "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
+    "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
+    "ORG_OWNER": "Engedélye van az egész szervezet fölött",
+    "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
+    "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
+    "ORG_USER_PERMISSION_EDITOR": "Engedélye van a felhasználói jogok kezelésére",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Engedélye van a projektjogosultságok kezelésére",
+    "ORG_PROJECT_CREATOR": "Engedélye van saját projektek és alapbeállítások létrehozására",
+    "ORG_ADMIN_IMPERSONATOR": "Engedélye van a szervezet adminisztrátorainak és véghasználóinak megszemélyesítésére",
+    "ORG_END_USER_IMPERSONATOR": "Engedélye van a szervezet véghasználóinak megszemélyesítésére",
+    "PROJECT_OWNER": "Engedélye van az egész projekt fölött",
+    "PROJECT_OWNER_VIEWER": "Jogosultságod van a teljes projekt átnézésére.",
+    "PROJECT_OWNER_GLOBAL": "Jogosultságod van a teljes projektre.",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Jogosultságod van a teljes projekt átnézésére.",
+    "PROJECT_GRANT_OWNER": "Jogosultságod van a projekt támogatásának kezelésére.",
+    "PROJECT_GRANT_OWNER_VIEWER": "Jogosultságod van a projekt támogatásának átnézésére."
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Az összes szervezeti beállítás és táblázat a konzolon egy kiválasztott szervezethez kapcsolódik. Kattints erre a gombra a szervezet váltásához vagy új létrehozásához."
+    },
+    "INSTANCE": {
+      "TEXT": "Kattints ide az alapértelmezett beállításokhoz. Kérjük, vedd figyelembe, hogy csak akkor férsz hozzá ehhez a gombhoz, ha rendelkezésedre állnak kiterjesztett jogosultságok."
+    },
+    "PROFILE": {
+      "TEXT": "Itt válthatsz a felhasználói fiókjaid között, valamint kezelheted a munkameneteidet és a profilodat."
+    },
+    "NAV": {
+      "TEXT": "Ez a navigáció a fent kiválasztott szervezet vagy példány alapján változik."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "A szervezeti kontextus megváltozott."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "A nézet épp most változott példányra!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Szűrő",
+    "STATE": "Állapot",
+    "DISPLAYNAME": "Felhasználó Megjelenítési Név",
+    "EMAIL": "E-mail",
+    "USERNAME": "Felhasználói Név",
+    "ORGNAME": "Szervezet Neve",
+    "PRIMARYDOMAIN": "Elsődleges Domain",
+    "PROJECTNAME": "Projekt Neve",
+    "RESOURCEOWNER": "Erőforrás Tulajdonos",
+    "METHODS": {
+      "5": "tartalmaz",
+      "7": "azzal végződik",
+      "1": "egyenlő"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Billentyűparancsok",
+    "UNDERORGCONTEXT": "Szervezeti oldalakon belül",
+    "SIDEWIDE": "Webhely-szintű parancsok",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>o to <strong>F</strong>őoldal",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
+      "ORG": "<strong>G</strong>o to <strong>S</strong>zervezet",
+      "ORGSETTINGS": "<strong>G</strong>o to Szervezet <strong>B</strong>eállításai",
+      "ORGSWITCHER": "Szervezet megváltoztatása",
+      "ME": "Menj a saját profilodra",
+      "PROJECTS": "<strong>M</strong>enj a <strong>P</strong>rojektekhez",
+      "USERS": "<strong>M</strong>enj a <strong>F</strong>elhasználókhoz",
+      "USERGRANTS": "<strong>M</strong>enj az <strong>E</strong>ngedélyekhez",
+      "ACTIONS": "<strong>M</strong>enj az Akciókhoz és a <strong>F</strong>olyamatokhoz",
+      "DOMAINS": "<strong>M</strong>enj a <strong>D</strong>oménekhez"
+    }
+  },
+  "RESOURCEID": "Erőforrás azonosító",
+  "NAME": "Név",
+  "VERSION": "Verzió",
+  "TABLE": {
+    "NOROWS": "Nincs adat"
+  },
+  "ERRORS": {
+    "REQUIRED": "Kérlek töltsd ki ezt a mezőt.",
+    "ATLEASTONE": "Adj meg legalább egy értéket.",
+    "TOKENINVALID": {
+      "TITLE": "Az engedélyezési token lejárt.",
+      "DESCRIPTION": "Kattints az alábbi gombra az újrabejelentkezéshez."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Az instance-od blokkolva van.",
+      "DESCRIPTION": "Kérd meg az ZITADEL instance adminisztrátorát, hogy frissítse az előfizetést."
+    },
+    "INVALID_FORMAT": "A formázás érvénytelen.",
+    "NOTANEMAIL": "A megadott érték nem egy e-mail cím.",
+    "MINLENGTH": "Legalább {{requiredLength}} karakter hosszúnak kell lennie.",
+    "MAXLENGTH": "Kevesebb mint {{requiredLength}} karakternek kell lennie.",
+    "UPPERCASEMISSING": "Tartalmaznia kell egy nagybetűt.",
+    "LOWERCASEMISSING": "Tartalmaznia kell egy kisbetűt.",
+    "SYMBOLERROR": "Tartalmaznia kell egy szimbólumot vagy írásjelet.",
+    "NUMBERERROR": "Tartalmaznia kell egy számjegyet.",
+    "PWNOTEQUAL": "A megadott jelszavak nem egyeznek.",
+    "PHONE": "A telefonszámnak + jellel kell kezdődnie."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Beállítások",
+      "GENERAL": "Általános",
+      "IDP": "Identitásszolgáltatók",
+      "SECURITY": "Jelszó és Biztonság",
+      "KEYS": "Kulcsok",
+      "PAT": "Személyes Hozzáférési Tokenek",
+      "USERGRANTS": "Engedélyek",
+      "MEMBERSHIPS": "Tagságok",
+      "METADATA": "Metaadatok"
+    },
+    "TITLE": "Személyes Információk",
+    "DESCRIPTION": "Kezeld az információidat és a biztonsági beállításaidat.",
+    "PAGES": {
+      "TITLE": "Felhasználó",
+      "DETAIL": "Részlet",
+      "CREATE": "Létrehozás",
+      "MY": "Saját információim",
+      "LOGINNAMES": "Bejelentkezési nevek",
+      "LOGINMETHODS": "Bejelentkezési módok",
+      "LOGINNAMESDESC": "Ezek a bejelentkezési neveid:",
+      "NOUSER": "Nincs társított felhasználó.",
+      "REACTIVATE": "Újraaktiválás",
+      "DEACTIVATE": "Deaktiválás",
+      "FILTER": "Szűrő",
+      "STATE": "Állapot",
+      "DELETE": "Felhasználó törlése",
+      "UNLOCK": "Felhasználó feloldása",
+      "GENERATESECRET": "Client Secret létrehozása",
+      "REMOVESECRET": "Client Secret eltávolítása",
+      "LOCKEDDESCRIPTION": "Ez a felhasználó zárolásra került a maximális bejelentkezési kísérletek túllépése miatt, és fel kell oldani ahhoz, hogy újra használható legyen.",
+      "DELETEACCOUNT": "Fiók törlése",
+      "DELETEACCOUNT_DESC": "Ha végrehajtod ezt a műveletet, kijelentkezel és többé nem lesz hozzáférésed a fiókodhoz. Ez a művelet nem visszafordítható, kérlek folytasd óvatosan.",
+      "DELETEACCOUNT_BTN": "Fiók törlése",
+      "DELETEACCOUNT_SUCCESS": "A fiók sikeresen törölve!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Létrehozva",
+      "DATECHANGED": "Megváltozott"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Felhasználó törlése",
+      "DELETE_SELF_TITLE": "Fiók törlése",
+      "DELETE_DESCRIPTION": "Véglegesen törölni fogsz egy felhasználót. Biztos vagy benne?",
+      "DELETE_SELF_DESCRIPTION": "Véglegesen törölni fogod a személyes fiókodat. Ez kiléptet téged és törli a felhasználódat. Ez a művelet nem visszavonható!",
+      "DELETE_AUTH_DESCRIPTION": "Véglegesen törölni fogod a személyes fiókodat. Biztos vagy benne?",
+      "TYPEUSERNAME": "Írd be: '{{value}}', a megerősítéshez és a felhasználó törléséhez.",
+      "USERNAME": "Bejelentkezési név",
+      "DELETE_BTN": "Végleges törlés"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "E-mail értesítés küldése",
+      "DESCRIPTION": "Kattints az alábbi gombra, hogy értesítést küldj a jelenlegi email címre, vagy változtasd meg az email címet a mezőben.",
+      "NEWEMAIL": "Új email cím"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Tartsd a client secretet biztonságos helyen, mert eltűnik, ha bezárod a párbeszédablakot."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Inaktiválás",
+      "ACTIVATE": "Aktiválás",
+      "CHANGEDATE": "Utolsó módosítás",
+      "CREATIONDATE": "Létrehozás ideje",
+      "FILTER": {
+        "0": "Szűrés megjelenített név alapján",
+        "1": "Szűrés felhasználónév alapján",
+        "2": "szűrő DisplayName-hez",
+        "3": "szűrő felhasználónévhez",
+        "4": "szűrő emailhez",
+        "5": "szűrő DisplayName-hez",
+        "10": "szűrő szervezetnévhez",
+        "12": "szűrő projekt névhez"
+      },
+      "EMPTY": "Nincsenek bejegyzések"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Regisztrációs link küldése",
+      "TABLETYPE": "Típus",
+      "TABLESTATE": "Állapot",
+      "NAME": "Név",
+      "EMPTY": "Nincs eszköz beállítva",
+      "TITLE": "Jelszó nélküli Hitelesítés",
+      "DESCRIPTION": "Adj hozzá WebAuthn alapú hitelesítési módszereket a jelszó nélküli bejelentkezéshez a ZITADEL-be.",
+      "MANAGE_DESCRIPTION": "Kezeld a felhasználóid második faktoros módszereit.",
+      "U2F": "Módszer hozzáadása",
+      "U2F_DIALOG_TITLE": "Hitelesítő eszköz ellenőrzése",
+      "U2F_DIALOG_DESCRIPTION": "Adj meg egy nevet a használt jelszó nélküli bejelentkezésnek",
+      "U2F_SUCCESS": "A jelszó nélküli hitelesítés sikeresen létrehozva!",
+      "U2F_ERROR": "Hiba történt a beállítás során!",
+      "U2F_NAME": "Hitelesítő neve",
+      "TYPE": {
+        "0": "Nincs MFA meghatározva",
+        "1": "Egyszeri jelszó (OTP)",
+        "2": "Ujjlenyomat, biztonsági kulcsok, Face ID és egyéb"
+      },
+      "STATE": {
+        "0": "Nincs állapot",
+        "1": "Nincs kész",
+        "2": "Kész",
+        "3": "Törölve"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Jelszó nélküli hitelesítési módszer eltávolítása",
+        "DELETE_DESCRIPTION": "Egy jelszó nélküli hitelesítési módszert készülsz törölni. Biztos vagy benne?",
+        "ADD_TITLE": "Jelszó nélküli hitelesítés",
+        "ADD_DESCRIPTION": "Válaszd ki az elérhető opciók közül a jelszó nélküli hitelesítés módjának létrehozásához.",
+        "SEND_DESCRIPTION": "Küldj magadnak egy regisztrációs linket az email címedre.",
+        "SEND": "Regisztrációs link küldése",
+        "SENT": "Az email sikeresen elküldve. Ellenőrizd a postaládádat a beállítás folytatásához.",
+        "QRCODE_DESCRIPTION": "Generálj QR-kódot egy másik eszközzel történő beolvasáshoz.",
+        "QRCODE": "QR-kód generálása",
+        "QRCODE_SCAN": "Olvasd be ezt a QR-kódot a beállítás folytatásához az eszközödön.",
+        "NEW_DESCRIPTION": "Használd ezt az eszközt a Jelszó nélküli beállításhoz.",
+        "NEW": "Új hozzáadása"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Típus",
+      "TABLESTATE": "Állapot",
+      "NAME": "Név",
+      "EMPTY": "Nincsenek további tényezők",
+      "TITLE": "Többfaktoros hitelesítés",
+      "DESCRIPTION": "Adj hozzá egy második tényezőt a fiókod optimális biztonsága érdekében.",
+      "MANAGE_DESCRIPTION": "Kezeld a felhasználóid második tényező módszereit.",
+      "ADD": "Tényező hozzáadása",
+      "OTP": "Hitelesítő alkalmazás TOTP-hez (ideiglenes egyedi jelszó időalapú)",
+      "OTP_DIALOG_TITLE": "OTP hozzáadása",
+      "OTP_DIALOG_DESCRIPTION": "Olvasd be a QR-kódot egy hitelesítő alkalmazással, majd írd be a kódot alul, hogy ellenőrizd és aktiváld az OTP módszert.",
+      "U2F": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb",
+      "U2F_DIALOG_TITLE": "Faktor ellenőrzése",
+      "U2F_DIALOG_DESCRIPTION": "Adj meg egy nevet a használt univerzális Multifactor-odnak.",
+      "U2F_SUCCESS": "A faktor sikeresen hozzáadva!",
+      "U2F_ERROR": "Hiba történt a beállítás során!",
+      "U2F_NAME": "Hitelesítő neve",
+      "OTPSMS": "OTP (Egyszer használatos jelszó) SMS-el",
+      "OTPEMAIL": "OTP (Egyszer használatos jelszó) Email-el",
+      "SETUPOTPSMSDESCRIPTION": "Be akarod állítani ezt a telefonszámot mint OTP (Egyszer használatos jelszó) második faktort?",
+      "OTPSMSSUCCESS": "Az OTP további biztonsági tényező sikeresen beállítva.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "A módszer használatához hitelesítened kell a telefonodat.",
+      "OTPEMAILSUCCESS": "Az OTP további biztonsági tényező sikeresen beállítva.",
+      "TYPE": {
+        "0": "Nem definiáltak többtényezős hitelesítést",
+        "1": "Egyszeri Jelszó (OTP)",
+        "2": "Ujjlenyomat, Biztonsági Kulcsok, Arcfelismerés és egyéb"
+      },
+      "STATE": {
+        "0": "Nincs Állapot",
+        "1": "Nem Kész",
+        "2": "Kész",
+        "3": "Törölt"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Második tényező eltávolítása",
+        "MFA_DELETE_DESCRIPTION": "Egy második tényezőt készülsz törölni. Biztos vagy ebben?",
+        "ADD_MFA_TITLE": "Második tényező hozzáadása",
+        "ADD_MFA_DESCRIPTION": "Válaszd ki az alábbi lehetőségek egyikét."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Külső azonosító szolgáltatók",
+      "DESC": "",
+      "IDPCONFIGID": "IDP konfiguráció azonosító",
+      "IDPNAME": "IDP név",
+      "USERDISPLAYNAME": "Külső név",
+      "EXTERNALUSERID": "Külső felhasználói azonosító",
+      "EMPTY": "Nem található külső IDP",
+      "DIALOG": {
+        "DELETE_TITLE": "IDP eltávolítása",
+        "DELETE_DESCRIPTION": "Az Identity Provider eltávolítására készülsz egy felhasználótól. Biztosan folytatni szeretnéd?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Új felhasználó létrehozása",
+      "DESCRIPTION": "Kérlek, add meg a szükséges információkat.",
+      "NAMEANDEMAILSECTION": "Név és e-mail",
+      "GENDERLANGSECTION": "Nem és nyelv",
+      "PHONESECTION": "Telefonszámok",
+      "PASSWORDSECTION": "Kezdeti jelszó",
+      "ADDRESSANDPHONESECTION": "Telefonszám",
+      "INITMAILDESCRIPTION": "Ha mindkét opció ki van választva, nem kerül kiküldésre inicializáló e-mail. Ha csak az egyik opció van kiválasztva, egy e-mailt küldünk az adatok megadására / ellenőrzésére."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Telefonszám ellenőrzése",
+      "DESCRIPTION": "Add meg az SMS-ben kapott kódot a telefonszámod ellenőrzéséhez.",
+      "CODE": "Kód"
+    },
+    "DATA": {
+      "STATE": "Állapot",
+      "STATE0": "Ismeretlen",
+      "STATE1": "Aktív",
+      "STATE2": "Inaktív",
+      "STATE3": "Törölt",
+      "STATE4": "Zárolt",
+      "STATE5": "Felfüggesztve",
+      "STATE6": "Kezdeti"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-mail",
+      "PHONE": "Telefonszám",
+      "PHONE_HINT": "Használd a + szimbólumot az ország hívókódja előtt, vagy válaszd ki az országot a legördülő menüből, és végül add meg a telefonszámot",
+      "PHONE_VERIFIED": "Telefonszám ellenőrizve",
+      "SEND_SMS": "Ellenőrző SMS küldése",
+      "SEND_EMAIL": "E-mail küldése",
+      "USERNAME": "Felhasználónév",
+      "CHANGEUSERNAME": "módosít",
+      "CHANGEUSERNAME_TITLE": "Felhasználónév megváltoztatása",
+      "CHANGEUSERNAME_DESC": "Írd be az új nevet az alábbi mezőbe.",
+      "FIRSTNAME": "Keresztnév",
+      "LASTNAME": "Vezetéknév",
+      "NICKNAME": "Becenév",
+      "DISPLAYNAME": "Megjelenített név",
+      "PREFERREDLOGINNAME": "Előnyben részesített bejelentkezési név",
+      "PREFERRED_LANGUAGE": "Nyelv",
+      "GENDER": "Nem",
+      "PASSWORD": "Jelszó",
+      "AVATAR": {
+        "UPLOADTITLE": "Töltsd fel a profilképed",
+        "UPLOADBTN": "Fájl kiválasztása",
+        "UPLOAD": "Feltöltés",
+        "CURRENT": "Jelenlegi kép",
+        "PREVIEW": "Előnézet",
+        "DELETESUCCESS": "Sikeresen törölve!",
+        "CROPPERERROR": "Hiba történt a fájl feltöltése közben. Próbálj meg egy másik formátumot és méretet, ha szükséges."
+      },
+      "COUNTRY": "Ország"
+    },
+    "MACHINE": {
+      "TITLE": "Szolgáltatás felhasználói adatok",
+      "USERNAME": "Felhasználó név",
+      "NAME": "Név",
+      "DESCRIPTION": "Leírás",
+      "KEYSTITLE": "Kulcsok",
+      "KEYSDESC": "Határozd meg a kulcsaidat, és adj hozzá egy opcionális lejárati dátumot.",
+      "TOKENSTITLE": "Személyes hozzáférési tokenek",
+      "TOKENSDESC": "A személyes hozzáférési tokenek úgy működnek, mint a szokásos OAuth hozzáférési tokenek.",
+      "ID": "Kulcs azonosító",
+      "TYPE": "Típus",
+      "EXPIRATIONDATE": "Lejárati dátum",
+      "CHOOSEDATEAFTER": "Adj meg egy érvényes lejárati dátumot",
+      "CHOOSEEXPIRY": "Válassz egy lejárati dátumot",
+      "CREATIONDATE": "Létrehozás dátuma",
+      "KEYDETAILS": "Kulcs részletei",
+      "ACCESSTOKENTYPE": "Hozzáférési token típusa",
+      "ACCESSTOKENTYPES": {
+        "0": "Hordozó",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Kulcs hozzáadása",
+        "DESCRIPTION": "Válaszd ki a kulcs típusát és válassz egy opcionális lejárati dátumot."
+      },
+      "ADDED": {
+        "TITLE": "A kulcs létre lett hozva",
+        "DESCRIPTION": "Töltsd le a kulcsot, mert nem lesz látható az ablak bezárása után!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Kulcs törlése",
+          "DESCRIPTION": "Törölni akarod a kiválasztott kulcsot? Ez nem visszavonható."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Jelszó",
+      "LABEL": "Egy biztonságos jelszó segít megvédeni a fiókot",
+      "DESCRIPTION": "Írd be az új jelszót az alábbi irányelvek szerint.",
+      "OLD": "Jelenlegi Jelszó",
+      "NEW": "Új Jelszó",
+      "CONFIRM": "Új Jelszó Megerősítése",
+      "NEWINITIAL": "Jelszó",
+      "CONFIRMINITIAL": "Jelszó Megerősítése",
+      "RESET": "Jelenlegi Jelszó Visszaállítása",
+      "SET": "Új jelszó beállítása",
+      "RESENDNOTIFICATION": "Jelszó visszaállító link küldése",
+      "REQUIRED": "Néhány kötelező mező hiányzik.",
+      "MINLENGTHERROR": "Legalább {{value}} karakter hosszúnak kell lennie.",
+      "MAXLENGTHERROR": "Kevesebb, mint {{value}} karakter kell legyen."
+    },
+    "ID": "Azonosító",
+    "EMAIL": "E-mail",
+    "PHONE": "Telefonszám",
+    "PHONEEMPTY": "Nincs megadott telefonszám",
+    "PHONEVERIFIED": "Telefonszám ellenőrizve.",
+    "EMAILVERIFIED": "Email megerősítve",
+    "NOTVERIFIED": "nem megerősítve",
+    "PREFERRED_LOGINNAME": "Előnyben részesített bejelentkezési név",
+    "ISINITIAL": "A felhasználó még nem aktív.",
+    "LOGINMETHODS": {
+      "TITLE": "Kapcsolattartási információk",
+      "DESCRIPTION": "A megadott információkat arra használjuk, hogy fontos információkat küldjünk, például jelszó-visszaállító e-maileket.",
+      "EMAIL": {
+        "TITLE": "E-mail",
+        "VALID": "ellenőrizve",
+        "ISVERIFIED": "Email megerősítve",
+        "ISVERIFIEDDESC": "Ha az e-mail megerősítve van, nem küldünk e-mail megerősítési kérést.",
+        "RESEND": "Ellenőrző e-mail újraküldése",
+        "EDITTITLE": "E-mail megváltoztatása",
+        "EDITDESC": "Add meg az új e-mail címet az alábbi mezőben."
+      },
+      "PHONE": {
+        "TITLE": "Telefon",
+        "VALID": "ellenőrizve",
+        "RESEND": "Ellenőrző szöveges üzenet újraküldése",
+        "EDITTITLE": "Szám megváltoztatása",
+        "EDITVALUE": "Telefonszám",
+        "EDITDESC": "Add meg az új telefonszámot az alábbi mezőben.",
+        "DELETETITLE": "Telefonszám törlése",
+        "DELETEDESC": "Tényleg törölni akarod a telefonszámot?",
+        "OTPSMSREMOVALWARNING": "Ez a fiók második tényezőként használja ezt a telefonszámot. Ha folytatod, nem tudod majd használni."
+      },
+      "RESENDCODE": "Kód újraküldése",
+      "ENTERCODE": "Ellenőriz",
+      "ENTERCODE_DESC": "Kód ellenőrzése"
+    },
+    "GRANTS": {
+      "TITLE": "Felhasználói jogosultságok",
+      "DESCRIPTION": "Adj hozzáférést ennek a felhasználónak bizonyos projektekhez",
+      "CREATE": {
+        "TITLE": "Felhasználói jogosultság létrehozása",
+        "DESCRIPTION": "Keresd meg a szervezetet, a projektet és a megfelelő projektszerepeket."
+      },
+      "PROJECTNAME": "Projekt neve",
+      "PROJECT-OWNED": "Projekt",
+      "PROJECT-GRANTED": "Engedélyezett projekt",
+      "FILTER": {
+        "0": "felhasználói szűrő",
+        "1": "domainek szűrője",
+        "2": "projektnév szűrő",
+        "3": "szerepkör neve szűrő"
+      }
+    },
+    "STATE": {
+      "0": "Ismeretlen",
+      "1": "Aktív",
+      "2": "Inaktív",
+      "3": "Törölt",
+      "4": "Zárolt",
+      "5": "Felfüggesztett",
+      "6": "Kezdeti"
+    },
+    "STATEV2": {
+      "0": "Ismeretlen",
+      "1": "Aktív",
+      "2": "Inaktív",
+      "3": "Törölt",
+      "4": "Zárolt",
+      "5": "Kezdeti"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Belépési név (jelenlegi szervezet)",
+      "ADDITIONAL-EXTERNAL": "Belépési név (külső szervezet)"
+    },
+    "TARGET": {
+      "SELF": "Ha egy másik szervezet felhasználójának szeretnél jogosultságot adni",
+      "EXTERNAL": "Ha szervezeted egy felhasználójának szeretnél jogosultságot adni",
+      "CLICKHERE": "kattints ide"
+    },
+    "SIGNEDOUT": "Ki vagy jelentkezve. Kattints a \"Bejelentkezés\" gombra a belépéshez.",
+    "SIGNEDOUT_BTN": "Bejelentkezés",
+    "EDITACCOUNT": "Fiók szerkesztése",
+    "ADDACCOUNT": "Bejelentkezés másik fiókkal",
+    "RESENDINITIALEMAIL": "Aktiváló email újraküldése",
+    "RESENDEMAILNOTIFICATION": "Értesítési email újraküldése",
+    "TOAST": {
+      "CREATED": "Felhasználó létrehozva sikeresen.",
+      "SAVED": "Profil sikeresen mentve.",
+      "USERNAMECHANGED": "Felhasználónév megváltoztatva.",
+      "EMAILSAVED": "Email sikeresen mentve.",
+      "INITEMAILSENT": "Kezdő email elküldve.",
+      "PHONESAVED": "Telefon sikeresen mentve.",
+      "PHONEREMOVED": "A telefon eltávolítva.",
+      "PHONEVERIFIED": "A telefon sikeresen ellenőrizve.",
+      "PHONEVERIFICATIONSENT": "A telefon ellenőrző kód elküldve.",
+      "EMAILVERIFICATIONSENT": "Az e-mail ellenőrző kód elküldve.",
+      "OTPREMOVED": "Az OTP eltávolítva.",
+      "U2FREMOVED": "A faktor eltávolítva.",
+      "PASSWORDLESSREMOVED": "A jelszónélküli belépés eltávolítva.",
+      "INITIALPASSWORDSET": "A kezdeti jelszó beállítva.",
+      "PASSWORDNOTIFICATIONSENT": "A jelszóváltoztatási értesítés elküldve.",
+      "PASSWORDCHANGED": "A jelszó sikeresen megváltoztatva.",
+      "REACTIVATED": "A felhasználó újraaktiválva.",
+      "DEACTIVATED": "A felhasználó deaktiválva.",
+      "SELECTEDREACTIVATED": "A kiválasztott felhasználók újraaktiválva.",
+      "SELECTEDDEACTIVATED": "A kiválasztott felhasználók deaktiválva.",
+      "SELECTEDKEYSDELETED": "A kiválasztott kulcsok törölve.",
+      "KEYADDED": "Kulcs hozzáadva!",
+      "MACHINEADDED": "Service User létrehozva!",
+      "DELETED": "A felhasználó sikeresen törölve!",
+      "UNLOCKED": "A felhasználó sikeresen feloldva!",
+      "PASSWORDLESSREGISTRATIONSENT": "A regisztrációs link sikeresen elküldve.",
+      "SECRETGENERATED": "A titok sikeresen létrehozva!",
+      "SECRETREMOVED": "A titok sikeresen eltávolítva!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "ZITADEL kezelői szerepkörök",
+      "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy IAM részletező oldalakon is.",
+      "ORGCONTEXT": "Láthatod az összes szervezetet és projektet, amelyek a jelenleg kiválasztott szervezethez kapcsolódnak.",
+      "USERCONTEXT": "Láthatod az összes szervezetet és projektet, amelyekhez jogosultságod van, beleértve más szervezeteket is.",
+      "CREATIONDATE": "Létrehozás dátuma",
+      "CHANGEDATE": "Utolsó módosítás",
+      "DISPLAYNAME": "Megjelenítési név",
+      "REMOVE": "Eltávolítás",
+      "TYPE": "Típus",
+      "ORGID": "Szervezet azonosító",
+      "UPDATED": "A tagság frissítve lett.",
+      "NOPERMISSIONTOEDIT": "Nincs meg a szükséges engedélyed, hogy szerepköröket szerkessz!",
+      "TYPES": {
+        "UNKNOWN": "Ismeretlen",
+        "ORG": "Szervezet",
+        "PROJECT": "Projekt",
+        "GRANTEDPROJECT": "Engedélyezett projekt"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "Azonosító",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Új Personal Access Token generálása",
+        "DESCRIPTION": "Állíts be egy egyéni lejárati időt a tokenhez.",
+        "CHOOSEEXPIRY": "Válassz egy lejárati dátumot",
+        "CHOOSEDATEAFTER": "Adj meg egy érvényes lejárati dátumot utána"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Ne felejtsd el lemásolni a personal access token-t. Nem fogod tudni újra megtekinteni!"
+      },
+      "DELETE": {
+        "TITLE": "Token törlése",
+        "DESCRIPTION": "A personal access token törlésére készülsz. Biztos vagy benne?"
+      },
+      "DELETED": "Token sikeresen törölve."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metaadatok",
+    "KEY": "Kulcs",
+    "VALUE": "Érték",
+    "ADD": "Új bejegyzés",
+    "SAVE": "Mentés",
+    "EMPTY": "Nincs metaadat",
+    "SETSUCCESS": "Az elem sikeresen mentve",
+    "REMOVESUCCESS": "Az elem sikeresen törölve"
+  },
+  "FLOWS": {
+    "ID": "Azonosító",
+    "NAME": "Név",
+    "STATE": "Állapot",
+    "STATES": {
+      "0": "nincs állapot",
+      "1": "inaktív",
+      "2": "aktív"
+    },
+    "ADDTRIGGER": "Indító hozzáadása",
+    "FLOWCHANGED": "A folyamat sikeresen megváltoztatva",
+    "FLOWCLEARED": "A folyamat sikeresen visszaállítva",
+    "TIMEOUT": "Időtúllépés",
+    "TIMEOUTINSEC": "Időtúllépés másodpercben",
+    "ALLOWEDTOFAIL": "Megengedett a hibázás",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Figyelmeztetés",
+      "DESCRIPTION": "Ha letiltod ezt a beállítást, azzal azt okozhatod, hogy a szervezeted felhasználói nem tudnak bejelentkezni. Emellett nem fogsz tudni hozzáférni a konzolhoz, hogy letiltsd a műveletet. Javasoljuk, hogy hozz létre egy adminisztrátori felhasználót egy külön szervezetben, vagy először tesztelj scripteket egy fejlesztési környezetben vagy egy fejlesztési szervezetben."
+    },
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Folyamat típus",
+    "TRIGGERTYPE": "Trigger típus",
+    "ACTIONS": "Műveletek",
+    "ACTIONSMAX": "A szinted alapján korlátozott számú művelet áll rendelkezésedre ({{value}}). Feltétlenül deaktiváld azokat, amikre nincs szükséged, vagy fontold meg a szinted frissítését.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Művelet létrehozása"
+      },
+      "UPDATE": {
+        "TITLE": "Művelet frissítése"
+      },
+      "DELETEACTION": {
+        "TITLE": "Művelet törlése?",
+        "DESCRIPTION": "Egy művelet törlésére készülsz. Ez nem visszavonható. Biztos vagy benne?",
+        "DELETE_SUCCESS": "Az akció sikeresen törölve."
+      },
+      "CLEAR": {
+        "TITLE": "Folyamat törlése?",
+        "DESCRIPTION": "A folyamatot az összes triggerrel és akcióval együtt fogod visszaállítani. Ez a változás nem visszaállítható. Biztos vagy benne?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Kiválasztott akciók törlése?",
+        "DESCRIPTION": "Biztos vagy benne, hogy törölni akarod a kiválasztott akciókat a folyamatból?"
+      },
+      "ABOUTNAME": "Az akció neve és a JavaScript-ben a funkció neve ugyanaz kell legyen."
+    },
+    "TOAST": {
+      "ACTIONSSET": "Akciók beállítva",
+      "ACTIONREACTIVATED": "Akciók sikeresen újraaktiválva",
+      "ACTIONDEACTIVATED": "Akciók sikeresen deaktiválva"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Rendszerpolitikák és hozzáférési beállítások",
+      "DESCRIPTION": "Kezeld a globális szabályzatokat és a hozzáférési beállításokat."
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAM tárhely adminisztráció",
+      "DESCRIPTION": "Kezeld a ZITADEL nézeteidet és a sikertelen eseményeket."
+    },
+    "MEMBER": {
+      "TITLE": "Menedzserek",
+      "DESCRIPTION": "Ezek a menedzserek végezhetnek módosításokat az instanciádban."
+    },
+    "PAGES": {
+      "STATE": "Állapot",
+      "DOMAINLIST": "Egyéni domainek"
+    },
+    "STATE": {
+      "0": "Meghatározatlan",
+      "1": "Létrehozás",
+      "2": "Fut",
+      "3": "Leállítás",
+      "4": "Leállítva"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Név",
+      "DATABASE": "Adatbázis",
+      "SEQUENCE": "Szekvencia",
+      "EVENTTIMESTAMP": "Időbélyeg",
+      "LASTSPOOL": "Sikeres fűzés",
+      "ACTIONS": "Műveletek",
+      "CLEAR": "Törlés",
+      "CLEARED": "A nézet sikeresen törölve!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Nézet törlése",
+        "VIEW_CLEAR_DESCRIPTION": "Arra készülsz, hogy törölj egy nézetet. A nézet törlésével egy olyan folyamat jön létre, amely alatt az adatok esetleg nem elérhetők a végfelhasználók számára. Biztos vagy benne?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Név",
+      "DATABASE": "Adatbázis",
+      "FAILEDSEQUENCE": "Sikertelen sorozat",
+      "FAILURECOUNT": "Sikertelenségek száma",
+      "LASTFAILED": "Utolsó sikertelen próbálkozás ideje",
+      "ERRORMESSAGE": "Hibaüzenet",
+      "ACTIONS": "Műveletek",
+      "DELETE": "Eltávolítás",
+      "DELETESUCCESS": "A sikertelen események eltávolítva."
+    },
+    "EVENTS": {
+      "EDITOR": "Szerkesztő",
+      "EDITORID": "Szerkesztő ID",
+      "AGGREGATE": "Aggregált",
+      "AGGREGATEID": "Aggregált ID",
+      "AGGREGATETYPE": "Aggregált típus",
+      "RESOURCEOWNER": "Erőforrás tulajdonos",
+      "SEQUENCE": "Sorrend",
+      "CREATIONDATE": "Létrehozva",
+      "TYPE": "Típus",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Szűrő",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Szűrés szerkesztő szerint"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregátum típus",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Szűrés aggregátum szerint"
+        },
+        "TYPE": {
+          "TYPELABEL": "Típus",
+          "CHECKBOX": "Szűrés típus szerint"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Szűrés erőforrás tulajdonos szerint"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sorrend",
+          "CHECKBOX": "Szűrés sorrend szerint"
+        },
+        "SORT": "Rendezés",
+        "ASC": "Növekvő",
+        "DESC": "Csökkenő",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Tól",
+          "RADIO_RANGE": "Tartomány",
+          "LABEL_SINCE": "Óta",
+          "LABEL_UNTIL": "Ig"
+        },
+        "OTHER": "másik",
+        "OTHERS": "mások"
+      },
+      "DIALOG": {
+        "TITLE": "Esemény részlete"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "A menedzser eltávolítva.",
+      "MEMBERSADDED": "Menedzserek hozzáadva.",
+      "MEMBERADDED": "A menedzser hozzáadva.",
+      "MEMBERCHANGED": "A menedzser megváltoztatva.",
+      "ROLEREMOVED": "Szerep eltávolítva.",
+      "ROLECHANGED": "Szerep megváltoztatva.",
+      "REACTIVATED": "Újraaktiválva",
+      "DEACTIVATED": "Inaktiválva"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Név",
+      "ID": "Azonosító",
+      "CREATIONDATE": "Létrehozás dátuma",
+      "DATECHANGED": "Módosítva",
+      "FILTER": "Szűrő",
+      "FILTERPLACEHOLDER": "Név szerinti szűrés",
+      "LIST": "Szervezetek",
+      "LISTDESCRIPTION": "Válassz egy szervezetet.",
+      "ACTIVE": "Aktív",
+      "CREATE": "Szervezet létrehozása",
+      "DEACTIVATE": "Szervezet inaktiválása",
+      "REACTIVATE": "Szervezet újraaktiválása",
+      "NOPERMISSION": "Nincs jogosultságod a szervezeti beállítások eléréséhez.",
+      "USERSELFACCOUNT": "Használd a személyes fiókodat szervezet tulajdonosként",
+      "ORGDETAIL_TITLE": "Add meg az új szervezeted nevét és domainjét.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Add meg az új szervezeted nevét.",
+      "ORGDETAILUSER_TITLE": "Szervezet tulajdonosának beállítása",
+      "DELETE": "Szervezet törlése",
+      "DEFAULTLABEL": "Alapértelmezett",
+      "SETASDEFAULT": "Állítsd be alapértelmezett szervezetként",
+      "DEFAULTORGSET": "Alapértelmezett szervezet sikeresen megváltoztatva",
+      "RENAME": {
+        "ACTION": "Átnevezés",
+        "TITLE": "Szervezet átnevezése",
+        "DESCRIPTION": "Add meg a szervezet új nevét",
+        "BTN": "Átnevezés"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "{{value}} tulajdonjogának ellenőrzése",
+        "VERIFICATION": "Két kézi ellenőrzési módot kínálunk a tartományod érvényesítésére:",
+        "VERIFICATION_HTML": "- HTTP. Helyezz el egy ideiglenes ellenőrző fájlt a weboldaladon",
+        "VERIFICATION_DNS": "- DNS. Hozz létre egy TXT Record DNS bejegyzést",
+        "VERIFICATION_DNS_DESC": "Ha te kezeled a {{ value }}-t és hozzáférsz a DNS rekordokhoz, létrehozhatsz egy új TXT rekordot a következő értékekkel:",
+        "VERIFICATION_DNS_HOST_LABEL": "Hoszt:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Ezt a kódot használd a TXT rekord értékeként:",
+        "VERIFICATION_HTTP_DESC": "Ha hozzáférsz a webhelyed hosztingjához, egyszerűen töltsd le az ellenőrző fájlt és töltsd fel a megadott URL-re",
+        "VERIFICATION_HTTP_URL_LABEL": "Várt URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Ellenőrző fájl:",
+        "VERIFICATION_SKIP": "Most átugorhatod az ellenőrzést és folytathatod a szervezeted létrehozását, de ahhoz, hogy használhasd a domained, ezt a lépést be kell fejezni!",
+        "VERIFICATION_VALIDATION_DESC": "Ne töröld az ellenőrző kódot, mivel a ZITADEL időnként újra ellenőrzi a domained tulajdonjogát.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Új Token Kérése",
+        "VERIFICATION_VALIDATION_ONGOING": "A {{ value }} módszer lett kiválasztva a domained ellenőrzésére. Kattints a gombra, hogy elindítsd az ellenőrzést vagy újrakezd az ellenőrzési folyamatot.",
+        "VERIFICATION_SUCCESSFUL": "A domain sikeresen ellenőrizve!",
+        "RESETMETHOD": "Ellenőrzési módszer visszaállítása"
+      },
+      "DOWNLOAD_FILE": "Fájl letöltése",
+      "SELECTORGTOOLTIP": "Ezt a szervezetet válaszd.",
+      "PRIMARYDOMAIN": "Elsődleges Domain",
+      "STATE": "Állapot",
+      "USEPASSWORD": "Első jelszó beállítása",
+      "USEPASSWORDDESC": "A felhasználónak nem kell jelszót beállítania az inicializálás során."
+    },
+    "LIST": {
+      "TITLE": "Szervezetek",
+      "DESCRIPTION": "Ezek a szervezetek az instanciádon"
+    },
+    "DOMAINS": {
+      "NEW": "Domain hozzáadása",
+      "TITLE": "Ellenőrzött domainek",
+      "DESCRIPTION": "Konfiguráld a szervezeted domainjeit. Ez a domain használható domain felfedezéshez és felhasználói név utótagként.",
+      "SETPRIMARY": "Beállítás elsődlegesnek",
+      "DELETE": {
+        "TITLE": "Domain törlése",
+        "DESCRIPTION": "Készülsz törölni az egyik domained."
+      },
+      "ADD": {
+        "TITLE": "Domain hozzáadása",
+        "DESCRIPTION": "Készülsz hozzáadni egy domaint a szervezetedhez. A sikeres folyamat után a domaint használhatod domain felfedezéshez és felhasználói utótagként."
+      }
+    },
+    "STATE": {
+      "0": "Nincs meghatározva",
+      "1": "Aktív",
+      "2": "Deaktiválva"
+    },
+    "MEMBER": {
+      "TITLE": "Szervezet vezetői",
+      "DESCRIPTION": "Határozd meg azokat a felhasználókat, akik megváltoztathatják a szervezet beállításait."
+    },
+    "TOAST": {
+      "UPDATED": "A szervezet frissítése sikeres volt.",
+      "DEACTIVATED": "A szervezet deaktiválva.",
+      "REACTIVATED": "A szervezet újraaktiválva.",
+      "DOMAINADDED": "Domain hozzáadva.",
+      "DOMAINREMOVED": "Domain eltávolítva.",
+      "MEMBERADDED": "Vezető hozzáadva.",
+      "MEMBERREMOVED": "Vezető eltávolítva.",
+      "MEMBERCHANGED": "A vezető megváltozott.",
+      "SETPRIMARY": "Az elsődleges domain beállítva.",
+      "DELETED": "A szervezet sikeresen törölve.",
+      "DEFAULTORGNOTFOUND": "Az alapértelmezett szervezet nem található.",
+      "ORG_WAS_DELETED": "A szervezet törölve lett."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Szervezet deaktiválása",
+        "DESCRIPTION": "Épp most készülöd deaktiválni a szervezetedet. A felhasználók ezután nem tudnak majd bejelentkezni. Biztosan folytatod?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Szervezet újraaktiválása",
+        "DESCRIPTION": "Épp most készülöd újraaktiválni a szervezetedet. A felhasználók újra be tudnak majd jelentkezni. Biztosan folytatod?"
+      },
+      "DELETE": {
+        "TITLE": "Szervezet törlése",
+        "DESCRIPTION": "Az szervezeted törlése folyamatban van. Ez elindít egy folyamatot, amelyben minden szervezethez kapcsolódó adat törlésre kerül. Ezt a műveletet most nem tudod visszavonni.",
+        "TYPENAME": "Írd be: '{{value}}', hogy töröld a szervezeted.",
+        "ORGNAME": "Név",
+        "BTN": "Törlés"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Szervezetek",
+      "FEATURESETTINGS": "Funkciók",
+      "LANGUAGES": "Nyelvek",
+      "LOGIN": "Bejelentkezési viselkedés és biztonság",
+      "LOCKOUT": "Kizárás",
+      "AGE": "Jelszó lejárata",
+      "COMPLEXITY": "Jelszó összetettsége",
+      "NOTIFICATIONS": "Értesítések",
+      "SMTP_PROVIDER": "SMTP szolgáltató",
+      "SMS_PROVIDER": "SMS/Telefon szolgáltató",
+      "NOTIFICATIONS_DESC": "SMTP és SMS beállítások",
+      "MESSAGETEXTS": "Üzenet szövegek",
+      "IDP": "Identitásszolgáltatók",
+      "VERIFIED_DOMAINS": "Ellenőrzött domainek",
+      "DOMAIN": "Domain beállítások",
+      "LOGINTEXTS": "Bejelentkezési felület szövegei",
+      "BRANDING": "Márkaépítés",
+      "PRIVACYPOLICY": "Külső hivatkozások",
+      "OIDC": "OIDC token élettartam és lejárat",
+      "SECRETS": "Titokgenerátor",
+      "SECURITY": "Biztonsági beállítások",
+      "EVENTS": "Események",
+      "FAILEDEVENTS": "Sikertelen események",
+      "VIEWS": "Nézetek"
+    },
+    "GROUPS": {
+      "GENERAL": "Általános információ",
+      "NOTIFICATIONS": "Értesítések",
+      "LOGIN": "Bejelentkezés és hozzáférés",
+      "DOMAIN": "Domain",
+      "TEXTS": "Szövegek és nyelvek",
+      "APPEARANCE": "Megjelenés",
+      "OTHER": "Egyéb",
+      "STORAGE": "Tárolás"
+    }
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Alapértelmezett nyelv",
+      "ALLOWED": "Engedélyezett nyelvek",
+      "NOT_ALLOWED": "Nem engedélyezett nyelvek",
+      "ALLOW_ALL": "Mindet engedélyezi",
+      "DISALLOW_ALL": "Mindet letilt",
+      "SETASDEFAULT": "Beállítás alapértelmezett nyelvként",
+      "DEFAULT_SAVED": "Alapértelmezett nyelv mentve",
+      "ALLOWED_SAVED": "Engedélyezett nyelvek mentve",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Lengyel",
+        "zh": "Egyszerűsített kínai",
+        "bg": "Bolgár",
+        "pt": "Portugál",
+        "mk": "Macedón",
+        "cs": "Cseh",
+        "ru": "Orosz",
+        "nl": "Holland",
+        "sv": "Svéd",
+        "id": "Indonéz",
+        "hu": "Magyar",
+        "ko": "한국어"
+      }
+    },
+    "SMTP": {
+      "TITLE": "SMTP Szolgáltató",
+      "DESCRIPTION": "Leírás",
+      "SENDERADDRESS": "Küldő Email Cím",
+      "SENDERNAME": "Küldő Neve",
+      "REPLYTOADDRESS": "Válasz-cím",
+      "HOSTANDPORT": "Host és Port",
+      "USER": "Felhasználó",
+      "PASSWORD": "Jelszó",
+      "SETPASSWORD": "SMTP Jelszó Beállítása",
+      "PASSWORDSET": "Az SMTP jelszót sikeresen beállítottuk.",
+      "TLS": "Adatátviteli Réteg Biztonság (TLS)",
+      "SAVED": "Sikeresen mentve!",
+      "NOCHANGES": "Nincs változás!",
+      "REQUIREDWARN": "Az értesítések elküldéséhez meg kell adnod az SMTP adataidat a domain-edhez."
+    },
+    "SMS": {
+      "PROVIDERS": "Szolgáltatók",
+      "PROVIDER": "SMS Szolgáltató",
+      "ADDPROVIDER": "SMS Szolgáltató hozzáadása",
+      "ADDPROVIDERDESCRIPTION": "Válassz egyet az elérhető szolgáltatók közül és add meg a szükséges adatokat.",
+      "REMOVEPROVIDER": "Szolgáltató eltávolítása",
+      "REMOVEPROVIDER_DESC": "Készülsz eltávolítani egy szolgáltatói konfigurációt. Folytatni szeretnéd?",
+      "SMSPROVIDERSTATE": {
+        "0": "Nincs megadva",
+        "1": "Aktív",
+        "2": "Inaktív"
+      },
+      "ACTIVATED": "Szolgáltató aktiválva.",
+      "DEACTIVATED": "Szolgáltató deaktiválva.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Küldő száma",
+        "ADDED": "Twilio sikeresen hozzáadva.",
+        "UPDATED": "Twilio sikeresen frissítve.",
+        "REMOVED": "Twilio eltávolítva",
+        "CHANGETOKEN": "Token módosítása",
+        "SETTOKEN": "Token beállítása",
+        "TOKENSET": "A token sikeresen beállítva."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Titkos típusok",
+      "TYPE": {
+        "1": "Inicializáló e-mail",
+        "2": "E-mail ellenőrzés",
+        "3": "Telefonos ellenőrzés",
+        "4": "Jelszó visszaállítás",
+        "5": "Jelszó nélküli inicializálás",
+        "6": "Alkalmazás titok",
+        "7": "Egyszer használatos jelszó (OTP) - SMS",
+        "8": "Egyszer használatos jelszó (OTP) - Email"
+      },
+      "EXPIRY": "Lejárat (percben)",
+      "INCLUDEDIGITS": "Számok bevonása",
+      "INCLUDESYMBOLS": "Szimbólumok bevonása",
+      "INCLUDELOWERLETTERS": "Kisbetűk bevonása",
+      "INCLUDEUPPERLETTERS": "Nagybetűk bevonása",
+      "LENGTH": "Hossz",
+      "UPDATED": "Beállítások frissítve."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Ez a beállítás lehetővé teszi a CSP számára, hogy az engedélyezett tartományokból származó keretezést engedélyezze. Ne feledd, hogy ha engedélyezed az iFrame-ek használatát, fennáll a lehetőség, hogy kockáztatod a clickjacking támadások lehetőségét.",
+      "IFRAMEENABLED": "iFrame engedélyezése",
+      "ALLOWEDORIGINS": "Engedélyezett URL-ek",
+      "IMPERSONATIONTITLE": "Megszemélyesítés",
+      "IMPERSONATIONENABLED": "Megszemélyesítés engedélyezése",
+      "IMPERSONATIONDESCRIPTION": "Ez a beállítás elvileg lehetővé teszi a megszemélyesítés használatát. Ne feledd, hogy a megszemélyesítőnek meg kell kapnia az `*_IMPERSONATOR` szerepköröket."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Alapértelmezett Org bejelentkezés",
+      "LOGINDEFAULTORG_DESCRIPTION": "A bejelentkezési felület az alapértelmezett org beállításait fogja használni (és nem az instance-tól), ha nincs megadva szervezeti kontextus",
+      "OIDCLEGACYINTROSPECTION": "OIDC régi introspekció",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nemrég refaktoráltuk az introspekciós végpontot a teljesítmény javítása érdekében. Ezt a funkciót használhatod a régi implementációra való visszaállításhoz, ha váratlan hibák lépnének fel.",
+      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Engedélyezd a kísérleti urn:ietf:params:oauth:grant-type:token-exchange támogatását az OIDC token végpont számára. A token csere használható kisebb hatókörű tokenek kérésére vagy más felhasználók megszemélyesítésére. Tekintsd meg a biztonsági irányelvet az impersonáció engedélyezéséhez egy példányon.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Introspekciós Projekciók Indítása",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Engedélyezd a projekciós indítókat az introspekciós kérés során. Ez lehet egy megoldás, ha észrevehető konzisztenciaproblémák vannak az introspekciós válaszban, de hatással lehet a teljesítményre. Tervezzük, hogy a jövőben eltávolítjuk a triggereket az introspekciós kérésből.",
+      "USERSCHEMA": "Felhasználói Séma",
+      "USERSCHEMA_DESCRIPTION": "A Felhasználói Sémák lehetővé teszik a felhasználói adat sémák kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
+      "ACTIONS": "Műveletek",
+      "ACTIONS_DESCRIPTION": "A Műveletek v2 lehetővé teszik az adat futtatások és célok kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Egyedüli V1 Munkamenet Befejezése",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ha a zászló engedélyezve van, képes leszel egyetlen munkamenetet megszüntetni a bejelentkezési UI-ben, ha egy id_tokent biztosítasz egy `sid` claim-mel mint id_token_hint az end_session végpontnál. Megjegyzendő, hogy jelenleg az összes munkamenet ugyanabból a felhasználói ügynökből (böngésző) leállításra kerül a bejelentkezési UI-ben. A Session API-val kezelt munkamenetek már lehetővé teszik egyes munkamenetek megszüntetését.",
+      "STATES": {
+        "INHERITED": "Örököl",
+        "ENABLED": "Engedélyezve",
+        "DISABLED": "Letiltva"
+      },
+      "INHERITED_DESCRIPTION": "Ez az értéket a rendszer alapértelmezett értékére állítja.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Engedélyezve\" öröklődik",
+        "DISABLED": "\"Letiltva\" öröklődik"
+      },
+      "RESET": "Mindent állíts öröklésre",
+      "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a konzolban felhasználók létrehozásához",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Beállítás visszaállítása",
+        "DEFAULTDESCRIPTION": "Készülsz visszaállítani a beállításaidat az instanciád alapértelmezett konfigurációjára. Biztosan folytatni akarod?",
+        "LOGINPOLICY_DESCRIPTION": "Figyelem: Ha folytatod, az Identity Provider beállítások is az instance beállításokra lesznek visszaállítva."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Alkalmazva",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Jelszó Komplexitás",
+      "DESCRIPTION": "Biztosítja, hogy minden megadott jelszó megfeleljen egy adott mintának",
+      "SYMBOLANDNUMBERERROR": "Tartalmaznia kell egy számjegyet és egy szimbólumot/pontozási jelet.",
+      "SYMBOLERROR": "Tartalmaznia kell egy szimbólumot/pontozási jelet.",
+      "NUMBERERROR": "Tartalmaznia kell egy számjegyet.",
+      "PATTERNERROR": "A jelszó nem felel meg a szükséges mintának."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Értesítés",
+      "DESCRIPTION": "Meghatározza, hogy milyen változások esetén lesznek értesítések küldve.",
+      "PASSWORDCHANGE": "Jelszó megváltoztatása"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Adj egyéni stílust a bejelentkezésnek, és módosítsd a viselkedését.",
+      "PREVIEW_DESCRIPTION": "A szabályzat módosításai automatikusan telepítésre kerülnek az előnézeti környezetbe.",
+      "BTN": "Fájl kiválasztása",
+      "ACTIVATEPREVIEW": "Konfiguráció alkalmazása",
+      "DARK": "Sötét mód",
+      "LIGHT": "Világos mód",
+      "CHANGEVIEW": "Nézet módosítása",
+      "ACTIVATED": "A szabályzat módosításai mostantól élnek",
+      "THEME": "Téma",
+      "COLORS": "Színek",
+      "FONT": "Betűtípus",
+      "ADVANCEDBEHAVIOR": "Speciális Viselkedés",
+      "DROP": "Húzd ide a képet vagy",
+      "RELEASE": "Engedélyezés",
+      "DROPFONT": "Húzd ide a betűfájlokat",
+      "RELEASEFONT": "Engedélyezés",
+      "USEOFLOGO": "A logódat a bejelentkezésnél és az e-mailekben használjuk, míg az ikont kisebb UI elemekhez, például a konzolban lévő szervezetváltóban használjuk",
+      "MAXSIZE": "A maximális méret 524 kB-ig van korlátozva",
+      "EMAILNOSVG": "Az SVG fájlformátum nem támogatott az e-mailekben. Ezért töltsd fel a logódat PNG vagy más támogatott formátumban.",
+      "MAXSIZEEXCEEDED": "A maximális méret, 524kB, túllépve.",
+      "NOSVGSUPPORTED": "Az SVG formátum nem támogatott!",
+      "FONTINLOGINONLY": "A betűtípus jelenleg csak a bejelentkezési felületen jelenik meg.",
+      "BACKGROUNDCOLOR": "Háttérszín",
+      "PRIMARYCOLOR": "Elsődleges szín",
+      "WARNCOLOR": "Figyelmeztető szín",
+      "FONTCOLOR": "Betűszín",
+      "VIEWS": {
+        "PREVIEW": "Előnézet",
+        "CURRENT": "Jelenlegi konfiguráció"
+      },
+      "PREVIEW": {
+        "TITLE": "Bejelentkezés",
+        "SECOND": "jelentkezz be a ZITADEL-fiókoddal.",
+        "ERROR": "A felhasználó nem található!",
+        "PRIMARYBUTTON": "következő",
+        "SECONDARYBUTTON": "regisztráció"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automata mód",
+        "THEME_MODE_LIGHT": "Csak világos mód",
+        "THEME_MODE_DARK": "Csak sötét mód"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Jelszó lejárata",
+      "DESCRIPTION": "Beállíthatsz egy irányelvet a jelszavak lejárati idejére. Ez az irányelv arra kényszeríti a felhasználót, hogy a lejárat után a következő bejelentkezéskor módosítsa a jelszót. Nincsenek automatikus figyelmeztetések és értesítések."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Zárolási irányelv",
+      "DESCRIPTION": "Állíts be egy maximális jelszó-próbálkozási számot, amely után a fiókok le lesznek tiltva."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Arculat",
+      "BTN": "Fájl kiválasztása",
+      "DESCRIPTION": "A bejelentkezés megjelenésének testreszabása",
+      "ACTIVATEPREVIEW": "Konfiguráció aktiválása"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Bejelentkezési beállítások",
+      "DESCRIPTION": "Határozd meg, hogyan lehet a felhasználókat hitelesíteni, és konfiguráld az Identity Provider-eket",
+      "DESCRIPTIONCREATEADMIN": "A felhasználók az alábbi elérhető Identity Provider-ek közül választhatnak.",
+      "DESCRIPTIONCREATEMGMT": "A felhasználók az alábbi elérhető Identity Provider-ek közül választhatnak. Megjegyzés: Használhatod a rendszer által beállított szolgáltatókat, valamint csak a szervezeted számára beállított szolgáltatókat is.",
+      "LIFETIME_INVALID": "Az űrlap érvénytelen értékeket tartalmaz.",
+      "SAVED": "Sikeresen mentve!",
+      "PROVIDER_ADDED": "Az azonosítószolgáltató aktiválva."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Állítsd be az Adatvédelmi Szabályzat és a Szolgáltatási Feltételek linkjeit",
+      "TOSLINK": "Szolgáltatási Feltételek Linkje",
+      "POLICYLINK": "Adatvédelmi Szabályzat Linkje",
+      "HELPLINK": "Segítség Link",
+      "SUPPORTEMAIL": "Támogatási E-mail",
+      "DOCSLINK": "Dokumentáció Link (Konzol)",
+      "CUSTOMLINK": "Egyéni Link (Konzol)",
+      "CUSTOMLINKTEXT": "Egyéni Link Szöveg (Konzol)",
+      "SAVED": "Sikeresen mentve!",
+      "RESET_TITLE": "Alapértelmezett értékek visszaállítása",
+      "RESET_DESCRIPTION": "Az ÁSZF és az Adatvédelmi Szabályzat alapértelmezett linkjeit készülsz visszaállítani. Tényleg folytatni szeretnéd?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Bejelentkezési felület szövegek",
+      "DESCRIPTION": "Add meg a bejelentkezési felületek szövegeit. Ha a mezők üresek, akkor az alapértelmezett értékek lesznek láthatók a helyőrzőként.",
+      "DESCRIPTION_SHORT": "Add meg a bejelentkezési felületek szövegeit.",
+      "NEWERVERSIONEXISTS": "Újabb verzió létezik",
+      "CURRENTDATE": "Jelenlegi konfiguráció",
+      "CHANGEDATE": "Újabb verzió innen",
+      "KEYNAME": "Bejelentkező képernyő / felület",
+      "RESET_TITLE": "Alapértelmezett értékek visszaállítása",
+      "RESET_DESCRIPTION": "Az alapértelmezett értékeket fogod visszaállítani. Minden elvégzett módosítás véglegesen törlésre kerül. Biztosan folytatni akarod?",
+      "UNSAVED_TITLE": "Folytatod mentés nélkül?",
+      "UNSAVED_DESCRIPTION": "Módosításokat végeztél mentés nélkül. Akarod most menteni?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Egy nem engedélyezett nyelvet választottál. Továbbra is módosíthatod a szövegeket. De ha azt akarod, hogy a felhasználók ténylegesen használni tudják ezt a nyelvet, változtasd meg az instance korlátozásait.",
+      "LANGUAGES_NOT_ALLOWED": "Nem engedélyezett:",
+      "LANGUAGE": "Nyelv",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Francia",
+        "it": "Olasz",
+        "ja": "Japán",
+        "pl": "Lengyel",
+        "zh": "Egyszerűsített kínai",
+        "bg": "Bolgár",
+        "pt": "Portugál",
+        "mk": "Macedón",
+        "cs": "Cseh",
+        "ru": "Orosz",
+        "nl": "Holland",
+        "sv": "Svéd",
+        "id": "Indonéz",
+        "ko": "한국어"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "E-mail ellenőrzés kész",
+        "emailVerificationText": "E-mail ellenőrzés",
+        "externalUserNotFoundText": "Külső felhasználó nem található",
+        "footerText": "Lábléc",
+        "initMfaDoneText": "MFA inicializálás kész",
+        "initMfaOtpText": "MFA inicializálás",
+        "initMfaPromptText": "MFA inicializálási prompt",
+        "initMfaU2fText": "Univerzális második faktor inicializálása",
+        "initPasswordDoneText": "Jelszó inicializálása kész",
+        "initPasswordText": "Jelszó inicializálása",
+        "initializeDoneText": "Felhasználó inicializálása kész",
+        "initializeUserText": "Felhasználó inicializálása",
+        "linkingUserDoneText": "Felhasználói összekapcsolás kész",
+        "loginText": "Bejelentkezés",
+        "logoutText": "Kijelentkezés",
+        "mfaProvidersText": "MFA Szolgáltatók",
+        "passwordChangeDoneText": "Jelszó megváltoztatása kész",
+        "passwordChangeText": "Jelszócsere",
+        "passwordResetDoneText": "Jelszó visszaállítás kész",
+        "passwordText": "Jelszó",
+        "registrationOptionText": "Regisztrációs lehetőségek",
+        "registrationOrgText": "Szervezet regisztrálása",
+        "registrationUserText": "Felhasználó regisztrálása",
+        "selectAccountText": "Fiók kiválasztása",
+        "successLoginText": "Sikeres bejelentkezés",
+        "usernameChangeDoneText": "Felhasználónév módosítása kész",
+        "usernameChangeText": "Felhasználónév módosítása",
+        "verifyMfaOtpText": "OTP ellenőrzése",
+        "verifyMfaU2fText": "Univerzális második faktor ellenőrzése",
+        "passwordlessPromptText": "Jelszó nélküli kérés",
+        "passwordlessRegistrationDoneText": "Jelszó nélküli regisztráció kész",
+        "passwordlessRegistrationText": "Jelszó nélküli regisztráció",
+        "passwordlessText": "Jelszó nélküli",
+        "externalRegistrationUserOverviewText": "Külső regisztrációs felhasználói áttekintés"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Értesítés",
+      "TYPES": {
+        "INIT": "Inicializálás",
+        "VE": "Email ellenőrzése",
+        "VP": "Telefon igazolása",
+        "VSO": "SMS OTP igazolása",
+        "VEO": "Email OTP igazolása",
+        "PR": "Jelszó visszaállítása",
+        "DC": "Domain igénylés",
+        "PL": "Jelszó nélküli",
+        "PC": "Jelszó módosítása",
+        "IU": "Felhasználó meghívása"
+      },
+      "CHIPS": {
+        "firstname": "Keresztnév",
+        "lastname": "Vezetéknév",
+        "code": "Kód",
+        "preferredLoginName": "Előnyben részesített bejelentkezési név",
+        "displayName": "Megjelenítési név",
+        "nickName": "Becenév",
+        "loginnames": "Bejelentkezési nevek",
+        "domain": "Tartomány",
+        "lastEmail": "Utolsó email",
+        "lastPhone": "Utolsó telefon",
+        "verifiedEmail": "Ellenőrzött email",
+        "verifiedPhone": "Ellenőrzött telefon",
+        "changedate": "Dátum megváltoztatása",
+        "username": "Felhasználónév",
+        "tempUsername": "Ideiglenes felhasználónév",
+        "otp": "Egyszeri jelszó",
+        "verifyUrl": "Egyszeri jelszó URL-jének ellenőrzése",
+        "expiry": "Lejárat",
+        "applicationName": "Alkalmazás neve"
+      },
+      "TOAST": {
+        "UPDATED": "Egyéni szövegek mentve."
+      }
+    },
+    "DEFAULTLABEL": "A jelenlegi beállítások megfelelnek az Instancia szabványának.",
+    "BTN_INSTALL": "Beállítás",
+    "BTN_EDIT": "Módosítás",
+    "DATA": {
+      "DESCRIPTION": "Leírás",
+      "MINLENGTH": "meg kell adni a minimális hosszúságot",
+      "HASNUMBER": "számot kell tartalmaznia",
+      "HASSYMBOL": "szimbólumot kell tartalmaznia",
+      "HASLOWERCASE": "kisbetűt kell tartalmaznia",
+      "HASUPPERCASE": "nagybetűt kell tartalmaznia",
+      "SHOWLOCKOUTFAILURES": "zárási hibák megjelenítése",
+      "MAXPASSWORDATTEMPTS": "Jelszó maximális próbálkozások",
+      "MAXOTPATTEMPTS": "OTP maximális próbálkozások",
+      "EXPIREWARNDAYS": "Lejárati figyelmeztetés ennyi nap után",
+      "MAXAGEDAYS": "Maximális érvényesség napokban",
+      "USERLOGINMUSTBEDOMAIN": "Szervezeti domain hozzáadása utótagként a bejelentkezési nevekhez",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Ha engedélyezed ezt a beállítást, minden bejelentkezési név utótagként megkapja a szervezeti domaint. Ha ez a beállítás le van tiltva, biztosítanod kell, hogy a felhasználónevek egyediek legyenek minden szervezetben.",
+      "VALIDATEORGDOMAINS": "Szervezeti domain ellenőrzése szükséges (DNS vagy HTTP kihívás)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Az SMTP küldő címe megegyezik az Instance Domain-nel",
+      "ALLOWUSERNAMEPASSWORD_DESC": "A hagyományos bejelentkezés felhasználónévvel és jelszóval engedélyezett.",
+      "ALLOWEXTERNALIDP_DESC": "A bejelentkezés engedélyezett az alapul szolgáló identitásszolgáltatóknál",
+      "ALLOWREGISTER_DESC": "Ha ezt az opciót választod, egy további lépés jelenik meg a bejelentkezés során a felhasználói regisztrációhoz.",
+      "FORCEMFA": "MFA kikényszerítése minden felhasználó számára",
+      "FORCEMFALOCALONLY": "MFA kikényszerítése csak helyi hitelesített felhasználók számára",
+      "FORCEMFALOCALONLY_DESC": "Ha ezt az opciót választod, a helyileg hitelesített felhasználóknak be kell állítaniuk egy második faktor a bejelentkezéshez.",
+      "HIDEPASSWORDRESET_DESC": "Ha ezt az opciót választod, a felhasználó nem tudja visszaállítani a jelszavát a bejelentkezési folyamat során.",
+      "HIDELOGINNAMESUFFIX": "Bejelentkezési név utótag elrejtése",
+      "HIDELOGINNAMESUFFIX_DESC": "Elrejti a bejelentkezési név utótagját a bejelentkezési felületen",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Ha ezt az opciót választod, a jelszó képernyő megjelenik a bejelentkezési folyamatban akkor is, ha a felhasználó nem található. A jelszó ellenőrzése során fellépő hiba nem fogja felfedni, hogy a felhasználónév vagy a jelszó volt-e rossz.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Ha ezt az opciót választod, egy ismeretlen felhasználónév bemeneti utótagja (@domain.com) a bejelentkezési képernyőn összepárosítható a szervezet domainjeivel, és sikeres egyezés esetén átirányít a regisztrációra az adott szervezetnél.",
+      "DEFAULTREDIRECTURI": "Alapértelmezett átirányítási URI",
+      "DEFAULTREDIRECTURI_DESC": "Meghatározza, hová lesz a felhasználó átirányítva, ha a bejelentkezés alkalmazás kontextus nélkül indul (pl. e-mailből)",
+      "ERRORMSGPOPUP": "Hiba megjelenítése párbeszédablakban",
+      "DISABLEWATERMARK": "Vízjel elrejtése",
+      "DISABLEWATERMARK_DESC": "A ZITADEL által működtetett vízjel elrejtése a bejelentkezési felületen"
+    },
+    "RESET": "Visszaállítás az alapértelmezett példányra",
+    "CREATECUSTOM": "Egyéni szabály létrehozása",
+    "TOAST": {
+      "SET": "Szabály sikeresen beállítva!",
+      "RESETSUCCESS": "Szabály sikeresen visszaállítva!",
+      "UPLOADSUCCESS": "Sikeresen feltöltve!",
+      "DELETESUCCESS": "Sikeresen törölve!",
+      "UPLOADFAILED": "Feltöltés sikertelen!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Szervezet",
+    "DESCRIPTION": "Itt szerkesztheted a szervezeted konfigurációját és kezelheted a tagokat.",
+    "DETAIL": {
+      "TITLE": "Részletek",
+      "NAME": "Név",
+      "DOMAIN": "Domain",
+      "STATE": {
+        "0": "Nincs meghatározva",
+        "1": "Aktív",
+        "2": "Inaktív"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Tagok",
+      "USERNAME": "Felhasználónév",
+      "DISPLAYNAME": "Megjelenített név",
+      "LOGINNAME": "Bejelentkezési név",
+      "EMAIL": "E-mail",
+      "ROLES": "Szerepkörök",
+      "ADD": "Tag hozzáadása",
+      "ADDDESCRIPTION": "Add meg a hozzáadandó felhasználók neveit."
+    },
+    "TABLE": {
+      "TOTAL": "Összes bejegyzés",
+      "SELECTION": "Kiválasztott elemek",
+      "DEACTIVATE": "Felhasználó deaktiválása",
+      "ACTIVATE": "Felhasználó aktiválása",
+      "DELETE": "Felhasználó törlése",
+      "CLEAR": "Kiválasztás törlése"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Projekt",
+      "DESCRIPTION": "Itt meghatározhatod az alkalmazásokat, kezelheted a szerepköröket és engedélyezheted más szervezetek számára a projekted használatát.",
+      "DELETE": "Projekt törlése",
+      "DETAIL": "Részlet",
+      "CREATE": "Projekt létrehozása",
+      "CREATE_DESC": "Add meg a projekted nevét.",
+      "ROLE": "Szerepkör",
+      "NOITEMS": "Nincsenek projektek",
+      "ZITADELPROJECT": "Ez a ZITADEL projekthez tartozik. Vigyázz: Ha változtatásokat hajtasz végre, a ZITADEL lehet, hogy nem fog a szándékod szerint működni.",
+      "TYPE": {
+        "OWNED": "Saját Projektek",
+        "OWNED_SINGULAR": "Saját Projekt",
+        "GRANTED_SINGULAR": "{{name}} által Biztosított Projekt"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Márkabeállítás",
+        "0": {
+          "TITLE": "Nem meghatározott",
+          "DESC": "Amint a felhasználó azonosításra kerül, az azonosított felhasználó szervezetének márkajelzése lesz látható, mielőtt a rendszer alapértelmezése megjelenne."
+        },
+        "1": {
+          "TITLE": "Projektbeállítás használata",
+          "DESC": "A projektet birtokló szervezet márkajelzése lesz látható"
+        },
+        "2": {
+          "TITLE": "Felhasználói Szervezeti beállítás használata",
+          "DESC": "A projekt szervezetének márkajelzése lesz látható, de amint a felhasználót azonosítják, az azonosított felhasználó szervezetének beállítása lesz látható."
+        },
+        "DIALOG": {
+          "TITLE": "Márka beállítás",
+          "DESCRIPTION": "Válaszd ki a bejelentkezés viselkedését, amikor a projektet használod."
+        }
+      },
+      "PINNED": "Rögzített",
+      "ALL": "Mind",
+      "CREATEDON": "Létrehozva",
+      "LASTMODIFIED": "Utoljára módosítva",
+      "ADDNEW": "Új projekt létrehozása",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Projekt újraaktiválása",
+          "DESCRIPTION": "Biztosan újra akarod aktiválni a projektedet?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Projekt deaktiválása",
+          "DESCRIPTION": "Tényleg szeretnéd deaktiválni a projekted?"
+        },
+        "DELETE": {
+          "TITLE": "Projekt törlése",
+          "DESCRIPTION": "Tényleg törölni szeretnéd a projekted?",
+          "TYPENAME": "Írd be a projekt nevét a végleges törléshez."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Beállítások",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Állapot",
+      "0": "Nincs meghatározva",
+      "1": "Aktív",
+      "2": "Inaktív"
+    },
+    "TYPE": {
+      "TITLE": "Típus",
+      "0": "Ismeretlen típus",
+      "1": "Tulajdonolt",
+      "2": "Megadva"
+    },
+    "NAME": "Név",
+    "NAMEDIALOG": {
+      "TITLE": "Projekt átnevezése",
+      "DESCRIPTION": "Add meg az új nevet a projekthez",
+      "NAME": "Új név"
+    },
+    "MEMBER": {
+      "TITLE": "Menedzserek",
+      "TITLEDESC": "A menedzserek módosításokat végezhetnek ezen a projekten a szerepkörük alapján.",
+      "DESCRIPTION": "Ezek a menedzserek esetleg szerkeszthetik a projektedet.",
+      "USERNAME": "Felhasználónév",
+      "DISPLAYNAME": "Megjelenített név",
+      "LOGINNAME": "Bejelentkezési név",
+      "EMAIL": "E-mail",
+      "ROLES": "Szerepkörök",
+      "USERID": "Felhasználó azonosító"
+    },
+    "GRANT": {
+      "EMPTY": "Nincs kijelölt szervezet.",
+      "TITLE": "Projekt engedélyek",
+      "DESCRIPTION": "Engedd meg egy másik szervezetnek, hogy használja a projektedet.",
+      "EDITTITLE": "Szerepkörök szerkesztése",
+      "CREATE": {
+        "TITLE": "Szervezet támogatás létrehozása",
+        "SEL_USERS": "Válaszd ki azokat a felhasználókat, akiknek hozzáférést szeretnél biztosítani",
+        "SEL_PROJECT": "Keresés egy projektre",
+        "SEL_ROLES": "Válaszd ki azokat a szerepköröket, amiket hozzá szeretnél adni a támogatáshoz",
+        "SEL_USER": "Felhasználók kiválasztása",
+        "SEL_ORG": "Szervezet keresése",
+        "SEL_ORG_DESC": "Keresd meg a támogatni kívánt szervezetet.",
+        "ORG_DESCRIPTION": "Arra készülsz, hogy hozzáférést adj egy felhasználónak a(z) {{name}} szervezethez.",
+        "ORG_DESCRIPTION_DESC": "Válts a fenti fejlécen, hogy hozzáférést adj egy felhasználónak egy másik szervezethez.",
+        "SEL_ORG_FORMFIELD": "Szervezet",
+        "FOR_ORG": "A támogatás azoknak készült:"
+      },
+      "DETAIL": {
+        "TITLE": "Projekt Támogatás",
+        "DESC": "Kiválaszthatod, hogy mely szerepeket használhatja a megadott szervezet, és kinevezhetsz menedzsereket",
+        "MEMBERTITLE": "Menedzserek",
+        "MEMBERDESC": "Ezek a támogatott szervezet menedzserei. Adj hozzá felhasználókat, akik hozzáférést kapnak a projekt adatok szerkesztéséhez.",
+        "PROJECTNAME": "Projekt Neve",
+        "GRANTEDORG": "Támogatott Szervezet",
+        "RESOURCEOWNER": "Erőforrás Tulajdonos"
+      },
+      "STATE": "Állapot",
+      "STATES": {
+        "1": "Aktív",
+        "2": "Inaktív"
+      },
+      "ALL": "Összes",
+      "SHOWDETAIL": "Részletek megjelenítése",
+      "USER": "Felhasználó",
+      "MEMBERS": "Menedzserek",
+      "ORG": "Szervezet",
+      "PROJECTNAME": "Projekt neve",
+      "GRANTEDORG": "Támogatott szervezet",
+      "GRANTEDORGDOMAIN": "Domain",
+      "RESOURCEOWNER": "Erőforrás tulajdonos",
+      "GRANTEDORGNAME": "Szervezet neve",
+      "GRANTID": "Grant azonosító",
+      "CREATIONDATE": "Létrehozás dátuma",
+      "CHANGEDATE": "Utoljára módosítva",
+      "DATES": "Dátumok",
+      "ROLENAMESLIST": "Szerepkörök",
+      "NOROLES": "Nincsenek szerepkörök",
+      "TYPE": "Típus",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Projekt grant létrehozva.",
+        "PROJECTGRANTADDED": "Projekt támogatás létrehozva.",
+        "PROJECTGRANTCHANGED": "Projekt támogatás módosítva.",
+        "PROJECTGRANTMEMBERADDED": "Támogatáskezelő hozzáadva.",
+        "PROJECTGRANTMEMBERCHANGED": "Támogatáskezelő módosítva.",
+        "PROJECTGRANTMEMBERREMOVED": "Támogatáskezelő eltávolítva.",
+        "PROJECTGRANTUPDATED": "Projekt támogatás frissítve"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Projekt támogatás törlése",
+        "DELETE_DESCRIPTION": "Készülsz törölni egy projekt támogatást. Biztos vagy benne?"
+      },
+      "ROLES": "Projekt szerepkörök"
+    },
+    "APP": {
+      "TITLE": "Alkalmazások",
+      "NAME": "Név",
+      "NAMEREQUIRED": "A név megadása kötelező."
+    },
+    "ROLE": {
+      "EMPTY": "Még nem hoztak létre szerepkört.",
+      "ADDNEWLINE": "További szerepkör hozzáadása",
+      "KEY": "Kulcs",
+      "TITLE": "Szerepkörök",
+      "DESCRIPTION": "Határozz meg néhány szerepkört, amelyeket projekt-jogosultságok létrehozásához használhatsz.",
+      "NAME": "Név",
+      "DISPLAY_NAME": "Megjelenítési Név",
+      "GROUP": "Csoport",
+      "ACTIONS": "Műveletek",
+      "ADDTITLE": "Szerepkör létrehozása",
+      "ADDDESCRIPTION": "Add meg az új szerepkör adatait.",
+      "EDITTITLE": "Szerepkör szerkesztése",
+      "EDITDESCRIPTION": "Add meg az új adatokat a szerepkörhöz.",
+      "DELETE": "Szerepkör törlése",
+      "CREATIONDATE": "Létrehozva",
+      "CHANGEDATE": "Utoljára módosítva",
+      "SELECTGROUPTOOLTIP": "Válaszd ki a(z) {{group}} csoport összes szerepkörét.",
+      "OPTIONS": "Opciók",
+      "ASSERTION": "Szerepek megerősítése hitelesítéskor",
+      "ASSERTION_DESCRIPTION": "A szerepinformáció a Userinfo végpontról van elküldve, és az alkalmazás beállításaitól függően tokenekben és más típusokban is lehetnek.",
+      "CHECK": "Azonosítás ellenőrzése hitelesítéskor",
+      "CHECK_DESCRIPTION": "Ha be van állítva, a felhasználók csak akkor hitelesíthetők, ha azonosították őket valamelyik szerepre.",
+      "DIALOG": {
+        "DELETE_TITLE": "Szerep törlése",
+        "DELETE_DESCRIPTION": "Egy projektszerepet készülsz törölni. Biztos vagy benne?"
+      }
+    },
+    "HAS_PROJECT": "Projekt ellenőrzése hitelesítéskor",
+    "HAS_PROJECT_DESCRIPTION": "Ellenőrizve van, hogy a felhasználó szervezetének van-e ilyen projektje. Ha nincs, a felhasználó nem hitelesíthető.",
+    "TABLE": {
+      "TOTAL": "Bejegyzések összesen:",
+      "SELECTION": "Kiválasztott elemek",
+      "DEACTIVATE": "Projekt deaktiválása",
+      "ACTIVATE": "Projekt aktiválása",
+      "DELETE": "Projekt törlése",
+      "ORGNAME": "Szervezet neve",
+      "ORGDOMAIN": "Szervezet domainje",
+      "STATE": "Státusz",
+      "TYPE": "Típus",
+      "CREATIONDATE": "Létrehozva ekkor",
+      "CHANGEDATE": "Utoljára módosítva",
+      "RESOURCEOWNER": "Tulajdonos",
+      "SHOWTABLE": "Táblázat megjelenítése",
+      "SHOWGRID": "Rács megjelenítése",
+      "EMPTY": "Nem található projekt"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Menedzser eltávolítva.",
+      "MEMBERSADDED": "Menedzserek hozzáadva.",
+      "MEMBERADDED": "Menedzser hozzáadva.",
+      "MEMBERCHANGED": "Menedzser megváltoztatva.",
+      "ROLESCREATED": "Szerepkörök létrehozva.",
+      "ROLEREMOVED": "Szerepkör eltávolítva.",
+      "ROLECHANGED": "Szerepkör megváltoztatva.",
+      "REACTIVATED": "Újraaktiválva.",
+      "DEACTIVATED": "Deaktiválva.",
+      "CREATED": "Projekt létrehozva.",
+      "UPDATED": "Projekt megváltoztatva.",
+      "GRANTUPDATED": "Jogosultság megváltoztatva.",
+      "DELETED": "Projekt törölve."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Szerep törlése",
+      "DELETE_DESCRIPTION": "Egy szerepet készülsz törölni. Biztos vagy benne?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Következő lépések"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Aktív identitás-szolgáltatók"
+    },
+    "CREATE": {
+      "TITLE": "Szolgáltató hozzáadása",
+      "DESCRIPTION": "Válassz egyet vagy többet az alábbi szolgáltatók közül.",
+      "STEPPERTITLE": "Szolgáltató létrehozása",
+      "OIDC": {
+        "TITLE": "OIDC szolgáltató",
+        "DESCRIPTION": "Add meg a szükséges adatokat az OIDC szolgáltatódhoz."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth szolgáltató",
+        "DESCRIPTION": "Add meg a szükséges adatokat az OAuth szolgáltatódhoz."
+      },
+      "JWT": {
+        "TITLE": "JWT szolgáltató",
+        "DESCRIPTION": "Add meg a szükséges adatokat a JWT szolgáltatódhoz."
+      },
+      "GOOGLE": {
+        "TITLE": "Google szolgáltató",
+        "DESCRIPTION": "Add meg a Google Identity Provider hitelesítő adatait"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Szolgáltató",
+        "DESCRIPTION": "Add meg a Gitlab Identity Provider hitelesítő adatait"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Saját Hoszt Szolgáltató",
+        "DESCRIPTION": "Add meg a Gitlab Saját Hoszt Identity Provider hitelesítő adatait"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Szolgáltató",
+        "DESCRIPTION": "Add meg a GitHub Enterprise Server Identity Provider hitelesítő adatait"
+      },
+      "GITHUB": {
+        "TITLE": "Github Szolgáltató",
+        "DESCRIPTION": "Add meg a Github Identity Provider hitelesítő adatait"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Szolgáltató",
+        "DESCRIPTION": "Add meg a Microsoft Identity Provider hitelesítő adatait"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Add meg az LDAP Provider hitelesítő adatait"
+      },
+      "APPLE": {
+        "TITLE": "Jelentkezz be Apple-lel",
+        "DESCRIPTION": "Add meg az Apple Provider hitelesítő adatait"
+      },
+      "SAML": {
+        "TITLE": "Jelentkezz be SAML-lel",
+        "DESCRIPTION": "Add meg a SAML Provider hitelesítő adatait"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Identity Provider",
+      "DESCRIPTION": "Frissítsd a provider konfigurációját",
+      "DATECREATED": "Létrehozva",
+      "DATECHANGED": "Változott"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatikus létrehozás",
+      "ISAUTOCREATION_DESC": "Ha kiválasztod, egy fiók jön létre, ha még nem létezik.",
+      "ISAUTOUPDATE": "Automatikus frissítés",
+      "ISAUTOUPDATE_DESC": "Ha kiválasztod, a fiókok újrahitelesítéskor frissülnek.",
+      "ISCREATIONALLOWED": "Fióklétrehozás engedélyezve (kézzel)",
+      "ISCREATIONALLOWED_DESC": "Meghatározza, hogy a fiókok külső fiókon keresztül létrehozhatók-e. Letiltáskor a felhasználók nem tudják szerkeszteni a fiókadatokat, ha az auto_creation engedélyezve van.",
+      "ISLINKINGALLOWED": "Fiók-összekapcsolás engedélyezve (kézzel)",
+      "ISLINKINGALLOWED_DESC": "Meghatározza, hogy egy identitás kézzel összekapcsolható-e egy meglévő fiókkal. Letiltáskor a felhasználók csak akkor kapcsolhatják össze a javasolt fiókot, ha az auto_linking aktív.",
+      "AUTOLINKING_DESC": "Meghatározza, hogy egy identitást be kell-e kérni a meglévő fiókkal való összekapcsolásra.",
+      "AUTOLINKINGTYPE": {
+        "0": "Letiltva",
+        "1": "Ellenőrizd a meglévő felhasználónevet",
+        "2": "Ellenőrizd a meglévő email címet"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "ismeretlen",
+      "1": "Példány",
+      "2": "Szervezet"
+    },
+    "STATES": {
+      "1": "aktív",
+      "2": "inaktív"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "Bérlő azonosító",
+      "0": "Gyakori",
+      "1": "Szervezetek",
+      "2": "Fogyasztók"
+    },
+    "AZUREADTENANTTYPE": "Bérlő típusa",
+    "AZUREADTENANTID": "Bérlő azonosító",
+    "EMAILVERIFIED": "E-mail megerősítve",
+    "NAMEHINT": "Ha meg van adva, megjelenik a bejelentkezési felületen.",
+    "OPTIONAL": "opcionális",
+    "LDAPATTRIBUTES": "LDAP attribútumok",
+    "UPDATEBINDPASSWORD": "Bind jelszó frissítése",
+    "UPDATECLIENTSECRET": "ügyféltitok frissítése",
+    "ADD": "Azonosítószolgáltató hozzáadása",
+    "TYPE": "Típus",
+    "OWNER": "Tulajdonos",
+    "ID": "Azonosító",
+    "NAME": "Név",
+    "AUTHORIZATIONENDPOINT": "Hitelesítési végpont",
+    "TOKENENDPOINT": "Token végpont",
+    "USERENDPOINT": "Felhasználói végpont",
+    "IDATTRIBUTE": "Azonosító attribútum",
+    "AVAILABILITY": "Elérhetőség",
+    "AVAILABLE": "elérhető",
+    "AVAILABLEBUTINACTIVE": "elérhető, de nem aktív",
+    "SETAVAILABLE": "állítsd be elérhetőként",
+    "SETUNAVAILABLE": "állítsd be nem elérhetőként",
+    "CONFIG": "Konfiguráció",
+    "STATE": "Állapot",
+    "ISSUER": "Kibocsátó",
+    "SCOPESLIST": "Hatókörök listája",
+    "CLIENTID": "Client ID",
+    "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Kapcsolat",
+    "LDAPUSERBINDING": "Felhasználó kötés",
+    "BASEDN": "AlapDn",
+    "BINDDN": "KötésDn",
+    "BINDPASSWORD": "Kötési jelszó",
+    "SERVERS": "Szerverek",
+    "STARTTLS": "TLS indítása",
+    "TIMEOUT": "Időtúllépés másodpercekben",
+    "USERBASE": "Felhasználói bázis",
+    "USERFILTERS": "Felhasználói szűrők",
+    "USEROBJECTCLASSES": "Felhasználói objektum osztályok",
+    "REQUIRED": "kötelező",
+    "LDAPIDATTRIBUTE": "ID attribútum",
+    "AVATARURLATTRIBUTE": "Avatar Url attribútum",
+    "DISPLAYNAMEATTRIBUTE": "Megjelenített név attribútum",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribútum",
+    "EMAILVERIFIEDATTRIBUTE": "Email ellenőrzött attribútum",
+    "FIRSTNAMEATTRIBUTE": "Keresztnév attribútum",
+    "LASTNAMEATTRIBUTE": "Vezetéknév attribútum",
+    "NICKNAMEATTRIBUTE": "Becenév attribútum",
+    "PHONEATTRIBUTE": "Telefon attribútum",
+    "PHONEVERIFIEDATTRIBUTE": "Telefon megerősített attribútum",
+    "PREFERREDLANGUAGEATTRIBUTE": "Előnyben részesített nyelv attribútum",
+    "PREFERREDUSERNAMEATTRIBUTE": "Előnyben részesített felhasználónév attribútum",
+    "PROFILEATTRIBUTE": "Profil attribútum",
+    "IDPDISPLAYNAMMAPPING": "IDP megjelenített név leképezés",
+    "USERNAMEMAPPING": "Felhasználónév leképezés",
+    "DATES": "Dátumok",
+    "CREATIONDATE": "Létrehozva",
+    "CHANGEDATE": "Utoljára módosítva",
+    "DEACTIVATE": "Inaktiválás",
+    "ACTIVATE": "Aktiválás",
+    "DELETE": "Törlés",
+    "DELETE_TITLE": "IDP törlése",
+    "DELETE_DESCRIPTION": "Egy identity providert készülsz törölni. A változások visszafordíthatatlanok. Biztosan folytatni akarod?",
+    "REMOVE_WARN_TITLE": "IDP eltávolítása",
+    "REMOVE_WARN_DESCRIPTION": "Egy identity providert készülsz eltávolítani. Ez eltávolítja a felhasználóid számára elérhető IDP kiválasztását, és a már regisztrált felhasználók nem tudnak újra bejelentkezni. Biztosan folytatod?",
+    "DELETE_SELECTION_TITLE": "IDP törlése",
+    "DELETE_SELECTION_DESCRIPTION": "Egy identity providert készülsz törölni. A változások visszafordíthatatlanok. Biztosan folytatni akarod?",
+    "EMPTY": "Nincs elérhető IDP",
+    "OIDC": {
+      "GENERAL": "Általános információk",
+      "TITLE": "OIDC konfiguráció",
+      "DESCRIPTION": "Add meg az adatokat az OIDC azonosítószolgáltatóhoz."
+    },
+    "JWT": {
+      "TITLE": "JWT konfiguráció",
+      "DESCRIPTION": "Add meg az adatokat a JWT azonosítószolgáltatóhoz.",
+      "HEADERNAME": "Fejléc neve",
+      "JWTENDPOINT": "JWT végpont",
+      "JWTKEYSENDPOINT": "JWT kulcsok végpont"
+    },
+    "APPLE": {
+      "TEAMID": "Csapatazonosító",
+      "KEYID": "Kulcsazonosító",
+      "PRIVATEKEY": "Privát kulcs",
+      "UPDATEPRIVATEKEY": "Privát kulcs frissítése",
+      "UPLOADPRIVATEKEY": "Privát kulcs feltöltése",
+      "KEYMAXSIZEEXCEEDED": "Az 5kB maximális méret túllépve."
+    },
+    "SAML": {
+      "METADATAXML": "Metaadatok Xml",
+      "METADATAURL": "Metaadatok URL",
+      "BINDING": "Kötés",
+      "SIGNEDREQUEST": "Aláírt kérés",
+      "NAMEIDFORMAT": "NameID formátum",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Egyéni leképezési attribútumnév",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternatív attribútumnév a felhasználó leképezéséhez, ha a visszakapott `nameid-format` `transient`, pl. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "Sikeresen mentve.",
+      "REACTIVATED": "Idp újraaktiválva.",
+      "DEACTIVATED": "Idp inaktiválva.",
+      "SELECTEDREACTIVATED": "Kiválasztott Idp-k újraaktiválva.",
+      "SELECTEDDEACTIVATED": "Kiválasztott Idp-k inaktiválva.",
+      "SELECTEDKEYSDELETED": "Kiválasztott Idp-k törölve.",
+      "DELETED": "Idp sikeresen eltávolítva!",
+      "ADDED": "Sikeresen hozzáadva.",
+      "REMOVED": "Sikeresen eltávolítva."
+    },
+    "ISIDTOKENMAPPING": "Hozzárendelés az ID token alapján",
+    "ISIDTOKENMAPPING_DESC": "Ha ezt választod, a szolgáltatói információkat az ID token alapján rendeljük hozzá, nem a userinfo végpontból.",
+    "USEPKCE": "PKCE használata",
+    "USEPKCE_DESC": "Meghatározza, hogy a code_challenge és a code_challenge_method paraméterek szerepeljenek-e a hitelesítési kérelemben"
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Jelszó nélküli",
+      "MULTIFACTORDESCRIPTION": "Itt definiálhatod a jelszó nélküli azonosítás több faktorát.",
+      "SECONDFACTORTITLE": "Többfaktoros hitelesítés",
+      "SECONDFACTORDESCRIPTION": "Határozz meg további lehetséges faktorokat, amelyekkel biztosíthatod a jelszavas hitelesítésed."
+    },
+    "CREATE": {
+      "TITLE": "Új faktor",
+      "DESCRIPTION": "Válaszd ki az új faktor típusát."
+    },
+    "DELETE": {
+      "TITLE": "Faktor törlése",
+      "DESCRIPTION": "Egy faktort készül el törölni a bejelentkezési beállítások közül. Biztos vagy benne?"
+    },
+    "TOAST": {
+      "ADDED": "Sikeresen hozzáadva.",
+      "SAVED": "Sikeresen mentve.",
+      "DELETED": "Sikeresen eltávolítva"
+    },
+    "TYPE": "Típus",
+    "MULTIFACTORTYPES": {
+      "0": "Ismeretlen",
+      "1": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Ismeretlen",
+      "1": "Egyszeri Jelszó az Authenticator App-al (TOTP)",
+      "2": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb",
+      "3": "Egyszeri Jelszó Emailben (Email OTP)",
+      "4": "Egyszeri jelszó SMS-ben (SMS OTP)"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Bejelentkezési beállítások",
+      "DESCRIPTION": "Határozd meg, hogyan azonosíthatók a felhasználóid a szervezeteden belül."
+    },
+    "IDPS": "Identitásszolgáltatók",
+    "ADDIDP": {
+      "TITLE": "Identitásszolgáltató hozzáadása",
+      "DESCRIPTION": "Előre definiált vagy saját magad által létrehozott szolgáltatókat választhatsz az azonosításhoz.",
+      "SELECTIDPS": "Identitásszolgáltatók"
+    },
+    "PASSWORDLESS": "Jelszó nélküli bejelentkezés",
+    "PASSWORDLESSTYPE": {
+      "0": "Nem engedélyezett",
+      "1": "Engedélyezett"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP Szolgáltató",
+      "DESCRIPTION": "Itt találhatók az SMTP szolgáltatók a ZITADEL példányodhoz. Aktiváld azt, amelyiket használni szeretnéd a felhasználóidnak küldött értesítésekhez.",
+      "EMPTY": "Nincs elérhető SMTP Szolgáltató",
+      "ACTIVATED": "Aktiválva",
+      "ACTIVATE": "Szolgáltató aktiválása",
+      "DEACTIVATE": "Szolgáltató inaktiválása",
+      "TEST": "Teszteld a szolgáltatódat",
+      "TYPE": "Típus",
+      "DIALOG": {
+        "ACTIVATED": "Az SMTP konfiguráció aktiválva",
+        "ACTIVATE_WARN_TITLE": "SMTP konfiguráció aktiválása",
+        "ACTIVATE_WARN_DESCRIPTION": "Az SMTP konfiguráció aktiválása előtt állsz. Először deaktiváljuk a jelenlegi aktív szolgáltatót, majd aktiváljuk ezt a konfigurációt. Biztos vagy benne?",
+        "DEACTIVATE_WARN_TITLE": "SMTP konfiguráció deaktiválása",
+        "DEACTIVATE_WARN_DESCRIPTION": "Az SMTP konfiguráció deaktiválása előtt állsz. Biztos vagy benne?",
+        "DEACTIVATED": "Az SMTP konfiguráció deaktiválva lett",
+        "DELETE_TITLE": "SMTP konfiguráció törlése",
+        "DELETE_DESCRIPTION": "Egy konfiguráció törlése előtt állsz. Erősítsd meg ezt a lépést azzal, hogy beírod a feladó nevét",
+        "DELETED": "Az SMTP konfiguráció törölve lett",
+        "SENDER": "Írd be, hogy {{value}}, hogy töröld ezt az SMTP konfigurációt.",
+        "TEST_TITLE": "Teszteld az SMTP konfigurációdat",
+        "TEST_DESCRIPTION": "Adj meg egy email címet az SMTP konfiguráció teszteléséhez ennél a szolgáltatónál",
+        "TEST_EMAIL": "Email cím",
+        "TEST_RESULT": "Teszt eredmény"
+      }
+    },
+    "CREATE": {
+      "TITLE": "SMTP szolgáltató hozzáadása",
+      "DESCRIPTION": "Válassz egyet vagy többet a következő szolgáltatók közül.",
+      "STEPS": {
+        "TITLE": "{{ value }} SMTP szolgáltató hozzáadása",
+        "CREATE_DESC_TITLE": "Add meg a(z) {{ value }} SMTP beállításaidat lépésről lépésre",
+        "CURRENT_DESC_TITLE": "Ezek a te SMTP beállításaid",
+        "PROVIDER_SETTINGS": "SMTP Szolgáltató Beállítások",
+        "SENDER_SETTINGS": "Küldő Beállítások",
+        "NEXT_STEPS": "Következő lépések",
+        "ACTIVATE": {
+          "TITLE": "Aktiváld az SMTP szolgáltatót",
+          "DESCRIPTION": "A ZITADEL nem tudja használni ezt az SMTP szolgáltatót értesítések küldésére, amíg nem aktiválod. Ha aktiválod ezt a szolgáltatót, bármely másik aktív szolgáltató inaktív lesz."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktiváld az SMTP szolgáltatót",
+          "DESCRIPTION": "Ha deaktiválod ezt az SMTP szolgáltatót, a ZITADEL nem tudja használni értesítések küldésére, amíg újra nem aktiválod."
+        },
+        "SAVE_SETTINGS": "Mentés",
+        "TEST": {
+          "TITLE": "Teszteld a beállításokat",
+          "DESCRIPTION": "Tesztelheted az SMTP szolgáltató beállításait és ellenőrizheted a teszt eredményét, mielőtt elmentenéd azokat.",
+          "RESULT": "Az email sikeresen elküldve"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP szolgáltató beállításai"
+    },
+    "EMPTY": "Nincs elérhető SMTP szolgáltató",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Alkalmazások",
+    "COMPLIANCE": "OIDC Megfelelőség",
+    "URLS": "URL-ek",
+    "CONFIGURATION": "Konfiguráció",
+    "TOKEN": "Token Beállítások",
+    "PAGES": {
+      "TITLE": "Alkalmazás",
+      "ID": "ID",
+      "DESCRIPTION": "Itt szerkesztheted az alkalmazásod adatait és a konfigurációját.",
+      "CREATE": "Alkalmazás létrehozása",
+      "CREATE_SELECT_PROJECT": "Először válaszd ki a projekted",
+      "CREATE_NEW_PROJECT": "vagy add meg az új projekted nevét",
+      "CREATE_DESC_TITLE": "Add meg alkalmazásod részleteit lépésről lépésre",
+      "CREATE_DESC_SUB": "Egy ajánlott konfiguráció automatikusan generálódik.",
+      "STATE": "Státusz",
+      "DATECREATED": "Létrehozva",
+      "DATECHANGED": "Módosítva",
+      "URLS": "URL-ek",
+      "DELETE": "Alkalmazás törlése",
+      "JUMPTOPROJECT": "A szerepkörök, jogosultságok és további beállításokhoz navigálj a projekthez.",
+      "DETAIL": {
+        "TITLE": "Részlet",
+        "STATE": {
+          "0": "Nincs meghatározva",
+          "1": "Aktív",
+          "2": "Inaktív"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "OIDC konfiguráció módosítása"
+        },
+        "DELETE": {
+          "TITLE": "Alkalmazás törlése",
+          "DESCRIPTION": "Biztos, hogy törölni szeretnéd ezt az alkalmazást?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Következő lépések",
+        "0": {
+          "TITLE": "Szerepkörök hozzáadása",
+          "DESC": "Add meg a projekt szerepköreit"
+        },
+        "1": {
+          "TITLE": "Felhasználók hozzáadása",
+          "DESC": "Adj hozzá új felhasználókat a szervezetedhez"
+        },
+        "2": {
+          "TITLE": "Segítség & Támogatás",
+          "DESC": "Olvasd el a dokumentációnkat az alkalmazások létrehozásáról, vagy vedd fel a kapcsolatot a támogatásunkkal"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Alkalmazás átnevezése",
+      "DESCRIPTION": "Add meg az új nevet az alkalmazásodhoz",
+      "NAME": "Új Név"
+    },
+    "NAME": "Név",
+    "TYPE": "Alkalmazás Típusa",
+    "AUTHMETHOD": "Hitelesítési Módszer",
+    "AUTHMETHODSECTION": "Hitelesítési Módszer",
+    "GRANT": "Hozzáférési típusok",
+    "ADDITIONALORIGINS": "További eredetek",
+    "ADDITIONALORIGINSDESC": "Ha további eredeteket szeretnél hozzáadni az alkalmazásodhoz, amelyeket nem használsz átirányításként, itt megteheted.",
+    "ORIGINS": "Eredetek",
+    "NOTANORIGIN": "A megadott érték nem egy eredet",
+    "PROSWITCH": "Profi vagyok. Hagyd ki ezt a varázslót.",
+    "NAMEANDTYPESECTION": "Név és Típus",
+    "TITLEFIRST": "Alkalmazás neve",
+    "TYPETITLE": "Az alkalmazás típusa",
+    "OIDC": {
+      "WELLKNOWN": "További linkeket a <a href='{{url}}' title='Discovery endpoint' target='_blank'>felfedezési végpont</a>-ról érhetsz el.",
+      "INFO": {
+        "ISSUER": "Kibocsátó",
+        "CLIENTID": "Ügyfél azonosító"
+      },
+      "CURRENT": "Jelenlegi konfiguráció",
+      "TOKENSECTIONTITLE": "AuthToken beállítások",
+      "REDIRECTSECTIONTITLE": "Átirányítási beállítások",
+      "REDIRECTTITLE": "Add meg az URI-kat, ahová a bejelentkezés át fog irányítani.",
+      "POSTREDIRECTTITLE": "Ez az URI lesz az átirányítási pont kijelentkezés után.",
+      "REDIRECTDESCRIPTIONWEB": "Az átirányítási URI-knak https://-sel kell kezdődniük. Az http:// csak fejlesztői mód bekapcsolásával érvényes.",
+      "REDIRECTDESCRIPTIONNATIVE": "Az átirányítási URI-knak saját protokolloddal, http://127.0.0.1, http://[::1] vagy http://localhost címekkel kell kezdődniük.",
+      "REDIRECTNOTVALID": "Ez az átirányítási URI érvénytelen.",
+      "COMMAORENTERSEPERATION": "separate with ↵",
+      "TYPEREQUIRED": "A típus megadása kötelező.",
+      "TITLE": "OIDC konfiguráció",
+      "CLIENTID": "Ügyfél azonosító",
+      "CLIENTSECRET": "Ügyfél titok",
+      "CLIENTSECRET_NOSECRET": "A választott hitelesítési folyamatnál nem szükséges titok, ezért nem érhető el.",
+      "CLIENTSECRET_DESCRIPTION": "Tartsd biztonságos helyen az ügyfél titkot, mert eltűnik, miután a párbeszédablak bezárul.",
+      "REGENERATESECRET": "Ügyfél titok újragenerálása",
+      "DEVMODE": "Fejlesztői mód",
+      "DEVMODE_ENABLED": "Engedélyezve",
+      "DEVMODE_DISABLED": "Kikapcsolva",
+      "DEVMODEDESC": "Figyelem: Ha a fejlesztői mód be van kapcsolva, a redirect URI-k nem lesznek érvényesítve.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Login sikeroldal kihagyása",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hagyd ki a sikeroldalt a bejelentkezés után ennél a helyi alkalmazásnál.",
+      "REDIRECT": "Redirect URIs",
+      "REDIRECTSECTION": "Redirect URIs",
+      "POSTLOGOUTREDIRECT": "Kijelentkezés utáni URIs",
+      "RESPONSESECTION": "Válasz Típusok",
+      "GRANTSECTION": "Engedélyezési Típusok",
+      "GRANTTITLE": "Válaszd ki az engedélyezési típusokat. Megjegyzés: Az implicit csak böngésző alapú alkalmazásoknál elérhető.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "Felhasználói ügynök",
+        "2": "Natív"
+      },
+      "RESPONSETYPE": "Választípusok",
+      "RESPONSE": {
+        "0": "Kód",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Frissítő token",
+      "GRANTTYPE": "Adományozási típusok",
+      "GRANT": {
+        "0": "Engedélyezési kód",
+        "1": "Implicit",
+        "2": "Frissítési token",
+        "3": "Eszközkód",
+        "4": "Token csere"
+      },
+      "AUTHMETHOD": {
+        "0": "Alap",
+        "1": "Post",
+        "2": "Nincs",
+        "3": "Privát kulcs JWT"
+      },
+      "TOKENTYPE": "Auth token típus",
+      "TOKENTYPE0": "Hordozó token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Nagyon remélem, tudod, mit csinálsz.",
+      "OVERVIEWSECTION": "Áttekintés",
+      "OVERVIEWTITLE": "Most már készen vagy. Ellenőrizd a konfigurációdat.",
+      "ACCESSTOKENROLEASSERTION": "Felhasználói szerepkörök hozzáadása az access tokenhez",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Ha kiválasztod, a hitelesített felhasználó kért szerepkörei hozzá lesznek adva az access tokenhez.",
+      "IDTOKENROLEASSERTION": "Felhasználói szerepkörök az ID Tokenben",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Ha kiválasztod, a hitelesített felhasználó kért szerepkörei hozzá lesznek adva az ID tokenhez.",
+      "IDTOKENUSERINFOASSERTION": "Felhasználói információk az ID Tokenben",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Lehetővé teszi az ügyfelek számára, hogy lekérjék a profil-, e-mail-, telefon- és címadatokat az ID tokenből.",
+      "CLOCKSKEW": "Lehetővé teszi az ügyfelek számára az OP és az ügyfél óraeltolódásának kezelését. Az időtartam (0-5 másodperc) hozzá lesz adva az exp igényhez, és levonásra kerül az iats, auth_time és nbf értékeiből.",
+      "RECOMMENDED": "ajánlott",
+      "NOTRECOMMENDED": "nem ajánlott",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Szokásos webalkalmazások, mint például .net, PHP, Node.js, Java, stb."
+          },
+          "NATIVE": {
+            "TITLE": "Natív",
+            "DESCRIPTION": "Mobilalkalmazások, asztali alkalmazások, okoseszközök stb."
+          },
+          "USERAGENT": {
+            "TITLE": "Felhasználói ügynök",
+            "DESCRIPTION": "Egylapos alkalmazások (SPA) és általában minden böngészőben futó JS keretrendszer"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Ügyfélazonosító"
+      },
+      "REGENERATESECRET": "Ügyfél titkos kód újragenerálása",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "Általában az API-król"
+      },
+      "AUTHMETHOD": {
+        "0": "Alap",
+        "1": "Privát Kulcs JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Alkalmazások"
+      },
+      "CONFIGSECTION": "SAML Konfiguráció",
+      "CHOOSEMETADATASOURCE": "Add meg a SAML konfigurációdat az alábbi lehetőségek egyikével:",
+      "METADATAOPT1": "1. lehetőség: Add meg az URL-t, ahol a metaadat fájl található",
+      "METADATAOPT2": "2. opció. Tölts fel egy fájlt, amely tartalmazza a metadata XML-t",
+      "METADATAOPT3": "3. opció. Hozz létre egy minimális metadata fájlt menet közben ENTITYID és ACS URL megadásával",
+      "UPLOAD": "XML fájl feltöltése",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata fájlból",
+      "CERTIFICATE": "SAML tanúsítvány",
+      "DOWNLOADCERT": "SAML tanúsítvány letöltése",
+      "CREATEMETADATA": "Metadata létrehozása",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS végpont URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Kód",
+        "DESCRIPTION": "Cseréld le az autorizációs kódot a tokenekre"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Használj véletlenszerű hash-t a statikus kliens titok helyett a nagyobb biztonság érdekében"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Küldd el a client_id-t és a client_secret-et az űrlap részeként"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Használj privát kulcsot az alkalmazásod autorizálásához"
+      },
+      "BASIC": {
+        "TITLE": "Alap",
+        "DESCRIPTION": "Hitelesítés felhasználónévvel és jelszóval"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Szerezd meg a tokeneket közvetlenül az autorizációs végponttól"
+      },
+      "DEVICECODE": {
+        "TITLE": "Eszközkód",
+        "DESCRIPTION": "Engedélyezd az eszközt számítógépen vagy okostelefonon."
+      },
+      "CUSTOM": {
+        "TITLE": "Egyéni",
+        "DESCRIPTION": "A beállításod nem felel meg egyetlen másik opciónak sem."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Alkalmazás újraaktiválva.",
+      "DEACTIVATED": "Alkalmazás deaktiválva.",
+      "OIDCUPDATED": "Az alkalmazás frissítve.",
+      "APIUPDATED": "Az alkalmazás frissítve",
+      "UPDATED": "Az app frissítve.",
+      "CREATED": "Az app létrehozva.",
+      "CLIENTSECRETREGENERATED": "Az ügyfél titok generálva.",
+      "DELETED": "Az app törölve.",
+      "CONFIGCHANGED": "Változások észlelve!"
+    },
+    "LOGINV2": {
+      "USEV2": "Új bejelentkezési felhasználói felület használata",
+      "BASEURL": "Egyéni alapértelmezett URL az új bejelentkezési felhasználói felülethez"
+    }
+  },
+  "GENDERS": {
+    "0": "Ismeretlen",
+    "1": "Nő",
+    "2": "Férfi",
+    "3": "Egyéb"
+  },
+  "LANGUAGES": {
+    "de": "Német",
+    "en": "Angol",
+    "es": "Spanyol",
+    "fr": "Francia",
+    "it": "Olasz",
+    "ja": "Japán",
+    "pl": "Lengyel",
+    "zh": "Egyszerűsített kínai",
+    "bg": "Bolgár",
+    "pt": "Portugál",
+    "mk": "Macedón",
+    "cs": "Cseh",
+    "ru": "Orosz",
+    "nl": "Holland",
+    "sv": "Svéd",
+    "id": "Indonéz",
+    "hu": "Magyar"
+  },
+  "MEMBER": {
+    "ADD": "Hozzáadás egy menedzsert",
+    "CREATIONTYPE": "Létrehozás típusa",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Szervezet",
+      "0": "Saját projekt",
+      "1": "Engedélyezett Projekt",
+      "4": "Projekt"
+    },
+    "EDITROLE": "Szerepkörök szerkesztése",
+    "EDITFOR": "Felhasználó szerepköreinek szerkesztése: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Menedszer eltávolítása",
+      "DELETE_DESCRIPTION": "Egy menedzser eltávolítására készülsz. Biztos vagy benne?"
+    },
+    "SHOWDETAILS": "Kattints a részletek megjelenítéséhez."
+  },
+  "ROLESLABEL": "Szerepkörök",
+  "GRANTS": {
+    "TITLE": "Jogosultságok",
+    "DESC": "Ezek a te szervezeted összes jogosultságai.",
+    "DELETE": "Engedély törlése",
+    "EMPTY": "Nem található engedély",
+    "ADD": "Engedély létrehozása",
+    "ADD_BTN": "Új",
+    "PROJECT": {
+      "TITLE": "Engedély",
+      "DESCRIPTION": "Határozd meg az engedélyeket a megadott projekthez. Ne feledd, hogy csak azoknak a projekteknek és felhasználóknak a bejegyzéseit láthatod, amelyekhez van jogosultságod."
+    },
+    "USER": {
+      "TITLE": "Engedély",
+      "DESCRIPTION": "Határozd meg az engedélyeket a megadott felhasználóhoz. Ne feledd, hogy csak azoknak a projekteknek és felhasználóknak a bejegyzéseit láthatod, amelyekhez van jogosultságod."
+    },
+    "CREATE": {
+      "TITLE": "Engedély létrehozása",
+      "DESCRIPTION": "Keresd meg a szervezetet, a projektet és a hozzá tartozó szerepköröket."
+    },
+    "EDIT": {
+      "TITLE": "Engedély megváltoztatása"
+    },
+    "DETAIL": {
+      "TITLE": "Engedély részlete",
+      "DESCRIPTION": "Itt láthatod az engedély összes részletét."
+    },
+    "TOAST": {
+      "UPDATED": "Engedély frissítve.",
+      "REMOVED": "Engedély eltávolítva",
+      "BULKREMOVED": "Engedélyek eltávolítva.",
+      "CANTSHOWINFO": "Nem látogathatod meg ennek a felhasználónak a profilját, mivel nem vagy tagja annak a szervezetnek, amelyhez a felhasználó tartozik."
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Engedély törlése",
+      "DELETE_DESCRIPTION": "Az engedély törlésére készülsz. Folytatod?",
+      "BULK_DELETE_TITLE": "Engedélyek törlése",
+      "BULK_DELETE_DESCRIPTION": "Most több jogosultságot készülsz törölni. Folytatod?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Legutóbbi változások",
+    "BOTTOM": "Elérted a lista végét.",
+    "LOADMORE": "Tovább",
+    "ORG": {
+      "TITLE": "Tevékenység",
+      "DESCRIPTION": "Itt láthatod a legújabb eseményeket, amelyek szervezeti változást hoztak létre."
+    },
+    "PROJECT": {
+      "TITLE": "Tevékenység",
+      "DESCRIPTION": "Itt láthatod a legújabb eseményeket, amelyek projektváltozást hoztak létre."
+    },
+    "USER": {
+      "TITLE": "Tevékenység",
+      "DESCRIPTION": "Itt láthatod a legújabb eseményeket, amelyek felhasználói változást hoztak létre."
+    }
+  }
+}

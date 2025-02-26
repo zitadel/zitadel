@@ -74,8 +74,8 @@ type privacyPolicyProvider interface {
 }
 
 type userSessionViewProvider interface {
-	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
-	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
+	UserSessionByIDs(context.Context, string, string, string) (*user_view_model.UserSessionView, error)
+	UserSessionsByAgentID(context.Context, string, string) ([]*user_view_model.UserSessionView, error)
 	GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error)
 }
 
@@ -106,6 +106,7 @@ type idpUserLinksProvider interface {
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
 	PasswordCodeExists(ctx context.Context, userID string) (exists bool, err error)
+	InviteCodeExists(ctx context.Context, userID string) (exists bool, err error)
 }
 
 type userCommandProvider interface {
@@ -254,14 +255,14 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, 
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) (err error) {
+func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string, idpArguments map[string]any) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
-	err = repo.checkSelectedExternalIDP(request, idpConfigID)
+	err = repo.checkSelectedExternalIDP(request, idpConfigID, idpArguments)
 	if err != nil {
 		return err
 	}
@@ -562,6 +563,15 @@ func (repo *AuthRequestRepo) ResetSelectedIDP(ctx context.Context, authReqID, us
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) RequestLocalAuth(ctx context.Context, authReqID, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+	request.RequestLocalAuth = true
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *domain.Human, externalIDP *domain.UserIDPLink, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, metadatas []*domain.Metadata, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -725,7 +735,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		request.DefaultTranslations = defaultLoginTranslations
 	}
 	if len(request.OrgTranslations) == 0 || request.PolicyOrgID() != orgID {
-		orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
+		orgLoginTranslations, err := repo.getLoginTexts(ctx, request.PrivateLabelingOrgID(orgID))
 		if err != nil {
 			return err
 		}
@@ -784,9 +794,12 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// the user was either not found or not active
 	// so check if the loginname suffix matches a verified org domain
-	ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
-	if errDomainDiscovery != nil || ok {
-		return errDomainDiscovery
+	// but only if no org was requested (by id or domain)
+	if request.RequestedOrgID == "" {
+		ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
+		if errDomainDiscovery != nil || ok {
+			return errDomainDiscovery
+		}
 	}
 	// let's once again check if the user was just inactive
 	if user != nil && user.State == int32(domain.UserStateInactive) {
@@ -971,10 +984,11 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 	}
 }
 
-func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthRequest, idpConfigID string) error {
+func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthRequest, idpConfigID string, idpArguments map[string]any) error {
 	for _, externalIDP := range request.AllowedExternalIDPs {
 		if externalIDP.IDPConfigID == idpConfigID {
 			request.SelectedIDPConfigID = idpConfigID
+			request.SelectedIDPConfigArgs = idpArguments
 			return nil
 		}
 	}
@@ -1048,19 +1062,28 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
+	request.SessionID = userSession.ID
 	request.DisplayName = userSession.DisplayName
 	request.AvatarKey = userSession.AvatarKey
 	if user.HumanView != nil && user.HumanView.PreferredLanguage != "" {
 		request.PreferredLanguage = gu.Ptr(language.Make(user.HumanView.PreferredLanguage))
 	}
 
-	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
+	isInternalLogin := (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || request.RequestLocalAuth
 	idps, err := checkExternalIDPsOfUser(ctx, repo.IDPUserLinksProvider, user.ID)
 	if err != nil {
 		return nil, err
 	}
-	if (!isInternalLogin || len(idps.Links) > 0) && len(request.LinkingUsers) == 0 {
-		step := repo.idpChecked(request, idps.Links, userSession)
+	noLocalAuth := request.LoginPolicy != nil && !request.LoginPolicy.AllowUsernamePassword
+
+	allowedLinkedIDPs := checkForAllowedIDPs(request.AllowedExternalIDPs, idps.Links)
+	if (!isInternalLogin || len(allowedLinkedIDPs) > 0 || noLocalAuth) &&
+		len(request.LinkingUsers) == 0 &&
+		!request.RequestLocalAuth {
+		step, err := repo.idpChecked(request, allowedLinkedIDPs, userSession)
+		if err != nil {
+			return nil, err
+		}
 		if step != nil {
 			return append(steps, step), nil
 		}
@@ -1070,6 +1093,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		if step != nil {
 			return append(steps, step), nil
 		}
+	}
+
+	// If the user never had a verified email, we need to verify it.
+	// This prevents situations, where OTP email is the only MFA method and no verified email is set.
+	// If the user had a verified email, but change it and has not yet verified the new one, we'll verify it after we checked the MFA methods.
+	if user.VerifiedEmail == "" && !user.IsEmailVerified {
+		return append(steps, &domain.VerifyEMailStep{
+			InitPassword: !user.PasswordSet && len(idps.Links) == 0,
+		}), nil
 	}
 
 	step, ok, err := repo.mfaChecked(userSession, request, user, isInternalLogin && len(request.LinkingUsers) == 0)
@@ -1086,7 +1118,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	if !user.IsEmailVerified {
 		steps = append(steps, &domain.VerifyEMailStep{
-			InitPassword: !user.PasswordSet,
+			InitPassword: !user.PasswordSet && len(idps.Links) == 0,
 		})
 	}
 	if user.UsernameChangeRequired {
@@ -1126,6 +1158,19 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		steps = append(steps, &domain.LoginSucceededStep{})
 	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
+}
+
+func checkForAllowedIDPs(allowedIDPs []*domain.IDPProvider, idps []*query.IDPUserLink) (_ []string) {
+	allowedLinkedIDPs := make([]string, 0, len(idps))
+	// only use allowed linked idps
+	for _, idp := range idps {
+		for _, allowedIdP := range allowedIDPs {
+			if idp.IDPID == allowedIdP.IDPConfigID {
+				allowedLinkedIDPs = append(allowedLinkedIDPs, allowedIdP.IDPConfigID)
+			}
+		}
+	}
+	return allowedLinkedIDPs
 }
 
 func passwordAgeChangeRequired(policy *domain.PasswordAgePolicy, changed time.Time) bool {
@@ -1249,8 +1294,18 @@ func (repo *AuthRequestRepo) firstFactorChecked(ctx context.Context, request *do
 
 	if user.PasswordInitRequired {
 		if !user.IsEmailVerified {
+			// If the user was created through the user resource API,
+			// they can either have an invite code...
+			exists, err := repo.UserEventProvider.InviteCodeExists(ctx, user.ID)
+			logging.WithFields("userID", user.ID).OnError(err).Error("unable to check if invite code exists")
+			if err == nil && exists {
+				return &domain.VerifyInviteStep{}
+			}
+			// or were created with an explicit email verification mail
 			return &domain.VerifyEMailStep{InitPassword: true}
 		}
+		// If they were created with a verified mail, they might have never received mail to set their password,
+		// e.g. when created through a user resource API. In this case we'll just create and send one now.
 		exists, err := repo.UserEventProvider.PasswordCodeExists(ctx, user.ID)
 		logging.WithFields("userID", user.ID).OnError(err).Error("unable to check if password code exists")
 		if err == nil && !exists {
@@ -1271,20 +1326,41 @@ func (repo *AuthRequestRepo) firstFactorChecked(ctx context.Context, request *do
 	return &domain.PasswordStep{}
 }
 
-func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*query.IDPUserLink, userSession *user_model.UserSessionView) domain.NextStep {
+func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []string, userSession *user_model.UserSessionView) (domain.NextStep, error) {
 	if checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
 		request.IDPLoginChecked = true
 		request.AuthTime = userSession.ExternalLoginVerification
-		return nil
+		return nil, nil
 	}
-	selectedIDPConfigID := request.SelectedIDPConfigID
-	if selectedIDPConfigID == "" {
-		selectedIDPConfigID = userSession.SelectedIDPConfigID
+	// use the explicitly set IdP first
+	if request.SelectedIDPConfigID != "" {
+		// only use the explicitly set IdP if allowed
+		for _, allowedIdP := range request.AllowedExternalIDPs {
+			if request.SelectedIDPConfigID == allowedIdP.IDPConfigID {
+				return &domain.ExternalLoginStep{SelectedIDPConfigID: request.SelectedIDPConfigID}, nil
+			}
+		}
+		// error if the explicitly set IdP is not allowed, to avoid misinterpretation with usage of another IdP
+		return nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-LWif2", "Errors.Org.IdpNotExisting")
 	}
-	if selectedIDPConfigID == "" && len(idps) > 0 {
-		selectedIDPConfigID = idps[0].IDPID
+	// reuse the previously used IdP from the session
+	if userSession.SelectedIDPConfigID != "" {
+		// only use the previously used IdP if allowed
+		for _, allowedIdP := range request.AllowedExternalIDPs {
+			if userSession.SelectedIDPConfigID == allowedIdP.IDPConfigID {
+				return &domain.ExternalLoginStep{SelectedIDPConfigID: userSession.SelectedIDPConfigID}, nil
+			}
+		}
 	}
-	return &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}
+	// then use an existing linked and allowed IdP of the user
+	if len(idps) > 0 {
+		return &domain.ExternalLoginStep{SelectedIDPConfigID: idps[0]}, nil
+	}
+	// if the user did not link one, then just use one of the configured IdPs of the org
+	if len(request.AllowedExternalIDPs) > 0 {
+		return &domain.ExternalLoginStep{SelectedIDPConfigID: request.AllowedExternalIDPs[0].IDPConfigID}, nil
+	}
+	return nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Org.IdpNotExisting")
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView, isInternalAuthentication bool) (domain.NextStep, bool, error) {
@@ -1532,7 +1608,7 @@ func userSessionsByUserAgentID(ctx context.Context, provider userSessionViewProv
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := provider.UserSessionsByAgentID(agentID, instanceID)
+	session, err := provider.UserSessionsByAgentID(ctx, agentID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -1572,7 +1648,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		OnError(err).
 		Errorf("could not get current sequence for userSessionByIDs")
 
-	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
+	session, err := provider.UserSessionByIDs(ctx, agentID, user.ID, instanceID)
 	if err != nil {
 		if !zerrors.IsNotFound(err) {
 			return nil, err

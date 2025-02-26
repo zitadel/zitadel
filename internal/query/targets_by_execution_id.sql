@@ -31,9 +31,9 @@ WITH RECURSIVE
                           ON e.instance_id = p.instance_id
                               AND e.include IS NOT NULL
                               AND e.include = p.execution_id)
-select e.execution_id, e.instance_id, e.target_id, t.target_type, t.endpoint, t.timeout, t.interrupt_on_error
+select e.execution_id, e.instance_id, e.target_id, t.target_type, t.endpoint, t.timeout, t.interrupt_on_error, t.signing_key
 FROM dissolved_execution_targets e
-         JOIN projections.targets1 t
+         JOIN projections.targets2 t
               ON e.instance_id = t.instance_id
                   AND e.target_id = t.id
 WHERE "include" = ''

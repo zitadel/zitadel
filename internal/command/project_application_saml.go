@@ -16,11 +16,9 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-35Fn0", "Errors.Project.App.Invalid")
 	}
 
-	_, err = c.getProjectByID(ctx, application.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3p9ss", "Errors.Project.NotFound")
+	if err := c.checkProjectExists(ctx, application.AggregateID, resourceOwner); err != nil {
+		return nil, err
 	}
-
 	addedApplication := NewSAMLApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 	events, err := c.addSAMLApplication(ctx, projectAgg, application)
@@ -28,10 +26,15 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, err
 	}
 	addedApplication.AppID = application.AppID
+	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -76,6 +79,8 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 			string(entity.EntityID),
 			samlApp.Metadata,
 			samlApp.MetadataURL,
+			samlApp.LoginVersion,
+			samlApp.LoginBaseURI,
 		),
 	}, nil
 }
@@ -116,7 +121,10 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 		samlApp.AppID,
 		string(entity.EntityID),
 		samlApp.Metadata,
-		samlApp.MetadataURL)
+		samlApp.MetadataURL,
+		samlApp.LoginVersion,
+		samlApp.LoginBaseURI,
+	)
 	if err != nil {
 		return nil, err
 	}

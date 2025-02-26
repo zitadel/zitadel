@@ -108,7 +108,12 @@ func Test_verifyEvents(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := createEvents(context.Background(), tt.args.db.db); !errors.Is(err, tt.targetErr) {
+			conn, err := tt.args.db.db.Conn(context.Background())
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if err := createEvents(context.Background(), conn); !errors.Is(err, tt.targetErr) {
 				t.Errorf("createEvents() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {

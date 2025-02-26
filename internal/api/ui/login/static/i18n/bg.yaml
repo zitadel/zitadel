@@ -81,6 +81,14 @@ InitUserDone:
   Description: Имейлът е потвърден и паролата е успешно зададена
   NextButtonText: следващия
   CancelButtonText: анулиране
+InviteUser:
+  Title: Активиране на потребителя
+  Description: Проверете своя имейл с кода по-долу и задайте паролата си.
+  CodeLabel: Код
+  NewPasswordLabel: Нова парола
+  NewPasswordConfirm: Потвърди парола
+  NextButtonText: Напред
+  ResendButtonText: Изпрати отново код
 InitMFAPrompt:
   Title: 2-факторна настройка
   Description: >-
@@ -250,6 +258,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -289,6 +300,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -357,6 +371,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
@@ -476,6 +493,10 @@ Errors:
       CreationNotAllowed: Създаването на нов потребител не е разрешено на този доставчик
       LinkingNotAllowed: Свързването на потребител не е разрешено на този доставчик
       NoOptionAllowed: Нито създаване, нито свързване е разрешено за този доставчик. Моля, свържете се с администратора.
+      LoginFailedSwitchLocal: |
+        Вход в външен доставчик на идентификация е неуспешен. Връщане към локален вход.
+
+        Подробности за грешката: {{.Details}}
     GrantRequired: 'Влизането не е възможно. '
     ProjectRequired: 'Влизането не е възможно. '
   IdentityProvider:

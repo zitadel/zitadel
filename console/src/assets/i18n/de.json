@@ -197,7 +197,8 @@
           "VE": "Wenn ein Benutzer seine E-Mail-Adresse ändert, erhält er eine E-Mail mit einem Link zur Verifizierung der neuen Adresse.",
           "VP": "Wenn ein Benutzer seine Telefonnummer ändert, erhält er eine SMS mit einem Code zur Verifizierung der neuen Nummer.",
           "VEO": "Wenn ein Benutzer eine Einmalpasswort-Methode per E-Mail hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine E-Mail-Adresse gesendet wurde.",
-          "VSO": "Wenn ein Benutzer eine Einmalpasswort-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde."
+          "VSO": "Wenn ein Benutzer eine Einmalpasswort-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde.",
+          "IU": "Wenn ein Benutzer-Einladungscode erstellt wird, erhält er eine E-Mail mit einem Link zur Einstellung seiner Authentifizierungsmethode."
         }
       },
       "LOGIN_TEXTS": {
@@ -808,6 +809,9 @@
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
       "PHONE_HINT": "Verwenden das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wähle das Land aus der Dropdown-Liste aus und gebe anschließend die Telefonnummer ein.",
+      "PHONE_VERIFIED": "Telefonnummer verifiziert",
+      "SEND_SMS": "Bestätigungs-SMS senden",
+      "SEND_EMAIL": "E-Mail senden",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -947,6 +951,14 @@
       "4": "Gesperrt",
       "5": "Suspendiert",
       "6": "Initialisiert"
+    },
+    "STATEV2": {
+      "0": "Unbekannt",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Gelöscht",
+      "4": "Gesperrt",
+      "5": "Initialisiert"
     },
     "SEARCH": {
       "ADDITIONAL": "Benutzer Name (eigene Organisation)",
@@ -1381,7 +1393,10 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1418,6 +1433,8 @@
         "SID": "SID",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
+        "VERIFYSERVICESID": "Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Das Setzen einer Verification Service Sid ermöglicht die Verwendung des Twilio Verify-Dienstes anstelle des Nachrichtendienstes zur Überprüfung von Telefonnummern und OTP-SMS.",
         "ADDED": "Twilio erfolgreich hinzugefügt.",
         "UPDATED": "Twilio wurde erfolgreich aktualisiert.",
         "REMOVED": "Twilio entfernt",
@@ -1468,6 +1485,8 @@
       "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "ACTIONS": "Aktionen",
       "ACTIONS_DESCRIPTION": "Aktionen v2 ermöglichen die Verwaltung von Datenausführungen und Zielen. Wenn das Flag aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sitzungsbeendigung",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
       "STATES": {
         "INHERITED": "Erben",
         "ENABLED": "Aktiviert",
@@ -1478,7 +1497,9 @@
         "ENABLED": "„Aktiviert“ wird vererbt",
         "DISABLED": "„Deaktiviert“ wird vererbt"
       },
-      "RESET": "Alle auf Erben setzen"
+      "RESET": "Alle auf Erben setzen",
+      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Konsole zur Erstellung von Benutzern",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand."
     },
     "DIALOG": {
       "RESET": {
@@ -1613,7 +1634,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1663,7 +1686,8 @@
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
         "PL": "Passwortlos",
-        "PC": "Passwordwechsel"
+        "PC": "Passwordwechsel",
+        "IU": "Benutzer einladen"
       },
       "CHIPS": {
         "firstname": "Vorname",
@@ -1683,7 +1707,8 @@
         "tempUsername": "Temp. Username",
         "otp": "Einmalpasswort",
         "verifyUrl": "URL zur Überprüfung des Einmalpassworts",
-        "expiry": "Ablauf"
+        "expiry": "Ablauf",
+        "applicationName": "Anwendungsname"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."
@@ -1711,8 +1736,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
-      "FORCEMFA": "MFA erzwingen",
-      "FORCEMFALOCALONLY": "MFA für lokale Benutzer erzwingen",
+      "FORCEMFA": "MFA für alle Benutzer erzwingen",
+      "FORCEMFALOCALONLY": "MFA nur für lokal authentifizierte Benutzer erzwingen",
       "FORCEMFALOCALONLY_DESC": "Ist die Option gewählt, müssen lokal authentifizierte Benutzer einen zweiten Faktor für den Login verwenden.",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
@@ -2179,7 +2204,9 @@
       "REMOVED": "Erfolgreich entfernt."
     },
     "ISIDTOKENMAPPING": "Zuordnung vom ID-Token",
-    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints."
+    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints.",
+    "USEPKCE": "Verwenden Sie PKCE",
+    "USEPKCE_DESC": "Bestimmt, ob die Parameter code_challenge und code_challenge_method in der Authentifizierungsanforderung enthalten sind"
   },
   "MFA": {
     "LIST": {
@@ -2529,6 +2556,10 @@
       "CLIENTSECRETREGENERATED": "Client Secret generiert.",
       "DELETED": "App gelöscht.",
       "CONFIGCHANGED": "Konfigurationsänderung entdeckt."
+    },
+    "LOGINV2": {
+      "USEV2": "Neue Login-Benutzeroberfläche verwenden",
+      "BASEURL": "Benutzerdefinierte Basis-URL für die neue Login-Benutzeroberfläche"
     }
   },
   "GENDERS": {
@@ -2552,7 +2583,9 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

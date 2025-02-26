@@ -280,14 +280,18 @@ func Test_userInfoToOIDC(t *testing.T) {
 			args: args{
 				user: humanUserInfo,
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "human1",
+			},
 		},
 		{
 			name: "machine, empty",
 			args: args{
 				user: machineUserInfo,
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "machine1",
+			},
 		},
 		{
 			name: "human, scope openid",
@@ -317,6 +321,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope:             []string{oidc.ScopeEmail},
 			},
 			want: &oidc.UserInfo{
+				Subject: "human1",
 				UserInfoEmail: oidc.UserInfoEmail{
 					Email:         "foo@bar.com",
 					EmailVerified: true,
@@ -329,7 +334,9 @@ func Test_userInfoToOIDC(t *testing.T) {
 				user:  humanUserInfo,
 				scope: []string{oidc.ScopeEmail},
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "human1",
+			},
 		},
 		{
 			name: "machine, scope email, profileInfoAssertion",
@@ -338,7 +345,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope: []string{oidc.ScopeEmail},
 			},
 			want: &oidc.UserInfo{
-				UserInfoEmail: oidc.UserInfoEmail{},
+				Subject: "machine1",
 			},
 		},
 		{
@@ -349,6 +356,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope:             []string{oidc.ScopeProfile},
 			},
 			want: &oidc.UserInfo{
+				Subject: "human1",
 				UserInfoProfile: oidc.UserInfoProfile{
 					Name:              "xxx",
 					GivenName:         "user",
@@ -370,6 +378,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope:             []string{oidc.ScopeProfile},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
 				UserInfoProfile: oidc.UserInfoProfile{
 					Name:              "machine",
 					UpdatedAt:         oidc.FromTime(time.Unix(567, 890)),
@@ -383,7 +392,9 @@ func Test_userInfoToOIDC(t *testing.T) {
 				user:  machineUserInfo,
 				scope: []string{oidc.ScopeProfile},
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "machine1",
+			},
 		},
 		{
 			name: "human, scope phone, profileInfoAssertion",
@@ -393,6 +404,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope:             []string{oidc.ScopePhone},
 			},
 			want: &oidc.UserInfo{
+				Subject: "human1",
 				UserInfoPhone: oidc.UserInfoPhone{
 					PhoneNumber:         "+31123456789",
 					PhoneNumberVerified: true,
@@ -405,7 +417,9 @@ func Test_userInfoToOIDC(t *testing.T) {
 				user:  humanUserInfo,
 				scope: []string{oidc.ScopePhone},
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "human1",
+			},
 		},
 		{
 			name: "machine, scope phone",
@@ -414,6 +428,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope: []string{oidc.ScopePhone},
 			},
 			want: &oidc.UserInfo{
+				Subject:       "machine1",
 				UserInfoPhone: oidc.UserInfoPhone{},
 			},
 		},
@@ -424,6 +439,8 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope: []string{ScopeUserMetaData},
 			},
 			want: &oidc.UserInfo{
+				Subject:       "human1",
+				UserInfoEmail: oidc.UserInfoEmail{},
 				Claims: map[string]any{
 					ClaimUserMetaData: map[string]string{
 						"key1": base64.RawURLEncoding.EncodeToString([]byte{1, 2, 3}),
@@ -438,7 +455,9 @@ func Test_userInfoToOIDC(t *testing.T) {
 				user:  machineUserInfo,
 				scope: []string{ScopeUserMetaData},
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "machine1",
+			},
 		},
 		{
 			name: "machine, scope resource owner",
@@ -447,6 +466,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope: []string{ScopeResourceOwner},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
 				Claims: map[string]any{
 					ClaimResourceOwnerID:            "orgID",
 					ClaimResourceOwnerName:          "orgName",
@@ -461,6 +481,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope: []string{domain.OrgDomainPrimaryScope + "foo.com"},
 			},
 			want: &oidc.UserInfo{
+				Subject: "human1",
 				Claims: map[string]any{
 					domain.OrgDomainPrimaryClaim: "foo.com",
 				},
@@ -473,6 +494,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				scope: []string{domain.OrgIDScope + "orgID"},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
 				Claims: map[string]any{
 					domain.OrgIDClaim:               "orgID",
 					ClaimResourceOwnerID:            "orgID",

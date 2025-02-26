@@ -45,7 +45,7 @@ The [OIDC Playground](/oidc-playground) is for testing OpenID authentication req
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2) or get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service).
+ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2), get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service) or get SAML request details with the [SAML service API](/docs/apis/resources/saml_service).
 User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
@@ -302,7 +302,6 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 /saml/v2/
 /oauth/v2/
 /device
-/oidc/v1/
 /.well-known/openid-configuration
 /openapi/
 /idps/callback

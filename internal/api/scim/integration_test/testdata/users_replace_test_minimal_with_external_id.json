@@ -1,0 +1,17 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "externalID": "replaced-external-id",
+  "userName": "acmeUser1-replaced-with-external-id",
+  "name": {
+    "familyName": "Ross",
+    "givenName": "Bethany"
+  },
+  "emails": [
+    {
+      "value": "user1-minimal-replaced-with-external-id@example.com",
+      "primary": true
+    }
+  ]
+}

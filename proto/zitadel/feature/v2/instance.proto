@@ -72,6 +72,47 @@ message SetInstanceFeaturesRequest{
       description: "Return parent errors to OIDC clients for debugging purposes. Parent errors may contain sensitive data or unwanted details about the system status of zitadel. Only enable if really needed.";
     }
   ];
+
+  optional bool oidc_single_v1_session_termination = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
+    }
+  ];
+
+  optional bool disable_user_token_event = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
+    }
+  ];
+
+  optional bool enable_back_channel_logout = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
+    }
+  ];
+
+  optional LoginV2 login_v2 = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the login UI for all users and applications regardless of their preference.";
+    }
+  ];
+
+  optional bool permission_check_v2 = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
+    }
+  ];
+
+  optional bool console_use_v2_user_api = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -155,6 +196,47 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Return parent errors to OIDC clients for debugging purposes. Parent errors may contain sensitive data or unwanted details about the system status of zitadel. Only enable if really needed.";
+    }
+  ];
+
+  FeatureFlag oidc_single_v1_session_termination = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
+    }
+  ];
+
+  FeatureFlag disable_user_token_event = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
+    }
+  ];
+
+  FeatureFlag enable_back_channel_logout = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
+    }
+  ];
+
+  LoginV2FeatureFlag login_v2 = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is set, all users will be redirected to the login V2 regardless of the application's preference.";
+    }
+  ];
+
+  FeatureFlag permission_check_v2 = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
+    }
+  ];
+
+  FeatureFlag console_use_v2_user_api = 16 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
     }
   ];
 }

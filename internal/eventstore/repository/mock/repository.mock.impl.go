@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -78,8 +79,8 @@ func (m *MockRepository) ExpectInstanceIDsError(err error) *MockRepository {
 // ExpectPush checks if the expectedCommands are send to the Push method.
 // The call will sleep at least the amount of passed duration.
 func (m *MockRepository) ExpectPush(expectedCommands []eventstore.Command, sleep time.Duration) *MockRepository {
-	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, commands ...eventstore.Command) ([]eventstore.Event, error) {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, _ database.ContextQueryExecuter, commands ...eventstore.Command) ([]eventstore.Event, error) {
 			m.MockPusher.ctrl.T.Helper()
 
 			time.Sleep(sleep)
@@ -133,8 +134,8 @@ func (m *MockRepository) ExpectPush(expectedCommands []eventstore.Command, sleep
 func (m *MockRepository) ExpectPushFailed(err error, expectedCommands []eventstore.Command) *MockRepository {
 	m.MockPusher.ctrl.T.Helper()
 
-	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, commands ...eventstore.Command) ([]eventstore.Event, error) {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, _ database.ContextQueryExecuter, commands ...eventstore.Command) ([]eventstore.Event, error) {
 			if len(expectedCommands) != len(commands) {
 				return nil, fmt.Errorf("unexpected amount of commands: want %d, got %d", len(expectedCommands), len(commands))
 			}
@@ -143,7 +144,17 @@ func (m *MockRepository) ExpectPushFailed(err error, expectedCommands []eventsto
 				assert.Equal(m.MockPusher.ctrl.T, expectedCommand.Creator(), commands[i].Creator())
 				assert.Equal(m.MockPusher.ctrl.T, expectedCommand.Type(), commands[i].Type())
 				assert.Equal(m.MockPusher.ctrl.T, expectedCommand.Revision(), commands[i].Revision())
-				assert.Equal(m.MockPusher.ctrl.T, expectedCommand.Payload(), commands[i].Payload())
+				var expectedPayload []byte
+				expectedPayload, ok := expectedCommand.Payload().([]byte)
+				if !ok {
+					expectedPayload, _ = json.Marshal(expectedCommand.Payload())
+				}
+				if string(expectedPayload) == "" {
+					expectedPayload = []byte("null")
+				}
+				gotPayload, _ := json.Marshal(commands[i].Payload())
+
+				assert.Equal(m.MockPusher.ctrl.T, expectedPayload, gotPayload)
 				assert.ElementsMatch(m.MockPusher.ctrl.T, expectedCommand.UniqueConstraints(), commands[i].UniqueConstraints())
 			}
 
@@ -195,8 +206,8 @@ func (e *mockEvent) CreatedAt() time.Time {
 }
 
 func (m *MockRepository) ExpectRandomPush(expectedCommands []eventstore.Command) *MockRepository {
-	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, commands ...eventstore.Command) ([]eventstore.Event, error) {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, _ database.ContextQueryExecuter, commands ...eventstore.Command) ([]eventstore.Event, error) {
 			assert.Len(m.MockPusher.ctrl.T, commands, len(expectedCommands))
 
 			events := make([]eventstore.Event, len(commands))
@@ -213,8 +224,8 @@ func (m *MockRepository) ExpectRandomPush(expectedCommands []eventstore.Command)
 }
 
 func (m *MockRepository) ExpectRandomPushFailed(err error, expectedEvents []eventstore.Command) *MockRepository {
-	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, events ...eventstore.Command) ([]eventstore.Event, error) {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, _ database.ContextQueryExecuter, events ...eventstore.Command) ([]eventstore.Event, error) {
 			assert.Len(m.MockPusher.ctrl.T, events, len(expectedEvents))
 			return nil, err
 		},

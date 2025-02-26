@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: dalej
   CancelButtonText: anuluj
 
+InviteUser:
+  Title: Aktywuj użytkownika
+  Description: Zweryfikuj swój adres e-mail za pomocą poniższego kodu i ustaw swoje hasło.
+  CodeLabel: Kod
+  NewPasswordLabel: Nowe hasło
+  NewPasswordConfirm: Potwierdź hasło
+  NextButtonText: Dalej
+  ResendButtonText: Wyślij ponownie kod
+
 InitMFAPrompt:
   Title: Konfiguracja 2-etapowego uwierzytelniania
   Description: 2-etapowe uwierzytelnianie daje Ci dodatkową ochronę dla Twojego konta użytkownika. Dzięki temu masz pewność, że tylko Ty masz dostęp do swojego konta.
@@ -253,6 +262,9 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -293,6 +305,9 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -367,6 +382,9 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
 
 DeviceAuth:
   Title: Autoryzacja urządzenia
@@ -488,6 +506,10 @@ Errors:
       CreationNotAllowed: Tworzenie nowego użytkownika nie jest dozwolone w tym Providencie
       LinkingNotAllowed: Linkowanie użytkownika nie jest dozwolone na tym Providencie
       NoOptionAllowed: Ani tworzenie, ani łączenie nie jest dozwolone dla tego dostawcy. Skontaktuj się z administratorem.
+      LoginFailedSwitchLocal: |
+        Logowanie w zewnętrznym dostawcy tożsamości nie powiodło się. Powrót do logowania lokalnego.
+
+        Szczegóły błędu: {{.Details}}
     GrantRequired: Logowanie nie jest możliwe. Użytkownik musi posiadać przynajmniej jedno uprawnienie w aplikacji. Skontaktuj się z administratorem.
     ProjectRequired: Logowanie nie jest możliwe. Organizacja użytkownika musi zostać udzielona projektowi. Skontaktuj się z administratorem.
   IdentityProvider:
