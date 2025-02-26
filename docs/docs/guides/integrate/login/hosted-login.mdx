@@ -5,6 +5,7 @@ sidebar_label: Hosted Login UI
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import PreventLockout from './_prevent-lockout.mdx';
 
 ZITADEL provides a hosted single-sign-on page to securely sign-in users to your applications.
 ZITADEL's hosted login page serves as a centralized authentication interface provided for applications that integrate ZITADEL.
@@ -184,14 +185,13 @@ To try out the new login without modifying it, the easiest way is to just activa
 
 The easiest way to actually customizing it is to fork the https://github.com/zitadel/typescript repo and use the "Deploy" button to run your code on Vercel.
 
-:::caution
-Before you reconfigure Zitadel, we recommend you to create a service user with a personal access token and the IAM_OWNER role for a lockout-failsafe.
-:::
-
 <Tabs queryString="deployment">
     <TabItem value="zitadel_cloud" label="Activate Zitadel Cloud V2 Login" default="true">
 
-        Zitadel Cloud provides the V2 login at the fixed path `/ui/v2/login`. To activate it in your Zitadel Cloud instance, you can follow one of these steps:
+        Zitadel Cloud provides the V2 login at the fixed path `/ui/v2/login`.
+        <PreventLockout/>
+
+        To activate it to authenticate on your Zitadel Cloud apps, you can follow one of these steps:
 
         1. Enable the new login on your application configuration and point it to `/ui/v2/login`. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
         ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
@@ -210,7 +210,9 @@ Before you reconfigure Zitadel, we recommend you to create a service user with a
            - PAT
            - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
         5. Add the domain where your login UI is hosted to the [trusted domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
-        6. Use the new login in your application. You have three different options on how to achieve this
+        6. Use the new login in your application.
+            <PreventLockout/>
+            You have three different options on how to achieve this:
             1. Enable the new login on your application configuration and add the URL of your login UI. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
             ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
             2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
