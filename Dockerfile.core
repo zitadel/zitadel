@@ -8,7 +8,6 @@ COPY openapi/ openapi/
 COPY pkg/ pkg/
 COPY proto/ proto/
 COPY statik/ statik/
-COPY --from=console ./ internal/api/ui/console/static
 RUN go mod download \
     && go install tool \
     && buf generate && cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/ \
@@ -25,6 +24,7 @@ ARG OS=
 ARG ARCH=
 ARG COMMIT_SHA=
 ARG VERSION=
+COPY --from=console ./ internal/api/ui/console/static
 RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -o zitadel-${OS}-${ARCH} -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
     && chmod +x zitadel-${OS}-${ARCH}
 
@@ -43,23 +43,11 @@ RUN golangci-lint run \
     --concurrency=$(getconf _NPROCESSORS_ONLN)
 
 FROM base AS unit-test
+COPY --from=console ./ internal/api/ui/console/static
 RUN go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./...
 
 FROM scratch AS unit
 COPY --from=unit-test /app/profile.cov .
-
-FROM base AS integration
-ENV DOCKER_HOST=tcp://docker:2375
-#RUN go build -cover -race -tags integration -o zitadel.test main.go
-RUN docker-compose -f internal/integration/config/docker-compose.yaml up --pull always --wait cache
-RUN GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
-RUN GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml --steps internal/integration/config/steps.yaml
-RUN GORACE="log_path=tmp/race.log" \
-./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml \
-  > tmp/zitadel.log 2>&1 \
-  & printf $$! > tmp/zitadel.pid
-RUN go test -race -count 1 -tags integration -timeout 30m $$(go list -tags integration ./... | grep "integration_test")
-RUN docker-compose -f internal/integration/config/docker-compose.yaml down
 
 FROM debian:latest AS base-image
 ENV ZITADEL_ARGS=
