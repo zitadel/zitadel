@@ -2204,7 +2204,9 @@
       "REMOVED": "Usunięto pomyślnie."
     },
     "ISIDTOKENMAPPING": "Mapowanie z tokena ID",
-    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo."
+    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo.",
+    "USEPKCE": "Skorzystaj z PKCE",
+    "USEPKCE_DESC": "Określa, czy parametry code_challenge i code_challenge_method są uwzględnione w żądaniu uwierzytelnienia"
   },
   "MFA": {
     "LIST": {

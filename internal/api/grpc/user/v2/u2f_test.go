@@ -43,6 +43,7 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
+						CreationDate:  time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
 					ID:                                 "123",
@@ -59,6 +60,7 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
+						CreationDate:  time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
 					ID:                                 "123",
@@ -70,6 +72,10 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 				Details: &object.Details{
 					Sequence: 22,
 					ChangeDate: &timestamppb.Timestamp{
+						Seconds: 3000,
+						Nanos:   22,
+					},
+					CreationDate: &timestamppb.Timestamp{
 						Seconds: 3000,
 						Nanos:   22,
 					},

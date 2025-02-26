@@ -890,6 +890,20 @@ module.exports = {
             "apis/benchmarks/v2.66.0/machine_jwt_profile_grant/index",
           ],
         },
+        {
+          type: "category",
+          label: "v2.70.0",
+          link: {
+            title: "v2.70.0",
+            slug: "/apis/benchmarks/v2.70.0",
+            description:
+              "Benchmark results of Zitadel v2.70.0\n"
+          },
+          items: [
+            "apis/benchmarks/v2.70.0/machine_jwt_profile_grant/index",
+            "apis/benchmarks/v2.70.0/oidc_session/index",
+          ],
+        },
       ],
     },
   ],
