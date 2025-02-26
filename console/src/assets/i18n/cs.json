@@ -2213,7 +2213,9 @@
       "REMOVED": "Úspěšně odebráno."
     },
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
-    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo."
+    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
+    "USEPKCE": "Použijte PKCE",
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
   },
   "MFA": {
     "LIST": {
