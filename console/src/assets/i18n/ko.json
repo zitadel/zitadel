@@ -2225,7 +2225,9 @@
       "REMOVED": "성공적으로 제거되었습니다."
     },
     "ISIDTOKENMAPPING": "ID 토큰에서 매핑",
-    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다."
+    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다.",
+    "USEPKCE": "PKCE 사용",
+    "USEPKCE_DESC": "code_challenge 및 code_challenge_method 매개변수가 인증 요청에 포함되는지 여부를 결정합니다"
   },
   "MFA": {
     "LIST": {

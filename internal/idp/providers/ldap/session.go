@@ -34,11 +34,21 @@ type Session struct {
 	Entry    *ldap.Entry
 }
 
+func NewSession(provider *Provider, username, password string) *Session {
+	return &Session{Provider: provider, User: username, Password: password}
+}
+
 // GetAuth implements the [idp.Session] interface.
 func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	return idp.Redirect(s.loginUrl)
 }
 
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
+}
+
+// FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 	var user *ldap.Entry
 	for _, server := range s.Provider.servers {
