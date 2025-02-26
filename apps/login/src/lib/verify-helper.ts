@@ -203,29 +203,43 @@ export async function checkMFAFactors(
       serviceUrl,
       userId: session.factors?.user?.id,
     });
+
     if (
       user.user?.type?.case === "human" &&
       user.user?.type?.value.mfaInitSkipped
     ) {
-    }
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName as string,
-      force: "false", // this defines if the mfa is not forced in the settings and can be skipped
-      checkAfter: "true", // this defines if the check is directly made after the setup
-    });
-
-    if (requestId) {
-      params.append("requestId", requestId);
-    }
-
-    if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
+      const mfaInitSkippedTimestamp = timestampDate(
+        user.user.type.value.mfaInitSkipped,
       );
-    }
 
-    // TODO: provide a way to setup passkeys on mfa page?
-    return { redirect: `/mfa/set?` + params };
+      const mfaInitSkipLifetimeMillis =
+        Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000 +
+        loginSettings.mfaInitSkipLifetime.nanos / 1000000;
+      const currentTime = Date.now();
+      const mfaInitSkippedTime = mfaInitSkippedTimestamp.getTime();
+      const timeDifference = currentTime - mfaInitSkippedTime;
+
+      if (timeDifference > mfaInitSkipLifetimeMillis) {
+        const params = new URLSearchParams({
+          loginName: session.factors?.user?.loginName as string,
+          force: "false", // this defines if the mfa is not forced in the settings and can be skipped
+          checkAfter: "true", // this defines if the check is directly made after the setup
+        });
+
+        if (requestId) {
+          params.append("requestId", requestId);
+        }
+
+        if (organization || session.factors?.user?.organizationId) {
+          params.append(
+            "organization",
+            organization ?? (session.factors?.user?.organizationId as string),
+          );
+        }
+
+        // TODO: provide a way to setup passkeys on mfa page?
+        return { redirect: `/mfa/set?` + params };
+      }
+    }
   }
 }
