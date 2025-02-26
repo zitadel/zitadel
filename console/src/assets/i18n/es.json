@@ -2201,7 +2201,9 @@
       "REMOVED": "Eliminado con éxito."
     },
     "ISIDTOKENMAPPING": "Asignación del ID token",
-    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo."
+    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo.",
+    "USEPKCE": "Usa PKCE",
+    "USEPKCE_DESC": "Determina si los parámetros code_challenge y code_challenge_method son incluidos en la solicitud de autenticación."
   },
   "MFA": {
     "LIST": {
