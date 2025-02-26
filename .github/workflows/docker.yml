@@ -58,13 +58,14 @@ jobs:
         run: pnpm install
 
       - name: Build for Docker
-        run: NEXT_PUBLIC_BASE_PATH=/new-login pnpm build:docker
+        run: NEXT_PUBLIC_BASE_PATH=/ui/v2/login pnpm build:docker
 
       - name: Build and Push Image
         id: build
         uses: docker/build-push-action@v5
         timeout-minutes: 10
         with:
+          context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}

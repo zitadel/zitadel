@@ -203,13 +203,11 @@ Go to your instance and create a service user for the login application.
 The login application creates users on your primary organization and reads policy data.
 For the sake of simplicity, just make the service user an instance member with the role `IAM_OWNER`.
 Create a PAT and copy it to the file `apps/login/.env.local` using the key `ZITADEL_SERVICE_USER_TOKEN`.
-Also add the users ID to the file using the key `ZITADEL_SERVICE_USER_ID`.
 
 The file should look similar to this:
 
 ```
 ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
-ZITADEL_SERVICE_USER_ID=289106423158521850
 ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
 ```
 
@@ -253,9 +251,8 @@ pnpm test:acceptance
 ### Deploy to Vercel
 
 To deploy your own version on Vercel, navigate to your instance and create a service user.
-Copy its id from the overview and set it as ZITADEL_SERVICE_USER_ID.
 Then create a personal access token (PAT), copy and set it as ZITADEL_SERVICE_USER_TOKEN, then navigate to your instance
 settings and make sure it gets IAM_OWNER permissions.
 Finally set your instance url as ZITADEL_API_URL. Make sure to set it without trailing slash.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_OWNER%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)

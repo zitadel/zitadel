@@ -10,24 +10,12 @@ declare namespace NodeJS {
     SYSTEM_USER_PRIVATE_KEY: string; // The fallback service user private key
 
     /**
-     * Self hosting: The Zitadel API url
+     * The Zitadel API url
      */
     ZITADEL_API_URL: string;
 
     /**
-     * Takes effect only if ZITADEL_API_URL is not empty.
-     * This is only relevant if Zitadels runtime has the ZITADEL_INSTANCEHOSTHEADERS config changed.
-     * The default is x-zitadel-instance-host.
-     * Most users don't need to set this variable.
-     */
-    ZITADEL_INSTANCE_HOST_HEADER: string;
-
-    /**
-     * Self hosting: The service user id
-     */
-    ZITADEL_SERVICE_USER_ID: string;
-    /**
-     * Self hosting: The service user token
+     * The service user token
      */
     ZITADEL_SERVICE_USER_TOKEN: string;
 
@@ -35,5 +23,11 @@ declare namespace NodeJS {
      * Optional: wheter a user must have verified email
      */
     EMAIL_VERIFICATION: string;
+
+    /**
+     * Optional: custom request headers to be added to every request
+     * Split by comma, key value pairs separated by colon
+     */
+    CUSTOM_REQUEST_HEADERS: string;
   }
 }
