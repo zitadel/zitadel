@@ -33,23 +33,23 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   @ViewChild(MatTable) public table!: MatTable<AuthFactor>;
   @ViewChild(MatSort) public sort!: MatSort;
   @Input() public phoneVerified: boolean = false;
+  public AuthFactorState: any = AuthFactorState;
   public dataSource: MatTableDataSource<AuthFactor> = new MatTableDataSource<AuthFactor>([]);
 
-  public AuthFactorState: any = AuthFactorState;
+  protected error: string = '';
 
-  public error: string = '';
-  public otpAvailable$ = new BehaviorSubject<boolean>(false);
-  public u2fAvailable$ = new BehaviorSubject<boolean>(false);
-  public otpSmsAvailable$ = new BehaviorSubject<boolean>(false);
-  public otpEmailAvailable$ = new BehaviorSubject<boolean>(false);
-  public otpDisabled$ = new BehaviorSubject<boolean>(true);
-  public otpSmsDisabled$ = new BehaviorSubject<boolean>(true);
-  public otpEmailDisabled$ = new BehaviorSubject<boolean>(true);
+  protected otpAvailable$ = new BehaviorSubject<boolean>(false);
+  protected u2fAvailable$ = new BehaviorSubject<boolean>(false);
+  protected otpSmsAvailable$ = new BehaviorSubject<boolean>(false);
+  protected otpEmailAvailable$ = new BehaviorSubject<boolean>(false);
+  protected otpDisabled$ = new BehaviorSubject<boolean>(true);
+  protected otpSmsDisabled$ = new BehaviorSubject<boolean>(true);
+  protected otpEmailDisabled$ = new BehaviorSubject<boolean>(true);
 
   constructor(
-    private service: NewAuthService,
-    private toast: ToastService,
-    private dialog: MatDialog,
+    private readonly service: NewAuthService,
+    private readonly toast: ToastService,
+    private readonly dialog: MatDialog,
   ) {}
 
   public ngOnInit(): void {

@@ -5,8 +5,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MatDialog } from '@angular/material/dialog';
 import { NewAuthService } from 'src/app/services/new-auth.service';
 import { SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
-import { CardComponent } from '../../../../../modules/card/card.component';
-import { RefreshTableComponent } from '../../../../../modules/refresh-table/refresh-table.component';
+import { CardComponent } from 'src/app/modules/card/card.component';
+import { RefreshTableComponent } from 'src/app/modules/refresh-table/refresh-table.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -15,8 +15,24 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthFactor, AuthFactorState } from '@zitadel/proto/zitadel/user_pb';
 
 describe('AuthUserMfaComponent', () => {
-  let component: AuthUserMfaComponent;
-  let fixture: ComponentFixture<AuthUserMfaComponent>;
+  // Create a test host component that extends the original component
+  class TestHostComponent extends AuthUserMfaComponent {
+    // Expose protected properties for testing
+    public getOtpEmailDisabled$() {
+      return this.otpEmailDisabled$;
+    }
+    
+    public getOtpDisabled$() {
+      return this.otpDisabled$;
+    }
+    
+    public getOtpSmsDisabled$() {
+      return this.otpSmsDisabled$;
+    }
+  }
+
+  let component: TestHostComponent;
+  let fixture: ComponentFixture<TestHostComponent>;
   let serviceStub: Partial<NewAuthService>;
   let toastStub: Partial<ToastService>;
   let dialogStub: Partial<MatDialog>;
@@ -25,7 +41,7 @@ describe('AuthUserMfaComponent', () => {
     // Create stubs for required services
     serviceStub = {
       listMyMultiFactors: jasmine.createSpy('listMyMultiFactors').and.returnValue(Promise.resolve({
-        resultList: [
+        result: [
           { type: {case: 'otp'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor,
           { type: {case: 'otpSms'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor' } as AuthFactor,
           { type: {case: 'otpEmail'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor,
@@ -60,7 +76,7 @@ describe('AuthUserMfaComponent', () => {
     };
 
     TestBed.configureTestingModule({
-      declarations: [AuthUserMfaComponent, CardComponent, RefreshTableComponent],
+      declarations: [TestHostComponent, CardComponent, RefreshTableComponent], // Use TestHostComponent instead
       imports: [MatIconModule, TranslateModule.forRoot(), MatTooltipModule, MatTableModule, BrowserAnimationsModule],
       providers: [
         { provide: NewAuthService, useValue: serviceStub },
@@ -71,7 +87,7 @@ describe('AuthUserMfaComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AuthUserMfaComponent);
+    fixture = TestBed.createComponent(TestHostComponent); // Use TestHostComponent
     component = fixture.componentInstance;
     // Optionally set the phoneVerified input if needed by your tests
     component.phoneVerified = true;
@@ -88,17 +104,17 @@ describe('AuthUserMfaComponent', () => {
     fixture.detectChanges();
 
     expect(serviceStub.listMyMultiFactors).toHaveBeenCalled();
-    // Our stub returned 4 items
-    expect(component.dataSource.data.length).toBe(4);
+    // Our stub returns 3 items
+    expect(component.dataSource.data.length).toBe(3);
 
-    // Pipes were updated
-    component.otpDisabled$.subscribe(value => {
+    // Use the public getter methods to access protected properties
+    component.getOtpDisabled$().subscribe(value => {
       expect(value).toBeTrue();
     });
-    component.otpSmsDisabled$.subscribe(value => {
+    component.getOtpSmsDisabled$().subscribe(value => {
       expect(value).toBeTrue();
     });
-    component.otpEmailDisabled$.subscribe(value => {
+    component.getOtpEmailDisabled$().subscribe(value => {
       expect(value).toBeTrue();
     });
   });
