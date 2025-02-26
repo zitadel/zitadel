@@ -22,7 +22,7 @@ const (
 )
 
 // SynchronizeRolePermission checks the current state of role permissions in the eventstore for the aggregate.
-// It pushed the commands required to reach the desired state passed in target.
+// It pushes the commands required to reach the desired state passed in target.
 // For system level permissions aggregateID must be set to `SYSTEM`, else it is the instance ID.
 //
 // In case cockroachDB is used, the commands are pushed in chunks of CockroachRollPermissionChunkSize.
