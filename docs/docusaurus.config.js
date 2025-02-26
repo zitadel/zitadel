@@ -201,28 +201,6 @@ module.exports = {
       runmeLinkLabel: 'Checkout via Runme'
     },
   },
-  webpack: {
-    jsLoader: (isServer) => ({
-      loader: require.resolve('swc-loader'),
-      options: {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          transform: {
-            react: {
-              runtime: 'automatic',
-            },
-          },
-          target: 'es2017',
-        },
-        module: {
-          type: isServer ? 'commonjs' : 'es6',
-        },
-      },
-    }),
-  },
   presets: [
     [
       "classic",
@@ -234,8 +212,7 @@ module.exports = {
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
-          remarkPlugins: [require("mdx-mermaid")],
-          
+          remarkPlugins: [require("mdx-mermaid")],          
           docItemComponent:  '@theme/ApiItem'
         },
         theme: {
@@ -380,5 +357,18 @@ module.exports = {
       };
     },
   ],
-  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  markdown: {
+    mermaid: true,
+  },
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs", "@docusaurus/theme-mermaid"],
+  future: {
+    experimental_faster: {
+      swcJsLoader: false,
+      swcJsMinimizer: false,
+      swcHtmlMinimizer: false,
+      lightningCssMinimizer: false,
+      rspackBundler: true,
+      mdxCrossCompilerCache: false,
+    },
+  },
 };
