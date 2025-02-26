@@ -837,6 +837,7 @@ func TestCommands_updateSession(t *testing.T) {
 								nil,
 								nil,
 								"idpID",
+								nil,
 							),
 						),
 						eventFromEventPusher(

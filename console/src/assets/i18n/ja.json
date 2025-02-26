@@ -2225,7 +2225,9 @@
       "REMOVED": "正常に削除されました。"
     },
     "ISIDTOKENMAPPING": "IDトークンからのマッピング",
-    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。",
+    "USEPKCE": "PKCEを使用する",
+    "USEPKCE_DESC": "code_challenge パラメータと code_challenge_method パラメータが認証リクエストに含まれるかどうかを決定します。"
   },
   "MFA": {
     "LIST": {

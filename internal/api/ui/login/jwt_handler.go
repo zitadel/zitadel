@@ -81,7 +81,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	session := &jwt.Session{Provider: provider, Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{IDToken: token, Token: &oauth2.Token{}}}
+	session := jwt.NewSession(provider, &oidc.Tokens[*oidc.IDTokenClaims]{IDToken: token, Token: &oauth2.Token{}})
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
 		if _, _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), tokens(session), authReq, r, user, err); actionErr != nil {
