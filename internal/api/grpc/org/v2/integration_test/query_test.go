@@ -26,6 +26,16 @@ type orgAttr struct {
 	Details *object.Details
 }
 
+func createOrganization(ctx context.Context, name string) orgAttr {
+	orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
+	orgResp.Details.CreationDate = orgResp.Details.ChangeDate
+	return orgAttr{
+		ID:      orgResp.GetOrganizationId(),
+		Name:    name,
+		Details: orgResp.GetDetails(),
+	}
+}
+
 func TestServer_ListOrganizations(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -63,6 +73,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						State:         org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -85,12 +96,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 					prefix := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
 					for i := 0; i < count; i++ {
 						name := prefix + strconv.Itoa(i)
-						orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
-						orgs[i] = orgAttr{
-							ID:      orgResp.GetOrganizationId(),
-							Name:    name,
-							Details: orgResp.GetDetails(),
-						}
+						orgs[i] = createOrganization(ctx, name)
 					}
 					request.Queries = []*org.SearchQuery{
 						OrganizationNamePrefixQuery(prefix),
@@ -140,6 +146,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -172,6 +179,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -204,6 +212,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -221,14 +230,9 @@ func TestServer_ListOrganizations(t *testing.T) {
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					orgs := make([]orgAttr, 1)
 					name := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
-					orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
-					orgs[0] = orgAttr{
-						ID:      orgResp.GetOrganizationId(),
-						Name:    name,
-						Details: orgResp.GetDetails(),
-					}
+					orgs[0] = createOrganization(ctx, name)
 					domain := gofakeit.DomainName()
-					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgResp.GetOrganizationId()), &management.AddOrgDomainRequest{
+					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgs[0].ID), &management.AddOrgDomainRequest{
 						Domain: domain,
 					})
 					if err != nil {
@@ -262,18 +266,19 @@ func TestServer_ListOrganizations(t *testing.T) {
 				},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					name := gofakeit.Name()
-					orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
-					deactivateOrgResp := Instance.DeactivateOrganization(ctx, orgResp.GetOrganizationId())
+					orgResp := createOrganization(ctx, name)
+					deactivateOrgResp := Instance.DeactivateOrganization(ctx, orgResp.ID)
 					request.Queries = []*org.SearchQuery{
-						OrganizationIdQuery(orgResp.GetOrganizationId()),
+						OrganizationIdQuery(orgResp.ID),
 						OrganizationStateQuery(org.OrganizationState_ORGANIZATION_STATE_INACTIVE),
 					}
 					return []orgAttr{{
-						ID:   orgResp.GetOrganizationId(),
+						ID:   orgResp.ID,
 						Name: name,
 						Details: &object.Details{
 							ResourceOwner: deactivateOrgResp.GetDetails().GetResourceOwner(),
 							Sequence:      deactivateOrgResp.GetDetails().GetSequence(),
+							CreationDate:  orgResp.Details.GetCreationDate(),
 							ChangeDate:    deactivateOrgResp.GetDetails().GetChangeDate(),
 						},
 					}}, nil
@@ -317,6 +322,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.ChangeDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -414,6 +420,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.ChangeDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
