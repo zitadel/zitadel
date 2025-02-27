@@ -40,7 +40,8 @@ var _ provider.AuthStorage = &Storage{}
 var _ provider.UserStorage = &Storage{}
 
 const (
-	LoginClientHeader = "x-zitadel-login-client"
+	LoginClientHeader        = "x-zitadel-login-client"
+	AttributeActionLogFormat = "urn:zitadel:iam:action:%s:log"
 )
 
 type Storage struct {
@@ -406,15 +407,17 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 	}
 	contextInfoResponse, ok := resp.(*ContextInfoResponse)
 	if ok && contextInfoResponse != nil {
-		claimLogs := make([]string, 0)
+		attributeLogs := make([]string, 0)
 		for _, metadata := range contextInfoResponse.SetUserMetadata {
 			if _, err = p.command.SetUserMetadata(ctx, metadata, user.ID, user.ResourceOwner); err != nil {
-				claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
+				attributeLogs = append(attributeLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
 			}
 		}
 		for _, attribute := range contextInfoResponse.AppendAttribute {
 			customAttributes = appendCustomAttribute(customAttributes, attribute.Name, attribute.NameFormat, attribute.Value)
-
+		}
+		if len(attributeLogs) > 0 {
+			customAttributes = appendCustomAttribute(customAttributes, fmt.Sprintf(AttributeActionLogFormat, function), "", attributeLogs)
 		}
 	}
 
