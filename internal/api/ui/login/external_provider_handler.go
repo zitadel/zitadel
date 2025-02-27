@@ -473,22 +473,25 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	// if a user was linked, we don't want to do any more renderings
+	var userLinked bool
 	// if action is done and no user linked then link or register
 	if zerrors.IsNotFound(externalErr) {
-		if !l.createOrLinkUser(w, r, authReq, provider, externalUser, externalUserChange) {
+		userLinked = l.createOrLinkUser(w, r, authReq, provider, externalUser, externalUserChange)
+		if !userLinked {
 			return
 		}
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
-		if err != nil {
+		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
 		}
 	}
 	if len(externalUser.Metadatas) > 0 {
 		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
-		if err != nil {
+		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
 		}
