@@ -518,6 +518,7 @@
     "ORG_PROJECT_CREATOR": "자신의 프로젝트와 하위 설정을 생성할 수 있는 권한이 있습니다",
     "ORG_ADMIN_IMPERSONATOR": "조직의 관리자 및 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "ORG_END_USER_IMPERSONATOR": "조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
+    "ORG_USER_SELF_MANAGER": "자신의 사용자 계정을 관리할 수 있는 권한이 있습니다",
     "PROJECT_OWNER": "프로젝트에 대한 전체 권한이 있습니다",
     "PROJECT_OWNER_VIEWER": "프로젝트 전체를 검토할 수 있는 권한이 있습니다",
     "PROJECT_OWNER_GLOBAL": "프로젝트에 대한 전체 권한이 있습니다",

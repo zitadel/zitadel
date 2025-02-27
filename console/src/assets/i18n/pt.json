@@ -518,6 +518,7 @@
     "ORG_PROJECT_CREATOR": "Tem permissão para criar seus próprios projetos e configurações subjacentes",
     "ORG_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais da organização",
     "ORG_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais da organização",
+    "ORG_USER_SELF_MANAGER": "Tem permissão para gerenciar seu próprio usuário",
     "PROJECT_OWNER": "Tem permissão sobre todo o projeto",
     "PROJECT_OWNER_VIEWER": "Tem permissão para revisar todo o projeto",
     "PROJECT_OWNER_GLOBAL": "Tem permissão sobre todo o projeto",
