@@ -13,11 +13,11 @@ func handleWebhook(
 	webhookConfig webhook.Config,
 	channels ChannelChains,
 	serializable interface{},
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 ) error {
 	message := &messages.JSON{
-		Serializable:    serializable,
-		TriggeringEvent: triggeringEvent,
+		Serializable:        serializable,
+		TriggeringEventType: triggeringEventType,
 	}
 	webhookChannels, err := channels.Webhook(ctx, webhookConfig)
 	if err != nil {
