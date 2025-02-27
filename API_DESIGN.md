@@ -222,19 +222,21 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-  "code": "user_missing_information",
-  "message": "missing required information for the creation of the user",
+  "code": "user_invalid_information",
+  "message": "invalid or missing information provided for the creation of the user",
   "details": [
     {
       "@type": "type.googleapis.com/google.rpc.BadRequest",
       "fieldViolations": [
         {
           "field": "given_name",
-          "description": "given name is required"
+          "description": "given name is required",
+          "reason": "MISSING_VALUE"
         },
         {
           "field": "family_name",
-          "description": "family name is required"
+          "description": "family name must not exceed 200 characters",
+          "reason": "INVALID_LENGTH"
         }
       ]
     }
@@ -246,23 +248,25 @@ gRPC / connectRPC example:
 ```
 HTTP/2.0 200 OK
 Content-Type: application/grpc
-Grpc-Message: missing required information for the creation of the user
+Grpc-Message: invalid information provided for the creation of the user
 Grpc-Status: 3
 
 {
-  "code": "user_missing_information",
-  "message": "missing required information for the creation of the user",
+  "code": "user_invalid_information",
+  "message": "invalid or missing information provided for the creation of the user",
   "details": [
     {
       "@type": "type.googleapis.com/google.rpc.BadRequest",
       "fieldViolations": [
         {
           "field": "given_name",
-          "description": "given name is required"
+          "description": "given name is required",
+          "reason": "MISSING_VALUE"
         },
         {
           "field": "family_name",
-          "description": "family name is required"
+          "description": "family name must not exceed 200 characters",
+          "reason": "INVALID_LENGTH"
         }
       ]
     }
@@ -292,7 +296,7 @@ Grpc-Status: 3
 //   - user.write
 //
 // Error Codes:
-//   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) for the creation of the user. Check error details for the missing fields.
+//   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) or contains invalid data for the creation of the user. Check error details for the missing or invalid fields.
 //   - user_already_exists: The user already exists. The username must be unique.
 //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
 //   - permission_denied: You do not have the required permissions to access the requested resource.
