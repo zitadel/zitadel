@@ -38,7 +38,6 @@ func InitChannel(config Config) channels.NotificationChannel {
 			// as it would be a waste of resources and could potentially result in a rate limit.
 			var twilioErr *twilioClient.TwilioRestError
 			if errors.As(err, &twilioErr) && twilioErr.Status >= 400 && twilioErr.Status < 500 {
-				// userID, notificationID := userAndNotificationIDsFromEvent(twilioMsg.)
 				logging.WithFields(
 					"error", twilioErr.Message,
 					"status", twilioErr.Status,
