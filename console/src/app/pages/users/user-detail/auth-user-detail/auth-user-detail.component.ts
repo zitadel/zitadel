@@ -46,13 +46,14 @@ import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
 import { UserService } from 'src/app/services/user.service';
 import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { query } from '@angular/animations';
+import { withLatestFromSynchronousFix } from '../../../../utils/withLatestFromSynchronousFix';
 
-type UserQuery = { state: 'success'; value: User } | { state: 'error'; value: string } | { state: 'loading'; value?: User };
+type UserQuery = { state: 'success'; value: User } | { state: 'error'; error: any } | { state: 'loading'; value?: User };
 
 type MetadataQuery =
   | { state: 'success'; value: Metadata[] }
   | { state: 'loading'; value: Metadata[] }
-  | { state: 'error'; value: string };
+  | { state: 'error'; error: any };
 
 type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: HumanUser } };
 
@@ -92,9 +93,9 @@ export class AuthUserDetailComponent implements OnInit {
   protected readonly userName$: Observable<string>;
 
   constructor(
-    public translate: TranslateService,
+    private translate: TranslateService,
     private toast: ToastService,
-    public grpcAuthService: GrpcAuthService,
+    protected grpcAuthService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
     private breadcrumbService: BreadcrumbService,
@@ -164,7 +165,7 @@ export class AuthUserDetailComponent implements OnInit {
     });
     this.user$.pipe(mergeWith(this.metadata$), takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
       if (query.state == 'error') {
-        this.toast.showError(query.value);
+        this.toast.showError(query.error);
       }
     });
 
@@ -206,16 +207,22 @@ export class AuthUserDetailComponent implements OnInit {
   private getMyUser(): Observable<UserQuery> {
     return defer(() => this.userService.getMyUser()).pipe(
       map((user) => ({ state: 'success' as const, value: user })),
-      catchError((error) => of({ state: 'error', value: error.message ?? '' } as const)),
+      catchError((error) => of({ state: 'error', error } as const)),
       startWith({ state: 'loading' } as const),
     );
   }
 
   getMetadata$(user$: Observable<UserQuery>): Observable<MetadataQuery> {
+    const isAllowed$ = this.grpcAuthService.isAllowed(['user.read']);
+
     return this.refreshMetadata$.pipe(
       startWith(true),
       combineLatestWith(user$),
-      switchMap(([_, user]) => {
+      withLatestFromSynchronousFix(isAllowed$),
+      switchMap(([[_, user], isAllowed]): Observable<MetadataQuery> => {
+        if (!isAllowed) {
+          return of({ state: 'success', value: [] });
+        }
         if (!(user.state === 'success' || user.state === 'loading')) {
           return EMPTY;
         }
@@ -238,7 +245,7 @@ export class AuthUserDetailComponent implements OnInit {
     return defer(() => this.newMgmtService.listUserMetadata(userId)).pipe(
       map((metadata) => ({ state: 'success', value: metadata.result }) as const),
       startWith({ state: 'loading', value: [] as Metadata[] } as const),
-      catchError((err) => of({ state: 'error', value: err.message ?? '' } as const)),
+      catchError((error) => of({ state: 'error', error } as const)),
     );
   }
 
