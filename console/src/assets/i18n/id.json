@@ -749,6 +749,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Nomor telepon",
       "PHONE_HINT": "Gunakan simbol + diikuti dengan kode negara pemanggil, atau pilih negara dari dropdown dan terakhir masukkan nomor telepon",
+      "PHONE_VERIFIED": "Nomor telepon terverifikasi",
+      "SEND_SMS": "Kirim SMS verifikasi",
+      "SEND_EMAIL": "Kirim E-mail",
       "USERNAME": "Nama belakang",
       "CHANGEUSERNAME": "memodifikasi",
       "CHANGEUSERNAME_TITLE": "Ubah nama pengguna",
@@ -877,6 +880,14 @@
       "4": "Terkunci",
       "5": "Tergantung",
       "6": "Awal"
+    },
+    "STATEV2": {
+      "0": "Tidak dikenal",
+      "1": "Aktif",
+      "2": "Tidak aktif",
+      "3": "Dihapus",
+      "4": "Terkunci",
+      "5": "Awal"
     },
     "SEARCH": {
       "ADDITIONAL": "Nama login (organisasi saat ini)",
@@ -1354,7 +1365,9 @@
         "ENABLED": "\"Diaktifkan\" diwariskan",
         "DISABLED": "\"Dinonaktifkan\" diwariskan"
       },
-      "RESET": "Tetapkan semua untuk diwarisi"
+      "RESET": "Tetapkan semua untuk diwarisi",
+      "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol untuk pembuatan pengguna",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal."
     },
     "DIALOG": {
       "RESET": {
@@ -1993,7 +2006,9 @@
       "REMOVED": "Berhasil dihapus."
     },
     "ISIDTOKENMAPPING": "Peta dari token ID",
-    "ISIDTOKENMAPPING_DESC": "Jika dipilih, informasi penyedia akan dipetakan dari token ID, bukan dari titik akhir info pengguna."
+    "ISIDTOKENMAPPING_DESC": "Jika dipilih, informasi penyedia akan dipetakan dari token ID, bukan dari titik akhir info pengguna.",
+    "USEPKCE": "Gunakan PKCE",
+    "USEPKCE_DESC": "Menentukan apakah parameter code_challenge dan code_challenge_method disertakan dalam permintaan autentikasi"
   },
   "MFA": {
     "LIST": {

@@ -809,6 +809,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefonní číslo",
       "PHONE_HINT": "Použijte symbol + následovaný mezinárodním kódem země, nebo ze seznamu vyberte zemi a nakonec zadejte telefonní číslo",
+      "PHONE_VERIFIED": "Telefonní číslo ověřeno",
+      "SEND_SMS": "Odeslat ověřovací SMS",
+      "SEND_EMAIL": "Odeslat E-mail",
       "USERNAME": "Uživatelské jméno",
       "CHANGEUSERNAME": "upravit",
       "CHANGEUSERNAME_TITLE": "Změna uživatelského jména",
@@ -948,6 +951,14 @@
       "4": "Uzamčený",
       "5": "Pozastavený",
       "6": "Počáteční"
+    },
+    "STATEV2": {
+      "0": "Neznámý",
+      "1": "Aktivní",
+      "2": "Neaktivní",
+      "3": "Smazaný",
+      "4": "Uzamčený",
+      "5": "Počáteční"
     },
     "SEARCH": {
       "ADDITIONAL": "Přihlašovací jméno (současná organizace)",
@@ -1486,7 +1497,9 @@
         "ENABLED": "„Povoleno“ je zděděno",
         "DISABLED": "„Zakázáno“ je zděděno"
       },
-      "RESET": "Nastavit vše na děděné"
+      "RESET": "Nastavit vše na děděné",
+      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro vytvoření uživatele",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu."
     },
     "DIALOG": {
       "RESET": {
@@ -2200,7 +2213,9 @@
       "REMOVED": "Úspěšně odebráno."
     },
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
-    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo."
+    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
+    "USEPKCE": "Použijte PKCE",
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
   },
   "MFA": {
     "LIST": {

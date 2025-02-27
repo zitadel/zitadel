@@ -1,10 +1,10 @@
-<div class="contact-method-col" *ngIf="human">
+<div class="contact-method-col">
   <div class="contact-method-row">
     <div class="left">
       <span class="label cnsl-secondary-text">{{ 'USER.EMAIL' | translate }}</span>
       <span class="name">{{ human.email?.email }}</span>
-      <span *ngIf="human.email?.isEmailVerified" class="contact-state verified">{{ 'USER.EMAILVERIFIED' | translate }}</span>
-      <div *ngIf="!human.email?.isEmailVerified" class="block">
+      <span *ngIf="isEmailVerified" class="contact-state verified">{{ 'USER.EMAILVERIFIED' | translate }}</span>
+      <div *ngIf="!isEmailVerified" class="block">
         <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>
 
         <ng-container *ngIf="human.email">
@@ -37,8 +37,8 @@
     <div class="left">
       <span class="label cnsl-secondary-text">{{ 'USER.PHONE' | translate }}</span>
       <cnsl-phone-detail [phone]="human.phone?.phone"></cnsl-phone-detail>
-      <span *ngIf="human.phone?.isPhoneVerified" class="contact-state verified">{{ 'USER.PHONEVERIFIED' | translate }}</span>
-      <div *ngIf="human.phone?.phone && !human.phone?.isPhoneVerified" class="block">
+      <span *ngIf="isPhoneVerified" class="contact-state verified">{{ 'USER.PHONEVERIFIED' | translate }}</span>
+      <div *ngIf="human.phone?.phone && !isPhoneVerified" class="block">
         <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>
 
         <ng-container *ngIf="human.phone?.phone">
