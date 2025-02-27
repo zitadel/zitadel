@@ -511,6 +511,7 @@
     "ORG_OWNER": "Ma uprawnienie nad całą organizacją",
     "ORG_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami organizacji",
     "ORG_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej organizacji",
+    "ORG_SETTINGS_MANAGER": "Ma uprawnienie do zarządzania ustawieniami organizacji",
     "ORG_USER_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami użytkowników",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami projektu",
     "ORG_PROJECT_CREATOR": "Ma uprawnienie do tworzenia własnych projektów i podstawowych ustawień",
