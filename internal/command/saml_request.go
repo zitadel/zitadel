@@ -22,7 +22,6 @@ type SAMLRequest struct {
 	Binding       string
 	Issuer        string
 	Destination   string
-	EntityID      string
 }
 
 type CurrentSAMLRequest struct {

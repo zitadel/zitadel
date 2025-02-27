@@ -412,62 +412,64 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		}
 	}
 
-	function := ""
+	var function string
 	switch triggerType {
 	case domain.TriggerTypePreUserinfoCreation:
 		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreUserinfo.LocalizationKey())
 	case domain.TriggerTypePreAccessTokenCreation:
 		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreAccessToken.LocalizationKey())
 	case domain.TriggerTypeUnspecified, domain.TriggerTypePostAuthentication, domain.TriggerTypePreCreation, domain.TriggerTypePostCreation, domain.TriggerTypePreSAMLResponseCreation:
-		fallthrough
-	default:
-		function = ""
+		// added for linting, there should never be any trigger type be used here besides PreUserinfo and PreAccessToken
+		return
 	}
 
-	if function != "" {
-		executionTargets, err := queryExecutionTargets(ctx, s.query, function)
-		if err != nil {
-			return err
-		}
-		info := &ContextInfo{
-			Function:     function,
-			UserInfo:     userInfo,
-			User:         qu.User,
-			UserMetadata: qu.Metadata,
-			Org:          qu.Org,
-			UserGrants:   qu.UserGrants,
-		}
+	if function == "" {
+		return nil
+	}
+	executionTargets, err := execution.QueryExecutionTargetsForFunction(ctx, s.query, function)
+	if err != nil {
+		return err
+	}
+	info := &ContextInfo{
+		Function:     function,
+		UserInfo:     userInfo,
+		User:         qu.User,
+		UserMetadata: qu.Metadata,
+		Org:          qu.Org,
+		UserGrants:   qu.UserGrants,
+	}
 
-		resp, err := execution.CallTargets(ctx, executionTargets, info)
-		if err != nil {
-			return err
-		}
-		contextInfoResponse, ok := resp.(*ContextInfoResponse)
-		if ok && contextInfoResponse != nil {
-			claimLogs := make([]string, 0)
-			for _, metadata := range contextInfoResponse.SetUserMetadata {
-				if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
-					claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
-				}
-			}
-			for _, claim := range contextInfoResponse.AppendClaims {
-				if strings.HasPrefix(claim.Key, ClaimPrefix) {
-					continue
-				}
-				if userInfo.Claims[claim.Key] == nil {
-					userInfo.AppendClaims(claim.Key, claim.Value)
-					continue
-				}
-				claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", claim.Key))
-			}
-			for _, log := range contextInfoResponse.AppendLogClaims {
-				claimLogs = append(claimLogs, log)
-			}
-			if len(claimLogs) > 0 {
-				userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, function), claimLogs)
-			}
+	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	if err != nil {
+		return err
+	}
+	contextInfoResponse, ok := resp.(*ContextInfoResponse)
+	if !ok || contextInfoResponse == nil {
+		return nil
+	}
+	claimLogs := make([]string, 0)
+	for _, metadata := range contextInfoResponse.SetUserMetadata {
+		if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+			claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
 		}
 	}
+	for _, claim := range contextInfoResponse.AppendClaims {
+		if strings.HasPrefix(claim.Key, ClaimPrefix) {
+			continue
+		}
+		if userInfo.Claims[claim.Key] == nil {
+			userInfo.AppendClaims(claim.Key, claim.Value)
+			continue
+		}
+		claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", claim.Key))
+	}
+	for _, log := range contextInfoResponse.AppendLogClaims {
+		claimLogs = append(claimLogs, log)
+	}
+	if len(claimLogs) > 0 {
+		userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, function), claimLogs)
+	}
+
 	return nil
 }
 
@@ -510,32 +512,6 @@ func (c *ContextInfo) SetHTTPResponseBody(resp []byte) error {
 	return json.Unmarshal(resp, c.Response)
 }
 
-func (c *ContextInfo) GetContent() interface{} {
+func (c *ContextInfo) GetContent() any {
 	return c.Response
-}
-
-func queryExecutionTargets(ctx context.Context, query *query.Queries, function string) ([]execution.Target, error) {
-	queriedActionsV2, err := query.TargetsByExecutionID(ctx, []string{function})
-	if err != nil {
-		return nil, err
-	}
-	executionTargets := make([]execution.Target, len(queriedActionsV2))
-	for i, action := range queriedActionsV2 {
-		executionTargets[i] = action
-	}
-	return executionTargets, nil
-}
-
-func (s *Server) queryOrgMetadata(ctx context.Context, organizationID string) ([]*query.OrgMetadata, error) {
-	metadata, err := s.query.SearchOrgMetadata(
-		ctx,
-		true,
-		organizationID,
-		&query.OrgMetadataSearchQueries{},
-		false,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return metadata.Metadata, nil
 }

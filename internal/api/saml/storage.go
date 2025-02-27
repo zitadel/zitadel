@@ -385,7 +385,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 	}
 
 	function := exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreSAMLResponse.LocalizationKey())
-	executionTargets, err := queryExecutionTargets(ctx, p.query, function)
+	executionTargets, err := execution.QueryExecutionTargetsForFunction(ctx, p.query, function)
 	if err != nil {
 		return nil, err
 	}
@@ -459,18 +459,6 @@ func (c *ContextInfo) SetHTTPResponseBody(resp []byte) error {
 
 func (c *ContextInfo) GetContent() interface{} {
 	return c.Response
-}
-
-func queryExecutionTargets(ctx context.Context, query *query.Queries, function string) ([]execution.Target, error) {
-	queriedActionsV2, err := query.TargetsByExecutionID(ctx, []string{function})
-	if err != nil {
-		return nil, err
-	}
-	executionTargets := make([]execution.Target, len(queriedActionsV2))
-	for i, action := range queriedActionsV2 {
-		executionTargets[i] = action
-	}
-	return executionTargets, nil
 }
 
 func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (*query.UserGrants, error) {
