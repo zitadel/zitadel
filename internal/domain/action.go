@@ -73,6 +73,8 @@ func (s ActionFunction) LocalizationKey() string {
 		return "preaccesstoken"
 	case ActionFunctionPreSAMLResponse:
 		return "presamlresponse"
+	case ActionFunctionUnspecified, actionFunctionCount:
+		fallthrough
 	default:
 		return "unspecified"
 	}

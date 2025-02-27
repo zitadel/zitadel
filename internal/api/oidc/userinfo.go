@@ -420,7 +420,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreAccessToken.LocalizationKey())
 	case domain.TriggerTypeUnspecified, domain.TriggerTypePostAuthentication, domain.TriggerTypePreCreation, domain.TriggerTypePostCreation, domain.TriggerTypePreSAMLResponseCreation:
 		// added for linting, there should never be any trigger type be used here besides PreUserinfo and PreAccessToken
-		return
+		return err
 	}
 
 	if function == "" {
@@ -463,9 +463,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		}
 		claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", claim.Key))
 	}
-	for _, log := range contextInfoResponse.AppendLogClaims {
-		claimLogs = append(claimLogs, log)
-	}
+	claimLogs = append(claimLogs, contextInfoResponse.AppendLogClaims...)
 	if len(claimLogs) > 0 {
 		userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, function), claimLogs)
 	}
