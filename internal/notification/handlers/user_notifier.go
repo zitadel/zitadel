@@ -101,17 +101,17 @@ func NewUserNotifier(
 	queries *NotificationQueries,
 	channels types.ChannelChains,
 	otpEmailTmpl string,
-	legacyMode bool,
+	workerConfig WorkerConfig,
 	queue Queue,
 ) *handler.Handler {
-	if legacyMode {
+	if workerConfig.LegacyEnabled {
 		return NewUserNotifierLegacy(ctx, config, commands, queries, channels, otpEmailTmpl)
 	}
 	return handler.NewHandler(ctx, &config, &userNotifier{
 		queries:      queries,
 		otpEmailTmpl: otpEmailTmpl,
 		queue:        queue,
-		maxAttempts:  config.MaxFailureCount,
+		maxAttempts:  workerConfig.MaxAttempts,
 	})
 }
 

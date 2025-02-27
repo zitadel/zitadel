@@ -56,6 +56,7 @@ func generateSms(
 			TriggeringEventType:  triggeringEventType,
 			InstanceID:           instanceID,
 			JobID:                jobID,
+			UserID:               user.ID,
 		}
 		err = smsChannels.HandleMessage(message)
 		if err != nil {

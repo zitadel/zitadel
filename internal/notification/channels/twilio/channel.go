@@ -45,6 +45,7 @@ func InitChannel(config Config) channels.NotificationChannel {
 					"code", twilioErr.Code,
 					"instanceID", twilioMsg.InstanceID,
 					"jobID", twilioMsg.JobID,
+					"userID", twilioMsg.UserID,
 				).Warn("twilio create verification error")
 				return channels.NewCancelError(twilioErr)
 			}

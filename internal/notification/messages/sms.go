@@ -17,6 +17,7 @@ type SMS struct {
 	VerificationID *string
 	InstanceID     string
 	JobID          string
+	UserID         string
 }
 
 func (msg *SMS) GetContent() (string, error) {

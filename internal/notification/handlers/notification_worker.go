@@ -85,7 +85,7 @@ type WorkerConfig struct {
 	Workers             uint8
 	TransactionDuration time.Duration
 	MaxTtl              time.Duration
-	RetryDelayFactor    float32
+	MaxAttempts         uint8
 }
 
 // nowFunc makes [time.Now] mockable
@@ -111,10 +111,6 @@ func NewNotificationWorker(
 	channels types.ChannelChains,
 	queue *queue.Queue,
 ) *NotificationWorker {
-	// make sure the delay does not get less
-	if config.RetryDelayFactor < 1 {
-		config.RetryDelayFactor = 1
-	}
 	w := &NotificationWorker{
 		config:   config,
 		commands: commands,

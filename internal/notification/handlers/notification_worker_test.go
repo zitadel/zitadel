@@ -164,6 +164,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					TriggeringEventType:  session.OTPSMSChallengedType,
 					InstanceID:           instanceID,
 					JobID:                "1",
+					UserID:               userID,
 				}
 				codeAlg, code := cryptoValue(t, ctrl, testCode)
 				expectTemplateWithNotifyUserQueriesSMS(queries)
@@ -470,7 +471,6 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			Workers:             1,
 			TransactionDuration: 5 * time.Second,
 			MaxTtl:              5 * time.Minute,
-			RetryDelayFactor:    2,
 		},
 		now: f.now,
 	}
