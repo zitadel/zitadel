@@ -328,7 +328,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idpUser, idpSession, err := h.fetchIDPUserFromCode(ctx, provider, data.Code, data.User)
+	idpUser, idpSession, err := h.fetchIDPUserFromCode(ctx, provider, data.Code, data.User, intent.IDPArguments)
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -410,23 +410,23 @@ func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDP
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
-func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp.Provider, code string, appleUser string) (user idp.User, idpTokens idp.Session, err error) {
+func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp.Provider, code string, appleUser string, idpArguments map[string]any) (user idp.User, idpTokens idp.Session, err error) {
 	var session idp.Session
 	switch provider := identityProvider.(type) {
 	case *oauth.Provider:
-		session = &oauth.Session{Provider: provider, Code: code}
+		session = oauth.NewSession(provider, code, idpArguments)
 	case *openid.Provider:
-		session = &openid.Session{Provider: provider, Code: code}
+		session = openid.NewSession(provider, code, idpArguments)
 	case *azuread.Provider:
-		session = &azuread.Session{Provider: provider, Code: code}
+		session = azuread.NewSession(provider, code)
 	case *github.Provider:
-		session = &oauth.Session{Provider: provider.Provider, Code: code}
+		session = oauth.NewSession(provider.Provider, code, idpArguments)
 	case *gitlab.Provider:
-		session = &openid.Session{Provider: provider.Provider, Code: code}
+		session = openid.NewSession(provider.Provider, code, idpArguments)
 	case *google.Provider:
-		session = &openid.Session{Provider: provider.Provider, Code: code}
+		session = openid.NewSession(provider.Provider, code, idpArguments)
 	case *apple.Provider:
-		session = &apple.Session{Session: &openid.Session{Provider: provider.Provider, Code: code}, UserFormValue: appleUser}
+		session = apple.NewSession(provider, code, appleUser)
 	case *jwt.Provider, *ldap.Provider, *saml2.Provider:
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	default:

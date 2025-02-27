@@ -2206,7 +2206,9 @@
       "REMOVED": "Suppression réussie."
     },
     "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
-    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo."
+    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo.",
+    "USEPKCE": "Utiliser PKCE",
+    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification"
   },
   "MFA": {
     "LIST": {

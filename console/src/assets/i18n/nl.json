@@ -2221,7 +2221,9 @@
       "REMOVED": "Succesvol verwijderd."
     },
     "ISIDTOKENMAPPING": "Kaart van de ID token",
-    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt."
+    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
+    "USEPKCE": "Gebruik PKCE",
+    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
   },
   "MFA": {
     "LIST": {

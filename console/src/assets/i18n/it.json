@@ -2206,7 +2206,9 @@
       "REMOVED": "Rimosso con successo."
     },
     "ISIDTOKENMAPPING": "Mappatura dal token ID",
-    "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo."
+    "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo.",
+    "USEPKCE": "Usa PKCE",
+    "USEPKCE_DESC": "Determina se i parametri code_challenge e code_challenge_method sono inclusi nella richiesta di autenticazione"
   },
   "MFA": {
     "LIST": {

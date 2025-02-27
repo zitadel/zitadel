@@ -2205,7 +2205,9 @@
       "REMOVED": "Erfolgreich entfernt."
     },
     "ISIDTOKENMAPPING": "Zuordnung vom ID-Token",
-    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints."
+    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints.",
+    "USEPKCE": "Verwenden Sie PKCE",
+    "USEPKCE_DESC": "Bestimmt, ob die Parameter code_challenge und code_challenge_method in der Authentifizierungsanforderung enthalten sind"
   },
   "MFA": {
     "LIST": {
