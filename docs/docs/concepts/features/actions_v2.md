@@ -11,7 +11,8 @@ We're working on Actions continuously. In the [roadmap](https://zitadel.com/road
 :::
 
 :::warning
-To use Actions v2 activate the feature flag "Actions" [feature flag](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features, to be able to manage the related resources.
+To use Actions v2 activate the feature flag "Actions" [feature flag](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features), to be able to manage the related resources.
+
 The Actions v2 will always be executed if available, even if the feature flag is switched off, to remove any Actions v2 the related Execution has to be removed.
 :::
 
