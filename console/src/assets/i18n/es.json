@@ -512,6 +512,7 @@
     "ORG_OWNER": "Tiene permisos sobre toda la organización",
     "ORG_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios de la organización",
     "ORG_OWNER_VIEWER": "TIene permiso para revisar toda la organización",
+    "ORG_SETTINGS_MANAGER": "Tiene permiso para gestionar las configuraciones de la organización",
     "ORG_USER_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de usuario",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de proyecto",
     "ORG_PROJECT_CREATOR": "Tiene permiso para crear sus propios proyectos y ajustes subyacentes",

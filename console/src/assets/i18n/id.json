@@ -479,6 +479,7 @@
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
+    "ORG_SETTINGS_MANAGER": "Memiliki izin untuk mengelola pengaturan organisasi",
     "ORG_USER_PERMISSION_EDITOR": "Memiliki izin untuk mengelola izin pengguna",
     "ORG_PROJECT_PERMISSION_EDITOR": "Memiliki izin untuk mengelola hibah proyek",
     "ORG_PROJECT_CREATOR": "Memiliki izin untuk membuat proyeknya sendiri dan pengaturan yang mendasarinya",
