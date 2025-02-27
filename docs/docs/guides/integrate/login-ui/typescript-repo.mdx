@@ -11,7 +11,6 @@ The typescript repository contains all TypeScript and JavaScript packages and ap
 - **[login](./typescript-repo#new-login-ui)**: The future login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/proto`: Typescript implementation of Protocol Buffers, suitable for web browsers and Node.js.
 - `@zitadel/client`: Core components for establishing a client connection
-- `@zitadel/node`: Core components for establishing a server connection
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
 
@@ -130,7 +129,6 @@ To register your login domain on your instance, [add](/docs/apis/resources/admin
 When setting up the new login app for OIDC, ensure it meets the following requirements:
 
 - The OIDC Proxy is deployed and running on HTTPS
-- The OIDC Proxy sets `x-zitadel-login-client` which is the user ID of the service account
 - The OIDC Proxy sets `x-zitadel-public-host` which is the host, your login is deployed to `ex. login.example.com`.
 - The OIDC Proxy sets `x-zitadel-instance-host` which is the host of your instance `ex. test-hdujwl.zitadel.cloud`.
 
@@ -138,11 +136,10 @@ You can review an example implementation of a middlware [here](https://github.co
 
 #### Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_OWNER%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
 
 To deploy your own version on Vercel, navigate to your instance and create a service user.
-Copy its id from the overview and set it as `ZITADEL_SERVICE_USER_ID`.
-Then create a personal access token (PAT), copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_OWNER` permissions.
+Create a personal access token (PAT) for the user and copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_LOGIN_CLIENT` permissions.
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
 Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain).
 

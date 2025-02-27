@@ -512,11 +512,13 @@
     "ORG_OWNER": "Tem permissão sobre toda a organização",
     "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
+    "ORG_SETTINGS_MANAGER": "Tem permissão para gerenciar as configurações da organização",
     "ORG_USER_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de usuários",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de projetos",
     "ORG_PROJECT_CREATOR": "Tem permissão para criar seus próprios projetos e configurações subjacentes",
     "ORG_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais da organização",
     "ORG_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais da organização",
+    "ORG_USER_SELF_MANAGER": "Tem permissão para gerenciar seu próprio usuário",
     "PROJECT_OWNER": "Tem permissão sobre todo o projeto",
     "PROJECT_OWNER_VIEWER": "Tem permissão para revisar todo o projeto",
     "PROJECT_OWNER_GLOBAL": "Tem permissão sobre todo o projeto",
@@ -809,6 +811,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Número de Telefone",
       "PHONE_HINT": "Use o símbolo + seguido do código de chamada do país, ou selecione o país na lista suspensa e, em seguida, insira o número de telefone",
+      "PHONE_VERIFIED": "Número de telefone verificado",
+      "SEND_SMS": "Enviar SMS de verificação",
+      "SEND_EMAIL": "Enviar E-mail",
       "USERNAME": "Nome de Usuário",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Alterar nome de usuário",
@@ -948,6 +953,14 @@
       "4": "Bloqueado",
       "5": "Suspenso",
       "6": "Inicial"
+    },
+    "STATEV2": {
+      "0": "Desconhecido",
+      "1": "Ativo",
+      "2": "Inativo",
+      "3": "Excluído",
+      "4": "Bloqueado",
+      "5": "Inicial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nome de usuário (organização atual)",
@@ -1487,7 +1500,9 @@
         "ENABLED": "\"Habilitado\" é herdado",
         "DISABLED": "\"Desabilitado\" é herdado"
       },
-      "RESET": "Definir tudo para herdar"
+      "RESET": "Definir tudo para herdar",
+      "CONSOLEUSEV2USERAPI": "Use a API V2 no console para criação de usuários",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial."
     },
     "DIALOG": {
       "RESET": {
@@ -2187,7 +2202,9 @@
       "REMOVED": "Removido com sucesso."
     },
     "ISIDTOKENMAPPING": "Mapeamento do token ID",
-    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo."
+    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo.",
+    "USEPKCE": "Usar PKCE",
+    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação"
   },
   "MFA": {
     "LIST": {

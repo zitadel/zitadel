@@ -1,55 +1,77 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Component, DestroyRef, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { combineLatestWith, distinctUntilChanged, ReplaySubject } from 'rxjs';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import { AccessTokenType, Human, Machine } from 'src/app/proto/generated/zitadel/user_pb';
+import { AccessTokenType, MachineUser } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { startWith } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'cnsl-detail-form-machine',
   templateUrl: './detail-form-machine.component.html',
   styleUrls: ['./detail-form-machine.component.scss'],
 })
-export class DetailFormMachineComponent implements OnInit, OnDestroy {
-  @Input() public username!: string;
-  @Input() public user!: Human.AsObject | Machine.AsObject;
-  @Input() public disabled: boolean = false;
-  @Output() public submitData: EventEmitter<any> = new EventEmitter<any>();
+export class DetailFormMachineComponent {
+  @Input({ required: true }) public set username(username: string) {
+    this.username$.next(username);
+  }
+  @Input({ required: true }) public set user(user: MachineUser) {
+    this.user$.next(user);
+  }
+  @Input() public set disabled(disabled: boolean) {
+    this.disabled$.next(disabled);
+  }
 
-  public machineForm!: UntypedFormGroup;
+  private username$ = new ReplaySubject<string>(1);
+  private user$ = new ReplaySubject<MachineUser>(1);
+  private disabled$ = new ReplaySubject<boolean>(1);
 
-  public accessTokenTypes: AccessTokenType[] = [
-    AccessTokenType.ACCESS_TOKEN_TYPE_BEARER,
-    AccessTokenType.ACCESS_TOKEN_TYPE_JWT,
-  ];
+  public machineForm: ReturnType<typeof this.buildForm>;
 
-  private sub: Subscription = new Subscription();
+  @Output() public submitData = new EventEmitter<ReturnType<(typeof this.machineForm)['getRawValue']>>();
 
-  constructor(private fb: UntypedFormBuilder) {
-    this.machineForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [requiredValidator]],
-      name: [{ value: '', disabled: this.disabled }, requiredValidator],
-      description: [{ value: '', disabled: this.disabled }],
-      accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, [requiredValidator]],
+  public accessTokenTypes: AccessTokenType[] = [AccessTokenType.BEARER, AccessTokenType.JWT];
+
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly destroyRef: DestroyRef,
+  ) {
+    this.machineForm = this.buildForm();
+  }
+
+  private buildForm() {
+    const form = this.fb.group({
+      username: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      name: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      description: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      accessTokenType: new FormControl(AccessTokenType.BEARER, { nonNullable: true, validators: [requiredValidator] }),
     });
+
+    form.controls.username.disable();
+    this.disabled$
+      .pipe(startWith(false), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((disabled) => {
+        this.toggleFormControl(form.controls.name, disabled);
+        this.toggleFormControl(form.controls.description, disabled);
+        this.toggleFormControl(form.controls.accessTokenType, disabled);
+      });
+
+    this.username$.pipe(combineLatestWith(this.user$), takeUntilDestroyed(this.destroyRef)).subscribe(([username, user]) => {
+      this.machineForm.patchValue({ ...user, username });
+    });
+
+    return form;
   }
 
-  public ngOnInit(): void {
-    this.machineForm.patchValue({ ...this.user, userName: this.username });
-  }
-
-  public ngOnDestroy(): void {
-    this.sub.unsubscribe();
+  public toggleFormControl<T>(control: FormControl<T>, disabled: boolean) {
+    if (disabled) {
+      control.disable();
+      return;
+    }
+    control.enable();
   }
 
   public submitForm(): void {
-    this.submitData.emit(this.machineForm.value);
-  }
-
-  public get name(): AbstractControl | null {
-    return this.machineForm.get('name');
-  }
-
-  public get userName(): AbstractControl | null {
-    return this.machineForm.get('userName');
+    this.submitData.emit(this.machineForm.getRawValue());
   }
 }
