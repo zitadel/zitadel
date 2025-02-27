@@ -200,7 +200,7 @@ export class ProviderOIDCComponent {
       this.loading = true;
       this.service
         .updateGenericOIDCProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();
