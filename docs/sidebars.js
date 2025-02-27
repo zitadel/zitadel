@@ -805,7 +805,12 @@ module.exports = {
           collapsed: true,
           items: [
             "apis/openidoauth/endpoints",
-            "https://zitadel.com/oidc-playground",
+            {
+              title: "OIDC Playground",
+              href: "https://zitadel.com/oidc-playground",
+              description:
+                "Test OpenID Authentication Requests, giving you more insight how OpenID Connect works",
+            },
             "apis/openidoauth/scopes",
             "apis/openidoauth/claims",
             "apis/openidoauth/authn-methods",
