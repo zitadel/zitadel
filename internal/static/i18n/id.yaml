@@ -543,6 +543,7 @@ Errors:
     AlreadyExists: Permintaan Otentikasi sudah ada
     NotExisting: Permintaan Otentikasi tidak ada
     WrongLoginClient: Permintaan Otentikasi dibuat oleh klien login lain
+    AlreadyHandled: Permintaan Otentikasi sudah ditangani
   OIDCSession:
     RefreshTokenInvalid: Token Penyegaran tidak valid
     Token:
@@ -553,8 +554,12 @@ Errors:
     AlreadyExists: SAMLRequest sudah ada
     NotExisting: SAMLRequest tidak ada
     WrongLoginClient: SAMLRequest dibuat oleh klien login lainnya
+    AlreadyHandled: SAMLRequest sudah ditangani
   SAMLSession:
     InvalidClient: SAMLResponse tidak dikeluarkan untuk klien ini
+  DeviceAuth:
+    NotFound: Permintaan Otorisasi Perangkat tidak ada
+    AlreadyHandled: Permintaan Otorisasi Perangkat sudah ditangani
   Feature:
     NotExisting: Fitur tidak ada
     TypeNotSupported: Jenis fitur tidak didukung

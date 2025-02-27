@@ -512,11 +512,13 @@
     "ORG_OWNER": "Har behörighet över hela organisationen",
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
+    "ORG_SETTINGS_MANAGER": "Har behörighet att hantera organisationens inställningar",
     "ORG_USER_PERMISSION_EDITOR": "Har behörighet att hantera användarbehörigheter",
     "ORG_PROJECT_PERMISSION_EDITOR": "Har behörighet att hantera projektbehörigheter",
     "ORG_PROJECT_CREATOR": "Har behörighet att skapa egna projekt och underliggande inställningar",
     "ORG_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från organisationen",
     "ORG_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från organisationen",
+    "ORG_USER_SELF_MANAGER": "Har behörighet att hantera sin egen användare",
     "PROJECT_OWNER": "Har behörighet över hela projektet",
     "PROJECT_OWNER_VIEWER": "Har behörighet att granska hela projektet",
     "PROJECT_OWNER_GLOBAL": "Har behörighet över hela projektet",
@@ -2229,7 +2231,9 @@
       "REMOVED": "Borttagen framgångsrikt."
     },
     "ISIDTOKENMAPPING": "Mappa från ID-token",
-    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten."
+    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten.",
+    "USEPKCE": "Använd PKCE",
+    "USEPKCE_DESC": "Avgör om parametrarna code_challenge och code_challenge_method ingår i autentiseringsbegäran"
   },
   "MFA": {
     "LIST": {
