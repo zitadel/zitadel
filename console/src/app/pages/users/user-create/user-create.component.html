@@ -124,12 +124,12 @@
                 <span class="trigger-name">{{ selected?.countryName }}</span>
               </mat-select-trigger>
               <mat-option class="phone-country-option" *ngFor="let country of countryPhoneCodes" [value]="country">
-              <span class="phone-country-row">
-                <span class="phone-country-flag fi fi-{{ country.countryCode | lowercase }}"></span>
-                <span class="phone-country-name">{{ country.countryName }}</span>
-                <span class="fill-space"></span>
-                <small class="phone-country-code">+{{ country.countryCallingCode }}</small>
-              </span>
+                <span class="phone-country-row">
+                  <span class="phone-country-flag fi fi-{{ country.countryCode | lowercase }}"></span>
+                  <span class="phone-country-name">{{ country.countryName }}</span>
+                  <span class="fill-space"></span>
+                  <small class="phone-country-code">+{{ country.countryCallingCode }}</small>
+                </span>
               </mat-option>
             </mat-select>
           </cnsl-form-field>
