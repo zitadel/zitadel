@@ -56,6 +56,7 @@ func NewOAuthIDPAddedEvent(
 	userEndpoint,
 	idAttribute string,
 	scopes []string,
+	usePKCE bool,
 	options idp.Options,
 ) *OAuthIDPAddedEvent {
 
@@ -75,6 +76,7 @@ func NewOAuthIDPAddedEvent(
 			userEndpoint,
 			idAttribute,
 			scopes,
+			usePKCE,
 			options,
 		),
 	}
@@ -137,7 +139,7 @@ func NewOIDCIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
-	isIDTokenMapping bool,
+	isIDTokenMapping, usePKCE bool,
 	options idp.Options,
 ) *OIDCIDPAddedEvent {
 
@@ -155,6 +157,7 @@ func NewOIDCIDPAddedEvent(
 			clientSecret,
 			scopes,
 			isIDTokenMapping,
+			usePKCE,
 			options,
 		),
 	}

@@ -2230,7 +2230,9 @@
       "REMOVED": "Borttagen framgångsrikt."
     },
     "ISIDTOKENMAPPING": "Mappa från ID-token",
-    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten."
+    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten.",
+    "USEPKCE": "Använd PKCE",
+    "USEPKCE_DESC": "Avgör om parametrarna code_challenge och code_challenge_method ingår i autentiseringsbegäran"
   },
   "MFA": {
     "LIST": {
