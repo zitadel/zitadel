@@ -406,21 +406,21 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 		return nil, err
 	}
 	contextInfoResponse, ok := resp.(*ContextInfoResponse)
-	if ok && contextInfoResponse != nil {
-		attributeLogs := make([]string, 0)
-		for _, metadata := range contextInfoResponse.SetUserMetadata {
-			if _, err = p.command.SetUserMetadata(ctx, metadata, user.ID, user.ResourceOwner); err != nil {
-				attributeLogs = append(attributeLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
-			}
-		}
-		for _, attribute := range contextInfoResponse.AppendAttribute {
-			customAttributes = appendCustomAttribute(customAttributes, attribute.Name, attribute.NameFormat, attribute.Value)
-		}
-		if len(attributeLogs) > 0 {
-			customAttributes = appendCustomAttribute(customAttributes, fmt.Sprintf(AttributeActionLogFormat, function), "", attributeLogs)
+	if !ok || contextInfoResponse == nil {
+		return customAttributes, nil
+	}
+	attributeLogs := make([]string, 0)
+	for _, metadata := range contextInfoResponse.SetUserMetadata {
+		if _, err = p.command.SetUserMetadata(ctx, metadata, user.ID, user.ResourceOwner); err != nil {
+			attributeLogs = append(attributeLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
 		}
 	}
-
+	for _, attribute := range contextInfoResponse.AppendAttribute {
+		customAttributes = appendCustomAttribute(customAttributes, attribute.Name, attribute.NameFormat, attribute.Value)
+	}
+	if len(attributeLogs) > 0 {
+		customAttributes = appendCustomAttribute(customAttributes, fmt.Sprintf(AttributeActionLogFormat, function), "", attributeLogs)
+	}
 	return customAttributes, nil
 }
 
