@@ -72,7 +72,6 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   return passwordReset({
     serviceUrl,
-
     userId,
     urlTemplate:
       `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
