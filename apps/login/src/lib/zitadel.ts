@@ -457,6 +457,21 @@ export async function getUserByID({
   return userService.getUserByID({ userId }, {});
 }
 
+export async function humanMFAInitSkipped({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl,
+  );
+
+  return userService.humanMFAInitSkipped({ userId }, {});
+}
+
 export async function verifyInviteCode({
   serviceUrl,
   userId,

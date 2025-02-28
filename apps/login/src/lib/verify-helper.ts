@@ -199,18 +199,18 @@ export async function checkMFAFactors(
     !availableMultiFactors.length &&
     session?.factors?.user?.id
   ) {
-    const user = await getUserByID({
+    const userResponse = await getUserByID({
       serviceUrl,
       userId: session.factors?.user?.id,
     });
 
-    if (
-      user.user?.type?.case === "human" &&
-      user.user?.type?.value.mfaInitSkipped
-    ) {
-      const mfaInitSkippedTimestamp = timestampDate(
-        user.user.type.value.mfaInitSkipped,
-      );
+    const humanUser =
+      userResponse?.user?.type.case === "human"
+        ? userResponse?.user.type.value
+        : undefined;
+
+    if (humanUser?.mfaInitSkipped) {
+      const mfaInitSkippedTimestamp = timestampDate(humanUser.mfaInitSkipped);
 
       const mfaInitSkipLifetimeMillis =
         Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000 +
@@ -219,27 +219,32 @@ export async function checkMFAFactors(
       const mfaInitSkippedTime = mfaInitSkippedTimestamp.getTime();
       const timeDifference = currentTime - mfaInitSkippedTime;
 
-      if (timeDifference > mfaInitSkipLifetimeMillis) {
-        const params = new URLSearchParams({
-          loginName: session.factors?.user?.loginName as string,
-          force: "false", // this defines if the mfa is not forced in the settings and can be skipped
-          checkAfter: "true", // this defines if the check is directly made after the setup
-        });
-
-        if (requestId) {
-          params.append("requestId", requestId);
-        }
-
-        if (organization || session.factors?.user?.organizationId) {
-          params.append(
-            "organization",
-            organization ?? (session.factors?.user?.organizationId as string),
-          );
-        }
-
-        // TODO: provide a way to setup passkeys on mfa page?
-        return { redirect: `/mfa/set?` + params };
+      if (!(timeDifference > mfaInitSkipLifetimeMillis)) {
+        // if the time difference is smaller than the lifetime, skip the mfa setup
+        return;
       }
     }
+
+    // the user has never skipped the mfa init but we have a setting so we redirect
+
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+      force: "false", // this defines if the mfa is not forced in the settings and can be skipped
+      checkAfter: "true", // this defines if the check is directly made after the setup
+    });
+
+    if (requestId) {
+      params.append("requestId", requestId);
+    }
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        organization ?? (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    // TODO: provide a way to setup passkeys on mfa page?
+    return { redirect: `/mfa/set?` + params };
   }
 }
