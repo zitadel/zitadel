@@ -532,13 +532,13 @@ OIDC:
       CharSet: "BCDFGHJKLMNPQRSTVWXZ" # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARSET
       CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARARMOUNT
       DashInterval: 4 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_DASHINTERVAL
-  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
-  DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
+  DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
-  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
+  DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
   ProviderConfig:
     MetadataConfig:
       Path: "/metadata" # ZITADEL_SAML_PROVIDERCONFIG_METADATACONFIG_PATH
