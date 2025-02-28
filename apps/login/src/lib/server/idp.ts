@@ -26,13 +26,14 @@ export async function startIDPFlow(command: StartIDPFlowCommand) {
     return { error: "Could not get host" };
   }
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   return startIdentityProviderFlow({
     serviceUrl,
-
     idpId: command.idpId,
     urls: {
-      successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.successUrl}`,
-      failureUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.failureUrl}`,
+      successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}${command.successUrl}`,
+      failureUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}${command.failureUrl}`,
     },
   }).then((response) => {
     if (
