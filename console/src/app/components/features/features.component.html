@@ -403,34 +403,6 @@
           'SETTING.FEATURES.OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION' | translate
         }}</cnsl-info-section>
       </div>
-
-      <div class="feature-row" *ngIf="toggleStates.consoleUseV2UserApi">
-        <span>{{ 'SETTING.FEATURES.CONSOLEUSEV2USERAPI' | translate }}</span>
-        <div class="row">
-          <mat-button-toggle-group
-            class="theme-toggle"
-            class="buttongroup"
-            [(ngModel)]="toggleStates.consoleUseV2UserApi.state"
-            (change)="validateAndSave()"
-            name="displayview"
-            aria-label="Display View"
-          >
-            <mat-button-toggle [value]="ToggleState.DISABLED">
-              <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
-              </div>
-            </mat-button-toggle>
-            <mat-button-toggle [value]="ToggleState.ENABLED">
-              <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
-              </div>
-            </mat-button-toggle>
-          </mat-button-toggle-group>
-        </div>
-        <cnsl-info-section class="feature-info">{{
-          'SETTING.FEATURES.CONSOLEUSEV2USERAPI_DESCRIPTION' | translate
-        }}</cnsl-info-section>
-      </div>
     </div>
   </cnsl-card>
 </div>

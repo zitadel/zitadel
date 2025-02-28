@@ -511,11 +511,13 @@
     "ORG_OWNER": "Ma uprawnienie nad całą organizacją",
     "ORG_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami organizacji",
     "ORG_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej organizacji",
+    "ORG_SETTINGS_MANAGER": "Ma uprawnienie do zarządzania ustawieniami organizacji",
     "ORG_USER_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami użytkowników",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami projektu",
     "ORG_PROJECT_CREATOR": "Ma uprawnienie do tworzenia własnych projektów i podstawowych ustawień",
     "ORG_ADMIN_IMPERSONATOR": "Ma uprawnienia do podszywania się pod administratora i użytkowników końcowych z organizacji",
     "ORG_END_USER_IMPERSONATOR": "Ma uprawnienia do podszywania się pod użytkowników końcowych z organizacji",
+    "ORG_USER_SELF_MANAGER": "Ma uprawnienie do zarządzania swoim własnym kontem użytkownika",
     "PROJECT_OWNER": "Ma uprawnienie nad całym projektem",
     "PROJECT_OWNER_VIEWER": "Ma uprawnienie do przeglądania całego projektu",
     "PROJECT_OWNER_GLOBAL": "Ma uprawnienia do całego projektu",
@@ -2206,7 +2208,9 @@
       "REMOVED": "Usunięto pomyślnie."
     },
     "ISIDTOKENMAPPING": "Mapowanie z tokena ID",
-    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo."
+    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo.",
+    "USEPKCE": "Skorzystaj z PKCE",
+    "USEPKCE_DESC": "Określa, czy parametry code_challenge i code_challenge_method są uwzględnione w żądaniu uwierzytelnienia"
   },
   "MFA": {
     "LIST": {

@@ -17,9 +17,12 @@ import (
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -2110,15 +2113,20 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	}
 }
 
-/*
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-		idpID := Instance.AddGenericOAuthProvider(t, CTX)
-	intentID := Instance.CreateIntent(t, CTX, idpID)
-	successfulID, token, changeDate, sequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID, "", "id")
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID, "user", "id")
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Instance.CreateSuccessfulSAMLIntent(t, CTX, idpID, "", "id")
+	idpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
+	intentID := Instance.CreateIntent(CTX, idpID).GetIdpIntent().GetIdpIntentId()
+
+	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "")
+	require.NoError(t, err)
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "user")
+	require.NoError(t, err)
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "")
+	require.NoError(t, err)
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "user")
+	require.NoError(t, err)
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), idpID, "id", "")
+	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -2369,7 +2377,6 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 		})
 	}
 }
-*/
 
 func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
