@@ -24,7 +24,7 @@ You can do so by using [Console](../console/users) or [setting user metadata](/d
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
-Use the [OIDC authentication request playground](/docs/oidc-playground) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 :::info Getting a token
 In case you want to test out different settings configure an application with code flow (PKCE).
