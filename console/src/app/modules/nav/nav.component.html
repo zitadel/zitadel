@@ -68,12 +68,23 @@
                   </a>
                 </ng-template>
 
+                <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLink]="['/groups']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                  >
+                    <span class="label">{{ 'MENU.GROUPS' | translate }}</span>
+                  </a>
+                </ng-template>
+
                 <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
                   <a
                     class="nav-item"
                     [routerLinkActive]="['active']"
                     [routerLink]="['/grants']"
-                    [routerLinkActiveOptions]="{ exact: true }"
+                    [routerLinkActiveOptions]="{ exact: false }"
                   >
                     <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
                   </a>

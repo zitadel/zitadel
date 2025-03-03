@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>
+  <span class="title">{{ 'MEMBER.ADD' | translate }}</span>
+</h1>
+
+<div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ 'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate }}</p>
+
+  <cnsl-search-user-autocomplete [users]="preselectedUsers" (selectionChanged)="users = $any($event)">
+  </cnsl-search-user-autocomplete>
+
+</div>
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CANCEL' | translate }}
+  </button>
+
+  <button
+    [disabled]="users.length === 0"
+    color="primary"
+    mat-raised-button
+    class="ok-button"
+    (click)="closeDialogWithSuccess()"
+    data-e2e="confirm-add-member-button"
+  >
+    {{ 'ACTIONS.ADD' | translate }}
+  </button>
+</div>

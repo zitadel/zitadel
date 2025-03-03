@@ -1,0 +1,37 @@
+<cnsl-create-layout
+  title="{{ 'GROUP.CREATE.TITLE' | translate }}"
+  [createSteps]="1"
+  [currentCreateStep]="1"
+  (closed)="close()"
+>
+  <div class="group-create-main-content">
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+
+    <form *ngIf="groupForm" [formGroup]="groupForm" (ngSubmit)="createGroup()" class="group-create-form">
+      <div class="group-create-content">
+        <div class="group-create-grid">
+          <cnsl-form-field>
+            <cnsl-label>{{ 'GROUP.CREATE.NAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="name" required />
+          </cnsl-form-field>
+          <cnsl-form-field>
+            <cnsl-label>{{ 'GROUP.CREATE.DESCRIPTION' | translate }}</cnsl-label>
+            <input cnslInput formControlName="description"/>
+          </cnsl-form-field>
+        </div>
+      </div>
+      <div class="group-create-btn-container">
+        <button
+          data-e2e="create-button"
+          color="primary"
+          [disabled]="groupForm.invalid"
+          type="submit"
+          class="create-button"
+          mat-raised-button
+        >
+          {{ 'ACTIONS.CREATE' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

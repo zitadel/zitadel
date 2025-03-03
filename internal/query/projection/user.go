@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -74,6 +75,9 @@ const (
 	NotifyLastPhoneCol          = "last_phone"
 	NotifyVerifiedPhoneCol      = "verified_phone"
 	NotifyPasswordSetCol        = "password_set"
+
+	// groups
+	GroupIDsCol = "group_ids"
 )
 
 type userProjection struct{}
@@ -98,6 +102,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(UserUsernameCol, handler.ColumnTypeText),
 			handler.NewColumn(UserTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(GroupIDsCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
 			handler.WithIndex(handler.NewIndex("username", []string{UserUsernameCol})),
@@ -329,6 +334,19 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanMFAInitSkippedType,
 					Reduce: p.reduceMFAInitSkipped,
+				},
+			},
+		},
+		{
+			Aggregate: group.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  user.UserGroupAddedType,
+					Reduce: p.reduceGroupMemberAdded,
+				},
+				{
+					Event:  user.UserGroupRemovedType,
+					Reduce: p.reduceGroupMemberRemoved,
 				},
 			},
 		},
@@ -1206,4 +1224,67 @@ func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 			handler.NewCond(UserResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil
+}
+
+// Group Member Add/Remove Events
+
+func reduceUserGroupAdded(e user.UserGroupAddedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
+	config := reduceGroupMemberConfig{
+		cols: []handler.Column{
+			handler.NewArrayAppendCol(GroupIDsCol, e.GroupID),
+			/* TODO Need to update change date, currently getting: (ERROR: column \"change_date\" is of type timestamp with time zone but expression is of type text (SQLSTATE 42804))"
+			// handler.NewCol(UserChangeDateCol, e.CreationDate()),
+			// handler.NewCol(UserSequenceCol, e.Sequence()),
+			*/
+		},
+		conds: []handler.Condition{
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+		}}
+	for _, opt := range opts {
+		config = opt(config)
+	}
+	return handler.NewUpdateStatement(&e, config.cols, config.conds), nil
+}
+
+func reduceUserGroupRemoved(e user.UserGroupRemovedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
+	config := reduceGroupMemberConfig{
+		cols: []handler.Column{
+			handler.NewArrayRemoveCol(GroupIDsCol, e.GroupID),
+			// handler.NewCol(UserChangeDateCol, e.CreatedAt()),
+			// handler.NewCol(UserSequenceCol, e.Sequence()),
+		},
+		conds: []handler.Condition{
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+		}}
+
+	for _, opt := range opts {
+		config = opt(config)
+	}
+
+	return handler.NewUpdateStatement(&e, config.cols, config.conds), nil
+}
+
+func (p *userProjection) reduceGroupMemberAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserGroupAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-vhy1O", "reduce.wrong.event.type %s", user.UserGroupAddedType)
+	}
+
+	return reduceUserGroupAdded(
+		*e,
+	)
+}
+
+func (p *userProjection) reduceGroupMemberRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserGroupRemovedEvent)
+	// e, ok := event.(*group.MemberAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-aqz1O", "reduce.wrong.event.type %s", user.UserGroupRemovedType)
+	}
+
+	return reduceUserGroupRemoved(
+		*e,
+	)
 }

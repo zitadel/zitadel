@@ -1,5 +1,5 @@
 with usr as (
-	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name as preferred_login_name
+	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, u.group_ids, n.login_name as preferred_login_name
 	from projections.users14 u
 	left join projections.login_names3 n on u.id = n.user_id and u.instance_id = n.instance_id
 	where u.id = $1 and u.state = 1 -- only allow active users
@@ -89,3 +89,55 @@ select json_build_object(
 	'metadata', (select metadata from metadata),
 	'user_grants', (select grants from grants)
 );
+-- -- get all group grants, now for all group_ids from the user record
+-- group_grants as (
+--     select 
+--         id, 
+--         grant_id, 
+--         state, 
+--         creation_date, 
+--         change_date, 
+--         sequence, 
+--         group_id, 
+--         roles, 
+--         resource_owner, 
+--         project_id
+--     from projections.group_grants16
+--     where grougroup_idp_id = any((select unnest(group_ids) from usr))
+--       and instance_id = $2
+--       and project_id = any($3)
+--       and state = 1
+--     {{ if . -}}
+--       and resource_owner = any($4)
+--     {{- end }}
+-- ),
+-- -- join group grants to orgs, projects
+-- groupgrants as (
+--     select json_agg(row_to_json(r)) as grants 
+--     from (
+--         select 
+--             g.*,
+--             o.name as org_name, 
+--             o.primary_domain as org_primary_domain,
+--             p.name as project_name
+--         from group_grants g
+--         left join orgs o on o.id = g.resource_owner
+--         left join projections.projects4 p on p.id = g.project_id
+--         where p.instance_id = $2
+--     ) r
+-- )
+-- -- build the final result JSON
+-- select json_build_object(
+-- 	'user', (
+-- 		select row_to_json(r) as usr from (
+-- 			select u.*, h.human, m.machine
+-- 			from usr u
+-- 			left join human h on u.id = h.user_id
+-- 			left join machine m on u.id = m.user_id
+-- 		) r
+-- 	),
+-- 	'org', (select organization from user_org),
+-- 	'metadata', (select metadata from metadata),
+-- 	'user_grants', (select grants from grants),
+-- 	'group_grants', (select grants from groupgrants)
+-- );

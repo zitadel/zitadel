@@ -1,0 +1,81 @@
+<cnsl-top-view
+  *ngIf="group"
+  title="{{ group.name }}"
+  sub="{{ group.description }}"
+  [isActive]="group.state === GroupState.GROUP_STATE_ACTIVE"
+  [isInactive]="group.state === GroupState.GROUP_STATE_INACTIVE"
+  stateTooltip="{{ 'USER.STATE.' + group.state | translate }}"
+  (backClicked)="navigateBack()"
+  [hasActions]="['user.write$', 'user.write:' + group.id] | hasRole | async"
+>
+  <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:' + group.id]">
+    <button mat-menu-item (click)="openNameDialog()" aria-label="Edit group name">
+      {{ 'ACTIONS.RENAME' | translate }}
+    </button>
+    <button
+      mat-menu-item
+      *ngIf="group?.state === GroupState.GROUP_STATE_ACTIVE"
+      (click)="changeState(GroupState.GROUP_STATE_INACTIVE)"
+    >
+      {{ 'USER.PAGES.DEACTIVATE' | translate }}
+    </button>
+    <button
+      mat-menu-item
+      *ngIf="group?.state === GroupState.GROUP_STATE_INACTIVE"
+      (click)="changeState(GroupState.GROUP_STATE_ACTIVE)"
+    >
+      {{ 'USER.PAGES.REACTIVATE' | translate }}
+    </button>
+    <ng-template cnslHasRole [hasRole]="['user.delete$', 'user.delete:' + group.id]">
+      <button mat-menu-item matTooltip="{{ 'GROUP.PAGES.DELETE' | translate }}" (click)="deleteGroup()">
+        <span [style.color]="'var(--warn)'">{{ 'GROUP.PAGES.DELETE' | translate }}</span>
+      </button>
+    </ng-template>
+  </ng-template>
+  <cnsl-info-row topContent *ngIf="group" [group]="group"></cnsl-info-row>
+</cnsl-top-view>
+
+<div *ngIf="loading" class="max-width-container">
+  <div class="sp-wrapper">
+    <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
+  </div>
+</div>
+
+<div *ngIf="!loading && !group" class="max-width-container">
+  <p class="no-group-error">{{ 'GROUP.PAGES.NOGROUP' | translate }}</p>
+</div>
+
+<div class="max-width-container" *ngIf="group && (['user.write$', 'user.write:' + group.id] | hasRole) as canWrite$">
+  <cnsl-meta-layout>
+    <div *ngIf="error" class="max-width-container">
+      <p>{{ error }}</p>
+    </div>
+    <div class="max-width-container">
+      <span *ngIf="!loading && !group">{{ 'GROUP.PAGES.NOUSER' | translate }}</span>
+        <cnsl-group-members-table
+          *ngIf="group"
+          [dataSource]="dataSource"
+          [factoryLoadFunc]="changePageFactory"
+          [refreshTrigger]="changePage"
+          [canWrite]="['project.member.write$'] | hasRole | async"
+          [canDelete]="['project.member.delete$'] | hasRole | async"
+          (deleteMember)="removeGroupMember($event)"
+        >
+          <ng-template
+            cnslHasRole
+            writeactions
+            [hasRole]="['project.member.write']"
+          >
+            <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
+              <mat-icon class="icon">add</mat-icon>
+              <span>{{ 'ACTIONS.NEW' | translate }}</span>
+              <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+            </button>
+          </ng-template>
+        </cnsl-group-members-table>
+    </div>
+    <div metainfo>
+      <cnsl-changes *ngIf="group" [changeType]="ChangeType.GROUP" [id]="group.id"></cnsl-changes>
+    </div>
+  </cnsl-meta-layout>
+</div>
