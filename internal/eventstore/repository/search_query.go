@@ -16,7 +16,6 @@ type SearchQuery struct {
 	Tx                    *sql.Tx
 	LockRows              bool
 	LockOption            eventstore.LockOption
-	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
 	Offset                uint32
@@ -129,7 +128,6 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		Offset:                builder.GetOffset(),
 		Desc:                  builder.GetDesc(),
 		Tx:                    builder.GetTx(),
-		AllowTimeTravel:       builder.GetAllowTimeTravel(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 	}

@@ -663,7 +663,7 @@ func Test_query_events_with_postgres(t *testing.T) {
 func Test_query_events_mocked(t *testing.T) {
 	type args struct {
 		query *eventstore.SearchQueryBuilder
-		dest  interface{}
+		dest  any
 		useV1 bool
 	}
 	type res struct {
@@ -739,30 +739,6 @@ func Test_query_events_mocked(t *testing.T) {
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
 					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $3`),
-					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
-				),
-			},
-			res: res{
-				wantErr: false,
-			},
-		},
-		{
-			name: "with limit and order by desc as of system time",
-			args: args{
-				dest: &[]*repository.Event{},
-				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					OrderDesc().
-					AwaitOpenTransactions().
-					Limit(5).
-					AllowTimeTravel().
-					AddQuery().
-					AggregateTypes("user").
-					Builder(),
-				useV1: true,
-			},
-			fields: fields{
-				mock: newMockClient(t).expectQuery(t,
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms' WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $3`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
 				),
 			},
