@@ -32,7 +32,7 @@ Prerequisites:
 }
 
 func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config) error {
-	err := ReadStmts(config.Type())
+	err := ReadStmts()
 	if err != nil {
 		return err
 	}
