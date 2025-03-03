@@ -75,7 +75,7 @@ In case all your applications depend on ZITADEL after the migration date, and ZI
 For all other cases, we recommend that the **legacy system orchestrates the migration** of users to ZITADEL for more flexibility:
 
 - Update your legacy system to create a user in ZITADEL on their next login, if not already flagged as migrated, by using our APIs (you can set the password and a verified email)
-- Redirect migrated users with a login hint in the [auth request](/docs/oidc-playground) to ZITADEL to pre-select the user
+- Redirect migrated users with a login hint in the [auth request](/playgrounds/oidc) to ZITADEL to pre-select the user
 
 In this case the migration can also be done as an import job or also allowing to create user session in both the legacy auth solution and ZITADEL in parallel with identity brokering:
 
