@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 func exec(m *testing.M) int {
 	tempPath, err := os.MkdirTemp("", "db")
 	logging.OnError(err).Fatal("unable to create temp dir")
-	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).DataPath(tempPath)
+	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath)
 	psql := embeddedpostgres.NewDatabase(config)
 	err = psql.Start()
 	logging.OnError(err).Fatal("unable to start db")
