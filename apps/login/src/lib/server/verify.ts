@@ -257,14 +257,15 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
     return { error: "No host found" };
   }
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   return command.isInvite
     ? resendInviteCode({ serviceUrl, userId: command.userId })
     : resendEmailCode({
         userId: command.userId,
         serviceUrl,
-
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
       });
 }

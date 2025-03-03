@@ -70,11 +70,13 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   return passwordReset({
     serviceUrl,
     userId,
     urlTemplate:
-      `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+      `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
       (command.requestId ? `&requestId=${command.requestId}` : ""),
   });
 }

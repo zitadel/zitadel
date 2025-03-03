@@ -76,6 +76,8 @@ export function LoginOTP({
   async function updateSessionForOTPChallenge() {
     let challenges;
 
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
     if (method === "email") {
       challenges = create(RequestChallengesSchema, {
         otpEmail: {
@@ -84,7 +86,7 @@ export function LoginOTP({
             value: host
               ? {
                   urlTemplate:
-                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
+                    `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
                     (requestId ? `&requestId=${requestId}` : ""),
                 }
               : {},

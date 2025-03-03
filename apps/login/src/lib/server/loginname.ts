@@ -104,16 +104,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.set("organization", command.organization);
       }
 
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
       const resp = await startIdentityProviderFlow({
         serviceUrl,
-
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
             new URLSearchParams(params),
           failureUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
             new URLSearchParams(params),
         },
       });
@@ -169,16 +170,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.set("organization", command.organization);
       }
 
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
       const resp = await startIdentityProviderFlow({
         serviceUrl,
-
         idpId: idp.id,
         urls: {
           successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
             new URLSearchParams(params),
           failureUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
             new URLSearchParams(params),
         },
       });
