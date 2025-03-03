@@ -4,6 +4,7 @@ import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   deleteSession,
   getLoginSettings,
+  humanMFAInitSkipped,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import { Duration } from "@zitadel/client";
@@ -20,10 +21,57 @@ import {
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service";
 
+export async function skipMFAAndContinueWithNextUrl({
+  userId,
+  requestId,
+  loginName,
+  sessionId,
+  organization,
+}: {
+  userId: string;
+  loginName?: string;
+  sessionId?: string;
+  requestId?: string;
+  organization?: string;
+}) {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization: organization,
+  });
+
+  await humanMFAInitSkipped({ serviceUrl, userId });
+
+  const url =
+    requestId && sessionId
+      ? await getNextUrl(
+          {
+            sessionId: sessionId,
+            requestId: requestId,
+            organization: organization,
+          },
+          loginSettings?.defaultRedirectUri,
+        )
+      : loginName
+        ? await getNextUrl(
+            {
+              loginName: loginName,
+              organization: organization,
+            },
+            loginSettings?.defaultRedirectUri,
+          )
+        : null;
+  if (url) {
+    return { redirect: url };
+  }
+}
+
 export async function continueWithSession({
-  authRequestId,
+  requestId,
   ...session
-}: Session & { authRequestId?: string }) {
+}: Session & { requestId?: string }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -34,11 +82,11 @@ export async function continueWithSession({
   });
 
   const url =
-    authRequestId && session.id && session.factors?.user
+    requestId && session.id && session.factors?.user
       ? await getNextUrl(
           {
             sessionId: session.id,
-            authRequestId: authRequestId,
+            requestId: requestId,
             organization: session.factors.user.organizationId,
           },
           loginSettings?.defaultRedirectUri,
@@ -62,20 +110,14 @@ export type UpdateSessionCommand = {
   sessionId?: string;
   organization?: string;
   checks?: Checks;
-  authRequestId?: string;
+  requestId?: string;
   challenges?: RequestChallenges;
   lifetime?: Duration;
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  let {
-    loginName,
-    sessionId,
-    organization,
-    checks,
-    authRequestId,
-    challenges,
-  } = options;
+  let { loginName, sessionId, organization, checks, requestId, challenges } =
+    options;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -123,7 +165,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     recentSession,
     checks,
     challenges,
-    authRequestId,
+    requestId,
     lifetime,
   );
 

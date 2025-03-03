@@ -34,7 +34,7 @@ export default async function Page(props: {
   const {
     loginName, // send from password page
     userId, // send from email link
-    authRequestId,
+    requestId,
     sessionId,
     organization,
     code,
@@ -115,7 +115,7 @@ export default async function Page(props: {
           <LoginOTP
             loginName={loginName ?? session.factors?.user?.loginName}
             sessionId={sessionId}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={
               organization ?? session?.factors?.user?.organizationId
             }

@@ -6,7 +6,7 @@ import { IdpSignin } from "../../idp-signin";
 export async function linkingSuccess(
   userId: string,
   idpIntent: { idpIntentId: string; idpIntentToken: string },
-  authRequestId?: string,
+  requestId?: string,
   branding?: BrandingSettings,
 ) {
   const locale = getLocale();
@@ -21,7 +21,7 @@ export async function linkingSuccess(
         <IdpSignin
           userId={userId}
           idpIntent={idpIntent}
-          authRequestId={authRequestId}
+          requestId={requestId}
         />
       </div>
     </DynamicTheme>

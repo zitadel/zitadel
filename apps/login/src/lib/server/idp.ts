@@ -55,7 +55,7 @@ type CreateNewSessionCommand = {
   loginName?: string;
   password?: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function createNewSessionFromIdpIntent(
@@ -92,7 +92,7 @@ export async function createNewSessionFromIdpIntent(
   const session = await createSessionForIdpAndUpdateCookie(
     command.userId,
     command.idpIntent,
-    command.authRequestId,
+    command.requestId,
     loginSettings?.externalLoginCheckLifetime,
   );
 
@@ -110,7 +110,7 @@ export async function createNewSessionFromIdpIntent(
     session,
     humanUser,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (emailVerificationCheck?.redirect) {
@@ -118,16 +118,16 @@ export async function createNewSessionFromIdpIntent(
   }
 
   // TODO: check if user has MFA methods
-  // const mfaFactorCheck = checkMFAFactors(session, loginSettings, authMethods, organization, authRequestId);
+  // const mfaFactorCheck = checkMFAFactors(session, loginSettings, authMethods, organization, requestId);
   // if (mfaFactorCheck?.redirect) {
   //   return mfaFactorCheck;
   // }
 
   const url = await getNextUrl(
-    command.authRequestId && session.id
+    command.requestId && session.id
       ? {
           sessionId: session.id,
-          authRequestId: command.authRequestId,
+          requestId: command.requestId,
           organization: session.factors.user.organizationId,
         }
       : {

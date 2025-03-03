@@ -9,10 +9,10 @@ import { SessionItem } from "./session-item";
 
 type Props = {
   sessions: Session[];
-  authRequestId?: string;
+  requestId?: string;
 };
 
-export function SessionsList({ sessions, authRequestId }: Props) {
+export function SessionsList({ sessions, requestId }: Props) {
   const t = useTranslations("accounts");
   const [list, setList] = useState<Session[]>(sessions);
   return sessions ? (
@@ -34,7 +34,7 @@ export function SessionsList({ sessions, authRequestId }: Props) {
           return (
             <SessionItem
               session={session}
-              authRequestId={authRequestId}
+              requestId={requestId}
               reload={() => {
                 setList(list.filter((s) => s.id !== session.id));
               }}

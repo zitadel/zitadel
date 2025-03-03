@@ -21,7 +21,7 @@ type Props = {
   host: string | null;
   loginName?: string;
   sessionId?: string;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
   method: string;
   code?: string;
@@ -36,7 +36,7 @@ export function LoginOTP({
   host,
   loginName,
   sessionId,
-  authRequestId,
+  requestId,
   organization,
   method,
   code,
@@ -87,7 +87,7 @@ export function LoginOTP({
               ? {
                   urlTemplate:
                     `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
-                    (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+                    (requestId ? `&requestId=${requestId}` : ""),
                 }
               : {},
           },
@@ -107,7 +107,7 @@ export function LoginOTP({
       sessionId,
       organization,
       challenges,
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not request OTP challenge");
@@ -137,8 +137,8 @@ export function LoginOTP({
       body.organization = organization;
     }
 
-    if (authRequestId) {
-      body.authRequestId = authRequestId;
+    if (requestId) {
+      body.requestId = requestId;
     }
 
     let checks;
@@ -164,7 +164,7 @@ export function LoginOTP({
       sessionId,
       organization,
       checks,
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not verify OTP code");
@@ -190,11 +190,11 @@ export function LoginOTP({
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         const url =
-          authRequestId && response.sessionId
+          requestId && response.sessionId
             ? await getNextUrl(
                 {
                   sessionId: response.sessionId,
-                  authRequestId: authRequestId,
+                  requestId: requestId,
                   organization: response.factors?.user?.organizationId,
                 },
                 loginSettings?.defaultRedirectUri,

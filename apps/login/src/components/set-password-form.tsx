@@ -39,14 +39,14 @@ type Props = {
   loginName: string;
   userId: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
   codeRequired: boolean;
 };
 
 export function SetPasswordForm({
   passwordComplexitySettings,
   organization,
-  authRequestId,
+  requestId,
   loginName,
   userId,
   code,
@@ -73,7 +73,7 @@ export function SetPasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not reset password");
@@ -137,7 +137,7 @@ export function SetPasswordForm({
       checks: create(ChecksSchema, {
         password: { password: values.password },
       }),
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not verify password");

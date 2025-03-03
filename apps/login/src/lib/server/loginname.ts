@@ -25,7 +25,7 @@ import { createSessionAndUpdateCookie } from "./cookie";
 
 export type SendLoginnameCommand = {
   loginName: string;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
   suffix?: string;
 };
@@ -96,8 +96,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const params = new URLSearchParams();
 
-      if (command.authRequestId) {
-        params.set("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        params.set("requestId", command.requestId);
       }
 
       if (command.organization) {
@@ -162,8 +162,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const params = new URLSearchParams({ userId });
 
-      if (command.authRequestId) {
-        params.set("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        params.set("requestId", command.requestId);
       }
 
       if (command.organization) {
@@ -243,8 +243,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const session = await createSessionAndUpdateCookie(
       checks,
-      undefined,
-      command.authRequestId,
+      command.requestId,
     );
 
     if (!session.factors?.user?.id) {
@@ -269,7 +268,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         session,
         humanUser,
         session.factors.user.organizationId,
-        command.authRequestId,
+        command.requestId,
       );
 
       if (inviteCheck?.redirect) {
@@ -288,8 +287,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         );
       }
 
-      if (command.authRequestId) {
-        paramsAuthenticatorSetup.append("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        paramsAuthenticatorSetup.append("requestId", command.requestId);
       }
 
       return { redirect: "/authenticator/set?" + paramsAuthenticatorSetup };
@@ -317,8 +316,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               command.organization ?? session.factors?.user?.organizationId;
           }
 
-          if (command.authRequestId) {
-            paramsPassword.authRequestId = command.authRequestId;
+          if (command.requestId) {
+            paramsPassword.requestId = command.requestId;
           }
 
           return {
@@ -334,8 +333,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           const paramsPasskey: any = { loginName: command.loginName };
-          if (command.authRequestId) {
-            paramsPasskey.authRequestId = command.authRequestId;
+          if (command.requestId) {
+            paramsPasskey.requestId = command.requestId;
           }
 
           if (command.organization || session.factors?.user?.organizationId) {
@@ -353,8 +352,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           altPassword: `${methods.authMethodTypes.includes(1)}`, // show alternative password option
         };
 
-        if (command.authRequestId) {
-          passkeyParams.authRequestId = command.authRequestId;
+        if (command.requestId) {
+          passkeyParams.requestId = command.requestId;
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
@@ -373,8 +372,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         // user has no passkey setup and login settings allow passkeys
         const paramsPasswordDefault: any = { loginName: command.loginName };
 
-        if (command.authRequestId) {
-          paramsPasswordDefault.authRequestId = command.authRequestId;
+        if (command.requestId) {
+          paramsPasswordDefault.requestId = command.requestId;
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
@@ -437,8 +436,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (orgToRegisterOn && !loginSettingsByContext?.ignoreUnknownUsernames) {
       const params = new URLSearchParams({ organization: orgToRegisterOn });
 
-      if (command.authRequestId) {
-        params.set("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        params.set("requestId", command.requestId);
       }
 
       if (command.loginName) {
@@ -454,8 +453,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       loginName: command.loginName,
     });
 
-    if (command.authRequestId) {
-      paramsPasswordDefault.append("authRequestId", command.authRequestId);
+    if (command.requestId) {
+      paramsPasswordDefault.append("requestId", command.requestId);
     }
 
     if (command.organization) {

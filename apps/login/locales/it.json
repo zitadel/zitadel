@@ -71,7 +71,8 @@
     },
     "set": {
       "title": "Configura l'autenticazione a 2 fattori",
-      "description": "Scegli uno dei seguenti secondi fattori."
+      "description": "Scegli uno dei seguenti secondi fattori.",
+      "skip": "Salta"
     }
   },
   "otp": {

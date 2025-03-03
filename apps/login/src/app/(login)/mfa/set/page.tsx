@@ -42,23 +42,17 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "mfa" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const {
-    loginName,
-    checkAfter,
-    force,
-    authRequestId,
-    organization,
-    sessionId,
-  } = searchParams;
+  const { loginName, checkAfter, force, requestId, organization, sessionId } =
+    searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionWithData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
-  async function getAuthMethodsAndUser(host: string, session?: Session) {
+  async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
 
     if (!userId) {
@@ -86,7 +80,6 @@ export default async function Page(props: {
   }
 
   async function loadSessionByLoginname(
-    host: string,
     loginName?: string,
     organization?: string,
   ) {
@@ -98,23 +91,18 @@ export default async function Page(props: {
         organization,
       },
     }).then((session) => {
-      return getAuthMethodsAndUser(serviceUrl, session);
+      return getAuthMethodsAndUser(session);
     });
   }
 
-  async function loadSessionById(
-    host: string,
-    sessionId: string,
-    organization?: string,
-  ) {
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
+      return getAuthMethodsAndUser(sessionResponse.session);
     });
   }
 
@@ -153,17 +141,20 @@ export default async function Page(props: {
 
         {isSessionValid(sessionWithData).valid &&
           loginSettings &&
-          sessionWithData && (
+          sessionWithData &&
+          sessionWithData.factors?.user?.id && (
             <ChooseSecondFactorToSetup
+              userId={sessionWithData.factors?.user?.id}
               loginName={loginName}
               sessionId={sessionId}
-              authRequestId={authRequestId}
+              requestId={requestId}
               organization={organization}
               loginSettings={loginSettings}
               userMethods={sessionWithData.authMethods ?? []}
               phoneVerified={sessionWithData.phoneVerified ?? false}
               emailVerified={sessionWithData.emailVerified ?? false}
               checkAfter={checkAfter === "true"}
+              force={force === "true"}
             ></ChooseSecondFactorToSetup>
           )}
 

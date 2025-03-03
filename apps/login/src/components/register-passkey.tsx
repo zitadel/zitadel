@@ -19,7 +19,7 @@ type Inputs = {};
 type Props = {
   sessionId: string;
   isPrompt: boolean;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
 };
 
@@ -27,7 +27,7 @@ export function RegisterPasskey({
   sessionId,
   isPrompt,
   organization,
-  authRequestId,
+  requestId,
 }: Props) {
   const t = useTranslations("passkey");
 
@@ -161,8 +161,8 @@ export function RegisterPasskey({
       params.set("organization", organization);
     }
 
-    if (authRequestId) {
-      params.set("authRequestId", authRequestId);
+    if (requestId) {
+      params.set("requestId", requestId);
     }
 
     params.set("sessionId", sessionId);

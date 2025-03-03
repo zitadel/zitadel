@@ -24,7 +24,7 @@ type Props = {
   secret: string;
   loginName?: string;
   sessionId?: string;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
   checkAfter?: boolean;
   loginSettings?: LoginSettings;
@@ -34,7 +34,7 @@ export function TotpRegister({
   secret,
   loginName,
   sessionId,
-  authRequestId,
+  requestId,
   organization,
   checkAfter,
   loginSettings,
@@ -63,8 +63,8 @@ export function TotpRegister({
           if (loginName) {
             params.append("loginName", loginName);
           }
-          if (authRequestId) {
-            params.append("authRequestId", authRequestId);
+          if (requestId) {
+            params.append("requestId", requestId);
           }
           if (organization) {
             params.append("organization", organization);
@@ -73,11 +73,11 @@ export function TotpRegister({
           return router.push(`/otp/time-based?` + params);
         } else {
           const url =
-            authRequestId && sessionId
+            requestId && sessionId
               ? await getNextUrl(
                   {
                     sessionId: sessionId,
-                    authRequestId: authRequestId,
+                    requestId: requestId,
                     organization: organization,
                   },
                   loginSettings?.defaultRedirectUri,

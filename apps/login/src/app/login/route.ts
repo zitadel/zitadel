@@ -1,28 +1,28 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
+import { loginWithOIDCandSession } from "@/lib/oidc";
+import { loginWithSAMLandSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { getServiceUrlFromHeaders } from "@/lib/service";
+import { findValidSession } from "@/lib/session";
 import {
   createCallback,
+  createResponse,
   getActiveIdentityProviders,
   getAuthRequest,
-  getLoginSettings,
   getOrgsByDomain,
-  listAuthenticationMethodTypes,
+  getSAMLRequest,
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { create, timestampDate } from "@zitadel/client";
-import {
-  AuthRequest,
-  Prompt,
-} from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { create } from "@zitadel/client";
+import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import {
   CreateCallbackRequestSchema,
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -30,12 +30,32 @@ export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
 
+const gotoAccounts = ({
+  request,
+  requestId,
+  organization,
+}: {
+  request: NextRequest;
+  requestId: string;
+  organization?: string;
+}): NextResponse<unknown> => {
+  const accountsUrl = new URL("/accounts", request.url);
+
+  if (requestId) {
+    accountsUrl.searchParams.set("requestId", requestId);
+  }
+  if (organization) {
+    accountsUrl.searchParams.set("organization", organization);
+  }
+
+  return NextResponse.redirect(accountsUrl);
+};
+
 async function loadSessions({
   serviceUrl,
   ids,
 }: {
   serviceUrl: string;
-
   ids: string[];
 }): Promise<Session[]> {
   const response = await listSessions({
@@ -50,174 +70,22 @@ const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
-/**
- * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
- * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
- **/
-async function isSessionValid(
-  serviceUrl: string,
-
-  session: Session,
-): Promise<boolean> {
-  // session can't be checked without user
-  if (!session.factors?.user) {
-    console.warn("Session has no user");
-    return false;
-  }
-
-  let mfaValid = true;
-
-  const authMethodTypes = await listAuthenticationMethodTypes({
-    serviceUrl,
-
-    userId: session.factors.user.id,
-  });
-
-  const authMethods = authMethodTypes.authMethodTypes;
-  if (authMethods && authMethods.includes(AuthenticationMethodType.TOTP)) {
-    mfaValid = !!session.factors.totp?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid totpEmail factor",
-        session.factors.totp?.verifiedAt,
-      );
-    }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.OTP_EMAIL)
-  ) {
-    mfaValid = !!session.factors.otpEmail?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid otpEmail factor",
-        session.factors.otpEmail?.verifiedAt,
-      );
-    }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.OTP_SMS)
-  ) {
-    mfaValid = !!session.factors.otpSms?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid otpSms factor",
-        session.factors.otpSms?.verifiedAt,
-      );
-    }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.U2F)
-  ) {
-    mfaValid = !!session.factors.webAuthN?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid u2f factor",
-        session.factors.webAuthN?.verifiedAt,
-      );
-    }
-  } else {
-    // only check settings if no auth methods are available, as this would require a setup
-    const loginSettings = await getLoginSettings({
-      serviceUrl,
-
-      organization: session.factors?.user?.organizationId,
-    });
-    if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
-      const otpEmail = session.factors.otpEmail?.verifiedAt;
-      const otpSms = session.factors.otpSms?.verifiedAt;
-      const totp = session.factors.totp?.verifiedAt;
-      const webAuthN = session.factors.webAuthN?.verifiedAt;
-      const idp = session.factors.intent?.verifiedAt; // TODO: forceMFA should not consider this as valid factor
-
-      // must have one single check
-      mfaValid = !!(otpEmail || otpSms || totp || webAuthN || idp);
-      if (!mfaValid) {
-        console.warn("Session has no valid multifactor", session.factors);
-      }
-    } else {
-      mfaValid = true;
-    }
-  }
-
-  const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const validIDP = session?.factors?.intent?.verifiedAt;
-
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate).getTime() > new Date().getTime()
-    : true;
-
-  if (!stillValid) {
-    console.warn(
-      "Session is expired",
-      session.expirationDate
-        ? timestampDate(session.expirationDate).toDateString()
-        : "no expiration date",
-    );
-  }
-
-  const validChecks = !!(validPassword || validPasskey || validIDP);
-
-  return stillValid && validChecks && mfaValid;
-}
-
-async function findValidSession(
-  serviceUrl: string,
-
-  sessions: Session[],
-  authRequest: AuthRequest,
-): Promise<Session | undefined> {
-  const sessionsWithHint = sessions.filter((s) => {
-    if (authRequest.hintUserId) {
-      return s.factors?.user?.id === authRequest.hintUserId;
-    }
-    if (authRequest.loginHint) {
-      return s.factors?.user?.loginName === authRequest.loginHint;
-    }
-    return true;
-  });
-
-  if (sessionsWithHint.length === 0) {
-    return undefined;
-  }
-
-  // sort by change date descending
-  sessionsWithHint.sort((a, b) => {
-    const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
-    const dateB = b.changeDate ? timestampDate(b.changeDate).getTime() : 0;
-    return dateB - dateA;
-  });
-
-  // return the first valid session according to settings
-  for (const session of sessionsWithHint) {
-    if (await isSessionValid(serviceUrl, session)) {
-      return session;
-    }
-  }
-
-  return undefined;
-}
-
-function constructUrl(request: NextRequest, path: string) {
-  const forwardedHost =
-    request.headers.get("x-zitadel-forward-host") ??
-    request.headers.get("host");
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-  return new URL(
-    `${basePath}${path}`,
-    forwardedHost?.startsWith("http")
-      ? forwardedHost
-      : `https://${forwardedHost}`,
-  );
-}
-
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const authRequestId = searchParams.get("authRequest");
-  const sessionId = searchParams.get("sessionId");
-
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const searchParams = request.nextUrl.searchParams;
+
+  const oidcRequestId = searchParams.get("authRequest"); // oidc initiated request
+  const samlRequestId = searchParams.get("samlRequest"); // saml initiated request
+
+  // internal request id which combines authRequest and samlRequest with the prefix oidc_ or saml_
+  let requestId =
+    searchParams.get("requestId") ||
+    `oidc_${oidcRequestId}` ||
+    `saml_${samlRequestId}`;
+
+  const sessionId = searchParams.get("sessionId");
 
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");
@@ -232,128 +100,36 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions({ serviceUrl, ids });
   }
 
-  if (authRequestId && sessionId) {
-    console.log(
-      `Login with session: ${sessionId} and authRequest: ${authRequestId}`,
-    );
-
-    const selectedSession = sessions.find((s) => s.id === sessionId);
-
-    if (selectedSession && selectedSession.id) {
-      console.log(`Found session ${selectedSession.id}`);
-
-      const isValid = await isSessionValid(
+  // complete flow if session and request id are provided
+  if (requestId && sessionId) {
+    if (requestId.startsWith("oidc_")) {
+      // this finishes the login process for OIDC
+      return loginWithOIDCandSession({
         serviceUrl,
-
-        selectedSession,
-      );
-
-      console.log("Session is valid:", isValid);
-
-      if (!isValid && selectedSession.factors?.user) {
-        // if the session is not valid anymore, we need to redirect the user to re-authenticate /
-        // TODO: handle IDP intent direcly if available
-        const command: SendLoginnameCommand = {
-          loginName: selectedSession.factors.user?.loginName,
-          organization: selectedSession.factors?.user?.organizationId,
-          authRequestId: authRequestId,
-        };
-
-        const res = await sendLoginname(command);
-
-        if (res && "redirect" in res && res?.redirect) {
-          const absoluteUrl = new URL(res.redirect, request.nextUrl);
-          return NextResponse.redirect(absoluteUrl.toString());
-        }
-      }
-
-      const cookie = sessionCookies.find(
-        (cookie) => cookie.id === selectedSession?.id,
-      );
-
-      if (cookie && cookie.id && cookie.token) {
-        const session = {
-          sessionId: cookie?.id,
-          sessionToken: cookie?.token,
-        };
-
-        // works not with _rsc request
-        try {
-          const { callbackUrl } = await createCallback({
-            serviceUrl,
-
-            req: create(CreateCallbackRequestSchema, {
-              authRequestId,
-              callbackKind: {
-                case: "session",
-                value: create(SessionSchema, session),
-              },
-            }),
-          });
-          if (callbackUrl) {
-            return NextResponse.redirect(callbackUrl);
-          } else {
-            return NextResponse.json(
-              { error: "An error occurred!" },
-              { status: 500 },
-            );
-          }
-        } catch (error: unknown) {
-          // handle already handled gracefully as these could come up if old emails with authRequestId are used (reset password, register emails etc.)
-          console.error(error);
-          if (
-            error &&
-            typeof error === "object" &&
-            "code" in error &&
-            error?.code === 9
-          ) {
-            const loginSettings = await getLoginSettings({
-              serviceUrl,
-
-              organization: selectedSession.factors?.user?.organizationId,
-            });
-
-            if (loginSettings?.defaultRedirectUri) {
-              return NextResponse.redirect(loginSettings.defaultRedirectUri);
-            }
-
-            const signedinUrl = constructUrl(request, "/signedin");
-            const params = new URLSearchParams();
-
-            if (selectedSession.factors?.user?.loginName) {
-              params.append(
-                "loginName",
-                selectedSession.factors?.user?.loginName,
-              );
-              // signedinUrl.searchParams.set(
-              //   "loginName",
-              //   selectedSession.factors?.user?.loginName,
-              // );
-            }
-            if (selectedSession.factors?.user?.organizationId) {
-              params.append(
-                "organization",
-                selectedSession.factors?.user?.organizationId,
-              );
-              // signedinUrl.searchParams.set(
-              //   "organization",
-              //   selectedSession.factors?.user?.organizationId,
-              // );
-            }
-            return NextResponse.redirect(signedinUrl + "?" + params);
-          } else {
-            return NextResponse.json({ error }, { status: 500 });
-          }
-        }
-      }
+        authRequest: requestId.replace("oidc_", ""),
+        sessionId,
+        sessions,
+        sessionCookies,
+        request,
+      });
+    } else if (requestId.startsWith("saml_")) {
+      // this finishes the login process for SAML
+      return loginWithSAMLandSession({
+        serviceUrl,
+        samlRequest: requestId.replace("saml_", ""),
+        sessionId,
+        sessions,
+        sessionCookies,
+        request,
+      });
     }
   }
 
-  if (authRequestId) {
+  // continue with OIDC
+  if (requestId && requestId.startsWith("oidc_")) {
     const { authRequest } = await getAuthRequest({
       serviceUrl,
-
-      authRequestId,
+      authRequestId: requestId.replace("oidc_", ""),
     });
 
     let organization = "";
@@ -400,7 +176,6 @@ export async function GET(request: NextRequest) {
 
         const identityProviders = await getActiveIdentityProviders({
           serviceUrl,
-
           orgId: organization ? organization : undefined,
         }).then((resp) => {
           return resp.identityProviders;
@@ -416,8 +191,8 @@ export async function GET(request: NextRequest) {
 
           const params = new URLSearchParams();
 
-          if (authRequestId) {
-            params.set("authRequestId", authRequestId);
+          if (requestId) {
+            params.set("requestId", requestId);
           }
 
           if (organization) {
@@ -426,7 +201,6 @@ export async function GET(request: NextRequest) {
 
           return startIdentityProviderFlow({
             serviceUrl,
-
             idpId,
             urls: {
               successUrl:
@@ -448,41 +222,27 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const gotoAccounts = (): NextResponse<unknown> => {
-      const accountsUrl = constructUrl(request, "/accounts");
-      const params = new URLSearchParams();
-      if (authRequest?.id) {
-        params.append("authRequestId", authRequest.id);
-        // accountsUrl.searchParams.set("authRequestId", authRequest?.id);
-      }
-      if (organization) {
-        params.append("organization", organization);
-        // accountsUrl.searchParams.set("organization", organization);
-      }
-
-      return NextResponse.redirect(accountsUrl + "?" + params);
-    };
-
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
-      const registerUrl = constructUrl(request, "/register");
-      const params = new URLSearchParams();
+      const registerUrl = new URL("/register", request.url);
       if (authRequest.id) {
-        params.append("authRequestId", authRequest.id);
-        // registerUrl.searchParams.set("authRequestId", authRequest.id);
+        registerUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
       }
       if (organization) {
-        params.append("organization", organization);
-        // registerUrl.searchParams.set("organization", organization);
+        registerUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(registerUrl + "?" + params);
+      return NextResponse.redirect(registerUrl);
     }
 
     // use existing session and hydrate it for oidc
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
       if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
-        return gotoAccounts();
+        return gotoAccounts({
+          request,
+          requestId: `oidc_${authRequest.id}`,
+          organization,
+        });
       } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
         /**
          * The login prompt instructs the authentication server to prompt the user for re-authentication, regardless of whether the user is already authenticated
@@ -493,7 +253,7 @@ export async function GET(request: NextRequest) {
           try {
             let command: SendLoginnameCommand = {
               loginName: authRequest.loginHint,
-              authRequestId: authRequest.id,
+              requestId: authRequest.id,
             };
 
             if (organization) {
@@ -503,7 +263,7 @@ export async function GET(request: NextRequest) {
             const res = await sendLoginname(command);
 
             if (res && "redirect" in res && res?.redirect) {
-              const absoluteUrl = new URL(res.redirect, request.nextUrl);
+              const absoluteUrl = new URL(res.redirect, request.url);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
@@ -511,39 +271,31 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const loginNameUrl = constructUrl(request, "/loginname");
-
-        const params = new URLSearchParams();
-
+        const loginNameUrl = new URL("/loginname", request.url);
         if (authRequest.id) {
-          params.append("authRequestId", authRequest.id);
-          // loginNameUrl.searchParams.set("authRequestId", authRequest.id);
+          loginNameUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
         }
         if (authRequest.loginHint) {
-          params.append("loginName", authRequest.loginHint);
-          // loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         }
         if (organization) {
-          params.append("organization", organization);
-          // loginNameUrl.searchParams.set("organization", organization);
+          loginNameUrl.searchParams.set("organization", organization);
         }
         if (suffix) {
-          params.append("suffix", suffix);
-          // loginNameUrl.searchParams.set("suffix", suffix);
+          loginNameUrl.searchParams.set("suffix", suffix);
         }
-        return NextResponse.redirect(loginNameUrl + "?" + params);
+        return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
          * With an OIDC none prompt, the authentication server must not display any authentication or consent user interface pages.
          * This means that the user should not be prompted to enter their password again.
          * Instead, the server attempts to silently authenticate the user using an existing session or other authentication mechanisms that do not require user interaction
          **/
-        const selectedSession = await findValidSession(
+        const selectedSession = await findValidSession({
           serviceUrl,
-
           sessions,
           authRequest,
-        );
+        });
 
         if (!selectedSession || !selectedSession.id) {
           return NextResponse.json(
@@ -570,9 +322,8 @@ export async function GET(request: NextRequest) {
 
         const { callbackUrl } = await createCallback({
           serviceUrl,
-
           req: create(CreateCallbackRequestSchema, {
-            authRequestId,
+            authRequestId: requestId.replace("oidc_", ""),
             callbackKind: {
               case: "session",
               value: create(SessionSchema, session),
@@ -582,15 +333,18 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(callbackUrl);
       } else {
         // check for loginHint, userId hint and valid sessions
-        let selectedSession = await findValidSession(
+        let selectedSession = await findValidSession({
           serviceUrl,
-
           sessions,
           authRequest,
-        );
+        });
 
         if (!selectedSession || !selectedSession.id) {
-          return gotoAccounts();
+          return gotoAccounts({
+            request,
+            requestId: `oidc_${authRequest.id}`,
+            organization,
+          });
         }
 
         const cookie = sessionCookies.find(
@@ -598,7 +352,11 @@ export async function GET(request: NextRequest) {
         );
 
         if (!cookie || !cookie.id || !cookie.token) {
-          return gotoAccounts();
+          return gotoAccounts({
+            request,
+            requestId: `oidc_${authRequest.id}`,
+            organization,
+          });
         }
 
         const session = {
@@ -611,7 +369,7 @@ export async function GET(request: NextRequest) {
             serviceUrl,
 
             req: create(CreateCallbackRequestSchema, {
-              authRequestId,
+              authRequestId: requestId.replace("oidc_", ""),
               callbackKind: {
                 case: "session",
                 value: create(SessionSchema, session),
@@ -624,36 +382,148 @@ export async function GET(request: NextRequest) {
             console.log(
               "could not create callback, redirect user to choose other account",
             );
-            return gotoAccounts();
+            return gotoAccounts({
+              request,
+              organization,
+              requestId: `oidc_${authRequest.id}`,
+            });
           }
         } catch (error) {
           console.error(error);
-          return gotoAccounts();
+          return gotoAccounts({
+            request,
+            requestId: `oidc_${authRequest.id}`,
+            organization,
+          });
         }
       }
     } else {
-      const loginNameUrl = constructUrl(request, "/loginname");
+      const loginNameUrl = new URL("/loginname", request.url);
 
-      const params = new URLSearchParams();
-      params.set("authRequestId", authRequestId);
-      // loginNameUrl.searchParams.set("authRequestId", authRequestId);
+      loginNameUrl.searchParams.set("requestId", requestId);
       if (authRequest?.loginHint) {
-        params.set("loginName", authRequest.loginHint);
-        params.set("submit", "true"); // autosubmit
-        // loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-        // loginNameUrl.searchParams.set("submit", "true"); // autosubmit
+        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+        loginNameUrl.searchParams.set("submit", "true"); // autosubmit
       }
 
       if (organization) {
-        params.set("organization", organization);
+        loginNameUrl.searchParams.append("organization", organization);
         // loginNameUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(loginNameUrl + "?" + params);
+      return NextResponse.redirect(loginNameUrl);
+    }
+  }
+  // continue with SAML
+  else if (requestId && requestId.startsWith("saml_")) {
+    const { samlRequest } = await getSAMLRequest({
+      serviceUrl,
+      samlRequestId: requestId.replace("saml_", ""),
+    });
+
+    if (!samlRequest) {
+      return NextResponse.json(
+        { error: "No samlRequest found" },
+        { status: 400 },
+      );
+    }
+
+    let selectedSession = await findValidSession({
+      serviceUrl,
+      sessions,
+      samlRequest,
+    });
+
+    if (!selectedSession || !selectedSession.id) {
+      return gotoAccounts({
+        request,
+        requestId: `saml_${samlRequest.id}`,
+      });
+    }
+
+    const cookie = sessionCookies.find(
+      (cookie) => cookie.id === selectedSession.id,
+    );
+
+    if (!cookie || !cookie.id || !cookie.token) {
+      return gotoAccounts({
+        request,
+        requestId: `saml_${samlRequest.id}`,
+        // organization,
+      });
+    }
+
+    const session = {
+      sessionId: cookie.id,
+      sessionToken: cookie.token,
+    };
+
+    try {
+      const { url, binding } = await createResponse({
+        serviceUrl,
+        req: create(CreateResponseRequestSchema, {
+          samlRequestId: requestId.replace("saml_", ""),
+          responseKind: {
+            case: "session",
+            value: session,
+          },
+        }),
+      });
+      if (url && binding.case === "redirect") {
+        return NextResponse.redirect(url);
+      } else if (url && binding.case === "post") {
+        const formData = {
+          key1: "value1",
+          key2: "value2",
+        };
+
+        // Convert form data to URL-encoded string
+        const formBody = Object.entries(formData)
+          .map(
+            ([key, value]) =>
+              encodeURIComponent(key) + "=" + encodeURIComponent(value),
+          )
+          .join("&");
+
+        // Make a POST request to the external URL with the form data
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: formBody,
+        });
+
+        // Handle the response from the external URL
+        if (response.ok) {
+          return NextResponse.json({
+            message: "SAML request completed successfully",
+          });
+        } else {
+          return NextResponse.json(
+            { error: "Failed to complete SAML request" },
+            { status: response.status },
+          );
+        }
+      } else {
+        console.log(
+          "could not create response, redirect user to choose other account",
+        );
+        return gotoAccounts({
+          request,
+          requestId: `saml_${samlRequest.id}`,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      return gotoAccounts({
+        request,
+        requestId: `saml_${samlRequest.id}`,
+      });
     }
   } else {
     return NextResponse.json(
-      { error: "No authRequestId provided" },
+      { error: "No authRequest nor samlRequest provided" },
       { status: 500 },
     );
   }

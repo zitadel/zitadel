@@ -71,7 +71,8 @@
     },
     "set": {
       "title": "设置双因素认证",
-      "description": "选择以下的一个第二因素。"
+      "description": "选择以下的一个第二因素。",
+      "skip": "跳过"
     }
   },
   "otp": {

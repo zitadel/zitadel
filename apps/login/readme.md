@@ -389,7 +389,6 @@ In future, self service options to jump to are shown below, like:
 
 ## Currently NOT Supported
 
-- Login Settings: multifactor init prompt
 - forceMFA on login settings is not checked for IDPs
 
 Also note that IDP logins are considered as valid MFA. An additional MFA check will be implemented in future if enforced.
