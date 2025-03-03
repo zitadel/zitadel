@@ -503,12 +503,12 @@ func (l *Login) handleExternalUserAuthenticated(
 // The decision, which information will be checked is based on the IdP template option.
 // The function returns a boolean whether a user was found or not.
 // If single a user was found, it will be automatically linked.
-func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) (bool, error) {
 	queries := make([]query.SearchQuery, 0, 2)
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUnspecified:
 		// is auto linking is disable, we shouldn't even get here, but in case we do we can directly return
-		return false
+		return false, nil
 	case domain.AutoLinkingOptionUsername:
 		// if we're checking for usernames there are to options:
 		//
@@ -517,22 +517,24 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 		if authReq.RequestedOrgID == "" {
 			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
 			if err != nil {
-				return false
+				return false, nil
 			}
-			l.autoLinkUser(w, r, authReq, user)
-			return true
+			if err = l.autoLinkUser(r, authReq, user); err != nil {
+				return false, err
+			}
+			return true, nil
 		}
 		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
 		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, usernameQuery)
 	case domain.AutoLinkingOptionEmail:
 		// Email will always be checked against verified email addresses.
 		emailQuery, err := query.NewUserVerifiedEmailSearchQuery(string(externalUser.Email))
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, emailQuery)
 	}
@@ -540,29 +542,29 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 	if authReq.RequestedOrgID != "" {
 		resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(authReq.RequestedOrgID, query.TextEquals)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, resourceOwnerQuery)
 	}
 	user, err := l.query.GetNotifyUser(r.Context(), false, queries...)
 	if err != nil {
-		return false
+		return false, nil
 	}
-	l.autoLinkUser(w, r, authReq, user)
-	return true
+	if err = l.autoLinkUser(r, authReq, user); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
-func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) {
+func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) error {
 	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID); err != nil {
-		l.renderError(w, r, authReq, err)
-		return
+		return err
 	}
 	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
-		l.renderError(w, r, authReq, err)
-		return
+		return err
 	}
 	authReq.UserID = user.ID
-	l.renderNextStep(w, r, authReq)
+	return nil
 }
 
 // createOrLinkUser is called if an externalAuthentication couldn't find a corresponding externalID
@@ -583,9 +585,13 @@ func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
-		if l.checkAutoLinking(w, r, authReq, provider, externalUser) {
-			userLinked = true
-			return
+		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return false
+		}
+		if userLinked {
+			return userLinked
 		}
 	}
 
@@ -609,7 +615,7 @@ func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq
 		}
 	}
 	l.autoCreateExternalUser(w, r, authReq)
-	return
+	return false
 }
 
 // autoCreateExternalUser takes the externalUser and creates it automatically (without user interaction)
