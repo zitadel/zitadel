@@ -25,41 +25,38 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	code := exec(m)
-	os.Exit(code)
-}
+	os.Exit(func() int {
+		tempPath, err := os.MkdirTemp("", "db")
+		logging.OnError(err).Fatal("unable to create temp dir")
+		config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath).Port(rand.Uint32() % math.MaxUint16)
+		psql := embeddedpostgres.NewDatabase(config)
+		err = psql.Start()
+		logging.OnError(err).Fatal("unable to start db")
+		defer func() {
+			logging.OnError(psql.Stop()).Error("unable to stop db")
+		}()
 
-func exec(m *testing.M) int {
-	tempPath, err := os.MkdirTemp("", "db")
-	logging.OnError(err).Fatal("unable to create temp dir")
-	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath).Port(rand.Uint32() % math.MaxUint16)
-	psql := embeddedpostgres.NewDatabase(config)
-	err = psql.Start()
-	logging.OnError(err).Fatal("unable to start db")
-	defer func() {
-		logging.OnError(psql.Stop()).Error("unable to stop db")
-	}()
+		connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
+		logging.OnError(err).Fatal("unable to parse db url")
 
-	connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
-	logging.OnError(err).Fatal("unable to parse db url")
+		connConfig.AfterConnect = new_es.RegisterEventstoreTypes
+		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
+		logging.OnError(err).Fatal("unable to create db pool")
 
-	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
-	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
-	logging.OnError(err).Fatal("unable to create db pool")
+		testClient = stdlib.OpenDBFromPool(pool)
 
-	testClient = stdlib.OpenDBFromPool(pool)
+		err = testClient.Ping()
+		logging.OnError(err).Fatal("unable to ping db")
 
-	err = testClient.Ping()
-	logging.OnError(err).Fatal("unable to ping db")
+		defer func() {
+			logging.OnError(testClient.Close()).Error("unable to close db")
+		}()
 
-	defer func() {
-		logging.OnError(testClient.Close()).Error("unable to close db")
-	}()
+		err = initDB(context.Background(), &database.DB{DB: testClient, Database: &postgres.Config{Database: "zitadel"}})
+		logging.OnError(err).Fatal("migrations failed")
 
-	err = initDB(context.Background(), &database.DB{DB: testClient, Database: &postgres.Config{Database: "zitadel"}})
-	logging.OnError(err).Fatal("migrations failed")
-
-	return m.Run()
+		return m.Run()
+	}())
 }
 
 func initDB(ctx context.Context, db *database.DB) error {

@@ -31,58 +31,56 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	os.Exit(exec(m))
-}
+	os.Exit(func() int {
+		tempPath, err := os.MkdirTemp("", "db")
+		logging.OnError(err).Fatal("unable to create temp dir")
+		config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath).Port(rand.Uint32() % math.MaxUint16)
+		psql := embeddedpostgres.NewDatabase(config)
+		err = psql.Start()
+		logging.OnError(err).Fatal("unable to start db")
+		defer func() {
+			logging.OnError(psql.Stop()).Error("unable to stop db")
+		}()
 
-func exec(m *testing.M) int {
-	tempPath, err := os.MkdirTemp("", "db")
-	logging.OnError(err).Fatal("unable to create temp dir")
-	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath).Port(rand.Uint32() % math.MaxUint16)
-	psql := embeddedpostgres.NewDatabase(config)
-	err = psql.Start()
-	logging.OnError(err).Fatal("unable to start db")
-	defer func() {
-		logging.OnError(psql.Stop()).Error("unable to stop db")
-	}()
+		testClient = &database.DB{
+			Database: new(testDB),
+		}
 
-	testClient = &database.DB{
-		Database: new(testDB),
-	}
+		connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
+		logging.OnError(err).Fatal("unable to parse db url")
 
-	connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
-	logging.OnError(err).Fatal("unable to parse db url")
+		connConfig.AfterConnect = new_es.RegisterEventstoreTypes
+		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
+		logging.OnError(err).Fatal("unable to create db pool")
 
-	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
-	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
-	logging.OnError(err).Fatal("unable to create db pool")
+		testClient.DB = stdlib.OpenDBFromPool(pool)
+		err = testClient.Ping()
+		logging.OnError(err).Fatal("unable to ping db")
 
-	testClient.DB = stdlib.OpenDBFromPool(pool)
-	err = testClient.Ping()
-	logging.OnError(err).Fatal("unable to ping db")
+		v2 := &es_sql.Postgres{DB: testClient}
+		queriers["v2(inmemory)"] = v2
+		clients["v2(inmemory)"] = testClient
 
-	v2 := &es_sql.Postgres{DB: testClient}
-	queriers["v2(inmemory)"] = v2
-	clients["v2(inmemory)"] = testClient
+		pushers["v3(inmemory)"] = new_es.NewEventstore(testClient)
+		clients["v3(inmemory)"] = testClient
 
-	pushers["v3(inmemory)"] = new_es.NewEventstore(testClient)
-	clients["v3(inmemory)"] = testClient
+		if localDB, err := connectLocalhost(); err == nil {
+			err = initDB(context.Background(), localDB)
+			logging.OnError(err).Fatal("migrations failed")
 
-	if localDB, err := connectLocalhost(); err == nil {
-		err = initDB(context.Background(), localDB)
+			pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
+			clients["v3(singlenode)"] = localDB
+		}
+
+		defer func() {
+			logging.OnError(testClient.Close()).Error("unable to close db")
+		}()
+
+		err = initDB(context.Background(), &database.DB{DB: testClient.DB, Database: &postgres.Config{Database: "zitadel"}})
 		logging.OnError(err).Fatal("migrations failed")
 
-		pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
-		clients["v3(singlenode)"] = localDB
-	}
-
-	defer func() {
-		logging.OnError(testClient.Close()).Error("unable to close db")
-	}()
-
-	err = initDB(context.Background(), &database.DB{DB: testClient.DB, Database: &postgres.Config{Database: "zitadel"}})
-	logging.OnError(err).Fatal("migrations failed")
-
-	return m.Run()
+		return m.Run()
+	}())
 }
 
 func initDB(ctx context.Context, db *database.DB) error {
