@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"math/rand/v2"
 	"os"
 	"testing"
 	"time"
@@ -30,7 +31,7 @@ func TestMain(m *testing.M) {
 func exec(m *testing.M) int {
 	tempPath, err := os.MkdirTemp("", "db")
 	logging.OnError(err).Fatal("unable to create temp dir")
-	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath)
+	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath).Port(rand.Uint32())
 	psql := embeddedpostgres.NewDatabase(config)
 	err = psql.Start()
 	logging.OnError(err).Fatal("unable to start db")
