@@ -179,7 +179,7 @@ func TestServer_DeleteWebKey(t *testing.T) {
 
 	ok = t.Run("delete not existing key", func(t *testing.T) {
 		resp, err := client.DeleteWebKey(iamCtx, &webkey.DeleteWebKeyRequest{
-			Id: keyIDs[1],
+			Id: "not-existing",
 		})
 		require.NoError(t, err)
 		require.Nil(t, resp.DeletionDate)
