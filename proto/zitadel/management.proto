@@ -12545,6 +12545,8 @@ message AddGenericOAuthProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 9;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OAuth2 flow.
+    bool use_pkce = 10;
 }
 
 message AddGenericOAuthProviderResponse {
@@ -12612,6 +12614,8 @@ message UpdateGenericOAuthProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 10;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OAuth2 flow.
+    bool use_pkce = 11;
 }
 
 message UpdateGenericOAuthProviderResponse {
@@ -12655,6 +12659,8 @@ message AddGenericOIDCProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 6;
     bool is_id_token_mapping = 7;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
+    bool use_pkce = 8;
 }
 
 message AddGenericOIDCProviderResponse {
@@ -12706,6 +12712,8 @@ message UpdateGenericOIDCProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 7;
     bool is_id_token_mapping = 8;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
+    bool use_pkce = 9;
 }
 
 message UpdateGenericOIDCProviderResponse {

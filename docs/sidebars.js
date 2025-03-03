@@ -70,6 +70,11 @@ module.exports = {
         },
         {
           type: "link",
+          label: "FastAPI",
+          href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
+        },
+        {
+          type: "link",
           label: "NextAuth",
           href: "https://next-auth.js.org/providers/zitadel",
         },
@@ -328,6 +333,7 @@ module.exports = {
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
+            "guides/integrate/login-ui/device-auth",
             "guides/integrate/login-ui/typescript-repo",
           ],
         },
@@ -731,10 +737,6 @@ module.exports = {
           type: "category",
           label: "V3 (Preview)",
           collapsed: false,
-          link: {
-            type: "doc",
-            id: "apis/v3",
-          },
           items: [
             {
               type: "category",
@@ -882,6 +884,20 @@ module.exports = {
           },
           items: [
             "apis/benchmarks/v2.66.0/machine_jwt_profile_grant/index",
+          ],
+        },
+        {
+          type: "category",
+          label: "v2.70.0",
+          link: {
+            title: "v2.70.0",
+            slug: "/apis/benchmarks/v2.70.0",
+            description:
+              "Benchmark results of Zitadel v2.70.0\n"
+          },
+          items: [
+            "apis/benchmarks/v2.70.0/machine_jwt_profile_grant/index",
+            "apis/benchmarks/v2.70.0/oidc_session/index",
           ],
         },
       ],

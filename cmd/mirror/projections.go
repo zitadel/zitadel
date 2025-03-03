@@ -221,6 +221,7 @@ func projections(
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		client,
+		nil,
 	)
 
 	config.Auth.Spooler.Client = client
