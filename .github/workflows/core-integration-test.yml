@@ -89,7 +89,7 @@ jobs:
            tmp/race.log.*
       - 
         name: publish coverage
-        uses: codecov/codecov-action@v4.3.0
+        uses: codecov/codecov-action@v5.4.0
         with:
           file: profile.cov
           name: core-integration-tests-postgres
@@ -158,7 +158,7 @@ jobs:
   #       run: make core_integration_test
   #     - 
   #       name: publish coverage
-  #       uses: codecov/codecov-action@v4.3.0
+  #       uses: codecov/codecov-action@v5.4.0
   #       with:
   #         file: profile.cov
   #         name: core-integration-tests-cockroach
