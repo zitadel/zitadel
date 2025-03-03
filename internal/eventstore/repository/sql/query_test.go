@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/cockroach"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -465,7 +465,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 		},
 	}
-	crdb := NewCRDB(&database.DB{Database: new(cockroach.Config)})
+	crdb := NewCRDB(&database.DB{Database: new(postgres.Config)})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotClause, gotValues := prepareConditions(crdb, tt.args.query, tt.args.useV1)
@@ -661,89 +661,6 @@ func Test_query_events_with_crdb(t *testing.T) {
 		})
 	}
 }
-
-/* Cockroach test DB doesn't seem to lock
-func Test_query_events_with_crdb_locking(t *testing.T) {
-	type args struct {
-		searchQuery *eventstore.SearchQueryBuilder
-	}
-	type fields struct {
-		existingEvents []eventstore.Command
-		client         *sql.DB
-	}
-	tests := []struct {
-		name       string
-		fields     fields
-		args       args
-		lockOption eventstore.LockOption
-		wantErr    bool
-	}{
-		{
-			name: "skip locked",
-			fields: fields{
-				client: testCRDBClient,
-				existingEvents: []eventstore.Command{
-					generateEvent(t, "306", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "307", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "308", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-				},
-			},
-			args: args{
-				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					ResourceOwner("caos"),
-			},
-			lockOption: eventstore.LockOptionNoWait,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{
-				DB: &database.DB{
-					DB:       tt.fields.client,
-					Database: new(testDB),
-				},
-			}
-			// setup initial data for query
-			if _, err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
-				t.Errorf("error in setup = %v", err)
-				return
-			}
-			// first TX should lock and return all events
-			tx1, err := db.DB.Begin()
-			require.NoError(t, err)
-			defer func() {
-				require.NoError(t, tx1.Rollback())
-			}()
-			searchQuery1 := tt.args.searchQuery.LockRowsDuringTx(tx1, tt.lockOption)
-			gotEvents1 := []eventstore.Event{}
-			err = query(context.Background(), db, searchQuery1, eventstore.Reducer(func(event eventstore.Event) error {
-				gotEvents1 = append(gotEvents1, event)
-				return nil
-			}), true)
-			require.NoError(t, err)
-			assert.Len(t, gotEvents1, len(tt.fields.existingEvents))
-
-			// second TX should not return the events, and might return an error
-			tx2, err := db.DB.Begin()
-			require.NoError(t, err)
-			defer func() {
-				require.NoError(t, tx2.Rollback())
-			}()
-			searchQuery2 := tt.args.searchQuery.LockRowsDuringTx(tx1, tt.lockOption)
-			gotEvents2 := []eventstore.Event{}
-			err = query(context.Background(), db, searchQuery2, eventstore.Reducer(func(event eventstore.Event) error {
-				gotEvents2 = append(gotEvents2, event)
-				return nil
-			}), true)
-			if tt.wantErr {
-				require.Error(t, err)
-			}
-			require.NoError(t, err)
-			assert.Len(t, gotEvents2, 0)
-		})
-	}
-}
-*/
 
 func Test_query_events_mocked(t *testing.T) {
 	type args struct {
