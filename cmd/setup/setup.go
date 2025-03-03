@@ -304,8 +304,8 @@ func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Even
 // under the folder/typ/filename path.
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
-func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
-	stmt, err := fs.ReadFile(path.Join(folder, typ, filename))
+func readStmt(fs embed.FS, folder, filename string) (string, error) {
+	stmt, err := fs.ReadFile(path.Join(folder, filename))
 	return string(stmt), err
 }
 
@@ -318,16 +318,15 @@ type statement struct {
 // under the folder/type path.
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
-func readStatements(fs embed.FS, folder, typ string) ([]statement, error) {
-	basePath := path.Join(folder, typ)
-	dir, err := fs.ReadDir(basePath)
+func readStatements(fs embed.FS, folder string) ([]statement, error) {
+	dir, err := fs.ReadDir(folder)
 	if err != nil {
 		return nil, err
 	}
 	statements := make([]statement, len(dir))
 	for i, file := range dir {
 		statements[i].file = file.Name()
-		statements[i].query, err = readStmt(fs, folder, typ, file.Name())
+		statements[i].query, err = readStmt(fs, folder, file.Name())
 		if err != nil {
 			return nil, err
 		}

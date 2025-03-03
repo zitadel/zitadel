@@ -52,7 +52,7 @@ The user provided by flags needs privileges to
 		},
 	}
 
-	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant(), newSettings())
+	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
 	return cmd
 }
 
@@ -61,7 +61,6 @@ func InitAll(ctx context.Context, config *Config) {
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
 		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
-		VerifySettings(config.Database.DatabaseName(), config.Database.Username()),
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 

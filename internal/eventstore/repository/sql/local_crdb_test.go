@@ -73,8 +73,7 @@ func initDB(ctx context.Context, db *database.DB) error {
 	err := initialise.Init(ctx, db,
 		initialise.VerifyUser(config.Username(), ""),
 		initialise.VerifyDatabase(config.DatabaseName()),
-		initialise.VerifyGrant(config.DatabaseName(), config.Username()),
-		initialise.VerifySettings(config.DatabaseName(), config.Username()))
+		initialise.VerifyGrant(config.DatabaseName(), config.Username()))
 	if err != nil {
 		return err
 	}

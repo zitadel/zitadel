@@ -3,7 +3,6 @@ package dialect
 import (
 	"database/sql"
 	"sync"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -38,8 +37,6 @@ type Connector interface {
 type Database interface {
 	DatabaseName() string
 	Username() string
-	Type() string
-	Timetravel(time.Duration) string
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {

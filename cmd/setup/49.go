@@ -21,7 +21,7 @@ var (
 )
 
 func (mig *InitPermittedOrgsFunction) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(permittedOrgsFunction, "49", "")
+	statements, err := readStatements(permittedOrgsFunction, "49")
 	if err != nil {
 		return err
 	}

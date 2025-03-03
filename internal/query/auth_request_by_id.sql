@@ -10,6 +10,6 @@ select
     login_hint,
     max_age,
     hint_user_id
-from projections.auth_requests %s
+from projections.auth_requests
 where id = $1 and instance_id = $2
 limit 1;
