@@ -235,12 +235,3 @@ func (db *Postgres) placeholder(query string) string {
 	}
 	return replaced
 }
-
-func (db *Postgres) isUniqueViolationError(err error) bool {
-	if pgxErr, ok := err.(*pgconn.PgError); ok {
-		if pgxErr.Code == "23505" {
-			return true
-		}
-	}
-	return false
-}
