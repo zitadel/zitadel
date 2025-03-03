@@ -39,7 +39,7 @@ const gotoAccounts = ({
   requestId: string;
   organization?: string;
 }): NextResponse<unknown> => {
-  const accountsUrl = new URL("/accounts", request.url);
+  const accountsUrl = constructUrl(request, "/accounts");
 
   if (requestId) {
     accountsUrl.searchParams.set("requestId", requestId);
@@ -64,6 +64,19 @@ async function loadSessions({
   });
 
   return response?.sessions ?? [];
+}
+
+export function constructUrl(request: NextRequest, path: string) {
+  const forwardedHost =
+    request.headers.get("x-zitadel-forward-host") ??
+    request.headers.get("host");
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  return new URL(
+    `${basePath}${path}`,
+    forwardedHost?.startsWith("http")
+      ? forwardedHost
+      : `https://${forwardedHost}`,
+  );
 }
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
@@ -223,7 +236,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
-      const registerUrl = new URL("/register", request.url);
+      const registerUrl = constructUrl(request, "/register");
       if (authRequest.id) {
         registerUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
       }
@@ -263,7 +276,7 @@ export async function GET(request: NextRequest) {
             const res = await sendLoginname(command);
 
             if (res && "redirect" in res && res?.redirect) {
-              const absoluteUrl = new URL(res.redirect, request.url);
+              const absoluteUrl = constructUrl(request, res.redirect);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
@@ -271,7 +284,7 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const loginNameUrl = new URL("/loginname", request.url);
+        const loginNameUrl = constructUrl(request, "/loginname");
         if (authRequest.id) {
           loginNameUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
         }
@@ -398,7 +411,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } else {
-      const loginNameUrl = new URL("/loginname", request.url);
+      const loginNameUrl = constructUrl(request, "/loginname");
 
       loginNameUrl.searchParams.set("requestId", requestId);
       if (authRequest?.loginHint) {

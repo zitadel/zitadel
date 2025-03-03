@@ -1,3 +1,4 @@
+import { constructUrl } from "@/app/login/route";
 import { Cookie } from "@/lib/cookies";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createCallback, getLoginSettings } from "@/lib/zitadel";
@@ -54,7 +55,7 @@ export async function loginWithOIDCandSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        const absoluteUrl = new URL(res.redirect, request.url);
+        const absoluteUrl = constructUrl(request, res.redirect);
         return NextResponse.redirect(absoluteUrl.toString());
       }
     }
@@ -107,7 +108,7 @@ export async function loginWithOIDCandSession({
             return NextResponse.redirect(loginSettings.defaultRedirectUri);
           }
 
-          const signedinUrl = new URL("/signedin", request.url);
+          const signedinUrl = constructUrl(request, "/signedin");
 
           if (selectedSession.factors?.user?.loginName) {
             signedinUrl.searchParams.set(

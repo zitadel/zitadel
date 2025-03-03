@@ -1,3 +1,4 @@
+import { constructUrl } from "@/app/login/route";
 import { Cookie } from "@/lib/cookies";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createResponse, getLoginSettings } from "@/lib/zitadel";
@@ -52,7 +53,7 @@ export async function loginWithSAMLandSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        const absoluteUrl = new URL(res.redirect, request.url);
+        const absoluteUrl = constructUrl(request, res.redirect);
         return NextResponse.redirect(absoluteUrl.toString());
       }
     }
@@ -105,7 +106,7 @@ export async function loginWithSAMLandSession({
             return NextResponse.redirect(loginSettings.defaultRedirectUri);
           }
 
-          const signedinUrl = new URL("/signedin", request.url);
+          const signedinUrl = constructUrl(request, "/signedin");
 
           if (selectedSession.factors?.user?.loginName) {
             signedinUrl.searchParams.set(
