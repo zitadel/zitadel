@@ -60,9 +60,6 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context, _ eventstore.Event)
 				return err
 			}
 
-			if err != nil {
-				return err
-			}
 			_, err = tx.ExecContext(ctx, correctCreationDate10Update)
 			if err != nil {
 				return err

@@ -56,15 +56,15 @@ func copyEventstore(ctx context.Context, config *Migration) {
 }
 
 func positionQuery(db *db.DB) string {
-	switch db.Type() {
-	case "postgres":
-		return "SELECT EXTRACT(EPOCH FROM clock_timestamp())"
-	case "cockroach":
-		return "SELECT cluster_logical_timestamp()"
-	default:
-		logging.WithFields("db_type", db.Type()).Fatal("database type not recognized")
-		return ""
-	}
+	// switch db.Type() {
+	// case "postgres":
+	return "SELECT EXTRACT(EPOCH FROM clock_timestamp())"
+	// case "cockroach":
+	// 	return "SELECT cluster_logical_timestamp()"
+	// default:
+	// 	logging.WithFields("db_type", db.Type()).Fatal("database type not recognized")
+	// 	return ""
+	// }
 }
 
 func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
