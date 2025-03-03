@@ -576,7 +576,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "V1 (Generally Available)",
+          label: "V1",
           collapsed: false,
           link: {
             type: "generated-index",
@@ -640,7 +640,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "V2 (Generally Available)",
+          label: "V2",
           collapsed: false,
           link: {
             type: "doc",
@@ -649,7 +649,7 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "User Lifecycle",
+              label: "User",
               link: {
                 type: "generated-index",
                 title: "User Service API",
@@ -661,7 +661,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Session Lifecycle",
+              label: "Session",
               link: {
                 type: "generated-index",
                 title: "Session Service API",
@@ -673,7 +673,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "OIDC Lifecycle",
+              label: "OIDC",
               link: {
                 type: "generated-index",
                 title: "OIDC Service API",
@@ -685,7 +685,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Settings Lifecycle",
+              label: "Settings",
               link: {
                 type: "generated-index",
                 title: "Settings Service API",
@@ -697,7 +697,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Feature Lifecycle",
+              label: "Feature",
               link: {
                 type: "generated-index",
                 title: "Feature Service API",
@@ -754,7 +754,7 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "Action Lifecycle (Preview)",
+              label: "Action (Preview)",
               link: {
                 type: "generated-index",
                 title: "Action Service API (Preview)",

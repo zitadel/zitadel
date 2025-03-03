@@ -101,7 +101,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service ZITADELWebKeys {
+// Service to manage web keys for OIDC token signing and validation.
+// The service provides methods to create, activate, delete and list web keys.
+// The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.
+service WebKeyService {
   // Create Web Key
   //
   // Generate a private and public key pair. The private key can be used to sign OIDC tokens after activation.
