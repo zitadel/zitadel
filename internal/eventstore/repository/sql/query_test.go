@@ -18,6 +18,7 @@ import (
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -267,7 +268,7 @@ func Test_prepareColumns(t *testing.T) {
 
 			got := reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface()
 			if !reflect.DeepEqual(got, tt.res.expected) {
-				t.Errorf("unexpected result from rowScanner \nwant: %+v \ngot: %+v", tt.res.expected, got)
+				t.Errorf("unexpected result from rowScanner nwant: %+v ngot: %+v", tt.res.expected, got)
 			}
 		})
 	}
@@ -403,7 +404,7 @@ func Test_prepareCondition(t *testing.T) {
 				useV1: true,
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?) AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = ANY(?))",
+				clause: " WHERE aggregate_type = ANY(?) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')",
 				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
 			},
 		},
@@ -420,7 +421,7 @@ func Test_prepareCondition(t *testing.T) {
 				},
 			},
 			res: res{
-				clause: ` WHERE aggregate_type = ANY(?) AND hlc_to_timestamp("position") < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = ANY(?))`,
+				clause: ` WHERE aggregate_type = ANY(?) AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`,
 				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
 			},
 		},
@@ -440,7 +441,7 @@ func Test_prepareCondition(t *testing.T) {
 				useV1: true,
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = ANY(?))",
+				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')",
 				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
 			},
 		},
@@ -459,7 +460,7 @@ func Test_prepareCondition(t *testing.T) {
 				},
 			},
 			res: res{
-				clause: ` WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND hlc_to_timestamp("position") < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = ANY(?))`,
+				clause: ` WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`,
 				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
 			},
 		},
@@ -634,21 +635,24 @@ func Test_query_events_with_crdb(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{
-				DB: &database.DB{
-					DB:       tt.fields.client,
-					Database: new(testDB),
-				},
+			dbClient := &database.DB{
+				DB:       tt.fields.client,
+				Database: new(testDB),
 			}
 
+			crdbClient := &CRDB{
+				DB: dbClient,
+			}
+
+			pusher := new_es.NewEventstore(dbClient)
 			// setup initial data for query
-			if _, err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
+			if _, err := pusher.Push(context.Background(), dbClient.DB, tt.fields.existingEvents...); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
 
 			events := []eventstore.Event{}
-			if err := query(context.Background(), db, tt.args.searchQuery, eventstore.Reducer(func(event eventstore.Event) error {
+			if err := query(context.Background(), crdbClient, tt.args.searchQuery, eventstore.Reducer(func(event eventstore.Event) error {
 				events = append(events, event)
 				return nil
 			}), true); (err != nil) != tt.wantErr {
@@ -773,7 +777,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$2\)\) ORDER BY event_sequence DESC`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}},
 				),
 			},
@@ -796,7 +800,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$2\)\) ORDER BY event_sequence LIMIT \$3`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence LIMIT $3`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
 				),
 			},
@@ -819,7 +823,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$2\)\) ORDER BY event_sequence DESC LIMIT \$3`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $3`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
 				),
 			},
@@ -843,7 +847,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms' WHERE aggregate_type = \$1 AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$2\)\) ORDER BY event_sequence DESC LIMIT \$3`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms' WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $3`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
 				),
 			},
@@ -865,7 +869,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC LIMIT \$2 FOR UPDATE`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE`),
 					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -887,7 +891,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC LIMIT \$2 FOR UPDATE NOWAIT`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE NOWAIT`),
 					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -909,7 +913,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 ORDER BY event_sequence DESC LIMIT \$2 FOR UPDATE SKIP LOCKED`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE SKIP LOCKED`),
 					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -932,7 +936,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQueryErr(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$2\)\) ORDER BY event_sequence DESC`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}},
 					sql.ErrConnDone),
 			},
@@ -955,7 +959,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQueryScanErr(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = \$1 AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$2\)\) ORDER BY event_sequence DESC`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}},
 					&repository.Event{Seq: 100}),
 			},
@@ -990,7 +994,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \(aggregate_type = \$1 OR \(aggregate_type = \$2 AND aggregate_id = \$3\)\) AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$4\)\) ORDER BY event_sequence DESC LIMIT \$5`,
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE (aggregate_type = $1 OR (aggregate_type = $2 AND aggregate_id = $3)) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($4) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $5`),
 					[]driver.Value{eventstore.AggregateType("user"), eventstore.AggregateType("org"), "asdf42", database.TextArray[string]{}, uint64(5)},
 				),
 			},
@@ -1019,9 +1023,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					regexp.QuoteMeta(
-						`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY event_sequence DESC LIMIT $9`,
-					),
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY event_sequence DESC LIMIT $9`),
 					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), 123.456, eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", 123.456, uint64(5)},
 				),
 			},
@@ -1050,9 +1052,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					regexp.QuoteMeta(
-						`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`,
-					),
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`),
 					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), 123.456, eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", 123.456, uint64(5)},
 				),
 			},
@@ -1081,9 +1081,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					regexp.QuoteMeta(
-						`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`,
-					),
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`),
 					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), time.Unix(123, 456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", time.Unix(123, 456), uint64(5)},
 				),
 			},
