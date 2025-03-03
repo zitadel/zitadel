@@ -22,67 +22,63 @@ import (
 )
 
 var (
-	testCRDBClient *database.DB
-	queriers       map[string]eventstore.Querier = make(map[string]eventstore.Querier)
-	pushers        map[string]eventstore.Pusher  = make(map[string]eventstore.Pusher)
-	clients        map[string]*database.DB       = make(map[string]*database.DB)
+	testClient *database.DB
+	queriers   map[string]eventstore.Querier = make(map[string]eventstore.Querier)
+	pushers    map[string]eventstore.Pusher  = make(map[string]eventstore.Pusher)
+	clients    map[string]*database.DB       = make(map[string]*database.DB)
 )
 
 func TestMain(m *testing.M) {
+	os.Exit(exec(m))
+}
+
+func exec(m *testing.M) int {
 	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16)
 	psql := embeddedpostgres.NewDatabase(config)
 	err := psql.Start()
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to start db")
-	}
+	logging.OnError(err).Fatal("unable to start db")
 	defer func() {
-		logging.OnError(psql.Stop()).Debug("unable to stop db")
+		logging.OnError(psql.Stop()).Error("unable to stop db")
 	}()
 
-	testCRDBClient = &database.DB{
+	testClient = &database.DB{
 		Database: new(testDB),
 	}
 
 	connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to parse db url")
-	}
+	logging.OnError(err).Fatal("unable to parse db url")
+
 	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
 	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to create db pool")
-	}
-	testCRDBClient.DB = stdlib.OpenDBFromPool(pool)
-	if err = testCRDBClient.Ping(); err != nil {
-		logging.WithFields("error", err).Fatal("unable to ping db")
-	}
+	logging.OnError(err).Fatal("unable to create db pool")
 
-	v2 := &es_sql.CRDB{DB: testCRDBClient}
+	testClient.DB = stdlib.OpenDBFromPool(pool)
+	err = testClient.Ping()
+	logging.OnError(err).Fatal("unable to ping db")
+
+	v2 := &es_sql.Postgres{DB: testClient}
 	queriers["v2(inmemory)"] = v2
-	clients["v2(inmemory)"] = testCRDBClient
+	clients["v2(inmemory)"] = testClient
 
-	pushers["v3(inmemory)"] = new_es.NewEventstore(testCRDBClient)
-	clients["v3(inmemory)"] = testCRDBClient
+	pushers["v3(inmemory)"] = new_es.NewEventstore(testClient)
+	clients["v3(inmemory)"] = testClient
 
 	if localDB, err := connectLocalhost(); err == nil {
-		if err = initDB(context.Background(), localDB); err != nil {
-			logging.WithFields("error", err).Fatal("migrations failed")
-		}
+		err = initDB(context.Background(), localDB)
+		logging.OnError(err).Fatal("migrations failed")
+
 		pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
 		clients["v3(singlenode)"] = localDB
 	}
 
-	// pushers["v2(inmemory)"] = v2
-
 	defer func() {
-		testCRDBClient.Close()
+		logging.OnError(testClient.Close()).Error("unable to close db")
 	}()
 
-	if err = initDB(context.Background(), &database.DB{DB: testCRDBClient.DB, Database: &postgres.Config{Database: "zitadel"}}); err != nil {
-		logging.WithFields("error", err).Fatal("migrations failed")
-	}
+	err = initDB(context.Background(), &database.DB{DB: testClient.DB, Database: &postgres.Config{Database: "zitadel"}})
+	logging.OnError(err).Fatal("migrations failed")
 
-	os.Exit(m.Run())
+	return m.Run()
 }
 
 func initDB(ctx context.Context, db *database.DB) error {
@@ -178,7 +174,7 @@ func canceledCtx() context.Context {
 }
 
 func fillUniqueData(unique_type, field, instanceID string) error {
-	_, err := testCRDBClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
+	_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
 	return err
 }
 

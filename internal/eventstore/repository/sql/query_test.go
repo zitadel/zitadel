@@ -69,7 +69,7 @@ func Test_getCondition(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{}
+			db := &Postgres{}
 			if got := getCondition(db, tt.args.filter, false); got != tt.want {
 				t.Errorf("getCondition() = %v, want %v", got, tt.want)
 			}
@@ -237,8 +237,7 @@ func Test_prepareColumns(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			crdb := &CRDB{}
-			query, rowScanner := prepareColumns(crdb, tt.args.columns, tt.args.useV1)
+			query, rowScanner := prepareColumns(new(Postgres), tt.args.columns, tt.args.useV1)
 			if query != tt.res.query {
 				t.Errorf("prepareColumns() got = %s, want %s", query, tt.res.query)
 			}
@@ -465,10 +464,9 @@ func Test_prepareCondition(t *testing.T) {
 			},
 		},
 	}
-	crdb := NewCRDB(&database.DB{Database: new(postgres.Config)})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotClause, gotValues := prepareConditions(crdb, tt.args.query, tt.args.useV1)
+			gotClause, gotValues := prepareConditions(NewPostgres(&database.DB{Database: new(postgres.Config)}), tt.args.query, tt.args.useV1)
 			if gotClause != tt.res.clause {
 				t.Errorf("prepareCondition() gotClause = %v, want %v", gotClause, tt.res.clause)
 			}
@@ -485,7 +483,7 @@ func Test_prepareCondition(t *testing.T) {
 	}
 }
 
-func Test_query_events_with_crdb(t *testing.T) {
+func Test_query_events_with_postgres(t *testing.T) {
 	type args struct {
 		searchQuery *eventstore.SearchQueryBuilder
 	}
@@ -512,7 +510,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 					Builder(),
 			},
 			fields: fields{
-				client: testCRDBClient,
+				client: testClient,
 				existingEvents: []eventstore.Command{
 					generateEvent(t, "300"),
 					generateEvent(t, "300"),
@@ -533,7 +531,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 					Builder(),
 			},
 			fields: fields{
-				client: testCRDBClient,
+				client: testClient,
 				existingEvents: []eventstore.Command{
 					generateEvent(t, "301"),
 					generateEvent(t, "302"),
@@ -556,7 +554,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 					Builder(),
 			},
 			fields: fields{
-				client: testCRDBClient,
+				client: testClient,
 				existingEvents: []eventstore.Command{
 					generateEvent(t, "303"),
 					generateEvent(t, "303"),
@@ -577,7 +575,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 					ResourceOwner("caos"),
 			},
 			fields: fields{
-				client: testCRDBClient,
+				client: testClient,
 				existingEvents: []eventstore.Command{
 					generateEvent(t, "306", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
 					generateEvent(t, "307", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
@@ -600,7 +598,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 					Builder(),
 			},
 			fields: fields{
-				client: testCRDBClient,
+				client: testClient,
 				existingEvents: []eventstore.Command{
 					generateEvent(t, "311", func(e *repository.Event) { e.Typ = "user.created" }),
 					generateEvent(t, "311", func(e *repository.Event) { e.Typ = "user.updated" }),
@@ -624,7 +622,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.Columns(-1)),
 			},
 			fields: fields{
-				client:         testCRDBClient,
+				client:         testClient,
 				existingEvents: []eventstore.Command{},
 			},
 			res: res{
@@ -640,7 +638,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 				Database: new(testDB),
 			}
 
-			crdbClient := &CRDB{
+			client := &Postgres{
 				DB: dbClient,
 			}
 
@@ -652,11 +650,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			}
 
 			events := []eventstore.Event{}
-			if err := query(context.Background(), crdbClient, tt.args.searchQuery, eventstore.Reducer(func(event eventstore.Event) error {
+			if err := query(context.Background(), client, tt.args.searchQuery, eventstore.Reducer(func(event eventstore.Event) error {
 				events = append(events, event)
 				return nil
 			}), true); (err != nil) != tt.wantErr {
-				t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("eventstore.query() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -1007,14 +1005,14 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 		},
 	}
-	crdb := NewCRDB(&database.DB{Database: new(testDB)})
+	client := NewPostgres(&database.DB{Database: new(testDB)})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.fields.mock != nil {
-				crdb.DB.DB = tt.fields.mock.client
+				client.DB.DB = tt.fields.mock.client
 			}
 
-			err := query(context.Background(), crdb, tt.args.query, tt.args.dest, tt.args.useV1)
+			err := query(context.Background(), client, tt.args.query, tt.args.dest, tt.args.useV1)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("query() error = %v, wantErr %v", err, tt.res.wantErr)
 			}

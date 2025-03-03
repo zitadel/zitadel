@@ -28,42 +28,42 @@ func awaitOpenTransactions(useV1 bool) string {
 	return awaitOpenTransactionsV2
 }
 
-type CRDB struct {
+type Postgres struct {
 	*database.DB
 }
 
-func NewCRDB(client *database.DB) *CRDB {
-	return &CRDB{client}
+func NewPostgres(client *database.DB) *Postgres {
+	return &Postgres{client}
 }
 
-func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
+func (db *Postgres) Health(ctx context.Context) error { return db.Ping() }
 
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
-func (crdb *CRDB) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
+func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	err = query(ctx, crdb, searchQuery, reduce, false)
+	err = query(ctx, psql, searchQuery, reduce, false)
 	if err == nil {
 		return nil
 	}
 	pgErr := new(pgconn.PgError)
 	// check events2 not exists
 	if errors.As(err, &pgErr) && pgErr.Code == "42P01" {
-		return query(ctx, crdb, searchQuery, reduce, true)
+		return query(ctx, psql, searchQuery, reduce, true)
 	}
 	return err
 }
 
 // LatestSequence returns the latest sequence found by the search query
-func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
+func (db *Postgres) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
 	var position sql.NullFloat64
 	err := query(ctx, db, searchQuery, &position, false)
 	return position.Float64, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
-func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) ([]string, error) {
+func (db *Postgres) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) ([]string, error) {
 	var ids []string
 	err := query(ctx, db, searchQuery, &ids, false)
 	if err != nil {
@@ -72,11 +72,11 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQ
 	return ids, nil
 }
 
-func (db *CRDB) Client() *database.DB {
+func (db *Postgres) Client() *database.DB {
 	return db.DB
 }
 
-func (db *CRDB) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string {
+func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string {
 	if useV1 {
 		if desc {
 			return ` ORDER BY event_sequence DESC`
@@ -96,7 +96,7 @@ func (db *CRDB) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) st
 	return ` ORDER BY "position", in_tx_order`
 }
 
-func (db *CRDB) eventQuery(useV1 bool) string {
+func (db *Postgres) eventQuery(useV1 bool) string {
 	if useV1 {
 		return "SELECT" +
 			" creation_date" +
@@ -126,14 +126,14 @@ func (db *CRDB) eventQuery(useV1 bool) string {
 		" FROM eventstore.events2"
 }
 
-func (db *CRDB) maxSequenceQuery(useV1 bool) string {
+func (db *Postgres) maxSequenceQuery(useV1 bool) string {
 	if useV1 {
 		return `SELECT event_sequence FROM eventstore.events`
 	}
 	return `SELECT "position" FROM eventstore.events2`
 }
 
-func (db *CRDB) instanceIDsQuery(useV1 bool) string {
+func (db *Postgres) instanceIDsQuery(useV1 bool) string {
 	table := "eventstore.events2"
 	if useV1 {
 		table = "eventstore.events"
@@ -141,7 +141,7 @@ func (db *CRDB) instanceIDsQuery(useV1 bool) string {
 	return "SELECT DISTINCT instance_id FROM " + table
 }
 
-func (db *CRDB) columnName(col repository.Field, useV1 bool) string {
+func (db *Postgres) columnName(col repository.Field, useV1 bool) string {
 	switch col {
 	case repository.FieldAggregateID:
 		return "aggregate_id"
@@ -188,7 +188,7 @@ func (db *CRDB) columnName(col repository.Field, useV1 bool) string {
 	}
 }
 
-func (db *CRDB) conditionFormat(operation repository.Operation) string {
+func (db *Postgres) conditionFormat(operation repository.Operation) string {
 	switch operation {
 	case repository.OperationIn:
 		return "%s %s ANY(?)"
@@ -198,7 +198,7 @@ func (db *CRDB) conditionFormat(operation repository.Operation) string {
 	return "%s %s ?"
 }
 
-func (db *CRDB) operation(operation repository.Operation) string {
+func (db *Postgres) operation(operation repository.Operation) string {
 	switch operation {
 	case repository.OperationEquals, repository.OperationIn:
 		return "="
@@ -219,7 +219,7 @@ var (
 )
 
 // placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
-func (db *CRDB) placeholder(query string) string {
+func (db *Postgres) placeholder(query string) string {
 	occurances := placeholder.FindAllStringIndex(query, -1)
 	if len(occurances) == 0 {
 		return query
@@ -236,7 +236,7 @@ func (db *CRDB) placeholder(query string) string {
 	return replaced
 }
 
-func (db *CRDB) isUniqueViolationError(err error) bool {
+func (db *Postgres) isUniqueViolationError(err error) bool {
 	if pgxErr, ok := err.(*pgconn.PgError); ok {
 		if pgxErr.Code == "23505" {
 			return true

@@ -19,45 +19,43 @@ import (
 )
 
 var (
-	testCRDBClient *sql.DB
+	testClient *sql.DB
 )
 
 func TestMain(m *testing.M) {
+	code := exec(m)
+	os.Exit(code)
+}
+
+func exec(m *testing.M) int {
 	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16)
 	psql := embeddedpostgres.NewDatabase(config)
 	err := psql.Start()
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to start db")
-	}
+	logging.OnError(err).Fatal("unable to start db")
 	defer func() {
-		logging.OnError(psql.Stop()).Debug("unable to stop db")
+		logging.OnError(psql.Stop()).Error("unable to stop db")
 	}()
 
 	connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to parse db url")
-	}
+	logging.OnError(err).Fatal("unable to parse db url")
+
 	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
 	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to create db pool")
-	}
+	logging.OnError(err).Fatal("unable to create db pool")
 
-	testCRDBClient = stdlib.OpenDBFromPool(pool)
+	testClient = stdlib.OpenDBFromPool(pool)
 
-	if err = testCRDBClient.Ping(); err != nil {
-		logging.WithFields("error", err).Fatal("unable to ping db")
-	}
+	err = testClient.Ping()
+	logging.OnError(err).Fatal("unable to ping db")
 
 	defer func() {
-		testCRDBClient.Close()
+		logging.OnError(testClient.Close()).Error("unable to close db")
 	}()
 
-	if err = initDB(context.Background(), &database.DB{DB: testCRDBClient, Database: &postgres.Config{Database: "zitadel"}}); err != nil {
-		logging.WithFields("error", err).Fatal("migrations failed")
-	}
+	err = initDB(context.Background(), &database.DB{DB: testClient, Database: &postgres.Config{Database: "zitadel"}})
+	logging.OnError(err).Fatal("migrations failed")
 
-	os.Exit(m.Run())
+	return m.Run()
 }
 
 func initDB(ctx context.Context, db *database.DB) error {
