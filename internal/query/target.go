@@ -117,7 +117,7 @@ func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQuerie
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	query, scan := prepareTargetsQuery()
-	targets, err := genericRowsQueryWithState[*Targets](ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	targets, err := genericRowsQueryWithState(ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string) (*Target, error)
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	query, scan := prepareTargetQuery()
-	target, err := genericRowQuery[*Target](ctx, q.client, query.Where(eq), scan)
+	target, err := genericRowQuery(ctx, q.client, query.Where(eq), scan)
 	if err != nil {
 		return nil, err
 	}

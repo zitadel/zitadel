@@ -102,7 +102,7 @@ func (q *Queries) SearchExecutions(ctx context.Context, queries *ExecutionSearch
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	query, scan := prepareExecutionsQuery()
-	return genericRowsQueryWithState[*Executions](ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	return genericRowsQueryWithState(ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *Execution, err error) {
@@ -111,7 +111,7 @@ func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *E
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	query, scan := prepareExecutionQuery()
-	return genericRowQuery[*Execution](ctx, q.client, query.Where(eq), scan)
+	return genericRowQuery(ctx, q.client, query.Where(eq), scan)
 }
 
 func NewExecutionInIDsSearchQuery(values []string) (SearchQuery, error) {

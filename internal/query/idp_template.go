@@ -1370,6 +1370,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 		}
 }
 
+//nolint:gocognit
 func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),

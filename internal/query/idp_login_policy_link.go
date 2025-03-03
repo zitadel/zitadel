@@ -121,6 +121,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	return idps, err
 }
 
+//nolint:gocognit
 func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
 	resourceOwnerQuery, resourceOwnerArgs, err := prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx, resourceOwner)
 	if err != nil {

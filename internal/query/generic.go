@@ -44,7 +44,7 @@ func genericRowsQueryWithState[R Stateful](
 	scan func(rows *sql.Rows) (R, error),
 ) (resp R, err error) {
 	var rnil R
-	resp, err = genericRowsQuery[R](ctx, client, query, scan)
+	resp, err = genericRowsQuery(ctx, client, query, scan)
 	if err != nil {
 		return rnil, err
 	}
