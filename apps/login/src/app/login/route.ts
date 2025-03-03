@@ -66,19 +66,6 @@ async function loadSessions({
   return response?.sessions ?? [];
 }
 
-export function constructUrl(request: NextRequest, path: string) {
-  const forwardedHost =
-    request.headers.get("x-zitadel-forward-host") ??
-    request.headers.get("host");
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-  return new URL(
-    `${basePath}${path}`,
-    forwardedHost?.startsWith("http")
-      ? forwardedHost
-      : `https://${forwardedHost}`,
-  );
-}
-
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
