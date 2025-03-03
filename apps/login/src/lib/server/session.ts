@@ -4,6 +4,7 @@ import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   deleteSession,
   getLoginSettings,
+  humanMFAInitSkipped,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import { Duration } from "@zitadel/client";
@@ -19,6 +20,53 @@ import {
   removeSessionFromCookie,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service";
+
+export async function skipMFAAndContinueWithNextUrl({
+  userId,
+  requestId,
+  loginName,
+  sessionId,
+  organization,
+}: {
+  userId: string;
+  loginName?: string;
+  sessionId?: string;
+  requestId?: string;
+  organization?: string;
+}) {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization: organization,
+  });
+
+  await humanMFAInitSkipped({ serviceUrl, userId });
+
+  const url =
+    requestId && sessionId
+      ? await getNextUrl(
+          {
+            sessionId: sessionId,
+            requestId: requestId,
+            organization: organization,
+          },
+          loginSettings?.defaultRedirectUri,
+        )
+      : loginName
+        ? await getNextUrl(
+            {
+              loginName: loginName,
+              organization: organization,
+            },
+            loginSettings?.defaultRedirectUri,
+          )
+        : null;
+  if (url) {
+    return { redirect: url };
+  }
+}
 
 export async function continueWithSession({
   requestId,

@@ -71,7 +71,8 @@
     },
     "set": {
       "title": "Configurar autenticación de 2 factores",
-      "description": "Elige uno de los siguientes factores secundarios."
+      "description": "Elige uno de los siguientes factores secundarios.",
+      "skip": "Omitir"
     }
   },
   "otp": {

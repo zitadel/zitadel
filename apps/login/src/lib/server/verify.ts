@@ -203,7 +203,8 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   // redirect to mfa factor if user has one, or redirect to set one up
-  const mfaFactorCheck = checkMFAFactors(
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
     session,
     loginSettings,
     authMethodResponse.authMethodTypes,
@@ -407,12 +408,12 @@ export async function sendVerificationRedirectWithoutCheck(
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: user.details?.resourceOwner,
   });
 
   // redirect to mfa factor if user has one, or redirect to set one up
-  const mfaFactorCheck = checkMFAFactors(
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
     session,
     loginSettings,
     authMethodResponse.authMethodTypes,

@@ -71,7 +71,8 @@
     },
     "set": {
       "title": "2-Faktor einrichten",
-      "description": "Wählen Sie einen der folgenden zweiten Faktoren."
+      "description": "Wählen Sie einen der folgenden zweiten Faktoren.",
+      "skip": "Überspringen"
     }
   },
   "otp": {
