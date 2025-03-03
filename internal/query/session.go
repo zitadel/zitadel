@@ -235,6 +235,10 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		return nil, err
 	}
 	if sessionToken == "" {
+		// for internal calls, no token or permission check is necessary
+		if permissionCheck == nil {
+			return session, nil
+		}
 		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserAgent, session.UserFactor, permissionCheck); err != nil {
 			return nil, err
 		}
