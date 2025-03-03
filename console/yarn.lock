@@ -6870,10 +6870,10 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-libphonenumber-js@^1.11.8:
-  version "1.11.10"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.11.10.tgz#d9ccd71a227bfb9775eb0516744c26d8c0f4b057"
-  integrity sha512-yHEtzDlG2VbhuxMIo/sAUY+lyL5YThqD+gHT3YyelaRWRQv1VeyEk94jDvviRT4PYmLJR9cHxvtrx9h2f4OAIQ==
+libphonenumber-js@^1.12.4:
+  version "1.12.4"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.12.4.tgz#15062e61ac29d381305f0a37b0c2aad6ae432931"
+  integrity sha512-vLmhg7Gan7idyAKfc6pvCtNzvar4/eIzrVVk3hjNFH5+fGqyjD0gQRovdTrDl20wsmZhBtmZpcsR0tOfquwb8g==
 
 license-webpack-plugin@4.0.2:
   version "4.0.2"
