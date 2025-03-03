@@ -3,12 +3,12 @@ package webkey
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
 func (s *Server) CreateWebKey(ctx context.Context, req *webkey.CreateWebKeyRequest) (_ *webkey.CreateWebKeyResponse, err error) {
@@ -24,7 +24,8 @@ func (s *Server) CreateWebKey(ctx context.Context, req *webkey.CreateWebKeyReque
 	}
 
 	return &webkey.CreateWebKeyResponse{
-		Details: resource_object.DomainToDetailsPb(webKey.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, authz.GetInstance(ctx).InstanceID()),
+		Id:           webKey.KeyID,
+		CreationDate: timestamppb.New(webKey.ObjectDetails.CreationDate),
 	}, nil
 }
 
@@ -41,7 +42,7 @@ func (s *Server) ActivateWebKey(ctx context.Context, req *webkey.ActivateWebKeyR
 	}
 
 	return &webkey.ActivateWebKeyResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, authz.GetInstance(ctx).InstanceID()),
+		ChangeDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 
@@ -52,13 +53,17 @@ func (s *Server) DeleteWebKey(ctx context.Context, req *webkey.DeleteWebKeyReque
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteWebKey(ctx, req.GetId())
+	date, err := s.command.DeleteWebKey(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if !date.IsZero() {
+		deletionDate = timestamppb.New(date)
+	}
 	return &webkey.DeleteWebKeyResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, authz.GetInstance(ctx).InstanceID()),
+		DeletionDate: deletionDate,
 	}, nil
 }
 
@@ -75,7 +80,7 @@ func (s *Server) ListWebKeys(ctx context.Context, _ *webkey.ListWebKeysRequest) 
 	}
 
 	return &webkey.ListWebKeysResponse{
-		WebKeys: webKeyDetailsListToPb(list, authz.GetInstance(ctx).InstanceID()),
+		WebKeys: webKeyDetailsListToPb(list),
 	}, nil
 }
 
