@@ -8,7 +8,7 @@ import (
 )
 
 func Test_verifyUser(t *testing.T) {
-	err := ReadStmts() //TODO: check all dialects
+	err := ReadStmts()
 	if err != nil {
 		t.Errorf("unable to read stmts: %v", err)
 		t.FailNow()

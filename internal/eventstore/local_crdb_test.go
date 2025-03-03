@@ -89,7 +89,7 @@ func initDB(ctx context.Context, db *database.DB) error {
 	config := new(database.Config)
 	config.SetConnector(&postgres.Config{User: postgres.User{Username: "zitadel"}, Database: "zitadel"})
 
-	if err := initialise.ReadStmts("postgres"); err != nil {
+	if err := initialise.ReadStmts(); err != nil {
 		return err
 	}
 
