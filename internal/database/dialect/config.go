@@ -21,7 +21,7 @@ var (
 
 type Matcher interface {
 	MatchName(string) bool
-	Decode([]interface{}) (Connector, error)
+	Decode([]any) (Connector, error)
 }
 
 const (
