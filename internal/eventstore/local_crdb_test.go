@@ -102,7 +102,7 @@ func initDB(ctx context.Context, db *database.DB) error {
 		return err
 	}
 
-	err = initialise.VerifyZitadel(context.Background(), db, *config)
+	err = initialise.VerifyZitadel(ctx, db, *config)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func (*testDB) DatabaseName() string { return "db" }
 
 func (*testDB) Username() string { return "user" }
 
-func (*testDB) Type() string { return "cockroach" }
+func (*testDB) Type() string { return "postgres" }
 
 func generateCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
 	e := &testEvent{
