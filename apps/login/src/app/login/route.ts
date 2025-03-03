@@ -3,7 +3,7 @@ import { idpTypeToSlug } from "@/lib/idp";
 import { loginWithOIDCandSession } from "@/lib/oidc";
 import { loginWithSAMLandSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { constructUrl, getServiceUrlFromHeaders } from "@/lib/service";
 import { findValidSession } from "@/lib/session";
 import {
   createCallback,
