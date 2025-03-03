@@ -8,14 +8,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/cockroach"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_sql "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -29,20 +29,21 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	opts := make([]testserver.TestServerOpt, 0, 1)
-	if version := os.Getenv("ZITADEL_CRDB_VERSION"); version != "" {
-		opts = append(opts, testserver.CustomVersionOpt(version))
-	}
-	ts, err := testserver.NewTestServer(opts...)
+	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16)
+	psql := embeddedpostgres.NewDatabase(config)
+	err := psql.Start()
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to start db")
 	}
+	defer func() {
+		logging.OnError(psql.Stop()).Debug("unable to stop db")
+	}()
 
 	testCRDBClient = &database.DB{
 		Database: new(testDB),
 	}
 
-	connConfig, err := pgxpool.ParseConfig(ts.PGURL().String())
+	connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to parse db url")
 	}
@@ -75,10 +76,9 @@ func TestMain(m *testing.M) {
 
 	defer func() {
 		testCRDBClient.Close()
-		ts.Stop()
 	}()
 
-	if err = initDB(context.Background(), testCRDBClient); err != nil {
+	if err = initDB(context.Background(), &database.DB{DB: testCRDBClient.DB, Database: &postgres.Config{Database: "zitadel"}}); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
@@ -86,14 +86,13 @@ func TestMain(m *testing.M) {
 }
 
 func initDB(ctx context.Context, db *database.DB) error {
-	initialise.ReadStmts("cockroach")
 	config := new(database.Config)
-	config.SetConnector(&cockroach.Config{
-		User: cockroach.User{
-			Username: "zitadel",
-		},
-		Database: "zitadel",
-	})
+	config.SetConnector(&postgres.Config{User: postgres.User{Username: "zitadel"}, Database: "zitadel"})
+
+	if err := initialise.ReadStmts("postgres"); err != nil {
+		return err
+	}
+
 	err := initialise.Init(ctx, db,
 		initialise.VerifyUser(config.Username(), ""),
 		initialise.VerifyDatabase(config.DatabaseName()),
@@ -102,17 +101,19 @@ func initDB(ctx context.Context, db *database.DB) error {
 	if err != nil {
 		return err
 	}
-	err = initialise.VerifyZitadel(ctx, db, *config)
+
+	err = initialise.VerifyZitadel(context.Background(), db, *config)
 	if err != nil {
 		return err
 	}
+
 	// create old events
 	_, err = db.Exec(oldEventsTable)
 	return err
 }
 
 func connectLocalhost() (*database.DB, error) {
-	client, err := sql.Open("pgx", "postgresql://root@localhost:26257/defaultdb?sslmode=disable")
+	client, err := sql.Open("pgx", "postgresql://postgres@localhost:5432/postgres?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}
@@ -251,5 +252,5 @@ const oldEventsTable = `CREATE TABLE IF NOT EXISTS eventstore.events (
 	, "position" DECIMAL NOT NULL
 	, in_tx_order INTEGER NOT NULL
 
-	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence DESC)
+	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence)
 );`
