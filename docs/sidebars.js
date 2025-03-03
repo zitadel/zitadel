@@ -808,7 +808,7 @@ module.exports = {
             {
               label: "OIDC Playground",
               type: "link",
-              href: "https://zitadel.com/oidc-playground",
+              href: "/playgrounds/oidc",
             },
             "apis/openidoauth/scopes",
             "apis/openidoauth/claims",
