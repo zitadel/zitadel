@@ -736,10 +736,6 @@ module.exports = {
           type: "category",
           label: "V3 (Preview)",
           collapsed: false,
-          link: {
-            type: "doc",
-            id: "apis/v3",
-          },
           items: [
             {
               type: "category",
