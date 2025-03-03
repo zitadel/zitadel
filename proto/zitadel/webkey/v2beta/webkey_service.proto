@@ -111,6 +111,9 @@ service WebKeyService {
   // The public key can be used to validate OIDC tokens.
   // The newly created key will have the state `STATE_INITIAL` and is published to the public key endpoint.
   // Note that the JWKs OIDC endpoint returns a cacheable response.
+  //
+  // Required permission:
+  //   - `iam.web_key.write`
   rpc CreateWebKey(CreateWebKeyRequest) returns (CreateWebKeyResponse) {
     option (google.api.http) = {
       post: "/v2beta/web_keys"
@@ -139,6 +142,9 @@ service WebKeyService {
   // Note that the JWKs OIDC endpoint returns a cacheable response.
   // Therefore it is not advised to activate a key that has been created within the cache duration (default is 5min),
   // as the public key may not have been propagated to caches and clients yet.
+  //
+  // Required permission:
+  //   - `iam.web_key.write`
   rpc ActivateWebKey(ActivateWebKeyRequest) returns (ActivateWebKeyResponse) {
     option (google.api.http) = {
       post: "/v2beta/web_keys/{id}/activate"
@@ -299,7 +305,7 @@ message ListWebKeysRequest {}
 message ListWebKeysResponse {
   repeated WebKey web_keys = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "[{\"details\": {\"id\": \"69629012906488334\",\"created\": \"2024-12-18T07:50:47.492Z\"},\"state\": \"STATE_ACTIVE\",\"rsa\": {\"bits\": \"RSA_BITS_2048\",\"hasher\": \"RSA_HASHER_SHA256\"}},{ \"details\": {\"id\": \"69629012909346200\",\"created\": \"2025-01-18T12:05:47.492Z\"},\"state\": \"STATE_INITIAL\",\"ecdsa\": {\"curve\": \"ECDSA_CURVE_P256\"}}]";
+      example: "[{\"id\":\"69629012906488334\",\"creationDate\":\"2024-12-18T07:50:47.492Z\",\"changeDate\":\"2024-12-18T08:04:47.492Z\",\"state\":\"STATE_ACTIVE\",\"rsa\":{\"bits\":\"RSA_BITS_2048\",\"hasher\":\"RSA_HASHER_SHA256\"}},{\"id\":\"69629012909346200\",\"creationDate\":\"2025-01-18T12:05:47.492Z\",\"state\":\"STATE_INITIAL\",\"ecdsa\":{\"curve\":\"ECDSA_CURVE_P256\"}}]";
     }
   ];
 }
