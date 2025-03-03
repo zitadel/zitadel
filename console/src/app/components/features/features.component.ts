@@ -1,28 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject, Subject } from 'rxjs';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
-import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
-import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
-import {
-  GetInstanceFeaturesResponse,
-  SetInstanceFeaturesRequest,
-} from 'src/app/proto/generated/zitadel/feature/v2beta/instance_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
+import {
+  GetInstanceFeaturesResponse,
+  SetInstanceFeaturesRequest,
+} from 'src/app/proto/generated/zitadel/feature/v2/instance_pb';
 
 enum ToggleState {
   ENABLED = 'ENABLED',
@@ -61,21 +57,17 @@ type ToggleStates = {
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.scss'],
 })
-export class FeaturesComponent implements OnDestroy {
-  private destroy$: Subject<void> = new Subject();
+export class FeaturesComponent {
+  protected featureData: GetInstanceFeaturesResponse.AsObject | undefined;
 
-  public _loading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public featureData: GetInstanceFeaturesResponse.AsObject | undefined = undefined;
-
-  public toggleStates: ToggleStates | undefined = undefined;
-  public Source: any = Source;
-  public ToggleState: any = ToggleState;
+  protected toggleStates: ToggleStates | undefined;
+  protected Source: any = Source;
+  protected ToggleState: any = ToggleState;
 
   constructor(
     private featureService: FeatureService,
     private breadcrumbService: BreadcrumbService,
     private toast: ToastService,
-    private dialog: MatDialog,
   ) {
     const breadcrumbs = [
       new Breadcrumb({
@@ -87,20 +79,6 @@ export class FeaturesComponent implements OnDestroy {
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
     this.getFeatures(true);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  public openDialog(event: Event): void {
-    this.dialog.open(DisplayJsonDialogComponent, {
-      data: {
-        event: event,
-      },
-      width: '450px',
-    });
   }
 
   public validateAndSave() {

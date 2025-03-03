@@ -194,6 +194,14 @@ func (i *Instance) CreateProject(ctx context.Context) (*management.AddProjectRes
 	})
 }
 
+func (i *Instance) CreateProjectWithPermissionCheck(ctx context.Context, projectRoleCheck, hasProjectCheck bool) (*management.AddProjectResponse, error) {
+	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+		Name:             fmt.Sprintf("project-%d", time.Now().UnixNano()),
+		HasProjectCheck:  hasProjectCheck,
+		ProjectRoleCheck: projectRoleCheck,
+	})
+}
+
 func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
 	return i.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      projectID,
@@ -212,22 +220,22 @@ func (i *Instance) CreateAPIClientBasic(ctx context.Context, projectID string) (
 
 const CodeVerifier = "codeVerifier"
 
-func (i *Instance) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+func (i *Instance) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (now time.Time, authRequestID string, err error) {
 	return i.CreateOIDCAuthRequestWithDomain(ctx, i.Domain, clientID, loginClient, redirectURI, scope...)
 }
 
-func (i *Instance) CreateOIDCAuthRequestWithoutLoginClientHeader(ctx context.Context, clientID, redirectURI, loginBaseURI string, scope ...string) (authRequestID string, err error) {
+func (i *Instance) CreateOIDCAuthRequestWithoutLoginClientHeader(ctx context.Context, clientID, redirectURI, loginBaseURI string, scope ...string) (now time.Time, authRequestID string, err error) {
 	return i.createOIDCAuthRequestWithDomain(ctx, i.Domain, clientID, redirectURI, "", loginBaseURI, scope...)
 }
 
-func (i *Instance) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+func (i *Instance) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (now time.Time, authRequestID string, err error) {
 	return i.createOIDCAuthRequestWithDomain(ctx, domain, clientID, redirectURI, loginClient, "", scope...)
 }
 
-func (i *Instance) createOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, redirectURI, loginClient, loginBaseURI string, scope ...string) (authRequestID string, err error) {
+func (i *Instance) createOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, redirectURI, loginClient, loginBaseURI string, scope ...string) (now time.Time, authRequestID string, err error) {
 	provider, err := i.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, loginClient, scope...)
 	if err != nil {
-		return "", fmt.Errorf("create relying party: %w", err)
+		return now, "", fmt.Errorf("create relying party: %w", err)
 	}
 	codeChallenge := oidc.NewSHACodeChallenge(CodeVerifier)
 	authURL := rp.AuthURL("state", provider, rp.WithCodeChallenge(codeChallenge))
@@ -238,21 +246,22 @@ func (i *Instance) createOIDCAuthRequestWithDomain(ctx context.Context, domain, 
 	}
 	req, err := GetRequest(authURL, headers)
 	if err != nil {
-		return "", fmt.Errorf("get request: %w", err)
+		return now, "", fmt.Errorf("get request: %w", err)
 	}
 
+	now = time.Now()
 	loc, err := CheckRedirect(req)
 	if err != nil {
-		return "", fmt.Errorf("check redirect: %w", err)
+		return now, "", fmt.Errorf("check redirect: %w", err)
 	}
 
 	if loginBaseURI == "" {
 		loginBaseURI = provider.Issuer() + i.Config.LoginURLV2
 	}
 	if !strings.HasPrefix(loc.String(), loginBaseURI) {
-		return "", fmt.Errorf("login location has not prefix %s, but is %s", loginBaseURI, loc.String())
+		return now, "", fmt.Errorf("login location has not prefix %s, but is %s", loginBaseURI, loc.String())
 	}
-	return strings.TrimPrefix(loc.String(), loginBaseURI), nil
+	return now, strings.TrimPrefix(loc.String(), loginBaseURI), nil
 }
 
 func (i *Instance) CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(ctx context.Context, clientID, redirectURI string, scope ...string) (authRequestID string, err error) {
@@ -456,4 +465,12 @@ func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *man
 	})
 
 	return machine, name, keyResp.GetKeyDetails(), nil
+}
+
+func (i *Instance) CreateDeviceAuthorizationRequest(ctx context.Context, clientID string, scopes ...string) (*oidc.DeviceAuthorizationResponse, error) {
+	provider, err := i.CreateRelyingParty(ctx, clientID, "", scopes...)
+	if err != nil {
+		return nil, err
+	}
+	return rp.DeviceAuthorization(ctx, scopes, provider, nil)
 }

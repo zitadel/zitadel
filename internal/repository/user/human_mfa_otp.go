@@ -103,9 +103,10 @@ func NewHumanOTPVerifiedEvent(
 }
 
 func HumanOTPVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanOTPVerifiedEvent{
+	out := &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	return out, nil
 }
 
 type HumanOTPRemovedEvent struct {

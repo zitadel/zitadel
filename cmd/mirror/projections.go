@@ -223,6 +223,7 @@ func projections(
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		client,
+		nil,
 	)
 	execution.Create(
 		ctx,

@@ -511,11 +511,13 @@
     "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
     "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
+    "ORG_SETTINGS_MANAGER": "Ha il permesso di gestire le impostazioni dell'organizzazione",
     "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
     "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
     "ORG_ADMIN_IMPERSONATOR": "Ha il permesso per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
     "ORG_END_USER_IMPERSONATOR": "Ha il permesso per rappresentare gli utenti finali dell'organizzazione",
+    "ORG_USER_SELF_MANAGER": "Ha il permesso per gestire il proprio account utente",
     "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
     "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
     "PROJECT_OWNER_GLOBAL": "Ha il permesso per l'intero progetto",
@@ -808,6 +810,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Numero di telefono",
       "PHONE_HINT": "Utilizza il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
+      "PHONE_VERIFIED": "Numero di telefono verificato",
+      "SEND_SMS": "Invia SMS di verifica",
+      "SEND_EMAIL": "Invia E-mail",
       "USERNAME": "Nome utente",
       "CHANGEUSERNAME": "cambia",
       "CHANGEUSERNAME_TITLE": "Cambia nome utente",
@@ -947,6 +952,14 @@
       "4": "Bloccato",
       "5": "Sospeso",
       "6": "Initializzato"
+    },
+    "STATEV2": {
+      "0": "Sconosciuto",
+      "1": "Attivo",
+      "2": "Inattivo",
+      "3": "Rimosso",
+      "4": "Bloccato",
+      "5": "Initializzato"
     },
     "SEARCH": {
       "ADDITIONAL": "Nome (organizzazione corrente)",
@@ -1486,7 +1499,9 @@
         "ENABLED": "\"Abilitato\" viene ereditato",
         "DISABLED": "\"Disabilitato\" viene ereditato"
       },
-      "RESET": "Imposta tutto su predefinito"
+      "RESET": "Imposta tutto su predefinito",
+      "CONSOLEUSEV2USERAPI": "Utilizza l'API V2 nella console per la creazione degli utenti",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando questa opzione è abilitata, la console utilizza l'API V2 User per creare nuovi utenti. Con l'API V2, i nuovi utenti creati iniziano senza uno stato iniziale."
     },
     "DIALOG": {
       "RESET": {
@@ -2192,7 +2207,9 @@
       "REMOVED": "Rimosso con successo."
     },
     "ISIDTOKENMAPPING": "Mappatura dal token ID",
-    "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo."
+    "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo.",
+    "USEPKCE": "Usa PKCE",
+    "USEPKCE_DESC": "Determina se i parametri code_challenge e code_challenge_method sono inclusi nella richiesta di autenticazione"
   },
   "MFA": {
     "LIST": {

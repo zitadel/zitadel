@@ -7,11 +7,6 @@ import "encoding/json"
 // This increases security to really ensure this is never sent to a client.
 type WriteOnlyString string
 
-func NewWriteOnlyString(s string) *WriteOnlyString {
-	wos := WriteOnlyString(s)
-	return &wos
-}
-
 func (s *WriteOnlyString) MarshalJSON() ([]byte, error) {
 	return []byte("null"), nil
 }

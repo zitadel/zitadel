@@ -13,6 +13,7 @@ import (
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/queue"
 )
 
 var (
@@ -35,10 +36,15 @@ func Register(
 	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
 	tokenLifetime time.Duration,
 	client *database.DB,
+	queue *queue.Queue,
 ) {
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.ShouldStart()
+	}
+
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
-	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig.LegacyEnabled))
+	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
 	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
 		ctx,
@@ -53,14 +59,13 @@ func Register(
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
-	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, es, client, c)
+	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, es, client, c, queue)
 }
 
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
-	worker.Start(ctx)
 }
 
 func ProjectInstance(ctx context.Context) error {

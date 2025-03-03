@@ -55,6 +55,7 @@ type Human struct {
 	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
 	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
 	PasswordChanged        time.Time           `json:"password_changed,omitempty"`
+	MFAInitSkipped         time.Time           `json:"mfa_init_skipped,omitempty"`
 }
 
 type Profile struct {
@@ -271,6 +272,10 @@ var (
 		name:  projection.HumanPasswordChanged,
 		table: humanTable,
 	}
+	HumanMFAInitSkippedCol = Column{
+		name:  projection.HumanMFAInitSkipped,
+		table: humanTable,
+	}
 )
 
 var (
@@ -363,6 +368,10 @@ func (q *Queries) GetUserByIDWithPermission(ctx context.Context, shouldTriggerBu
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string) (user *User, err error) {
+	return q.GetUserByIDWithResourceOwner(ctx, shouldTriggerBulk, userID, "")
+}
+
+func (q *Queries) GetUserByIDWithResourceOwner(ctx context.Context, shouldTriggerBulk bool, userID, resourceOwner string) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -377,6 +386,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		},
 		userByIDQuery,
 		userID,
+		resourceOwner,
 		authz.GetInstance(ctx).InstanceID(),
 	)
 	return user, err
@@ -625,8 +635,8 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 	return count, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
-	users, err := q.searchUsers(ctx, queries, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheck domain.PermissionCheck) (*Users, error) {
+	users, err := q.searchUsers(ctx, queries, filterOrgIds, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
@@ -636,7 +646,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, p
 	return users, nil
 }
 
-func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheckV2 bool) (users *Users, err error) {
+func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheckV2 bool) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -645,7 +655,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	})
 	if permissionCheckV2 {
-		query = wherePermittedOrgs(ctx, query, UserResourceOwnerCol.identifier(), domain.PermissionUserRead)
+		query = wherePermittedOrgsOrCurrentUser(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
 	}
 
 	stmt, args, err := query.ToSql()
@@ -872,6 +882,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	isPhoneVerified := sql.NullBool{}
 	passwordChangeRequired := sql.NullBool{}
 	passwordChanged := sql.NullTime{}
+	mfaInitSkipped := sql.NullTime{}
 
 	machineID := sql.NullString{}
 	name := sql.NullString{}
@@ -904,6 +915,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&isPhoneVerified,
 		&passwordChangeRequired,
 		&passwordChanged,
+		&mfaInitSkipped,
 		&machineID,
 		&name,
 		&description,
@@ -936,6 +948,7 @@ func scanUser(row *sql.Row) (*User, error) {
 			IsPhoneVerified:        isPhoneVerified.Bool,
 			PasswordChangeRequired: passwordChangeRequired.Bool,
 			PasswordChanged:        passwordChanged.Time,
+			MFAInitSkipped:         mfaInitSkipped.Time,
 		}
 	} else if machineID.Valid {
 		u.Machine = &Machine{
@@ -982,6 +995,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			HumanIsPhoneVerifiedCol.identifier(),
 			HumanPasswordChangeRequiredCol.identifier(),
 			HumanPasswordChangedCol.identifier(),
+			HumanMFAInitSkippedCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),

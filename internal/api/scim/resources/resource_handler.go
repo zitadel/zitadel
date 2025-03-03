@@ -2,64 +2,52 @@ package resources
 
 import (
 	"context"
-	"path"
 	"strconv"
-	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/muhlemmer/gu"
+
+	"github.com/zitadel/zitadel/internal/api/scim/resources/patch"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type ResourceHandler[T ResourceHolder] interface {
-	ResourceNameSingular() schemas.ScimResourceTypeSingular
-	ResourceNamePlural() schemas.ScimResourceTypePlural
-	SchemaType() schemas.ScimSchemaType
+	Schema() *schemas.ResourceSchema
 	NewResource() T
 
 	Create(ctx context.Context, resource T) (T, error)
 	Replace(ctx context.Context, id string, resource T) (T, error)
+	Update(ctx context.Context, id string, operations patch.OperationCollection) error
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (T, error)
 	List(ctx context.Context, request *ListRequest) (*ListResponse[T], error)
 }
 
-type Resource struct {
-	Schemas []schemas.ScimSchemaType `json:"schemas"`
-	Meta    *ResourceMeta            `json:"meta"`
-}
-
-type ResourceMeta struct {
-	ResourceType schemas.ScimResourceTypeSingular `json:"resourceType"`
-	Created      time.Time                        `json:"created"`
-	LastModified time.Time                        `json:"lastModified"`
-	Version      string                           `json:"version"`
-	Location     string                           `json:"location"`
-}
-
 type ResourceHolder interface {
-	GetResource() *Resource
+	SchemasHolder
+	GetResource() *schemas.Resource
 }
 
-func buildResource[T ResourceHolder](ctx context.Context, handler ResourceHandler[T], details *domain.ObjectDetails) *Resource {
+type SchemasHolder interface {
+	GetSchemas() []schemas.ScimSchemaType
+}
+
+func buildResource[T ResourceHolder](ctx context.Context, handler ResourceHandler[T], details *domain.ObjectDetails) *schemas.Resource {
 	created := details.CreationDate.UTC()
 	if created.IsZero() {
 		created = details.EventDate.UTC()
 	}
 
-	return &Resource{
-		Schemas: []schemas.ScimSchemaType{handler.SchemaType()},
-		Meta: &ResourceMeta{
-			ResourceType: handler.ResourceNameSingular(),
-			Created:      created,
-			LastModified: details.EventDate.UTC(),
+	schema := handler.Schema()
+	return &schemas.Resource{
+		ID:      details.ID,
+		Schemas: []schemas.ScimSchemaType{schema.ID},
+		Meta: &schemas.ResourceMeta{
+			ResourceType: schema.Name,
+			Created:      &created,
+			LastModified: gu.Ptr(details.EventDate.UTC()),
 			Version:      strconv.FormatUint(details.Sequence, 10),
-			Location:     buildLocation(ctx, handler, details.ID),
+			Location:     schemas.BuildLocationForResource(ctx, schema.PluralName, details.ID),
 		},
 	}
-}
-
-func buildLocation[T ResourceHolder](ctx context.Context, handler ResourceHandler[T], id string) string {
-	return http.DomainContext(ctx).Origin() + path.Join(schemas.HandlerPrefix, authz.GetCtxData(ctx).OrgID, string(handler.ResourceNamePlural()), id)
 }

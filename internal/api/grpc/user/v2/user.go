@@ -275,7 +275,7 @@ func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUserV2(ctx, req.UserId, memberships, grants...)
+	details, err := s.command.RemoveUserV2(ctx, req.UserId, "", memberships, grants...)
 	if err != nil {
 		return nil, err
 	}
@@ -368,31 +368,31 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.Star
 }
 
 func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID())
+	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
 	}
-	content, redirect, err := s.command.AuthFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+	_, details, err := s.command.CreateIntent(ctx, state, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), session.PersistentParameters())
 	if err != nil {
 		return nil, err
 	}
+	content, redirect := session.GetAuth(ctx)
 	if redirect {
 		return &user.StartIdentityProviderIntentResponse{
 			Details:  object.DomainToDetailsPb(details),
 			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
 		}, nil
-	} else {
-		return &user.StartIdentityProviderIntentResponse{
-			Details: object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-				PostForm: []byte(content),
-			},
-		}, nil
 	}
+	return &user.StartIdentityProviderIntentResponse{
+		Details: object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
+			PostForm: []byte(content),
+		},
+	}, nil
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetInstance(ctx).InstanceID())
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -710,4 +710,14 @@ func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*comma
 	default:
 		return &command.CreateUserInvite{UserID: req.GetUserId()}, nil
 	}
+}
+
+func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInitSkippedRequest) (_ *user.HumanMFAInitSkippedResponse, err error) {
+	details, err := s.command.HumanMFAInitSkippedV2(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.HumanMFAInitSkippedResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
 }

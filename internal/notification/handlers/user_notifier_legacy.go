@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
@@ -169,9 +171,13 @@ func (u *userNotifierLegacy) reduceInitCodeAdded(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type()).
 			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
 		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.HumanInitCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
@@ -226,9 +232,13 @@ func (u *userNotifierLegacy) reduceEmailCodeAdded(event eventstore.Event) (*hand
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
 			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.HumanEmailVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
@@ -286,12 +296,16 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo)
+			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.ID, generatorInfo)
 		}
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
@@ -382,9 +396,13 @@ func (u *userNotifierLegacy) reduceOTPSMS(
 		return nil, err
 	}
 	generatorInfo := new(senders.CodeGeneratorInfo)
-	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event, generatorInfo)
+	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event.Type(), event.Aggregate().InstanceID, event.Aggregate().ID, generatorInfo)
 	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
+		if errors.Is(err, &channels.CancelError{}) {
+			// if the notification was canceled, we don't want to return the error, so there is no retry
+			return handler.NewNoOpStatement(event), nil
+		}
 		return nil, err
 	}
 	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner, generatorInfo)
@@ -504,9 +522,13 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event)
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
 	err = notify.SendOTPEmailCode(ctx, url, plainCode, expiry)
 	if err != nil {
+		if errors.Is(err, &channels.CancelError{}) {
+			// if the notification was canceled, we don't want to return the error, so there is no retry
+			return handler.NewNoOpStatement(event), nil
+		}
 		return nil, err
 	}
 	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
@@ -554,9 +576,13 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
 			SendDomainClaimed(ctx, notifyUser, e.UserName)
 		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.UserDomainClaimedSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
@@ -608,9 +634,13 @@ func (u *userNotifierLegacy) reducePasswordlessCodeRequested(event eventstore.Ev
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
 			SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate)
 		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.HumanPasswordlessInitCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
@@ -667,9 +697,13 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
 			SendPasswordChange(ctx, notifyUser)
 		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.PasswordChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
@@ -722,8 +756,12 @@ func (u *userNotifierLegacy) reducePhoneCodeAdded(event eventstore.Event) (*hand
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo).
+		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.ID, generatorInfo).
 			SendPhoneVerificationCode(ctx, code); err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
@@ -776,9 +814,13 @@ func (u *userNotifierLegacy) reduceInviteCodeAdded(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
 		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
 			return err
 		}
 		return u.commands.InviteCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner)

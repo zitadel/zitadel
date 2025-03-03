@@ -51,15 +51,17 @@ export class SidenavComponent implements ControlValueAccessor {
     }
 
     if (this.queryParam && setting) {
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: {
-          [this.queryParam]: setting,
-        },
-        replaceUrl: true,
-        queryParamsHandling: 'merge',
-        skipLocationChange: false,
-      });
+      this.router
+        .navigate([], {
+          relativeTo: this.route,
+          queryParams: {
+            [this.queryParam]: setting,
+          },
+          replaceUrl: true,
+          queryParamsHandling: 'merge',
+          skipLocationChange: false,
+        })
+        .then();
     }
   }
 
