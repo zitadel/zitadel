@@ -30,6 +30,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
+			parent = propagateSystemMemberRoles(ctxData, parent)
 			return context.WithValue(parent, dataKey, ctxData)
 		}, nil
 	}
@@ -50,6 +51,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		parent = context.WithValue(parent, dataKey, ctxData)
 		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
+		parent = propagateSystemMemberRoles(ctxData, parent)
 		return parent
 	}, nil
 }
@@ -124,4 +126,16 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 		}
 	}
 	return ctxIDs
+}
+
+func propagateSystemMemberRoles(ctxData CtxData, parent context.Context) context.Context {
+	if ctxData.SystemMemberships != nil {
+		roles := make([]string, 0)
+		for _, member := range ctxData.SystemMemberships {
+			roles = append(roles, member.Roles...)
+		}
+		parent = context.WithValue(parent, SystemPermissionsKey, roles)
+	}
+
+	return parent
 }
