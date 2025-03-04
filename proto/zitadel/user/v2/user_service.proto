@@ -2094,6 +2094,7 @@ message RetrieveIdentityProviderIntentResponse{
       example: "\"163840776835432345\"";
     }
   ];
+  AddHumanUserRequest add_human_user = 4;
 }
 
 message AddIDPLinkRequest{
