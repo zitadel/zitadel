@@ -11,7 +11,6 @@ import (
 
 var (
 	projections []*handler.Handler
-	worker      *Worker
 )
 
 func Register(
@@ -26,22 +25,13 @@ func Register(
 	projections = []*handler.Handler{
 		NewEventHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), eventTypes, eventstore.AggregateTypeFromEventType, queries, queue),
 	}
-	worker = NewWorker(workerConfig, queue)
+	queue.AddWorkers(NewWorker(workerConfig))
 }
 
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
-}
-
-func Init(ctx context.Context) error {
-	for _, p := range projections {
-		if err := p.Init(ctx); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {

@@ -19,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/repository/notification"
 )
 
@@ -104,19 +103,14 @@ func NewNotificationWorker(
 	commands Commands,
 	queries *NotificationQueries,
 	channels types.ChannelChains,
-	queue *queue.Queue,
 ) *NotificationWorker {
-	w := &NotificationWorker{
+	return &NotificationWorker{
 		config:   config,
 		commands: commands,
 		queries:  queries,
 		channels: channels,
 		now:      time.Now,
 	}
-	if !config.LegacyEnabled {
-		queue.AddWorkers(w)
-	}
-	return w
 }
 
 var _ river.Worker[*notification.Request] = (*NotificationWorker)(nil)

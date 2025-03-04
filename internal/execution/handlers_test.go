@@ -40,18 +40,22 @@ func Test_EventExecution(t *testing.T) {
 		{
 			"session added, ok",
 			args{
-				event: eventForEventExecution(
-					"aggID",
-					session.AggregateType,
-					session.AggregateVersion,
-					session.AddedType,
-					time.Date(2024, 1, 1, 1, 1, 1, 1, time.Local),
-					"userID",
-					1,
-					[]byte("{\"attr\":\"value\"}"),
-				),
+				event: &eventstore.BaseEvent{
+					Agg: &eventstore.Aggregate{
+						ID:            "aggID",
+						Type:          session.AggregateType,
+						ResourceOwner: "resourceOwner",
+						InstanceID:    "instanceID",
+						Version:       session.AggregateVersion,
+					},
+					EventType: session.AddedType,
+					Seq:       1,
+					Creation:  time.Date(2024, 1, 1, 1, 1, 1, 1, time.Local),
+					User:      userID,
+					Data:      []byte(`{"ID":"","Seq":1,"Pos":0,"Creation":"2024-01-01T01:01:01.000000001+01:00"}`),
+				},
 				targets: []*query.ExecutionTarget{{
-					InstanceID:       "instanceID",
+					InstanceID:       instanceID,
 					ExecutionID:      "executionID",
 					TargetID:         "targetID",
 					TargetType:       domain.TargetTypeWebhook,
@@ -64,7 +68,7 @@ func Test_EventExecution(t *testing.T) {
 			res{
 				targets: []Target{
 					&query.ExecutionTarget{
-						InstanceID:       "instanceID",
+						InstanceID:       instanceID,
 						ExecutionID:      "executionID",
 						TargetID:         "targetID",
 						TargetType:       domain.TargetTypeWebhook,
@@ -83,8 +87,8 @@ func Test_EventExecution(t *testing.T) {
 					Sequence:      1,
 					EventType:     "session.added",
 					CreatedAt:     time.Date(2024, 1, 1, 1, 1, 1, 1, time.Local).Format(time.RFC3339),
-					UserID:        "userID",
-					EventPayload:  []byte("{\"attr\":\"value\"}"),
+					UserID:        userID,
+					EventPayload:  []byte(`{"ID":"","Seq":1,"Pos":0,"Creation":"2024-01-01T01:01:01.000000001+01:00"}`),
 				},
 			},
 		},
@@ -103,23 +107,6 @@ func Test_EventExecution(t *testing.T) {
 			assert.Equal(t, tt.res.targets, targets)
 			assert.Equal(t, tt.res.contextInfo, execution_rp.ContextInfoFromRequest(request))
 		})
-	}
-}
-
-func eventForEventExecution(aggID, aggType, version, eventType string, creation time.Time, userID string, sequence uint64, data []byte) eventstore.Event {
-	return &eventstore.BaseEvent{
-		Agg: &eventstore.Aggregate{
-			ID:            aggID,
-			Type:          eventstore.AggregateType(aggType),
-			ResourceOwner: "resourceOwner",
-			InstanceID:    "instanceID",
-			Version:       eventstore.Version(version),
-		},
-		EventType: eventstore.EventType(eventType),
-		Seq:       sequence,
-		Creation:  creation,
-		User:      userID,
-		Data:      data,
 	}
 }
 

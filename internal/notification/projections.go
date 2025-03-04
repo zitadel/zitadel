@@ -17,7 +17,6 @@ import (
 
 var (
 	projections []*handler.Handler
-	worker      *handlers.NotificationWorker
 )
 
 func Register(
@@ -57,7 +56,9 @@ func Register(
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
-	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c, queue)
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.AddWorkers(handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
+	}
 }
 
 func Start(ctx context.Context) {

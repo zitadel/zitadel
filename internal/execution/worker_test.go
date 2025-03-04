@@ -48,7 +48,7 @@ type wantWorker struct {
 	err            assert.ErrorAssertionFunc
 }
 
-func newExecutionWorker(f fieldsWorker, w wantWorker) *Worker {
+func newExecutionWorker(f fieldsWorker) *Worker {
 	return &Worker{
 		config: WorkerConfig{
 			Workers:             1,
@@ -64,7 +64,7 @@ const (
 	orgID      = "orgID"
 	instanceID = "instanceID"
 	eventID    = "eventID"
-	eventData  = `{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`
+	eventData  = `{"name":"name","script":"name(){}","timeout":3000000000,"allowedToFail":true}`
 )
 
 func Test_handleEventExecution(t *testing.T) {
@@ -266,7 +266,7 @@ func Test_handleEventExecution(t *testing.T) {
 			require.NoError(t, err)
 			a.job.Args.TargetsData = data
 
-			err = newExecutionWorker(f, w).Work(
+			err = newExecutionWorker(f).Work(
 				authz.WithInstanceID(context.Background(), instanceID),
 				a.job,
 			)

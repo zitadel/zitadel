@@ -9,7 +9,6 @@ import (
 	"github.com/riverqueue/river"
 
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/queue"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
 
@@ -56,14 +55,11 @@ type WorkerConfig struct {
 
 func NewWorker(
 	config WorkerConfig,
-	queue *queue.Queue,
 ) *Worker {
-	w := &Worker{
+	return &Worker{
 		config: config,
 		now:    time.Now,
 	}
-	queue.AddWorkers(w)
-	return w
 }
 
 var _ river.Worker[*exec_repo.Request] = (*Worker)(nil)

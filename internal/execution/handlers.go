@@ -161,13 +161,17 @@ func NewRequest(e eventstore.Event, targets []*query.ExecutionTarget) (*exec_rep
 	if err != nil {
 		return nil, err
 	}
+	eventData, err := json.Marshal(e)
+	if err != nil {
+		return nil, err
+	}
 	return &exec_repo.Request{
 		Aggregate:   e.Aggregate(),
 		Sequence:    e.Sequence(),
 		EventType:   e.Type(),
 		CreatedAt:   e.CreatedAt(),
 		UserID:      e.Creator(),
-		EventData:   e.DataAsBytes(),
+		EventData:   eventData,
 		TargetsData: targetsData,
 	}, nil
 }
