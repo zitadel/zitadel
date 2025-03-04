@@ -8,6 +8,7 @@ export const config = {
     "/oauth/:path*",
     "/oidc/:path*",
     "/idps/callback/:path*",
+    "/saml/:path*",
   ],
 };
 
