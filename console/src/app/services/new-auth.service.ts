@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddMyAuthFactorOTPSMSResponse,
+  GetMyPasswordComplexityPolicyResponse,
   GetMyUserResponse,
   ListMyMetadataResponse,
   VerifyMyPhoneResponse,
@@ -27,5 +28,9 @@ export class NewAuthService {
 
   public listMyMetadata(): Promise<ListMyMetadataResponse> {
     return this.grpcService.authNew.listMyMetadata({});
+  }
+
+  public getMyPasswordComplexityPolicy(): Promise<GetMyPasswordComplexityPolicyResponse> {
+    return this.grpcService.authNew.getMyPasswordComplexityPolicy({});
   }
 }

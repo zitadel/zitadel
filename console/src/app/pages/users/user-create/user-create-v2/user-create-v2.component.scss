@@ -1,0 +1,44 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "email email"
+    "emailVerified emailVerified"
+    "givenName familyName"
+    "nickName username"
+    "authenticationFactor authenticationFactor";
+  ;
+}
+
+.email {
+  grid-area: email;
+}
+
+.emailVerified {
+  grid-area: emailVerified;
+}
+
+.givenName {
+  grid-area: givenName;
+}
+
+.familyName {
+  grid-area: familyName;
+}
+
+.nickName {
+  grid-area: nickName;
+}
+
+.username {
+  grid-area: username;
+}
+
+.authenticationFactor {
+  grid-area: authenticationFactor;
+}
+
+.authenticationFactorIntroductionDone {
+  background: red;
+}

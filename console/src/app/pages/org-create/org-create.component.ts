@@ -1,27 +1,21 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
-import {
-  containsLowerCaseValidator,
-  containsNumberValidator,
-  containsSymbolValidator,
-  containsUpperCaseValidator,
-  minLengthValidator,
-  passwordConfirmValidator,
-  requiredValidator,
-} from 'src/app/modules/form-field/validators/validators';
+import { passwordConfirmValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { LanguagesService } from '../../services/languages.service';
+import { LanguagesService } from 'src/app/services/languages.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { PasswordComplexityPolicy } from '@zitadel/proto/zitadel/policy_pb';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
+import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
 
 @Component({
   selector: 'cnsl-org-create',
@@ -48,20 +42,22 @@ export class OrgCreateComponent {
 
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
 
-  public policy?: PasswordComplexityPolicy.AsObject;
+  public policy?: PasswordComplexityPolicy;
   public usePassword: boolean = false;
 
   public forSelf: boolean = true;
 
   constructor(
-    private router: Router,
-    private toast: ToastService,
-    private adminService: AdminService,
-    private _location: Location,
-    private fb: UntypedFormBuilder,
-    private mgmtService: ManagementService,
-    private authService: GrpcAuthService,
-    public langSvc: LanguagesService,
+    private readonly router: Router,
+    private readonly toast: ToastService,
+    private readonly adminService: AdminService,
+    private readonly _location: Location,
+    private readonly fb: UntypedFormBuilder,
+    private readonly mgmtService: ManagementService,
+    private readonly newMgmtService: NewMgmtService,
+    private readonly authService: GrpcAuthService,
+    private readonly passwordComplexityValidatorFactory: PasswordComplexityValidatorFactoryService,
+    public readonly langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
     const instanceBread = new Breadcrumb({
@@ -103,8 +99,8 @@ export class OrgCreateComponent {
     this.adminService
       .SetUpOrg(createOrgRequest, humanRequest)
       .then(() => {
-        this.authService.revalidateOrgs();
-        this.router.navigate(['/orgs']);
+        this.authService.revalidateOrgs().then();
+        this.router.navigate(['/orgs']).then();
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -133,36 +129,12 @@ export class OrgCreateComponent {
   }
 
   public initPwdValidators(): void {
-    const validators: Validators[] = [requiredValidator];
-
     if (this.usePassword) {
-      this.mgmtService.getDefaultPasswordComplexityPolicy().then((data) => {
-        if (data.policy) {
-          this.policy = data.policy;
-
-          if (this.policy.minLength) {
-            validators.push(minLengthValidator(this.policy.minLength));
-          }
-          if (this.policy.hasLowercase) {
-            validators.push(containsLowerCaseValidator);
-          }
-          if (this.policy.hasUppercase) {
-            validators.push(containsUpperCaseValidator);
-          }
-          if (this.policy.hasNumber) {
-            validators.push(containsNumberValidator);
-          }
-          if (this.policy.hasSymbol) {
-            validators.push(containsSymbolValidator);
-          }
-
-          const pwdValidators = [...validators] as ValidatorFn[];
-          const confirmPwdValidators = [requiredValidator, passwordConfirmValidator()] as ValidatorFn[];
-          this.pwdForm = this.fb.group({
-            password: ['', pwdValidators],
-            confirmPassword: ['', confirmPwdValidators],
-          });
-        }
+      this.newMgmtService.getDefaultPasswordComplexityPolicy().then((data) => {
+        this.pwdForm = this.fb.group({
+          password: ['', this.passwordComplexityValidatorFactory.buildValidators(data.policy)],
+          confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
+        });
       });
     } else {
       this.pwdForm = this.fb.group({
@@ -194,8 +166,8 @@ export class OrgCreateComponent {
       this.mgmtService
         .addOrg(this.name.value)
         .then(() => {
-          this.authService.revalidateOrgs();
-          this.router.navigate(['/orgs']);
+          this.authService.revalidateOrgs().then();
+          this.router.navigate(['/orgs']).then();
         })
         .catch((error) => {
           this.toast.showError(error);
