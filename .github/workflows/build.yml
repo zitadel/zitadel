@@ -57,6 +57,7 @@ jobs:
       go_version: "1.22"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
+      crdb_version: "v24.2.4"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
