@@ -512,11 +512,13 @@
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
+    "ORG_SETTINGS_MANAGER": "조직 설정을 관리할 수 있는 권한이 있습니다",
     "ORG_USER_PERMISSION_EDITOR": "사용자 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_PERMISSION_EDITOR": "프로젝트 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_CREATOR": "자신의 프로젝트와 하위 설정을 생성할 수 있는 권한이 있습니다",
     "ORG_ADMIN_IMPERSONATOR": "조직의 관리자 및 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "ORG_END_USER_IMPERSONATOR": "조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
+    "ORG_USER_SELF_MANAGER": "자신의 사용자 계정을 관리할 수 있는 권한이 있습니다",
     "PROJECT_OWNER": "프로젝트에 대한 전체 권한이 있습니다",
     "PROJECT_OWNER_VIEWER": "프로젝트 전체를 검토할 수 있는 권한이 있습니다",
     "PROJECT_OWNER_GLOBAL": "프로젝트에 대한 전체 권한이 있습니다",
@@ -2225,7 +2227,9 @@
       "REMOVED": "성공적으로 제거되었습니다."
     },
     "ISIDTOKENMAPPING": "ID 토큰에서 매핑",
-    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다."
+    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다.",
+    "USEPKCE": "PKCE 사용",
+    "USEPKCE_DESC": "code_challenge 및 code_challenge_method 매개변수가 인증 요청에 포함되는지 여부를 결정합니다"
   },
   "MFA": {
     "LIST": {

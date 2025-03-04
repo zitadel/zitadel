@@ -31,6 +31,7 @@ func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
 				Sequence:      idp.Sequence,
 				EventDate:     idp.ChangeDate,
 				ResourceOwner: idp.ResourceOwner,
+				CreationDate:  idp.CreationDate,
 			}),
 		State:  idpStateToPb(idp.State),
 		Name:   idp.Name,

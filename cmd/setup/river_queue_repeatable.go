@@ -16,7 +16,7 @@ func (mig *RiverMigrateRepeatable) Execute(ctx context.Context, _ eventstore.Eve
 	if mig.client.Type() != "postgres" {
 		return nil
 	}
-	return queue.New(mig.client).ExecuteMigrations(ctx)
+	return queue.NewMigrator(mig.client).Execute(ctx)
 }
 
 func (mig *RiverMigrateRepeatable) String() string {
