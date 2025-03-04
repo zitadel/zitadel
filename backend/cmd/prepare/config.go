@@ -1,12 +1,12 @@
 package prepare
 
 import (
-	"github.com/Masterminds/semver/v3"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/zitadel/zitadel/backend/cmd/config"
 	"github.com/zitadel/zitadel/backend/cmd/configure"
+	"github.com/zitadel/zitadel/backend/cmd/configure/bla"
 	step001 "github.com/zitadel/zitadel/backend/cmd/prepare/001"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect"
@@ -36,62 +36,24 @@ var (
 		// 		panic(err)
 		// 	}
 		// },
-		Run: configure.Update(
-			"prepare",
-			"Writes the configuration for the prepare command",
-			configuration.Fields(),
-		),
+		// Run: configure.Update(
+		// 	"prepare",
+		// 	"Writes the configuration for the prepare command",
+		// 	configuration.Fields(),
+		// ),
+		Run:    bla.Update(viper.GetViper(), &configuration),
 		PreRun: configure.ReadConfigPreRun(viper.GetViper(), &configuration),
 	}
 )
 
 type Config struct {
-	config.Config `mapstructure:",squash"`
+	config.Config `mapstructure:",squash" configure:"-"`
 
-	Database dialect.Config
+	Database dialect.Config // `configure:"-"`
 	Step001  step001.Step001
 
 	// runtime config
-	Client database.Pool `mapstructure:"-"`
-}
-
-// Describe implements configure.StructUpdater.
-func (c *Config) Describe() string {
-	return "Configuration for the prepare command"
-}
-
-// Name implements configure.StructUpdater.
-func (c *Config) Name() string {
-	return "prepare"
-}
-
-// ShouldUpdate implements configure.StructUpdater.
-func (c *Config) ShouldUpdate(version *semver.Version) bool {
-	if version == nil {
-		return true
-	}
-	for _, field := range c.Fields() {
-		if field.ShouldUpdate(version) {
-			return true
-		}
-	}
-	return false
-}
-
-// Fields implements configure.UpdateConfig.
-func (c Config) Fields() []configure.Updater {
-	return []configure.Updater{
-		&configure.Struct{
-			FieldName:   "step001",
-			Description: "The configuration for the first step of the prepare command",
-			SubFields:   c.Step001.Fields(),
-		},
-		&configure.Struct{
-			FieldName:   "database",
-			Description: "The configuration for the database connection",
-			SubFields:   c.Database.Fields(),
-		},
-	}
+	Client database.Pool `mapstructure:"-" configure:"-"`
 }
 
 func (c *Config) Hooks() (decoders []viper.DecoderConfigOption) {

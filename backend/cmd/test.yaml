@@ -2,5 +2,5 @@ configuredversion: 2025.2.23
 database:
     postgres: host=local
 step001:
-    databasename: zita
-    username: adel
+    databasename: asdf
+    username: asdf

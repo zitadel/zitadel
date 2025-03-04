@@ -17,7 +17,7 @@ var (
 )
 
 type Step001 struct {
-	Database database.Pool `mapstructure:"-"`
+	Database database.Pool `mapstructure:"-" configure:"-"`
 
 	DatabaseName string `configure:"default=zitadel"`
 	Username     string `configure:"default=zitadel"`

@@ -3,7 +3,6 @@ package dialect
 import (
 	"context"
 	"errors"
-	"fmt"
 	"reflect"
 
 	"github.com/mitchellh/mapstructure"
@@ -11,68 +10,41 @@ import (
 
 	"github.com/zitadel/zitadel/backend/cmd/config"
 	"github.com/zitadel/zitadel/backend/cmd/configure"
+	"github.com/zitadel/zitadel/backend/cmd/configure/bla"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect/gosql"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect/postgres"
 )
 
 type Hook struct {
-	Match  func(string) bool
-	Decode func(name string, config any) (database.Connector, error)
-	Name   string
-	Field  configure.Updater
+	Match       func(string) bool
+	Decode      func(name string, config any) (database.Connector, error)
+	Name        string
+	Field       configure.Updater
+	Constructor func() any
 }
 
-var hooks = make([]Hook, 0)
-
-func init() {
-	hooks = append(hooks,
-		Hook{
-			Match:  postgres.NameMatcher,
-			Decode: postgres.DecodeConfig,
-			Name:   postgres.Name,
-			Field:  postgres.Field,
-		},
-		Hook{
-			Match:  gosql.NameMatcher,
-			Decode: gosql.DecodeConfig,
-			Name:   gosql.Name,
-			Field:  gosql.Field,
-		},
-	)
+var hooks = []Hook{
+	{
+		Match:       postgres.NameMatcher,
+		Decode:      postgres.DecodeConfig,
+		Name:        postgres.Name,
+		Field:       postgres.Field,
+		Constructor: func() any { return new(postgres.Config) },
+	},
+	{
+		Match:       gosql.NameMatcher,
+		Decode:      gosql.DecodeConfig,
+		Name:        gosql.Name,
+		Field:       gosql.Field,
+		Constructor: func() any { return new(gosql.Config) },
+	},
 }
 
 type Config struct {
-	Dialects map[string]any `mapstructure:",remain"`
+	Dialects dialects `mapstructure:",remain"`
 
 	connector database.Connector
-}
-
-// Fields implements [configure.StructUpdater].
-func (c *Config) Fields() []configure.Updater {
-	dialects := configure.OneOf{
-		Description: "The database dialect Zitadel connects to",
-		SubFields:   []configure.Updater{},
-	}
-	for _, hook := range hooks {
-		if hook.Field == nil {
-			panic("hook must configure its config fields")
-		}
-		dialects.SubFields = append(dialects.SubFields, &configure.Struct{
-			FieldName:   hook.Name,
-			Description: fmt.Sprintf("Configuration for %s", hook.Name),
-			SubFields:   []configure.Updater{hook.Field},
-		})
-	}
-
-	return []configure.Updater{
-		dialects,
-	}
-}
-
-// Name implements [configure.StructUpdater].
-func (c *Config) Name() string {
-	return "database"
 }
 
 func (c Config) Connect(ctx context.Context) (database.Pool, error) {
@@ -131,3 +103,21 @@ func decodeHook(from, to reflect.Value) (_ interface{}, err error) {
 
 	return config, nil
 }
+
+type dialects map[string]any
+
+// ConfigForIndex implements [bla.OneOfField].
+func (d dialects) ConfigForIndex(i int) any {
+	return hooks[i].Constructor()
+}
+
+// Possibilities implements [bla.OneOfField].
+func (d dialects) Possibilities() []string {
+	possibilities := make([]string, len(hooks))
+	for i, hook := range hooks {
+		possibilities[i] = hook.Name
+	}
+	return possibilities
+}
+
+var _ bla.OneOfField = (dialects)(nil)

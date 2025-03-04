@@ -114,6 +114,10 @@ func handleField(v *viper.Viper, field reflect.StructField, value reflect.Value)
 
 	value = reflect.Indirect(value)
 
+	if value.IsZero() {
+		value = reflect.New(value.Type()).Elem()
+	}
+
 	// Check if potential non pointer value implements [OneOfField]
 	if value.Type().Implements(reflect.TypeFor[OneOfField]()) {
 		return handleOneOf(v, field, value, fieldConfig)

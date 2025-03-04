@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/zitadel/zitadel/backend/cmd/configure"
+	"github.com/zitadel/zitadel/backend/cmd/configure/bla"
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
 
@@ -93,11 +94,29 @@ var (
 	}
 )
 
-type Config struct{ *pgxpool.Config }
+type Config struct{ pgxpool.Config }
+
+// ConfigForIndex implements bla.OneOfField.
+func (c Config) ConfigForIndex(i int) any {
+	switch i {
+	case 0:
+		return new(string)
+	case 1:
+		return &c.Config
+	}
+	return nil
+}
+
+// Possibilities implements bla.OneOfField.
+func (c Config) Possibilities() []string {
+	return []string{"connection string", "fields"}
+}
+
+var _ bla.OneOfField = (*Config)(nil)
 
 // Connect implements [database.Connector].
 func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
-	pool, err := pgxpool.NewWithConfig(ctx, c.Config)
+	pool, err := pgxpool.NewWithConfig(ctx, &c.Config)
 	if err != nil {
 		return nil, err
 	}
@@ -118,10 +137,10 @@ func DecodeConfig(_ string, config any) (database.Connector, error) {
 		if err != nil {
 			return nil, err
 		}
-		return &Config{config}, nil
+		return &Config{Config: *config}, nil
 	case map[string]any:
 		return &Config{
-			Config: &pgxpool.Config{},
+			Config: pgxpool.Config{},
 		}, nil
 	}
 	return nil, errors.New("invalid configuration")

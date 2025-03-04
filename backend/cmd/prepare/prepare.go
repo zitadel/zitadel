@@ -18,11 +18,11 @@ var (
 		// This application is a tool to generate the needed files
 		// to quickly create a Cobra application.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			var err error
-			configuration.Client, err = configuration.Database.Connect(cmd.Context())
-			if err != nil {
-				panic(err)
-			}
+			// var err error
+			// configuration.Client, err = configuration.Database.Connect(cmd.Context())
+			// if err != nil {
+			// 	panic(err)
+			// }
 			defer configuration.Client.Close(cmd.Context())
 			if err := (&step001.Step001{Database: configuration.Client}).Migrate(cmd.Context()); err != nil {
 				panic(err)
