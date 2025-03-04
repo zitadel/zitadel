@@ -9,7 +9,7 @@ import (
 )
 
 func Test_verifyEvents(t *testing.T) {
-	err := ReadStmts("cockroach") //TODO: check all dialects
+	err := ReadStmts()
 	if err != nil {
 		t.Errorf("unable to read stmts: %v", err)
 		t.FailNow()

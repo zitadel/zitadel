@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -129,7 +128,7 @@ func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPUserLinksQuery(ctx, q.client)
+	query, scan := prepareIDPUserLinksQuery()
 	eq := sq.Eq{IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[IDPUserLinkOwnerRemovedCol.identifier()] = false
@@ -166,7 +165,7 @@ func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEquals)
 }
 
-func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
+func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
@@ -177,7 +176,7 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			IDPUserLinkResourceOwnerCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
-			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPUserLinks, error) {
 			idps := make([]*IDPUserLink, 0)

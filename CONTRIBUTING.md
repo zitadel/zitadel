@@ -216,12 +216,6 @@ Integration tests are run as gRPC clients against a running ZITADEL server binar
 The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
 It is also possible to run a ZITADEL sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
 
-The database flavor can **optionally** be set in the environment to `cockroach` or `postgres`. The default is `postgres`.
-
-```bash
-export INTEGRATION_DB_FLAVOR="cockroach"
-```
-
 In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
 
 ```bash

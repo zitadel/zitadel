@@ -116,8 +116,8 @@ func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQuerie
 	eq := sq.Eq{
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetsQuery(ctx, q.client)
-	targets, err := genericRowsQueryWithState[*Targets](ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	query, scan := prepareTargetsQuery()
+	targets, err := genericRowsQueryWithState(ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +134,8 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string) (*Target, error)
 		TargetColumnID.identifier():         id,
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetQuery(ctx, q.client)
-	target, err := genericRowQuery[*Target](ctx, q.client, query.Where(eq), scan)
+	query, scan := prepareTargetQuery()
+	target, err := genericRowQuery(ctx, q.client, query.Where(eq), scan)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(TargetColumnID, values)
 }
 
-func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
+func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),
@@ -205,7 +205,7 @@ func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, fu
 		}
 }
 
-func prepareTargetQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
+func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),

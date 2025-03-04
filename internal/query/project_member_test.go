@@ -43,7 +43,6 @@ var (
 		"LEFT JOIN projections.login_names3 " +
 		"ON members.user_id = projections.login_names3.user_id " +
 		"AND members.instance_id = projections.login_names3.instance_id " +
-		`AS OF SYSTEM TIME '-1 ms' ` +
 		"WHERE projections.login_names3.is_primary = $1")
 	projectMembersColumns = []string{
 		"creation_date",
@@ -299,7 +298,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

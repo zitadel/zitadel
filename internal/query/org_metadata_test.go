@@ -18,8 +18,7 @@ var (
 		` projections.org_metadata2.sequence,` +
 		` projections.org_metadata2.key,` +
 		` projections.org_metadata2.value` +
-		` FROM projections.org_metadata2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.org_metadata2`
 	orgMetadataCols = []string{
 		"creation_date",
 		"change_date",
@@ -35,8 +34,7 @@ var (
 		` projections.org_metadata2.key,` +
 		` projections.org_metadata2.value,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.org_metadata2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.org_metadata2`
 	orgMetadataListCols = []string{
 		"creation_date",
 		"change_date",
@@ -244,7 +242,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
