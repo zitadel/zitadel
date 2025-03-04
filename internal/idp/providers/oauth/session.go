@@ -51,7 +51,7 @@ func (s *Session) PersistentParameters() map[string]any {
 // FetchUser implements the [idp.Session] interface.
 // It will execute an OAuth 2.0 code exchange if needed to retrieve the access token,
 // call the specified userEndpoint and map the received information into an [idp.User].
-func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
+func (s *Session) FetchUser(ctx context.Context) (_ idp.User, err error) {
 	if s.Tokens == nil {
 		if err = s.authorize(ctx); err != nil {
 			return nil, err
@@ -62,11 +62,11 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, err
 	}
 	req.Header.Set("authorization", s.Tokens.TokenType+" "+s.Tokens.AccessToken)
-	mapper := s.Provider.userMapper()
-	if err := httphelper.HttpRequest(s.Provider.RelyingParty.HttpClient(), req, &mapper); err != nil {
+	user := s.Provider.User()
+	if err := httphelper.HttpRequest(s.Provider.RelyingParty.HttpClient(), req, &user); err != nil {
 		return nil, err
 	}
-	return mapper, nil
+	return user, nil
 }
 
 func (s *Session) authorize(ctx context.Context) (err error) {

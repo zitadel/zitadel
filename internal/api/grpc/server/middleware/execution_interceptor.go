@@ -3,23 +3,19 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"strings"
 
-	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
-	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		requestTargets, responseTargets := queryTargets(ctx, queries, info.FullMethod)
+		requestTargets, responseTargets := execution.QueryExecutionTargetsForRequestAndResponse(ctx, queries, info.FullMethod)
 
 		// call targets otherwise return req
 		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req)
@@ -79,49 +75,6 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 	}
 
 	return execution.CallTargets(ctx, targets, info)
-}
-
-type ExecutionQueries interface {
-	TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
-}
-
-func queryTargets(
-	ctx context.Context,
-	queries ExecutionQueries,
-	fullMethod string,
-) ([]execution.Target, []execution.Target) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.End()
-
-	targets, err := queries.TargetsByExecutionIDs(ctx,
-		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
-		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
-	)
-	requestTargets := make([]execution.Target, 0, len(targets))
-	responseTargets := make([]execution.Target, 0, len(targets))
-	if err != nil {
-		logging.WithFields("fullMethod", fullMethod).WithError(err).Info("unable to query targets")
-		return requestTargets, responseTargets
-	}
-
-	for _, target := range targets {
-		if strings.HasPrefix(target.GetExecutionID(), exec_repo.IDAll(domain.ExecutionTypeRequest)) {
-			requestTargets = append(requestTargets, target)
-		} else if strings.HasPrefix(target.GetExecutionID(), exec_repo.IDAll(domain.ExecutionTypeResponse)) {
-			responseTargets = append(responseTargets, target)
-		}
-	}
-
-	return requestTargets, responseTargets
-}
-
-func idsForFullMethod(fullMethod string, executionType domain.ExecutionType) []string {
-	return []string{exec_repo.ID(executionType, fullMethod), exec_repo.ID(executionType, serviceFromFullMethod(fullMethod)), exec_repo.IDAll(executionType)}
-}
-
-func serviceFromFullMethod(s string) string {
-	parts := strings.Split(s, "/")
-	return parts[1]
 }
 
 var _ execution.ContextInfo = &ContextInfoRequest{}
