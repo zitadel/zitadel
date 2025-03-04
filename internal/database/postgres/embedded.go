@@ -40,9 +40,8 @@ func getPort() uint16 {
 		timeout := time.Second
 		_, err := net.DialTimeout("tcp", net.JoinHostPort("localhost", fmt.Sprintf("%d", nextPort)), timeout)
 		if err != nil {
-			nextPort++
-			continue
+			return nextPort
 		}
-		return nextPort
+		nextPort++
 	}
 }
