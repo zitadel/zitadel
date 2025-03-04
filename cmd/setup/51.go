@@ -15,11 +15,10 @@ type InitPermittedOrgsFunction struct {
 	eventstoreClient *database.DB
 }
 
-var (
-	//go:embed 51/*.sql
-	permittedOrgsFunction embed.FS
-)
-var nc (mig *InitPermittedOrgsFunction) Execute(ctx context.Context, _ eventstore.Event) error {
+//go:embed 49/*.sql
+var permittedOrgsFunction embed.FS
+
+func (mig *InitPermittedOrgsFunction) Execute(ctx context.Context, _ eventstore.Event) error {
 	statements, err := readStatements(permittedOrgsFunction, "51", "")
 	if err != nil {
 		return err
