@@ -16,6 +16,7 @@ func StartEmbedded() (embeddedpostgres.Config, func()) {
 
 	port := uint16(5432)
 	for isPortInUse(port) {
+		logging.WithFields("port", port).Debug("port in use, trying next")
 		port++
 	}
 
