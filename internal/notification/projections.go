@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -35,7 +34,6 @@ func Register(
 	otpEmailTmpl, fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
 	tokenLifetime time.Duration,
-	client *database.DB,
 	queue *queue.Queue,
 ) {
 	if !notificationWorkerConfig.LegacyEnabled {
@@ -59,7 +57,7 @@ func Register(
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
-	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, es, client, c, queue)
+	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c, queue)
 }
 
 func Start(ctx context.Context) {

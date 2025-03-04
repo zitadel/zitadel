@@ -1,22 +1,25 @@
 package execution
 
 import (
-	"context"
+	"database/sql"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/execution/mock"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	execution_rp "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_EventExecution(t *testing.T) {
@@ -26,8 +29,7 @@ func Test_EventExecution(t *testing.T) {
 	}
 	type res struct {
 		targets     []Target
-		contextInfo *ContextInfoEvent
-		columns     []handler.Column
+		contextInfo *execution_rp.ContextInfoEvent
 		wantErr     bool
 	}
 	tests := []struct {
@@ -72,7 +74,7 @@ func Test_EventExecution(t *testing.T) {
 						SigningKey:       "key",
 					},
 				},
-				contextInfo: &ContextInfoEvent{
+				contextInfo: &execution_rp.ContextInfoEvent{
 					AggregateID:   "aggID",
 					AggregateType: "session",
 					ResourceOwner: "resourceOwner",
@@ -84,36 +86,22 @@ func Test_EventExecution(t *testing.T) {
 					UserID:        "userID",
 					EventPayload:  []byte("{\"attr\":\"value\"}"),
 				},
-				columns: []handler.Column{
-					handler.NewCol(ExecutionInstanceID, "instanceID"),
-					handler.NewCol(ExecutionResourceOwner, "resourceOwner"),
-					handler.NewCol(ExecutionAggregateType, eventstore.AggregateType("session")),
-					handler.NewCol(ExecutionAggregateVersion, eventstore.Version("v1")),
-					handler.NewCol(ExecutionAggregateID, "aggID"),
-					handler.NewCol(ExecutionSequence, uint64(1)),
-					handler.NewCol(ExecutionEventType, eventstore.EventType("session.added")),
-					handler.NewCol(ExecutionCreatedAt, time.Date(2024, 1, 1, 1, 1, 1, 1, time.Local)),
-					handler.NewCol(ExecutionEventUserIDCol, "userID"),
-					handler.NewCol(ExecutionEventDataCol, []byte("{\"attr\":\"value\"}")),
-					handler.NewCol(ExecutionTargetsDataCol, []byte("[{\"InstanceID\":\"instanceID\",\"ExecutionID\":\"executionID\",\"TargetID\":\"targetID\",\"TargetType\":0,\"Endpoint\":\"endpoint\",\"Timeout\":60000000000,\"InterruptOnError\":true,\"SigningKey\":\"key\"}]")),
-				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			eventExecution, err := NewEventExecution(tt.args.event, tt.args.targets)
+			request, err := NewRequest(tt.args.event, tt.args.targets)
 			if tt.res.wantErr {
 				assert.Error(t, err)
-				assert.Nil(t, eventExecution)
+				assert.Nil(t, request)
 				return
 			}
 			assert.NoError(t, err)
-			targets, err := eventExecution.Targets()
+			targets, err := TargetsFromRequest(request)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.res.targets, targets)
-			assert.Equal(t, tt.res.contextInfo, eventExecution.ContextInfo())
-			assert.Equal(t, tt.res.columns, eventExecution.Columns())
+			assert.Equal(t, tt.res.contextInfo, execution_rp.ContextInfoFromRequest(request))
 		})
 	}
 }
@@ -255,137 +243,207 @@ func Test_idsForEventType(t *testing.T) {
 }
 
 func TestActionProjection_reduces(t *testing.T) {
-	type args struct {
-		event func(t *testing.T) eventstore.Event
-	}
 	tests := []struct {
-		name   string
-		args   args
-		reduce func(event eventstore.Event) (*handler.Statement, error)
-		want   wantReduce
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "reduce, action, error",
-			args: args{
-				event: getEvent(
-					testEvent(
-						action.AddedEventType,
-						action.AggregateType,
-						[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
-					),
-					action.AddedEventMapper,
-				),
-			},
-			reduce: (newMockEventExecutionsHandler(newMockEventExecutionHandlerQuery(0, fmt.Errorf("failed query")))).reduce,
-			want: wantReduce{
-				err: func(err error) bool {
-					return err.Error() == "failed query"
-				},
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, q *mock.MockQueue) (f fields, a args, w want) {
+				queries.EXPECT().TargetsByExecutionID(gomock.Any(), gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "QUERY-37ardr0pki", "Errors.Query.CloseRows"))
+				return fields{
+						queries: queries,
+						queue:   q,
+					}, args{
+						event: &action.AddedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								InstanceID:    instanceID,
+								AggregateID:   eventID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  time.Now().UTC(),
+								Typ:           action.AddedEventType,
+								Data:          []byte(eventData),
+								EditorUser:    userID,
+								Seq:           1,
+								AggregateType: action.AggregateType,
+								Version:       action.AggregateVersion,
+							}),
+							Name:          "name",
+							Script:        "name(){}",
+							Timeout:       3 * time.Second,
+							AllowedToFail: true,
+						},
+						mapper: action.AddedEventMapper,
+					}, want{
+						err: func(tt assert.TestingT, err error, i ...interface{}) bool {
+							return errors.Is(err, zerrors.ThrowInternal(nil, "QUERY-37ardr0pki", "Errors.Query.CloseRows"))
+						},
+					}
 			},
 		},
+
 		{
 			name: "reduce, action, none",
-			args: args{
-				event: getEvent(
-					testEvent(
-						action.AddedEventType,
-						action.AggregateType,
-						[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
-					),
-					action.AddedEventMapper,
-				),
-			},
-			reduce: (newMockEventExecutionsHandler(newMockEventExecutionHandlerQuery(0, nil))).reduce,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("action"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{},
-				},
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, q *mock.MockQueue) (f fields, a args, w want) {
+				queries.EXPECT().TargetsByExecutionID(gomock.Any(), gomock.Any()).Return([]*query.ExecutionTarget{}, nil)
+				return fields{
+						queries: queries,
+						queue:   q,
+					}, args{
+						event: &action.AddedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								InstanceID:    instanceID,
+								AggregateID:   eventID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  time.Now().UTC(),
+								Typ:           action.AddedEventType,
+								Data:          []byte(eventData),
+								EditorUser:    userID,
+								Seq:           1,
+								AggregateType: action.AggregateType,
+								Version:       action.AggregateVersion,
+							}),
+							Name:          "name",
+							Script:        "name(){}",
+							Timeout:       3 * time.Second,
+							AllowedToFail: true,
+						},
+						mapper: action.AddedEventMapper,
+					}, want{
+						noOperation: true,
+					}
 			},
 		},
 		{
 			name: "reduce, action, single",
-			args: args{
-				event: getEvent(
-					testEvent(
-						action.AddedEventType,
-						action.AggregateType,
-						[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
-					),
-					action.AddedEventMapper,
-				),
-			},
-			reduce: (newMockEventExecutionsHandler(newMockEventExecutionHandlerQuery(1, nil))).reduce,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("action"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "INSERT INTO projections.execution_handler (instance_id, resource_owner, aggregate_type, aggregate_version, aggregate_id, sequence, event_type, created_at, user_id, event_data, targets_data) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								"ro-id",
-								eventstore.AggregateType(action.AggregateType),
-								eventstore.Version(action.AggregateVersion),
-								"agg-id",
-								uint64(15),
-								action.AddedEventType,
-								anyArg{},
-								"editor-user",
-								[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
-								anyArg{},
-							},
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, q *mock.MockQueue) (f fields, a args, w want) {
+				targets := mockTargets(1)
+				queries.EXPECT().TargetsByExecutionID(gomock.Any(), gomock.Any()).Return(targets, nil)
+				createdAt := time.Now().UTC()
+				q.EXPECT().Insert(
+					gomock.Any(),
+					&execution_rp.Request{
+						Aggregate: &eventstore.Aggregate{
+							InstanceID:    instanceID,
+							Type:          action.AggregateType,
+							Version:       action.AggregateVersion,
+							ID:            eventID,
+							ResourceOwner: orgID,
 						},
+						Sequence:    1,
+						CreatedAt:   createdAt,
+						EventType:   action.AddedEventType,
+						UserID:      userID,
+						EventData:   []byte(eventData),
+						TargetsData: mockTargetsToBytes(targets),
 					},
-				},
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+						queries: queries,
+						queue:   q,
+					}, args{
+						event: &action.AddedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								InstanceID:    instanceID,
+								AggregateID:   eventID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  createdAt,
+								Typ:           action.AddedEventType,
+								Data:          []byte(eventData),
+								EditorUser:    userID,
+								Seq:           1,
+								AggregateType: action.AggregateType,
+								Version:       action.AggregateVersion,
+							}),
+							Name:          "name",
+							Script:        "name(){}",
+							Timeout:       3 * time.Second,
+							AllowedToFail: true,
+						},
+						mapper: action.AddedEventMapper,
+					}, w
 			},
 		},
 		{
 			name: "reduce, action, multiple",
-			args: args{
-				event: getEvent(
-					testEvent(
-						action.AddedEventType,
-						action.AggregateType,
-						[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
-					),
-					action.AddedEventMapper,
-				),
-			},
-			reduce: (newMockEventExecutionsHandler(newMockEventExecutionHandlerQuery(3, nil))).reduce,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("action"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "INSERT INTO projections.execution_handler (instance_id, resource_owner, aggregate_type, aggregate_version, aggregate_id, sequence, event_type, created_at, user_id, event_data, targets_data) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								"ro-id",
-								eventstore.AggregateType(action.AggregateType),
-								eventstore.Version(action.AggregateVersion),
-								"agg-id",
-								uint64(15),
-								action.AddedEventType,
-								anyArg{},
-								"editor-user",
-								[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
-								mockTargetsToBytes(3),
-							},
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, q *mock.MockQueue) (f fields, a args, w want) {
+				targets := mockTargets(3)
+				queries.EXPECT().TargetsByExecutionID(gomock.Any(), gomock.Any()).Return(targets, nil)
+				createdAt := time.Now().UTC()
+				q.EXPECT().Insert(
+					gomock.Any(),
+					&execution_rp.Request{
+						Aggregate: &eventstore.Aggregate{
+							InstanceID:    instanceID,
+							Type:          action.AggregateType,
+							Version:       action.AggregateVersion,
+							ID:            eventID,
+							ResourceOwner: orgID,
 						},
+						Sequence:    1,
+						CreatedAt:   createdAt,
+						EventType:   action.AddedEventType,
+						UserID:      userID,
+						EventData:   []byte(eventData),
+						TargetsData: mockTargetsToBytes(targets),
 					},
-				},
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+						queries: queries,
+						queue:   q,
+					}, args{
+						event: &action.AddedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								InstanceID:    instanceID,
+								AggregateID:   eventID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  createdAt,
+								Typ:           action.AddedEventType,
+								Data:          []byte(eventData),
+								EditorUser:    userID,
+								Seq:           1,
+								AggregateType: action.AggregateType,
+								Version:       action.AggregateVersion,
+							}),
+							Name:          "name",
+							Script:        "name(){}",
+							Timeout:       3 * time.Second,
+							AllowedToFail: true,
+						},
+						mapper: action.AddedEventMapper,
+					}, w
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			event := tt.args.event(t)
-			got, err := tt.reduce(event)
-			assertReduce(t, got, err, ExecutionHandlerTable, tt.want)
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+
+			event, err := a.mapper(a.event)
+			assert.NoError(t, err)
+
+			stmt, err := newEventExecutionsHandler(queries, f).reduce(event)
+			if w.err != nil {
+				w.err(t, err)
+				return
+			}
+			assert.NoError(t, err)
+
+			if w.noOperation {
+				assert.Nil(t, stmt.Execute)
+				return
+			}
+			err = stmt.Execute(nil, "")
+			if w.stmtErr != nil {
+				w.stmtErr(t, err)
+				return
+			}
+			assert.NoError(t, err)
 		})
 	}
 }
@@ -414,30 +472,16 @@ func mockTargets(count int) []*query.ExecutionTarget {
 	return targets
 }
 
-func mockTargetsToBytes(count int) []byte {
-	targets := mockTargets(count)
+func mockTargetsToBytes(targets []*query.ExecutionTarget) []byte {
 	data, _ := json.Marshal(targets)
 	return data
 }
 
-func newMockEventExecutionHandlerQuery(count int, err error) *mockEventExecutionHandlerQuery {
-	return &mockEventExecutionHandlerQuery{
-		targets: mockTargets(count),
-		err:     err,
-	}
-}
-
-type mockEventExecutionHandlerQuery struct {
-	targets []*query.ExecutionTarget
-	err     error
-}
-
-func (q *mockEventExecutionHandlerQuery) TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error) {
-	return q.targets, q.err
-}
-
-func newMockEventExecutionsHandler(query eventExecutionsHandlerQueries) *eventExecutionsHandler {
-	return &eventExecutionsHandler{
-		query: query,
+func newEventExecutionsHandler(queries *mock.MockQueries, f fields) *eventHandler {
+	return &eventHandler{
+		queue: f.queue,
+		query: NewExecutionsQueries(
+			queries,
+		),
 	}
 }

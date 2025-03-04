@@ -299,7 +299,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		dbClient,
 		q,
 	)
 	notification.Start(ctx)
@@ -309,8 +308,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.Projections.Customizations["executions"],
 		config.Executions,
 		queries,
-		eventstoreClient,
-		dbClient,
+		eventstoreClient.EventTypes(),
+		q,
 	)
 	execution.Start(ctx)
 

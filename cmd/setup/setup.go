@@ -181,7 +181,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
-	execution.Create(ctx, config.Projections.Customizations["executions"], nil, eventstoreClient)
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
@@ -495,7 +494,6 @@ func startCommandsQueries(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		dbClient,
 		q,
 	)
 
@@ -527,12 +525,7 @@ func initProjections(
 		err := migration.Migrate(ctx, eventstoreClient, p)
 		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
 	}
-	execution.Create(
-		ctx,
-		config.Projections.Customizations["executions"],
-		queries,
-		eventstoreClient,
-	)
+
 	for _, p := range execution.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)
 		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")

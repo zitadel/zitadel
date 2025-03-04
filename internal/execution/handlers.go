@@ -2,82 +2,60 @@ package execution
 
 import (
 	"context"
-	_ "embed"
 	"encoding/json"
 	"slices"
 	"strings"
-	"time"
 
-	"github.com/zitadel/logging"
+	"github.com/riverqueue/river"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/queue"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
 
 const (
-	ExecutionHandlerTable     = "projections.execution_handler"
-	ExecutionInstanceID       = "instance_id"
-	ExecutionResourceOwner    = "resource_owner"
-	ExecutionAggregateType    = "aggregate_type"
-	ExecutionAggregateVersion = "aggregate_version"
-	ExecutionAggregateID      = "aggregate_id"
-	ExecutionSequence         = "sequence"
-	ExecutionEventType        = "event_type"
-	ExecutionCreatedAt        = "created_at"
-	ExecutionEventUserIDCol   = "user_id"
-	ExecutionEventDataCol     = "event_data"
-	ExecutionTargetsDataCol   = "targets_data"
+	HandlerTable = "projections.execution_handler"
 )
 
-type eventExecutionsHandlerQueries interface {
+type eventHandlerQueries interface {
 	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
 }
 
-type eventExecutionsHandler struct {
-	eventTypes                 []string
-	aggregateTypeFromEventType func(typ eventstore.EventType) eventstore.AggregateType
-	query                      eventExecutionsHandlerQueries
+type Queue interface {
+	Insert(ctx context.Context, args river.JobArgs, opts ...queue.InsertOpt) error
 }
 
-func NewEventExecutionsHandler(
+type eventHandler struct {
+	eventTypes                 []string
+	aggregateTypeFromEventType func(typ eventstore.EventType) eventstore.AggregateType
+	query                      eventHandlerQueries
+	queue                      Queue
+}
+
+func NewEventHandler(
 	ctx context.Context,
 	config handler.Config,
 	eventTypes []string,
 	aggregateTypeFromEventType func(typ eventstore.EventType) eventstore.AggregateType,
-	query eventExecutionsHandlerQueries,
+	query eventHandlerQueries,
+	queue Queue,
 ) *handler.Handler {
-	return handler.NewHandler(ctx, &config, &eventExecutionsHandler{eventTypes: eventTypes, aggregateTypeFromEventType: aggregateTypeFromEventType, query: query})
+	return handler.NewHandler(ctx, &config, &eventHandler{
+		eventTypes:                 eventTypes,
+		aggregateTypeFromEventType: aggregateTypeFromEventType,
+		query:                      query,
+		queue:                      queue,
+	})
 }
 
-func (u *eventExecutionsHandler) Name() string {
-	return ExecutionHandlerTable
+func (u *eventHandler) Name() string {
+	return HandlerTable
 }
 
-func (*eventExecutionsHandler) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(ExecutionInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionResourceOwner, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionAggregateType, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionAggregateVersion, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionAggregateID, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(ExecutionCreatedAt, handler.ColumnTypeTimestamp),
-			handler.NewColumn(ExecutionEventType, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionEventUserIDCol, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionEventDataCol, handler.ColumnTypeJSONB),
-			handler.NewColumn(ExecutionTargetsDataCol, handler.ColumnTypeJSONB),
-		},
-			handler.NewPrimaryKey(ExecutionInstanceID, ExecutionResourceOwner, ExecutionAggregateID, ExecutionSequence),
-		),
-	)
-}
-
-func (u *eventExecutionsHandler) Reducers() []handler.AggregateReducer {
+func (u *eventHandler) Reducers() []handler.AggregateReducer {
 	aggList := make(map[eventstore.AggregateType][]eventstore.EventType)
 	for _, eventType := range u.eventTypes {
 		aggType := u.aggregateTypeFromEventType(eventstore.EventType(eventType))
@@ -152,7 +130,7 @@ func idsForEventType(eventType string) []string {
 	)
 }
 
-func (u *eventExecutionsHandler) reduce(e eventstore.Event) (*handler.Statement, error) {
+func (u *eventHandler) reduce(e eventstore.Event) (*handler.Statement, error) {
 	ctx := HandlerContext(e.Aggregate())
 
 	targets, err := u.query.TargetsByExecutionID(ctx, idsForEventType(string(e.Type())))
@@ -165,33 +143,25 @@ func (u *eventExecutionsHandler) reduce(e eventstore.Event) (*handler.Statement,
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	ee, err := NewEventExecution(e, targets)
-	if err != nil {
-		return nil, err
-	}
-
-	return handler.NewCreateStatement(
-		e,
-		ee.Columns(),
-	), nil
+	return handler.NewStatement(e, func(ex handler.Executer, projectionName string) error {
+		ctx := HandlerContext(e.Aggregate())
+		req, err := NewRequest(e, targets)
+		if err != nil {
+			return err
+		}
+		return u.queue.Insert(ctx,
+			req,
+			queue.WithQueueName(exec_repo.QueueName),
+		)
+	}), nil
 }
 
-type EventExecution struct {
-	Aggregate   *eventstore.Aggregate
-	Sequence    uint64
-	EventType   eventstore.EventType
-	CreatedAt   time.Time
-	UserID      string
-	EventData   []byte
-	TargetsData []byte
-}
-
-func NewEventExecution(e eventstore.Event, targets []*query.ExecutionTarget) (*EventExecution, error) {
+func NewRequest(e eventstore.Event, targets []*query.ExecutionTarget) (*exec_repo.Request, error) {
 	targetsData, err := json.Marshal(targets)
 	if err != nil {
 		return nil, err
 	}
-	return &EventExecution{
+	return &exec_repo.Request{
 		Aggregate:   e.Aggregate(),
 		Sequence:    e.Sequence(),
 		EventType:   e.Type(),
@@ -200,58 +170,4 @@ func NewEventExecution(e eventstore.Event, targets []*query.ExecutionTarget) (*E
 		EventData:   e.DataAsBytes(),
 		TargetsData: targetsData,
 	}, nil
-}
-
-func (e *EventExecution) Columns() []handler.Column {
-	return []handler.Column{
-		handler.NewCol(ExecutionInstanceID, e.Aggregate.InstanceID),
-		handler.NewCol(ExecutionResourceOwner, e.Aggregate.ResourceOwner),
-		handler.NewCol(ExecutionAggregateType, e.Aggregate.Type),
-		handler.NewCol(ExecutionAggregateVersion, e.Aggregate.Version),
-		handler.NewCol(ExecutionAggregateID, e.Aggregate.ID),
-		handler.NewCol(ExecutionSequence, e.Sequence),
-		handler.NewCol(ExecutionEventType, e.EventType),
-		handler.NewCol(ExecutionCreatedAt, e.CreatedAt),
-		handler.NewCol(ExecutionEventUserIDCol, e.UserID),
-		handler.NewCol(ExecutionEventDataCol, e.EventData),
-		handler.NewCol(ExecutionTargetsDataCol, e.TargetsData),
-	}
-}
-
-func (e *EventExecution) Targets() ([]Target, error) {
-	var execTargets []*query.ExecutionTarget
-	if err := json.Unmarshal(e.TargetsData, &execTargets); err != nil {
-		return nil, err
-	}
-	targets := make([]Target, len(execTargets))
-	for i, target := range execTargets {
-		targets[i] = target
-	}
-	return targets, nil
-}
-
-func (e *EventExecution) ContextInfo() *ContextInfoEvent {
-	return &ContextInfoEvent{
-		AggregateID:   e.Aggregate.ID,
-		AggregateType: string(e.Aggregate.Type),
-		ResourceOwner: e.Aggregate.ResourceOwner,
-		InstanceID:    e.Aggregate.InstanceID,
-		Version:       string(e.Aggregate.Version),
-		Sequence:      e.Sequence,
-		EventType:     string(e.EventType),
-		CreatedAt:     e.CreatedAt.Format(time.RFC3339),
-		UserID:        e.UserID,
-		EventPayload:  e.EventData,
-	}
-}
-
-func (e *EventExecution) WithLogFields(entry *logging.Entry) *logging.Entry {
-	return entry.
-		WithField("instanceID", e.Aggregate.InstanceID).
-		WithField("resourceOwner", e.Aggregate.ResourceOwner).
-		WithField("aggregateType", e.Aggregate.Type).
-		WithField("aggregateVersion", e.Aggregate.Version).
-		WithField("aggregateID", e.Aggregate.ID).
-		WithField("sequence", e.Sequence).
-		WithField("eventType", e.EventType)
 }

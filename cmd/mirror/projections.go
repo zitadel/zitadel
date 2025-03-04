@@ -222,14 +222,15 @@ func projections(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		client,
 		nil,
 	)
-	execution.Create(
+	execution.Register(
 		ctx,
 		config.Projections.Customizations["executions"],
+		config.Executions,
 		queries,
-		es,
+		es.EventTypes(),
+		nil,
 	)
 
 	config.Auth.Spooler.Client = client

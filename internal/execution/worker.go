@@ -2,26 +2,47 @@ package execution
 
 import (
 	"context"
-	"database/sql"
-	_ "embed"
 	"encoding/json"
+	"errors"
 	"time"
 
-	"github.com/zitadel/logging"
+	"github.com/riverqueue/river"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/queue"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
 
-//go:embed remove_event_executions.sql
-var removeEventExecution string
-
 type Worker struct {
-	client  *database.DB
-	config  WorkerConfig
-	queries *ExecutionsQueries
-	now     nowFunc
+	river.WorkerDefaults[*exec_repo.Request]
+
+	config WorkerConfig
+	now    nowFunc
+}
+
+func (w *Worker) Timeout(*river.Job[*exec_repo.Request]) time.Duration {
+	return w.config.TransactionDuration
+}
+
+// Work implements [river.Worker].
+func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) error {
+	ctx = ContextWithExecuter(ctx, job.Args.Aggregate)
+
+	// if the event is too old, we can directly return as it will be removed anyway
+	if job.CreatedAt.Add(w.config.MaxTtl).Before(w.now()) {
+		return river.JobCancel(errors.New("event is too old"))
+	}
+
+	targets, err := TargetsFromRequest(job.Args)
+	if err != nil {
+		return river.JobCancel(errors.New("targets not valid"))
+	}
+
+	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args))
+	if err != nil {
+		return river.JobCancel(err)
+	}
+	return nil
 }
 
 // nowFunc makes [time.Now] mockable
@@ -29,206 +50,39 @@ type nowFunc func() time.Time
 
 type WorkerConfig struct {
 	Workers             uint8
-	BulkLimit           uint16
-	RequeueEvery        time.Duration
 	TransactionDuration time.Duration
 	MaxTtl              time.Duration
 }
 
 func NewWorker(
 	config WorkerConfig,
-	client *database.DB,
-	queries *ExecutionsQueries,
+	queue *queue.Queue,
 ) *Worker {
-	return &Worker{
-		config:  config,
-		client:  client,
-		queries: queries,
-		now:     time.Now,
+	w := &Worker{
+		config: config,
+		now:    time.Now,
+	}
+	queue.AddWorkers(w)
+	return w
+}
+
+var _ river.Worker[*exec_repo.Request] = (*Worker)(nil)
+
+func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueConfig) {
+	river.AddWorker(workers, w)
+	queues[exec_repo.QueueName] = river.QueueConfig{
+		MaxWorkers: int(w.config.Workers),
 	}
 }
 
-func (w *Worker) Start(ctx context.Context) {
-	for i := 0; i < int(w.config.Workers); i++ {
-		go w.schedule(ctx, i)
+func TargetsFromRequest(e *exec_repo.Request) ([]Target, error) {
+	var execTargets []*query.ExecutionTarget
+	if err := json.Unmarshal(e.TargetsData, &execTargets); err != nil {
+		return nil, err
 	}
-}
-
-func (w *Worker) schedule(ctx context.Context, workerID int) {
-	t := time.NewTimer(0)
-
-	for {
-		select {
-		case <-ctx.Done():
-			t.Stop()
-			w.log(workerID).Info("scheduler stopped")
-			return
-		case <-t.C:
-			instances, err := w.queryInstances(ctx)
-			w.log(workerID).OnError(err).Error("unable to query instances")
-
-			w.triggerInstances(call.WithTimestamp(ctx), instances, workerID)
-			t.Reset(w.config.RequeueEvery)
-		}
+	targets := make([]Target, len(execTargets))
+	for i, target := range execTargets {
+		targets[i] = target
 	}
-}
-
-func (w *Worker) log(workerID int) *logging.Entry {
-	return logging.WithFields("execution worker", workerID)
-}
-
-func (w *Worker) queryInstances(ctx context.Context) ([]string, error) {
-	return w.queries.ActiveInstancesWithFeatureFlag(ctx), nil
-}
-
-func (w *Worker) triggerInstances(ctx context.Context, instances []string, workerID int) {
-	for _, instance := range instances {
-		instanceCtx := authz.WithInstanceID(ctx, instance)
-
-		err := w.trigger(instanceCtx, workerID)
-		w.log(workerID).WithField("instance", instance).OnError(err).Info("trigger failed")
-	}
-}
-
-func (w *Worker) trigger(ctx context.Context, workerID int) (err error) {
-	txCtx := ctx
-	if w.config.TransactionDuration > 0 {
-		var cancel, cancelTx func()
-		txCtx, cancelTx = context.WithCancel(ctx)
-		defer cancelTx()
-		ctx, cancel = context.WithTimeout(ctx, w.config.TransactionDuration)
-		defer cancel()
-	}
-	tx, err := w.client.BeginTx(txCtx, nil)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err = database.CloseTransaction(tx, err)
-	}()
-
-	eventExecutions, err := w.queries.searchEventExecutions(txCtx, w.config.BulkLimit)
-	if err != nil {
-		return err
-	}
-
-	// If there aren't any events or no unlocked event terminate early and start a new run.
-	if eventExecutions == nil || len(eventExecutions.EventExecutions) == 0 {
-		return nil
-	}
-
-	w.log(workerID).
-		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
-		WithField("events", len(eventExecutions.EventExecutions)).
-		Info("handling event executions")
-
-	for _, event := range eventExecutions.EventExecutions {
-		w.createSavepoint(txCtx, tx, event, workerID)
-		if err := w.reduceEventExecution(ctx, txCtx, tx, event, workerID); err != nil {
-			// if we have an error, we rollback to the savepoint and continue with the next event
-			// we use the txCtx to make sure we can rollback the transaction in case the ctx is canceled
-			w.rollbackToSavepoint(txCtx, tx, event, workerID)
-		}
-
-		// if the context is canceled, we stop the processing
-		if err := ctx.Err(); err != nil {
-			event.WithLogFields(w.log(workerID).OnError(err)).Error("timeout handle event executions")
-			return nil
-		}
-	}
-
-	w.log(workerID).
-		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
-		WithField("events", len(eventExecutions.EventExecutions)).
-		Info("end handling event executions")
-
-	return nil
-}
-
-func (w *Worker) createSavepoint(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) {
-	_, err := tx.ExecContext(ctx, "SAVEPOINT execution_removed")
-	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not create savepoint for notification event")
-}
-
-func (w *Worker) rollbackToSavepoint(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) {
-	_, err := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT execution_removed")
-	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not rollback to savepoint for notification event")
-}
-
-func (w *Worker) reduceEventExecution(ctx context.Context, txCtx context.Context, tx *sql.Tx, event *EventExecution, workerID int) (err error) {
-	// try to delete the execution, to lock the row from being processed by another worker
-	if err := w.removeEventExecution(txCtx, tx, event, workerID); err != nil {
-		// if the delete fails, return the error to rollback and continue on
-		return err
-	}
-
-	// handle the calling of the targets
-	if err := w.handleEventExecution(ctx, event); err != nil {
-		event.WithLogFields(w.log(workerID).OnError(err)).Error("could not handle event execution")
-	}
-	// besides the deletion of the row, no other error is relevant
-	return nil
-}
-
-func (w *Worker) removeEventExecution(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) error {
-	_, err := tx.ExecContext(ctx, removeEventExecution,
-		event.Aggregate.InstanceID,
-		event.Aggregate.ResourceOwner,
-		event.Aggregate.Type,
-		event.Aggregate.Version,
-		event.Aggregate.ID,
-		event.Sequence,
-		event.EventType,
-	)
-	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not remove event execution for event")
-	return err
-}
-
-func (w *Worker) handleEventExecution(ctx context.Context, event *EventExecution) (err error) {
-	ctx = ContextWithExecuter(ctx, event.Aggregate)
-
-	// if the event is too old, we can directly return as it will be removed anyway
-	if event.CreatedAt.Add(w.config.MaxTtl).Before(w.now()) {
-		return nil
-	}
-
-	targets, err := event.Targets()
-	if err != nil {
-		return err
-	}
-
-	_, err = CallTargets(ctx, targets, event.ContextInfo())
-	return err
-}
-
-var _ ContextInfo = &ContextInfoEvent{}
-
-type ContextInfoEvent struct {
-	AggregateID   string `json:"aggregateID,omitempty"`
-	AggregateType string `json:"aggregateType,omitempty"`
-	ResourceOwner string `json:"resourceOwner,omitempty"`
-	InstanceID    string `json:"instanceID,omitempty"`
-	Version       string `json:"version,omitempty"`
-	Sequence      uint64 `json:"sequence,omitempty"`
-	EventType     string `json:"event_type,omitempty"`
-	CreatedAt     string `json:"created_at,omitempty"`
-	UserID        string `json:"userID,omitempty"`
-	EventPayload  []byte `json:"event_payload,omitempty"`
-}
-
-func (c *ContextInfoEvent) GetHTTPRequestBody() []byte {
-	data, err := json.Marshal(c)
-	if err != nil {
-		return nil
-	}
-	return data
-}
-
-func (c *ContextInfoEvent) SetHTTPResponseBody(resp []byte) error {
-	// response is irrelevant and will not be unmarshalled
-	return nil
-}
-
-func (c *ContextInfoEvent) GetContent() interface{} {
-	return c.EventPayload
+	return targets, nil
 }

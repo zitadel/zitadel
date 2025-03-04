@@ -3,12 +3,10 @@ package execution
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	_ "github.com/zitadel/zitadel/internal/notification/statik"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/queue"
 )
 
 var (
@@ -16,35 +14,25 @@ var (
 	worker      *Worker
 )
 
-func Create(
-	ctx context.Context,
-	executionsCustomConfig projection.CustomConfig,
-	queries eventExecutionsHandlerQueries,
-	es *eventstore.Eventstore,
-) {
-	projections = []*handler.Handler{
-		NewEventExecutionsHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), es.EventTypes(), eventstore.AggregateTypeFromEventType, queries),
-	}
-}
-
 func Register(
 	ctx context.Context,
 	executionsCustomConfig projection.CustomConfig,
 	workerConfig WorkerConfig,
-	queries *query.Queries,
-	es *eventstore.Eventstore,
-	client *database.DB,
+	queries eventHandlerQueries,
+	eventTypes []string,
+	queue *queue.Queue,
 ) {
-	Create(ctx, executionsCustomConfig, queries, es)
-	q := NewExecutionsQueries(queries, client)
-	worker = NewWorker(workerConfig, client, q)
+	queue.ShouldStart()
+	projections = []*handler.Handler{
+		NewEventHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), eventTypes, eventstore.AggregateTypeFromEventType, queries, queue),
+	}
+	worker = NewWorker(workerConfig, queue)
 }
 
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
-	worker.Start(ctx)
 }
 
 func Init(ctx context.Context) error {

@@ -450,13 +450,23 @@ Notifications:
   # The amount of workers processing the notification request events.
   # If set to 0, no notification request events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
-  Workers: 1 # ZITADEL_NOTIFIACATIONS_WORKERS
+  Workers: 1 # ZITADEL_NOTIFICATIONS_WORKERS
   # The maximum duration a job can do it's work before it is considered as failed.
-  TransactionDuration: 10s # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
+  TransactionDuration: 10s # ZITADEL_NOTIFICATIONS_TRANSACTIONDURATION
   # Automatically cancel the notification after the amount of failed attempts
-  MaxAttempts: 3 # ZITADEL_NOTIFIACATIONS_MAXATTEMPTS
+  MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
-  MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
+  MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
+
+Executions:
+  # The amount of workers processing the execution request events.
+  # If set to 0, no execution request events will be handled. This can be useful when running in
+  # multi binary / pod setup and allowing only certain executables to process the events.
+  Workers: 1 # ZITADEL_EXECUTIONS_WORKERS
+  # The maximum duration a job can do it's work before it is considered as failed.
+  TransactionDuration: 10s # ZITADEL_NOTIFICATIONS_TRANSACTIONDURATION
+  # Automatically cancel the notification if it cannot be handled within a specific time
+  MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
 
 Auth:
   # See Projections.BulkLimit

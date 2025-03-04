@@ -13,7 +13,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels"
@@ -34,8 +33,6 @@ type NotificationWorker struct {
 
 	commands Commands
 	queries  *NotificationQueries
-	es       *eventstore.Eventstore
-	client   *database.DB
 	channels types.ChannelChains
 	config   WorkerConfig
 	now      nowFunc
@@ -106,8 +103,6 @@ func NewNotificationWorker(
 	config WorkerConfig,
 	commands Commands,
 	queries *NotificationQueries,
-	es *eventstore.Eventstore,
-	client *database.DB,
 	channels types.ChannelChains,
 	queue *queue.Queue,
 ) *NotificationWorker {
@@ -115,8 +110,6 @@ func NewNotificationWorker(
 		config:   config,
 		commands: commands,
 		queries:  queries,
-		es:       es,
-		client:   client,
 		channels: channels,
 		now:      time.Now,
 	}
