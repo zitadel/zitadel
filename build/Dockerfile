@@ -27,6 +27,7 @@ COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
 COPY --from=artifact /app/zitadel /app/zitadel
 
 HEALTHCHECK NONE
+EXPOSE 8080
 
 USER zitadel
 ENTRYPOINT ["/app/zitadel"]
