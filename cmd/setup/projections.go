@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
@@ -20,10 +19,7 @@ func (mig *projectionTables) Check(lastRun map[string]interface{}) bool {
 }
 
 func (mig *projectionTables) Execute(ctx context.Context, _ eventstore.Event) error {
-	if err := projection.Init(ctx); err != nil {
-		return err
-	}
-	return execution.Init(ctx)
+	return projection.Init(ctx)
 }
 
 func (mig *projectionTables) String() string {

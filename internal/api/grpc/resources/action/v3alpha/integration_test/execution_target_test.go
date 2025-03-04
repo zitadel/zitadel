@@ -5,12 +5,8 @@ package action_test
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -45,8 +41,6 @@ import (
 )
 
 const (
-	redirectURI         = "https://callback"
-	logoutRedirectURI   = "https://logged-out"
 	redirectURIImplicit = "http://localhost:9999/callback"
 )
 
@@ -286,9 +280,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			close, called, err := tt.dep(tt.ctx, tt.req, tt.want)
+			closeF, calledF, err := tt.dep(tt.ctx, tt.req, tt.want)
 			require.NoError(t, err)
-			defer close()
+			defer closeF()
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
@@ -308,7 +302,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			if tt.clean != nil {
 				tt.clean(tt.ctx)
 			}
-			require.True(t, called())
+			require.True(t, calledF())
 		})
 	}
 }
@@ -381,11 +375,8 @@ func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 10*time.Second, http.StatusOK, nil)
 	defer closeF()
 
-	targetRequest := instance.CreateTarget(isolatedIAMOwnerCTX, t, "session-added-target-"+gofakeit.AppName(), urlRequest, domain.TargetTypeWebhook, true)
-	instance.SetExecution(isolatedIAMOwnerCTX, t, conditionEvent(event), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
-	defer func() {
-		instance.DeleteExecution(isolatedIAMOwnerCTX, t, conditionEvent(event))
-	}()
+	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, domain.TargetTypeWebhook, true)
+	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
 	tests := []struct {
 		name          string
@@ -436,11 +427,8 @@ func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T)
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 1*time.Second, http.StatusOK, nil)
 	defer closeF()
 
-	targetRequest := instance.CreateTarget(isolatedIAMOwnerCTX, t, "session-added-target-"+gofakeit.AppName(), urlRequest, domain.TargetTypeWebhook, true)
-	instance.SetExecution(isolatedIAMOwnerCTX, t, conditionEvent(event), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
-	defer func() {
-		instance.DeleteExecution(isolatedIAMOwnerCTX, t, conditionEvent(event))
-	}()
+	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, domain.TargetTypeWebhook, true)
+	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
 	tests := []struct {
 		name          string
@@ -605,52 +593,6 @@ func conditionFunction(function string) *action.Condition {
 			},
 		},
 	}
-}
-
-func testServerCall(
-	reqBody interface{},
-	sleep time.Duration,
-	statusCode int,
-	respBody interface{},
-) (string, func()) {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		data, err := json.Marshal(reqBody)
-		if err != nil {
-			http.Error(w, "error, marshall: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		sentBody, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "error, read body: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if !reflect.DeepEqual(data, sentBody) {
-			http.Error(w, "error, equal:\n"+string(data)+"\nsent:\n"+string(sentBody), http.StatusInternalServerError)
-			return
-		}
-		if statusCode != http.StatusOK {
-			http.Error(w, "error, statusCode", statusCode)
-			return
-		}
-
-		time.Sleep(sleep)
-
-		w.Header().Set("Content-Type", "application/json")
-		resp, err := json.Marshal(respBody)
-		if err != nil {
-			http.Error(w, "error", http.StatusInternalServerError)
-			return
-		}
-		if _, err := io.WriteString(w, string(resp)); err != nil {
-			http.Error(w, "error", http.StatusInternalServerError)
-			return
-		}
-	}
-
-	server := httptest.NewServer(http.HandlerFunc(handler))
-
-	return server.URL, server.Close
 }
 
 func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
@@ -848,7 +790,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 	}
 	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", userResp, userEmail, userPhone)
 
-	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
+	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
 	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
@@ -1154,7 +1096,7 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 	}
 	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preaccesstoken", userResp, userEmail, userPhone)
 
-	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
+	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
 	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
@@ -1320,7 +1262,7 @@ func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance 
 	}
 	expectedContextInfo := contextInfoForUserSAML(instance, "function/presamlresponse", userResp, userEmail, userPhone)
 
-	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
+	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
 	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
