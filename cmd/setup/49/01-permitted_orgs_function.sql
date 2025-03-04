@@ -34,9 +34,9 @@ BEGIN
         AND CASE WHEN filter_orgs != ''
           THEN o.org_id IN (filter_orgs) 
           ELSE TRUE END;
-        RETURN;
-    END IF;
+      END IF;
     END;
+    RETURN;
   END IF;
 
 	-- First try if the permission was granted thru an instance-level role
