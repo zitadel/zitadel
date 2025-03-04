@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	//go:embed sql/*
+	//go:embed sql/*.sql
 	stmts embed.FS
 
 	createUserStmt           string
