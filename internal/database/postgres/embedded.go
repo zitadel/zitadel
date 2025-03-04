@@ -1,28 +1,23 @@
 package postgres
 
 import (
+	"fmt"
+	"net"
 	"os"
 	"sync"
+	"time"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/zitadel/logging"
-)
-
-var (
-	port   = uint16(5432)
-	portMu = sync.Mutex{}
 )
 
 func StartEmbedded() (embeddedpostgres.Config, func()) {
 	path, err := os.MkdirTemp("", "zitadel-embedded-postgres-*")
 	logging.OnError(err).Fatal("unable to create temp dir")
 
-	portMu.Lock()
-	startPort := port
-	port++
-	portMu.Unlock()
+	port := getPort()
 
-	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).Port(uint32(startPort)).RuntimePath(path)
+	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).Port(uint32(port)).RuntimePath(path)
 	embedded := embeddedpostgres.NewDatabase(config)
 
 	err = embedded.Start()
@@ -30,5 +25,24 @@ func StartEmbedded() (embeddedpostgres.Config, func()) {
 
 	return config, func() {
 		logging.OnError(embedded.Stop()).Error("unable to stop db")
+	}
+}
+
+var (
+	nextPort = uint16(5432)
+	portMu   = sync.Mutex{}
+)
+
+func getPort() uint16 {
+	portMu.Lock()
+	defer portMu.Unlock()
+	for {
+		timeout := time.Second
+		_, err := net.DialTimeout("tcp", net.JoinHostPort("localhost", fmt.Sprintf("%d", nextPort)), timeout)
+		if err != nil {
+			nextPort++
+			continue
+		}
+		return nextPort
 	}
 }
