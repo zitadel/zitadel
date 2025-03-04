@@ -22,7 +22,15 @@ var (
 type Matcher interface {
 	MatchName(string) bool
 	Decode([]any) (Connector, error)
+	Type() DatabaseType
 }
+
+type DatabaseType uint8
+
+const (
+	DatabaseTypePostgres DatabaseType = iota
+	DatabaseTypeCockroach
+)
 
 const (
 	DefaultAppName = "zitadel"
