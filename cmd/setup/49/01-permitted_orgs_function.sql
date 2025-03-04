@@ -4,7 +4,6 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     instanceId TEXT
     , userId TEXT
     , perm TEXT
-    , system_roles TEXT[]
     , filter_orgs TEXT
 
     , org_ids OUT TEXT[]
@@ -19,36 +18,17 @@ BEGIN
 	FROM eventstore.role_permissions rp
 	WHERE rp.instance_id = instanceId
 	AND rp.permission = perm;
-
-  IF system_roles IS NOT NULL THEN
-    DECLARE
-      permission_found_in_system_roles bool;
-    BEGIN
-      SELECT result.role_found INTO permission_found_in_system_roles
-      FROM (SELECT matched_roles && system_roles AS role_found) AS result;
-
-      IF permission_found_in_system_roles THEN
-        SELECT array_agg(o.org_id) INTO org_ids
-        FROM eventstore.instance_orgs o
-        WHERE o.instance_id = instanceId
-        AND CASE WHEN filter_orgs != ''
-          THEN o.org_id IN (filter_orgs) 
-          ELSE TRUE END;
-      END IF;
-    END;
-    RETURN;
-  END IF;
-
+	
 	-- First try if the permission was granted thru an instance-level role
 	DECLARE
 		has_instance_permission bool;
 	BEGIN
 		SELECT true INTO has_instance_permission
 			FROM eventstore.instance_members im
-      WHERE im.role = ANY(matched_roles)
-      AND im.instance_id = instanceId
-      AND im.user_id = userId
-      LIMIT 1;
+			WHERE im.role = ANY(matched_roles)
+			AND im.instance_id = instanceId
+			AND im.user_id = userId
+			LIMIT 1;
 		
 		IF has_instance_permission THEN
 			-- Return all organizations or only those in filter_orgs
@@ -74,4 +54,3 @@ BEGIN
     RETURN;
 END;
 $$;
-
