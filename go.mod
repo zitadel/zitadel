@@ -59,6 +59,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/riverqueue/river v0.16.0
 	github.com/riverqueue/river/riverdriver v0.16.0
+	github.com/riverqueue/river/rivertype v0.16.0
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/sony/gobreaker/v2 v2.0.0
@@ -127,7 +128,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/riverqueue/river/rivershared v0.16.0 // indirect
-	github.com/riverqueue/river/rivertype v0.16.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
@@ -137,6 +137,7 @@ require (
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
 	github.com/zenazn/goji v1.0.1 // indirect
+	go.uber.org/goleak v1.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20240624140628-dc46fd24d27d // indirect
