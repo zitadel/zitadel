@@ -3,13 +3,10 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"math"
-	"math/rand/v2"
 	"os"
 	"testing"
 	"time"
 
-	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
@@ -26,15 +23,8 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		tempPath, err := os.MkdirTemp("", "db")
-		logging.OnError(err).Fatal("unable to create temp dir")
-		config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).RuntimePath(tempPath).Port(rand.Uint32() % math.MaxUint16)
-		psql := embeddedpostgres.NewDatabase(config)
-		err = psql.Start()
-		logging.OnError(err).Fatal("unable to start db")
-		defer func() {
-			logging.OnError(psql.Stop()).Error("unable to stop db")
-		}()
+		config, cleanup := postgres.StartEmbedded()
+		defer cleanup()
 
 		connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
 		logging.OnError(err).Fatal("unable to parse db url")
