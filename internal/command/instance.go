@@ -233,21 +233,25 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", "", nil, nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	_, err = c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
+
+	// RolePermissions need to be pushed in separate transaction.
+	// https://github.com/zitadel/zitadel/issues/9293
+	details, err := c.SynchronizeRolePermission(ctx, setup.zitadel.instanceID, setup.RolePermissionMappings)
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+	details.ResourceOwner = setup.zitadel.orgID
 
 	var token string
 	if pat != nil {
 		token = pat.Token
 	}
 
-	return setup.zitadel.instanceID, token, machineKey, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: setup.zitadel.orgID,
-	}, nil
+	return setup.zitadel.instanceID, token, machineKey, details, nil
 }
 
 func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string) context.Context {
@@ -380,7 +384,6 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LabelPolicy.ThemeMode,
 		),
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
-		prepareAddRolePermissions(instanceAgg, setup.RolePermissionMappings),
 	}
 }
 
@@ -846,9 +849,6 @@ func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLangu
 				return nil, err
 			}
 			if err := domain.LanguageIsAllowed(false, restrictionsWM.allowedLanguages, defaultLanguage); err != nil {
-				return nil, err
-			}
-			if err != nil {
 				return nil, err
 			}
 			return []eventstore.Command{instance.NewDefaultLanguageSetEvent(ctx, &a.Aggregate, defaultLanguage)}, nil

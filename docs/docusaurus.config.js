@@ -324,22 +324,6 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
-          user_schema_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/userschema/v3alpha/user_schema_service.swagger.json",
-            outputDir: "docs/apis/resources/user_schema_service_v3",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          user_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/user/v3alpha/user_service.swagger.json",
-            outputDir: "docs/apis/resources/user_service_v3",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
           action_v3: {
             specPath: ".artifacts/openapi/zitadel/resources/action/v3alpha/action_service.swagger.json",
             outputDir: "docs/apis/resources/action_service_v3",

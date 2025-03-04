@@ -68,6 +68,7 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	userEndpoint,
 	idAttribute string,
 	scopes []string,
+	usePKCE bool,
 	options idp.Options,
 ) (*instance.OAuthIDPChangedEvent, error) {
 
@@ -81,6 +82,7 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 		userEndpoint,
 		idAttribute,
 		scopes,
+		usePKCE,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
@@ -174,7 +176,7 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 	clientSecretString string,
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
-	idTokenMapping bool,
+	idTokenMapping, usePKCE bool,
 	options idp.Options,
 ) (*instance.OIDCIDPChangedEvent, error) {
 
@@ -186,6 +188,7 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 		secretCrypto,
 		scopes,
 		idTokenMapping,
+		usePKCE,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
@@ -768,6 +771,7 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
+	rootCA []byte,
 	secretCrypto crypto.EncryptionAlgorithm,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
@@ -784,6 +788,7 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 		userObjectClasses,
 		userFilters,
 		timeout,
+		rootCA,
 		secretCrypto,
 		attributes,
 		options,

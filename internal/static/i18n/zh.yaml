@@ -544,6 +544,7 @@ Errors:
     AlreadyExists: AuthRequest已经存在
     NotExisting: AuthRequest不存在
     WrongLoginClient: 其他登录客户端创建的AuthRequest
+    AlreadyHandled: 身份验证请求已被处理
   OIDCSession:
     RefreshTokenInvalid: Refresh Token 无效
     Token:
@@ -554,8 +555,12 @@ Errors:
     AlreadyExists: SAMLRequest 已存在
     NotExisting: SAMLRequest不存在
     WrongLoginClient: 其他登录客户端创建的 SAMLRequest
+    AlreadyHandled: SAML请求已被处理
   SAMLSession:
     InvalidClient: 未向该客户端发出 SAMLResponse
+  DeviceAuth:
+    NotFound: 设备授权请求不存在
+    AlreadyHandled: 设备授权请求已被处理
   Feature:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
