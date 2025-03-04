@@ -1715,7 +1715,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.read"
+            permission: "iam.idp.read"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -1732,7 +1732,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.read"
+            permission: "iam.idp.read"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2092,7 +2092,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
+            permission: "iam.idp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2110,7 +2110,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
+            permission: "iam.idp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2561,7 +2561,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2578,7 +2578,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2595,7 +2595,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2612,7 +2612,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2629,7 +2629,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2646,7 +2646,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -3777,7 +3777,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.delete"
+            permission: "iam.policy.delete"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -3972,7 +3972,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.delete"
+            permission: "iam.policy.delete"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
