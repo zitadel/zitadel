@@ -1394,7 +1394,10 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "hu": "Magyar"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1634,6 +1637,7 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
+        "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română"
       },
@@ -2600,6 +2604,7 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
+    "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română"
   },

@@ -1622,9 +1622,9 @@
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
-        "fr": "Francia",
-        "it": "Olasz",
-        "ja": "Japán",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
         "pl": "Lengyel",
         "zh": "Egyszerűsített kínai",
         "bg": "Bolgár",
@@ -1635,6 +1635,7 @@
         "nl": "Holland",
         "sv": "Svéd",
         "id": "Indonéz",
+        "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română"
       },
@@ -2592,12 +2593,12 @@
     "3": "Egyéb"
   },
   "LANGUAGES": {
-    "de": "Német",
-    "en": "Angol",
-    "es": "Spanyol",
-    "fr": "Francia",
-    "it": "Olasz",
-    "ja": "Japán",
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
     "pl": "Lengyel",
     "zh": "Egyszerűsített kínai",
     "bg": "Bolgár",
@@ -2608,7 +2609,9 @@
     "nl": "Holland",
     "sv": "Svéd",
     "id": "Indonéz",
-    "hu": "Magyar"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Hozzáadás egy menedzsert",
