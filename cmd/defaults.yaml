@@ -1322,7 +1322,6 @@ InternalAuthZ:
         - "userschema.write"
         - "userschema.delete"
         - "session.read"
-        - "session.link"
         - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
