@@ -332,9 +332,9 @@ module.exports = {
                 categoryLinkSource: "auto",
             },
           },
-          webkey_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/webkey/v3alpha/webkey_service.swagger.json",
-            outputDir: "docs/apis/resources/webkey_service_v3",
+          webkey_v2: {
+            specPath: ".artifacts/openapi/zitadel/webkey/v2beta/webkey_service.swagger.json",
+            outputDir: "docs/apis/resources/webkey_service_v2",
             sidebarOptions: {
                 groupPathsBy: "tag",
                 categoryLinkSource: "auto",
