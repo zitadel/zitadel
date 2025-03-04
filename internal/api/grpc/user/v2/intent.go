@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 
+	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
