@@ -17,9 +17,9 @@ type Provider struct {
 	rp.RelyingParty
 	options           []rp.Option
 	name              string
-	userEndpoint     string
-	user             func() idp.User
-	isLinkingAllowed bool
+	userEndpoint      string
+	user              func() idp.User
+	isLinkingAllowed  bool
 	isCreationAllowed bool
 	isAutoCreation    bool
 	isAutoUpdate      bool
