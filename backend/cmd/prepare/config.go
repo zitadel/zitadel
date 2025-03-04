@@ -6,7 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/cmd/config"
 	"github.com/zitadel/zitadel/backend/cmd/configure"
-	"github.com/zitadel/zitadel/backend/cmd/configure/bla"
+	"github.com/zitadel/zitadel/backend/cmd/configure/bla2"
 	step001 "github.com/zitadel/zitadel/backend/cmd/prepare/001"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect"
@@ -41,7 +41,9 @@ var (
 		// 	"Writes the configuration for the prepare command",
 		// 	configuration.Fields(),
 		// ),
-		Run:    bla.Update(viper.GetViper(), &configuration),
+		Run: func(cmd *cobra.Command, args []string) {
+			bla2.Update(viper.GetViper(), &configuration)(cmd, args)
+		},
 		PreRun: configure.ReadConfigPreRun(viper.GetViper(), &configuration),
 	}
 )
@@ -49,7 +51,7 @@ var (
 type Config struct {
 	config.Config `mapstructure:",squash" configure:"-"`
 
-	Database dialect.Config // `configure:"-"`
+	Database dialect.Config `configure:"-"`
 	Step001  step001.Step001
 
 	// runtime config
