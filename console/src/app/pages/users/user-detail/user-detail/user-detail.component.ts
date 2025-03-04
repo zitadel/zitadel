@@ -445,6 +445,7 @@ export class UserDetailComponent implements OnInit {
     };
 
     const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
+      data,
       width: '400px',
     });
 

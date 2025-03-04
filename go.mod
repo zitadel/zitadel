@@ -57,6 +57,9 @@ require (
 	github.com/pquerna/otp v1.4.0
 	github.com/rakyll/statik v0.1.7
 	github.com/redis/go-redis/v9 v9.7.0
+	github.com/riverqueue/river v0.16.0
+	github.com/riverqueue/river/riverdriver v0.16.0
+	github.com/riverqueue/river/rivertype v0.16.0
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/sony/gobreaker/v2 v2.0.0
@@ -70,7 +73,7 @@ require (
 	github.com/zitadel/logging v0.6.1
 	github.com/zitadel/oidc/v3 v3.32.0
 	github.com/zitadel/passwap v0.6.0
-	github.com/zitadel/saml v0.3.3
+	github.com/zitadel/saml v0.3.4
 	github.com/zitadel/schema v1.3.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
@@ -124,10 +127,7 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/riverqueue/river v0.16.0 // indirect
-	github.com/riverqueue/river/riverdriver v0.16.0 // indirect
 	github.com/riverqueue/river/rivershared v0.16.0 // indirect
-	github.com/riverqueue/river/rivertype v0.16.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

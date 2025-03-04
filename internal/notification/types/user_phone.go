@@ -28,7 +28,9 @@ func generateSms(
 	data templates.TemplateData,
 	args map[string]interface{},
 	lastPhone bool,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
+	instanceID string,
+	jobID string,
 	generatorInfo *senders.CodeGeneratorInfo,
 ) error {
 	smsChannels, config, err := channels.SMS(ctx)
@@ -51,7 +53,10 @@ func generateSms(
 			SenderPhoneNumber:    number,
 			RecipientPhoneNumber: recipient,
 			Content:              data.Text,
-			TriggeringEvent:      triggeringEvent,
+			TriggeringEventType:  triggeringEventType,
+			InstanceID:           instanceID,
+			JobID:                jobID,
+			UserID:               user.ID,
 		}
 		err = smsChannels.HandleMessage(message)
 		if err != nil {
@@ -70,7 +75,7 @@ func generateSms(
 		}
 		contextInfo := map[string]interface{}{
 			"recipientPhoneNumber": recipient,
-			"eventType":            triggeringEvent.Type(),
+			"eventType":            triggeringEventType,
 			"provider":             config.ProviderConfig,
 		}
 
@@ -80,7 +85,7 @@ func generateSms(
 				Args:         caseArgs,
 				ContextInfo:  contextInfo,
 			},
-			TriggeringEvent: triggeringEvent,
+			TriggeringEventType: triggeringEventType,
 		}
 		webhookChannels, err := channels.Webhook(ctx, *config.WebhookConfig)
 		if err != nil {

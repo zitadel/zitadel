@@ -92,6 +92,7 @@ import (
 	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -142,10 +143,6 @@ type Server struct {
 
 func startZitadel(ctx context.Context, config *Config, masterKey string, server chan<- *Server) error {
 	showBasicInformation(config)
-
-	// sink Server is stubbed out in production builds, see function's godoc.
-	closeSink := sink.StartServer()
-	defer closeSink()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
@@ -254,6 +251,10 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 	defer commands.Close(ctx) // wait for background jobs
 
+	// sink Server is stubbed out in production builds, see function's godoc.
+	closeSink := sink.StartServer(commands)
+	defer closeSink()
+
 	clock := clockpkg.New()
 	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())
 	if err != nil {
@@ -266,6 +267,13 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
+
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	if err != nil {
+		return err
+	}
 
 	notification.Register(
 		ctx,
@@ -289,8 +297,13 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		dbClient,
+		q,
 	)
 	notification.Start(ctx)
+
+	if err = q.Start(ctx); err != nil {
+		return err
+	}
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -460,7 +473,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, idp_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
+	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
@@ -560,7 +573,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, oidc_v2beta.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
+	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure, keys.OIDC)); err != nil {
 		return nil, err
 	}
 	// After SAML provider so that the callback endpoint can be used
