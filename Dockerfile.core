@@ -1,0 +1,72 @@
+FROM devcontainer AS base
+WORKDIR /app
+COPY go.mod go.sum buf.gen.yaml buf.work.yaml main.go ./
+COPY docs/apis/assets/assets.md docs/apis/assets/assets.md
+COPY cmd/ cmd/
+COPY internal/ internal/
+COPY openapi/ openapi/
+COPY pkg/ pkg/
+COPY proto/ proto/
+COPY statik/ statik/
+RUN go mod download \
+    && go install tool \
+    && buf generate && cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/ \
+    && go generate ./... \
+    && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
+
+FROM scratch AS generate
+COPY --from=base /app/pkg/grpc/ /pkg/grpc/
+COPY --from=base /app/openapi/ /openapi/
+COPY --from=base /app/internal/api/assets/generator/ /internal/api/assets/generator/
+
+FROM base AS builder
+ARG OS=
+ARG ARCH=
+ARG COMMIT_SHA=
+ARG VERSION=
+COPY --from=console ./ internal/api/ui/console/static
+RUN CGO_ENABLED=0 GOOS=${OS} GOARCH=${ARCH} go build -o zitadel-${OS}-${ARCH} -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA}' -X 'github.com/zitadel/zitadel/cmd/build.date=${now}' -X 'github.com/zitadel/zitadel/cmd/build.version=${VERSION}' " \
+    && chmod +x zitadel-${OS}-${ARCH}
+
+FROM scratch AS build
+ARG OS=
+ARG ARCH=
+COPY --from=builder /app/zitadel-${OS}-${ARCH} zitadel-${OS}-${ARCH}
+
+FROM base AS lint
+COPY .golangci.yaml ./
+COPY .git/ ./.git/
+RUN golangci-lint run \
+    --timeout 10m \
+    --config ./.golangci.yaml \
+    --out-format=colored-line-number \
+    --concurrency=$(getconf _NPROCESSORS_ONLN)
+
+FROM base AS unit-test
+COPY --from=console ./ internal/api/ui/console/static
+RUN go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./...
+
+FROM scratch AS unit
+COPY --from=unit-test /app/profile.cov .
+
+FROM debian:latest AS base-image
+ENV ZITADEL_ARGS=
+ARG TARGETOS
+ARG TARGETARCH
+RUN apt-get update && apt-get install ca-certificates -y
+COPY --from=build /zitadel-${TARGETOS}-${TARGETARCH} /app/zitadel
+RUN echo hodor /zitadel-${TARGETOS}-${TARGETARCH}
+RUN useradd -s "" --home / zitadel && \
+    chown zitadel /app/zitadel && \
+    chmod +x /app/zitadel
+WORKDIR /app
+ENV PATH="/app:${PATH}"
+USER zitadel 
+
+FROM scratch AS image
+COPY --from=base-image /etc/passwd /etc/passwd
+COPY --from=base-image /etc/ssl/certs /etc/ssl/certs
+COPY --from=base-image /app/zitadel /app/zitadel
+HEALTHCHECK NONE
+USER zitadel
+ENTRYPOINT ["/app/zitadel"]

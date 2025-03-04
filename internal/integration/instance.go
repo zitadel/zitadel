@@ -2,13 +2,10 @@
 package integration
 
 import (
-	"bytes"
 	"context"
 	_ "embed"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -188,14 +185,6 @@ func (i *Instance) setupInstance(ctx context.Context, token string) {
 // Host returns the primary Domain of the instance with the port.
 func (i *Instance) Host() string {
 	return fmt.Sprintf("%s:%d", i.Domain, i.Config.Port)
-}
-
-func loadInstanceOwnerPAT() string {
-	data, err := os.ReadFile(filepath.Join(tmpDir, adminPATFile))
-	if err != nil {
-		panic(err)
-	}
-	return string(bytes.TrimSpace(data))
 }
 
 func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) {
