@@ -111,8 +111,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 }
 
 export function constructUrl(request: NextRequest, path: string) {
-  const forwardedProto =
-    request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol;
+  const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https";
 
   const forwardedHost =
     request.headers.get("x-zitadel-forward-host") ??
@@ -124,6 +123,6 @@ export function constructUrl(request: NextRequest, path: string) {
     // keep this check to allow localhost for local development
     forwardedHost?.startsWith("http")
       ? forwardedHost
-      : `${forwardedProto}//${forwardedHost}`,
+      : `${forwardedProto}://${forwardedHost}`,
   );
 }
