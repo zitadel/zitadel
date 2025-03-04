@@ -209,3 +209,5 @@ func isIndexOrSubPath(path string) bool {
 	//files will have an extension
 	return !strings.Contains(path, ".")
 }
+
+// start adding path here for filter
