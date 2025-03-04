@@ -11,15 +11,15 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-type InitPermittedOrgsFunction struct {
+type InitPermittedOrgsFunction51 struct {
 	eventstoreClient *database.DB
 }
 
-//go:embed 49/*.sql
-var permittedOrgsFunction embed.FS
+//go:embed 51/*.sql
+var permittedOrgsFunction51 embed.FS
 
-func (mig *InitPermittedOrgsFunction) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(permittedOrgsFunction, "51", "")
+func (mig *InitPermittedOrgsFunction51) Execute(ctx context.Context, _ eventstore.Event) error {
+	statements, err := readStatements(permittedOrgsFunction51, "51", "")
 	if err != nil {
 		return err
 	}
@@ -32,6 +32,6 @@ func (mig *InitPermittedOrgsFunction) Execute(ctx context.Context, _ eventstore.
 	return nil
 }
 
-func (*InitPermittedOrgsFunction) String() string {
+func (*InitPermittedOrgsFunction51) String() string {
 	return "51_init_permitted_orgs_function"
 }
