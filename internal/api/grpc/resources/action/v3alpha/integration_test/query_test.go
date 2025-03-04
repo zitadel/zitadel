@@ -835,7 +835,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: "user.added"}}}},
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: "user"}}}},
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}},
-									{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"}}},
+									{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: "presamlresponse"}}},
 								},
 							},
 						},

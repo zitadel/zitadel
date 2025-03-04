@@ -1,6 +1,7 @@
 package saml
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -83,7 +84,7 @@ func NewProvider(
 
 	p, err := provider.NewProvider(
 		provStorage,
-		HandlerPrefix,
+		IssuerFromContext,
 		conf.ProviderConfig,
 		options...,
 	)
@@ -93,6 +94,16 @@ func NewProvider(
 	return &Provider{
 		p,
 		command,
+	}, nil
+}
+
+func ContextToIssuer(ctx context.Context) string {
+	return http_utils.DomainContext(ctx).Origin() + HandlerPrefix
+}
+
+func IssuerFromContext(_ bool) (provider.IssuerFromRequest, error) {
+	return func(r *http.Request) string {
+		return ContextToIssuer(r.Context())
 	}, nil
 }
 

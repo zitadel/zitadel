@@ -104,13 +104,11 @@ func TestServer_CreateCallback(t *testing.T) {
 	sessionResp := createSession(t, CTX, Instance.Users[integration.UserTypeOrgOwner].ID)
 
 	tests := []struct {
-		name      string
-		ctx       context.Context
-		req       *oidc_pb.CreateCallbackRequest
-		AuthError string
-		want      *oidc_pb.CreateCallbackResponse
-		wantURL   *url.URL
-		wantErr   bool
+		name    string
+		ctx     context.Context
+		req     *oidc_pb.CreateCallbackRequest
+		want    *oidc_pb.CreateCallbackResponse
+		wantErr bool
 	}{
 		{
 			name: "Not found",
