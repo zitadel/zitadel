@@ -1,37 +1,34 @@
 package postgres
 
 import (
-	"sync/atomic"
+	"os"
+	"sync"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/zitadel/logging"
 )
 
 var (
-	runningTests atomic.Int32
-	embedded     *embeddedpostgres.EmbeddedPostgres
+	port   = uint16(5432)
+	portMu = sync.Mutex{}
 )
 
 func StartEmbedded() (embeddedpostgres.Config, func()) {
-	runningTests.Store(runningTests.Add(1))
-	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16)
+	path, err := os.MkdirTemp("", "zitadel-embedded-postgres-*")
+	logging.OnError(err).Fatal("unable to create temp dir")
 
-	// postgres is already started if running count > 1
-	if runningTests.Load() > 1 {
-		return config, cleanup
-	}
+	portMu.Lock()
+	startPort := port
+	port++
+	portMu.Unlock()
 
-	embedded = embeddedpostgres.NewDatabase(config)
-	err := embedded.Start()
+	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16).Port(uint32(startPort)).RuntimePath(path)
+	embedded := embeddedpostgres.NewDatabase(config)
+
+	err = embedded.Start()
 	logging.OnError(err).Fatal("unable to start db")
 
-	return config, cleanup
-}
-
-func cleanup() {
-	runningTests.Store(runningTests.Add(-1))
-	if runningTests.Load() > 0 {
-		return
+	return config, func() {
+		logging.OnError(embedded.Stop()).Error("unable to stop db")
 	}
-	logging.OnError(embedded.Stop()).Error("unable to stop db")
 }
