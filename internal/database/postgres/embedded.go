@@ -13,11 +13,11 @@ var (
 )
 
 func StartEmbedded() (embeddedpostgres.Config, func()) {
-	runningCount := runningTests.Add(1)
+	runningTests.Store(runningTests.Add(1))
 	config := embeddedpostgres.DefaultConfig().Version(embeddedpostgres.V16)
 
-	// postgres is already started if runningCount > 1
-	if runningCount > 1 {
+	// postgres is already started if running count > 1
+	if runningTests.Load() > 1 {
 		return config, cleanup
 	}
 
@@ -29,7 +29,8 @@ func StartEmbedded() (embeddedpostgres.Config, func()) {
 }
 
 func cleanup() {
-	if runningTests.Add(-1) > 0 {
+	runningTests.Store(runningTests.Add(-1))
+	if runningTests.Load() > 0 {
 		return
 	}
 	logging.OnError(embedded.Stop()).Error("unable to stop db")
