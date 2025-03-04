@@ -32,6 +32,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/migration"
 	notify_handler "github.com/zitadel/zitadel/internal/notification"
@@ -493,7 +494,6 @@ func startCommandsQueries(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		dbClient,
 		q,
 	)
 
@@ -522,6 +522,11 @@ func initProjections(
 	}
 
 	for _, p := range notify_handler.Projections() {
+		err := migration.Migrate(ctx, eventstoreClient, p)
+		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+	}
+
+	for _, p := range execution.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)
 		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
 	}
