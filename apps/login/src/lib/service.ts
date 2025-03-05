@@ -113,7 +113,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 export function constructUrl(request: NextRequest, path: string) {
   const forwardedProto = request.headers.get("x-forwarded-proto")
     ? `${request.headers.get("x-forwarded-proto")}:`
-    : request.protocol;
+    : request.nextUrl.protocol;
 
   const forwardedHost =
     request.headers.get("x-zitadel-forward-host") ??
