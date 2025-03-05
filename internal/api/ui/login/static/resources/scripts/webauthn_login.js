@@ -49,6 +49,6 @@ function verifyAssertion(assertedCredential) {
     },
   });
 
-  document.getElementsByName("credentialData")[0].value = btoa(data);
+  document.getElementsByName("credentialData")[0].value = window.btoa(data);
   document.getElementsByTagName("form")[0].submit();
 }

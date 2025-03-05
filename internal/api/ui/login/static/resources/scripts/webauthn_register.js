@@ -3,7 +3,7 @@ document.addEventListener(
   checkWebauthnSupported("btn-register", registerCredential)
 );
 
-function registerCredential() {
+async function registerCredential() {
   document.getElementById("wa-error").classList.add("hidden");
 
   let opt = JSON.parse(
@@ -27,16 +27,16 @@ function registerCredential() {
       }
     }
   }
-  navigator.credentials
-    .create({
+
+  try {
+    const credential = await navigator.credentials.create({
       publicKey: opt.publicKey,
-    })
-    .then(function (credential) {
-      createCredential(credential);
-    })
-    .catch(function (err) {
-      webauthnError(err);
     });
+
+    createCredential(credential);
+  } catch (err) {
+    webauthnError(err);
+  }
 }
 
 function createCredential(newCredential) {
@@ -56,6 +56,6 @@ function createCredential(newCredential) {
     },
   });
 
-  document.getElementsByName("credentialData")[0].value = btoa(data);
+  document.getElementsByName("credentialData")[0].value = window.btoa(data);
   document.getElementsByTagName("form")[0].submit();
 }
