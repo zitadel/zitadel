@@ -193,9 +193,9 @@ Your contributions will play a crucial role in shaping the future of our login s
 
         To activate it to authenticate on your Zitadel Cloud apps, you can follow one of these steps:
 
-        1. Enable the new login on your application configuration and point it to `/ui/v2/login`. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
+        1. Enable the new login on your application configuration. Leave the field **Custom base URL for the new Login UI** empty to use the default. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
         ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
-        2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance and add the base URI `/ui/v2/login`. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
+        2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
 
     </TabItem>
     <TabItem value="vercel_custom" label="Vercel Custom Login Deployment">
