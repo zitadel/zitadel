@@ -63,14 +63,14 @@ BEGIN
 	END;
 	
 	-- Return the organizations where permission were granted thru org-level roles
-	SELECT array_agg(org_id) INTO org_ids
+	SELECT array_agg(sub.org_id) INTO org_ids
 	FROM (
 		SELECT DISTINCT om.org_id
 		FROM eventstore.org_members om
 		WHERE om.role = ANY(matched_roles)
 		AND om.instance_id = instanceID
 		AND om.user_id = userId
-	);
+	) AS sub;
     RETURN;
 END;
 $$;
