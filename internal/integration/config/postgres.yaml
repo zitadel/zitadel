@@ -1,13 +1,14 @@
 Database:
   postgres:
-    MaxOpenConns: 10
-    MaxIdleConns: 8
+    MaxOpenConns: 20
+    MaxIdleConns: 20
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
     User:
       Password: zitadel
       SSL:
         Mode: disable
     Admin:
-      Username: adlerhurst
-      Password: password
+      Username: zitadel
       SSL:
         Mode: disable
