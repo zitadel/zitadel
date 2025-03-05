@@ -6,21 +6,28 @@ document.addEventListener(
 async function login() {
   document.getElementById("wa-error").classList.add("hidden");
 
-  let makeAssertionOptions = JSON.parse(
-    atob(document.getElementsByName("credentialAssertionData")[0].value)
-  );
-  makeAssertionOptions.publicKey.challenge = bufferDecode(
-    makeAssertionOptions.publicKey.challenge,
-    "publicKey.challenge"
-  );
-  makeAssertionOptions.publicKey.allowCredentials.forEach(function (listItem) {
-    listItem.id = bufferDecode(listItem.id, "publicKey.allowCredentials.id");
-  });
+  let makeAssertionOptions;
+  try {
+    makeAssertionOptions = JSON.parse(atob(document.getElementsByName("credentialAssertionData")[0].value));
+  } catch (e) {
+    webauthnError({ message: "Failed to parse credential assertion data." });
+    return;
+  }
+
+  try {
+    makeAssertionOptions.publicKey.challenge = bufferDecode(makeAssertionOptions.publicKey.challenge, "publicKey.challenge");
+    makeAssertionOptions.publicKey.allowCredentials.forEach(function (listItem) {
+      listItem.id = bufferDecode(listItem.id, "publicKey.allowCredentials.id");
+    });
+  } catch (e) {
+    webauthnError({ message: "Failed to decode buffer data." });
+    return;
+  }
 
   try {
     const credential = await navigator.credentials.get({
       publicKey: makeAssertionOptions.publicKey,
-    })
+    });
 
     verifyAssertion(credential);
   } catch (err) {

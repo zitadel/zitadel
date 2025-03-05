@@ -6,26 +6,27 @@ document.addEventListener(
 async function registerCredential() {
   document.getElementById("wa-error").classList.add("hidden");
 
-  let opt = JSON.parse(
-    atob(document.getElementsByName("credentialCreationData")[0].value)
-  );
-  opt.publicKey.challenge = bufferDecode(
-    opt.publicKey.challenge,
-    "publicKey.challenge"
-  );
-  opt.publicKey.user.id = bufferDecode(
-    opt.publicKey.user.id,
-    "publicKey.user.id"
-  );
-  if (opt.publicKey.excludeCredentials) {
-    for (let i = 0; i < opt.publicKey.excludeCredentials.length; i++) {
-      if (opt.publicKey.excludeCredentials[i].id !== null) {
-        opt.publicKey.excludeCredentials[i].id = bufferDecode(
-          opt.publicKey.excludeCredentials[i].id,
-          "publicKey.excludeCredentials"
-        );
+  let opt;
+  try {
+    opt = JSON.parse(atob(document.getElementsByName("credentialCreationData")[0].value));
+  } catch (e) {
+    webauthnError({ message: "Failed to parse credential creation data." });
+    return;
+  }
+
+  try {
+    opt.publicKey.challenge = bufferDecode(opt.publicKey.challenge, "publicKey.challenge");
+    opt.publicKey.user.id = bufferDecode(opt.publicKey.user.id, "publicKey.user.id");
+    if (opt.publicKey.excludeCredentials) {
+      for (let i = 0; i < opt.publicKey.excludeCredentials.length; i++) {
+        if (opt.publicKey.excludeCredentials[i].id !== null) {
+          opt.publicKey.excludeCredentials[i].id = bufferDecode(opt.publicKey.excludeCredentials[i].id, "publicKey.excludeCredentials");
+        }
       }
     }
+  } catch (e) {
+    webauthnError({ message: "Failed to decode buffer data." });
+    return;
   }
 
   try {
