@@ -27,6 +27,9 @@ type Config struct {
 }
 
 func NewQueue(config *Config) (_ *Queue, err error) {
+	if config.Client.Type() == "cockroach" {
+		return nil, nil
+	}
 	return &Queue{
 		driver: riverpgxv5.New(config.Client.Pool),
 		config: &river.Config{
