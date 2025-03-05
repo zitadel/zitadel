@@ -349,6 +349,9 @@ func (s *Server) createExchangeJWT(
 		"",
 		domain.OIDCResponseTypeUnspecified,
 	)
+	if err != nil {
+		return "", "", 0, err
+	}
 	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, roleAssertion, getSigner)
 	if err != nil {
 		return "", "", 0, err
