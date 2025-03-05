@@ -3,7 +3,7 @@ document.addEventListener(
   checkWebauthnSupported("btn-login", login)
 );
 
-function login() {
+async function login() {
   document.getElementById("wa-error").classList.add("hidden");
 
   let makeAssertionOptions = JSON.parse(
@@ -16,16 +16,16 @@ function login() {
   makeAssertionOptions.publicKey.allowCredentials.forEach(function (listItem) {
     listItem.id = bufferDecode(listItem.id, "publicKey.allowCredentials.id");
   });
-  navigator.credentials
-    .get({
+
+  try {
+    const credential = await navigator.credentials.get({
       publicKey: makeAssertionOptions.publicKey,
     })
-    .then(function (credential) {
-      verifyAssertion(credential);
-    })
-    .catch(function (err) {
-      webauthnError(err);
-    });
+
+    verifyAssertion(credential);
+  } catch (err) {
+    webauthnError(err);
+  }
 }
 
 function verifyAssertion(assertedCredential) {
