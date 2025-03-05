@@ -18,7 +18,7 @@ import (
 
 func init() {
 	config := new(Config)
-	dialect.Register(config, config, false)
+	dialect.Register(config, config, true)
 }
 
 const (
@@ -148,8 +148,8 @@ func (c *Config) Password() string {
 	return c.User.Password
 }
 
-func (c *Config) Type() string {
-	return "postgres"
+func (c *Config) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypePostgres
 }
 
 func (c *Config) Timetravel(time.Duration) string {

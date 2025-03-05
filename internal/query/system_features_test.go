@@ -45,23 +45,23 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			name: "all features set",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLegacyIntrospectionEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemActionsEventType, true,
 					)),
@@ -97,23 +97,23 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			name: "all features set, reset, set some feature",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLegacyIntrospectionEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemActionsEventType, false,
 					)),
@@ -121,7 +121,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
 					)),
@@ -157,23 +157,23 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			name: "all features set, reset, set some feature, not cascaded",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLegacyIntrospectionEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemActionsEventType, false,
 					)),
@@ -181,7 +181,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
 					)),

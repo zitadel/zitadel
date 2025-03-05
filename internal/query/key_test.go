@@ -36,8 +36,7 @@ var (
 		` projections.keys4_public.key,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.keys4` +
-		` LEFT JOIN projections.keys4_public ON projections.keys4.id = projections.keys4_public.id AND projections.keys4.instance_id = projections.keys4_public.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms' `
+		` LEFT JOIN projections.keys4_public ON projections.keys4.id = projections.keys4_public.id AND projections.keys4.instance_id = projections.keys4_public.instance_id`
 	preparePublicKeysCols = []string{
 		"id",
 		"creation_date",
@@ -62,8 +61,7 @@ var (
 		` projections.keys4_private.key,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.keys4` +
-		` LEFT JOIN projections.keys4_private ON projections.keys4.id = projections.keys4_private.id AND projections.keys4.instance_id = projections.keys4_private.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms' `
+		` LEFT JOIN projections.keys4_private ON projections.keys4.id = projections.keys4_private.id AND projections.keys4.instance_id = projections.keys4_private.instance_id`
 )
 
 func Test_KeyPrepares(t *testing.T) {
@@ -244,7 +242,7 @@ func Test_KeyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

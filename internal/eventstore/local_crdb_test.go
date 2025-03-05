@@ -8,111 +8,99 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cockroachdb/cockroach-go/v2/testserver"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/cockroach"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_sql "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 var (
-	testCRDBClient *database.DB
-	queriers       map[string]eventstore.Querier = make(map[string]eventstore.Querier)
-	pushers        map[string]eventstore.Pusher  = make(map[string]eventstore.Pusher)
-	clients        map[string]*database.DB       = make(map[string]*database.DB)
+	testClient *database.DB
+	queriers   map[string]eventstore.Querier = make(map[string]eventstore.Querier)
+	pushers    map[string]eventstore.Pusher  = make(map[string]eventstore.Pusher)
+	clients    map[string]*database.DB       = make(map[string]*database.DB)
 )
 
 func TestMain(m *testing.M) {
-	opts := make([]testserver.TestServerOpt, 0, 1)
-	if version := os.Getenv("ZITADEL_CRDB_VERSION"); version != "" {
-		opts = append(opts, testserver.CustomVersionOpt(version))
-	}
-	ts, err := testserver.NewTestServer(opts...)
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to start db")
-	}
+	os.Exit(func() int {
+		config, cleanup := postgres.StartEmbedded()
+		defer cleanup()
 
-	testCRDBClient = &database.DB{
-		Database: new(testDB),
-	}
-
-	connConfig, err := pgxpool.ParseConfig(ts.PGURL().String())
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to parse db url")
-	}
-	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
-	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to create db pool")
-	}
-	testCRDBClient.DB = stdlib.OpenDBFromPool(pool)
-	if err = testCRDBClient.Ping(); err != nil {
-		logging.WithFields("error", err).Fatal("unable to ping db")
-	}
-
-	v2 := &es_sql.CRDB{DB: testCRDBClient}
-	queriers["v2(inmemory)"] = v2
-	clients["v2(inmemory)"] = testCRDBClient
-
-	pushers["v3(inmemory)"] = new_es.NewEventstore(testCRDBClient)
-	clients["v3(inmemory)"] = testCRDBClient
-
-	if localDB, err := connectLocalhost(); err == nil {
-		if err = initDB(context.Background(), localDB); err != nil {
-			logging.WithFields("error", err).Fatal("migrations failed")
+		testClient = &database.DB{
+			Database: new(testDB),
 		}
-		pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
-		clients["v3(singlenode)"] = localDB
-	}
 
-	// pushers["v2(inmemory)"] = v2
+		connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
+		logging.OnError(err).Fatal("unable to parse db url")
 
-	defer func() {
-		testCRDBClient.Close()
-		ts.Stop()
-	}()
+		connConfig.AfterConnect = new_es.RegisterEventstoreTypes
+		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
+		logging.OnError(err).Fatal("unable to create db pool")
 
-	if err = initDB(context.Background(), testCRDBClient); err != nil {
-		logging.WithFields("error", err).Fatal("migrations failed")
-	}
+		testClient.DB = stdlib.OpenDBFromPool(pool)
+		err = testClient.Ping()
+		logging.OnError(err).Fatal("unable to ping db")
 
-	os.Exit(m.Run())
+		v2 := &es_sql.Postgres{DB: testClient}
+		queriers["v2(inmemory)"] = v2
+		clients["v2(inmemory)"] = testClient
+
+		pushers["v3(inmemory)"] = new_es.NewEventstore(testClient)
+		clients["v3(inmemory)"] = testClient
+
+		if localDB, err := connectLocalhost(); err == nil {
+			err = initDB(context.Background(), localDB)
+			logging.OnError(err).Fatal("migrations failed")
+
+			pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
+			clients["v3(singlenode)"] = localDB
+		}
+
+		defer func() {
+			logging.OnError(testClient.Close()).Error("unable to close db")
+		}()
+
+		err = initDB(context.Background(), &database.DB{DB: testClient.DB, Database: &postgres.Config{Database: "zitadel"}})
+		logging.OnError(err).Fatal("migrations failed")
+
+		return m.Run()
+	}())
 }
 
 func initDB(ctx context.Context, db *database.DB) error {
-	initialise.ReadStmts("cockroach")
 	config := new(database.Config)
-	config.SetConnector(&cockroach.Config{
-		User: cockroach.User{
-			Username: "zitadel",
-		},
-		Database: "zitadel",
-	})
+	config.SetConnector(&postgres.Config{User: postgres.User{Username: "zitadel"}, Database: "zitadel"})
+
+	if err := initialise.ReadStmts(); err != nil {
+		return err
+	}
+
 	err := initialise.Init(ctx, db,
 		initialise.VerifyUser(config.Username(), ""),
 		initialise.VerifyDatabase(config.DatabaseName()),
-		initialise.VerifyGrant(config.DatabaseName(), config.Username()),
-		initialise.VerifySettings(config.DatabaseName(), config.Username()))
+		initialise.VerifyGrant(config.DatabaseName(), config.Username()))
 	if err != nil {
 		return err
 	}
+
 	err = initialise.VerifyZitadel(ctx, db, *config)
 	if err != nil {
 		return err
 	}
+
 	// create old events
 	_, err = db.Exec(oldEventsTable)
 	return err
 }
 
 func connectLocalhost() (*database.DB, error) {
-	client, err := sql.Open("pgx", "postgresql://root@localhost:26257/defaultdb?sslmode=disable")
+	client, err := sql.Open("pgx", "postgresql://postgres@localhost:5432/postgres?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +122,7 @@ func (*testDB) DatabaseName() string { return "db" }
 
 func (*testDB) Username() string { return "user" }
 
-func (*testDB) Type() string { return "cockroach" }
+func (*testDB) Type() string { return "postgres" }
 
 func generateCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
 	e := &testEvent{
@@ -177,7 +165,7 @@ func canceledCtx() context.Context {
 }
 
 func fillUniqueData(unique_type, field, instanceID string) error {
-	_, err := testCRDBClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
+	_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
 	return err
 }
 
@@ -251,5 +239,5 @@ const oldEventsTable = `CREATE TABLE IF NOT EXISTS eventstore.events (
 	, "position" DECIMAL NOT NULL
 	, in_tx_order INTEGER NOT NULL
 
-	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence DESC)
+	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence)
 );`

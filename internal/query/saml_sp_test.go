@@ -109,8 +109,7 @@ func TestQueries_ActiveSAMLServiceProviderByID(t *testing.T) {
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")

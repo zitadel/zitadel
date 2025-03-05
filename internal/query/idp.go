@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -215,7 +214,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 			sq.Eq{IDPResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID()},
 		},
 	}
-	stmt, scan := prepareIDPByIDQuery(ctx, q.client)
+	stmt, scan := prepareIDPByIDQuery()
 	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
@@ -233,7 +232,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPsQuery(ctx, q.client)
+	query, scan := prepareIDPsQuery()
 	eq := sq.Eq{
 		IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -293,7 +292,7 @@ func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
+func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 	return sq.Select(
 			IDPIDCol.identifier(),
 			IDPResourceOwnerCol.identifier(),
@@ -321,7 +320,7 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			JWTIDPColEndpoint.identifier(),
 		).From(idpTable.identifier()).
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
-			LeftJoin(join(JWTIDPColIDPID, IDPIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDP, error) {
 			idp := new(IDP)
@@ -401,7 +400,7 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
+func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 	return sq.Select(
 			IDPIDCol.identifier(),
 			IDPResourceOwnerCol.identifier(),
@@ -430,7 +429,7 @@ func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			countColumn.identifier(),
 		).From(idpTable.identifier()).
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
-			LeftJoin(join(JWTIDPColIDPID, IDPIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPs, error) {
 			idps := make([]*IDP, 0)
