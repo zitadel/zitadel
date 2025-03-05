@@ -17,13 +17,16 @@ import (
 var (
 	//go:embed config/system-user-key.pem
 	systemUserKey []byte
+	//go:embed config/IAMSystemUser.pem
+	iamSystemUserKey []byte
 )
 
 var (
 	// SystemClient creates a system connection once and reuses it on every use.
 	// Each client call automatically gets the authorization context for the system user.
-	SystemClient = sync.OnceValue[system.SystemServiceClient](systemClient)
-	SystemToken  string
+	SystemClient       = sync.OnceValue[system.SystemServiceClient](systemClient)
+	SystemToken        string
+	IAMSystemUserToken string
 )
 
 func systemClient() system.SystemServiceClient {
@@ -40,7 +43,7 @@ func systemClient() system.SystemServiceClient {
 	return system.NewSystemServiceClient(cc)
 }
 
-func systemUserToken() string {
+func createSystemUserToken() string {
 	const ISSUER = "tester"
 	audience := http_util.BuildOrigin(loadedConfig.Host(), loadedConfig.Secure)
 	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
@@ -54,6 +57,24 @@ func systemUserToken() string {
 	return token
 }
 
+func createIAMSystemUserToken() string {
+	const ISSUER = "IAMSystemUser"
+	audience := http_util.BuildOrigin(loadedConfig.Host(), loadedConfig.Secure)
+	signer, err := client.NewSignerFromPrivateKeyByte(iamSystemUserKey, "")
+	if err != nil {
+		panic(err)
+	}
+	token, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
+	if err != nil {
+		panic(err)
+	}
+	return token
+}
+
 func WithSystemAuthorization(ctx context.Context) context.Context {
 	return WithAuthorizationToken(ctx, SystemToken)
+}
+
+func WithIAMSystemUserAuthorization(ctx context.Context) context.Context {
+	return WithAuthorizationToken(ctx, IAMSystemUserToken)
 }

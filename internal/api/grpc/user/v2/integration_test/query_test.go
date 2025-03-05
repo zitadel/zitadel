@@ -529,6 +529,101 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
+			name: "list user call made by systems user from config file",
+			args: func() args {
+				ctx, _ := context.WithTimeout(context.Background(), 15*time.Minute)
+				iamSystemUser := integration.WithIAMSystemUserAuthorization(ctx)
+
+				return args{
+					iamSystemUser,
+					&user.ListUsersRequest{},
+					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+						org1 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+						org2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+						org3 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+
+						info1 := createUser(IamCTX, org1.OrganizationId, false)
+						info2 := createUser(IamCTX, org2.OrganizationId, false)
+						info3 := createUser(IamCTX, org3.OrganizationId, false)
+
+						return []userAttr{info1, info2, info3}
+					},
+				}
+			}(),
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "list user by id, ok",
 			args: args{
 				IamCTX,
@@ -1133,9 +1228,10 @@ func TestServer_ListUsers(t *testing.T) {
 				setPermissionCheckV2Flag(t, f.SetFlag)
 				infos := tt.args.dep(IamCTX, tt.args.req)
 
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 10*time.Minute)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 1*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
+					fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 					if tt.wantErr {
 						require.Error(ttt, err)
 						return
