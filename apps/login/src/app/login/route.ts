@@ -3,7 +3,7 @@ import { idpTypeToSlug } from "@/lib/idp";
 import { loginWithOIDCandSession } from "@/lib/oidc";
 import { loginWithSAMLandSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { constructUrl, getServiceUrlFromHeaders } from "@/lib/service";
 import { findValidSession } from "@/lib/session";
 import {
   createCallback,
@@ -39,7 +39,7 @@ const gotoAccounts = ({
   requestId: string;
   organization?: string;
 }): NextResponse<unknown> => {
-  const accountsUrl = new URL("/accounts", request.url);
+  const accountsUrl = constructUrl(request, "/accounts");
 
   if (requestId) {
     accountsUrl.searchParams.set("requestId", requestId);
@@ -223,7 +223,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
-      const registerUrl = new URL("/register", request.url);
+      const registerUrl = constructUrl(request, "/register");
       if (authRequest.id) {
         registerUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
       }
@@ -263,7 +263,7 @@ export async function GET(request: NextRequest) {
             const res = await sendLoginname(command);
 
             if (res && "redirect" in res && res?.redirect) {
-              const absoluteUrl = new URL(res.redirect, request.url);
+              const absoluteUrl = constructUrl(request, res.redirect);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
@@ -271,7 +271,7 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const loginNameUrl = new URL("/loginname", request.url);
+        const loginNameUrl = constructUrl(request, "/loginname");
         if (authRequest.id) {
           loginNameUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
         }
@@ -398,7 +398,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } else {
-      const loginNameUrl = new URL("/loginname", request.url);
+      const loginNameUrl = constructUrl(request, "/loginname");
 
       loginNameUrl.searchParams.set("requestId", requestId);
       if (authRequest?.loginHint) {

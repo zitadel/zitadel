@@ -8,6 +8,7 @@ import {
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { NextRequest, NextResponse } from "next/server";
+import { constructUrl } from "./service";
 import { isSessionValid } from "./session";
 
 type LoginWithOIDCandSession = {
@@ -54,7 +55,7 @@ export async function loginWithOIDCandSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        const absoluteUrl = new URL(res.redirect, request.url);
+        const absoluteUrl = constructUrl(request, res.redirect);
         return NextResponse.redirect(absoluteUrl.toString());
       }
     }
@@ -107,7 +108,7 @@ export async function loginWithOIDCandSession({
             return NextResponse.redirect(loginSettings.defaultRedirectUri);
           }
 
-          const signedinUrl = new URL("/signedin", request.url);
+          const signedinUrl = constructUrl(request, "/signedin");
 
           if (selectedSession.factors?.user?.loginName) {
             signedinUrl.searchParams.set(
