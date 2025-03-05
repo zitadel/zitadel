@@ -183,7 +183,7 @@ func StartCommands(
 		EventGroupExisting:     func(group string) bool { return true },
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
-		ActionFunctionExisting: domain.FunctionExists(),
+		ActionFunctionExisting: domain.ActionFunctionExists(),
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
 				CryptoMFA: otpEncryption,
