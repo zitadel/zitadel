@@ -13,6 +13,7 @@
   <div actions *ngIf="!selection.hasValue()">
     <ng-content select="[writeactions]"></ng-content>
   </div>
+
   <div class="table-wrapper">
     <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
       <ng-container matColumnDef="select">
