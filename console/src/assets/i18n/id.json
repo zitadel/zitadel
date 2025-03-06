@@ -479,11 +479,13 @@
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
+    "ORG_SETTINGS_MANAGER": "Memiliki izin untuk mengelola pengaturan organisasi",
     "ORG_USER_PERMISSION_EDITOR": "Memiliki izin untuk mengelola izin pengguna",
     "ORG_PROJECT_PERMISSION_EDITOR": "Memiliki izin untuk mengelola hibah proyek",
     "ORG_PROJECT_CREATOR": "Memiliki izin untuk membuat proyeknya sendiri dan pengaturan yang mendasarinya",
     "ORG_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari organisasi",
     "ORG_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari organisasi",
+    "ORG_USER_SELF_MANAGER": "Memiliki izin untuk mengelola pengguna sendiri",
     "PROJECT_OWNER": "Memiliki izin atas keseluruhan proyek",
     "PROJECT_OWNER_VIEWER": "Memiliki izin untuk meninjau keseluruhan proyek",
     "PROJECT_OWNER_GLOBAL": "Memiliki izin atas keseluruhan proyek",
@@ -1274,7 +1276,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1501,7 +1504,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -2294,7 +2299,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",

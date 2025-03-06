@@ -2,11 +2,9 @@ import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import { create } from '@bufbuild/protobuf';
 import {
-  AddMyAuthFactorOTPSMSRequestSchema,
   AddMyAuthFactorOTPSMSResponse,
   GetMyLoginPolicyResponse,
   GetMyLoginPolicyRequestSchema,
-  GetMyUserRequestSchema,
   GetMyUserResponse,
   ListMyAuthFactorsRequestSchema,
   ListMyAuthFactorsResponse,
@@ -18,7 +16,7 @@ import {
   RemoveMyAuthFactorU2FResponse,
   RemoveMyAuthFactorOTPSMSRequestSchema,
   RemoveMyAuthFactorOTPSMSResponse,
-  VerifyMyPhoneRequestSchema,
+  ListMyMetadataResponse,
   VerifyMyPhoneResponse,
 } from '@zitadel/proto/zitadel/auth_pb';
 
@@ -29,20 +27,30 @@ export class NewAuthService {
   constructor(private readonly grpcService: GrpcService) {}
 
   public getMyUser(): Promise<GetMyUserResponse> {
-    return this.grpcService.authNew.getMyUser(create(GetMyUserRequestSchema));
+    return this.grpcService.authNew.getMyUser({});
   }
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
-    return this.grpcService.authNew.verifyMyPhone(create(VerifyMyPhoneRequestSchema, { code }));
+    return this.grpcService.authNew.verifyMyPhone({});
   }
 
   public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse> {
-    return this.grpcService.authNew.addMyAuthFactorOTPSMS(create(AddMyAuthFactorOTPSMSRequestSchema));
+    return this.grpcService.authNew.addMyAuthFactorOTPSMS({});
+  }
+
+  public listMyMetadata(): Promise<ListMyMetadataResponse> {
+    return this.grpcService.authNew.listMyMetadata({});
   }
 
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse> {
     return this.grpcService.authNew.listMyAuthFactors(create(ListMyAuthFactorsRequestSchema), null);
   }
+
+  public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse> {
+    return this.grpcService.authNew
+      .removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema), null);
+  }
+
 
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse> {
     return this.grpcService.authNew.getMyLoginPolicy(create(GetMyLoginPolicyRequestSchema), null);
@@ -62,8 +70,4 @@ export class NewAuthService {
       .removeMyAuthFactorOTPEmail(create(RemoveMyAuthFactorOTPEmailRequestSchema), null);
   }
 
-  public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse> {
-    return this.grpcService.authNew
-      .removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema), null);
-  }
 }

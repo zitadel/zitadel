@@ -512,11 +512,13 @@
     "ORG_OWNER": "Engedélye van az egész szervezet fölött",
     "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
+    "ORG_SETTINGS_MANAGER": "Engedélye van a szervezet beállításainak kezelésére",
     "ORG_USER_PERMISSION_EDITOR": "Engedélye van a felhasználói jogok kezelésére",
     "ORG_PROJECT_PERMISSION_EDITOR": "Engedélye van a projektjogosultságok kezelésére",
     "ORG_PROJECT_CREATOR": "Engedélye van saját projektek és alapbeállítások létrehozására",
     "ORG_ADMIN_IMPERSONATOR": "Engedélye van a szervezet adminisztrátorainak és véghasználóinak megszemélyesítésére",
     "ORG_END_USER_IMPERSONATOR": "Engedélye van a szervezet véghasználóinak megszemélyesítésére",
+    "ORG_USER_SELF_MANAGER": "Engedélye van a saját felhasználói fiókjaidat kezelésére",
     "PROJECT_OWNER": "Engedélye van az egész projekt fölött",
     "PROJECT_OWNER_VIEWER": "Jogosultságod van a teljes projekt átnézésére.",
     "PROJECT_OWNER_GLOBAL": "Jogosultságod van a teljes projektre.",
@@ -1396,7 +1398,8 @@
         "sv": "Svéd",
         "id": "Indonéz",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1621,9 +1624,9 @@
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
-        "fr": "Francia",
-        "it": "Olasz",
-        "ja": "Japán",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
         "pl": "Lengyel",
         "zh": "Egyszerűsített kínai",
         "bg": "Bolgár",
@@ -1634,7 +1637,9 @@
         "nl": "Holland",
         "sv": "Svéd",
         "id": "Indonéz",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",
@@ -2592,12 +2597,12 @@
     "3": "Egyéb"
   },
   "LANGUAGES": {
-    "de": "Német",
-    "en": "Angol",
-    "es": "Spanyol",
-    "fr": "Francia",
-    "it": "Olasz",
-    "ja": "Japán",
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
     "pl": "Lengyel",
     "zh": "Egyszerűsített kínai",
     "bg": "Bolgár",
@@ -2608,7 +2613,9 @@
     "nl": "Holland",
     "sv": "Svéd",
     "id": "Indonéz",
-    "hu": "Magyar"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Hozzáadás egy menedzsert",

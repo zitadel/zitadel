@@ -512,11 +512,13 @@
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
+    "ORG_SETTINGS_MANAGER": "Má oprávnění spravovat nastavení organizace",
     "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat uživatelská pověření",
     "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
     "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
     "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
     "ORG_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele z organizace",
+    "ORG_USER_SELF_MANAGER": "Má oprávnění spravovat svůj vlastní uživatelský účet",
     "PROJECT_OWNER": "Má oprávnění nad celým projektem",
     "PROJECT_OWNER_VIEWER": "Má oprávnění prohlížet celý projekt",
     "PROJECT_OWNER_GLOBAL": "Má oprávnění nad celým projektem",
@@ -1396,7 +1398,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1636,7 +1639,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2594,7 +2599,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

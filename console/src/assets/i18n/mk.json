@@ -512,11 +512,13 @@
     "ORG_OWNER": "Има дозвола врз целата организација",
     "ORG_USER_MANAGER": "Има дозвола за креирање и менаџирање на корисници во организацијата",
     "ORG_OWNER_VIEWER": "Има дозвола за преглед на целата организација",
+    "ORG_SETTINGS_MANAGER": "Има дозвола за менаџирање на подесувањата на организацијата",
     "ORG_USER_PERMISSION_EDITOR": "Има дозвола за менаџирање на овластувања на корисници",
     "ORG_PROJECT_PERMISSION_EDITOR": "Има дозвола за менаџирање на овластувања на проекти",
     "ORG_PROJECT_CREATOR": "Има дозвола за креирање на сопствени проекти и нивни подесувања",
     "ORG_ADMIN_IMPERSONATOR": "Има дозвола да имитира администратор и крајни корисници од организацијата",
     "ORG_END_USER_IMPERSONATOR": "Има дозвола да ги имитира крајните корисници од организацијата",
+    "ORG_USER_SELF_MANAGER": "Има дозвола за менаџирање на своите корисници",
     "PROJECT_OWNER": "Има дозвола врз целиот проект",
     "PROJECT_OWNER_VIEWER": "Има дозвола за преглед на целиот проект",
     "PROJECT_OWNER_GLOBAL": "Има дозвола врз целиот проект",
@@ -1397,7 +1399,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1637,7 +1640,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Е-поштата е верифицирана",
@@ -2582,7 +2587,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Додај Менаџер",
