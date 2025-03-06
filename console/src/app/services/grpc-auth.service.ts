@@ -164,24 +164,14 @@ export class GrpcAuthService {
       shareReplay({ refCount: true, bufferSize: 1 }),
     );
 
-    this.user = forkJoin([
-      defer(() => of(this.oauthService.getAccessToken())),
-      this.oauthService.events.pipe(
-        filter((e) => e.type === 'token_received'),
-        timeout(this.oauthService.waitForTokenInMsec ?? 0),
-        catchError((err) => {
-          if (err instanceof TimeoutError) {
-            return of(null);
-          }
-          throw err;
-        }), // timeout is not an error
-        map((_) => this.oauthService.getAccessToken()),
-      ),
-    ]).pipe(
-      filter(([_, token]) => !!token),
-      distinctUntilKeyChanged(1),
-      switchMap(() => this.getMyUser().then((resp) => resp.user)),
-      startWith(undefined),
+    this.user = this.oauthService.events.pipe(
+      filter((e) => e.type === 'token_received'),
+      map(() => this.oauthService.getAccessToken()),
+      startWith(this.oauthService.getAccessToken()),
+      filter(Boolean),
+      distinctUntilChanged(),
+      switchMap(() => this.getMyUser()),
+      map((user) => user.user),
       shareReplay({ refCount: true, bufferSize: 1 }),
     );
 
