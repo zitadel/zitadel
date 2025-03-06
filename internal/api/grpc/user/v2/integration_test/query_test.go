@@ -1190,36 +1190,43 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 	}()
 
 	org1 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
-	org2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	org2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), "org2@zitadel.com")
 	org3 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser1@zitadel.com", org1.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser2@zitadel.com", org2.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser3@zitadel.com", org3.OrganizationId, false)
 
 	tests := []struct {
-		name                   string
-		ctx                    context.Context
-		req                    *user.ListUsersRequest
-		expectedFoundUsernames []string
+		name                       string
+		ctx                        context.Context
+		req                        *user.ListUsersRequest
+		expectedFoundUsernames     []string
+		checkNumberOfUsersReturned bool
 	}{
 		{
-			name:                   "list users with neccessary permissions",
-			ctx:                    SystemCTX,
-			req:                    &user.ListUsersRequest{},
-			expectedFoundUsernames: []string{"Test_SystemUsers_ListUser1@zitadel.com", "Test_SystemUsers_ListUser2@zitadel.com", "Test_SystemUsers_ListUser3@zitadel.com"},
+			name: "list users with neccessary permissions",
+			ctx:  SystemCTX,
+			req:  &user.ListUsersRequest{},
+			// the number of users returned will vary from test run to test run,
+			// so just check the system user gets back users from different orgs whcih it is not a memeber of
+			checkNumberOfUsersReturned: false,
+			expectedFoundUsernames:     []string{"Test_SystemUsers_ListUser1@zitadel.com", "Test_SystemUsers_ListUser2@zitadel.com", "Test_SystemUsers_ListUser3@zitadel.com"},
 		},
 		{
 			name: "list users without neccessary permissions",
 			ctx:  SystemUserWithNoPermissionsCTX,
 			req:  &user.ListUsersRequest{},
+			// check no users returned
+			checkNumberOfUsersReturned: true,
 		},
 		{
 			name: "list users without neccessary permissions specifying org",
 			req: &user.ListUsersRequest{
 				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
 			},
-			ctx:                    SystemCTX,
-			expectedFoundUsernames: []string{"Test_SystemUsers_ListUser2@zitadel.com"},
+			ctx:                        SystemCTX,
+			expectedFoundUsernames:     []string{"Test_SystemUsers_ListUser2@zitadel.com", "org2@zitadel.com"},
+			checkNumberOfUsersReturned: true,
 		},
 	}
 
@@ -1234,24 +1241,24 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 					got, err := Client.ListUsers(tt.ctx, tt.req)
 					require.NoError(ttt, err)
 
-					if tt.expectedFoundUsernames == nil {
-						require.Empty(t, got.Result)
-						return
+					if tt.checkNumberOfUsersReturned {
+						require.Equal(t, len(got.Result), len(tt.expectedFoundUsernames))
 					}
 
-					for _, user := range got.Result {
-						for i, username := range tt.expectedFoundUsernames {
-							if username == user.Username {
-								tt.expectedFoundUsernames = tt.expectedFoundUsernames[i+1:]
-								break
+					if tt.expectedFoundUsernames != nil {
+						for _, user := range got.Result {
+							for i, username := range tt.expectedFoundUsernames {
+								if username == user.Username {
+									tt.expectedFoundUsernames = tt.expectedFoundUsernames[i+1:]
+									break
+								}
+							}
+							if len(tt.expectedFoundUsernames) == 0 {
+								return
 							}
 						}
-						if len(tt.expectedFoundUsernames) == 0 {
-							return
-						}
+						require.FailNow(t, "unable to find all users with specified usernames")
 					}
-
-					require.FailNow(t, "unable to find all users with specified usernames")
 				}, retryDuration, tick, "timeout waiting for expected user result")
 			})
 		}

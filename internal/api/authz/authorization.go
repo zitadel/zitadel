@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -30,7 +31,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
-			parent = propagateSystemMemberRoles(ctxData, parent)
+			parent = addGetSystemRolesFuncToCtx(parent, ctxData)
 			return context.WithValue(parent, dataKey, ctxData)
 		}, nil
 	}
@@ -51,7 +52,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		parent = context.WithValue(parent, dataKey, ctxData)
 		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
-		parent = propagateSystemMemberRoles(ctxData, parent)
+		parent = addGetSystemRolesFuncToCtx(parent, ctxData)
 		return parent
 	}, nil
 }
@@ -128,14 +129,46 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 	return ctxIDs
 }
 
-func propagateSystemMemberRoles(ctxData CtxData, parent context.Context) context.Context {
+func addGetSystemRolesFuncToCtx(ctx context.Context, ctxData CtxData) context.Context {
+	if len(ctxData.SystemMemberships) != 0 {
+		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func() func(ctx context.Context) ([]string, error) {
+			var roles []string
+			return func(ctx context.Context) ([]string, error) {
+				if roles != nil {
+					return roles, nil
+				}
+				var err error
+				roles, err = getSystemRoles(ctx)
+				return roles, err
+			}
+		}())
+	}
+	return ctx
+}
+
+func GetSystemRoles(ctx context.Context) ([]string, error) {
+	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesFuncKey)
+	if getSystemUserRolesFuncValue == nil {
+		return nil, nil
+	}
+	getSystemUserRolesFunc, ok := getSystemUserRolesFuncValue.(func(context.Context) ([]string, error))
+	if !ok {
+		return nil, errors.New("unable to obtain systems role func")
+	}
+	return getSystemUserRolesFunc(ctx)
+}
+
+func getSystemRoles(ctx context.Context) ([]string, error) {
+	ctxData, ok := ctx.Value(dataKey).(CtxData)
+	if !ok {
+		return nil, errors.New("unable to obtain ctxData")
+	}
+	var roles []string
 	if ctxData.SystemMemberships != nil {
-		roles := make([]string, 0)
 		for _, member := range ctxData.SystemMemberships {
 			roles = append(roles, member.Roles...)
 		}
-		parent = context.WithValue(parent, SystemPermissionsKey, roles)
 	}
 
-	return parent
+	return roles, nil
 }
