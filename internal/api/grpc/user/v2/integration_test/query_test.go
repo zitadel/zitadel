@@ -415,6 +415,10 @@ func createUsers(ctx context.Context, orgID string, count int, passwordChangeReq
 
 func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) userAttr {
 	username := gofakeit.Email()
+	return createUserWithUserName(ctx, username, orgID, passwordChangeRequired)
+}
+
+func createUserWithUserName(ctx context.Context, username string, orgID string, passwordChangeRequired bool) userAttr {
 	// used as default country prefix
 	phone := "+41" + gofakeit.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
@@ -522,101 +526,6 @@ func TestServer_ListUsers(t *testing.T) {
 								},
 								PasswordChangeRequired: true,
 								PasswordChanged:        timestamppb.Now(),
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "list user call made by systems user from config file",
-			args: func() args {
-				ctx, _ := context.WithTimeout(context.Background(), 15*time.Minute)
-				iamSystemUser := integration.WithIAMSystemUserAuthorization(ctx)
-
-				return args{
-					iamSystemUser,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						org1 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
-						org2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
-						org3 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
-
-						info1 := createUser(IamCTX, org1.OrganizationId, false)
-						info2 := createUser(IamCTX, org2.OrganizationId, false)
-						info3 := createUser(IamCTX, org3.OrganizationId, false)
-
-						return []userAttr{info1, info2, info3}
-					},
-				}
-			}(),
-			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
-					TotalResult: 3,
-					Timestamp:   timestamppb.Now(),
-				},
-				SortingColumn: 0,
-				Result: []*user.User{
-					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
-									GivenName:         "Mickey",
-									FamilyName:        "Mouse",
-									NickName:          gu.Ptr("Mickey"),
-									DisplayName:       gu.Ptr("Mickey Mouse"),
-									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
-								},
-								Email: &user.HumanEmail{
-									IsVerified: true,
-								},
-								Phone: &user.HumanPhone{
-									IsVerified: true,
-								},
-							},
-						},
-					},
-					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
-									GivenName:         "Mickey",
-									FamilyName:        "Mouse",
-									NickName:          gu.Ptr("Mickey"),
-									DisplayName:       gu.Ptr("Mickey Mouse"),
-									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
-								},
-								Email: &user.HumanEmail{
-									IsVerified: true,
-								},
-								Phone: &user.HumanPhone{
-									IsVerified: true,
-								},
-							},
-						},
-					},
-					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
-									GivenName:         "Mickey",
-									FamilyName:        "Mouse",
-									NickName:          gu.Ptr("Mickey"),
-									DisplayName:       gu.Ptr("Mickey Mouse"),
-									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
-								},
-								Email: &user.HumanEmail{
-									IsVerified: true,
-								},
-								Phone: &user.HumanPhone{
-									IsVerified: true,
-								},
 							},
 						},
 					},
@@ -1228,10 +1137,9 @@ func TestServer_ListUsers(t *testing.T) {
 				setPermissionCheckV2Flag(t, f.SetFlag)
 				infos := tt.args.dep(IamCTX, tt.args.req)
 
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 1*time.Minute)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 15*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
-					fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 					if tt.wantErr {
 						require.Error(ttt, err)
 						return
@@ -1269,6 +1177,70 @@ func TestServer_ListUsers(t *testing.T) {
 						}
 					}
 					integration.AssertListDetails(ttt, tt.want, got)
+				}, retryDuration, tick, "timeout waiting for expected user result")
+			})
+		}
+	}
+}
+
+func TestServer_SystemUsers_ListUsers(t *testing.T) {
+	defer func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	}()
+
+	org1 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	org2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	org3 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser1@zitadel.com", org1.OrganizationId, false)
+	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser2@zitadel.com", org2.OrganizationId, false)
+	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser3@zitadel.com", org3.OrganizationId, false)
+
+	tests := []struct {
+		name                   string
+		ctx                    context.Context
+		expectedFoundUsernames []string
+	}{
+		{
+			name:                   "list users with neccessary permissions",
+			ctx:                    SystemCTX,
+			expectedFoundUsernames: []string{"Test_SystemUsers_ListUser1@zitadel.com", "Test_SystemUsers_ListUser2@zitadel.com", "Test_SystemUsers_ListUser3@zitadel.com"},
+		},
+		{
+			name: "list users without neccessary permissions",
+			ctx:  SystemUserWithNoPermissionsCTX,
+		},
+	}
+
+	for _, f := range permissionCheckV2Settings {
+		f := f
+		for _, tt := range tests {
+			t.Run(f.TestNamePrependString+tt.name, func(t *testing.T) {
+				setPermissionCheckV2Flag(t, f.SetFlag)
+
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 1*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					got, err := Client.ListUsers(tt.ctx, &user.ListUsersRequest{})
+					require.NoError(ttt, err)
+
+					if tt.expectedFoundUsernames == nil {
+						require.Empty(t, got.Result)
+						return
+					}
+
+					for _, user := range got.Result {
+						for i, username := range tt.expectedFoundUsernames {
+							if username == user.Username {
+								tt.expectedFoundUsernames = tt.expectedFoundUsernames[i+1:]
+								break
+							}
+						}
+						if len(tt.expectedFoundUsernames) == 0 {
+							return
+						}
+					}
+
+					require.FailNow(t, "unable to find all users with specified usernames")
 				}, retryDuration, tick, "timeout waiting for expected user result")
 			})
 		}

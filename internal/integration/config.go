@@ -48,5 +48,5 @@ func init() {
 		panic(err)
 	}
 	SystemToken = createSystemUserToken()
-	IAMSystemUserToken = createIAMSystemUserToken()
+	SystemUserWithNoPermissionsToken = createSystemUserWithNoPermissionsToken()
 }
