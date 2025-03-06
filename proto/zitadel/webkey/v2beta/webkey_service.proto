@@ -139,6 +139,12 @@ service WebKeyService {
           description: "Web key created successfully.";
         }
       };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `web_key` is not enabled.";
+        }
+      };
     };
   }
 
@@ -170,6 +176,18 @@ service WebKeyService {
         key: "200"
         value: {
           description: "Web key activated successfully.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The web key to active does not exist.";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `web_key` is not enabled.";
         }
       };
     };
@@ -207,6 +225,12 @@ service WebKeyService {
           description: "Web key deleted successfully.";
         }
       };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `web_key` is not enabled or the web key is currently active.";
+        }
+      };
     };
   }
 
@@ -235,6 +259,12 @@ service WebKeyService {
         key: "200"
         value: {
           description: "List of all web keys.";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `web_key` is not enabled.";
         }
       };
     };
