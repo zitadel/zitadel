@@ -33,34 +33,26 @@ message Target {
     }
   ];
   string name = 4 [
-    (validate.rules).string = {min_len: 1, max_len: 1000},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ip_allow_list\"";
-      min_length: 1
-      max_length: 1000
     }
   ];
   // Defines the target type and how the response of the target is treated.
   oneof target_type {
-    option (validate.required) = true;
     RESTWebhook rest_webhook = 5;
     RESTCall rest_call = 6;
     RESTAsync rest_async = 7;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
+  // If the target doesn't respond before this timeout expires, the the connection is closed and the action fails.
   google.protobuf.Duration timeout = 8 [
-    (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "if the target doesn't respond before this timeout expires, the the connection is closed and the action fails";
       example: "\"10s\"";
     }
   ];
   string endpoint = 9 [
-    (validate.rules).string = {min_len: 1, max_len: 1000},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://example.com/hooks/ip_check\""
-      min_length: 1
-      max_length: 1000
     }
   ];
   string signing_key = 10 [

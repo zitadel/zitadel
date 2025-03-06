@@ -14,10 +14,10 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
-var _ action.ZITADELActionsServer = (*Server)(nil)
+var _ action.ActionServiceServer = (*Server)(nil)
 
 type Server struct {
-	action.UnimplementedZITADELActionsServer
+	action.UnimplementedActionServiceServer
 	systemDefaults      systemdefaults.SystemDefaults
 	command             *command.Commands
 	query               *query.Queries

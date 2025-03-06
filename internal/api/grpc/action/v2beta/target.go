@@ -25,7 +25,7 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 	}
 	return &action.CreateTargetResponse{
 		Id:           details.ID,
-		CreationDate: timestamppb.New(details.CreationDate),
+		CreationDate: timestamppb.New(details.EventDate),
 		SigningKey:   add.SigningKey,
 	}, nil
 }
