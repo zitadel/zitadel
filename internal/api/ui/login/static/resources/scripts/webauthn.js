@@ -11,7 +11,7 @@ function checkWebauthnSupported(buttonId, func) {
     return;
   }
 
-  // Check if the browser supports WebAuthn, anf if, then add the event listener
+  // Check if the browser supports WebAuthn, then add the event listener
   const button = document.getElementById(buttonId);
   if (button) {
     button.addEventListener("click", func);
