@@ -1199,16 +1199,27 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 	tests := []struct {
 		name                   string
 		ctx                    context.Context
+		req                    *user.ListUsersRequest
 		expectedFoundUsernames []string
 	}{
 		{
 			name:                   "list users with neccessary permissions",
 			ctx:                    SystemCTX,
+			req:                    &user.ListUsersRequest{},
 			expectedFoundUsernames: []string{"Test_SystemUsers_ListUser1@zitadel.com", "Test_SystemUsers_ListUser2@zitadel.com", "Test_SystemUsers_ListUser3@zitadel.com"},
 		},
 		{
 			name: "list users without neccessary permissions",
 			ctx:  SystemUserWithNoPermissionsCTX,
+			req:  &user.ListUsersRequest{},
+		},
+		{
+			name: "list users without neccessary permissions specifying org",
+			req: &user.ListUsersRequest{
+				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
+			},
+			ctx:                    SystemCTX,
+			expectedFoundUsernames: []string{"Test_SystemUsers_ListUser2@zitadel.com"},
 		},
 	}
 
@@ -1220,7 +1231,7 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 1*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-					got, err := Client.ListUsers(tt.ctx, &user.ListUsersRequest{})
+					got, err := Client.ListUsers(tt.ctx, tt.req)
 					require.NoError(ttt, err)
 
 					if tt.expectedFoundUsernames == nil {
