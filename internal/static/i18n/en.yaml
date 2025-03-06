@@ -904,7 +904,7 @@ EventTypes:
       added: User added to group
       removed: User removed from group
       cascade:
-        removed: User removed from group
+        removed: Cascade User removed from group
   org:
     added: Organization added
     changed: Organization changed

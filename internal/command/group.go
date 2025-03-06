@@ -341,7 +341,7 @@ func (c *Commands) ReactivateGroup(ctx context.Context, groupID string, resource
 	}, nil
 }
 
-func (c *Commands) RemoveGroup(ctx context.Context, groupID, resourceOwner string, cascadingUserGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveGroup(ctx context.Context, groupID, resourceOwner string, userIds []string, cascadingUserGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if groupID == "" || resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-77Hn9", "Errors.Group.GroupIDMissing")
 	}
@@ -351,7 +351,7 @@ func (c *Commands) RemoveGroup(ctx context.Context, groupID, resourceOwner strin
 		return nil, err
 	}
 	if existingGroup.State == domain.GroupStateUnspecified || existingGroup.State == domain.GroupStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-4N5sD", "Errors.Group.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-4N5sD", "Errors.Group.User.NotFound")
 	}
 
 	groupAgg := GroupAggregateFromWriteModel(&existingGroup.WriteModel)
@@ -367,15 +367,39 @@ func (c *Commands) RemoveGroup(ctx context.Context, groupID, resourceOwner strin
 		}
 		events = append(events, event)
 	}
+	var userEvents []eventstore.Command
+	for _, userID := range userIds {
+		m, err := c.userGroupMemberWriteModelByID(ctx, groupID, userID, resourceOwner)
+		if zerrors.IsNotFound(err) {
+			// empty response because we have no data that match the request
+			return &domain.ObjectDetails{}, err
+		}
+		userGroupAgg := GroupAggregateFromWriteModel(&m.WriteModel)
+
+		userEvent := c.removeUserGroupMember(ctx, userGroupAgg, groupID, true)
+		userEvents = append(userEvents, userEvent)
+	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+
 	err = AppendAndReduce(existingGroup, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
+
+	userPushedEvents, err := c.eventstore.Push(ctx, userEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = AppendAndReduce(existingGroup, userPushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
 	return writeModelToObjectDetails(&existingGroup.WriteModel), nil
 }
 
