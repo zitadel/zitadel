@@ -210,6 +210,8 @@ message ListQuery {
 On the corresponding responses the `ListDetails` can be used to return the total count of the resources
 and allow the user to handle their offset and limit accordingly.
 
+The API MUST enforce a reasonable maximum limit for the number of resources that can be retrieved and returned in a single request.
+The default limit is set to 100 and the maximum limit is set to 1000. If the client requests a limit that exceeds the maximum limit, an error is returned.
 
 ## Error Handling
 
