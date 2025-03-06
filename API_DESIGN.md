@@ -158,9 +158,33 @@ Additionally, state changes, specific actions or operations that do not fit into
 The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
 automatically return an error if the token is invalid.
 
-Permissions grated to the user are organization specific and might only be checked based on the queried resource.
-Therefore, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
-Required permissions need to be documented in the [API documentation](#documentation).
+Permissions grated to the user might be organization specific and can therefore only be checked based on the queried resource.
+In such case, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
+If the permission can be checked by the API itself, e.g. if the permission is instance wide, it can be annotated on the endpoint in the proto file (see below).
+In any case, the required permissions need to be documented in the [API documentation](#documentation).
+
+### Permission annotations
+
+Permissions can be annotated on the endpoint in the proto file. This allows the API to automatically check the permissions for the user.
+The permissions are checked by the middleware and an error is returned if the user does not have the required permissions.
+
+The following example requires the user to have the `iam.web_key.write` permission to call the `CreateWebKey` method.
+```protobuf
+ option (zitadel.protoc_gen_zitadel.v2.options) = {
+  auth_option: {
+    permission: "iam.web_key.write"
+  }
+};
+```
+
+In case the permission cannot be checked by the API itself, but all requests need to be from an authenticated user, the `auth_option` can be set to `authenticated`.
+```protobuf
+ option (zitadel.protoc_gen_zitadel.v2.options) = {
+  auth_option: {
+    permission: "authenticated"
+  }
+};
+```
 
 ## Pagination
 
