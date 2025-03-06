@@ -50,14 +50,14 @@ message WebKey {
 }
 
 message RSA {
-  // bit size of the RSA key
+  // Bit size of the RSA key. Default is 2048 bits.
   RSABits bits = 1 [
     (validate.rules).enum = {defined_only: true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       default: "RSA_BITS_2048";
     }
   ];
-  // signing algrithm used
+  // Signing algrithm used. Default is SHA256.
   RSAHasher hasher = 2 [
     (validate.rules).enum = {defined_only: true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -87,6 +87,7 @@ enum RSAHasher {
 }
 
 message ECDSA {
+  // Curve of the ECDSA key. Default is P-256.
   ECDSACurve curve = 1 [
     (validate.rules).enum = {defined_only: true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -741,7 +741,11 @@ module.exports = {
                 description:
                     "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
                     "\n" +
-                    "This project is in beta state. It can AND will continue breaking until a stable version is released.",
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n"+
+                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n"+
+                    "\n"+
+                    "Please make sure to enable the `web_key` feature flag on your instance to use this service.",
               },
               items: require("./docs/apis/resources/webkey_service_v2/sidebar.ts"),
             },
@@ -766,7 +770,7 @@ module.exports = {
                   "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v3 action executions anymore.\n" +
                   "Instead, it calls external endpoints which are implemented and maintained by action v3 users.\n" +
                   "\n" +
-                  "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
+                  "This service is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
               items: [{
                 type: "doc",

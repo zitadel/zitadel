@@ -9,7 +9,6 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/webkey/v2beta/key.proto";
-import "zitadel/object/v2beta/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta;webkey";
 
@@ -17,7 +16,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Web key Service";
     version: "2.0-beta";
-    description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This project is in beta state. It can AND will continue breaking until a stable version is released.";
+    description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This service is in beta state. It can AND will continue breaking until a stable version is released.\n\nThe public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n\nPlease make sure to enable the `web_key` feature flag on your instance to use this service.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -104,6 +103,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // Service to manage web keys for OIDC token signing and validation.
 // The service provides methods to create, activate, delete and list web keys.
 // The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.
+//
+// Please make sure to enable the `web_key` feature flag on your instance to use this service.
 service WebKeyService {
   // Create Web Key
   //
@@ -112,8 +113,13 @@ service WebKeyService {
   // The newly created key will have the state `STATE_INITIAL` and is published to the public key endpoint.
   // Note that the JWKs OIDC endpoint returns a cacheable response.
   //
+  // If no key type is provided, a RSA key pair with 2048 bits and SHA256 hashing will be created.
+  //
   // Required permission:
   //   - `iam.web_key.write`
+  //
+  // Required feature flag:
+  //   - `web_key`
   rpc CreateWebKey(CreateWebKeyRequest) returns (CreateWebKeyResponse) {
     option (google.api.http) = {
       post: "/v2beta/web_keys"
@@ -145,6 +151,9 @@ service WebKeyService {
   //
   // Required permission:
   //   - `iam.web_key.write`
+  //
+  // Required feature flag:
+  //   - `web_key`
   rpc ActivateWebKey(ActivateWebKeyRequest) returns (ActivateWebKeyResponse) {
     option (google.api.http) = {
       post: "/v2beta/web_keys/{id}/activate"
@@ -177,6 +186,9 @@ service WebKeyService {
   //
   // Required permission:
   //   - `iam.web_key.delete`
+  //
+  // Required feature flag:
+  //   - `web_key`
   rpc DeleteWebKey(DeleteWebKeyRequest) returns (DeleteWebKeyResponse) {
     option (google.api.http) = {
       delete: "/v2beta/web_keys/{id}"
@@ -204,6 +216,9 @@ service WebKeyService {
   //
   // Required permission:
   //   - `iam.web_key.read`
+  //
+  // Required feature flag:
+  //   - `web_key`
   rpc ListWebKeys(ListWebKeysRequest) returns (ListWebKeysResponse) {
     option (google.api.http) = {
       get: "/v2beta/web_keys"
@@ -228,10 +243,13 @@ service WebKeyService {
 
 message CreateWebKeyRequest {
   // The key type to create (RSA, ECDSA, ED25519).
+  // If no key type is provided, a RSA key pair with 2048 bits and SHA256 hashing will be created.
   oneof key {
-    // Create a RSA key pair.
+    // Create a RSA key pair and specify the bit size and hashing algorithm.
+    // If no bits and hasher are provided, a RSA key pair with 2048 bits and SHA256 hashing will be created.
     RSA rsa = 1;
-    // Create a ECDSA key pair.
+    // Create a ECDSA key pair and specify the curve.
+    // If no curve is provided, a ECDSA key pair with P-256 curve will be created.
     ECDSA ecdsa = 2;
     // Create a ED25519 key pair.
     ED25519 ed25519 = 3;
