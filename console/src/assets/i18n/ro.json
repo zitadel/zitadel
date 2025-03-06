@@ -1,0 +1,2693 @@
+{
+  "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Începeți cu ZITADEL",
+      "NEXT": {
+        "TITLE": "Pașii următori",
+        "DESCRIPTION": "Finalizați următorii pași pentru a vă securiza aplicația.",
+        "CREATE_PROJECT": {
+          "TITLE": "Creați un proiect",
+          "DESCRIPTION": "Adăugați un proiect și definiți rolurile și autorizațiile acestuia."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Începeți",
+          "DESCRIPTION": "Urmați ghidul rapid pas cu pas și începeți să construiți imediat."
+        },
+        "DOCS": {
+          "TITLE": "Documentație",
+          "DESCRIPTION": "Explorați baza de cunoștințe ZITADEL pentru a vă familiariza cu conceptele și ideile de bază. Aflați cum funcționează ZITADEL și cum să îl utilizați."
+        },
+        "EXAMPLES": {
+          "TITLE": "Exemple și Kituri de Dezvoltare Software",
+          "DESCRIPTION": "Navigați prin exemplele și SDK-urile noastre pentru a utiliza ZITADEL împreună cu limbajele și instrumentele de programare preferate."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organizație",
+      "DESCRIPTION": "O organizație găzduiește utilizatori, proiecte cu aplicații, furnizori de identitate și setări precum brandingul companiei. Doriți să partajați setări între mai multe organizații? Configurați setările implicite.",
+      "METADATA": "Adăugați atribute personalizate organizației, cum ar fi locația sau un identificator într-un alt sistem. Puteți utiliza aceste informații în acțiunile dvs."
+    },
+    "PROJECTS": {
+      "TITLE": "Proiecte",
+      "DESCRIPTION": "Un proiect găzduiește una sau mai multe aplicații, pe care le puteți utiliza pentru a vă autentifica utilizatorii. De asemenea, vă puteți autoriza utilizatorii cu proiecte. Pentru a permite utilizatorilor din alte organizații să se conecteze la aplicațiile dvs., acordați-le acces la proiectul dvs.<br/><br/>Dacă nu găsiți un proiect, contactați proprietarul proiectelor sau pe cineva cu drepturile corespunzătoare pentru a obține acces.",
+      "OWNED": {
+        "TITLE": "Proiecte deținute",
+        "DESCRIPTION": "Acestea sunt proiectele pe care le dețineți. Puteți gestiona setările acestor proiecte, autorizațiile și aplicațiile."
+      },
+      "GRANTED": {
+        "TITLE": "Proiecte acordate",
+        "DESCRIPTION": "Acestea sunt proiectele pe care alte organizații vi le-au acordat. Cu proiectele acordate, puteți oferi utilizatorilor dvs. acces la aplicațiile altor organizații."
+      }
+    },
+    "USERS": {
+      "TITLE": "Utilizatori",
+      "DESCRIPTION": "Un utilizator este o persoană sau o mașină care vă poate accesa aplicațiile.",
+      "HUMANS": {
+        "TITLE": "Utilizatori",
+        "DESCRIPTION": "Utilizatorii se autentifică interactiv într-o sesiune de browser cu o solicitare de autentificare.",
+        "METADATA": "Adăugați atribute personalizate utilizatorului, cum ar fi departamentul. Puteți utiliza aceste informații în acțiunile dvs."
+      },
+      "MACHINES": {
+        "TITLE": "Utilizatori de servicii",
+        "DESCRIPTION": "Utilizatorii de servicii se autentifică non-interactiv folosind un token JWT bearer semnat cu o cheie privată. De asemenea, pot utiliza un token de acces personal.",
+        "METADATA": "Adăugați atribute personalizate utilizatorului, cum ar fi sistemul de autentificare. Puteți utiliza aceste informații în acțiunile dvs."
+      },
+      "SELF": {
+        "METADATA": "Adăugați atribute personalizate utilizatorului dvs., cum ar fi departamentul. Puteți utiliza aceste informații în acțiunile organizațiilor dvs."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autorizații",
+      "DESCRIPTION": "Autorizațiile definesc drepturile de acces ale unui utilizator la un proiect. Puteți acorda unui utilizator acces la un proiect și puteți defini rolurile utilizatorilor în cadrul acelui proiect."
+    },
+    "ACTIONS": {
+      "TITLE": "Acțiuni",
+      "DESCRIPTION": "Executați cod personalizat pe evenimente care se întâmplă pe măsură ce utilizatorii dvs. se autentifică la ZITADEL. Automatizați-vă procesele, îmbogățiți metadatele utilizatorilor și tokenurile lor sau notificați sistemele externe.",
+      "SCRIPTS": {
+        "TITLE": "Scripturi",
+        "DESCRIPTION": "Scrieți codul JavaScript o singură dată și declanșați-l în mai multe fluxuri."
+      },
+      "FLOWS": {
+        "TITLE": "Fluxuri",
+        "DESCRIPTION": "Alegeți un flux de autentificare și declanșați acțiunea dvs. la un anumit eveniment din cadrul acestui flux."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Setări implicite",
+        "DESCRIPTION": "Setări implicite pentru toate organizațiile. Cu permisiunile potrivite, unele dintre ele pot fi suprascrise în setările organizației."
+      },
+      "ORG": {
+        "TITLE": "Setări organizație",
+        "DESCRIPTION": "Personalizați setările organizației dvs."
+      },
+      "FEATURES": {
+        "TITLE": "Setări caracteristici",
+        "DESCRIPTION": "Deblocați caracteristici pentru instanța dvs."
+      },
+      "IDPS": {
+        "TITLE": "Furnizori de identitate",
+        "DESCRIPTION": "Creați și activați furnizori de identitate externi. Alegeți un furnizor bine-cunoscut sau configurați orice alt furnizor compatibil OIDC, OAuth sau SAML la alegere. Puteți chiar să utilizați tokenurile JWT existente ca identități federate prin configurarea unui furnizor de identitate JWT.",
+        "NEXT": "Ce urmează?",
+        "SAML": {
+          "TITLE": "Configurați-vă furnizorul de identitate SAML",
+          "DESCRIPTION": "ZITADEL este configurat. Acum, furnizorul dvs. de identitate SAML are nevoie de o anumită configurație. Majoritatea furnizorilor vă permit să încărcați pur și simplu întregul XML de metadate ZITADEL. Alți furnizori vă cer să furnizați doar câteva URL-uri distincte, cum ar fi, de exemplu, ID-ul entității (URL-ul metadatelor), URL-ul Assertion Consumer Service (ACS) sau URL-ul Single Logout."
+        },
+        "CALLBACK": {
+          "TITLE": "Configurați-vă furnizorul de identitate {{ provider }}",
+          "DESCRIPTION": "Înainte de a putea configura ZITADEL, transmiteți acest URL furnizorului dvs. de identitate pentru a activa redirecționarea browserului înapoi la ZITADEL după autentificare."
+        },
+        "JWT": {
+          "TITLE": "Utilizați JWT-urile ca identități federate",
+          "DESCRIPTION": "Furnizorul de identitate JWT vă permite să utilizați tokenurile JWT existente ca identități federate. Această caracteristică este utilă dacă aveți deja un emitent pentru JWT-uri. Cu un IdP JWT, puteți utiliza aceste JWT-uri pentru a crea și actualiza utilizatori în ZITADEL din mers."
+        },
+        "LDAP": {
+          "TITLE": "Configurați ZITADEL pentru a vă conecta la furnizorul dvs. de identitate LDAP",
+          "DESCRIPTION": "Furnizați detaliile de conectare la serverul dvs. LDAP și configurați maparea atributelor LDAP la atributele ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Completare automată a datelor utilizatorului",
+          "DESCRIPTION": "Utilizați o acțiune pentru a îmbunătăți experiența utilizatorilor dvs. Puteți pre-completa formularul de înregistrare ZITADEL cu valori de la furnizorul de identitate."
+        },
+        "ACTIVATE": {
+          "TITLE": "Activați IdP-ul",
+          "DESCRIPTION": "IdP-ul dvs. nu este încă activ. Activați-l pentru a permite utilizatorilor să se conecteze."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Complexitatea parolei",
+        "DESCRIPTION": "Asigurați-vă că utilizatorii dvs. utilizează parole puternice definind reguli de complexitate."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Personalizați aspectul formularului dvs. de autentificare. Nu uitați să aplicați configurația dvs. când ați terminat."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Linkuri externe",
+        "DESCRIPTION": "Ghidați utilizatorii către resurse externe personalizate afișate pe pagina de autentificare. Utilizatorii trebuie să accepte Termenii și condițiile și Politica de confidențialitate înainte de a se putea înregistra. Modificați linkul către documentația dvs. sau setați un șir gol pentru a ascunde butonul de documentație din consolă. Adăugați un link extern personalizat și un text personalizat pentru acel link în consolă sau setați-le goale pentru a ascunde acel buton."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Setări SMTP",
+        "DESCRIPTION": "Configurați serverul dvs. SMTP pentru a utiliza un domeniu pentru adresa expeditorului pe care utilizatorii dvs. o cunosc și au încredere."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Setări SMS",
+        "DESCRIPTION": "Pentru a debloca toate caracteristicile ZITADEL, configurați Twilio pentru a trimite mesaje SMS utilizatorilor dvs."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Evenimente",
+        "DESCRIPTION": "Această pagină afișează toate modificările de stare din instanța dvs., până la limita de urmărire de audit a instanțelor dvs. Filtrați lista după intervalul de timp în scopuri de depanare sau filtrați-o după un agregat în scopuri de audit."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Evenimente eșuate",
+        "DESCRIPTION": "Această pagină afișează toate evenimentele eșuate din instanța dvs. Dacă ZITADEL nu se comportă așa cum vă așteptați, verificați întotdeauna mai întâi această listă."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Vizualizări",
+        "DESCRIPTION": "Această pagină afișează toate vizualizările bazei dvs. de date și când au procesat cel mai recent eveniment. Dacă vă lipsesc date, verificați dacă vizualizarea este actualizată."
+      },
+      "LANGUAGES": {
+        "TITLE": "Limbi",
+        "DESCRIPTION": "Restricționați limbile în care formularul de autentificare și mesajele de notificare sunt traduse. Dacă doriți să dezactivați unele dintre limbi, trageți-le în secțiunea Limbi nepermise. Puteți specifica o limbă permisă ca limbă implicită. Dacă limba preferată a utilizatorilor nu este permisă, se utilizează limba implicită."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generatoare de secrete",
+        "DESCRIPTION": "Definiți complexitățile și duratele de viață ale secretelor dvs. O complexitate și o durată de viață mai mari îmbunătățesc securitatea, o complexitate și o durată de viață mai mici îmbunătățesc performanța de decriptare."
+      },
+      "SECURITY": {
+        "TITLE": "Setări de securitate",
+        "DESCRIPTION": "Activați caracteristicile ZITADEL care pot avea impact asupra securității. Ar trebui să știți cu adevărat ce faceți înainte de a modifica aceste setări."
+      },
+      "OIDC": {
+        "TITLE": "Setări OpenID Connect",
+        "DESCRIPTION": "Configurați duratele de viață ale tokenurilor OIDC. Utilizați durate de viață mai scurte pentru a crește securitatea utilizatorilor dvs., utilizați durate de viață mai lungi pentru a crește confortul utilizatorilor dvs.",
+        "LABEL_HOURS": "Durata maximă de viață în ore",
+        "LABEL_DAYS": "Durata maximă de viață în zile",
+        "ACCESS_TOKEN": {
+          "TITLE": "Token de acces",
+          "DESCRIPTION": "Tokenul de acces este utilizat pentru a autentifica un utilizator. Este un token de scurtă durată care este utilizat pentru a accesa datele utilizatorului. Utilizați o durată de viață scurtă pentru a minimiza riscul de acces neautorizat. Tokenurile de acces pot fi reîmprospătate automat utilizând un token de reîmprospătare."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Token ID",
+          "DESCRIPTION": "Tokenul ID este un JSON Web Token (JWT) care conține informații despre utilizator. Durata de viață a tokenului ID nu trebuie să depășească durata de viață a tokenului de acces."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Token de reîmprospătare",
+          "DESCRIPTION": "Tokenul de reîmprospătare este utilizat pentru a obține un token de acces nou. Este un token de lungă durată care este utilizat pentru a reîmprospăta tokenul de acces. Un utilizator trebuie să se re-autentifice manual când tokenul de reîmprospătare expiră."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Token de reîmprospătare inactiv",
+          "DESCRIPTION": "Durata de viață inactivă a tokenului de reîmprospătare este timpul maxim în care un token de reîmprospătare poate fi neutilizat."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Texte de mesaje",
+        "DESCRIPTION": "Personalizați textele mesajelor de e-mail sau SMS de notificare. Dacă doriți să dezactivați unele dintre limbi, restricționați-le în setările de limbă ale instanțelor dvs.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Când revendicați un domeniu pentru organizația dvs., utilizatorii care nu utilizează acest domeniu în numele lor de conectare vor fi solicitați să își schimbe numele de conectare pentru a se potrivi cu domeniul revendicat.",
+          "INIT": "Când un utilizator este creat, acesta va primi un e-mail cu un link pentru a-și seta parola.",
+          "PC": "Când un utilizator își schimbă parola, acesta va primi o notificare despre modificare dacă ați activat acest lucru în setările de notificare.",
+          "PL": "Când un utilizator adaugă o metodă de autentificare fără parolă, acesta trebuie să o activeze făcând clic pe un link dintr-un e-mail.",
+          "PR": "Când un utilizator își resetează parola, acesta va primi un e-mail cu un link pentru a seta o parolă nouă.",
+          "VE": "Când un utilizator își schimbă adresa de e-mail, acesta va primi un e-mail cu un link pentru a verifica noua adresă.",
+          "VP": "Când un utilizator își schimbă numărul de telefon, acesta va primi un SMS cu un cod pentru a verifica noul număr.",
+          "VEO": "Când un utilizator adaugă o parolă unică prin metoda e-mail, acesta trebuie să o activeze introducând un cod trimis la adresa sa de e-mail.",
+          "VSO": "Când un utilizator adaugă o parolă unică prin metoda SMS, acesta trebuie să o activeze introducând un cod trimis la numărul său de telefon.",
+          "IU": "Când este creat un cod de invitație pentru utilizator, acesta va primi un e-mail cu un link pentru a-și seta metoda de autentificare."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Texte interfață de autentificare",
+        "DESCRIPTION": "Personalizați textele formularului dvs. de autentificare. Dacă un text este gol, substituentul afișează valoarea implicită. Dacă doriți să dezactivați unele dintre limbi, restricționați-le în setările de limbă ale instanțelor dvs."
+      },
+      "DOMAINS": {
+        "TITLE": "Setări domeniu",
+        "DESCRIPTION": "Definiți restricții asupra domeniilor dvs. și configurați modelele de nume de conectare.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Solicitați ca domeniile personalizate să fie verificate",
+          "DESCRIPTION": "Dacă acest lucru este activat, domeniile organizației trebuie să fie verificate înainte de a putea fi utilizate pentru descoperirea domeniului sau sufixarea numelui de utilizator."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Model de nume de conectare",
+          "DESCRIPTION": "Controlați modelul numelor de conectare ale utilizatorilor dvs. ZITADEL selectează organizația utilizatorilor dvs. imediat ce aceștia își introduc numele de conectare. Prin urmare, numele de conectare trebuie să fie unice în toate organizațiile. Dacă aveți utilizatori care au un cont în mai multe domenii, puteți asigura unicitatea prin sufixarea numelor de conectare cu domeniul organizației."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Verificarea domeniului",
+          "DESCRIPTION": "Permiteți organizației dvs. să utilizeze numai domeniile pe care le controlează efectiv. Dacă este activată, domeniile organizației sunt verificate periodic prin DNS sau provocare HTTP înainte de a putea fi utilizate. Aceasta este o caracteristică de securitate pentru a preveni deturnarea domeniului."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Adresa expeditorului SMTP",
+          "DESCRIPTION": "Permiteți o adresă expeditorului SMTP numai dacă se potrivește cu unul dintre domeniile instanței dvs."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Durate de viață autentificare",
+          "DESCRIPTION": "Consolidați-vă securitatea prin reducerea unor durate maxime de viață legate de autentificare.",
+          "LABEL": "Durata maximă de viață în ore",
+          "PW_CHECK": {
+            "TITLE": "Verificare parolă",
+            "DESCRIPTION": "Utilizatorii vor trebui să se re-autentifice cu parola lor după această perioadă."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Verificare autentificare externă",
+            "DESCRIPTION": "Utilizatorii dvs. sunt redirecționați către furnizorii lor de identitate externi după aceste perioade."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Verificare inițializare multifactor",
+            "DESCRIPTION": "Utilizatorii dvs. vor fi solicitați să configureze un al doilea factor sau un Multifactor după aceste perioade, dacă nu au făcut-o deja. O durată de viață de 0 dezactivează această solicitare."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Verificare al doilea factor",
+            "DESCRIPTION": "Utilizatorii dvs. trebuie să își revalideze al doilea factor în aceste perioade."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Verificare multifactor",
+            "DESCRIPTION": "Utilizatorii dvs. trebuie să își revalideze multifactorul în aceste perioade."
+          }
+        },
+        "FORM": {
+          "TITLE": "Formular de autentificare",
+          "DESCRIPTION": "Personalizați formularul de autentificare.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Nume de utilizator și parolă permise",
+            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu numele lor de utilizator și parola. Dacă acest lucru este dezactivat, utilizatorii dvs. se pot conecta numai utilizând autentificarea fără parolă sau cu un furnizor de identitate extern."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Înregistrarea utilizatorilor permisă",
+            "DESCRIPTION": "Permiteți utilizatorilor anonimi să își creeze un cont."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Înregistrarea organizației permisă",
+            "DESCRIPTION": "Permiteți utilizatorilor anonimi să își creeze o organizație."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Autentificare externă permisă",
+            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu un furnizor de identitate extern în loc să utilizeze utilizatorul ZITADEL pentru a se conecta."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Resetarea parolei ascunsă",
+            "DESCRIPTION": "Nu permiteți utilizatorilor dvs. să își reseteze parola."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Descoperirea domeniului permisă",
+            "DESCRIPTION": "Găsiți organizațiile utilizatorilor dvs. în funcție de domeniul numelor lor de conectare, de exemplu, adresa lor de e-mail."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorați numele de utilizator necunoscute",
+            "DESCRIPTION": "Dacă acest lucru este activat, formularul de autentificare nu va afișa un mesaj de eroare dacă numele de utilizator este necunoscut. Acest lucru ajută la prevenirea ghicirii numelui de utilizator."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Dezactivați autentificarea prin e-mail",
+            "DESCRIPTION": "Dacă acest lucru este activat, utilizatorii dvs. nu își pot utiliza adresele de e-mail pentru a se conecta. Atenție, dacă dezactivați acest lucru, adresele de e-mail ale utilizatorilor dvs. trebuie să fie unice în toate organizațiile pentru a se putea conecta."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Dezactivați autentificarea prin telefon",
+            "DESCRIPTION": "Dacă acest lucru este activat, utilizatorii dvs. nu își pot utiliza numerele de telefon pentru a se conecta. Atenție, dacă dezactivați acest lucru, numerele de telefon ale utilizatorilor dvs. trebuie să fie unice în toate organizațiile pentru a se putea conecta."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Anterior",
+    "NEXT": "Următorul",
+    "COUNT": "Rezultate totale",
+    "MORE": "Mai multe"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Contact",
+      "TOS": "Termeni și condiții",
+      "PP": "Politica de confidențialitate"
+    },
+    "THEME": {
+      "DARK": "Întunecat",
+      "LIGHT": "Deschis"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Începeți cu ZITADEL",
+    "DISCLAIMER": "ZITADEL vă tratează datele în mod confidențial și sigur.",
+    "DISCLAIMERLINK": "Informații suplimentare",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Începeți rapid cu ZITADEL."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Începeți rapid cu ZITADEL."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Primii pași",
+      "DESCRIPTION": "Începeți rapid cu ZITADEL."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Comenzi rapide",
+      "SETTINGS": "Comenzi rapide disponibile",
+      "PROJECTS": "Proiecte",
+      "REORDER": "Țineți apăsat și trageți țigla pentru a o muta",
+      "ADD": "Țineți apăsat și trageți o țiglă pentru a o adăuga"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Pașii următori",
+    "MOREDESCRIPTION": "mai multe comenzi rapide",
+    "COMPLETED": "finalizat",
+    "DISMISS": "Nu, mulțumesc, sunt profesionist.",
+    "CARD": {
+      "TITLE": "Puneți ZITADEL să funcționeze",
+      "DESCRIPTION": "Această listă de verificare ajută la configurarea instanței și vă ghidează prin cei mai esențiali pași"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Configurați-vă brandul",
+        "description": "Definiți culoarea și forma autentificării și încărcați logo-ul și pictogramele.",
+        "action": "Configurați brandingul"
+      },
+      "instance.smtp.config.added": {
+        "title": "Configurați-vă setările SMTP",
+        "description": "Setați propriile setări ale serverului de e-mail.",
+        "action": "Configurați SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Creați un proiect",
+        "description": "Adăugați un proiect și definiți rolurile și autorizațiile acestuia.",
+        "action": "Creați proiect"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Înregistrați-vă aplicația",
+        "description": "Înregistrați-vă aplicația web, nativă, api sau saml și configurați un flux de autentificare.",
+        "action": "Înregistrați aplicația"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Conectați-vă la aplicația dvs.",
+        "description": "Integrați aplicația dvs. cu ZITADEL pentru autentificare și testați-o conectându-vă cu utilizatorul dvs. administrator.",
+        "action": "Conectați-vă"
+      },
+      "user.human.added": {
+        "title": "Adăugați utilizatori",
+        "description": "Adăugați utilizatorii aplicației dvs.",
+        "action": "Adăugați utilizator"
+      },
+      "user.grant.added": {
+        "title": "Acordați utilizatorilor",
+        "description": "Permiteți utilizatorilor să acceseze aplicația dvs. și să își configureze rolul.",
+        "action": "Acordați utilizatorului"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Setări implicite",
+    "DASHBOARD": "Acasă",
+    "PERSONAL_INFO": "Informații personale",
+    "DOCUMENTATION": "Documentație",
+    "INSTANCEOVERVIEW": "Instanță",
+    "ORGS": "Organizații",
+    "VIEWS": "Vizualizări",
+    "EVENTS": "Evenimente",
+    "FAILEDEVENTS": "Evenimente eșuate",
+    "ORGANIZATION": "Organizație",
+    "PROJECT": "Proiecte",
+    "PROJECTOVERVIEW": "Prezentare generală",
+    "PROJECTGRANTS": "Granturi",
+    "ROLES": "Roluri",
+    "GRANTEDPROJECT": "Proiecte acordate",
+    "HUMANUSERS": "Utilizatori",
+    "MACHINEUSERS": "Utilizatori de servicii",
+    "LOGOUT": "Deconectați toți utilizatorii",
+    "NEWORG": "Organizație nouă",
+    "IAMADMIN": "Sunteți administrator IAM. Rețineți că aveți permisiuni extinse.",
+    "SHOWORGS": "Afișați toate organizațiile",
+    "GRANTS": "Autorizații",
+    "ACTIONS": "Acțiuni",
+    "PRIVACY": "Confidențialitate",
+    "TOS": "Termeni și condiții",
+    "OPENSHORTCUTSTOOLTIP": "Tastați ? pentru a afișa comenzile rapide de la tastatură",
+    "SETTINGS": "Setări",
+    "CUSTOMERPORTAL": "Portalul clienților"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integrați ZITADEL în aplicația dvs.",
+    "DESCRIPTION": "Integrați ZITADEL în aplicația dvs. sau utilizați unul dintre exemplele noastre pentru a începe în câteva minute.",
+    "BTN_START": "Creați aplicație",
+    "BTN_LEARNMORE": "Aflați mai multe",
+    "CREATEPROJECTFORAPP": "Creați proiectul {{value}}",
+    "SELECT_FRAMEWORK": "Selectați Framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Altele (OIDC, SAML, API)",
+    "ALMOSTDONE": "Aproape ați terminat.",
+    "REVIEWCONFIGURATION": "Revizuiți configurația",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Am creat o configurație de bază pentru aplicațiile {{value}}. Puteți adapta această configurație nevoilor dvs. după creare.",
+    "REDIRECTS": "Configurați redirecționări",
+    "DEVMODEWARN": "Modul Dev este activat în mod implicit. Puteți actualiza valorile pentru producție mai târziu.",
+    "GUIDE": "Ghid",
+    "BROWSEEXAMPLES": "Răsfoiți Exemple și SDK-uri",
+    "DUPLICATEAPPRENAME": "Există deja o aplicație cu același nume. Vă rugăm să alegeți un alt nume.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Modificați Framework-ul",
+        "DESCRIPTION": "Alegeți unul dintre framework-urile disponibile pentru configurarea rapidă a aplicației dvs."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Acțiuni",
+    "FILTER": "Filtru",
+    "RENAME": "Redenumiți",
+    "SET": "Setați",
+    "COPY": "Copiați în clipboard",
+    "COPIED": "Copiat în clipboard.",
+    "RESET": "Resetați",
+    "RESETDEFAULT": "Resetați la implicit",
+    "RESETTO": "Resetați la:",
+    "RESETCURRENT": "Resetați la curent",
+    "SHOW": "Afișați",
+    "HIDE": "Ascundeți",
+    "SAVE": "Salvați",
+    "SAVENOW": "Salvați acum",
+    "NEW": "Nou",
+    "ADD": "Adăugați",
+    "CREATE": "Creați",
+    "CONTINUE": "Continuați",
+    "CONTINUEWITH": "Continuați cu {{value}}",
+    "BACK": "Înapoi",
+    "CLOSE": "Închideți",
+    "CLEAR": "Ștergeți",
+    "CANCEL": "Anulați",
+    "INFO": "Info",
+    "OK": "OK",
+    "SELECT": "Selectați",
+    "VIEW": "Afișați",
+    "SELECTIONDELETE": "Ștergeți selecția",
+    "DELETE": "Ștergeți",
+    "REMOVE": "Eliminați",
+    "VERIFY": "Verificați",
+    "FINISH": "Finalizați",
+    "FINISHED": "Închideți",
+    "CHANGE": "Modificați",
+    "REACTIVATE": "Reactivați",
+    "ACTIVATE": "Activați",
+    "DEACTIVATE": "Dezactivați",
+    "REFRESH": "Reîmprospătați",
+    "LOGIN": "Conectați-vă",
+    "EDIT": "Editați",
+    "PIN": "Fixați / Anulați fixarea",
+    "CONFIGURE": "Configurați",
+    "SEND": "Trimiteți",
+    "NEWVALUE": "Valoare nouă",
+    "RESTORE": "Restabiliți",
+    "CONTINUEWITHOUTSAVE": "Continuați fără a salva",
+    "OF": "din",
+    "PREVIOUS": "Anterior",
+    "NEXT": "Următorul",
+    "MORE": "mai multe",
+    "STEP": "Pasul",
+    "SETUP": "Configurați",
+    "TEST": "Testați",
+    "UNSAVEDCHANGES": "Modificări nesalvate",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Sigur doriți să renunțați la această acțiune nouă? Acțiunea dvs. se va pierde",
+        "CANCEL": "Anulați",
+        "DISCARD": "Renunțați"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Afișați utilizatorul {{value}}"
+    },
+    "DOWNLOAD": "Descărcați",
+    "APPLY": "Aplicați"
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Are control asupra întregii instanțe, inclusiv asupra tuturor organizațiilor",
+    "IAM_OWNER_VIEWER": "Are permisiunea de a revizui întreaga instanță, inclusiv toate organizațiile",
+    "IAM_ORG_MANAGER": "Are permisiunea de a crea și gestiona organizații",
+    "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
+    "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
+    "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
+    "ORG_OWNER": "Are permisiunea asupra întregii organizații",
+    "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
+    "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",
+    "ORG_USER_PERMISSION_EDITOR": "Are permisiunea de a gestiona granturile utilizatorilor",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Are permisiunea de a gestiona granturile proiectelor",
+    "ORG_PROJECT_CREATOR": "Are permisiunea de a-și crea propriile proiecte și setările de bază",
+    "ORG_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din organizație",
+    "ORG_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din organizație",
+    "PROJECT_OWNER": "Are permisiunea asupra întregului proiect",
+    "PROJECT_OWNER_VIEWER": "Are permisiunea de a revizui întregul proiect",
+    "PROJECT_OWNER_GLOBAL": "Are permisiunea asupra întregului proiect",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Are permisiunea de a revizui întregul proiect",
+    "PROJECT_GRANT_OWNER": "Are permisiunea de a gestiona grantul proiectului",
+    "PROJECT_GRANT_OWNER_VIEWER": "Are permisiunea de a revizui grantul proiectului"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Toate setările organizației și tabelele din consolă se bazează pe o organizație selectată. Faceți clic pe acest buton pentru a schimba organizația sau pentru a crea una nouă."
+    },
+    "INSTANCE": {
+      "TEXT": "Faceți clic aici pentru a ajunge la setările implicite. Rețineți că aveți acces la acest buton numai dacă aveți permisiuni îmbunătățite."
+    },
+    "PROFILE": {
+      "TEXT": "Aici puteți comuta între conturile dvs. de utilizator și vă puteți gestiona sesiunile și profilul."
+    },
+    "NAV": {
+      "TEXT": "Această navigare se modifică în funcție de organizația selectată de mai sus sau de instanța dvs."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Contextul organizației s-a modificat."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Vizualizarea tocmai s-a schimbat în instanță!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filtru",
+    "STATE": "Stare",
+    "DISPLAYNAME": "Numele afișat al utilizatorului",
+    "EMAIL": "E-mail",
+    "USERNAME": "Numele utilizatorului",
+    "ORGNAME": "Numele organizației",
+    "PRIMARYDOMAIN": "Domeniu principal",
+    "PROJECTNAME": "Numele proiectului",
+    "RESOURCEOWNER": "Proprietarul resursei",
+    "METHODS": {
+      "5": "conține",
+      "7": "se termină cu",
+      "1": "este egal cu"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Comenzi rapide de la tastatură",
+    "UNDERORGCONTEXT": "În cadrul paginilor organizației",
+    "SIDEWIDE": "Comenzi rapide la nivelul site-ului",
+    "SHORTCUTS": {
+      "HOME": "<strong>Du-te</strong> la <strong>A</strong>casă",
+      "INSTANCE": "<strong>Du-te</strong> la <strong>I</strong>nstanță",
+      "ORG": "<strong>Du-te</strong> la <strong>O</strong>rganizație",
+      "ORGSETTINGS": "<strong>Du-te</strong> la <strong>S</strong>etările organizației",
+      "ORGSWITCHER": "Schimbă organizația",
+      "ME": "Du-te la propriul profil",
+      "PROJECTS": "<strong>Du-te</strong> la <strong>P</strong>roiecte",
+      "USERS": "<strong>Du-te</strong> la <strong>U</strong>tilizatori",
+      "USERGRANTS": "<strong>Du-te</strong> la <strong>A</strong>utorizații",
+      "ACTIONS": "<strong>Du-te</strong> la Acțiuni și <strong>F</strong>luxuri",
+      "DOMAINS": "<strong>Du-te</strong> la <strong>D</strong>omenii"
+    }
+  },
+  "RESOURCEID": "ID-ul resursei",
+  "NAME": "Nume",
+  "VERSION": "Versiune",
+  "TABLE": {
+    "NOROWS": "Fără date"
+  },
+  "ERRORS": {
+    "REQUIRED": "Vă rugăm să completați acest câmp.",
+    "ATLEASTONE": "Furnizați cel puțin o valoare.",
+    "TOKENINVALID": {
+      "TITLE": "Tokenul dvs. de autorizare a expirat.",
+      "DESCRIPTION": "Faceți clic pe butonul de mai jos pentru a vă conecta din nou."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Instanța dvs. este blocată.",
+      "DESCRIPTION": "Solicitați administratorului instanței ZITADEL să actualizeze abonamentul."
+    },
+    "INVALID_FORMAT": "Formatarea este nevalidă.",
+    "NOTANEMAIL": "Valoarea furnizată nu este o adresă de e-mail.",
+    "MINLENGTH": "Trebuie să aibă cel puțin {{requiredLength}} caractere.",
+    "MAXLENGTH": "Trebuie să aibă mai puțin de {{requiredLength}} caractere.",
+    "UPPERCASEMISSING": "Trebuie să includă o literă majusculă.",
+    "LOWERCASEMISSING": "Trebuie să includă o literă minusculă.",
+    "SYMBOLERROR": "Trebuie să includă un simbol sau un semn de punctuație.",
+    "NUMBERERROR": "Trebuie să includă o cifră.",
+    "PWNOTEQUAL": "Parolele furnizate nu se potrivesc.",
+    "PHONE": "Numărul de telefon trebuie să înceapă cu +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Setări",
+      "GENERAL": "General",
+      "IDP": "Furnizori de identitate",
+      "SECURITY": "Parolă și securitate",
+      "KEYS": "Chei",
+      "PAT": "Tokenuri de acces personal",
+      "USERGRANTS": "Autorizații",
+      "MEMBERSHIPS": "Afilieri",
+      "METADATA": "Metadata"
+    },
+    "TITLE": "Informații personale",
+    "DESCRIPTION": "Gestionați-vă informațiile și setările de securitate.",
+    "PAGES": {
+      "TITLE": "Utilizator",
+      "DETAIL": "Detalii",
+      "CREATE": "Creare",
+      "MY": "Informațiile mele",
+      "LOGINNAMES": "Nume de conectare",
+      "LOGINMETHODS": "Metode de conectare",
+      "LOGINNAMESDESC": "Acestea sunt numele dvs. de conectare:",
+      "NOUSER": "Niciun utilizator asociat.",
+      "REACTIVATE": "Reactivați",
+      "DEACTIVATE": "Dezactivați",
+      "FILTER": "Filtru",
+      "STATE": "Stare",
+      "DELETE": "Ștergeți utilizatorul",
+      "UNLOCK": "Deblocați utilizatorul",
+      "GENERATESECRET": "Generați secretul clientului",
+      "REMOVESECRET": "Eliminați secretul clientului",
+      "LOCKEDDESCRIPTION": "Acest utilizator a fost blocat din cauza depășirii numărului maxim de încercări de conectare și trebuie deblocat pentru a fi utilizat din nou.",
+      "DELETEACCOUNT": "Ștergeți contul",
+      "DELETEACCOUNT_DESC": "Dacă efectuați această acțiune, veți fi deconectat și nu veți mai avea acces la contul dvs. Această acțiune nu este reversibilă, așa că vă rugăm să continuați cu prudență.",
+      "DELETEACCOUNT_BTN": "Ștergeți contul",
+      "DELETEACCOUNT_SUCCESS": "Cont șters cu succes!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Creat",
+      "DATECHANGED": "Modificat"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Ștergeți utilizatorul",
+      "DELETE_SELF_TITLE": "Ștergeți contul",
+      "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți definitiv un utilizator. Sigur doriți să continuați?",
+      "DELETE_SELF_DESCRIPTION": "Sunteți pe cale să ștergeți definitiv contul dvs. personal. Aceasta vă va deconecta și vă va șterge utilizatorul. Această acțiune nu poate fi anulată!",
+      "DELETE_AUTH_DESCRIPTION": "Sunteți pe cale să ștergeți definitiv contul dvs. personal. Sigur doriți să continuați?",
+      "TYPEUSERNAME": "Tastați '{{value}}' pentru a confirma și a șterge utilizatorul.",
+      "USERNAME": "Nume de conectare",
+      "DELETE_BTN": "Ștergeți definitiv"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Trimiteți notificarea prin e-mail",
+      "DESCRIPTION": "Faceți clic pe butonul de mai jos pentru a trimite o notificare la adresa de e-mail curentă sau modificați adresa de e-mail din câmp.",
+      "NEWEMAIL": "Adresă de e-mail nouă"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Secretul clientului",
+      "CLIENTSECRET_DESCRIPTION": "Păstrați secretul clientului într-un loc sigur, deoarece va dispărea odată ce dialogul este închis."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Dezactivați",
+      "ACTIVATE": "Activați",
+      "CHANGEDATE": "Ultima modificare",
+      "CREATIONDATE": "Creat la",
+      "FILTER": {
+        "0": "Filtrați după Numele afișat",
+        "1": "Filtrați după Numele de utilizator",
+        "2": "filtrați după Numele afișat",
+        "3": "filtrați după Numele de utilizator",
+        "4": "filtrați după E-mail",
+        "5": "filtrați după Numele afișat",
+        "10": "filtrați după numele organizației",
+        "12": "filtrați după numele proiectului"
+      },
+      "EMPTY": "Nicio înregistrare"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Trimiteți linkul de înregistrare",
+      "TABLETYPE": "Tip",
+      "TABLESTATE": "Stare",
+      "NAME": "Nume",
+      "EMPTY": "Niciun dispozitiv setat",
+      "TITLE": "Autentificare fără parolă",
+      "DESCRIPTION": "Adăugați metode de autentificare bazate pe WebAuthn pentru a vă conecta la ZITADEL fără parolă.",
+      "MANAGE_DESCRIPTION": "Gestionați metodele de al doilea factor ale utilizatorilor dvs.",
+      "U2F": "Adăugați metodă",
+      "U2F_DIALOG_TITLE": "Verificați autentificatorul",
+      "U2F_DIALOG_DESCRIPTION": "Introduceți un nume pentru conectarea fără parolă utilizată",
+      "U2F_SUCCESS": "Autentificare fără parolă creată cu succes!",
+      "U2F_ERROR": "A apărut o eroare în timpul configurării!",
+      "U2F_NAME": "Numele autentificatorului",
+      "TYPE": {
+        "0": "Niciun MFA definit",
+        "1": "Parolă unică (OTP)",
+        "2": "Amprentă, chei de securitate, Face ID și altele"
+      },
+      "STATE": {
+        "0": "Nicio stare",
+        "1": "Nu este gata",
+        "2": "Gata",
+        "3": "Șters"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Eliminați metoda de autentificare fără parolă",
+        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o metodă de autentificare fără parolă. Sigur doriți să continuați?",
+        "ADD_TITLE": "Autentificare fără parolă",
+        "ADD_DESCRIPTION": "Selectați una dintre opțiunile disponibile pentru a crea o metodă de autentificare fără parolă.",
+        "SEND_DESCRIPTION": "Trimiteți-vă un link de înregistrare la adresa dvs. de e-mail.",
+        "SEND": "Trimiteți linkul de înregistrare",
+        "SENT": "E-mailul a fost livrat cu succes. Verificați-vă căsuța poștală pentru a continua cu configurarea.",
+        "QRCODE_DESCRIPTION": "Generați codul QR pentru scanare cu un alt dispozitiv.",
+        "QRCODE": "Generați codul QR",
+        "QRCODE_SCAN": "Scanați acest cod QR pentru a continua cu configurarea pe dispozitivul dvs.",
+        "NEW_DESCRIPTION": "Utilizați acest dispozitiv pentru a configura Autentificarea fără parolă.",
+        "NEW": "Adăugați nou"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Tip",
+      "TABLESTATE": "Stare",
+      "NAME": "Nume",
+      "EMPTY": "Niciun factor suplimentar",
+      "TITLE": "Autentificare multifactor",
+      "DESCRIPTION": "Adăugați un al doilea factor pentru a asigura o securitate optimă pentru contul dvs.",
+      "MANAGE_DESCRIPTION": "Gestionați metodele de al doilea factor ale utilizatorilor dvs.",
+      "ADD": "Adăugați factor",
+      "OTP": "Aplicație de autentificare pentru TOTP (Parolă unică bazată pe timp)",
+      "OTP_DIALOG_TITLE": "Adăugați OTP",
+      "OTP_DIALOG_DESCRIPTION": "Scanați codul QR cu o aplicație de autentificare și introduceți codul de mai jos pentru a verifica și a activa metoda OTP.",
+      "U2F": "Amprentă, chei de securitate, Face ID și altele",
+      "U2F_DIALOG_TITLE": "Verificați factorul",
+      "U2F_DIALOG_DESCRIPTION": "Introduceți un nume pentru multifactorul universal utilizat.",
+      "U2F_SUCCESS": "Factor adăugat cu succes!",
+      "U2F_ERROR": "A apărut o eroare în timpul configurării!",
+      "U2F_NAME": "Numele autentificatorului",
+      "OTPSMS": "OTP (Parolă unică) cu SMS",
+      "OTPEMAIL": "OTP (Parolă unică) cu e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Doriți să configurați acest număr de telefon ca al doilea factor OTP (parolă unică)?",
+      "OTPSMSSUCCESS": "Factorul OTP configurat cu succes.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Telefonul dvs. trebuie să fie verificat pentru a utiliza această metodă.",
+      "OTPEMAILSUCCESS": "Factorul OTP configurat cu succes.",
+      "TYPE": {
+        "0": "Niciun MFA definit",
+        "1": "Parolă unică (OTP)",
+        "2": "Amprentă, chei de securitate, Face ID și altele"
+      },
+      "STATE": {
+        "0": "Nicio stare",
+        "1": "Nu este gata",
+        "2": "Gata",
+        "3": "Șters"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Eliminați al doilea factor",
+        "MFA_DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți un al doilea factor. Sigur doriți să continuați?",
+        "ADD_MFA_TITLE": "Adăugați al doilea factor",
+        "ADD_MFA_DESCRIPTION": "Selectați una dintre următoarele opțiuni."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Furnizori de identitate externi",
+      "DESC": "",
+      "IDPCONFIGID": "ID-ul config-ului IDP",
+      "IDPNAME": "Numele IDP",
+      "USERDISPLAYNAME": "Nume extern",
+      "EXTERNALUSERID": "ID-ul utilizatorului extern",
+      "EMPTY": "Niciun IdP extern găsit",
+      "DIALOG": {
+        "DELETE_TITLE": "Eliminați IdP",
+        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți un furnizor de identitate de la un utilizator. Doriți cu adevărat să continuați?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Creați un utilizator nou",
+      "DESCRIPTION": "Vă rugăm să furnizați informațiile necesare.",
+      "NAMEANDEMAILSECTION": "Nume și e-mail",
+      "GENDERLANGSECTION": "Sex și limbă",
+      "PHONESECTION": "Numere de telefon",
+      "PASSWORDSECTION": "Parola inițială",
+      "ADDRESSANDPHONESECTION": "Număr de telefon",
+      "INITMAILDESCRIPTION": "Dacă ambele opțiuni sunt selectate, nu va fi trimis niciun e-mail pentru inițializare. Dacă este selectată doar una dintre opțiuni, va fi trimis un e-mail pentru a furniza / verifica datele."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verificați numărul de telefon",
+      "DESCRIPTION": "Introduceți codul pe care l-ați primit prin mesaj text pentru a vă verifica numărul de telefon.",
+      "CODE": "Cod"
+    },
+    "DATA": {
+      "STATE": "Stare",
+      "STATE0": "Necunoscut",
+      "STATE1": "Activ",
+      "STATE2": "Inactiv",
+      "STATE3": "Șters",
+      "STATE4": "Blocat",
+      "STATE5": "Suspendat",
+      "STATE6": "Inițial"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-mail",
+      "PHONE": "Număr de telefon",
+      "PHONE_HINT": "Utilizați simbolul + urmat de codul de țară, sau selectați țara din lista derulantă și introduceți în cele din urmă numărul de telefon",
+      "PHONE_VERIFIED": "Numărul de telefon verificat",
+      "SEND_SMS": "Trimiteți SMS de verificare",
+      "SEND_EMAIL": "Trimiteți E-mail",
+      "USERNAME": "Nume de utilizator",
+      "CHANGEUSERNAME": "modificați",
+      "CHANGEUSERNAME_TITLE": "Modificați numele de utilizator",
+      "CHANGEUSERNAME_DESC": "Introduceți noul nume în câmpul de mai jos.",
+      "FIRSTNAME": "Prenume",
+      "LASTNAME": "Nume de familie",
+      "NICKNAME": "Poreclă",
+      "DISPLAYNAME": "Numele afișat",
+      "PREFERREDLOGINNAME": "Numele de conectare preferat",
+      "PREFERRED_LANGUAGE": "Limbă",
+      "GENDER": "Sex",
+      "PASSWORD": "Parolă",
+      "AVATAR": {
+        "UPLOADTITLE": "Încărcați-vă poza de profil",
+        "UPLOADBTN": "Alegeți fișier",
+        "UPLOAD": "Încărcați",
+        "CURRENT": "Poza actuală",
+        "PREVIEW": "Previzualizare",
+        "DELETESUCCESS": "Șters cu succes!",
+        "CROPPERERROR": "A apărut o eroare în timpul încărcării fișierului dvs. Încercați un format și o dimensiune diferite, dacă este necesar."
+      },
+      "COUNTRY": "Țară"
+    },
+    "MACHINE": {
+      "TITLE": "Detalii utilizator de serviciu",
+      "USERNAME": "Nume de utilizator",
+      "NAME": "Nume",
+      "DESCRIPTION": "Descriere",
+      "KEYSTITLE": "Chei",
+      "KEYSDESC": "Definiți-vă cheile și adăugați o dată de expirare opțională.",
+      "TOKENSTITLE": "Tokenuri de acces personal",
+      "TOKENSDESC": "Tokenurile de acces personal funcționează ca tokenurile de acces OAuth obișnuite.",
+      "ID": "ID cheie",
+      "TYPE": "Tip",
+      "EXPIRATIONDATE": "Data de expirare",
+      "CHOOSEDATEAFTER": "Introduceți o expirare validă după",
+      "CHOOSEEXPIRY": "Selectați o dată de expirare",
+      "CREATIONDATE": "Data creării",
+      "KEYDETAILS": "Detalii cheie",
+      "ACCESSTOKENTYPE": "Tipul tokenului de acces",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Adăugați cheie",
+        "DESCRIPTION": "Selectați tipul cheii și alegeți o dată de expirare opțională."
+      },
+      "ADDED": {
+        "TITLE": "Cheia a fost creată",
+        "DESCRIPTION": "Descărcați cheia, deoarece nu va mai fi vizibilă după închiderea acestui dialog!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Ștergeți cheia",
+          "DESCRIPTION": "Doriți să ștergeți cheia selectată? Această acțiune nu poate fi anulată."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Parolă",
+      "LABEL": "O parolă sigură ajută la protejarea contului",
+      "DESCRIPTION": "Introduceți noua parolă conform politicii de mai jos.",
+      "OLD": "Parola curentă",
+      "NEW": "Parolă nouă",
+      "CONFIRM": "Confirmați parola nouă",
+      "NEWINITIAL": "Parolă",
+      "CONFIRMINITIAL": "Confirmați parola",
+      "RESET": "Resetați parola curentă",
+      "SET": "Setați parola nouă",
+      "RESENDNOTIFICATION": "Trimiteți linkul de resetare a parolei",
+      "REQUIRED": "Lipsesc unele câmpuri obligatorii.",
+      "MINLENGTHERROR": "Trebuie să aibă cel puțin {{value}} caractere.",
+      "MAXLENGTHERROR": "Trebuie să aibă mai puțin de {{value}} caractere."
+    },
+    "ID": "ID",
+    "EMAIL": "E-mail",
+    "PHONE": "Număr de telefon",
+    "PHONEEMPTY": "Niciun număr de telefon definit",
+    "PHONEVERIFIED": "Numărul de telefon verificat.",
+    "EMAILVERIFIED": "E-mail verificat",
+    "NOTVERIFIED": "neverificat",
+    "PREFERRED_LOGINNAME": "Nume de conectare preferat",
+    "ISINITIAL": "Utilizatorul nu este încă activ.",
+    "LOGINMETHODS": {
+      "TITLE": "Informații de contact",
+      "DESCRIPTION": "Informațiile furnizate sunt utilizate pentru a vă trimite informații importante, cum ar fi e-mailurile de resetare a parolei.",
+      "EMAIL": {
+        "TITLE": "E-mail",
+        "VALID": "validat",
+        "ISVERIFIED": "E-mail verificat",
+        "ISVERIFIEDDESC": "Dacă e-mailul este indicat ca verificat, nu va fi făcută nicio solicitare de verificare a e-mailului.",
+        "RESEND": "Retrimiteți e-mailul de verificare",
+        "EDITTITLE": "Modificați e-mailul",
+        "EDITDESC": "Introduceți noul e-mail în câmpul de mai jos."
+      },
+      "PHONE": {
+        "TITLE": "Telefon",
+        "VALID": "validat",
+        "RESEND": "Retrimiteți mesajul text de verificare",
+        "EDITTITLE": "Modificați numărul",
+        "EDITVALUE": "Număr de telefon",
+        "EDITDESC": "Introduceți noul număr de telefon în câmpul de mai jos.",
+        "DELETETITLE": "Ștergeți numărul de telefon",
+        "DELETEDESC": "Doriți cu adevărat să ștergeți numărul de telefon",
+        "OTPSMSREMOVALWARNING": "Acest cont utilizează acest număr de telefon ca al doilea factor. Nu veți putea să îl utilizați după ce continuați."
+      },
+      "RESENDCODE": "Retrimiteți codul",
+      "ENTERCODE": "Verificați",
+      "ENTERCODE_DESC": "Verificați codul"
+    },
+    "GRANTS": {
+      "TITLE": "Granturi de utilizator",
+      "DESCRIPTION": "Acordați acestui utilizator acces la anumite proiecte",
+      "CREATE": {
+        "TITLE": "Creați grant de utilizator",
+        "DESCRIPTION": "Căutați organizația, proiectul și rolurile de proiect corespunzătoare."
+      },
+      "PROJECTNAME": "Numele proiectului",
+      "PROJECT-OWNED": "Proiect",
+      "PROJECT-GRANTED": "Proiect acordat",
+      "FILTER": {
+        "0": "filtrați după utilizator",
+        "1": "filtrați după domeniu",
+        "2": "filtrați după numele proiectului",
+        "3": "filtrați după numele rolului"
+      }
+    },
+    "STATE": {
+      "0": "Necunoscut",
+      "1": "Activ",
+      "2": "Inactiv",
+      "3": "Șters",
+      "4": "Blocat",
+      "5": "Suspendat",
+      "6": "Inițial"
+    },
+    "STATEV2": {
+      "0": "Necunoscut",
+      "1": "Activ",
+      "2": "Inactiv",
+      "3": "Șters",
+      "4": "Blocat",
+      "5": "Inițial"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Nume de conectare (organizația curentă)",
+      "ADDITIONAL-EXTERNAL": "Nume de conectare (organizație externă)"
+    },
+    "TARGET": {
+      "SELF": "Dacă doriți să acordați un utilizator al unei alte organizații",
+      "EXTERNAL": "Pentru a acorda un utilizator al organizației dvs.",
+      "CLICKHERE": "faceți clic aici"
+    },
+    "SIGNEDOUT": "Sunteți deconectat. Faceți clic pe butonul \"Conectare\" pentru a vă conecta din nou.",
+    "SIGNEDOUT_BTN": "Conectare",
+    "EDITACCOUNT": "Editați contul",
+    "ADDACCOUNT": "Conectați-vă cu un alt cont",
+    "RESENDINITIALEMAIL": "Retrimiteți e-mailul de activare",
+    "RESENDEMAILNOTIFICATION": "Retrimiteți notificarea prin e-mail",
+    "TOAST": {
+      "CREATED": "Utilizator creat cu succes.",
+      "SAVED": "Profil salvat cu succes.",
+      "USERNAMECHANGED": "Nume de utilizator modificat.",
+      "EMAILSAVED": "E-mail salvat cu succes.",
+      "INITEMAILSENT": "E-mail de inițializare trimis.",
+      "PHONESAVED": "Telefon salvat cu succes.",
+      "PHONEREMOVED": "Telefon eliminat.",
+      "PHONEVERIFIED": "Telefon verificat cu succes.",
+      "PHONEVERIFICATIONSENT": "Codul de verificare a telefonului trimis.",
+      "EMAILVERIFICATIONSENT": "Codul de verificare a e-mailului trimis.",
+      "OTPREMOVED": "OTP eliminat.",
+      "U2FREMOVED": "Factor eliminat.",
+      "PASSWORDLESSREMOVED": "Fără parolă eliminat.",
+      "INITIALPASSWORDSET": "Parola inițială setată.",
+      "PASSWORDNOTIFICATIONSENT": "Notificarea de modificare a parolei trimisă.",
+      "PASSWORDCHANGED": "Parola modificată cu succes.",
+      "REACTIVATED": "Utilizatorul reactivat.",
+      "DEACTIVATED": "Utilizatorul dezactivat.",
+      "SELECTEDREACTIVATED": "Utilizatorii selectați au fost reactivați.",
+      "SELECTEDDEACTIVATED": "Utilizatorii selectați au fost dezactivați.",
+      "SELECTEDKEYSDELETED": "Cheile selectate au fost șterse.",
+      "KEYADDED": "Cheie adăugată!",
+      "MACHINEADDED": "Utilizator de serviciu creat!",
+      "DELETED": "Utilizator șters cu succes!",
+      "UNLOCKED": "Utilizator deblocat cu succes!",
+      "PASSWORDLESSREGISTRATIONSENT": "Link de înregistrare trimis cu succes.",
+      "SECRETGENERATED": "Secret generat cu succes!",
+      "SECRETREMOVED": "Secret eliminat cu succes!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Roluri de manager ZITADEL",
+      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
+      "ORGCONTEXT": "Vedeți toate organizațiile și proiectele care sunt legate de organizația selectată în prezent.",
+      "USERCONTEXT": "Vedeți toate organizațiile și proiectele la care sunteți autorizat. Inclusiv alte organizații.",
+      "CREATIONDATE": "Data creării",
+      "CHANGEDATE": "Ultima modificare",
+      "DISPLAYNAME": "Numele afișat",
+      "REMOVE": "Eliminați",
+      "TYPE": "Tip",
+      "ORGID": "ID-ul organizației",
+      "UPDATED": "Afilierea a fost actualizată.",
+      "NOPERMISSIONTOEDIT": "Vă lipsesc permisiunile necesare pentru a edita rolurile!",
+      "TYPES": {
+        "UNKNOWN": "Necunoscut",
+        "ORG": "Organizație",
+        "PROJECT": "Proiect",
+        "GRANTEDPROJECT": "Proiect acordat"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Generați un token de acces personal nou",
+        "DESCRIPTION": "Definiți o expirare personalizată pentru token.",
+        "CHOOSEEXPIRY": "Selectați o dată de expirare",
+        "CHOOSEDATEAFTER": "Introduceți o expirare validă după"
+      },
+      "ADDED": {
+        "TITLE": "Token de acces personal",
+        "DESCRIPTION": "Asigurați-vă că vă copiați tokenul de acces personal. Nu veți mai putea să îl vedeți din nou!"
+      },
+      "DELETE": {
+        "TITLE": "Ștergeți tokenul",
+        "DESCRIPTION": "Sunteți pe cale să ștergeți tokenul de acces personal. Sigur doriți să continuați?"
+      },
+      "DELETED": "Token șters cu succes."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "KEY": "Cheie",
+    "VALUE": "Valoare",
+    "ADD": "Înregistrare nouă",
+    "SAVE": "Salvați",
+    "EMPTY": "Nicio metadată",
+    "SETSUCCESS": "Element salvat cu succes",
+    "REMOVESUCCESS": "Element șters cu succes"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Nume",
+    "STATE": "Stare",
+    "STATES": {
+      "0": "nicio stare",
+      "1": "inactiv",
+      "2": "activ"
+    },
+    "ADDTRIGGER": "Adăugați declanșator",
+    "FLOWCHANGED": "Fluxul a fost modificat cu succes",
+    "FLOWCLEARED": "Fluxul a fost resetat cu succes",
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timeout în secunde",
+    "ALLOWEDTOFAIL": "Permis să eșueze",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Avertisment",
+      "DESCRIPTION": "Dacă dezactivați această setare, este posibil ca utilizatorii din organizația dvs. să nu se poată conecta. În plus, nu veți mai putea accesa consola pentru a dezactiva acțiunea. Vă recomandăm să creați un utilizator administrator într-o organizație separată sau să testați mai întâi scripturile într-un mediu de dezvoltare sau într-o organizație de dezvoltare."
+    },
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Tip flux",
+    "TRIGGERTYPE": "Tip declanșator",
+    "ACTIONS": "Acțiuni",
+    "ACTIONSMAX": "Pe baza nivelului dvs., aveți la dispoziție un număr limitat de acțiuni ({{value}}). Asigurați-vă că dezactivați pe cele de care nu aveți nevoie sau luați în considerare actualizarea nivelului.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Creați o acțiune"
+      },
+      "UPDATE": {
+        "TITLE": "Actualizați acțiunea"
+      },
+      "DELETEACTION": {
+        "TITLE": "Ștergeți acțiunea?",
+        "DESCRIPTION": "Sunteți pe cale să ștergeți o acțiune. Aceasta nu poate fi inversată. Sigur doriți să continuați?",
+        "DELETE_SUCCESS": "Acțiunea a fost ștearsă cu succes."
+      },
+      "CLEAR": {
+        "TITLE": "Ștergeți fluxul?",
+        "DESCRIPTION": "Sunteți pe cale să resetați fluxul împreună cu declanșatoarele și acțiunile sale. Această modificare nu poate fi restabilită. Sigur doriți să continuați?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Ștergeți acțiunile selectate?",
+        "DESCRIPTION": "Sigur doriți să ștergeți acțiunile selectate din flux?"
+      },
+      "ABOUTNAME": "Numele acțiunii și numele funcției din javascript trebuie să fie aceleași"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Acțiuni setate",
+      "ACTIONREACTIVATED": "Acțiuni reactivate cu succes",
+      "ACTIONDEACTIVATED": "Acțiuni dezactivate cu succes"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Politici de sistem și setări de acces",
+      "DESCRIPTION": "Gestionați-vă politicile globale și setările de acces pentru gestionare."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Administrarea stocării IAM",
+      "DESCRIPTION": "Gestionați-vă vizualizările ZITADEL și evenimentele eșuate."
+    },
+    "MEMBER": {
+      "TITLE": "Manageri",
+      "DESCRIPTION": "Acești manageri au permisiunea de a face modificări în instanța dvs."
+    },
+    "PAGES": {
+      "STATE": "Stare",
+      "DOMAINLIST": "Domenii personalizate"
+    },
+    "STATE": {
+      "0": "Nespecificat",
+      "1": "Creare",
+      "2": "Rulează",
+      "3": "Oprire",
+      "4": "Oprit"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Nume",
+      "DATABASE": "Bază de date",
+      "SEQUENCE": "Secvență",
+      "EVENTTIMESTAMP": "Marcaj de timp",
+      "LASTSPOOL": "Spool cu succes",
+      "ACTIONS": "Acțiuni",
+      "CLEAR": "Ștergeți",
+      "CLEARED": "Vizualizarea a fost ștearsă cu succes!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Ștergeți vizualizarea",
+        "VIEW_CLEAR_DESCRIPTION": "Sunteți pe cale să ștergeți o vizualizare. Ștergerea unei vizualizări creează un proces în timpul căruia este posibil ca datele să nu fie disponibile pentru utilizatorii finali. Sigur doriți să continuați?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Nume",
+      "DATABASE": "Bază de date",
+      "FAILEDSEQUENCE": "Secvență eșuată",
+      "FAILURECOUNT": "Număr de eșecuri",
+      "LASTFAILED": "Ultima eroare la",
+      "ERRORMESSAGE": "Mesaj de eroare",
+      "ACTIONS": "Acțiuni",
+      "DELETE": "Eliminați",
+      "DELETESUCCESS": "Evenimente eșuate eliminate."
+    },
+    "EVENTS": {
+      "EDITOR": "Editor",
+      "EDITORID": "ID editor",
+      "AGGREGATE": "Agregat",
+      "AGGREGATEID": "ID agregat",
+      "AGGREGATETYPE": "Tip agregat",
+      "RESOURCEOWNER": "Proprietarul resursei",
+      "SEQUENCE": "Secvență",
+      "CREATIONDATE": "Creat la",
+      "TYPE": "Tip",
+      "PAYLOAD": "Sarcină utilă",
+      "FILTERS": {
+        "BTN": "Filtru",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrați după editor"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Tip agregat",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrați după agregat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Tip",
+          "CHECKBOX": "Filtrați după tip"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrați după proprietarul resursei"
+        },
+        "SEQUENCE": {
+          "LABEL": "Secvență",
+          "CHECKBOX": "Filtrați după secvență"
+        },
+        "SORT": "Sortați",
+        "ASC": "Ascendent",
+        "DESC": "Descendent",
+        "CREATIONDATE": {
+          "RADIO_FROM": "De la",
+          "RADIO_RANGE": "Interval",
+          "LABEL_SINCE": "De când",
+          "LABEL_UNTIL": "Până la"
+        },
+        "OTHER": "altele",
+        "OTHERS": "altele"
+      },
+      "DIALOG": {
+        "TITLE": "Detalii eveniment"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Manager eliminat.",
+      "MEMBERSADDED": "Manageri adăugați.",
+      "MEMBERADDED": "Manager adăugat.",
+      "MEMBERCHANGED": "Manager modificat.",
+      "ROLEREMOVED": "Rol eliminat.",
+      "ROLECHANGED": "Rol modificat.",
+      "REACTIVATED": "Reactivat",
+      "DEACTIVATED": "Dezactivat"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Nume",
+      "ID": "ID",
+      "CREATIONDATE": "Data creării",
+      "DATECHANGED": "Modificat",
+      "FILTER": "Filtru",
+      "FILTERPLACEHOLDER": "Filtrați după nume",
+      "LIST": "Organizații",
+      "LISTDESCRIPTION": "Alegeți o organizație.",
+      "ACTIVE": "Activ",
+      "CREATE": "Creați organizație",
+      "DEACTIVATE": "Dezactivați organizația",
+      "REACTIVATE": "Reactivați organizația",
+      "NOPERMISSION": "Nu aveți permisiunea de a accesa setările organizației.",
+      "USERSELFACCOUNT": "Utilizați-vă contul personal ca proprietar al organizației",
+      "ORGDETAIL_TITLE": "Introduceți numele și domeniul noii dvs. organizații.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Introduceți numele noii dvs. organizații.",
+      "ORGDETAILUSER_TITLE": "Configurați proprietarul organizației",
+      "DELETE": "Ștergeți organizația",
+      "DEFAULTLABEL": "Implicit",
+      "SETASDEFAULT": "Setați ca organizație implicită",
+      "DEFAULTORGSET": "Organizația implicită a fost modificată cu succes",
+      "RENAME": {
+        "ACTION": "Redenumiți",
+        "TITLE": "Redenumiți organizația",
+        "DESCRIPTION": "Introduceți noul nume pentru organizația dvs.",
+        "BTN": "Redenumiți"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Verificați proprietatea {{value}}",
+        "VERIFICATION": "Vă oferim două metode pentru a vă valida manual domeniul:",
+        "VERIFICATION_HTML": "- HTTP. Găzduiți un fișier temporar de verificare pe site-ul dvs. web",
+        "VERIFICATION_DNS": "- DNS. Creați o înregistrare DNS TXT",
+        "VERIFICATION_DNS_DESC": "Dacă gestionați {{ value }} și aveți acces la înregistrările DNS, puteți crea o înregistrare TXT nouă cu următoarele valori:",
+        "VERIFICATION_DNS_HOST_LABEL": "Gazdă:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Utilizați acest cod pentru valoarea înregistrării TXT:",
+        "VERIFICATION_HTTP_DESC": "Dacă aveți acces la găzduirea site-ului dvs. web, pur și simplu descărcați fișierul de verificare și încărcați-l la adresa URL furnizată",
+        "VERIFICATION_HTTP_URL_LABEL": "Adresă URL așteptată:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Fișier de verificare:",
+        "VERIFICATION_SKIP": "Puteți sări peste verificarea deocamdată și să continuați să vă creați organizația, dar pentru a utiliza domeniul, acest pas trebuie finalizat!",
+        "VERIFICATION_VALIDATION_DESC": "Nu ștergeți codul de verificare, deoarece ZITADEL va verifica din când în când proprietatea domeniului dvs.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Solicitați un token nou",
+        "VERIFICATION_VALIDATION_ONGOING": "Metoda {{ value }} a fost selectată pentru a vă verifica domeniul. Faceți clic pe buton pentru a declanșa o verificare de verificare sau pentru a reseta procesul de verificare.",
+        "VERIFICATION_SUCCESSFUL": "Domeniu verificat cu succes!",
+        "RESETMETHOD": "Resetați metoda de verificare"
+      },
+      "DOWNLOAD_FILE": "Descărcați fișierul",
+      "SELECTORGTOOLTIP": "Selectați această organizație.",
+      "PRIMARYDOMAIN": "Domeniu principal",
+      "STATE": "Stare",
+      "USEPASSWORD": "Setați parola inițială",
+      "USEPASSWORDDESC": "Utilizatorul nu trebuie să seteze parola în timpul inițializării."
+    },
+    "LIST": {
+      "TITLE": "Organizații",
+      "DESCRIPTION": "Acestea sunt organizațiile din instanța dvs."
+    },
+    "DOMAINS": {
+      "NEW": "Adăugați domeniu",
+      "TITLE": "Domenii verificate",
+      "DESCRIPTION": "Configurați domeniile organizației dvs. Acest domeniu poate fi utilizat pentru descoperirea domeniului și sufixarea numelui de utilizator.",
+      "SETPRIMARY": "Setați ca principal",
+      "DELETE": {
+        "TITLE": "Ștergeți domeniul",
+        "DESCRIPTION": "Sunteți pe cale să ștergeți unul dintre domeniile dvs."
+      },
+      "ADD": {
+        "TITLE": "Adăugați domeniu",
+        "DESCRIPTION": "Sunteți pe cale să adăugați un domeniu pentru organizația dvs. După un proces de succes, domeniul poate fi utilizat pentru descoperirea domeniului și ca sufix pentru utilizatorii dvs."
+      }
+    },
+    "STATE": {
+      "0": "Nedefinit",
+      "1": "Activ",
+      "2": "Dezactivat"
+    },
+    "MEMBER": {
+      "TITLE": "Manageri de organizație",
+      "DESCRIPTION": "Definiți utilizatorii care vă pot modifica preferințele organizațiilor."
+    },
+    "TOAST": {
+      "UPDATED": "Organizația a fost actualizată cu succes.",
+      "DEACTIVATED": "Organizația a fost dezactivată.",
+      "REACTIVATED": "Organizația a fost reactivată.",
+      "DOMAINADDED": "Domeniu adăugat.",
+      "DOMAINREMOVED": "Domeniu eliminat.",
+      "MEMBERADDED": "Manager adăugat.",
+      "MEMBERREMOVED": "Manager eliminat.",
+      "MEMBERCHANGED": "Manager modificat.",
+      "SETPRIMARY": "Domeniu principal setat.",
+      "DELETED": "Organizația a fost ștearsă cu succes",
+      "DEFAULTORGNOTFOUND": "Organizația implicită nu a fost găsită",
+      "ORG_WAS_DELETED": "Organizația a fost ștearsă."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Dezactivați organizația",
+        "DESCRIPTION": "Sunteți pe cale să vă dezactivați organizația. Utilizatorii nu se vor mai putea conecta după aceea. Sigur doriți să continuați?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Reactivați organizația",
+        "DESCRIPTION": "Sunteți pe cale să vă reactivați organizația. Utilizatorii se vor putea conecta din nou. Sigur doriți să continuați?"
+      },
+      "DELETE": {
+        "TITLE": "Ștergeți organizația",
+        "DESCRIPTION": "Sunteți pe cale să vă ștergeți organizația. Aceasta inițiază un proces în care vor fi șterse toate datele legate de organizație. Nu puteți anula această acțiune deocamdată.",
+        "TYPENAME": "Tastați '{{value}}' pentru a vă șterge organizația.",
+        "ORGNAME": "Nume",
+        "BTN": "Ștergeți"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organizații",
+      "FEATURESETTINGS": "Caracteristici",
+      "LANGUAGES": "Limbi",
+      "LOGIN": "Comportament și securitate la conectare",
+      "LOCKOUT": "Blocare",
+      "AGE": "Expirarea parolei",
+      "COMPLEXITY": "Complexitatea parolei",
+      "NOTIFICATIONS": "Notificări",
+      "SMTP_PROVIDER": "Furnizor SMTP",
+      "SMS_PROVIDER": "Furnizor SMS/Telefon",
+      "NOTIFICATIONS_DESC": "Setări SMTP și SMS",
+      "MESSAGETEXTS": "Texte de mesaje",
+      "IDP": "Furnizori de identitate",
+      "VERIFIED_DOMAINS": "Domenii verificate",
+      "DOMAIN": "Setări domeniu",
+      "LOGINTEXTS": "Texte interfață de conectare",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Linkuri externe",
+      "OIDC": "Durata de viață și expirarea tokenului OIDC",
+      "SECRETS": "Generator de secrete",
+      "SECURITY": "Setări de securitate",
+      "EVENTS": "Evenimente",
+      "FAILEDEVENTS": "Evenimente eșuate",
+      "VIEWS": "Vizualizări"
+    },
+    "GROUPS": {
+      "GENERAL": "Informații generale",
+      "NOTIFICATIONS": "Notificări",
+      "LOGIN": "Conectare și acces",
+      "DOMAIN": "Domeniu",
+      "TEXTS": "Texte și limbi",
+      "APPEARANCE": "Aspect",
+      "OTHER": "Altele",
+      "STORAGE": "Stocare"
+    }
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Limbă implicită",
+      "ALLOWED": "Limbi permise",
+      "NOT_ALLOWED": "Limbi nepermise",
+      "ALLOW_ALL": "Permiteți toate",
+      "DISALLOW_ALL": "Nu permiteți toate",
+      "SETASDEFAULT": "Setați ca limbă implicită",
+      "DEFAULT_SAVED": "Limba implicită a fost salvată",
+      "ALLOWED_SAVED": "Limbile permise au fost salvate",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
+      }
+    },
+    "SMTP": {
+      "TITLE": "Furnizor SMTP",
+      "DESCRIPTION": "Descriere",
+      "SENDERADDRESS": "Adresă de e-mail expeditor",
+      "SENDERNAME": "Nume expeditor",
+      "REPLYTOADDRESS": "Adresă de răspuns",
+      "HOSTANDPORT": "Gazdă și port",
+      "USER": "Utilizator",
+      "PASSWORD": "Parolă",
+      "SETPASSWORD": "Setați parola SMTP",
+      "PASSWORDSET": "Parola SMTP a fost setată cu succes.",
+      "TLS": "Securitatea stratului de transport (TLS)",
+      "SAVED": "Salvat cu succes!",
+      "NOCHANGES": "Nicio modificare!",
+      "REQUIREDWARN": "Pentru a trimite notificări din domeniul dvs., trebuie să introduceți datele SMTP."
+    },
+    "SMS": {
+      "PROVIDERS": "Furnizori",
+      "PROVIDER": "Furnizor SMS",
+      "ADDPROVIDER": "Adăugați furnizor SMS",
+      "ADDPROVIDERDESCRIPTION": "Alegeți unul dintre furnizorii disponibili și introduceți datele necesare.",
+      "REMOVEPROVIDER": "Eliminați furnizorul",
+      "REMOVEPROVIDER_DESC": "Sunteți pe cale să ștergeți o configurație de furnizor. Doriți să continuați?",
+      "SMSPROVIDERSTATE": {
+        "0": "Nespecificat",
+        "1": "Activ",
+        "2": "Inactiv"
+      },
+      "ACTIVATED": "Furnizor activat.",
+      "DEACTIVATED": "Furnizor dezactivat.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Număr expeditor",
+        "VERIFYSERVICESID": "Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Setarea unui Verification Service Sid, permite utilizarea Twilio Verify Service în loc de Messages Service pentru verificarea numerelor de telefon și a OTP SMS",
+        "ADDED": "Twilio adăugat cu succes.",
+        "UPDATED": "Twilio actualizat cu succes.",
+        "REMOVED": "Twilio eliminat",
+        "CHANGETOKEN": "Modificați tokenul",
+        "SETTOKEN": "Setați tokenul",
+        "TOKENSET": "Token setat cu succes."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Tipuri de secrete",
+      "TYPE": {
+        "1": "E-mail de inițializare",
+        "2": "Verificarea e-mailului",
+        "3": "Verificarea telefonului",
+        "4": "Resetarea parolei",
+        "5": "Inițializarea fără parolă",
+        "6": "Secretul aplicației",
+        "7": "Parolă unică (OTP) - SMS",
+        "8": "Parolă unică (OTP) - E-mail"
+      },
+      "EXPIRY": "Expirare (în minute)",
+      "INCLUDEDIGITS": "Includeți numere",
+      "INCLUDESYMBOLS": "Includeți simboluri",
+      "INCLUDELOWERLETTERS": "Includeți litere mici",
+      "INCLUDEUPPERLETTERS": "Includeți litere mari",
+      "LENGTH": "Lungime",
+      "UPDATED": "Setări actualizate."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Această setare setează CSP pentru a permite încadrarea dintr-un set de domenii permise. Rețineți că prin activarea utilizării iFrames, vă asumați riscul de a permite clickjacking.",
+      "IFRAMEENABLED": "Permiteți iFrame",
+      "ALLOWEDORIGINS": "Adrese URL permise",
+      "IMPERSONATIONTITLE": "Impersonare",
+      "IMPERSONATIONENABLED": "Permiteți impersonarea",
+      "IMPERSONATIONDESCRIPTION": "Această setare permite utilizarea impersonării în principiu. Rețineți că impersonatorul trebuie să aibă și rolurile *_IMPERSONATOR atribuite corespunzător."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Organizație implicită de conectare",
+      "LOGINDEFAULTORG_DESCRIPTION": "UI-ul de conectare va utiliza setările organizației implicite (și nu din instanță) dacă nu este setat niciun context de organizație",
+      "OIDCLEGACYINTROSPECTION": "Introspecție OIDC Legacy",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Am refactorizat recent endpointul de introspecție din motive de performanță. Această caracteristică poate fi utilizată pentru a reveni la implementarea legacy dacă apar erori neașteptate.",
+      "OIDCTOKENEXCHANGE": "Schimb de token OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Activați tipul de grant experimental urn:ietf:params:oauth:grant-type:token-exchange pentru endpointul token OIDC. Schimbul de tokenuri poate fi utilizat pentru a solicita tokenuri cu o rază de acțiune mai mică sau pentru a impersona alți utilizatori. Consultați politica de securitate pentru a permite impersonarea pe o instanță.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Proiecții de introspecție OIDC Trigger",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activați declanșatoarele de proiecție în timpul unei solicitări de introspecție. Acest lucru poate acționa ca o soluție dacă există probleme notabile de consistență în răspunsul de introspecție, dar poate avea un impact asupra performanței. Planificăm să eliminăm declanșatoarele pentru solicitările de introspecție în viitor.",
+      "USERSCHEMA": "Schema de utilizator",
+      "USERSCHEMA_DESCRIPTION": "Schemele de utilizator permit gestionarea schemelor de date ale utilizatorului. Dacă indicatorul este activat, veți putea utiliza noul API și caracteristicile sale.",
+      "ACTIONS": "Acțiuni",
+      "ACTIONS_DESCRIPTION": "Acțiunile v2 permit gestionarea execuțiilor și țintelor de date. Dacă indicatorul este activat, veți putea utiliza noul API și caracteristicile sale.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "Terminarea sesiunii unice OIDC V1",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Dacă indicatorul este activat, veți putea termina o singură sesiune din UI-ul de conectare furnizând un id_token cu o revendicare sid ca id_token_hint pe endpointul end_session. Rețineți că în prezent toate sesiunile de la același agent utilizator (browser) sunt terminate în UI-ul de conectare. Sesiunile gestionate prin API-ul Session permit deja terminarea sesiunilor individuale.",
+      "STATES": {
+        "INHERITED": "Moșteniți",
+        "ENABLED": "Activat",
+        "DISABLED": "Dezactivat"
+      },
+      "INHERITED_DESCRIPTION": "Aceasta setează valoarea la valoarea implicită a sistemului.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Activat\" este moștenit",
+        "DISABLED": "\"Dezactivat\" este moștenit"
+      },
+      "RESET": "Setați totul pentru a moșteni",
+      "CONSOLEUSEV2USERAPI": "Utilizați API-ul V2 în Consola pentru crearea utilizatorului",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Resetați setarea",
+        "DEFAULTDESCRIPTION": "Sunteți pe cale să vă resetați setările la configurația implicită a instanței dvs. Sigur doriți să continuați?",
+        "LOGINPOLICY_DESCRIPTION": "Avertisment: dacă continuați, setările furnizorului de identitate vor fi resetate și la setările instanței."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Aplicat la",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Complexitatea parolei",
+      "DESCRIPTION": "Asigură că toate parolele setate corespund unui model specific",
+      "SYMBOLANDNUMBERERROR": "Trebuie să conțină o cifră și un simbol/semn de punctuație.",
+      "SYMBOLERROR": "Trebuie să includă un simbol/semn de punctuație.",
+      "NUMBERERROR": "Trebuie să includă o cifră.",
+      "PATTERNERROR": "Parola nu respectă modelul cerut."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notificare",
+      "DESCRIPTION": "Determină la ce modificări vor fi trimise notificări.",
+      "PASSWORDCHANGE": "Modificarea parolei"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Oferiți conectării stilul dvs. personalizat și modificați-i comportamentul.",
+      "PREVIEW_DESCRIPTION": "Modificările politicii vor fi implementate automat în mediul de previzualizare.",
+      "BTN": "Selectați fișier",
+      "ACTIVATEPREVIEW": "Aplicați configurația",
+      "DARK": "Mod întunecat",
+      "LIGHT": "Mod luminos",
+      "CHANGEVIEW": "Modificați vizualizarea",
+      "ACTIVATED": "Modificările politicii sunt acum LIVE",
+      "THEME": "Temă",
+      "COLORS": "Culori",
+      "FONT": "Font",
+      "ADVANCEDBEHAVIOR": "Comportament avansat",
+      "DROP": "Trageți imaginea aici sau",
+      "RELEASE": "Eliberați",
+      "DROPFONT": "Trageți fișierul fontului aici",
+      "RELEASEFONT": "Eliberați",
+      "USEOFLOGO": "Logo-ul dvs. va fi utilizat în conectare, precum și în e-mailuri, în timp ce pictograma este utilizată pentru elemente UI mai mici, cum ar fi în comutatorul organizației în consolă",
+      "MAXSIZE": "Dimensiunea maximă este limitată la 524 kB",
+      "EMAILNOSVG": "Formatul de fișier SVG nu este acceptat în e-mailuri. Prin urmare, încărcați-vă logo-ul în PNG sau în alt format acceptat.",
+      "MAXSIZEEXCEEDED": "Dimensiune maximă de 524 kB depășită.",
+      "NOSVGSUPPORTED": "SVG-urile nu sunt acceptate!",
+      "FONTINLOGINONLY": "Fontul este afișat în prezent numai în interfața de conectare.",
+      "BACKGROUNDCOLOR": "Culoare de fundal",
+      "PRIMARYCOLOR": "Culoare primară",
+      "WARNCOLOR": "Culoare de avertisment",
+      "FONTCOLOR": "Culoare font",
+      "VIEWS": {
+        "PREVIEW": "Previzualizare",
+        "CURRENT": "Configurația curentă"
+      },
+      "PREVIEW": {
+        "TITLE": "Conectare",
+        "SECOND": "conectați-vă cu contul dvs. ZITADEL.",
+        "ERROR": "Utilizatorul nu a putut fi găsit!",
+        "PRIMARYBUTTON": "următorul",
+        "SECONDARYBUTTON": "înregistrați-vă"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Mod automat",
+        "THEME_MODE_LIGHT": "Numai mod luminos",
+        "THEME_MODE_DARK": "Numai mod întunecat"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Expirarea parolei",
+      "DESCRIPTION": "Puteți seta o politică pentru expirarea parolelor. Această politică va obliga utilizatorul să își schimbe parola la următoarea conectare după expirare. Nu există avertismente și notificări automate."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Politica de blocare",
+      "DESCRIPTION": "Setați un număr maxim de încercări de parolă, după care conturile vor fi blocate."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Branding",
+      "BTN": "Selectați fișier",
+      "DESCRIPTION": "Personalizați aspectul conectării",
+      "ACTIVATEPREVIEW": "Activați configurația"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Setări de conectare",
+      "DESCRIPTION": "Definiți modul în care utilizatorii pot fi autentificați și configurați furnizorii de identitate",
+      "DESCRIPTIONCREATEADMIN": "Utilizatorii pot alege dintre furnizorii de identitate disponibili de mai jos.",
+      "DESCRIPTIONCREATEMGMT": "Utilizatorii pot alege dintre furnizorii de identitate disponibili de mai jos. Notă: Puteți utiliza atât furnizorii setați de sistem, cât și furnizorii setați numai pentru organizația dvs.",
+      "LIFETIME_INVALID": "Formularul conține valori nevalide.",
+      "SAVED": "Salvat cu succes!",
+      "PROVIDER_ADDED": "Furnizorul de identitate a fost activat."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Setați linkurile către Politica dvs. de confidențialitate și Termenii și condițiile",
+      "TOSLINK": "Link către Termenii și condițiile",
+      "POLICYLINK": "Link către Politica de confidențialitate",
+      "HELPLINK": "Link către Ajutor",
+      "SUPPORTEMAIL": "E-mail de asistență",
+      "DOCSLINK": "Link către Documente (Consolă)",
+      "CUSTOMLINK": "Link personalizat (Consolă)",
+      "CUSTOMLINKTEXT": "Text link personalizat (Consolă)",
+      "SAVED": "Salvat cu succes!",
+      "RESET_TITLE": "Restabiliți valorile implicite",
+      "RESET_DESCRIPTION": "Sunteți pe cale să restabiliți linkurile implicite pentru TOS și Politica de confidențialitate. Doriți cu adevărat să continuați?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Texte interfață de conectare",
+      "DESCRIPTION": "Definiți-vă textele pentru interfețele de conectare. Dacă textele sunt goale, va fi utilizată valoarea implicită afișată ca substituent.",
+      "DESCRIPTION_SHORT": "Definiți-vă textele pentru interfețele de conectare.",
+      "NEWERVERSIONEXISTS": "Există o versiune mai nouă",
+      "CURRENTDATE": "Configurația curentă",
+      "CHANGEDATE": "Versiune mai nouă de la",
+      "KEYNAME": "Ecran / Interfață de conectare",
+      "RESET_TITLE": "Restabiliți valorile implicite",
+      "RESET_DESCRIPTION": "Sunteți pe cale să restabiliți toate valorile implicite. Toate modificările pe care le-ați făcut vor fi șterse definitiv. Doriți cu adevărat să continuați?",
+      "UNSAVED_TITLE": "Continuați fără a salva?",
+      "UNSAVED_DESCRIPTION": "Ați făcut modificări fără a salva. Doriți să salvați acum?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Ați selectat o limbă care nu este permisă. Puteți continua să modificați textele. Dar dacă doriți ca utilizatorii dvs. să poată utiliza efectiv această limbă, modificați restricțiile instanței dvs.",
+      "LANGUAGES_NOT_ALLOWED": "Nepermise:",
+      "LANGUAGE": "Limbă",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "Verificarea e-mailului efectuată",
+        "emailVerificationText": "Verificarea e-mailului",
+        "externalUserNotFoundText": "Utilizatorul extern nu a fost găsit",
+        "footerText": "Subsol",
+        "initMfaDoneText": "MFA inițializat efectuată",
+        "initMfaOtpText": "Inițializați MFA",
+        "initMfaPromptText": "Solicitare inițializare MFA",
+        "initMfaU2fText": "Inițializați al doilea factor universal",
+        "initPasswordDoneText": "Parola inițializată efectuată",
+        "initPasswordText": "Inițializați parola",
+        "initializeDoneText": "Utilizatorul inițializat efectuat",
+        "initializeUserText": "Inițializați utilizatorul",
+        "linkingUserDoneText": "Utilizatorul de conectare efectuat",
+        "loginText": "Conectare",
+        "logoutText": "Deconectare",
+        "mfaProvidersText": "Furnizori MFA",
+        "passwordChangeDoneText": "Modificarea parolei efectuată",
+        "passwordChangeText": "Modificarea parolei",
+        "passwordResetDoneText": "Resetarea parolei efectuată",
+        "passwordText": "Parolă",
+        "registrationOptionText": "Opțiuni de înregistrare",
+        "registrationOrgText": "Înregistrați organizația",
+        "registrationUserText": "Înregistrați utilizatorul",
+        "selectAccountText": "Selectați contul",
+        "successLoginText": "Conectare cu succes",
+        "usernameChangeDoneText": "Modificarea numelui de utilizator efectuată",
+        "usernameChangeText": "Modificarea numelui de utilizator",
+        "verifyMfaOtpText": "Verificați OTP",
+        "verifyMfaU2fText": "Verificați al doilea factor universal",
+        "passwordlessPromptText": "Solicitare fără parolă",
+        "passwordlessRegistrationDoneText": "Înregistrarea fără parolă efectuată",
+        "passwordlessRegistrationText": "Înregistrarea fără parolă",
+        "passwordlessText": "Fără parolă",
+        "externalRegistrationUserOverviewText": "Prezentare generală utilizator înregistrare externă"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Notificare",
+      "TYPES": {
+        "INIT": "Inițializare",
+        "VE": "Verificați e-mailul",
+        "VP": "Verificați telefonul",
+        "VSO": "Verificați OTP SMS",
+        "VEO": "Verificați OTP e-mail",
+        "PR": "Resetare parolă",
+        "DC": "Revendicare domeniu",
+        "PL": "Fără parolă",
+        "PC": "Modificare parolă",
+        "IU": "Invitați utilizatorul"
+      },
+      "CHIPS": {
+        "firstname": "Prenume",
+        "lastname": "Nume de familie",
+        "code": "Cod",
+        "preferredLoginName": "Nume de conectare preferat",
+        "displayName": "Nume afișat",
+        "nickName": "Poreclă",
+        "loginnames": "Nume de conectare",
+        "domain": "Domeniu",
+        "lastEmail": "Ultimul e-mail",
+        "lastPhone": "Ultimul telefon",
+        "verifiedEmail": "E-mail verificat",
+        "verifiedPhone": "Telefon verificat",
+        "changedate": "Data modificării",
+        "username": "Nume de utilizator",
+        "tempUsername": "Nume de utilizator temporar",
+        "otp": "Parolă unică",
+        "verifyUrl": "Verificați adresa URL a parolei unice",
+        "expiry": "Expirare",
+        "applicationName": "Numele aplicației"
+      },
+      "TOAST": {
+        "UPDATED": "Textele personalizate au fost salvate."
+      }
+    },
+    "DEFAULTLABEL": "Setările curente corespund standardului instanței dvs.",
+    "BTN_INSTALL": "Configurați",
+    "BTN_EDIT": "Modificați",
+    "DATA": {
+      "DESCRIPTION": "Descriere",
+      "MINLENGTH": "trebuie să aibă o lungime minimă",
+      "HASNUMBER": "trebuie să includă un număr",
+      "HASSYMBOL": "trebuie să includă un simbol",
+      "HASLOWERCASE": "trebuie să includă o literă mică",
+      "HASUPPERCASE": "trebuie să includă o literă mare",
+      "SHOWLOCKOUTFAILURES": "afișați erorile de blocare",
+      "MAXPASSWORDATTEMPTS": "Numărul maxim de încercări de parolă",
+      "MAXOTPATTEMPTS": "Numărul maxim de încercări OTP",
+      "EXPIREWARNDAYS": "Avertisment de expirare după zile",
+      "MAXAGEDAYS": "Valabilitate maximă în zile",
+      "USERLOGINMUSTBEDOMAIN": "Adăugați domeniul organizației ca sufix la numele de conectare",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Dacă activați această setare, toate numele de conectare vor fi sufixate cu domeniul organizației. Dacă această setare este dezactivată, trebuie să vă asigurați că numele de utilizator sunt unice pentru toate organizațiile.",
+      "VALIDATEORGDOMAINS": "Verificarea domeniului organizației este necesară (provocare DNS sau HTTP)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adresa expeditorului SMTP se potrivește cu domeniul instanței",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Conectarea convențională cu nume de utilizator și parolă este permisă.",
+      "ALLOWEXTERNALIDP_DESC": "Conectarea este permisă pentru furnizorii de identitate de bază",
+      "ALLOWREGISTER_DESC": "Dacă opțiunea este selectată, în procesul de conectare apare un pas suplimentar pentru înregistrarea unui utilizator.",
+      "FORCEMFA": "Forțați MFA pentru toți utilizatorii",
+      "FORCEMFALOCALONLY": "Forțați MFA numai pentru utilizatorii autentificați local",
+      "FORCEMFALOCALONLY_DESC": "Dacă opțiunea este selectată, utilizatorii autentificați local trebuie să configureze un al doilea factor pentru conectare.",
+      "HIDEPASSWORDRESET_DESC": "Dacă opțiunea este selectată, utilizatorul nu își poate reseta parola în procesul de conectare.",
+      "HIDELOGINNAMESUFFIX": "Ascundeți sufixul numelui de conectare",
+      "HIDELOGINNAMESUFFIX_DESC": "Ascunde sufixul numelui de conectare în interfața de conectare",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Dacă opțiunea este selectată, ecranul cu parolă va fi afișat în procesul de conectare chiar dacă utilizatorul nu a fost găsit. Eroarea la verificarea parolei nu va dezvălui dacă numele de utilizator sau parola au fost greșite.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Dacă opțiunea este selectată, sufixul (@domain.com) al unei intrări de nume de utilizator necunoscut pe ecranul de conectare va fi comparat cu domeniile organizației și va redirecționa către înregistrarea organizației respective în caz de succes.",
+      "DEFAULTREDIRECTURI": "URI implicit de redirecționare",
+      "DEFAULTREDIRECTURI_DESC": "Definește unde va fi redirecționat utilizatorul dacă conectarea a început fără un context de aplicație (de exemplu, din e-mail)",
+      "ERRORMSGPOPUP": "Afișați mesajul de eroare într-o casetă de dialog",
+      "DISABLEWATERMARK": "Ascundeți filigranul",
+      "DISABLEWATERMARK_DESC": "Ascundeți filigranul Alimentat de ZITADEL în interfața de conectare"
+    },
+    "RESET": "Resetați la valoarea implicită a instanței",
+    "CREATECUSTOM": "Creați o politică personalizată",
+    "TOAST": {
+      "SET": "Politica a fost setată cu succes!",
+      "RESETSUCCESS": "Politica a fost resetată cu succes!",
+      "UPLOADSUCCESS": "Încărcat cu succes!",
+      "DELETESUCCESS": "Șters cu succes!",
+      "UPLOADFAILED": "Încărcarea a eșuat!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organizație",
+    "DESCRIPTION": "Aici puteți edita configurația organizației dvs. și puteți gestiona membrii.",
+    "DETAIL": {
+      "TITLE": "Detalii",
+      "NAME": "Nume",
+      "DOMAIN": "Domeniu",
+      "STATE": {
+        "0": "Nedefinit",
+        "1": "Activ",
+        "2": "Inactiv"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Membri",
+      "USERNAME": "Nume de utilizator",
+      "DISPLAYNAME": "Nume afișat",
+      "LOGINNAME": "Nume de conectare",
+      "EMAIL": "E-mail",
+      "ROLES": "Roluri",
+      "ADD": "Adăugați membru",
+      "ADDDESCRIPTION": "Introduceți numele utilizatorilor care urmează să fie adăugați."
+    },
+    "TABLE": {
+      "TOTAL": "Număr total de intrări",
+      "SELECTION": "Elemente selectate",
+      "DEACTIVATE": "Dezactivați utilizatorul",
+      "ACTIVATE": "Activați utilizatorul",
+      "DELETE": "Ștergeți utilizatorul",
+      "CLEAR": "Goliți selecția"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Proiect",
+      "DESCRIPTION": "Aici puteți defini aplicații, puteți gestiona rolurile și puteți acorda altor organizații să utilizeze proiectul dvs.",
+      "DELETE": "Ștergeți proiectul",
+      "DETAIL": "Detalii",
+      "CREATE": "Creați proiectul",
+      "CREATE_DESC": "Introduceți numele proiectului dvs.",
+      "ROLE": "Rol",
+      "NOITEMS": "Niciun proiect",
+      "ZITADELPROJECT": "Acesta aparține proiectului ZITADEL. Atenție: Dacă faceți modificări, ZITADEL ar putea să nu se comporte conform intențiilor.",
+      "TYPE": {
+        "OWNED": "Proiecte deținute",
+        "OWNED_SINGULAR": "Proiect deținut",
+        "GRANTED_SINGULAR": "Proiect acordat al {{name}}"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Setare de branding",
+        "0": {
+          "TITLE": "Nespecificat",
+          "DESC": "De îndată ce utilizatorul este identificat, brandingul organizației utilizatorului identificat va fi afișat înainte ca valoarea implicită a sistemului să fie afișată."
+        },
+        "1": {
+          "TITLE": "Utilizați setarea proiectului",
+          "DESC": "Va fi afișat brandingul organizației care deține proiectul"
+        },
+        "2": {
+          "TITLE": "Utilizați setarea Organizației utilizatorului",
+          "DESC": "Va fi afișat brandingul organizației proiectului, dar de îndată ce utilizatorul este identificat, va fi afișată setarea organizației utilizatorului identificat."
+        },
+        "DIALOG": {
+          "TITLE": "Setare branding",
+          "DESCRIPTION": "Selectați comportamentul conectării, atunci când utilizați proiectul."
+        }
+      },
+      "PINNED": "Fixat",
+      "ALL": "Toate",
+      "CREATEDON": "Creat la",
+      "LASTMODIFIED": "Ultima modificare la",
+      "ADDNEW": "Creați un proiect nou",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Reactivați proiectul",
+          "DESCRIPTION": "Doriți cu adevărat să vă reactivați proiectul?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Dezactivați proiectul",
+          "DESCRIPTION": "Doriți cu adevărat să vă dezactivați proiectul?"
+        },
+        "DELETE": {
+          "TITLE": "Ștergeți proiectul",
+          "DESCRIPTION": "Doriți cu adevărat să vă ștergeți proiectul?",
+          "TYPENAME": "Tastați numele proiectului pentru a-l șterge definitiv."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Setări",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Stare",
+      "0": "Nedefinit",
+      "1": "Activ",
+      "2": "Inactiv"
+    },
+    "TYPE": {
+      "TITLE": "Tip",
+      "0": "Tip necunoscut",
+      "1": "Deținut",
+      "2": "Acordat"
+    },
+    "NAME": "Nume",
+    "NAMEDIALOG": {
+      "TITLE": "Redenumiți proiectul",
+      "DESCRIPTION": "Introduceți noul nume pentru proiectul dvs.",
+      "NAME": "Nume nou"
+    },
+    "MEMBER": {
+      "TITLE": "Manageri",
+      "TITLEDESC": "Managerii pot face modificări acestui proiect pe baza rolului lor.",
+      "DESCRIPTION": "Acești manageri ar putea să vă poată edita proiectul.",
+      "USERNAME": "Nume de utilizator",
+      "DISPLAYNAME": "Nume afișat",
+      "LOGINNAME": "Nume de conectare",
+      "EMAIL": "E-mail",
+      "ROLES": "Roluri",
+      "USERID": "ID utilizator"
+    },
+    "GRANT": {
+      "EMPTY": "Nicio organizație acordată.",
+      "TITLE": "Granturi de proiect",
+      "DESCRIPTION": "Permiteți altei organizații să vă utilizeze proiectul.",
+      "EDITTITLE": "Editați rolurile",
+      "CREATE": {
+        "TITLE": "Creați un grant de organizație",
+        "SEL_USERS": "Selectați utilizatorii cărora doriți să le acordați acces",
+        "SEL_PROJECT": "Căutați un proiect",
+        "SEL_ROLES": "Selectați rolurile pe care doriți să le adăugați la grant",
+        "SEL_USER": "Selectați utilizatori",
+        "SEL_ORG": "Căutați o organizație",
+        "SEL_ORG_DESC": "Căutați organizația căreia să acordați.",
+        "ORG_DESCRIPTION": "Sunteți pe cale să acordați un utilizator pentru organizația {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Schimbați contextul în antetul de mai sus pentru a acorda un utilizator pentru o altă organizație.",
+        "SEL_ORG_FORMFIELD": "Organizație",
+        "FOR_ORG": "Grantul este creat pentru:"
+      },
+      "DETAIL": {
+        "TITLE": "Grant de proiect",
+        "DESC": "Puteți selecta ce roluri pot fi utilizate de organizația specificată și puteți alege manageri",
+        "MEMBERTITLE": "Manageri",
+        "MEMBERDESC": "Aceștia sunt managerii organizației acordate. Adăugați aici utilizatori care ar trebui să obțină acces pentru a edita datele proiectului.",
+        "PROJECTNAME": "Numele proiectului",
+        "GRANTEDORG": "Organizație acordată",
+        "RESOURCEOWNER": "Proprietarul resursei"
+      },
+      "STATE": "Stare",
+      "STATES": {
+        "1": "Activ",
+        "2": "Inactiv"
+      },
+      "ALL": "Toate",
+      "SHOWDETAIL": "Afișați detalii",
+      "USER": "Utilizator",
+      "MEMBERS": "Manageri",
+      "ORG": "Organizație",
+      "PROJECTNAME": "Numele proiectului",
+      "GRANTEDORG": "Organizație acordată",
+      "GRANTEDORGDOMAIN": "Domeniu",
+      "RESOURCEOWNER": "Proprietarul resursei",
+      "GRANTEDORGNAME": "Nume organizație",
+      "GRANTID": "Id-ul grantului",
+      "CREATIONDATE": "Data creării",
+      "CHANGEDATE": "Ultima modificare",
+      "DATES": "Date",
+      "ROLENAMESLIST": "Roluri",
+      "NOROLES": "Niciun rol",
+      "TYPE": "Tip",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Grantul de proiect a fost creat.",
+        "PROJECTGRANTADDED": "Grantul de proiect a fost creat.",
+        "PROJECTGRANTCHANGED": "Grantul de proiect a fost modificat.",
+        "PROJECTGRANTMEMBERADDED": "Managerul grantului a fost adăugat.",
+        "PROJECTGRANTMEMBERCHANGED": "Managerul grantului a fost modificat.",
+        "PROJECTGRANTMEMBERREMOVED": "Managerul grantului a fost eliminat.",
+        "PROJECTGRANTUPDATED": "Grantul de proiect a fost actualizat"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Ștergeți grantul de proiect",
+        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți un grant de proiect. Sigur doriți să continuați?"
+      },
+      "ROLES": "Roluri de proiect"
+    },
+    "APP": {
+      "TITLE": "Aplicații",
+      "NAME": "Nume",
+      "NAMEREQUIRED": "Este necesar un nume."
+    },
+    "ROLE": {
+      "EMPTY": "Niciun rol nu a fost creat încă.",
+      "ADDNEWLINE": "Adăugați un rol suplimentar",
+      "KEY": "Cheie",
+      "TITLE": "Roluri",
+      "DESCRIPTION": "Definiți câteva roluri care pot fi utilizate pentru a crea granturi de proiect.",
+      "NAME": "Nume",
+      "DISPLAY_NAME": "Nume afișat",
+      "GROUP": "Grup",
+      "ACTIONS": "Acțiuni",
+      "ADDTITLE": "Creați rolul",
+      "ADDDESCRIPTION": "Introduceți datele pentru noul rol.",
+      "EDITTITLE": "Editați rolul",
+      "EDITDESCRIPTION": "Introduceți datele noi pentru rol.",
+      "DELETE": "Ștergeți rolul",
+      "CREATIONDATE": "Creat",
+      "CHANGEDATE": "Ultima modificare",
+      "SELECTGROUPTOOLTIP": "Selectați toate rolurile grupului {{group}}.",
+      "OPTIONS": "Opțiuni",
+      "ASSERTION": "Afirmați rolurile la autentificare",
+      "ASSERTION_DESCRIPTION": "Informațiile despre roluri sunt trimise din endpoint-ul Userinfo și, în funcție de setările aplicației dvs., în tokenuri și alte tipuri.",
+      "CHECK": "Verificați autorizarea la autentificare",
+      "CHECK_DESCRIPTION": "Dacă este setat, utilizatorilor li se permite să se autentifice numai dacă oricărui cont le este atribuit vreun rol.",
+      "DIALOG": {
+        "DELETE_TITLE": "Ștergeți rolul",
+        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți un rol de proiect. Sigur doriți să continuați?"
+      }
+    },
+    "HAS_PROJECT": "Verificați proiectul la autentificare",
+    "HAS_PROJECT_DESCRIPTION": "Se verifică dacă organizația utilizatorului are acest proiect. Dacă nu, utilizatorul nu se poate autentifica.",
+    "TABLE": {
+      "TOTAL": "Numărul total de intrări:",
+      "SELECTION": "Elemente selectate",
+      "DEACTIVATE": "Dezactivați proiectul",
+      "ACTIVATE": "Activați proiectul",
+      "DELETE": "Ștergeți proiectul",
+      "ORGNAME": "Nume organizație",
+      "ORGDOMAIN": "Domeniu organizație",
+      "STATE": "Stare",
+      "TYPE": "Tip",
+      "CREATIONDATE": "Creat la",
+      "CHANGEDATE": "Ultima modificare",
+      "RESOURCEOWNER": "Proprietar",
+      "SHOWTABLE": "Afișați tabelul",
+      "SHOWGRID": "Afișați grila",
+      "EMPTY": "Niciun proiect găsit"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Manager eliminat.",
+      "MEMBERSADDED": "Manageri adăugați.",
+      "MEMBERADDED": "Manager adăugat.",
+      "MEMBERCHANGED": "Manager modificat.",
+      "ROLESCREATED": "Roluri create.",
+      "ROLEREMOVED": "Rol eliminat.",
+      "ROLECHANGED": "Rol modificat.",
+      "REACTIVATED": "Reactivat.",
+      "DEACTIVATED": "Dezactivat.",
+      "CREATED": "Proiect creat.",
+      "UPDATED": "Proiect modificat.",
+      "GRANTUPDATED": "Grant modificat.",
+      "DELETED": "Proiect șters."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Ștergeți rolul",
+      "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți un rol. Sigur doriți să continuați?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Pași următori"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Furnizori de identitate activi"
+    },
+    "CREATE": {
+      "TITLE": "Adăugați furnizor",
+      "DESCRIPTION": "Selectați unul sau mai mulți dintre următorii furnizori.",
+      "STEPPERTITLE": "Creați furnizorul",
+      "OIDC": {
+        "TITLE": "Furnizor OIDC",
+        "DESCRIPTION": "Introduceți datele necesare pentru furnizorul dvs. OIDC."
+      },
+      "OAUTH": {
+        "TITLE": "Furnizor OAuth",
+        "DESCRIPTION": "Introduceți datele necesare pentru furnizorul dvs. OAuth."
+      },
+      "JWT": {
+        "TITLE": "Furnizor JWT",
+        "DESCRIPTION": "Introduceți datele necesare pentru furnizorul dvs. JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Furnizor Google",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. de identitate Google"
+      },
+      "GITLAB": {
+        "TITLE": "Furnizor Gitlab",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. de identitate Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Furnizor Gitlab autogăzduit",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. de identitate Gitlab autogăzduit"
+      },
+      "GITHUBES": {
+        "TITLE": "Furnizor GitHub Enterprise Server",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. de identitate GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Furnizor Github",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. de identitate Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Furnizor Microsoft",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. de identitate Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. LDAP"
+      },
+      "APPLE": {
+        "TITLE": "Conectare cu Apple",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. Apple"
+      },
+      "SAML": {
+        "TITLE": "Conectare cu SAML",
+        "DESCRIPTION": "Introduceți acreditările pentru furnizorul dvs. SAML"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Furnizor de identitate",
+      "DESCRIPTION": "Actualizați configurația furnizorului dvs.",
+      "DATECREATED": "Creat",
+      "DATECHANGED": "Modificat"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Creare automată",
+      "ISAUTOCREATION_DESC": "Dacă este selectat, va fi creat un cont dacă nu există încă.",
+      "ISAUTOUPDATE": "Actualizare automată",
+      "ISAUTOUPDATE_DESC": "Dacă este selectat, conturile sunt actualizate la reautentificare.",
+      "ISCREATIONALLOWED": "Crearea contului permisă (manual)",
+      "ISCREATIONALLOWED_DESC": "Determină dacă conturile pot fi create folosind un cont extern. Dezactivați dacă utilizatorii nu ar trebui să poată edita informațiile contului când auto_creation este activată.",
+      "ISLINKINGALLOWED": "Conectarea contului permisă (manual)",
+      "ISLINKINGALLOWED_DESC": "Determină dacă o identitate poate fi conectată manual la un cont existent. Dezactivați dacă utilizatorilor ar trebui să li se permită să conecteze doar contul propus în caz de auto_linking activ.",
+      "AUTOLINKING_DESC": "Determină dacă unei identități i se va solicita să fie conectată la un cont existent.",
+      "AUTOLINKINGTYPE": {
+        "0": "Dezactivat",
+        "1": "Verificați dacă există un nume de utilizator existent",
+        "2": "Verificați dacă există un e-mail existent"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "necunoscut",
+      "1": "Instanță",
+      "2": "Organizație"
+    },
+    "STATES": {
+      "1": "activ",
+      "2": "inactiv"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "ID chiriaș",
+      "0": "Comun",
+      "1": "Organizații",
+      "2": "Consumatori"
+    },
+    "AZUREADTENANTTYPE": "Tip chiriaș",
+    "AZUREADTENANTID": "ID chiriaș",
+    "EMAILVERIFIED": "E-mail verificat",
+    "NAMEHINT": "Dacă este specificat, va fi afișat în interfața de conectare.",
+    "OPTIONAL": "opțional",
+    "LDAPATTRIBUTES": "Atribute LDAP",
+    "UPDATEBINDPASSWORD": "actualizați parola de conectare",
+    "UPDATECLIENTSECRET": "actualizați secretul clientului",
+    "ADD": "Adăugați furnizor de identitate",
+    "TYPE": "Tip",
+    "OWNER": "Proprietar",
+    "ID": "ID",
+    "NAME": "Nume",
+    "AUTHORIZATIONENDPOINT": "Punct final de autorizare",
+    "TOKENENDPOINT": "Punct final de token",
+    "USERENDPOINT": "Punct final utilizator",
+    "IDATTRIBUTE": "Atribut ID",
+    "AVAILABILITY": "Disponibilitate",
+    "AVAILABLE": "disponibil",
+    "AVAILABLEBUTINACTIVE": "disponibil, dar inactiv",
+    "SETAVAILABLE": "setați ca disponibil",
+    "SETUNAVAILABLE": "setați ca indisponibil",
+    "CONFIG": "Configurație",
+    "STATE": "Stare",
+    "ISSUER": "Emitent",
+    "SCOPESLIST": "Listă de domenii",
+    "CLIENTID": "ID client",
+    "CLIENTSECRET": "Secret client",
+    "LDAPCONNECTION": "Conexiune",
+    "LDAPUSERBINDING": "Conectarea utilizatorului",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Parola de conectare",
+    "SERVERS": "Servere",
+    "STARTTLS": "Porniți TLS",
+    "TIMEOUT": "Timeout în secunde",
+    "USERBASE": "Baza de utilizatori",
+    "USERFILTERS": "Filtre de utilizatori",
+    "USEROBJECTCLASSES": "Clase de obiecte utilizator",
+    "REQUIRED": "necesar",
+    "LDAPIDATTRIBUTE": "Atribut ID",
+    "AVATARURLATTRIBUTE": "Atribut adresa URL avatar",
+    "DISPLAYNAMEATTRIBUTE": "Atribut Nume afișat",
+    "EMAILATTRIBUTEATTRIBUTE": "Atribut Atribut e-mail",
+    "EMAILVERIFIEDATTRIBUTE": "Atribut E-mail verificat",
+    "FIRSTNAMEATTRIBUTE": "Atribut Prenume",
+    "LASTNAMEATTRIBUTE": "Atribut Nume de familie",
+    "NICKNAMEATTRIBUTE": "Atribut Poreclă",
+    "PHONEATTRIBUTE": "Atribut Telefon",
+    "PHONEVERIFIEDATTRIBUTE": "Atribut Telefon verificat",
+    "PREFERREDLANGUAGEATTRIBUTE": "Atribut Limbă preferată",
+    "PREFERREDUSERNAMEATTRIBUTE": "Atribut Nume de utilizator preferat",
+    "PROFILEATTRIBUTE": "Atribut Profil",
+    "IDPDISPLAYNAMMAPPING": "Mapare nume afișat IdP",
+    "USERNAMEMAPPING": "Mapare nume de utilizator",
+    "DATES": "Date",
+    "CREATIONDATE": "Creat la",
+    "CHANGEDATE": "Ultima modificare",
+    "DEACTIVATE": "Dezactivați",
+    "ACTIVATE": "Activați",
+    "DELETE": "Ștergeți",
+    "DELETE_TITLE": "Ștergeți IdP",
+    "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți un furnizor de identitate. Modificările rezultate sunt irevocabile. Doriți cu adevărat să faceți acest lucru?",
+    "REMOVE_WARN_TITLE": "Eliminați IdP",
+    "REMOVE_WARN_DESCRIPTION": "Sunteți pe cale să eliminați un furnizor de identitate. Aceasta va elimina selecția IdP-ului disponibil pentru utilizatorii dvs. și utilizatorii deja înregistrați nu se vor mai putea conecta. Sigur doriți să continuați?",
+    "DELETE_SELECTION_TITLE": "Ștergeți IdP",
+    "DELETE_SELECTION_DESCRIPTION": "Sunteți pe cale să ștergeți un furnizor de identitate. Modificările rezultate sunt irevocabile. Doriți cu adevărat să faceți acest lucru?",
+    "EMPTY": "Niciun IdP disponibil",
+    "OIDC": {
+      "GENERAL": "Informații generale",
+      "TITLE": "Configurație OIDC",
+      "DESCRIPTION": "Introduceți datele pentru furnizorul de identitate OIDC."
+    },
+    "JWT": {
+      "TITLE": "Configurație JWT",
+      "DESCRIPTION": "Introduceți datele pentru furnizorul de identitate JWT.",
+      "HEADERNAME": "Nume antet",
+      "JWTENDPOINT": "Punct final JWT",
+      "JWTKEYSENDPOINT": "Punct final chei JWT"
+    },
+    "APPLE": {
+      "TEAMID": "ID echipă",
+      "KEYID": "ID cheie",
+      "PRIVATEKEY": "Cheie privată",
+      "UPDATEPRIVATEKEY": "Actualizați cheia privată",
+      "UPLOADPRIVATEKEY": "Încărcați cheia privată",
+      "KEYMAXSIZEEXCEEDED": "Dimensiune maximă de 5 kB depășită."
+    },
+    "SAML": {
+      "METADATAXML": "XML metadata",
+      "METADATAURL": "URL metadata",
+      "BINDING": "Legare",
+      "SIGNEDREQUEST": "Solicitare semnată",
+      "NAMEIDFORMAT": "Format ID nume",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Nume atribut mapare personalizat",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nume alternativ de atribut pentru a mapa utilizatorul în cazul în care nameid-format returnat este tranzitoriu, de exemplu, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+    },
+    "TOAST": {
+      "SAVED": "Salvat cu succes.",
+      "REACTIVATED": "Idp reactivat.",
+      "DEACTIVATED": "Idp dezactivat.",
+      "SELECTEDREACTIVATED": "Idp-urile selectate au fost reactivate.",
+      "SELECTEDDEACTIVATED": "Idp-urile selectate au fost dezactivate.",
+      "SELECTEDKEYSDELETED": "Idp-urile selectate au fost șterse.",
+      "DELETED": "Idp eliminat cu succes!",
+      "ADDED": "Adăugat cu succes.",
+      "REMOVED": "Eliminat cu succes."
+    },
+    "ISIDTOKENMAPPING": "Mapați din tokenul ID",
+    "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo."
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Fără parolă",
+      "MULTIFACTORDESCRIPTION": "Definiți-vă multifactorii pentru autentificarea fără parolă aici.",
+      "SECONDFACTORTITLE": "Autentificare multifactor",
+      "SECONDFACTORDESCRIPTION": "Definiți alți factori posibili cu care vă puteți securiza autentificarea cu parolă."
+    },
+    "CREATE": {
+      "TITLE": "Factor nou",
+      "DESCRIPTION": "Selectați noul dvs. tip de factor."
+    },
+    "DELETE": {
+      "TITLE": "Ștergeți factorul",
+      "DESCRIPTION": "Sunteți pe cale să ștergeți un factor din Setările de conectare. Sigur doriți să continuați?"
+    },
+    "TOAST": {
+      "ADDED": "Adăugat cu succes.",
+      "SAVED": "Salvat cu succes.",
+      "DELETED": "Eliminat cu succes"
+    },
+    "TYPE": "Tip",
+    "MULTIFACTORTYPES": {
+      "0": "Necunoscut",
+      "1": "Amprentă, chei de securitate, Face ID și altele"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Necunoscut",
+      "1": "Parolă unică după aplicația de autentificare (TOTP)",
+      "2": "Amprentă, chei de securitate, Face ID și altele",
+      "3": "Parolă unică prin e-mail (OTP e-mail)",
+      "4": "Parolă unică prin SMS (OTP SMS)"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Setări de conectare",
+      "DESCRIPTION": "Definiți modul în care utilizatorii dvs. pot fi autentificați în organizația dvs."
+    },
+    "IDPS": "Furnizori de identitate",
+    "ADDIDP": {
+      "TITLE": "Adăugați furnizor de identate",
+      "DESCRIPTION": "Puteți selecta furnizori predefiniți sau autocreați pentru autentificare.",
+      "SELECTIDPS": "Furnizori de identitate"
+    },
+    "PASSWORDLESS": "Conectare fără parolă",
+    "PASSWORDLESSTYPE": {
+      "0": "Nepermis",
+      "1": "Permis"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Furnizor SMTP",
+      "DESCRIPTION": "Aceștia sunt furnizorii SMTP pentru instanța dvs. ZITADEL. Activați-l pe cel pe care doriți să-l utilizați pentru a trimite notificări utilizatorilor dvs.",
+      "EMPTY": "Niciun furnizor SMTP disponibil",
+      "ACTIVATED": "Activat",
+      "ACTIVATE": "Activați furnizorul",
+      "DEACTIVATE": "Dezactivați furnizorul",
+      "TEST": "Testați-vă furnizorul",
+      "TYPE": "Tip",
+      "DIALOG": {
+        "ACTIVATED": "Configurația SMTP a fost activată",
+        "ACTIVATE_WARN_TITLE": "Activați configurația SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Sunteți pe cale să activați o configurație SMTP. Mai întâi vom dezactiva furnizorul activ curent și apoi vom activa această configurație. Sigur doriți să continuați?",
+        "DEACTIVATE_WARN_TITLE": "Dezactivați configurația SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Sunteți pe cale să dezactivați o configurație SMTP. Sigur doriți să continuați?",
+        "DEACTIVATED": "Configurația SMTP a fost dezactivată",
+        "DELETE_TITLE": "Ștergeți configurația SMTP",
+        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o configurație. Confirmați această acțiune tastând numele expeditorului",
+        "DELETED": "Configurația SMTP a fost ștearsă",
+        "SENDER": "Tastați {{value}}, pentru a șterge această configurație SMTP.",
+        "TEST_TITLE": "Testați-vă configurația SMTP",
+        "TEST_DESCRIPTION": "Specificați o adresă de e-mail pentru a vă testa configurația SMTP pentru acest furnizor",
+        "TEST_EMAIL": "Adresă de e-mail",
+        "TEST_RESULT": "Rezultatul testului"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Adăugați furnizor SMTP",
+      "DESCRIPTION": "Selectați unul sau mai mulți dintre următorii furnizori.",
+      "STEPS": {
+        "TITLE": "Adăugați furnizor SMTP {{ value }}",
+        "CREATE_DESC_TITLE": "Introduceți pas cu pas setările dvs. SMTP {{ value }}",
+        "CURRENT_DESC_TITLE": "Acestea sunt setările dvs. SMTP",
+        "PROVIDER_SETTINGS": "Setări furnizor SMTP",
+        "SENDER_SETTINGS": "Setări expeditor",
+        "NEXT_STEPS": "Pași următori",
+        "ACTIVATE": {
+          "TITLE": "Activați-vă furnizorul SMTP",
+          "DESCRIPTION": "ZITADEL nu poate utiliza acest furnizor SMTP pentru a trimite notificări până când nu îl activați. Dacă activați acest furnizor, orice alt furnizor care era activ va fi acum dezactivat."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Dezactivați-vă furnizorul SMTP",
+          "DESCRIPTION": "Dacă dezactivați acest furnizor SMTP, ZITADEL nu îl poate utiliza pentru a trimite notificări până când nu îl activați din nou."
+        },
+        "SAVE_SETTINGS": "Salvați-vă setările",
+        "TEST": {
+          "TITLE": "Testați-vă setările",
+          "DESCRIPTION": "Puteți testa setările furnizorului dvs. SMTP și puteți verifica rezultatul testului înainte de a le salva",
+          "RESULT": "E-mailul dvs. a fost trimis cu succes"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Setări furnizor SMTP"
+    },
+    "EMPTY": "Niciun furnizor SMTP disponibil",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Aplicații",
+    "COMPLIANCE": "Conformitate OIDC",
+    "URLS": "Adrese URL",
+    "CONFIGURATION": "Configurație",
+    "TOKEN": "Setări token",
+    "PAGES": {
+      "TITLE": "Aplicație",
+      "ID": "ID",
+      "DESCRIPTION": "Aici puteți edita datele aplicației și configurația acesteia.",
+      "CREATE": "Creați aplicația",
+      "CREATE_SELECT_PROJECT": "Selectați mai întâi proiectul dvs.",
+      "CREATE_NEW_PROJECT": "sau introduceți numele pentru noul dvs. proiect",
+      "CREATE_DESC_TITLE": "Introduceți pas cu pas detaliile aplicației dvs.",
+      "CREATE_DESC_SUB": "Va fi generată automat o configurație recomandată.",
+      "STATE": "Stare",
+      "DATECREATED": "Creat",
+      "DATECHANGED": "Modificat",
+      "URLS": "Adrese URL",
+      "DELETE": "Ștergeți aplicația",
+      "JUMPTOPROJECT": "Pentru a configura roluri, autorizații și multe altele, navigați la proiect.",
+      "DETAIL": {
+        "TITLE": "Detalii",
+        "STATE": {
+          "0": "Nedefinit",
+          "1": "Activ",
+          "2": "Inactiv"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Modificați configurația OIDC"
+        },
+        "DELETE": {
+          "TITLE": "Ștergeți aplicația",
+          "DESCRIPTION": "Doriți cu adevărat să ștergeți această aplicație?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Pași următori",
+        "0": {
+          "TITLE": "Adăugați roluri",
+          "DESC": "Introduceți rolurile proiectului dvs."
+        },
+        "1": {
+          "TITLE": "Adăugați utilizatori",
+          "DESC": "Adăugați utilizatori noi ai organizației dvs."
+        },
+        "2": {
+          "TITLE": "Ajutor și asistență",
+          "DESC": "Citiți documentația noastră despre crearea aplicațiilor sau contactați asistența noastră"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Redenumiți aplicația",
+      "DESCRIPTION": "Introduceți noul nume pentru aplicația dvs.",
+      "NAME": "Nume nou"
+    },
+    "NAME": "Nume",
+    "TYPE": "Tipul aplicației",
+    "AUTHMETHOD": "Metoda de autentificare",
+    "AUTHMETHODSECTION": "Metoda de autentificare",
+    "GRANT": "Tipuri de grant",
+    "ADDITIONALORIGINS": "Origini suplimentare",
+    "ADDITIONALORIGINSDESC": "Dacă doriți să adăugați origini suplimentare la aplicația dvs. care nu sunt utilizate ca redirecționare, puteți face acest lucru aici.",
+    "ORIGINS": "Origini",
+    "NOTANORIGIN": "Valoarea introdusă nu este o origine",
+    "PROSWITCH": "Sunt profesionist. Omiteți acest vrăjitor.",
+    "NAMEANDTYPESECTION": "Nume și tip",
+    "TITLEFIRST": "Numele aplicației",
+    "TYPETITLE": "Tipul de aplicație",
+    "OIDC": {
+      "WELLKNOWN": "Puteți prelua linkuri suplimentare de la <a href='{{url}}' title='Punct final de descoperire' target='_blank'>punctul final de descoperire</a>.",
+      "INFO": {
+        "ISSUER": "Emitent",
+        "CLIENTID": "ID client"
+      },
+      "CURRENT": "Configurația curentă",
+      "TOKENSECTIONTITLE": "Opțiuni AuthToken",
+      "REDIRECTSECTIONTITLE": "Setări de redirecționare",
+      "REDIRECTTITLE": "Specificați URI-urile unde se va redirecționa conectarea.",
+      "POSTREDIRECTTITLE": "Acesta este URI-ul de redirecționare după deconectare.",
+      "REDIRECTDESCRIPTIONWEB": "URI-urile de redirecționare trebuie să înceapă cu https://. http:// este valabil numai cu modul de dezvoltare activat.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI-urile de redirecționare trebuie să înceapă cu propriul protocol, http://127.0.0.1, http://[::1] sau http://localhost.",
+      "REDIRECTNOTVALID": "Acest URI de redirecționare nu este valabil.",
+      "COMMAORENTERSEPERATION": "separați cu ↵",
+      "TYPEREQUIRED": "Tipul este necesar.",
+      "TITLE": "Configurație OIDC",
+      "CLIENTID": "ID client",
+      "CLIENTSECRET": "Secret client",
+      "CLIENTSECRET_NOSECRET": "Cu fluxul de autentificare ales, nu este necesar niciun secret și, prin urmare, nu este disponibil.",
+      "CLIENTSECRET_DESCRIPTION": "Păstrați secretul clientului într-un loc sigur, deoarece va dispărea odată ce dialogul este închis.",
+      "REGENERATESECRET": "Regenerați secretul clientului",
+      "DEVMODE": "Mod dezvoltare",
+      "DEVMODE_ENABLED": "Activat",
+      "DEVMODE_DISABLED": "Dezactivat",
+      "DEVMODEDESC": "Atenție: Cu modul de dezvoltare activat, URI-urile de redirecționare nu vor fi validate.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Omiteți pagina de succes la conectare",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Omiteți pagina de succes după o conectare pentru această aplicație nativă.",
+      "REDIRECT": "URI-uri de redirecționare",
+      "REDIRECTSECTION": "URI-uri de redirecționare",
+      "POSTLOGOUTREDIRECT": "URI-uri de redirecționare după deconectare",
+      "RESPONSESECTION": "Tipuri de răspuns",
+      "GRANTSECTION": "Tipuri de grant",
+      "GRANTTITLE": "Selectați tipurile de grant. Notă: Implicit este disponibil numai pentru aplicațiile bazate pe browser.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "Agent utilizator",
+        "2": "Nativ"
+      },
+      "RESPONSETYPE": "Tipuri de răspuns",
+      "RESPONSE": {
+        "0": "Cod",
+        "1": "Token ID",
+        "2": "Token-Token ID"
+      },
+      "REFRESHTOKEN": "Token de reîmprospătare",
+      "GRANTTYPE": "Tipuri de grant",
+      "GRANT": {
+        "0": "Cod de autorizare",
+        "1": "Implicit",
+        "2": "Token de reîmprospătare",
+        "3": "Cod dispozitiv",
+        "4": "Schimb token"
+      },
+      "AUTHMETHOD": {
+        "0": "De bază",
+        "1": "Post",
+        "2": "Niciunul",
+        "3": "JWT cheie privată"
+      },
+      "TOKENTYPE": "Tipul token-ului de autentificare",
+      "TOKENTYPE0": "Token Bearer",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Sper cu siguranță că știți ce faceți.",
+      "OVERVIEWSECTION": "Prezentare generală",
+      "OVERVIEWTITLE": "Ați terminat acum. Revizuiți configurația dvs.",
+      "ACCESSTOKENROLEASSERTION": "Adăugați rolurile utilizatorului la token-ul de acces",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Dacă este selectat, rolurile solicitate ale utilizatorului autentificat sunt adăugate la token-ul de acces.",
+      "IDTOKENROLEASSERTION": "Roluri utilizator în interiorul token-ului ID",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Dacă este selectat, rolurile solicitate ale utilizatorului autentificat sunt adăugate la token-ul ID.",
+      "IDTOKENUSERINFOASSERTION": "Informații utilizator în interiorul token-ului ID",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite clienților să preia revendicări de profil, e-mail, telefon și adresă din token-ul ID.",
+      "CLOCKSKEW": "Permite clienților să gestioneze decalajul de ceas al OP și al clientului. Durata (0-5s) va fi adăugată revendicării exp și scăzută din iats, auth_time și nbf.",
+      "RECOMMENDED": "recomandat",
+      "NOTRECOMMENDED": "nerecomandat",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Aplicații Web obișnuite precum .net, PHP, Node.js, Java etc."
+          },
+          "NATIVE": {
+            "TITLE": "Nativ",
+            "DESCRIPTION": "Aplicații mobile, desktop, dispozitive inteligente etc."
+          },
+          "USERAGENT": {
+            "TITLE": "Agent utilizator",
+            "DESCRIPTION": "Aplicații cu o singură pagină (SPA) și în general toate cadrele JS executate în browsere"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "ID client"
+      },
+      "REGENERATESECRET": "Regenerați secretul clientului",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API-uri în general"
+      },
+      "AUTHMETHOD": {
+        "0": "De bază",
+        "1": "JWT cheie privată"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Aplicații SAML"
+      },
+      "CONFIGSECTION": "Configurație SAML",
+      "CHOOSEMETADATASOURCE": "Furnizați configurația SAML utilizând una dintre următoarele opțiuni:",
+      "METADATAOPT1": "Opțiunea 1. Specificați adresa URL unde se află fișierul metadata",
+      "METADATAOPT2": "Opțiunea 2. Încărcați un fișier care conține XML-ul dvs. metadata",
+      "METADATAOPT3": "Opțiunea 3. Creați un fișier metadata minim din mers furnizând ENTITYID și ACS URL",
+      "UPLOAD": "Încărcați fișier XML",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata din fișier",
+      "CERTIFICATE": "Certificat SAML",
+      "DOWNLOADCERT": "Descărcați certificatul SAML",
+      "CREATEMETADATA": "Creați metadata",
+      "ENTITYID": "ID entitate",
+      "ACSURL": "Adresă URL punct final ACS"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Cod",
+        "DESCRIPTION": "Schimbați codul de autorizare pentru tokenuri"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Utilizați un hash aleatoriu în loc de un secret static al clientului pentru mai multă securitate"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Trimiteți client_id și client_secret ca parte a formularului"
+      },
+      "PK_JWT": {
+        "TITLE": "JWT cheie privată",
+        "DESCRIPTION": "Utilizați o cheie privată pentru a vă autoriza aplicația"
+      },
+      "BASIC": {
+        "TITLE": "De bază",
+        "DESCRIPTION": "Autentificare cu nume de utilizator și parolă"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Obțineți token-urile direct de la punctul final de autorizare"
+      },
+      "DEVICECODE": {
+        "TITLE": "Cod dispozitiv",
+        "DESCRIPTION": "Autorizați dispozitivul pe un computer sau smartphone."
+      },
+      "CUSTOM": {
+        "TITLE": "Personalizat",
+        "DESCRIPTION": "Setarea dvs. nu corespunde cu nicio altă opțiune."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Aplicația a fost reactivată.",
+      "DEACTIVATED": "Aplicația a fost dezactivată.",
+      "OIDCUPDATED": "Aplicația a fost actualizată.",
+      "APIUPDATED": "Aplicația a fost actualizată",
+      "UPDATED": "Aplicația a fost actualizată.",
+      "CREATED": "Aplicația a fost creată.",
+      "CLIENTSECRETREGENERATED": "secretul clientului a fost generat.",
+      "DELETED": "Aplicația a fost ștearsă.",
+      "CONFIGCHANGED": "Au fost detectate modificări!"
+    },
+    "LOGINV2": {
+      "USEV2": "Utilizați noua UI de conectare",
+      "BASEURL": "Adresă URL de bază personalizată pentru noua UI de conectare"
+    }
+  },
+  "GENDERS": {
+    "0": "Necunoscut",
+    "1": "Femeie",
+    "2": "Bărbat",
+    "3": "Altul"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
+  },
+  "MEMBER": {
+    "ADD": "Adăugați un manager",
+    "CREATIONTYPE": "Tip creare",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organizație",
+      "0": "Proiect deținut",
+      "1": "Proiect acordat",
+      "4": "Proiect"
+    },
+    "EDITROLE": "Editați rolurile",
+    "EDITFOR": "Editați rolurile pentru utilizator: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Eliminați managerul",
+      "DELETE_DESCRIPTION": "Sunteți pe cale să eliminați un manager. Sigur doriți să continuați?"
+    },
+    "SHOWDETAILS": "Faceți clic pentru a afișa detalii."
+  },
+  "ROLESLABEL": "Roluri",
+  "GRANTS": {
+    "TITLE": "Autorizații",
+    "DESC": "Acestea sunt toate autorizațiile din organizația dvs.",
+    "DELETE": "Ștergeți autorizarea",
+    "EMPTY": "Nicio autorizare găsită",
+    "ADD": "Creați autorizarea",
+    "ADD_BTN": "Nou",
+    "PROJECT": {
+      "TITLE": "Autorizare",
+      "DESCRIPTION": "Definiți autorizații pentru proiectul specificat. Rețineți că puteți vedea numai intrările proiectelor și utilizatorilor pentru care aveți permisiunile."
+    },
+    "USER": {
+      "TITLE": "Autorizare",
+      "DESCRIPTION": "Definiți autorizații pentru utilizatorul specificat. Rețineți că puteți vedea numai intrările proiectelor și utilizatorilor pentru care aveți permisiunile."
+    },
+    "CREATE": {
+      "TITLE": "Creați autorizarea",
+      "DESCRIPTION": "Căutați organizația, proiectul și rolurile corespunzătoare."
+    },
+    "EDIT": {
+      "TITLE": "Modificați autorizarea"
+    },
+    "DETAIL": {
+      "TITLE": "Detaliile autorizării",
+      "DESCRIPTION": "Aici puteți vedea toate detaliile autorizării."
+    },
+    "TOAST": {
+      "UPDATED": "Autorizarea a fost actualizată.",
+      "REMOVED": "Autorizarea a fost eliminată",
+      "BULKREMOVED": "Autorizațiile au fost eliminate.",
+      "CANTSHOWINFO": "Nu puteți vizita profilul acestui utilizator, deoarece nu sunteți membru al organizației căreia îi aparține acest utilizator"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Ștergeți autorizarea",
+      "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o autorizare. Doriți să continuați?",
+      "BULK_DELETE_TITLE": "Ștergeți autorizațiile",
+      "BULK_DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți mai multe autorizații. Doriți să continuați?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Ultimele modificări",
+    "BOTTOM": "Ați ajuns la sfârșitul listei.",
+    "LOADMORE": "Încărcați mai multe",
+    "ORG": {
+      "TITLE": "Activitate",
+      "DESCRIPTION": "Aici puteți vedea ultimele evenimente care au generat o modificare a organizației."
+    },
+    "PROJECT": {
+      "TITLE": "Activitate",
+      "DESCRIPTION": "Aici puteți vedea ultimele evenimente care au generat o modificare a proiectului."
+    },
+    "USER": {
+      "TITLE": "Activitate",
+      "DESCRIPTION": "Aici puteți vedea ultimele evenimente care au generat o modificare a utilizatorului."
+    }
+  }
+}

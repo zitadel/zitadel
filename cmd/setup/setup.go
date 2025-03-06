@@ -468,10 +468,14 @@ func startCommandsQueries(
 		config.DefaultInstance.SecretGenerators,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
+
+	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
+		logging.Fatal("notifications must be set to LegacyEnabled=true when using CockroachDB")
+	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
-	logging.OnError(err).Fatal("unable to start queue")
+	logging.OnError(err).Fatal("unable to init queue")
 
 	notify_handler.Register(
 		ctx,
