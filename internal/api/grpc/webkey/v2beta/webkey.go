@@ -53,14 +53,14 @@ func (s *Server) DeleteWebKey(ctx context.Context, req *webkey.DeleteWebKeyReque
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
-	date, err := s.command.DeleteWebKey(ctx, req.GetId())
+	deletedAt, err := s.command.DeleteWebKey(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
 	var deletionDate *timestamppb.Timestamp
 	if !date.IsZero() {
-		deletionDate = timestamppb.New(date)
+		deletionDate = timestamppb.New(deletedAt)
 	}
 	return &webkey.DeleteWebKeyResponse{
 		DeletionDate: deletionDate,
