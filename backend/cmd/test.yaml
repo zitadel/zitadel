@@ -1,6 +1,8 @@
-configuredversion: 2025.2.23
 database:
-    postgres: host=local
+    postgres: host=localhost user=zitadel password= dbname=zitadel sslmode=disable test=test
 step001:
-    databasename: zx;lvkj
-    username: z.;nv.,mvnzx
+    databasename: qwer
+    username: asdf
+step002:
+    databasename: yuio
+    username: hjkl

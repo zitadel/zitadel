@@ -5,23 +5,20 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/manifoldco/promptui"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 
-	"github.com/zitadel/zitadel/backend/cmd/config"
-	"github.com/zitadel/zitadel/backend/cmd/configure"
-	"github.com/zitadel/zitadel/backend/cmd/configure/bla"
+	"github.com/zitadel/zitadel/backend/cmd/configure/bla4"
 	"github.com/zitadel/zitadel/backend/storage/database"
-	"github.com/zitadel/zitadel/backend/storage/database/dialect/gosql"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect/postgres"
 )
 
 type Hook struct {
 	Match       func(string) bool
-	Decode      func(name string, config any) (database.Connector, error)
+	Decode      func(config any) (database.Connector, error)
 	Name        string
-	Field       configure.Updater
-	Constructor func() any
+	Constructor func() database.Connector
 }
 
 var hooks = []Hook{
@@ -29,22 +26,63 @@ var hooks = []Hook{
 		Match:       postgres.NameMatcher,
 		Decode:      postgres.DecodeConfig,
 		Name:        postgres.Name,
-		Field:       postgres.Field,
-		Constructor: func() any { return new(postgres.Config) },
+		Constructor: func() database.Connector { return new(postgres.Config) },
 	},
-	{
-		Match:       gosql.NameMatcher,
-		Decode:      gosql.DecodeConfig,
-		Name:        gosql.Name,
-		Field:       gosql.Field,
-		Constructor: func() any { return new(gosql.Config) },
-	},
+	// {
+	// 	Match:       gosql.NameMatcher,
+	// 	Decode:      gosql.DecodeConfig,
+	// 	Name:        gosql.Name,
+	// 	Constructor: func() database.Connector { return new(gosql.Config) },
+	// },
 }
 
 type Config struct {
-	Dialects dialects `mapstructure:",remain"`
+	Dialects map[string]any `mapstructure:",remain" yaml:",inline"`
 
 	connector database.Connector
+}
+
+// Configure implements [configure.Configurer].
+func (c *Config) Configure() (any, error) {
+	possibilities := make([]string, len(hooks))
+	var cursor int
+	for i, hook := range hooks {
+		if _, ok := c.Dialects[hook.Name]; ok {
+			cursor = i
+		}
+		possibilities[i] = hook.Name
+	}
+
+	prompt := promptui.Select{
+		Label:     "Select a dialect",
+		Items:     possibilities,
+		CursorPos: cursor,
+	}
+	i, _, err := prompt.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	var config bla4.Configurer
+
+	if dialect, ok := c.Dialects[hooks[i].Name]; ok {
+		config, err = hooks[i].Decode(dialect)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		clear(c.Dialects)
+		config = hooks[i].Constructor()
+	}
+	if c.Dialects == nil {
+		c.Dialects = make(map[string]any)
+	}
+	c.Dialects[hooks[i].Name], err = config.Configure()
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }
 
 func (c Config) Connect(ctx context.Context) (database.Pool, error) {
@@ -62,12 +100,6 @@ func (c Config) Hooks() []viper.DecoderConfigOption {
 	}
 }
 
-// var _ configure.StructUpdater = (*Config)(nil)
-
-func (c Config) Configure(v *viper.Viper, currentVersion config.Version) Config {
-	return c
-}
-
 func (c *Config) decodeDialect() error {
 	for _, hook := range hooks {
 		for name, config := range c.Dialects {
@@ -75,7 +107,7 @@ func (c *Config) decodeDialect() error {
 				continue
 			}
 
-			connector, err := hook.Decode(name, config)
+			connector, err := hook.Decode(config)
 			if err != nil {
 				return err
 			}
@@ -87,7 +119,7 @@ func (c *Config) decodeDialect() error {
 	return errors.New("no dialect found")
 }
 
-func decodeHook(from, to reflect.Value) (_ interface{}, err error) {
+func decodeHook(from, to reflect.Value) (_ any, err error) {
 	if to.Type() != reflect.TypeOf(Config{}) {
 		return from.Interface(), nil
 	}
@@ -103,21 +135,3 @@ func decodeHook(from, to reflect.Value) (_ interface{}, err error) {
 
 	return config, nil
 }
-
-type dialects map[string]any
-
-// ConfigForIndex implements [bla.OneOfField].
-func (d dialects) ConfigForIndex(i int) any {
-	return hooks[i].Constructor()
-}
-
-// Possibilities implements [bla.OneOfField].
-func (d dialects) Possibilities() []string {
-	possibilities := make([]string, len(hooks))
-	for i, hook := range hooks {
-		possibilities[i] = hook.Name
-	}
-	return possibilities
-}
-
-var _ bla.OneOfField = (dialects)(nil)

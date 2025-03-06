@@ -6,117 +6,70 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/manifoldco/promptui"
+	"github.com/mitchellh/mapstructure"
 
-	"github.com/zitadel/zitadel/backend/cmd/configure"
-	"github.com/zitadel/zitadel/backend/cmd/configure/bla"
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
 
 var (
 	_    database.Connector = (*Config)(nil)
 	Name                    = "postgres"
-
-	Field = &configure.OneOf{
-		Description: "Configuring postgres using one of the following options",
-		SubFields: []configure.Updater{
-			&configure.Field[string]{
-				Description: "Connection string",
-				Version:     semver.MustParse("v3"),
-				Validate: func(s string) error {
-					_, err := pgxpool.ParseConfig(s)
-					return err
-				},
-			},
-			&configure.Struct{
-				Description: "Configuration for the connection",
-				SubFields: []configure.Updater{
-					&configure.Field[string]{
-						FieldName:   "host",
-						Value:       "localhost",
-						Description: "The host to connect to",
-						Version:     semver.MustParse("3"),
-					},
-					&configure.Field[uint32]{
-						FieldName:   "port",
-						Value:       5432,
-						Description: "The port to connect to",
-						Version:     semver.MustParse("3"),
-					},
-					&configure.Field[string]{
-						FieldName:   "database",
-						Value:       "zitadel",
-						Description: "The database to connect to",
-						Version:     semver.MustParse("3"),
-					},
-					&configure.Field[string]{
-						FieldName:   "user",
-						Description: "The user to connect as",
-						Value:       "zitadel",
-						Version:     semver.MustParse("3"),
-					},
-					&configure.Field[string]{
-						FieldName:   "password",
-						Description: "The password to connect with",
-						Version:     semver.MustParse("3"),
-						HideInput:   true,
-					},
-					&configure.OneOf{
-						FieldName:   "sslMode",
-						Description: "The SSL mode to use",
-						SubFields: []configure.Updater{
-							&configure.Constant[string]{
-								Description: "Disable",
-								Constant:    "disable",
-								Version:     semver.MustParse("3"),
-							},
-							&configure.Constant[string]{
-								Description: "Require",
-								Constant:    "require",
-								Version:     semver.MustParse("3"),
-							},
-							&configure.Constant[string]{
-								Description: "Verify CA",
-								Constant:    "verify-ca",
-								Version:     semver.MustParse("3"),
-							},
-							&configure.Constant[string]{
-								Description: "Verify Full",
-								Constant:    "verify-full",
-								Version:     semver.MustParse("3"),
-							},
-						},
-					},
-				},
-			},
-		},
-	}
 )
 
-type Config struct{ pgxpool.Config }
+type Config struct {
+	config *pgxpool.Config
 
-// ConfigForIndex implements bla.OneOfField.
-func (c Config) ConfigForIndex(i int) any {
-	switch i {
-	case 0:
-		return new(string)
-	case 1:
-		return &c.Config
+	// Host               string
+	// Port               int32
+	// Database           string
+	// EventPushConnRatio float64
+	// MaxOpenConns       uint32
+	// MaxIdleConns       uint32
+	// MaxConnLifetime    time.Duration
+	// MaxConnIdleTime    time.Duration
+	// User               User
+	// Admin              AdminUser
+	// // Additional options to be appended as options=<Options>
+	// // The value will be taken as is. Multiple options are space separated.
+	// Options string
+}
+
+// Configure implements bla3.Custom.
+func (c *Config) Configure() (value any, err error) {
+	typeSelect := promptui.Select{
+		Label: "Configure the database connection",
+		Items: []string{"connection string", "fields"},
 	}
-	return nil
-}
+	i, _, err := typeSelect.Run()
+	if err != nil {
+		return nil, err
+	}
+	if i > 0 {
+		return nil, nil
+	}
 
-// Possibilities implements bla.OneOfField.
-func (c Config) Possibilities() []string {
-	return []string{"connection string", "fields"}
-}
+	if c.config == nil {
+		c.config, _ = pgxpool.ParseConfig("host=localhost user=zitadel password= dbname=zitadel sslmode=disable")
+	}
 
-var _ bla.OneOfField = (*Config)(nil)
+	prompt := promptui.Prompt{
+		Label:     "Connection string",
+		Default:   c.config.ConnString(),
+		AllowEdit: c.config.ConnString() != "",
+		Validate: func(input string) error {
+			_, err := pgxpool.ParseConfig(input)
+			return err
+		},
+	}
+
+	return prompt.Run()
+}
 
 // Connect implements [database.Connector].
 func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
-	pool, err := pgxpool.NewWithConfig(ctx, &c.Config)
+	pool, err := pgxpool.NewWithConfig(ctx, c.config)
 	if err != nil {
 		return nil, err
 	}
@@ -130,17 +83,29 @@ func NameMatcher(name string) bool {
 	return slices.Contains([]string{"postgres", "pg"}, strings.ToLower(name))
 }
 
-func DecodeConfig(_ string, config any) (database.Connector, error) {
-	switch c := config.(type) {
+func DecodeConfig(input any) (database.Connector, error) {
+	switch c := input.(type) {
 	case string:
 		config, err := pgxpool.ParseConfig(c)
 		if err != nil {
 			return nil, err
 		}
-		return &Config{Config: *config}, nil
+		return &Config{config: config}, nil
 	case map[string]any:
+		connector := new(Config)
+		decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+			DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
+			WeaklyTypedInput: true,
+			Result:           connector,
+		})
+		if err != nil {
+			return nil, err
+		}
+		if err = decoder.Decode(c); err != nil {
+			return nil, err
+		}
 		return &Config{
-			Config: pgxpool.Config{},
+			config: &pgxpool.Config{},
 		}, nil
 	}
 	return nil, errors.New("invalid configuration")

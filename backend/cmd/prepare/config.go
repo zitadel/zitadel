@@ -6,7 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/cmd/config"
 	"github.com/zitadel/zitadel/backend/cmd/configure"
-	"github.com/zitadel/zitadel/backend/cmd/configure/bla2"
+	"github.com/zitadel/zitadel/backend/cmd/configure/bla4"
 	step001 "github.com/zitadel/zitadel/backend/cmd/prepare/001"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect"
@@ -42,7 +42,7 @@ var (
 		// 	configuration.Fields(),
 		// ),
 		Run: func(cmd *cobra.Command, args []string) {
-			bla2.Update(viper.GetViper(), &configuration)(cmd, args)
+			bla4.Update(viper.GetViper(), &configuration)(cmd, args)
 		},
 		PreRun: configure.ReadConfigPreRun(viper.GetViper(), &configuration),
 	}
@@ -51,20 +51,21 @@ var (
 type Config struct {
 	config.Config `mapstructure:",squash" configure:"-"`
 
-	Database dialect.Config `configure:"-"`
+	Database *dialect.Config // `configure:"-"`
 	Step001  step001.Step001
+	Step002  *step001.Step001
 
 	// runtime config
 	Client database.Pool `mapstructure:"-" configure:"-"`
 }
 
 func (c *Config) Hooks() (decoders []viper.DecoderConfigOption) {
-	for _, hooks := range []configure.Unmarshaller{
-		c.Config,
-		c.Database,
-	} {
-		decoders = append(decoders, hooks.Hooks()...)
-	}
+	// for _, hooks := range []configure.Unmarshaller{
+	// 	c.Config,
+	// 	c.Database,
+	// } {
+	// 	decoders = append(decoders, hooks.Hooks()...)
+	// }
 	return decoders
 }
 

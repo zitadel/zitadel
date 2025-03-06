@@ -6,25 +6,13 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/Masterminds/semver/v3"
-	"github.com/jackc/pgx/v5/pgxpool"
-
-	"github.com/zitadel/zitadel/backend/cmd/configure"
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
 
 var (
 	_ database.Connector = (*Config)(nil)
 
-	Name  = "gosql"
-	Field = &configure.Field[string]{
-		Description: "Connection string",
-		Version:     semver.MustParse("v3"),
-		Validate: func(s string) error {
-			_, err := pgxpool.ParseConfig(s)
-			return err
-		},
-	}
+	Name = "gosql"
 )
 
 type Config struct {

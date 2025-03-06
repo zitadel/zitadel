@@ -36,20 +36,12 @@ func (o *Object) Configure(v *viper.Viper) error {
 			continue
 		}
 		structField := o.value.Field(i)
-		tag, err := newFieldTag(o.value.Type().Field(i), structField.Interface())
-		if err != nil {
-			return err
-		}
-		if tag.skip {
-			continue
-		}
 
 		f := Field{
-			tag:         tag,
 			value:       structField,
 			structField: o.value.Type().Field(i),
 		}
-		err = f.Configure(v)
+		err := f.Configure(v)
 		if err != nil {
 			return err
 		}
@@ -85,9 +77,7 @@ func (f *Field) callCustom(v *viper.Viper) (ok bool, err error) {
 	if !f.value.Type().Implements(customType) {
 		return false, nil
 	}
-	if f.value.IsNil() {
-		f.value.Set(reflect.New(f.value.Type().Elem()))
-	}
+
 	custom := f.value.Interface().(Custom)
 	value, err := custom.Configure()
 	if err != nil {
@@ -108,6 +98,18 @@ func (f *Field) callCustom(v *viper.Viper) (ok bool, err error) {
 }
 
 func (f *Field) Configure(v *viper.Viper) error {
+	if f.value.IsNil() {
+		f.value.Set(reflect.New(f.value.Type().Elem()))
+	}
+
+	tag, err := newFieldTag(f.structField, f.value.Interface())
+	if err != nil {
+		return err
+	}
+	if tag.skip {
+		return nil
+	}
+
 	if ok, err := f.callCustom(v); ok || err != nil {
 		return err
 	}
