@@ -1,6 +1,14 @@
 document.addEventListener(
   "DOMContentLoaded",
-  checkWebauthnSupported("btn-login", login)
+  () => {
+    const form = document.getElementsByTagName("form")[0];
+    if (form) {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault(); // Prevent the default form submission
+        checkWebauthnSupported(login); // check if webauthn is supported, then execute login function
+      });
+    }
+  }
 );
 
 async function login() {
