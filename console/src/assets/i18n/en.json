@@ -1077,6 +1077,10 @@
     },
     "SEARCH": {
       "ADDITIONAL": "Groupname (current organization)"
+    },
+    "SETTINGS": {
+      "GROUPGRANTS": "Authorizations",
+      "MEMBERS": "Members"
     }
   },
   "METADATA": {

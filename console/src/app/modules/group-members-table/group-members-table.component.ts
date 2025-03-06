@@ -4,25 +4,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { InstanceMembersDataSource } from 'src/app/pages/instance/instance-members/instance-members-datasource';
-import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
-import { ProjectGrantMembersDataSource } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
-import { getMembershipColor } from 'src/app/utils/color';
-
 import { Type } from 'src/app/proto/generated/zitadel/user_pb';
 import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
-import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
 import { GroupMembersDataSource } from 'src/app/pages/groups/group-detail/group-detail/group-members-datasource';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
-type MemberDatasource =
-  | OrgMembersDataSource
-  | ProjectMembersDataSource
-  | ProjectGrantMembersDataSource
-  | InstanceMembersDataSource
-  | GroupMembersDataSource;
+type MemberDatasource = GroupMembersDataSource;
 
 @Component({
   selector: 'cnsl-group-members-table',
@@ -66,10 +55,6 @@ export class GroupMembersTableComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.destroyed.next();
-  }
-
-  public getColor(role: string) {
-    return getMembershipColor(role)[500];
   }
 
   public removeRole(member: Member.AsObject, role: string) {

@@ -15,7 +15,7 @@
       <h2>{{ 'PROJECT.GRANT.CREATE.SEL_GROUP' | translate }}</h2>
 
       <cnsl-search-group-autocomplete
-        [editState]="context !== UserGrantContext.USER"
+        [editState]="context !== GroupGrantContext.GROUP"
         class="block"
         [groups]="group ? [group] : []"
         (selectionChanged)="selectGroups($event)"
@@ -23,7 +23,7 @@
       </cnsl-search-group-autocomplete>
     </ng-container>
 
-    <ng-container *ngIf="context && (context === UserGrantContext.NONE)">
+    <ng-container *ngIf="context && (context === GroupGrantContext.GROUP || context === GroupGrantContext.NONE)">
       <h2 class="project-search">{{ 'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate }}</h2>
 
       <cnsl-search-project-autocomplete class="block" (selectionChanged)="selectProject($event.project, $event.type)">

@@ -18,7 +18,6 @@ import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListGroupsResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { GroupNameQuery, GroupQuery, Group } from 'src/app/proto/generated/zitadel/group_pb';
-import { LoginNameQuery, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 

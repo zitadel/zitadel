@@ -8,7 +8,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
+import { GroupGrantContext } from 'src/app/modules/group-grants/group-grants-datasource';
 import { Group, GroupState } from 'src/app/proto/generated/zitadel/group_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
@@ -32,13 +33,17 @@ export class GroupDetailComponent implements OnInit {
   public loading: boolean = true;
 
   public GroupState: any = GroupState;
-  public copied: string = '';
   public ChangeType: any = ChangeType;
 
   public changePage: EventEmitter<void> = new EventEmitter();
+  public settingsList: SidenavSetting[] = [
+    { id: 'members', i18nKey: 'GROUP.SETTINGS.MEMBERS' },
+    { id: 'grants', i18nKey: 'GROUP.SETTINGS.GROUPGRANTS' },
+  ];
+  public currentSetting: string | undefined = this.settingsList[0].id;
+  public GROUPGRANTCONTEXT: GroupGrantContext = GroupGrantContext.GROUP;
 
   public error: string = '';
-  public loginPolicy?: LoginPolicy.AsObject;
 
   public changePageFactory!: Function;
   public dataSource!: GroupMembersDataSource;
@@ -58,6 +63,12 @@ export class GroupDetailComponent implements OnInit {
     public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
+    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
+      const { key } = params;
+      if (key) {
+        this.currentSetting = key;
+      }
+    });
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
         type: BreadcrumbType.ORG,
@@ -69,8 +80,6 @@ export class GroupDetailComponent implements OnInit {
       this.groupId = params['id'];
       this.loadMembers();
     });
-
-    const mediaq: string = '(max-width: 500px)';
   }
 
 
@@ -98,12 +107,6 @@ export class GroupDetailComponent implements OnInit {
   public ngOnInit(): void {
     const groupId = this.route.snapshot.paramMap.get('id');
     this.refreshGroup();
-
-    this.mgmtGroupService.getLoginPolicy().then((policy) => {
-      if (policy.policy) {
-        this.loginPolicy = policy.policy;
-      }
-    });
   }
 
   public changeState(newState: GroupState): void {

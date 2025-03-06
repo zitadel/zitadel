@@ -56,6 +56,7 @@ export class GroupCreateComponent implements OnInit, OnDestroy {
   private initForm(): void {
     this.groupForm = this.fb.group({
       name: ['', [requiredValidator, minLengthValidator(1)]],
+      description: ['', []],
     });
 
     const validators: Validators[] = [requiredValidator];

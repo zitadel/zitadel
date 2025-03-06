@@ -2,13 +2,14 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ListGroupGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
-import { GroupGrantQuery, GroupGrant, GroupGrantProjectIDQuery, GroupGrantProjectGrantIDQuery } from 'src/app/proto/generated/zitadel/group_pb';
+import { GroupGrantQuery, GroupGrant, GroupGrantGroupIDQuery, GroupGrantProjectIDQuery, GroupGrantProjectGrantIDQuery } from 'src/app/proto/generated/zitadel/group_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 type GroupGrantAsObject = GroupGrant.AsObject;
 
 export enum GroupGrantContext {
   NONE = 'none',
+  GROUP = 'group',
   OWNED_PROJECT = 'owned',
   GRANTED_PROJECT = 'granted',
 }
@@ -33,11 +34,30 @@ export class GroupGrantsDataSource extends DataSource<GroupGrantAsObject> {
     data: {
       projectId?: string;
       grantId?: string;
-      groupIp?: string;
+      groupId?: string;
     },
     queries?: GroupGrantQuery[],
   ): void {
     switch (context) {
+      case GroupGrantContext.GROUP:
+        if (data && data.groupId) {
+          this.loadingSubject.next(true);
+
+          const groupfilter = new GroupGrantQuery();
+          const ugUiq = new GroupGrantGroupIDQuery();
+          ugUiq.setGroupId(data.groupId);
+          groupfilter.setGroupIdQuery(ugUiq);
+
+          if (queries) {
+            queries.push(groupfilter);
+          } else {
+            queries = [groupfilter];
+          }
+
+          const promise = this.groupService.listGroupGrants(pageSize, pageSize * pageIndex, queries);
+          this.loadResponse(promise);
+        }
+        break;
       case GroupGrantContext.OWNED_PROJECT:
         if (data && data.projectId) {
           this.loadingSubject.next(true);

@@ -3,7 +3,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
-import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
+import { GroupGrantContext } from 'src/app/modules/group-grants/group-grants-datasource';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -19,7 +19,7 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./group-grant-create.component.scss'],
 })
 export class GroupGrantCreateComponent implements OnDestroy {
-  public context!: UserGrantContext;
+  public context!: GroupGrantContext;
 
   public org?: Org.AsObject;
   public groupIds: string[] = [];
@@ -32,7 +32,7 @@ export class GroupGrantCreateComponent implements OnDestroy {
   public createSteps: number = 2;
   public currentCreateStep: number = 1;
 
-  public UserGrantContext: any = UserGrantContext;
+  public GroupGrantContext: any = GroupGrantContext;
 
   public group?: Group.AsObject;
 
@@ -54,13 +54,13 @@ export class GroupGrantCreateComponent implements OnDestroy {
       }),
     ]);
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
-      const { projectid, grantid, userid } = params;
-      this.context = UserGrantContext.NONE;
+      const { projectid, grantid, groupid } = params;
+      this.context = GroupGrantContext.NONE;
 
-      this.groupIds = userid ? [userid] : [];
+      this.groupIds = groupid ? [groupid] : [];
 
       if (projectid && !grantid) {
-        this.context = UserGrantContext.OWNED_PROJECT;
+        this.context = GroupGrantContext.OWNED_PROJECT;
 
         this.mgmtService
           .getProjectByID(projectid)
@@ -73,7 +73,7 @@ export class GroupGrantCreateComponent implements OnDestroy {
             this.toast.showError(error);
           });
       } else if (projectid && grantid) {
-        this.context = UserGrantContext.GRANTED_PROJECT;
+        this.context = GroupGrantContext.GRANTED_PROJECT;
         this.mgmtService
           .getGrantedProjectByID(projectid, grantid)
           .then((resp) => {
@@ -85,6 +85,7 @@ export class GroupGrantCreateComponent implements OnDestroy {
             this.toast.showError(error);
           });
       } else if (this.groupIds && this.groupIds.length === 1) {
+        this.context = GroupGrantContext.GROUP;
         this.mgmtService
           .getGroupByID(this.groupIds[0])
           .then((resp) => {

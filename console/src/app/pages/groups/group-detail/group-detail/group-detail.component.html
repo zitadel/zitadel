@@ -47,13 +47,14 @@
 
 <div class="max-width-container" *ngIf="group && (['user.write$', 'user.write:' + group.id] | hasRole) as canWrite$">
   <cnsl-meta-layout>
-    <div *ngIf="error" class="max-width-container">
-      <p>{{ error }}</p>
-    </div>
-    <div class="max-width-container">
-      <span *ngIf="!loading && !group">{{ 'GROUP.PAGES.NOUSER' | translate }}</span>
+    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" queryParam="id">
+      <div *ngIf="error" class="max-width-container">
+        <p>{{ error }}</p>
+      </div>
+      <div class="max-width-container">
+        <span *ngIf="!loading && !group">{{ 'GROUP.PAGES.NOUSER' | translate }}</span>
         <cnsl-group-members-table
-          *ngIf="group"
+          [ngStyle]="{ display: currentSetting === 'members' ? 'block' : 'none' }"
           [dataSource]="dataSource"
           [factoryLoadFunc]="changePageFactory"
           [refreshTrigger]="changePage"
@@ -73,7 +74,17 @@
             </button>
           </ng-template>
         </cnsl-group-members-table>
-    </div>
+        <cnsl-group-grants
+            [ngStyle]="{ display: currentSetting === 'grants' ? 'block' : 'none' }"
+            [groupId]="group.id"
+            [context]="GROUPGRANTCONTEXT"
+            [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'state', 'roleNamesList', 'actions']"
+            [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
+            [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
+          >
+          </cnsl-group-grants>
+      </div>
+    </cnsl-sidenav>
     <div metainfo>
       <cnsl-changes *ngIf="group" [changeType]="ChangeType.GROUP" [id]="group.id"></cnsl-changes>
     </div>

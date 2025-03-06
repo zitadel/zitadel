@@ -33,6 +33,21 @@ func (c *ListProjectGrantChangesResponse) Localizers() []middleware.Localizer {
 	return changesLocalizers(c.Result)
 }
 
+
+func (c *ListGroupChangesResponse) Localizers() []middleware.Localizer {
+	if c == nil {
+		return nil
+	}
+	return changesLocalizers(c.Result)
+}
+
+func (c *ListGroupGrantChangesResponse) Localizers() []middleware.Localizer {
+	if c == nil {
+		return nil
+	}
+	return changesLocalizers(c.Result)
+}
+
 func (c *ListAppChangesResponse) Localizers() []middleware.Localizer {
 	if c == nil {
 		return nil

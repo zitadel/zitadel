@@ -54,7 +54,7 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
   @Input() disableWrite: boolean = false;
   @Input() disableDelete: boolean = false;
 
-  @Input() groupIp: string = '';
+  @Input() groupId: string = '';
   @Input() projectId: string = '';
   @Input() grantId: string = '';
   @ViewChild('input') public filter!: MatInput;
@@ -105,6 +105,11 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
           this.routerLink = ['/grant-create/groups/', 'project', this.projectId, 'grant', this.grantId];
         }
         break;
+      case GroupGrantContext.GROUP:
+        if (this.groupId) {
+          this.routerLink = ['/grant-create/groups/', 'group', this.groupId];
+        }
+        break;
       case GroupGrantContext.NONE:
         this.routerLink = ['/grant-create/groups/'];
     }
@@ -129,7 +134,7 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
       {
         projectId: this.projectId,
         grantId: this.grantId,
-        groupIp: this.groupIp,
+        groupId: this.groupId,
       },
       searchQueries ? [...searchQueries, ...queries] : queries,
     );
@@ -255,7 +260,7 @@ export class GroupGrantsComponent implements OnInit, AfterViewInit {
       {
         projectId: this.projectId,
         grantId: this.grantId,
-        groupIp: this.groupIp,
+        groupId: this.groupId,
       },
     );
   }
