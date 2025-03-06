@@ -8,7 +8,7 @@ async function registerCredential() {
 
   let opt;
   try {
-    opt = JSON.parse(atob(document.getElementsByName("credentialCreationData")[0].value));
+    opt = JSON.parse(window.atob(document.getElementsByName("credentialCreationData")[0].value));
   } catch (e) {
     webauthnError({ message: "Failed to parse credential creation data." });
     return;
@@ -41,22 +41,45 @@ async function registerCredential() {
 }
 
 function createCredential(newCredential) {
-  let attestationObject = new Uint8Array(
-    newCredential.response.attestationObject
-  );
-  let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
-  let rawId = new Uint8Array(newCredential.rawId);
+  try {
+    let attestationObject = new Uint8Array(
+      newCredential.response.attestationObject
+    );
+    let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
+    let rawId = new Uint8Array(newCredential.rawId);
 
-  let data = JSON.stringify({
-    id: newCredential.id,
-    rawId: bufferEncode(rawId),
-    type: newCredential.type,
-    response: {
-      attestationObject: bufferEncode(attestationObject),
-      clientDataJSON: bufferEncode(clientDataJSON),
-    },
-  });
+    let data = JSON.stringify({
+      id: newCredential.id,
+      rawId: bufferEncode(rawId),
+      type: newCredential.type,
+      response: {
+        attestationObject: bufferEncode(attestationObject),
+        clientDataJSON: bufferEncode(clientDataJSON),
+      },
+    });
 
-  document.getElementsByName("credentialData")[0].value = window.btoa(data);
-  document.getElementsByTagName("form")[0].submit();
+    console.log("Encoded data:", data);
+
+    let credentialDataElement = document.getElementsByName("credentialData")[0];
+    if (!credentialDataElement) {
+      console.error("Element with name 'credentialData' not found.");
+      webauthnError({ message: "Element with name 'credentialData' not found." });
+      return;
+    }
+
+    credentialDataElement.value = window.btoa(data);
+    console.log("Credential data set:", credentialDataElement.value);
+
+    let form = document.getElementsByTagName("form")[0];
+    if (!form) {
+      console.error("Form element not found.");
+      webauthnError({ message: "Form element not found." });
+      return;
+    }
+
+    console.log("Submitting form...");
+    form.submit();
+  } catch (err) {
+    webauthnError(err);
+  }
 }

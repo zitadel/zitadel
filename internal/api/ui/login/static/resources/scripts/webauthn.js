@@ -1,4 +1,4 @@
-function checkWebauthnSupported(button, func) {
+function checkWebauthnSupported(buttonId, func) {
   let support = document.getElementsByClassName("wa-support");
   let noSupport = document.getElementsByClassName("wa-no-support");
   if (!window.PublicKeyCredential) {
@@ -10,7 +10,14 @@ function checkWebauthnSupported(button, func) {
     }
     return;
   }
-  document.getElementById(button).addEventListener("click", func);
+
+  // Check if the browser supports WebAuthn, anf if, then add the event listener
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.addEventListener("click", func);
+  } else {
+    console.warn(`Button with id '${buttonId}' not found. No event listener added.`);
+  }
 }
 
 function webauthnError(error) {
