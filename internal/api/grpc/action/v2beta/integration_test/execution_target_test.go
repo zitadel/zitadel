@@ -32,12 +32,12 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/query"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/metadata"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -87,32 +87,33 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
-				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetDetails().GetId()}
+				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, false)
 
-				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
-						Config: &action.Target{
-							Name:     targetCreatedName,
-							Endpoint: targetCreatedURL,
-							TargetType: &action.Target_RestCall{
-								RestCall: &action.SetRESTCall{
-									InterruptOnError: false,
-								},
+					Target: &action.Target{
+						Id:           targetCreated.GetId(),
+						CreationDate: targetCreated.GetCreationDate(),
+						ChangeDate:   targetCreated.GetCreationDate(),
+						Name:         targetCreatedName,
+						TargetType: &action.Target_RestCall{
+							RestCall: &action.RESTCall{
+								InterruptOnError: false,
 							},
-							Timeout: durationpb.New(10 * time.Second),
 						},
-						Details: targetCreated.GetDetails(),
+						Timeout:    durationpb.New(10 * time.Second),
+						Endpoint:   targetCreatedURL,
+						SigningKey: targetCreated.GetSigningKey(),
 					},
 				}
 				// has to be set separately because of the pointers
-				response.Target = &action.GetTarget{
+				response.Target = &action.Target{
 					Details: targetCreated.GetDetails(),
 					Config: &action.Target{
 						Name: targetCreatedName,
@@ -128,9 +129,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				// content for partial update
 				changedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
+					Target: &action.Target{
 						Details: &resource_object.Details{
-							Id: targetCreated.GetDetails().GetId(),
+							Id: targetCreated.GetId(),
 						},
 					},
 				}
@@ -149,7 +150,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, false)
-				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
 				return func() {
 					closeRequest()
 					closeResponse()
@@ -163,7 +164,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				Id: "something",
 			},
 			want: &action.GetTargetResponse{
-				Target: &action.GetTarget{
+				Target: &action.Target{
 					Details: &resource_object.Details{
 						Id: "changed",
 						Owner: &object.Owner{
@@ -189,9 +190,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
 				// GetTarget with used target
-				request.Id = targetRequest.GetDetails().GetId()
+				request.Id = targetRequest.GetId()
 				return func() {
 					closeRequest()
 				}, nil
@@ -219,11 +220,11 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// GetTarget with used target
-				request.Id = targetCreated.GetDetails().GetId()
+				request.Id = targetCreated.GetId()
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
+					Target: &action.Target{
 						Details: targetCreated.GetDetails(),
 						Config: &action.Target{
 							Name:     targetCreatedName,
@@ -239,7 +240,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// content for partial update
 				changedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
+					Target: &action.Target{
 						Details: &resource_object.Details{
 							Id: "changed",
 						},
@@ -260,7 +261,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
 				return func() {
 					closeResponse()
 				}, nil
@@ -338,7 +339,7 @@ func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Inst
 		got, err := instance.Client.ActionV3Alpha.SearchTargets(ctx, &action.SearchTargetsRequest{
 			Filters: []*action.TargetSearchFilter{
 				{Filter: &action.TargetSearchFilter_InTargetIdsFilter{
-					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetDetails().GetId()}},
+					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetId()}},
 				}},
 			},
 		})
@@ -646,7 +647,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetId()))
 	return userResp.GetUserId(), closeF
 }
 
@@ -952,7 +953,7 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), executionTargetsSingleTarget(targetResp.GetId()))
 	return userResp.GetUserId(), closeF
 }
 
@@ -1118,7 +1119,7 @@ func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance 
 	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), executionTargetsSingleTarget(targetResp.GetId()))
 
 	return userResp.GetUserId(), closeF
 }

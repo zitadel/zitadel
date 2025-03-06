@@ -4,14 +4,13 @@ import (
 	"context"
 
 	"github.com/muhlemmer/gu"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
 func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetRequest) (*action.CreateTargetResponse, error) {
@@ -25,24 +24,25 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 		return nil, err
 	}
 	return &action.CreateTargetResponse{
-		Details:    resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
-		SigningKey: add.SigningKey,
+		Id:           details.ID,
+		CreationDate: timestamppb.New(details.CreationDate),
+		SigningKey:   add.SigningKey,
 	}, nil
 }
 
-func (s *Server) PatchTarget(ctx context.Context, req *action.PatchTargetRequest) (*action.PatchTargetResponse, error) {
+func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetRequest) (*action.UpdateTargetResponse, error) {
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	patch := patchTargetToCommand(req)
-	details, err := s.command.ChangeTarget(ctx, patch, instanceID)
+	update := updateTargetToCommand(req)
+	details, err := s.command.ChangeTarget(ctx, update, instanceID)
 	if err != nil {
 		return nil, err
 	}
-	return &action.PatchTargetResponse{
-		Details:    resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
-		SigningKey: patch.SigningKey,
+	return &action.UpdateTargetResponse{
+		ChangeDate: timestamppb.New(details.EventDate),
+		SigningKey: update.SigningKey,
 	}, nil
 }
 
@@ -56,69 +56,67 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 		return nil, err
 	}
 	return &action.DeleteTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		DeletionDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 
 func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
-	reqTarget := req.GetTarget()
 	var (
 		targetType       domain.TargetType
 		interruptOnError bool
 	)
-	switch t := reqTarget.GetTargetType().(type) {
-	case *action.Target_RestWebhook:
+	switch t := req.GetTargetType().(type) {
+	case *action.CreateTargetRequest_RestWebhook:
 		targetType = domain.TargetTypeWebhook
 		interruptOnError = t.RestWebhook.InterruptOnError
-	case *action.Target_RestCall:
+	case *action.CreateTargetRequest_RestCall:
 		targetType = domain.TargetTypeCall
 		interruptOnError = t.RestCall.InterruptOnError
-	case *action.Target_RestAsync:
+	case *action.CreateTargetRequest_RestAsync:
 		targetType = domain.TargetTypeAsync
 	}
 	return &command.AddTarget{
-		Name:             reqTarget.GetName(),
+		Name:             req.GetName(),
 		TargetType:       targetType,
-		Endpoint:         reqTarget.GetEndpoint(),
-		Timeout:          reqTarget.GetTimeout().AsDuration(),
+		Endpoint:         req.GetEndpoint(),
+		Timeout:          req.GetTimeout().AsDuration(),
 		InterruptOnError: interruptOnError,
 	}
 }
 
-func patchTargetToCommand(req *action.PatchTargetRequest) *command.ChangeTarget {
+func updateTargetToCommand(req *action.UpdateTargetRequest) *command.ChangeTarget {
 	expirationSigningKey := false
 	// TODO handle expiration, currently only immediate expiration is supported
-	if req.GetTarget().GetExpirationSigningKey() != nil {
+	if req.GetExpirationSigningKey() != nil {
 		expirationSigningKey = true
 	}
 
-	reqTarget := req.GetTarget()
-	if reqTarget == nil {
+	if req == nil {
 		return nil
 	}
 	target := &command.ChangeTarget{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.GetId(),
 		},
-		Name:                 reqTarget.Name,
-		Endpoint:             reqTarget.Endpoint,
+		Name:                 req.Name,
+		Endpoint:             req.Endpoint,
 		ExpirationSigningKey: expirationSigningKey,
 	}
-	if reqTarget.TargetType != nil {
-		switch t := reqTarget.GetTargetType().(type) {
-		case *action.PatchTarget_RestWebhook:
+	if req.TargetType != nil {
+		switch t := req.GetTargetType().(type) {
+		case *action.UpdateTargetRequest_RestWebhook:
 			target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
 			target.InterruptOnError = gu.Ptr(t.RestWebhook.InterruptOnError)
-		case *action.PatchTarget_RestCall:
+		case *action.UpdateTargetRequest_RestCall:
 			target.TargetType = gu.Ptr(domain.TargetTypeCall)
 			target.InterruptOnError = gu.Ptr(t.RestCall.InterruptOnError)
-		case *action.PatchTarget_RestAsync:
+		case *action.UpdateTargetRequest_RestAsync:
 			target.TargetType = gu.Ptr(domain.TargetTypeAsync)
 			target.InterruptOnError = gu.Ptr(false)
 		}
 	}
-	if reqTarget.Timeout != nil {
-		target.Timeout = gu.Ptr(reqTarget.GetTimeout().AsDuration())
+	if req.Timeout != nil {
+		target.Timeout = gu.Ptr(req.GetTimeout().AsDuration())
 	}
 	return target
 }
