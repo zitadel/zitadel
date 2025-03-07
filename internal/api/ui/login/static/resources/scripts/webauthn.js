@@ -13,7 +13,7 @@ function checkWebauthnSupported(func, optionalClickId) {
 
   // if id is provided add click event only, otherwise call the function directly
   if (optionalClickId) {
-    document.getElementById(button).addEventListener("click", func);
+    document.getElementById(optionalClickId).addEventListener("click", func);
   } else {
     func();
   }
