@@ -64,11 +64,13 @@ func (a *AuthRequestSAML) IsValid() bool {
 }
 
 type AuthRequestDevice struct {
-	ClientID   string
-	DeviceCode string
-	UserCode   string
-	Scopes     []string
-	Audience   []string
+	ClientID    string
+	DeviceCode  string
+	UserCode    string
+	Scopes      []string
+	Audience    []string
+	AppName     string
+	ProjectName string
 }
 
 func (*AuthRequestDevice) Type() AuthRequestType {

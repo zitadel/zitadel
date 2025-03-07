@@ -1297,8 +1297,8 @@ func newOIDCAppChangedEvent(ctx context.Context, appID, projectID, resourceOwner
 		project.ChangeIDTokenRoleAssertion(false),
 		project.ChangeIDTokenUserinfoAssertion(false),
 		project.ChangeClockSkew(time.Second * 2),
-		project.ChangeLoginVersion(domain.LoginVersion2),
-		project.ChangeLoginBaseURI("https://login.test.ch"),
+		project.ChangeOIDCLoginVersion(domain.LoginVersion2),
+		project.ChangeOIDCLoginBaseURI("https://login.test.ch"),
 	}
 	event, _ := project.NewOIDCConfigChangedEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,

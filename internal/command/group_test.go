@@ -793,6 +793,7 @@ func TestCommandSide_RemoveGroup(t *testing.T) {
 		ctx           context.Context
 		groupID       string
 		resourceOwner string
+		userIDs       []string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -919,7 +920,7 @@ func TestCommandSide_RemoveGroup(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveGroup(tt.args.ctx, tt.args.groupID, tt.args.resourceOwner)
+			got, err := r.RemoveGroup(tt.args.ctx, tt.args.groupID, tt.args.resourceOwner, tt.args.userIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

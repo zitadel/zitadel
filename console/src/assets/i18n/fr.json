@@ -512,11 +512,13 @@
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
+    "ORG_SETTINGS_MANAGER": "A le droit de gérer les paramètres de l'organisation",
     "ORG_USER_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux utilisateurs",
     "ORG_PROJECT_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux projets",
     "ORG_PROJECT_CREATOR": "A le droit de créer ses propres projets et leurs paramètres sous-jacents.",
     "ORG_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de l'organisation",
     "ORG_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de l'organisation",
+    "ORG_USER_SELF_MANAGER": "A le droit de gérer ses propres utilisateurs",
     "PROJECT_OWNER": "A le droit de gérer l'ensemble du projet",
     "PROJECT_OWNER_VIEWER": "A le droit de passer en revue l'ensemble du projet",
     "PROJECT_OWNER_GLOBAL": "A le droit d'accéder à l'ensemble du projet",
@@ -809,6 +811,9 @@
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
       "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone.",
+      "PHONE_VERIFIED": "Numéro de téléphone vérifié",
+      "SEND_SMS": "Envoyer un SMS de vérification",
+      "SEND_EMAIL": "Envoyer un Courriel",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -948,6 +953,14 @@
       "4": "Verrouillé",
       "5": "Suspendu",
       "6": "Initial"
+    },
+    "STATEV2": {
+      "0": "Inconnu",
+      "1": "Actif",
+      "2": "Inactif",
+      "3": "Supprimé",
+      "4": "Verrouillé",
+      "5": "Initial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nom de connexion (organisation actuelle)",
@@ -1486,7 +1499,9 @@
         "ENABLED": "\"Activé\" est hérité",
         "DISABLED": "\"Désactivé\" est hérité"
       },
-      "RESET": "Réinitialiser tout sur hérité"
+      "RESET": "Réinitialiser tout sur hérité",
+      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console pour la création d'utilisateurs",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial."
     },
     "DIALOG": {
       "RESET": {
@@ -2192,7 +2207,9 @@
       "REMOVED": "Suppression réussie."
     },
     "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
-    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo."
+    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo.",
+    "USEPKCE": "Utiliser PKCE",
+    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification"
   },
   "MFA": {
     "LIST": {

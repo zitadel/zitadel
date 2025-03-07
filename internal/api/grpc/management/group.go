@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/groupgrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -204,7 +205,16 @@ func (s *Server) RemoveGroup(ctx context.Context, req *mgmt_pb.RemoveGroupReques
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveGroup(ctx, req.Id, authz.GetCtxData(ctx).OrgID, groupGrantsToIDs(grants.GroupGrants)...)
+	groupMember, err := s.query.GroupMembers(ctx, &query.GroupMembersQuery{
+		MembersQuery: query.MembersQuery{
+			Queries: nil,
+		},
+		GroupID: req.Id,
+	})
+	if err != nil {
+		return nil, zerrors.ThrowInvalidArgumentf(err, "GROUP-IDasq", "GroupMember %v", groupMember)
+	}
+	details, err := s.command.RemoveGroup(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberToUserIDs(groupMember.GroupMembers), groupGrantsToIDs(grants.GroupGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -266,6 +276,14 @@ func groupGrantsToIDs(groupGrants []*query.GroupGrant) []string {
 	converted := make([]string, len(groupGrants))
 	for i, grant := range groupGrants {
 		converted[i] = grant.ID
+	}
+	return converted
+}
+
+func memberToUserIDs(groupMember []*query.GroupMember) []string {
+	converted := make([]string, len(groupMember))
+	for i, group := range groupMember {
+		converted[i] = group.UserID
 	}
 	return converted
 }

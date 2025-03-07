@@ -70,6 +70,11 @@ module.exports = {
         },
         {
           type: "link",
+          label: "FastAPI",
+          href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
+        },
+        {
+          type: "link",
           label: "NextAuth",
           href: "https://next-auth.js.org/providers/zitadel",
         },
@@ -328,6 +333,7 @@ module.exports = {
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
+            "guides/integrate/login-ui/device-auth",
             "guides/integrate/login-ui/typescript-repo",
           ],
         },
@@ -738,34 +744,6 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "User Schema Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "User Schema Service API (Preview)",
-                slug: "/apis/resources/user_schema_service",
-                description:
-                  "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
-              },
-              items: require("./docs/apis/resources/user_schema_service_v3/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "User Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "User Service API (Preview)",
-                slug: "/apis/resources/user_service_v3",
-                description:
-                  "This API is intended to manage users with your own data schema in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
-              },
-              items: require("./docs/apis/resources/user_service_v3/sidebar.ts"),
-            },
-            {
-              type: "category",
               label: "Action Lifecycle (Preview)",
               link: {
                 type: "generated-index",
@@ -910,6 +888,20 @@ module.exports = {
           },
           items: [
             "apis/benchmarks/v2.66.0/machine_jwt_profile_grant/index",
+          ],
+        },
+        {
+          type: "category",
+          label: "v2.70.0",
+          link: {
+            title: "v2.70.0",
+            slug: "/apis/benchmarks/v2.70.0",
+            description:
+              "Benchmark results of Zitadel v2.70.0\n"
+          },
+          items: [
+            "apis/benchmarks/v2.70.0/machine_jwt_profile_grant/index",
+            "apis/benchmarks/v2.70.0/oidc_session/index",
           ],
         },
       ],

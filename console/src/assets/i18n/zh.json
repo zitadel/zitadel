@@ -512,11 +512,13 @@
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
+    "ORG_SETTINGS_MANAGER": "有权管理组织的设置",
     "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
     "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
     "ORG_ADMIN_IMPERSONATOR": "有权模拟组织的管理员和最终用户",
     "ORG_END_USER_IMPERSONATOR": "有权模拟组织的最终用户",
+    "ORG_USER_SELF_MANAGER": "有权管理自己的用户",
     "PROJECT_OWNER": "拥有整个项目的权限",
     "PROJECT_OWNER_VIEWER": "有权审查整个项目",
     "PROJECT_OWNER_GLOBAL": "拥有整个项目的权限",
@@ -809,6 +811,9 @@
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
       "PHONE_HINT": "使用+号，后跟呼叫者的国家/地区代码，或从下拉列表中选择国家/地区，最后输入电话号码",
+      "PHONE_VERIFIED": "电话号码已验证",
+      "SEND_SMS": "发送验证短信",
+      "SEND_EMAIL": "发送电子邮件",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -948,6 +953,14 @@
       "4": "已锁定",
       "5": "已暂停",
       "6": "初始化"
+    },
+    "STATEV2": {
+      "0": "未知",
+      "1": "启用",
+      "2": "停用",
+      "3": "已删除",
+      "4": "已锁定",
+      "5": "初始化"
     },
     "SEARCH": {
       "ADDITIONAL": "登录名 (当前组织)",
@@ -1486,7 +1499,9 @@
         "ENABLED": "“已启用” 是继承的",
         "DISABLED": "“已禁用” 是继承的"
       },
-      "RESET": "全部设置为继承"
+      "RESET": "全部设置为继承",
+      "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。"
     },
     "DIALOG": {
       "RESET": {
@@ -2191,7 +2206,9 @@
       "REMOVED": "成功删除。"
     },
     "ISIDTOKENMAPPING": "从ID令牌映射",
-    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。"
+    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。",
+    "USEPKCE": "使用PKCE",
+    "USEPKCE_DESC": "确定 auth 请求中是否包含 code_challenge 和 code_challenge_method 参数"
   },
   "MFA": {
     "LIST": {

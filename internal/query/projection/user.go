@@ -348,6 +348,10 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserGroupRemovedType,
 					Reduce: p.reduceGroupMemberRemoved,
 				},
+				{
+					Event:  user.UserGroupCascadeRemovedType,
+					Reduce: p.reduceCascadeGroupMemberRemoved,
+				},
 			},
 		},
 		{
@@ -1251,8 +1255,23 @@ func reduceUserGroupRemoved(e user.UserGroupRemovedEvent, opts ...reduceGroupMem
 	config := reduceGroupMemberConfig{
 		cols: []handler.Column{
 			handler.NewArrayRemoveCol(GroupIDsCol, e.GroupID),
-			// handler.NewCol(UserChangeDateCol, e.CreatedAt()),
-			// handler.NewCol(UserSequenceCol, e.Sequence()),
+		},
+		conds: []handler.Condition{
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+		}}
+
+	for _, opt := range opts {
+		config = opt(config)
+	}
+
+	return handler.NewUpdateStatement(&e, config.cols, config.conds), nil
+}
+
+func reduceUserGroupCascadeRemoved(e user.UserGroupCascadeRemovedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
+	config := reduceGroupMemberConfig{
+		cols: []handler.Column{
+			handler.NewArrayRemoveCol(GroupIDsCol, e.GroupID),
 		},
 		conds: []handler.Condition{
 			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
@@ -1279,12 +1298,22 @@ func (p *userProjection) reduceGroupMemberAdded(event eventstore.Event) (*handle
 
 func (p *userProjection) reduceGroupMemberRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserGroupRemovedEvent)
-	// e, ok := event.(*group.MemberAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-aqz1O", "reduce.wrong.event.type %s", user.UserGroupRemovedType)
 	}
 
 	return reduceUserGroupRemoved(
+		*e,
+	)
+}
+
+func (p *userProjection) reduceCascadeGroupMemberRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserGroupCascadeRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-aqz1O", "reduce.wrong.event.type %s", user.UserGroupCascadeRemovedType)
+	}
+
+	return reduceUserGroupCascadeRemoved(
 		*e,
 	)
 }
