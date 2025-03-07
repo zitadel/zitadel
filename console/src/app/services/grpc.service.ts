@@ -1,28 +1,28 @@
-import {PlatformLocation} from '@angular/common';
-import {Injectable} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
-import {AuthConfig} from 'angular-oauth2-oidc';
-import {catchError, firstValueFrom, switchMap, tap} from 'rxjs';
+import { PlatformLocation } from '@angular/common';
+import { Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { AuthConfig } from 'angular-oauth2-oidc';
+import { catchError, firstValueFrom, switchMap, tap } from 'rxjs';
 
-import {AdminServiceClient} from '../proto/generated/zitadel/AdminServiceClientPb';
-import {AuthServiceClient} from '../proto/generated/zitadel/AuthServiceClientPb';
-import {ManagementServiceClient} from '../proto/generated/zitadel/ManagementServiceClientPb';
-import {fallbackLanguage, supportedLanguagesRegexp} from '../utils/language';
-import {AuthenticationService} from './authentication.service';
-import {EnvironmentService} from './environment.service';
-import {ExhaustedService} from './exhausted.service';
-import {AuthInterceptor, AuthInterceptorProvider, NewConnectWebAuthInterceptor} from './interceptors/auth.interceptor';
-import {ExhaustedGrpcInterceptor} from './interceptors/exhausted.grpc.interceptor';
-import {I18nInterceptor} from './interceptors/i18n.interceptor';
-import {NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider} from './interceptors/org.interceptor';
-import {StorageService} from './storage.service';
-import {UserServiceClient} from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
+import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
+import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
+import { ManagementServiceClient } from '../proto/generated/zitadel/ManagementServiceClientPb';
+import { fallbackLanguage, supportedLanguagesRegexp } from '../utils/language';
+import { AuthenticationService } from './authentication.service';
+import { EnvironmentService } from './environment.service';
+import { ExhaustedService } from './exhausted.service';
+import { AuthInterceptor, AuthInterceptorProvider, NewConnectWebAuthInterceptor } from './interceptors/auth.interceptor';
+import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.interceptor';
+import { I18nInterceptor } from './interceptors/i18n.interceptor';
+import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
+import { StorageService } from './storage.service';
+import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
-import {createUserServiceClient} from '@zitadel/client/v2';
+import { createUserServiceClient } from '@zitadel/client/v2';
 //@ts-ignore
-import {createAuthServiceClient, createManagementServiceClient} from '@zitadel/client/v1';
-import {createGrpcWebTransport} from '@connectrpc/connect-web';
-import {FeatureServiceClient} from '../proto/generated/zitadel/feature/v2/Feature_serviceServiceClientPb';
+import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
+import { createGrpcWebTransport } from '@connectrpc/connect-web';
+import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2/Feature_serviceServiceClientPb';
 
 @Injectable({
   providedIn: 'root',
@@ -47,8 +47,7 @@ export class GrpcService {
     private readonly authInterceptor: AuthInterceptor,
     private readonly authInterceptorProvider: AuthInterceptorProvider,
     private readonly orgInterceptorProvider: OrgInterceptorProvider,
-  ) {
-  }
+  ) {}
 
   public loadAppEnvironment(): Promise<any> {
     // We use the browser language until we can make API requests to get the users configured language.
@@ -107,7 +106,10 @@ export class GrpcService {
         });
         const transportOldAPIs = createGrpcWebTransport({
           baseUrl: env.api,
-          interceptors: [NewConnectWebAuthInterceptor(this.authInterceptorProvider), NewConnectWebOrgInterceptor(this.orgInterceptorProvider)],
+          interceptors: [
+            NewConnectWebAuthInterceptor(this.authInterceptorProvider),
+            NewConnectWebOrgInterceptor(this.orgInterceptorProvider),
+          ],
         });
         this.userNew = createUserServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);

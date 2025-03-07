@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
-import {Request, RpcError, StatusCode, UnaryInterceptor, UnaryResponse} from 'grpc-web';
-import {Org} from 'src/app/proto/generated/zitadel/org_pb';
+import { Injectable } from '@angular/core';
+import { Request, RpcError, StatusCode, UnaryInterceptor, UnaryResponse } from 'grpc-web';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 
-import {StorageKey, StorageLocation, StorageService} from '../storage.service';
-import {ConnectError, Interceptor} from "@connectrpc/connect";
-import {firstValueFrom, identity, Observable, Subject} from "rxjs";
-import {debounceTime, filter, map} from "rxjs/operators";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import { StorageKey, StorageLocation, StorageService } from '../storage.service';
+import { ConnectError, Interceptor } from '@connectrpc/connect';
+import { firstValueFrom, identity, Observable, Subject } from 'rxjs';
+import { debounceTime, filter, map } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ORG_HEADER_KEY = 'x-zitadel-orgid';
 @Injectable({ providedIn: 'root' })
@@ -37,7 +37,6 @@ export class OrgInterceptor<TReq = unknown, TResp = unknown> implements UnaryInt
   }
 }
 
-
 export function NewConnectWebOrgInterceptor(orgInterceptorProvider: OrgInterceptorProvider): Interceptor {
   return (next) => async (req) => {
     if (!req.header.get(ORG_HEADER_KEY)) {
@@ -51,9 +50,7 @@ export function NewConnectWebOrgInterceptor(orgInterceptorProvider: OrgIntercept
 
 @Injectable({ providedIn: 'root' })
 export class OrgInterceptorProvider {
-  constructor(
-    private storageService: StorageService,
-  ){}
+  constructor(private storageService: StorageService) {}
 
   getOrgId(): Observable<string> {
     const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
@@ -63,13 +60,13 @@ export class OrgInterceptorProvider {
     });
   }
 
-
   handleError = (error: any): never => {
     if (!(error instanceof RpcError) && !(error instanceof ConnectError)) {
       throw error;
     }
 
-    if (error instanceof RpcError &&
+    if (
+      error instanceof RpcError &&
       error.code === StatusCode.PERMISSION_DENIED &&
       error.message.startsWith("Organisation doesn't exist")
     ) {
