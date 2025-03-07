@@ -504,19 +504,13 @@ message UpdateTargetRequest {
 
 message UpdateTargetResponse {
   // The timestamp of the change of the target.
-  google.protobuf.Timestamp creation_date = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"2025-01-23T10:34:18.051Z\"";
-    }
-  ];
-  // The timestamp of the change of the target.
-  google.protobuf.Timestamp change_date = 2 [
+  google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
   // Key used to sign and check payload sent to the target.
-  optional string signing_key = 3 [
+  optional string signing_key = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"98KmsU67\""
     }
@@ -536,16 +530,10 @@ message DeleteTargetRequest {
 }
 
 message DeleteTargetResponse {
-  // The timestamp of the change of the target.
-  google.protobuf.Timestamp creation_date = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"2025-01-23T10:34:18.051Z\"";
-    }
-  ];
   // The timestamp of the deletion of the target.
   // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
   // In case the deletion occurred in a previous request, the deletion date might be empty.
-  google.protobuf.Timestamp deletion_date = 2 [
+  google.protobuf.Timestamp deletion_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }

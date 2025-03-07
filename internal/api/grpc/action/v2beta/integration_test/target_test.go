@@ -269,9 +269,8 @@ func TestServer_UpdateTarget(t *testing.T) {
 				},
 			},
 			want: &action.UpdateTargetResponse{
-				CreationDate: timestamppb.Now(),
-				ChangeDate:   timestamppb.Now(),
-				SigningKey:   nil,
+				ChangeDate: timestamppb.Now(),
+				SigningKey: nil,
 			},
 		},
 		{
@@ -288,9 +287,8 @@ func TestServer_UpdateTarget(t *testing.T) {
 				},
 			},
 			want: &action.UpdateTargetResponse{
-				CreationDate: timestamppb.Now(),
-				ChangeDate:   timestamppb.Now(),
-				SigningKey:   gu.Ptr("notempty"),
+				ChangeDate: timestamppb.Now(),
+				SigningKey: gu.Ptr("notempty"),
 			},
 		},
 		{
@@ -311,9 +309,8 @@ func TestServer_UpdateTarget(t *testing.T) {
 				},
 			},
 			want: &action.UpdateTargetResponse{
-				CreationDate: timestamppb.Now(),
-				ChangeDate:   timestamppb.Now(),
-				SigningKey:   nil,
+				ChangeDate: timestamppb.Now(),
+				SigningKey: nil,
 			},
 		},
 		{
@@ -330,9 +327,8 @@ func TestServer_UpdateTarget(t *testing.T) {
 				},
 			},
 			want: &action.UpdateTargetResponse{
-				CreationDate: timestamppb.Now(),
-				ChangeDate:   timestamppb.Now(),
-				SigningKey:   nil,
+				ChangeDate: timestamppb.Now(),
+				SigningKey: nil,
 			},
 		},
 		{
@@ -349,9 +345,8 @@ func TestServer_UpdateTarget(t *testing.T) {
 				},
 			},
 			want: &action.UpdateTargetResponse{
-				CreationDate: timestamppb.Now(),
-				ChangeDate:   timestamppb.Now(),
-				SigningKey:   nil,
+				ChangeDate: timestamppb.Now(),
+				SigningKey: nil,
 			},
 		},
 		{
@@ -370,9 +365,8 @@ func TestServer_UpdateTarget(t *testing.T) {
 				},
 			},
 			want: &action.UpdateTargetResponse{
-				CreationDate: timestamppb.Now(),
-				ChangeDate:   timestamppb.Now(),
-				SigningKey:   nil,
+				ChangeDate: timestamppb.Now(),
+				SigningKey: nil,
 			},
 		},
 	}
@@ -394,10 +388,6 @@ func TestServer_UpdateTarget(t *testing.T) {
 }
 
 func assertUpdateTargetResponse(t *testing.T, expectedResp *action.UpdateTargetResponse, actualResp *action.UpdateTargetResponse) {
-	if expectedResp.GetCreationDate() == nil {
-		wantCreationDate := expectedResp.GetCreationDate().AsTime()
-		assert.WithinRange(t, actualResp.GetCreationDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
-	}
 	if expectedResp.GetChangeDate() == nil {
 		wantCreationDate := expectedResp.GetChangeDate().AsTime()
 		assert.WithinRange(t, actualResp.GetChangeDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
@@ -436,6 +426,16 @@ func TestServer_DeleteTarget(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "delete target, not existing",
+			ctx:  iamOwnerCtx,
+			req: &action.DeleteTargetRequest{
+				Id: "notexisting",
+			},
+			want: &action.DeleteTargetResponse{
+				DeletionDate: timestamppb.Now(),
+			},
+		},
+		{
 			name: "delete target",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *action.DeleteTargetRequest) {
@@ -444,7 +444,19 @@ func TestServer_DeleteTarget(t *testing.T) {
 			},
 			req: &action.DeleteTargetRequest{},
 			want: &action.DeleteTargetResponse{
-				CreationDate: timestamppb.Now(),
+				DeletionDate: timestamppb.Now(),
+			},
+		},
+		{
+			name: "delete target, already removed",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *action.DeleteTargetRequest) {
+				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				request.Id = targetID
+				instance.DeleteTarget(iamOwnerCtx, t, targetID)
+			},
+			req: &action.DeleteTargetRequest{},
+			want: &action.DeleteTargetResponse{
 				DeletionDate: timestamppb.Now(),
 			},
 		},
@@ -466,10 +478,6 @@ func TestServer_DeleteTarget(t *testing.T) {
 }
 
 func assertDeleteTargetResponse(t *testing.T, expectedResp *action.DeleteTargetResponse, actualResp *action.DeleteTargetResponse) {
-	if expectedResp.GetCreationDate() == nil {
-		wantCreationDate := expectedResp.GetCreationDate().AsTime()
-		assert.WithinRange(t, actualResp.GetCreationDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
-	}
 	if expectedResp.GetDeletionDate() == nil {
 		wantCreationDate := expectedResp.GetDeletionDate().AsTime()
 		assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))

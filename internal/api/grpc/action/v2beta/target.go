@@ -19,13 +19,17 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 	}
 	add := createTargetToCommand(req)
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	details, err := s.command.AddTarget(ctx, add, instanceID)
+	createdAt, err := s.command.AddTarget(ctx, add, instanceID)
 	if err != nil {
 		return nil, err
 	}
+	var creationDate *timestamppb.Timestamp
+	if !createdAt.IsZero() {
+		creationDate = timestamppb.New(createdAt)
+	}
 	return &action.CreateTargetResponse{
-		Id:           details.ID,
-		CreationDate: timestamppb.New(details.EventDate),
+		Id:           add.AggregateID,
+		CreationDate: creationDate,
 		SigningKey:   add.SigningKey,
 	}, nil
 }
@@ -36,12 +40,16 @@ func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetReque
 	}
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	update := updateTargetToCommand(req)
-	details, err := s.command.ChangeTarget(ctx, update, instanceID)
+	changedAt, err := s.command.ChangeTarget(ctx, update, instanceID)
 	if err != nil {
 		return nil, err
 	}
+	var changeDate *timestamppb.Timestamp
+	if !changedAt.IsZero() {
+		changeDate = timestamppb.New(changedAt)
+	}
 	return &action.UpdateTargetResponse{
-		ChangeDate: timestamppb.New(details.EventDate),
+		ChangeDate: changeDate,
 		SigningKey: update.SigningKey,
 	}, nil
 }
@@ -51,12 +59,16 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 		return nil, err
 	}
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	details, err := s.command.DeleteTarget(ctx, req.GetId(), instanceID)
+	deletedAt, err := s.command.DeleteTarget(ctx, req.GetId(), instanceID)
 	if err != nil {
 		return nil, err
 	}
+	var deletionDate *timestamppb.Timestamp
+	if !deletedAt.IsZero() {
+		deletionDate = timestamppb.New(deletedAt)
+	}
 	return &action.DeleteTargetResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+		DeletionDate: deletionDate,
 	}, nil
 }
 
