@@ -546,7 +546,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			_, _, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
+			_, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
