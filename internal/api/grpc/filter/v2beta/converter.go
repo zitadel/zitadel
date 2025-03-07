@@ -17,6 +17,12 @@ func TextMethodPbToQuery(method filter.TextFilterMethod) query.TextComparison {
 		return query.TextStartsWithIgnoreCase
 	case filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS:
 		return query.TextContains
+	case filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS_IGNORE_CASE:
+		return query.TextContainsIgnoreCase
+	case filter.TextFilterMethod_TEXT_FILTER_METHOD_ENDS_WITH:
+		return query.TextEndsWith
+	case filter.TextFilterMethod_TEXT_FILTER_METHOD_ENDS_WITH_IGNORE_CASE:
+		return query.TextEndsWithIgnoreCase
 	default:
 		return -1
 	}
