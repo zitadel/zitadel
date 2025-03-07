@@ -126,8 +126,8 @@ export class GroupMembersTableComponent implements OnInit, OnDestroy {
       data: {
         confirmKey: 'ACTIONS.DELETE',
         cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'MEMBER.DIALOG.DELETE_TITLE',
-        descriptionKey: 'MEMBER.DIALOG.DELETE_DESCRIPTION',
+        titleKey: 'GROUP.MEMBER.DELETE_TITLE',
+        descriptionKey: 'GROUP.MEMBER.DELETE_DESCRIPTION',
       },
       width: '400px',
     });

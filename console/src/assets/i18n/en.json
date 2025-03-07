@@ -1073,11 +1073,18 @@
       "SELECTEDREACTIVATED": "Selected groups reactivated.",
       "SELECTEDDEACTIVATED": "Selected groups deactivated.",
       "REACTIVATED": "Group reactivated.",
-      "DEACTIVATED": "Group deactivated."
+      "DEACTIVATED": "Group deactivated.",
+      "MEMBERREMOVED": "Member removed.",
+      "MEMBERSADDED": "Members added."
     },
     "PAGES": {
       "NOGROUP": "No associated group.",
       "DELETE": "Delete Group"
+    },
+    "MEMBER": {
+      "ADD": "Add a Member",
+      "DELETE_TITLE": "Remove Member",
+      "DELETE_DESCRIPTION": "You are about to remove a member. Are you sure?"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete Group",

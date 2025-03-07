@@ -213,7 +213,7 @@ export class GroupDetailComponent implements OnInit {
               setTimeout(() => {
                 this.changePage.emit();
               }, 1000);
-              this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
+              this.toast.showInfo('GROUP.TOAST.MEMBERSADDED', true);
             })
             .catch((error) => {
               this.changePage.emit();
@@ -231,7 +231,7 @@ export class GroupDetailComponent implements OnInit {
         setTimeout(() => {
           this.changePage.emit();
         }, 1000);
-        this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+        this.toast.showInfo('GROUP.TOAST.MEMBERREMOVED', true);
       })
       .catch((error) => {
         this.toast.showError(error);
