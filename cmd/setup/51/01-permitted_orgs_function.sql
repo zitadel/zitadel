@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     instanceId TEXT
     , userId TEXT
     , perm TEXT
-    , system_roles TEXT[]
+    , system_user_roles TEXT[]
     , filter_orgs TEXT
 
     , org_ids OUT TEXT[]
@@ -20,12 +20,12 @@ BEGIN
 	WHERE rp.instance_id = instanceId
 	AND rp.permission = perm;
 
-  IF system_roles IS NOT NULL THEN
+  IF system_user_roles IS NOT NULL THEN
     DECLARE
       permission_found_in_system_roles bool;
     BEGIN
       SELECT result.role_found INTO permission_found_in_system_roles
-      FROM (SELECT matched_roles && system_roles AS role_found) AS result;
+      FROM (SELECT matched_roles && system_user_roles AS role_found) AS result;
 
       IF permission_found_in_system_roles THEN
         SELECT array_agg(o.org_id) INTO org_ids

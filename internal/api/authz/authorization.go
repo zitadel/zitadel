@@ -31,7 +31,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
-			parent = addGetSystemRolesFuncToCtx(parent, ctxData)
+			parent = addGetSystemUserRolesFuncToCtx(parent, ctxData)
 			return context.WithValue(parent, dataKey, ctxData)
 		}, nil
 	}
@@ -52,7 +52,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		parent = context.WithValue(parent, dataKey, ctxData)
 		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
-		parent = addGetSystemRolesFuncToCtx(parent, ctxData)
+		parent = addGetSystemUserRolesFuncToCtx(parent, ctxData)
 		return parent
 	}, nil
 }
@@ -129,7 +129,7 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 	return ctxIDs
 }
 
-func addGetSystemRolesFuncToCtx(ctx context.Context, ctxData CtxData) context.Context {
+func addGetSystemUserRolesFuncToCtx(ctx context.Context, ctxData CtxData) context.Context {
 	if len(ctxData.SystemMemberships) != 0 {
 		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func() func(ctx context.Context) ([]string, error) {
 			var roles []string
@@ -138,7 +138,7 @@ func addGetSystemRolesFuncToCtx(ctx context.Context, ctxData CtxData) context.Co
 					return roles, nil
 				}
 				var err error
-				roles, err = getSystemRoles(ctx)
+				roles, err = getSystemUserRoles(ctx)
 				return roles, err
 			}
 		}())
@@ -146,7 +146,7 @@ func addGetSystemRolesFuncToCtx(ctx context.Context, ctxData CtxData) context.Co
 	return ctx
 }
 
-func GetSystemRoles(ctx context.Context) ([]string, error) {
+func GetSystemUserRoles(ctx context.Context) ([]string, error) {
 	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesFuncKey)
 	if getSystemUserRolesFuncValue == nil {
 		return nil, nil
@@ -158,7 +158,7 @@ func GetSystemRoles(ctx context.Context) ([]string, error) {
 	return getSystemUserRolesFunc(ctx)
 }
 
-func getSystemRoles(ctx context.Context) ([]string, error) {
+func getSystemUserRoles(ctx context.Context) ([]string, error) {
 	ctxData, ok := ctx.Value(dataKey).(CtxData)
 	if !ok {
 		return nil, errors.New("unable to obtain ctxData")
