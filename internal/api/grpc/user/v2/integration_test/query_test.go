@@ -1137,7 +1137,7 @@ func TestServer_ListUsers(t *testing.T) {
 				setPermissionCheckV2Flag(t, f.SetFlag)
 				infos := tt.args.dep(IamCTX, tt.args.req)
 
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 15*time.Minute)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 10*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
 					if tt.wantErr {
