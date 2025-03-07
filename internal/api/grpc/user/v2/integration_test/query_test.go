@@ -1220,12 +1220,21 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 			checkNumberOfUsersReturned: true,
 		},
 		{
-			name: "list users without neccessary permissions specifying org",
+			name: "list users with neccessary permissions specifying org",
 			req: &user.ListUsersRequest{
 				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
 			},
 			ctx:                        SystemCTX,
 			expectedFoundUsernames:     []string{"Test_SystemUsers_ListUser2@zitadel.com", "org2@zitadel.com"},
+			checkNumberOfUsersReturned: true,
+		},
+		{
+			name: "list users without neccessary permissions specifying org",
+			req: &user.ListUsersRequest{
+				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
+			},
+			ctx: SystemUserWithNoPermissionsCTX,
+			// check no users returned
 			checkNumberOfUsersReturned: true,
 		},
 	}
