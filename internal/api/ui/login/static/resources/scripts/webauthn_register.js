@@ -1,6 +1,14 @@
 document.addEventListener(
   "DOMContentLoaded",
-  checkWebauthnSupported("btn-register", registerCredential)
+  () => {
+    const form = document.getElementsByTagName("form")[0];
+    if (form) {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault(); // Prevent the default form submission
+        checkWebauthnSupported(registerCredential);
+      });
+    }
+  }
 );
 
 async function registerCredential() {
@@ -8,7 +16,7 @@ async function registerCredential() {
 
   let opt;
   try {
-    opt = JSON.parse(atob(document.getElementsByName("credentialCreationData")[0].value));
+    opt = JSON.parse(window.atob(document.getElementsByName("credentialCreationData")[0].value));
   } catch (e) {
     webauthnError({ message: "Failed to parse credential creation data." });
     return;
