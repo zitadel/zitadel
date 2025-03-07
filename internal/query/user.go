@@ -655,7 +655,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	})
 	if permissionCheckV2 {
-		// extract system roles
+		// extract system user roles
 		systemUserRoles, err := authz.GetSystemUserRoles(ctx)
 		if err != nil {
 			return nil, zerrors.ThrowInternal(err, "QUERY-GS9gs", "Errors.Internal")
