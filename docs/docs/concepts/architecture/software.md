@@ -20,7 +20,7 @@ This All in One (AiO) approach makes operating Zitadel simple.
 Zitadels software architecture is built around multiple components at different levels.
 This chapter should give you an idea of the components as well as the different layers.
 
-![Software Architecture](/img/Zitadel_software_architecture.png)
+![Software Architecture](/img/zitadel_software_architecture.png)
 
 ### Service Layer
 
