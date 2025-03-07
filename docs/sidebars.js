@@ -743,7 +743,7 @@ module.exports = {
               link: {
                 type: "generated-index",
                 title: "Action Service API (Preview)",
-                slug: "/apis/resources/action_service_v3",
+                slug: "/apis/resources/action_service_v2",
                 description:
                   "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
                   "The version 3 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
@@ -756,14 +756,14 @@ module.exports = {
               items: [
                 {
                   type: "doc",
-                  id: "apis/actions/v3/usage",
+                  id: "apis/actions/v2/usage",
                 },
                 {
                   type: "doc",
-                  id: "apis/actions/v3/testing-locally",
+                  id: "apis/actions/v2/testing-locally",
                 },
               ].concat(
-                require("./docs/apis/resources/action_service_v3/sidebar.ts")
+                require("./docs/apis/resources/action_service_v2/sidebar.ts")
               ),
             },
             {
