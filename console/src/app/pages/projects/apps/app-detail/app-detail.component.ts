@@ -938,7 +938,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.samlForm.get('loginV2BaseURL');
   }
 
-
   get decodedBase64(): string {
     if (
       this.app &&
