@@ -147,5 +147,5 @@ Zitadel currently supports PostgreSQL.
 Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgresql) before you decide on using one of them.
 
 :::info
-ZITADEL v2 supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/). Please refer to [the mirror guide](cli/mirror) to migrate to postgres.
+ZITADEL v2 supported CockroachDB and PostgreSQL. Zitadel v3 only supports PostgreSQL. Please refer to [the mirror guide](cli/mirror) to migrate to PostgreSQL.
 :::
