@@ -1,6 +1,6 @@
 document.addEventListener(
   "DOMContentLoaded",
-  checkWebauthnSupported("btn-login", login)
+  checkWebauthnSupported(login, "btn-login"),
 );
 
 async function login() {
