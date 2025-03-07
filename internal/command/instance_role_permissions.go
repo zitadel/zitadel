@@ -32,6 +32,7 @@ func (c *Commands) SynchronizeRolePermission(ctx context.Context, aggregateID st
 	}
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
+		logging.WithError(err).Error("failed to push role permission commands")
 		return nil, zerrors.ThrowInternal(err, "COMMA-AiV3u", "Errors.Internal")
 	}
 	return pushedEventsToObjectDetails(events), nil
