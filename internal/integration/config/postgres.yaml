@@ -3,5 +3,5 @@ Database:
     User:
       Password: zitadel
     Admin:
-      Username: adlerhurst
-      Password: password
+      Username: postgres
+      Password: postgres
