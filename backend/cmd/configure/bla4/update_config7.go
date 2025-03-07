@@ -88,7 +88,8 @@ func structToConfigureMap(l *slog.Logger, v *viper.Viper, object reflect.Value) 
 
 func fieldFunction(l *slog.Logger, f *field) (configure Configure) {
 	for _, mapper := range []func(*slog.Logger, *field) Configure{
-		fieldFunctionByImplementation,
+		fieldFunctionByConfigurer,
+		fieldFunctionByIterator,
 		fieldFunctionByReflection,
 	} {
 		if configure = mapper(l, f); configure != nil {
@@ -98,9 +99,8 @@ func fieldFunction(l *slog.Logger, f *field) (configure Configure) {
 	panic(fmt.Sprintf("unsupported field type: %s", f.info.Type.String()))
 }
 
-func fieldFunctionByImplementation(l *slog.Logger, f *field) Configure {
+func fieldFunctionByConfigurer(l *slog.Logger, f *field) Configure {
 	if f.value.Type().Implements(reflect.TypeFor[Configurer]()) {
-		l.Debug("field is a custom implementation")
 		return func() (value any, err error) {
 			f.printStructInfo()
 			res, err := f.value.Interface().(Configurer).Configure()

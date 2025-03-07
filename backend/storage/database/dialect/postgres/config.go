@@ -10,6 +10,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/mitchellh/mapstructure"
 
+	"github.com/zitadel/zitadel/backend/cmd/configure/bla4"
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
 
@@ -24,19 +25,38 @@ type Config struct {
 	// Host               string
 	// Port               int32
 	// Database           string
-	// EventPushConnRatio float64
 	// MaxOpenConns       uint32
 	// MaxIdleConns       uint32
 	// MaxConnLifetime    time.Duration
 	// MaxConnIdleTime    time.Duration
 	// User               User
-	// Admin              AdminUser
 	// // Additional options to be appended as options=<Options>
 	// // The value will be taken as is. Multiple options are space separated.
 	// Options string
+
+	configuredFields []string
 }
 
-// Configure implements bla3.Custom.
+// FinishAllowed implements [bla4.Iterator].
+func (c *Config) FinishAllowed() bool {
+	// Option can be skipped
+	return len(c.configuredFields) < 2
+}
+
+// NextField implements [bla4.Iterator].
+func (c *Config) NextField() string {
+	if c.configuredFields == nil {
+		c.configuredFields = []string{"Host", "Port", "Database", "MaxOpenConns", "MaxIdleConns", "MaxConnLifetime", "MaxConnIdleTime", "User", "Options"}
+	}
+	if len(c.configuredFields) == 0 {
+		return ""
+	}
+	field := c.configuredFields[0]
+	c.configuredFields = c.configuredFields[1:]
+	return field
+}
+
+// Configure implements [bla4.Configurer].
 func (c *Config) Configure() (value any, err error) {
 	typeSelect := promptui.Select{
 		Label: "Configure the database connection",
@@ -66,6 +86,8 @@ func (c *Config) Configure() (value any, err error) {
 
 	return prompt.Run()
 }
+
+var _ bla4.Iterator = (*Config)(nil)
 
 // Connect implements [database.Connector].
 func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
