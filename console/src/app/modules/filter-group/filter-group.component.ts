@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -21,8 +21,8 @@ export class FilterGroupComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: GroupQuery[] = [];
 
-  constructor(router: Router, route: ActivatedRoute) {
-    super(router, route);
+  constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
+    super(router, route, destroyRef);
   }
 
   ngOnInit(): void {
