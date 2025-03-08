@@ -2,36 +2,134 @@ services:
 
   traefik:
     networks:
-      - 'zitadel'
+      - 'backend'
     image: "traefik:latest"
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - "./example-traefik.yaml:/etc/traefik/traefik.yaml"
+    depends_on:
+      - zitadel
+      - login
 
-  zitadel:
-    restart: 'always'
+  login:
+    restart: 'unless-stopped'
     networks:
-      - 'zitadel'
+      - 'backend'
+    # TODO: Use a public image
+    image: 'europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login:sha-365a85e'
+    environment:
+      - ZITADEL_API_URL=http://zitadel:8080
+      - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
+    user: "${UID:-1000}"
+    volumes:
+      - './.env-file:/.env-file:ro'
+    depends_on:
+      zitadel:
+        condition: 'service_started'
+        restart: false
+
+  zitadel-init:
+    restart: 'no'
+    networks:
+      - 'storage'
     image: 'ghcr.io/zitadel/zitadel:latest'
-    command: 'start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}" --tlsMode external'
+    command: 'init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml'
     depends_on:
       db:
         condition: 'service_healthy'
     volumes:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
+
+  zitadel-setup-internal:
+    restart: 'no'
+    networks:
+      - 'storage'
+    # We use the debug image so we have the environment to create the .env file for the login to authenticate at Zitadel
+    image: 'ghcr.io/zitadel/zitadel:latest-debug'
+    entrypoint: '/bin/bash -c'
+    user: root
+    command: >
+      "/app/zitadel setup
+      --config /example-zitadel-config.yaml
+      --config /example-zitadel-secrets.yaml
+      --steps /example-zitadel-init-steps.yaml
+      --masterkey ${ZITADEL_MASTERKEY} &&
+      echo ZITADEL_SERVICE_USER_TOKEN=$(cat /tmp/pat) > /.env-file/.env &&
+      chown -R 1001:${GID} /.env-file &&
+      chmod -R 770 /.env-file"
+    environment:
+      - ZITADEL_EXTERNALDOMAIN=zitadel
+      - GID
+    depends_on:
+      zitadel-init:
+        condition: 'service_completed_successfully'
+        restart: false
+    volumes:
+      - './.env-file:/.env-file:rw'
+      - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
+      - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
       - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
+
+  zitadel-setup-external:
+    restart: 'no'
+    networks:
+      - 'storage'
+    image: 'ghcr.io/zitadel/zitadel:latest'
+    command: >
+      setup --config /example-zitadel-config.yaml
+      --config /example-zitadel-secrets.yaml
+      --steps /example-zitadel-init-steps.yaml
+      --masterkey ${ZITADEL_MASTERKEY}
+    depends_on:
+      zitadel-setup-internal:
+        condition: 'service_completed_successfully'
+        restart: false
+    volumes:
+      - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
+      - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
+      - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
+
+  zitadel:
+    restart: 'unless-stopped'
+    networks:
+      - 'backend'
+      - 'storage'
+    image: 'ghcr.io/zitadel/zitadel:latest'
+    command: >
+      start --config /example-zitadel-config.yaml
+      --config /example-zitadel-secrets.yaml
+      --masterkey ${ZITADEL_MASTERKEY}
+    depends_on:
+      zitadel-setup-external:
+        condition: 'service_completed_successfully'
+        restart: true
+    volumes:
+      - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
+      - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
+#    healthcheck:
+#      test: [
+#        "CMD-SHELL", "/app/zitadel", "ready",
+#        "--config", "/example-zitadel-config.yaml",
+#        "--config", "/example-zitadel-secrets.yaml"
+#      ]
+#      interval: 10s
+#      timeout: 60s
+#      retries: 5
+#      start_period: 10s
+
+
 
   db:
     image: postgres:16-alpine
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=postgres
     networks:
-      - 'zitadel'
+      - 'storage'
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
       interval: 10s
@@ -42,7 +140,8 @@ services:
       - 'data:/var/lib/postgresql/data:rw'
 
 networks:
-  zitadel:
+  storage:
+  backend:
 
 volumes:
   data:

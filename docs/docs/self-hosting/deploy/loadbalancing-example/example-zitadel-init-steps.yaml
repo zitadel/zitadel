@@ -1,8 +1,12 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml
 FirstInstance:
+  PatPath: '/tmp/pat'
   Org:
-    Name: 'My Org'
     Human:
-      # use the loginname root@my-org.my.domain
-      Username: 'root'
-      Password: 'RootPassword1!'
+      PasswordChangeRequired: false
+    Machine:
+      Machine:
+        Username: 'root-machine'
+        Name: 'Root Machine'
+      Pat:
+        ExpirationDate: '2029-01-01T00:00:00Z'
