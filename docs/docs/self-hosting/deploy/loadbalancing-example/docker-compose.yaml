@@ -30,7 +30,7 @@ services:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
 
-  zitadel-setup-internal:
+  zitadel-setup:
     restart: 'no'
     networks:
       - 'storage'
@@ -52,7 +52,6 @@ services:
       chmod -R 770 /.env-file
       "
     environment:
-      - ZITADEL_EXTERNALDOMAIN=zitadel
       - GID
     depends_on:
       zitadel-init:
@@ -60,25 +59,6 @@ services:
         restart: false
     volumes:
       - './.env-file:/.env-file:rw'
-      - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
-      - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
-      - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
-
-  zitadel-setup-external:
-    restart: 'no'
-    networks:
-      - 'storage'
-    image: 'ghcr.io/zitadel/zitadel:latest'
-    command: >
-      setup --config /example-zitadel-config.yaml
-      --config /example-zitadel-secrets.yaml
-      --steps /example-zitadel-init-steps.yaml
-      --masterkey ${ZITADEL_MASTERKEY}
-    depends_on:
-      zitadel-setup-internal:
-        condition: 'service_completed_successfully'
-        restart: false
-    volumes:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
       - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
@@ -94,7 +74,7 @@ services:
       --config /example-zitadel-secrets.yaml
       --masterkey ${ZITADEL_MASTERKEY}
     depends_on:
-      zitadel-setup-external:
+      zitadel-setup:
         condition: 'service_completed_successfully'
         restart: true
     volumes:
@@ -121,9 +101,9 @@ services:
     image: 'badouralix/curl-jq:alpine'
     entrypoint: '/bin/sh -c'
     command: >
-      "curl --fail-with-body -X PUT -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/v2/features/instance -d '{\"loginV2\": {\"required\": true}}' &&
-      LOGIN_USER=$(curl --fail-with-body -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/auth/v1/users/me | jq -r '.user.id') &&
-      curl --fail-with-body -X PUT -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/admin/v1/members/$${LOGIN_USER} -d '{\"roles\": [\"IAM_OWNER\", \"IAM_LOGIN_CLIENT\"]}'
+      "curl --fail-with-body -X PUT -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/v2/features/instance -d '{\"loginV2\": {\"required\": true}}' &&
+      LOGIN_USER=$(curl --fail-with-body  -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/auth/v1/users/me | jq -r '.user.id') &&
+      curl --fail-with-body -X PUT  -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/admin/v1/members/$${LOGIN_USER} -d '{\"roles\": [\"IAM_OWNER\", \"IAM_LOGIN_CLIENT\"]}'
       "
     volumes:
       - './.env-file:/.env-file:ro'
@@ -139,6 +119,7 @@ services:
     image: 'ghcr.io/zitadel/zitadel-login:sha-365a85e'
     environment:
       - ZITADEL_API_URL=http://zitadel:8080
+      - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
       - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
     user: "${UID:-1000}"
     volumes:
