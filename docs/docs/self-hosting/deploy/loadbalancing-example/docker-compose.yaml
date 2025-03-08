@@ -17,8 +17,7 @@ services:
     restart: 'unless-stopped'
     networks:
       - 'backend'
-    # TODO: Use a public image
-    image: 'europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login:sha-365a85e'
+    image: 'ghcr.io/zitadel/zitadel/zitadel-login:sha-365a85e'
     environment:
       - ZITADEL_API_URL=http://zitadel:8080
       - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
