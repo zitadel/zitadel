@@ -16,10 +16,8 @@ import (
 	"github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption"
 )
 
-var (
-	//go:embed auth_method_mapping.go.tmpl
-	authTemplate []byte
-)
+//go:embed auth_method_mapping.go.tmpl
+var authTemplate []byte
 
 type authMethods struct {
 	GoPackageName    string
@@ -35,7 +33,6 @@ type authOption struct {
 }
 
 func main() {
-
 	input, _ := io.ReadAll(os.Stdin)
 	var req pluginpb.CodeGeneratorRequest
 	err := proto.Unmarshal(input, &req)
@@ -88,7 +85,7 @@ func main() {
 	}
 
 	// Write the response to stdout, to be picked up by protoc
-	fmt.Fprintf(os.Stdout, string(out))
+	fmt.Fprintf(os.Stdout, "%s", string(out))
 }
 
 func loadTemplate(templateData []byte) *template.Template {

@@ -45,7 +45,7 @@ func oidcError(err error) error {
 	return op.NewStatusError(
 		newOidcErr().
 			WithParent(err).
-			WithDescription(zError.GetMessage()),
+			WithDescription("%s", zError.GetMessage()),
 		statusCode,
 	)
 }
