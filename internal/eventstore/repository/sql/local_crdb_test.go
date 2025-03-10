@@ -13,6 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/database/postgres"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
@@ -83,7 +84,7 @@ func (*testDB) DatabaseName() string { return "db" }
 
 func (*testDB) Username() string { return "user" }
 
-func (*testDB) Type() string { return "postgres" }
+func (*testDB) Type() dialect.DatabaseType { return dialect.DatabaseTypePostgres }
 
 const oldEventsTable = `CREATE TABLE IF NOT EXISTS eventstore.events (
 	id UUID DEFAULT gen_random_uuid()
