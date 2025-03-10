@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/logging"
 
 	db "github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -56,15 +57,15 @@ func copyEventstore(ctx context.Context, config *Migration) {
 }
 
 func positionQuery(db *db.DB) string {
-	// switch db.Type() {
-	// case "postgres":
-	return "SELECT EXTRACT(EPOCH FROM clock_timestamp())"
-	// case "cockroach":
-	// 	return "SELECT cluster_logical_timestamp()"
-	// default:
-	// 	logging.WithFields("db_type", db.Type()).Fatal("database type not recognized")
-	// 	return ""
-	// }
+	switch db.Type() {
+	case dialect.DatabaseTypePostgres:
+		return "SELECT EXTRACT(EPOCH FROM clock_timestamp())"
+	case dialect.DatabaseTypeCockroach:
+		return "SELECT cluster_logical_timestamp()"
+	default:
+		logging.WithFields("db_type", db.Type()).Fatal("database type not recognized")
+		return ""
+	}
 }
 
 func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {

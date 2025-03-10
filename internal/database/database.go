@@ -197,6 +197,10 @@ func (c Config) Password() string {
 	return c.connector.Password()
 }
 
+func (c Config) Type() dialect.DatabaseType {
+	return c.connector.Type()
+}
+
 func EscapeLikeWildcards(value string) string {
 	value = strings.ReplaceAll(value, "%", "\\%")
 	value = strings.ReplaceAll(value, "_", "\\_")
