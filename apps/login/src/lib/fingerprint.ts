@@ -44,16 +44,21 @@ export async function getUserAgent(): Promise<UserAgent> {
 
   const fingerprintId = await getOrSetFingerprintId();
 
-  const { device } = userAgent({ headers: _headers });
+  const { device, engine, os, browser } = userAgent({ headers: _headers });
 
   const userAgentHeader = _headers.get("user-agent");
 
   const userAgentHeaderValues = userAgentHeader?.split(",");
 
+  const deviceDescription = `${device?.type ? `${device.type},` : ""} ${device?.vendor ? `${device.vendor},` : ""} ${device.model ? `${device.model},` : ""} `;
+  const osDescription = `${os?.name ? `${os.name},` : ""} ${os?.version ? `${os.version},` : ""} `;
+  const engineDescription = `${engine?.name ? `${engine.name},` : ""} ${engine?.version ? `${engine.version},` : ""} `;
+  const browserDescription = `${browser?.name ? `${browser.name},` : ""} ${browser.version ? `${browser.version},` : ""} `;
+
   const userAgentData: UserAgent = create(UserAgentSchema, {
     ip: _headers.get("x-forwarded-for") ?? _headers.get("remoteAddress") ?? "",
     header: { "user-agent": { values: userAgentHeaderValues } },
-    description: `${device?.type ?? "unknown type"}, ${device?.vendor ?? "unknown vendor"} ${device?.model ?? "unknown model"}`,
+    description: `${browserDescription}, ${deviceDescription}, ${engineDescription}, ${osDescription}`,
     fingerprintId: fingerprintId,
   });
 
