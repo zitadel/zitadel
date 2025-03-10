@@ -176,6 +176,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
 	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsInstanceDomain]))
 	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
+	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
 	newProjectionsList()
 	return nil
@@ -203,6 +204,21 @@ func Start(ctx context.Context) {
 func ProjectInstance(ctx context.Context) error {
 	for _, projection := range projections {
 		_, err := projection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func ProjectInstanceFields(ctx context.Context) error {
+	for _, projection := range []*handler.FieldHandler{
+		ProjectGrantFields,
+		OrgDomainVerifiedFields,
+		InstanceDomainFields,
+		MembershipFields,
+	} {
+		err := projection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
