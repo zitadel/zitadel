@@ -33,7 +33,6 @@ async function loadSession(
   if (requestId && requestId.startsWith("oidc_")) {
     return createCallback({
       serviceUrl,
-
       req: create(CreateCallbackRequestSchema, {
         authRequestId: requestId,
         callbackKind: {
@@ -67,7 +66,6 @@ async function loadSession(
 
   return getSession({
     serviceUrl,
-
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((response) => {
@@ -86,16 +84,10 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const { loginName, requestId, organization } = searchParams;
-  const sessionFactors = await loadSession(
-    serviceUrl,
-
-    loginName,
-    requestId,
-  );
+  const sessionFactors = await loadSession(serviceUrl, loginName, requestId);
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -103,7 +95,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   if (!requestId) {
     loginSettings = await getLoginSettings({
       serviceUrl,
-
       organization,
     });
   }

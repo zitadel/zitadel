@@ -32,7 +32,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -41,7 +40,6 @@ export default async function Page(props: {
   if (userId) {
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId,
     });
     if (userResponse) {

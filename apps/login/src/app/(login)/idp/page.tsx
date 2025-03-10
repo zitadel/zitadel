@@ -20,7 +20,6 @@ export default async function Page(props: {
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
-
     orgId: organization,
   }).then((resp) => {
     return resp.identityProviders;
@@ -28,7 +27,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 

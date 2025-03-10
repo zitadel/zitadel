@@ -38,18 +38,15 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization,
   });
 
   const session = await loadMostRecentSession({
     serviceUrl,
-
     sessionParams: {
       loginName,
       organization,
@@ -61,7 +58,6 @@ export default async function Page(props: {
     if (method === "time-based") {
       await registerTOTP({
         serviceUrl,
-
         userId: session.factors.user.id,
       })
         .then((resp) => {
@@ -76,7 +72,6 @@ export default async function Page(props: {
       // does not work
       await addOTPSMS({
         serviceUrl,
-
         userId: session.factors.user.id,
       }).catch((error) => {
         error = new Error("Could not add OTP via SMS");
@@ -85,7 +80,6 @@ export default async function Page(props: {
       // works
       await addOTPEmail({
         serviceUrl,
-
         userId: session.factors.user.id,
       }).catch((error) => {
         error = new Error("Could not add OTP via Email");

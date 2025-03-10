@@ -46,6 +46,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
+import { getUserAgent } from "./fingerprint";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -246,7 +247,9 @@ export async function createSessionFromChecks({
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
 
-  return sessionService.createSession({ checks, lifetime }, {});
+  const userAgent = await getUserAgent();
+
+  return sessionService.createSession({ checks, lifetime, userAgent }, {});
 }
 
 export async function createSessionForUserIdAndIdpIntent({
@@ -266,6 +269,8 @@ export async function createSessionForUserIdAndIdpIntent({
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
 
+  const userAgent = await getUserAgent();
+
   return sessionService.createSession({
     checks: {
       user: {
@@ -277,6 +282,7 @@ export async function createSessionForUserIdAndIdpIntent({
       idpIntent,
     },
     lifetime,
+    userAgent,
   });
 }
 
@@ -346,11 +352,7 @@ type ListSessionsCommand = {
   ids: string[];
 };
 
-export async function listSessions({
-  serviceUrl,
-
-  ids,
-}: ListSessionsCommand) {
+export async function listSessions({ serviceUrl, ids }: ListSessionsCommand) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
 

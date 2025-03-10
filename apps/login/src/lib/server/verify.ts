@@ -34,7 +34,6 @@ export async function verifyTOTP(
 
   return loadMostRecentSession({
     serviceUrl,
-
     sessionParams: {
       loginName,
       organization,
@@ -43,7 +42,6 @@ export async function verifyTOTP(
     if (session?.factors?.user?.id) {
       return verifyTOTPRegistration({
         serviceUrl,
-
         code,
         userId: session.factors.user.id,
       });
@@ -69,7 +67,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({
         serviceUrl,
-
         userId: command.userId,
         verificationCode: command.code,
       }).catch(() => {
@@ -77,7 +74,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       })
     : await verifyEmail({
         serviceUrl,
-
         userId: command.userId,
         verificationCode: command.code,
       }).catch(() => {
@@ -109,7 +105,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     session = await getSession({
       serviceUrl,
-
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -124,7 +119,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId: session?.factors?.user?.id,
     });
 
@@ -136,7 +130,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   } else {
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId: command.userId,
     });
 
@@ -155,7 +148,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       },
     });
 
-    session = await createSessionAndUpdateCookie(checks, command.requestId);
+    session = await createSessionAndUpdateCookie({
+      checks,
+      requestId: command.requestId,
+    });
   }
 
   if (!session?.factors?.user?.id) {
@@ -172,13 +168,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: user.details?.resourceOwner,
   });
 
   const authMethodResponse = await listAuthenticationMethodTypes({
     serviceUrl,
-
     userId: user.userId,
   });
 
@@ -320,7 +314,6 @@ export async function sendVerificationRedirectWithoutCheck(
 
     session = await getSession({
       serviceUrl,
-
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -335,7 +328,6 @@ export async function sendVerificationRedirectWithoutCheck(
 
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId: session?.factors?.user?.id,
     });
 
@@ -347,7 +339,6 @@ export async function sendVerificationRedirectWithoutCheck(
   } else if ("userId" in command) {
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId: command.userId,
     });
 
@@ -366,7 +357,10 @@ export async function sendVerificationRedirectWithoutCheck(
       },
     });
 
-    session = await createSessionAndUpdateCookie(checks, command.requestId);
+    session = await createSessionAndUpdateCookie({
+      checks,
+      requestId: command.requestId,
+    });
   }
 
   if (!session?.factors?.user?.id) {
@@ -383,7 +377,6 @@ export async function sendVerificationRedirectWithoutCheck(
 
   const authMethodResponse = await listAuthenticationMethodTypes({
     serviceUrl,
-
     userId: user.userId,
   });
 

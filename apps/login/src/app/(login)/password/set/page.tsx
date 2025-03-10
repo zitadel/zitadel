@@ -34,7 +34,6 @@ export default async function Page(props: {
   if (loginName) {
     session = await loadMostRecentSession({
       serviceUrl,
-
       sessionParams: {
         loginName,
         organization,
@@ -44,19 +43,16 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceUrl,
-
     organization: session?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -65,7 +61,6 @@ export default async function Page(props: {
   if (userId) {
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId,
     });
     user = userResponse.user;
