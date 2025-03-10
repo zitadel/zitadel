@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"slices"
+	"strings"
 	"syscall"
 	"time"
 
@@ -315,6 +316,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		eventstoreClient.EventTypes(),
 		q,
 	)
+	// set here to use the same base as in the handling
+	commands.EventExisting = checkExisting(eventstoreClient.EventTypes())
+	commands.EventGroupExisting = checkExistingGroup(eventstoreClient.EventTypes())
 	execution.Start(ctx)
 
 	if err = q.Start(ctx); err != nil {
@@ -675,5 +679,16 @@ func showBasicInformation(startConfig *Config) {
 func checkExisting(values []string) func(string) bool {
 	return func(value string) bool {
 		return slices.Contains(values, value)
+	}
+}
+
+func checkExistingGroup(values []string) func(string) bool {
+	return func(group string) bool {
+		for _, value := range values {
+			if strings.HasPrefix(value, group) {
+				return true
+			}
+		}
+		return false
 	}
 }

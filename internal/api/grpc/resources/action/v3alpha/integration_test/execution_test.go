@@ -568,27 +568,25 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		/*
-			//TODO event existing check
-
-			{
-				name: "event, not existing",
-				ctx:  isolatedIAMOwnerCTX,
-				req: &action.SetExecutionRequest{
-					Condition: &action.Condition{
-						ConditionType: &action.Condition_Event{
-							Event: &action.EventExecution{
-								Condition: &action.EventExecution_Event{
-									Event: "xxx",
-								},
+		{
+			name: "event, not existing",
+			ctx:  isolatedIAMOwnerCTX,
+			req: &action.SetExecutionRequest{
+				Condition: &action.Condition{
+					ConditionType: &action.Condition_Event{
+						Event: &action.EventExecution{
+							Condition: &action.EventExecution_Event{
+								Event: "user.human.notexisting",
 							},
 						},
 					},
-					Targets: []string{targetResp.GetId()},
 				},
-				wantErr: true,
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
-		*/
+			wantErr: true,
+		},
 		{
 			name: "event, ok",
 			ctx:  isolatedIAMOwnerCTX,
@@ -597,7 +595,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					ConditionType: &action.Condition_Event{
 						Event: &action.EventExecution{
 							Condition: &action.EventExecution_Event{
-								Event: "xxx",
+								Event: "user.human.added",
 							},
 						},
 					},
@@ -616,36 +614,61 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 			},
 		},
-		/*
-			// TODO:
-
-			{
-				name: "group, not existing",
-				ctx:  isolatedIAMOwnerCTX,
-				req: &action.SetExecutionRequest{
-					Condition: &action.Condition{
-						ConditionType: &action.Condition_Event{
-							Event: &action.EventExecution{
-								Condition: &action.EventExecution_Group{
-									Group: "xxx",
-								},
-							},
-						},
-					},
-					Targets: []string{targetResp.GetId()},
-				},
-				wantErr: true,
-			},
-		*/
 		{
-			name: "group, ok",
+			name: "group, not existing",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
 						Event: &action.EventExecution{
 							Condition: &action.EventExecution_Group{
-								Group: "xxx",
+								Group: "user.notexisting",
+							},
+						},
+					},
+				},
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "group, level 1, ok",
+			ctx:  isolatedIAMOwnerCTX,
+			req: &action.SetExecutionRequest{
+				Condition: &action.Condition{
+					ConditionType: &action.Condition_Event{
+						Event: &action.EventExecution{
+							Condition: &action.EventExecution_Group{
+								Group: "user",
+							},
+						},
+					},
+				},
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
+			},
+			want: &action.SetExecutionResponse{
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   instance.ID(),
+					},
+				},
+			},
+		},
+		{
+			name: "group, level 2, ok",
+			ctx:  isolatedIAMOwnerCTX,
+			req: &action.SetExecutionRequest{
+				Condition: &action.Condition{
+					ConditionType: &action.Condition_Event{
+						Event: &action.EventExecution{
+							Condition: &action.EventExecution_Group{
+								Group: "user.human",
 							},
 						},
 					},
