@@ -74,9 +74,6 @@ importers:
 
   apps/login:
     dependencies:
-      '@fingerprintjs/fingerprintjs':
-        specifier: ^4.6.1
-        version: 4.6.1
       '@headlessui/react':
         specifier: ^2.1.9
         version: 2.1.9(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -140,6 +137,9 @@ importers:
       tinycolor2:
         specifier: 1.4.2
         version: 1.4.2
+      uuid:
+        specifier: ^11.1.0
+        version: 11.1.0
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.46.0
@@ -916,9 +916,6 @@ packages:
   '@faker-js/faker@9.2.0':
     resolution: {integrity: sha512-ulqQu4KMr1/sTFIYvqSdegHT8NIkt66tFAkugGnHA+1WAfEn6hMzNR+svjXGFRVLnapxvej67Z/LwchFrnLBUg==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0'}
-
-  '@fingerprintjs/fingerprintjs@4.6.1':
-    resolution: {integrity: sha512-62TPnX6fXXMlxS7SOR3DJWEOKab7rCALwSWkuKWYMRrnsZ/jD9Ju4CUyy9VWDUYuhQ2ZW1RGLwOZJXTXR6K1pg==}
 
   '@floating-ui/core@1.6.8':
     resolution: {integrity: sha512-7XJ9cPU+yI2QeLS+FCSlqNFZJq8arvswefkZrYI1yQBbftw6FyrZOxYSh+9S7z7TpeWlRt9zJ5IhM1WIL334jA==}
@@ -4644,6 +4641,10 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  uuid@11.1.0:
+    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
+    hasBin: true
+
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
@@ -5434,10 +5435,6 @@ snapshots:
   '@eslint/js@8.57.1': {}
 
   '@faker-js/faker@9.2.0': {}
-
-  '@fingerprintjs/fingerprintjs@4.6.1':
-    dependencies:
-      tslib: 2.8.1
 
   '@floating-ui/core@1.6.8':
     dependencies:
@@ -9392,6 +9389,8 @@ snapshots:
       react: 19.0.0
 
   util-deprecate@1.0.2: {}
+
+  uuid@11.1.0: {}
 
   uuid@8.3.2: {}
 

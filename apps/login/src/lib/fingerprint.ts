@@ -1,4 +1,3 @@
-import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { create } from "@zitadel/client";
 import {
   UserAgent,
@@ -6,11 +5,10 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 export async function getFingerprintId() {
-  const fp = await FingerprintJS.load();
-  const result = await fp.get();
-  return result.visitorId;
+  return uuidv4();
 }
 
 export async function setFingerprintIdCookie(fingerprintId: string) {
