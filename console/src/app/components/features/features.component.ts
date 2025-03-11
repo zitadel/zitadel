@@ -19,22 +19,38 @@ import {
   GetInstanceFeaturesResponse,
   SetInstanceFeaturesRequest,
 } from 'src/app/proto/generated/zitadel/feature/v2/instance_pb';
+import { FeatureToggleComponent } from '../feature-toggle/feature-toggle.component';
+import { FeatureFlag } from 'src/app/proto/generated/zitadel/feature/v2/feature_pb';
 
-enum ToggleState {
+export enum ToggleState {
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED',
   INHERITED = 'INHERITED',
 }
 
+const FEATURE_KEYS: ToggleStateKeys[] = [
+  'actions',
+  'consoleUseV2UserApi',
+  'debugOidcParentError',
+  'disableUserTokenEvent',
+  'enableBackChannelLogout',
+  // 'improvedPerformance',
+  'loginDefaultOrg',
+  // 'loginV2',
+  'oidcLegacyIntrospection',
+  'oidcSingleV1SessionTermination',
+  'oidcTokenExchange',
+  'oidcTriggerIntrospectionProjections',
+  'permissionCheckV2',
+  'userSchema',
+  'webKey',
+];
+
 type FeatureState = { source: Source; state: ToggleState };
-type ToggleStates = {
-  loginDefaultOrg?: FeatureState;
-  oidcTriggerIntrospectionProjections?: FeatureState;
-  oidcLegacyIntrospection?: FeatureState;
-  userSchema?: FeatureState;
-  oidcTokenExchange?: FeatureState;
-  actions?: FeatureState;
-  oidcSingleV1SessionTermination?: FeatureState;
+export type ToggleStateKeys = Exclude<keyof GetInstanceFeaturesResponse.AsObject, 'details'>;
+
+export type ToggleStates = {
+  [key in ToggleStateKeys]: FeatureState;
 };
 
 @Component({
@@ -51,6 +67,7 @@ type ToggleStates = {
     InfoSectionModule,
     MatTooltipModule,
     HasRoleModule,
+    FeatureToggleComponent,
   ],
   standalone: true,
   selector: 'cnsl-features',
@@ -58,7 +75,7 @@ type ToggleStates = {
   styleUrls: ['./features.component.scss'],
 })
 export class FeaturesComponent {
-  protected featureData: GetInstanceFeaturesResponse.AsObject | undefined;
+  protected featureData: Partial<GetInstanceFeaturesResponse.AsObject> | undefined;
 
   protected toggleStates: ToggleStates | undefined;
   protected Source: any = Source;
@@ -86,10 +103,50 @@ export class FeaturesComponent {
       const req = new SetInstanceFeaturesRequest();
       let changed = false;
 
-      console.log(this.toggleStates);
-
+      if (this.toggleStates?.actions?.state !== ToggleState.INHERITED) {
+        req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.consoleUseV2UserApi?.state !== ToggleState.INHERITED) {
+        req.setConsoleUseV2UserApi(this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.debugOidcParentError?.state !== ToggleState.INHERITED) {
+        req.setDebugOidcParentError(this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.disableUserTokenEvent?.state !== ToggleState.INHERITED) {
+        req.setDisableUserTokenEvent(this.toggleStates?.disableUserTokenEvent?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.enableBackChannelLogout?.state !== ToggleState.INHERITED) {
+        req.setEnableBackChannelLogout(this.toggleStates?.enableBackChannelLogout?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      // if (this.toggleStates?.improvedPerformance?.state !== ToggleState.INHERITED) {
+      //   req.setImprovedPerformanceList(this.toggleStates?.improvedPerformance?.state === ToggleState.ENABLED);
+      //   changed = true;
+      // }
       if (this.toggleStates?.loginDefaultOrg?.state !== ToggleState.INHERITED) {
         req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      // if (this.toggleStates?.loginV2?.state !== ToggleState.INHERITED) {
+      //   req.setLoginV2(this.toggleStates?.loginV2?.state === ToggleState.ENABLED);
+      //   changed = true;
+      // }
+      if (this.toggleStates?.oidcLegacyIntrospection?.state !== ToggleState.INHERITED) {
+        req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.oidcSingleV1SessionTermination?.state !== ToggleState.INHERITED) {
+        req.setOidcSingleV1SessionTermination(
+          this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
+        );
+        changed = true;
+      }
+      if (this.toggleStates?.oidcTokenExchange?.state !== ToggleState.INHERITED) {
+        req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
         changed = true;
       }
       if (this.toggleStates?.oidcTriggerIntrospectionProjections?.state !== ToggleState.INHERITED) {
@@ -98,26 +155,16 @@ export class FeaturesComponent {
         );
         changed = true;
       }
-      if (this.toggleStates?.oidcLegacyIntrospection?.state !== ToggleState.INHERITED) {
-        req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
+      if (this.toggleStates?.permissionCheckV2?.state !== ToggleState.INHERITED) {
+        req.setPermissionCheckV2(this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED);
         changed = true;
       }
       if (this.toggleStates?.userSchema?.state !== ToggleState.INHERITED) {
         req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
         changed = true;
       }
-      if (this.toggleStates?.oidcTokenExchange?.state !== ToggleState.INHERITED) {
-        req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.actions?.state !== ToggleState.INHERITED) {
-        req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.oidcSingleV1SessionTermination?.state !== ToggleState.INHERITED) {
-        req.setOidcSingleV1SessionTermination(
-          this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
-        );
+      if (this.toggleStates?.webKey?.state !== ToggleState.INHERITED) {
+        req.setWebKey(this.toggleStates?.webKey?.state === ToggleState.ENABLED);
         changed = true;
       }
 
@@ -137,81 +184,30 @@ export class FeaturesComponent {
   private getFeatures(inheritance: boolean) {
     this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse.toObject();
-      console.log(this.featureData);
 
-      this.toggleStates = {
-        loginDefaultOrg: {
-          source: this.featureData.loginDefaultOrg?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.loginDefaultOrg?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcTriggerIntrospectionProjections: {
-          source: this.featureData.oidcTriggerIntrospectionProjections?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcTriggerIntrospectionProjections?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcLegacyIntrospection: {
-          source: this.featureData.oidcLegacyIntrospection?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcLegacyIntrospection?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        userSchema: {
-          source: this.featureData.userSchema?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.userSchema?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcTokenExchange: {
-          source: this.featureData.oidcTokenExchange?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcTokenExchange?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        actions: {
-          source: Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.actions?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.actions?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.actions?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcSingleV1SessionTermination: {
-          source: this.featureData.oidcSingleV1SessionTermination?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcSingleV1SessionTermination?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
+      console.log(this.featureData);
+      this.toggleStates = this.createToggleStates(this.featureData);
+    });
+  }
+
+  private createToggleStates(featureData: GetInstanceFeaturesResponse.AsObject): ToggleStates {
+    const toggleStates: Partial<ToggleStates> = {};
+
+    FEATURE_KEYS.forEach((key) => {
+      // TODO: Fix this type cast as not all keys are present as FeatureFlag
+      const feature = featureData[key] as unknown as FeatureFlag.AsObject;
+      toggleStates[key] = {
+        source: feature?.source || Source.SOURCE_SYSTEM,
+        state:
+          feature?.source === Source.SOURCE_SYSTEM || feature?.source === Source.SOURCE_UNSPECIFIED
+            ? ToggleState.INHERITED
+            : !!feature?.enabled
+              ? ToggleState.ENABLED
+              : ToggleState.DISABLED,
       };
     });
+
+    return toggleStates as ToggleStates;
   }
 
   public resetSettings(): void {
@@ -226,5 +222,9 @@ export class FeaturesComponent {
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public get toggleStateKeys() {
+    return Object.keys(this.toggleStates ?? {});
   }
 }
