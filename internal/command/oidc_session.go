@@ -55,7 +55,13 @@ type AuthRequestComplianceChecker func(context.Context, *AuthRequestWriteModel) 
 // CreateOIDCSessionFromAuthRequest creates a new OIDC Session, creates an access token and refresh token.
 // It returns the access token id, expiration and the refresh token.
 // If the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchanged.
-func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReqId string, complianceCheck AuthRequestComplianceChecker, needRefreshToken bool) (session *OIDCSession, state string, err error) {
+func (c *Commands) CreateOIDCSessionFromAuthRequest(
+	ctx context.Context,
+	authReqId string,
+	complianceCheck AuthRequestComplianceChecker,
+	needRefreshToken bool,
+	backChannelLogoutURI string,
+) (session *OIDCSession, state string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -108,6 +114,7 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		sessionModel.PreferredLanguage,
 		sessionModel.UserAgent,
 	)
+	cmd.RegisterLogout(ctx, sessionModel.AggregateID, sessionModel.UserID, authReqModel.ClientID, backChannelLogoutURI)
 
 	if authReqModel.ResponseType != domain.OIDCResponseTypeIDToken {
 		if err = cmd.AddAccessToken(ctx, authReqModel.Scope, sessionModel.UserID, sessionModel.UserResourceOwner, domain.TokenReasonAuthRequest, nil); err != nil {
