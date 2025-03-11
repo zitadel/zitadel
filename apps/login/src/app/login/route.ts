@@ -476,8 +476,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(url);
       } else if (url && binding.case === "post") {
         const formData = {
-          key1: "value1",
-          key2: "value2",
+          relayState: binding.value.relayState,
+          samlResponse: binding.value.samlResponse,
         };
 
         // Convert form data to URL-encoded string
