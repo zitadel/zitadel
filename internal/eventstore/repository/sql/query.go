@@ -270,14 +270,19 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		clauses += "(" + strings.Join(subClauses, " OR ") + ")"
 	}
 
-	additionalClauses, additionalArgs := prepareQuery(criteria, useV1,
-		query.Position,
+	filters := make([]*repository.Filter, 0, 6)
+	if len(subClauses) != 1 {
+		filters = append(filters, query.Position)
+	}
+	filters = append(filters,
 		query.Owner,
 		query.Sequence,
 		query.CreatedAfter,
 		query.CreatedBefore,
 		query.Creator,
 	)
+
+	additionalClauses, additionalArgs := prepareQuery(criteria, useV1, filters...)
 	if additionalClauses != "" {
 		if clauses != "" {
 			clauses += " AND "
