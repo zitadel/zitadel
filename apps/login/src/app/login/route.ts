@@ -81,9 +81,12 @@ export async function GET(request: NextRequest) {
 
   // internal request id which combines authRequest and samlRequest with the prefix oidc_ or saml_
   let requestId =
-    searchParams.get("requestId") ||
-    `oidc_${oidcRequestId}` ||
-    `saml_${samlRequestId}`;
+    searchParams.get("requestId") ??
+    (oidcRequestId
+      ? `oidc_${oidcRequestId}`
+      : samlRequestId
+        ? `saml_${samlRequestId}`
+        : undefined);
 
   const sessionId = searchParams.get("sessionId");
 
