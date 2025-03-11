@@ -481,12 +481,10 @@ export async function GET(request: NextRequest) {
         };
 
         // Convert form data to URL-encoded string
-        const formBody = Object.entries(formData)
-          .map(
-            ([key, value]) =>
-              encodeURIComponent(key) + "=" + encodeURIComponent(value),
-          )
-          .join("&");
+        const formBody = new FormData();
+
+        formBody.append("relayState", formData.relayState);
+        formBody.append("samlResponse", formData.samlResponse);
 
         // Make a POST request to the external URL with the form data
         const response = await fetch(url, {
