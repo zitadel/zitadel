@@ -244,6 +244,12 @@ func eventsScanner(useV1 bool) func(scanner scan, dest any) (err error) {
 }
 
 func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (clauses string, args []any) {
+	if len(query.SubQueries) != 1 {
+		clauses, args = prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
+		if clauses != "" && len(query.SubQueries) > 0 {
+			clauses += " AND "
+		}
+	}
 	subClauses := make([]string, len(query.SubQueries))
 	for i, filters := range query.SubQueries {
 		var subArgs []any
@@ -262,8 +268,6 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		clauses += subClauses[0]
 	} else if len(subClauses) > 1 {
 		clauses += "(" + strings.Join(subClauses, " OR ") + ")"
-	} else {
-		clauses, args = prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
 	}
 
 	additionalClauses, additionalArgs := prepareQuery(criteria, useV1,
