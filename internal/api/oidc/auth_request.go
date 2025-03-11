@@ -502,6 +502,7 @@ func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest)
 		req.GetID(),
 		implicitFlowComplianceChecker(),
 		slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
+		client.client.BackChannelLogoutURI,
 	)
 	if err != nil {
 		return "", err
