@@ -253,7 +253,7 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 	subClauses := make([]string, len(query.SubQueries))
 	for i, filters := range query.SubQueries {
 		var subArgs []any
-		filters = append([]*repository.Filter{query.InstanceID, query.InstanceIDs, query.ExcludedInstances}, filters...)
+		filters = append([]*repository.Filter{query.InstanceID, query.InstanceIDs, query.ExcludedInstances, query.Position}, filters...)
 		subClauses[i], subArgs = prepareQuery(criteria, useV1, filters...)
 		// an error is thrown in [query]
 		if subClauses[i] == "" {
