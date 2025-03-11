@@ -4,22 +4,14 @@
     <mat-button-toggle-group
       class="theme-toggle"
       class="buttongroup"
-      [(ngModel)]="toggleStates[$any(toggleStateKey)].state"
+      [(ngModel)]="toggleStates[toggleStateKey].state"
       (change)="onToggleChange()"
       name="displayview"
     >
-      <mat-button-toggle [value]="ToggleState.INHERITED">
+      <mat-button-toggle [value]="ToggleState.DISABLED">
         <div class="toggle-row">
-          <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
-          <i
-            class="info-i las la-question-circle"
-            matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
-          ></i>
-          <div
-            *ngIf="enabled && (source === Source.SOURCE_SYSTEM || source === Source.SOURCE_UNSPECIFIED)"
-            class="current-dot enabled"
-            matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
-          ></div>
+          <span>{{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+
           <div
             *ngIf="!enabled && (source === Source.SOURCE_SYSTEM || source === Source.SOURCE_UNSPECIFIED)"
             class="current-dot disabled"
@@ -27,14 +19,14 @@
           ></div>
         </div>
       </mat-button-toggle>
-      <mat-button-toggle [value]="ToggleState.DISABLED">
-        <div class="toggle-row">
-          <span>{{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
-        </div>
-      </mat-button-toggle>
       <mat-button-toggle [value]="ToggleState.ENABLED">
         <div class="toggle-row">
           <span>{{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+          <div
+            *ngIf="enabled && (source === Source.SOURCE_SYSTEM || source === Source.SOURCE_UNSPECIFIED)"
+            class="current-dot enabled"
+            matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
+          ></div>
         </div>
       </mat-button-toggle>
     </mat-button-toggle-group>

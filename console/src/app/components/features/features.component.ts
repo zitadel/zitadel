@@ -25,9 +25,9 @@ import { FeatureFlag } from 'src/app/proto/generated/zitadel/feature/v2/feature_
 export enum ToggleState {
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED',
-  INHERITED = 'INHERITED',
 }
 
+// TODO: to add a new feature, add the key here and in the FEATURE_KEYS array
 const FEATURE_KEYS: ToggleStateKeys[] = [
   'actions',
   'consoleUseV2UserApi',
@@ -101,83 +101,33 @@ export class FeaturesComponent {
   public validateAndSave() {
     this.featureService.resetInstanceFeatures().then(() => {
       const req = new SetInstanceFeaturesRequest();
-      let changed = false;
 
-      if (this.toggleStates?.actions?.state !== ToggleState.INHERITED) {
-        req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.consoleUseV2UserApi?.state !== ToggleState.INHERITED) {
-        req.setConsoleUseV2UserApi(this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.debugOidcParentError?.state !== ToggleState.INHERITED) {
-        req.setDebugOidcParentError(this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.disableUserTokenEvent?.state !== ToggleState.INHERITED) {
-        req.setDisableUserTokenEvent(this.toggleStates?.disableUserTokenEvent?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.enableBackChannelLogout?.state !== ToggleState.INHERITED) {
-        req.setEnableBackChannelLogout(this.toggleStates?.enableBackChannelLogout?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      // if (this.toggleStates?.improvedPerformance?.state !== ToggleState.INHERITED) {
-      //   req.setImprovedPerformanceList(this.toggleStates?.improvedPerformance?.state === ToggleState.ENABLED);
-      //   changed = true;
-      // }
-      if (this.toggleStates?.loginDefaultOrg?.state !== ToggleState.INHERITED) {
-        req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      // if (this.toggleStates?.loginV2?.state !== ToggleState.INHERITED) {
-      //   req.setLoginV2(this.toggleStates?.loginV2?.state === ToggleState.ENABLED);
-      //   changed = true;
-      // }
-      if (this.toggleStates?.oidcLegacyIntrospection?.state !== ToggleState.INHERITED) {
-        req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.oidcSingleV1SessionTermination?.state !== ToggleState.INHERITED) {
-        req.setOidcSingleV1SessionTermination(
-          this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
-        );
-        changed = true;
-      }
-      if (this.toggleStates?.oidcTokenExchange?.state !== ToggleState.INHERITED) {
-        req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.oidcTriggerIntrospectionProjections?.state !== ToggleState.INHERITED) {
-        req.setOidcTriggerIntrospectionProjections(
-          this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
-        );
-        changed = true;
-      }
-      if (this.toggleStates?.permissionCheckV2?.state !== ToggleState.INHERITED) {
-        req.setPermissionCheckV2(this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.userSchema?.state !== ToggleState.INHERITED) {
-        req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.webKey?.state !== ToggleState.INHERITED) {
-        req.setWebKey(this.toggleStates?.webKey?.state === ToggleState.ENABLED);
-        changed = true;
-      }
+      req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
+      req.setConsoleUseV2UserApi(this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED);
+      req.setDebugOidcParentError(this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED);
+      req.setDisableUserTokenEvent(this.toggleStates?.disableUserTokenEvent?.state === ToggleState.ENABLED);
+      req.setEnableBackChannelLogout(this.toggleStates?.enableBackChannelLogout?.state === ToggleState.ENABLED);
+      req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
+      req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
+      req.setOidcSingleV1SessionTermination(
+        this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
+      );
+      req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
+      req.setOidcTriggerIntrospectionProjections(
+        this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
+      );
+      req.setPermissionCheckV2(this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED);
+      req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
+      req.setWebKey(this.toggleStates?.webKey?.state === ToggleState.ENABLED);
 
-      if (changed) {
-        this.featureService
-          .setInstanceFeatures(req)
-          .then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
+      this.featureService
+        .setInstanceFeatures(req)
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.SET', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     });
   }
 
@@ -198,12 +148,7 @@ export class FeaturesComponent {
       const feature = featureData[key] as unknown as FeatureFlag.AsObject;
       toggleStates[key] = {
         source: feature?.source || Source.SOURCE_SYSTEM,
-        state:
-          feature?.source === Source.SOURCE_SYSTEM || feature?.source === Source.SOURCE_UNSPECIFIED
-            ? ToggleState.INHERITED
-            : !!feature?.enabled
-              ? ToggleState.ENABLED
-              : ToggleState.DISABLED,
+        state: !!feature?.enabled ? ToggleState.ENABLED : ToggleState.DISABLED,
       };
     });
 
