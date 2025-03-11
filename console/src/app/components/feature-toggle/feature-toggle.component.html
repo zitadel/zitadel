@@ -14,7 +14,7 @@
 
           <div
             *ngIf="!enabled && (source === Source.SOURCE_SYSTEM || source === Source.SOURCE_UNSPECIFIED)"
-            class="current-dot disabled"
+            class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.DISABLED' | translate }}"
           ></div>
         </div>
@@ -24,14 +24,17 @@
           <span>{{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
           <div
             *ngIf="enabled && (source === Source.SOURCE_SYSTEM || source === Source.SOURCE_UNSPECIFIED)"
-            class="current-dot enabled"
+            class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
           ></div>
         </div>
       </mat-button-toggle>
     </mat-button-toggle-group>
   </div>
-  <cnsl-info-section class="feature-info">{{
-    'SETTING.FEATURES.' + toggleStateKey.toUpperCase() + '_DESCRIPTION' | translate
-  }}</cnsl-info-section>
+  <ng-content></ng-content>
+  <cnsl-info-section
+    class="feature-info"
+    *ngIf="'SETTING.FEATURES.' + toggleStateKey.toUpperCase() + '_DESCRIPTION' | translate as i18nDescription"
+    >{{ i18nDescription }}</cnsl-info-section
+  >
 </div>
