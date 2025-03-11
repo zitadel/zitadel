@@ -483,9 +483,10 @@ export async function GET(request: NextRequest) {
         // Convert form data to URL-encoded string
         const formBody = new FormData();
 
-        formBody.append("relayState", formData.relayState);
-        formBody.append("samlResponse", formData.samlResponse);
-
+        formBody.append("RelayState", formData.relayState);
+        formBody.append("SAMLResponse", formData.samlResponse);
+        console.log(url)
+        console.log(formBody)
         // Make a POST request to the external URL with the form data
         const response = await fetch(url, {
           method: "POST",
@@ -494,6 +495,7 @@ export async function GET(request: NextRequest) {
           },
           body: formBody,
         });
+        console.log(response)
 
         // Handle the response from the external URL
         if (response.ok) {
