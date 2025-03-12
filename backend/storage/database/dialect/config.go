@@ -5,11 +5,9 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/manifoldco/promptui"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 
-	"github.com/zitadel/zitadel/backend/cmd/configure/bla4"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect/postgres"
 )
@@ -43,47 +41,47 @@ type Config struct {
 }
 
 // Configure implements [configure.Configurer].
-func (c *Config) Configure() (any, error) {
-	possibilities := make([]string, len(hooks))
-	var cursor int
-	for i, hook := range hooks {
-		if _, ok := c.Dialects[hook.Name]; ok {
-			cursor = i
-		}
-		possibilities[i] = hook.Name
-	}
+// func (c *Config) Configure() (any, error) {
+// 	possibilities := make([]string, len(hooks))
+// 	var cursor int
+// 	for i, hook := range hooks {
+// 		if _, ok := c.Dialects[hook.Name]; ok {
+// 			cursor = i
+// 		}
+// 		possibilities[i] = hook.Name
+// 	}
 
-	prompt := promptui.Select{
-		Label:     "Select a dialect",
-		Items:     possibilities,
-		CursorPos: cursor,
-	}
-	i, _, err := prompt.Run()
-	if err != nil {
-		return nil, err
-	}
+// 	prompt := promptui.Select{
+// 		Label:     "Select a dialect",
+// 		Items:     possibilities,
+// 		CursorPos: cursor,
+// 	}
+// 	i, _, err := prompt.Run()
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	var config bla4.Configurer
+// 	var config bla4.Configurer
 
-	if dialect, ok := c.Dialects[hooks[i].Name]; ok {
-		config, err = hooks[i].Decode(dialect)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		clear(c.Dialects)
-		config = hooks[i].Constructor()
-	}
-	if c.Dialects == nil {
-		c.Dialects = make(map[string]any)
-	}
-	c.Dialects[hooks[i].Name], err = config.Configure()
-	if err != nil {
-		return nil, err
-	}
+// 	if dialect, ok := c.Dialects[hooks[i].Name]; ok {
+// 		config, err = hooks[i].Decode(dialect)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	} else {
+// 		clear(c.Dialects)
+// 		config = hooks[i].Constructor()
+// 	}
+// 	if c.Dialects == nil {
+// 		c.Dialects = make(map[string]any)
+// 	}
+// 	c.Dialects[hooks[i].Name], err = config.Configure()
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return c, nil
-}
+// 	return c, nil
+// }
 
 func (c Config) Connect(ctx context.Context) (database.Pool, error) {
 	if len(c.Dialects) != 1 {
