@@ -475,11 +475,13 @@ export async function GET(request: NextRequest) {
       if (url && binding.case === "redirect") {
         return NextResponse.redirect(url);
       } else if (url && binding.case === "post") {
+        // Create form data after SAML standard
         const formData = {
           "RelayState": binding.value.relayState,
           "SAMLResponse": binding.value.samlResponse,
         };
 
+        // Convert form data to URL-encoded string
         const formBody = Object.entries(formData)
             .map(
                 ([key, value]) =>
