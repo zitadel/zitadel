@@ -1172,6 +1172,34 @@ DefaultInstance:
 # If an audit log retention is set using an instance limit, it will overwrite the system default.
 AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
+SystemAuthZ:
+  # Configure the RolePermissionMappings by environment variable using JSON notation:
+  # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'
+  # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
+  #
+  # Warning: RolePermissionMappings are synhronized to the database.
+  # Changes here will only be applied after running `zitadel setup` or `zitadel start-from-setup`.
+  RolePermissionMappings:
+    - Role: "SYSTEM_OWNER"
+      Permissions:
+        - "system.instance.read"
+        - "system.instance.write"
+        - "system.instance.delete"
+        - "system.domain.read"
+        - "system.domain.write"
+        - "system.domain.delete"
+        - "system.debug.read"
+        - "system.debug.write"
+        - "system.debug.delete"
+        - "system.feature.read"
+        - "system.feature.write"
+        - "system.feature.delete"
+        - "system.limits.write"
+        - "system.limits.delete"
+        - "system.quota.write"
+        - "system.quota.delete"
+        - "system.iam.member.read"
+
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
   # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'

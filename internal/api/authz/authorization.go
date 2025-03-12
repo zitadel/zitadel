@@ -20,7 +20,7 @@ const (
 // - the organisation (**either** provided by ID or verified domain) exists
 // - the user is permitted to call the requested endpoint (permission option in proto)
 // it will pass the [CtxData] and permission of the user into the ctx [context.Context]
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, SystemAuthConfig Config, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -31,12 +31,12 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
-			parent = addGetSystemUserRolesFuncToCtx(parent, ctxData)
+			parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, ctxData)
 			return context.WithValue(parent, dataKey, ctxData)
 		}, nil
 	}
 
-	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig.RolePermissionMappings, ctxData, ctxData.OrgID)
+	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, SystemAuthConfig.RolePermissionMappings, authConfig.RolePermissionMappings, ctxData, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		parent = context.WithValue(parent, dataKey, ctxData)
 		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
-		parent = addGetSystemUserRolesFuncToCtx(parent, ctxData)
+		parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, ctxData)
 		return parent
 	}, nil
 }
@@ -129,17 +129,17 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 	return ctxIDs
 }
 
-func addGetSystemUserRolesFuncToCtx(ctx context.Context, ctxData CtxData) context.Context {
-	if len(ctxData.SystemMemberships) != 0 {
+func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []RoleMapping, ctxData CtxData) context.Context {
+	if len(ctxData.SystemMemberships) != 0 && ctxData.SystemMemberships[0].MemberType == MemberTypeSystem {
 		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func() func(ctx context.Context) ([]string, error) {
-			var roles []string
+			var permissions []string
 			return func(ctx context.Context) ([]string, error) {
-				if roles != nil {
-					return roles, nil
+				if permissions != nil {
+					return permissions, nil
 				}
 				var err error
-				roles, err = getSystemUserRoles(ctx)
-				return roles, err
+				permissions, err = getSystemUserPermissions(ctx, systemUserRoleMap)
+				return permissions, err
 			}
 		}())
 	}
@@ -158,17 +158,15 @@ func GetSystemUserRoles(ctx context.Context) ([]string, error) {
 	return getSystemUserRolesFunc(ctx)
 }
 
-func getSystemUserRoles(ctx context.Context) ([]string, error) {
+func getSystemUserPermissions(ctx context.Context, systemUserRoleMap []RoleMapping) ([]string, error) {
 	ctxData, ok := ctx.Value(dataKey).(CtxData)
 	if !ok {
 		return nil, errors.New("unable to obtain ctxData")
 	}
-	var roles []string
-	if ctxData.SystemMemberships != nil {
-		for _, member := range ctxData.SystemMemberships {
-			roles = append(roles, member.Roles...)
-		}
+	var permissions []string
+	for _, member := range ctxData.SystemMemberships {
+		permissions = append(permissions, member.Roles...)
 	}
 
-	return roles, nil
+	return permissions, nil
 }

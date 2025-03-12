@@ -55,6 +55,9 @@ type Membership struct {
 	ObjectID string
 
 	Roles []string
+
+	// aggregate all the permissions for each role
+	Permissions []string
 }
 
 type MemberType int32
