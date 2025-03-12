@@ -31,7 +31,6 @@ export class GrpcService {
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
-  public feature!: FeatureServiceClient;
   public user!: UserServiceClient;
   public userNew!: ReturnType<typeof createUserServiceClient>;
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
@@ -82,12 +81,6 @@ export class GrpcService {
           interceptors,
         );
         this.admin = new AdminServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.feature = new FeatureServiceClient(
           env.api,
           null,
           // @ts-ignore
