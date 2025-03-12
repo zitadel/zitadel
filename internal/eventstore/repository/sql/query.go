@@ -32,7 +32,7 @@ type querier interface {
 	dialect.Database
 }
 
-type scan func(dest ...interface{}) error
+type scan func(dest ...any) error
 
 type tx struct {
 	*sql.Tx
@@ -54,7 +54,7 @@ func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, 
 	return rows.Err()
 }
 
-func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}, useV1 bool) error {
+func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest any, useV1 bool) error {
 	q, err := repository.QueryFromBuilder(searchQuery)
 	if err != nil {
 		return err
@@ -120,7 +120,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
-		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
+		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...any) error
 	}
 	contextQuerier = criteria.Client()
 	if q.Tx != nil {
@@ -145,7 +145,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	return nil
 }
 
-func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (string, func(s scan, dest interface{}) error) {
+func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (string, func(s scan, dest any) error) {
 	switch columns {
 	case eventstore.ColumnsMaxSequence:
 		return criteria.maxSequenceQuery(useV1), maxSequenceScanner
@@ -166,7 +166,7 @@ func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string
 	return criteria.Timetravel(took)
 }
 
-func maxSequenceScanner(row scan, dest interface{}) (err error) {
+func maxSequenceScanner(row scan, dest any) (err error) {
 	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
 		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
@@ -178,7 +178,7 @@ func maxSequenceScanner(row scan, dest interface{}) (err error) {
 	return zerrors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
 }
 
-func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
+func instanceIDsScanner(scanner scan, dest any) (err error) {
 	ids, ok := dest.(*[]string)
 	if !ok {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-Begh2", "type must be an array of string")
@@ -194,8 +194,8 @@ func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
-func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) {
-	return func(scanner scan, dest interface{}) (err error) {
+func eventsScanner(useV1 bool) func(scanner scan, dest any) (err error) {
+	return func(scanner scan, dest any) (err error) {
 		reduce, ok := dest.(eventstore.Reducer)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
@@ -243,14 +243,17 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 	}
 }
 
-func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (_ string, args []any) {
-	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
-	if clauses != "" && len(query.SubQueries) > 0 {
-		clauses += " AND "
+func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (clauses string, args []any) {
+	if len(query.SubQueries) != 1 {
+		clauses, args = prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
+		if clauses != "" && len(query.SubQueries) > 0 {
+			clauses += " AND "
+		}
 	}
 	subClauses := make([]string, len(query.SubQueries))
 	for i, filters := range query.SubQueries {
 		var subArgs []any
+		filters = append([]*repository.Filter{query.InstanceID, query.InstanceIDs, query.ExcludedInstances, query.Position}, filters...)
 		subClauses[i], subArgs = prepareQuery(criteria, useV1, filters...)
 		// an error is thrown in [query]
 		if subClauses[i] == "" {
@@ -267,14 +270,19 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		clauses += "(" + strings.Join(subClauses, " OR ") + ")"
 	}
 
-	additionalClauses, additionalArgs := prepareQuery(criteria, useV1,
-		query.Position,
+	filters := make([]*repository.Filter, 0, 6)
+	if len(subClauses) != 1 {
+		filters = append(filters, query.Position)
+	}
+	filters = append(filters,
 		query.Owner,
 		query.Sequence,
 		query.CreatedAfter,
 		query.CreatedBefore,
 		query.Creator,
 	)
+
+	additionalClauses, additionalArgs := prepareQuery(criteria, useV1, filters...)
 	if additionalClauses != "" {
 		if clauses != "" {
 			clauses += " AND "
@@ -283,20 +291,12 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		args = append(args, additionalArgs...)
 	}
 
-	excludeAggregateIDs := query.ExcludeAggregateIDs
-	if len(excludeAggregateIDs) > 0 {
-		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position, query.CreatedAfter, query.CreatedBefore)
-	}
-	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
-	if excludeAggregateIDsClauses != "" {
+	excludeAggregateIDsClause, excludeAggregateIDsArgs := excludeAggregateIDs(criteria, query, useV1)
+	if excludeAggregateIDsClause != "" {
 		if clauses != "" {
 			clauses += " AND "
 		}
-		if useV1 {
-			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
-		} else {
-			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
-		}
+		clauses += excludeAggregateIDsClause
 		args = append(args, excludeAggregateIDsArgs...)
 	}
 
@@ -312,6 +312,9 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 			instanceIDs[i] = dialect.DBPurposeEventPusher.AppName() + "_" + instanceIDs[i]
 		}
 
+		if clauses != "" {
+			clauses += " AND "
+		}
 		clauses += awaitOpenTransactions(useV1)
 		args = append(args, instanceIDs)
 	}
@@ -321,6 +324,23 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 	}
 
 	return " WHERE " + clauses, args
+}
+
+func excludeAggregateIDs(criteria querier, query *repository.SearchQuery, useV1 bool) (clause string, args []any) {
+	excludeAggregateIDs := query.ExcludeAggregateIDs
+	if len(excludeAggregateIDs) > 0 {
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position, query.CreatedAfter, query.CreatedBefore)
+	}
+	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
+	if excludeAggregateIDsClauses == "" {
+		return "", nil
+	}
+	if useV1 {
+		clause = "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
+	} else {
+		clause = "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
+	}
+	return clause, excludeAggregateIDsArgs
 }
 
 func prepareQuery(criteria querier, useV1 bool, filters ...*repository.Filter) (_ string, args []any) {
