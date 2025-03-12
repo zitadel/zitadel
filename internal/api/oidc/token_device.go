@@ -25,7 +25,7 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 	if !ok {
 		return nil, zerrors.ThrowInternal(nil, "OIDC-Ae2ph", "Error.Internal")
 	}
-	session, err := s.command.CreateOIDCSessionFromDeviceAuth(ctx, r.Data.DeviceCode)
+	session, err := s.command.CreateOIDCSessionFromDeviceAuth(ctx, r.Data.DeviceCode, client.client.BackChannelLogoutURI)
 	if err == nil {
 		return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
 	}
