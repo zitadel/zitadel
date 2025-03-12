@@ -11,12 +11,11 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto;
   grid-template-areas:
-    "email email"
-    "emailVerified emailVerified"
-    "givenName familyName"
-    "nickName username"
-    "authenticationFactor authenticationFactor";
-  ;
+    'email email'
+    'emailVerified emailVerified'
+    'givenName familyName'
+    'nickName username'
+    'authenticationFactor authenticationFactor';
   column-gap: 1rem;
 }
 
