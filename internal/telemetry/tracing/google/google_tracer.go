@@ -34,6 +34,6 @@ func (c *Config) NewTracer() error {
 		return err
 	}
 
-	tracing.T, err = otel.NewTracer(sampler, exporter)
+	tracing.T, err = otel.NewTracer(sampler, exporter, "ZITADEL")
 	return err
 }

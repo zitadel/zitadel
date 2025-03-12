@@ -29,6 +29,7 @@ import (
 const (
 	mimeWildcard = "*/*"
 	UnknownPath  = "UNKNOWN_PATH"
+	UnknownPath  = "UNKNOWN_PATH"
 )
 
 var (
