@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func CheckPermission(ctx context.Context, resolver MembershipsResolver, systemPermissions []string, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
-	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, roleMappings, GetCtxData(ctx), orgID)
+func CheckPermission(ctx context.Context, resolver MembershipsResolver, systemUserRoleMapping []RoleMapping, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
+	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, systemUserRoleMapping, roleMappings, GetCtxData(ctx), orgID)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,9 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 	}
 
 	if ctxData.SystemMemberships != nil {
-		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, SystemUserRoleMappings)
+		// for when we get rid of internalAuthz
+		// requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, SystemUserRoleMappings)
+		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, roleMappings)
 		return requestedPermissions, allPermissions, nil
 	}
 

@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     instanceId TEXT
     , userId TEXT
     , perm TEXT
-    , system_user_roles TEXT[]
+    , system_user_perms TEXT[]
     , filter_orgs TEXT
 
     , org_ids OUT TEXT[]
@@ -15,19 +15,15 @@ AS $$
 DECLARE
 	matched_roles TEXT[]; -- roles containing permission
 BEGIN
-	SELECT array_agg(rp.role) INTO matched_roles
-	FROM eventstore.role_permissions rp
-	WHERE rp.instance_id = instanceId
-	AND rp.permission = perm;
 
-  IF system_user_roles IS NOT NULL THEN
+  IF system_user_perms IS NOT NULL THEN
     DECLARE
-      permission_found_in_system_roles bool;
+      system_user_permission_found bool;
     BEGIN
-      SELECT result.role_found INTO permission_found_in_system_roles
-      FROM (SELECT matched_roles && system_user_roles AS role_found) AS result;
+      SELECT result.perm_found INTO system_user_permission_found
+      FROM (SELECT COALESCE((SELECT array_position(system_user_perms, perm) > 0 ), false) AS perm_found) AS result;
 
-      IF permission_found_in_system_roles THEN
+      IF system_user_permission_found THEN
         SELECT array_agg(o.org_id) INTO org_ids
         FROM eventstore.instance_orgs o
         WHERE o.instance_id = instanceId
@@ -38,6 +34,11 @@ BEGIN
     END;
     RETURN;
   END IF;
+
+	SELECT array_agg(rp.role) INTO matched_roles
+	FROM eventstore.role_permissions rp
+	WHERE rp.instance_id = instanceId
+	AND rp.permission = perm;
 
 	-- First try if the permission was granted thru an instance-level role
 	DECLARE
@@ -74,4 +75,3 @@ BEGIN
     RETURN;
 END;
 $$;
-

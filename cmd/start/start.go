@@ -174,12 +174,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return fmt.Errorf("unable to start caches: %w", err)
 	}
 
-	systemPermissions := make([]string, 0)
-	// for _, roleMapping := range config.SystemAuthZ.RolePermissionMappings {
-	// 	systemPermissions = append(systemPermissions, roleMapping.Permissions...)
-	// }
-	// config.InternalAuthZ.SystemUserPermissions = systemPermissions
-
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
@@ -198,7 +192,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
 			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, systemPermissions, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 			}
 		},
 		config.AuditLogRetention,
@@ -214,7 +208,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-		return internal_authz.CheckPermission(ctx, authZRepo, systemPermissions, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+		return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
 	storage, err := config.AssetStorage.NewStorage(dbClient.DB)

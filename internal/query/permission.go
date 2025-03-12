@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	// eventstore.permitted_orgs(instanceid text, userid text, perm text, system_user_roles text[], filter_orgs text)
+	// eventstore.permitted_orgs(instanceid text, userid text, perm text, system_user_perms text[], filter_orgs text)
 	wherePermittedOrgsClause              = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))"
 	wherePermittedOrgsOrCurrentUserClause = "(" + wherePermittedOrgsClause + " OR %s = ?" + ")"
 )

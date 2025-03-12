@@ -1251,7 +1251,7 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 					require.NoError(ttt, err)
 
 					if tt.checkNumberOfUsersReturned {
-						require.Equal(t, len(got.Result), len(tt.expectedFoundUsernames))
+						require.Equal(t, len(tt.expectedFoundUsernames), len(got.Result))
 					}
 
 					if tt.expectedFoundUsernames != nil {
