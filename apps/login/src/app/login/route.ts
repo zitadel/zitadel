@@ -475,18 +475,12 @@ export async function GET(request: NextRequest) {
       if (url && binding.case === "redirect") {
         return NextResponse.redirect(url);
       } else if (url && binding.case === "post") {
-        const formData = {
-          relayState: binding.value.relayState,
-          samlResponse: binding.value.samlResponse,
-        };
-
         // Convert form data to URL-encoded string
         const formBody = new FormData();
 
-        formBody.append("RelayState", formData.relayState);
-        formBody.append("SAMLResponse", formData.samlResponse);
-        console.log(url)
-        console.log(formBody)
+        formBody.append("RelayState", binding.value.relayState);
+        formBody.append("SAMLResponse", binding.value.samlResponse);
+
         // Make a POST request to the external URL with the form data
         const response = await fetch(url, {
           method: "POST",
@@ -495,7 +489,6 @@ export async function GET(request: NextRequest) {
           },
           body: formBody,
         });
-        console.log(response)
 
         // Handle the response from the external URL
         if (response.ok) {
