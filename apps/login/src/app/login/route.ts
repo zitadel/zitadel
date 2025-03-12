@@ -477,17 +477,17 @@ export async function GET(request: NextRequest) {
       } else if (url && binding.case === "post") {
         // Create form data after SAML standard
         const formData = {
-          "RelayState": binding.value.relayState,
-          "SAMLResponse": binding.value.samlResponse,
+          RelayState: binding.value.relayState,
+          SAMLResponse: binding.value.samlResponse,
         };
 
         // Convert form data to URL-encoded string
         const formBody = Object.entries(formData)
-            .map(
-                ([key, value]) =>
-                    encodeURIComponent(key) + "=" + encodeURIComponent(value),
-            )
-            .join("&");
+          .map(
+            ([key, value]) =>
+              encodeURIComponent(key) + "=" + encodeURIComponent(value),
+          )
+          .join("&");
 
         // Make a POST request to the external URL with the form data
         const response = await fetch(url, {
