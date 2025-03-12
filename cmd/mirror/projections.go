@@ -224,14 +224,6 @@ func projections(
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		nil,
 	)
-	execution.Register(
-		ctx,
-		config.Projections.Customizations["executions"],
-		config.Executions,
-		queries,
-		es.EventTypes(),
-		nil,
-	)
 
 	config.Auth.Spooler.Client = client
 	config.Auth.Spooler.Eventstore = es
@@ -305,12 +297,6 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			continue
 		}
 
-		err = execution.ProjectInstance(ctx)
-		if err != nil {
-			logging.WithFields("instance", instance).OnError(err).Info("trigger executions failed")
-			failedInstances <- instance
-			continue
-		}
 		logging.WithFields("instance", instance).Info("projections done")
 	}
 	wg.Done()
