@@ -1,0 +1,204 @@
+# Building a Secure Login Application with Zitadel Session API V2
+
+## **Introduction**
+
+This guide demonstrates how to implement a secure login application using Zitadel's **Session API V2**, supporting multi-factor authentication (password + passkeys). We focus on:
+
+- Running the session service in a **confidential environment** (server-side).
+- Securing sessions with **HTTP-only**, **Secure**, and **SameSite cookies**.
+- Using Next.js App Router for server-side rendering (SSR) and API routes.
+
+You can adapt this guide to any server-side framework or runtime environment.
+
+## **Prerequisites**
+
+1. A Zitadel instance (cloud or self-hosted).
+2. Next.js 14+ project with App Router enabled.
+3. Zitadel SDK (`@zitadel/proto` and `@zitadel/client`) installed.
+4. Environment variables configured for Zitadel credentials.
+
+## **Step 1: Configure workspace**
+
+### **Environment Variables (`.env.local`)**:
+
+```env
+ZITADEL_API_URL=https://your-zitadel-instance.com
+ZITADEL_SERVICE_USER_TOKEN=your-service-user-token
+```
+
+### **Install Dependencies**:
+
+```bash
+npm install @zitadel/proto @zitadel/client
+```
+
+---
+
+## **Step 2: Implement Authentication Flows**
+
+### **Password Login (Server Action)**:
+
+```tsx
+// app/login/actions.ts
+"use server";
+
+import { createSession, updateSession } from "../zitadel";
+
+export async function loginWithPassword(prevState: any, formData: FormData) {
+  const username = formData.get("username");
+  const password = formData.get("password");
+
+  try {
+    // 1. Create session with Zitadel
+    const { sessionId, sessionToken } = await createSession({
+      username: username.toString(),
+      password: password.toString(),
+    });
+
+    // 2. Update session with password factor
+    await updateSession({
+      sessionId,
+      checks: {
+        user: { password: password.toString() },
+      },
+    });
+
+    // 3. Set secure cookie (Next.js server-side)
+    cookies().set("sid", sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24, // 1 day
+      path: "/",
+    });
+
+    return { success: true };
+  } catch (error) {
+    return { error: "Invalid credentials" };
+  }
+}
+```
+
+### **Passkey Login (Server Action)**:
+
+```tsx
+// app/login/passkey/actions.ts
+"use server";
+
+export async function startPasskeyAuth() {
+  const { challenge, sessionId } = await createSession({
+    // No credentials, initiate WebAuthn
+  });
+
+  // Store challenge server-side (e.g., Redis)
+  await storeChallenge(sessionId, challenge);
+
+  return { challenge, sessionId };
+}
+
+export async function verifyPasskeyResponse(
+  sessionId: string,
+  credential: PublicKeyCredential
+) {
+  const challenge = await getStoredChallenge(sessionId);
+
+  await updateSession({
+    sessionId,
+    checks: {
+      user: { passkey: { credential, challenge } },
+    },
+  });
+
+  // Set session cookie (same as password flow)
+}
+```
+
+---
+
+## **Step 3: Session Management Middleware**
+
+```ts
+// middleware.ts
+import { NextResponse } from "next/server";
+import { verifySession } from "@zitadel/core";
+
+export async function middleware(request: NextRequest) {
+  const sessionToken = request.cookies.get("sid")?.value;
+
+  if (!sessionToken) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  try {
+    await verifySession(sessionToken);
+    return NextResponse.next();
+  } catch (error) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+}
+```
+
+---
+
+## **Step 4: Secure Server-Side Pages**
+
+### **Protected Page (Server Component)**:
+
+```tsx
+// app/dashboard/page.tsx
+import { cookies } from "next/headers";
+import { getUserDetails } from "@zitadel/core";
+
+export default async function Dashboard() {
+  const sessionToken = cookies().get("sid")?.value;
+
+  if (!sessionToken) {
+    redirect("/login");
+  }
+
+  const user = await getUserDetails(sessionToken);
+
+  return (
+    <div>
+      <h1>Welcome, {user.name}</h1>
+    </div>
+  );
+}
+```
+
+---
+
+## **Security Highlights**
+
+### **Why Server-Side + Secure Cookies?**
+
+| Feature                 | Security Benefit                         |
+| ----------------------- | ---------------------------------------- |
+| **HTTP-only Cookies**   | Prevents XSS attacks from reading tokens |
+| **Secure Flag**         | Ensures cookies only sent over HTTPS     |
+| **SameSite=Strict**     | Mitigates CSRF attacks                   |
+| **Server-Side Storage** | Session tokens never exposed to client   |
+
+### **Confidential Environment**
+
+- Session API calls **never run in the browser**.
+- Client secret stays secure in Next.js server runtime.
+- All authentication logic protected by serverless function isolation.
+
+---
+
+## **Conclusion**
+
+By combining Zitadel Session API V2 with Next.js App Router:
+
+- 🛡️ Achieve **zero client-side session exposure**.
+- 🔑 Support **modern authentication factors** like passkeys.
+- 🚀 Simplify multi-factor authentication flows.
+- 🔒 Ensure compliance with security best practices.
+
+For production, always:
+
+1. Use HTTPS in production environments.
+2. Regularly rotate client secrets.
+3. Implement rate limiting on authentication endpoints.
+4. Audit session activity via Zitadel logs.
