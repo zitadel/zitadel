@@ -1,6 +1,6 @@
 {
   "name": "@zitadel/proto",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
+    "generate": "buf generate https://github.com/zitadel/zitadel.git#tag=v2.71.1 --path ./proto/zitadel",
     "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate"
   },
   "dependencies": {
