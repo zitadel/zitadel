@@ -63,7 +63,7 @@ export class GrpcService {
         const interceptors = {
           unaryInterceptors: [
             new ExhaustedGrpcInterceptor(this.exhaustedService, this.envService),
-            new OrgInterceptor(this.storageService),
+            new OrgInterceptor(this.orgInterceptorProvider),
             this.authInterceptor,
             new I18nInterceptor(this.translate),
           ],

@@ -11,29 +11,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 const ORG_HEADER_KEY = 'x-zitadel-orgid';
 @Injectable({ providedIn: 'root' })
 export class OrgInterceptor<TReq = unknown, TResp = unknown> implements UnaryInterceptor<TReq, TResp> {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(private readonly orgInterceptorProvider: OrgInterceptorProvider) {}
 
   public async intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
     const metadata = request.getMetadata();
 
-    const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
-
-    if (org) {
-      metadata[ORG_HEADER_KEY] = `${org.id}`;
+    const orgId = await firstValueFrom(this.orgInterceptorProvider.getOrgId());
+    if (orgId) {
+      metadata[ORG_HEADER_KEY] = orgId;
     }
 
-    try {
-      return await invoker(request);
-    } catch (error: any) {
-      if (
-        error instanceof RpcError &&
-        error.code === StatusCode.PERMISSION_DENIED &&
-        error.message.startsWith("Organisation doesn't exist")
-      ) {
-        this.storageService.removeItem(StorageKey.organization, StorageLocation.session);
-      }
-      throw error;
-    }
+    return invoker(request).catch(this.orgInterceptorProvider.handleError);
   }
 }
 
