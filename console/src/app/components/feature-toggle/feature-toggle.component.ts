@@ -40,7 +40,7 @@ export class FeatureToggleComponent {
   protected Source = Source;
 
   get isInherited(): boolean {
-    const source = this.featureData[this.toggleStateKey as ToggleStateKeys]?.source ?? Source.UNSPECIFIED;
+    const source = this.featureData[this.toggleStateKey as ToggleStateKeys]?.source;
     return source == Source.SYSTEM || source == Source.UNSPECIFIED;
   }
 
