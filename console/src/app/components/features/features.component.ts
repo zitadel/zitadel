@@ -98,7 +98,7 @@ export class FeaturesComponent {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.getFeatures(true);
+    this.getFeatures();
   }
 
   public validateAndSave() {
@@ -129,7 +129,7 @@ export class FeaturesComponent {
       });
   }
 
-  private getFeatures(inheritance: boolean) {
+  private getFeatures() {
     this.featureService.getInstanceFeatures().then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse;
 
@@ -159,7 +159,7 @@ export class FeaturesComponent {
       .then(() => {
         this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
         setTimeout(() => {
-          this.getFeatures(true);
+          this.getFeatures();
         }, 1000);
       })
       .catch((error) => {
