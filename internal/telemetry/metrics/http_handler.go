@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"net/http"
+	"slices"
 	"strings"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -126,6 +127,9 @@ func RegisterTotalRequestCounter(r *http.Request) {
 }
 
 func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
+	if shouldIgnoreStatusCodes(recorder, http.StatusNotFound) {
+		return
+	}
 	var labels = map[string]attribute.Value{
 		URI:        attribute.StringValue(*recorder.RequestURI),
 		Method:     attribute.StringValue(r.Method),
@@ -133,6 +137,12 @@ func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
 	}
 	RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
 	AddCount(r.Context(), ReturnCodeCounter, 1, labels)
+}
+
+func shouldIgnoreStatusCodes(recorder *StatusRecorder, statuses ...int) bool {
+	val := slices.Contains(statuses, recorder.Status)
+
+	return val
 }
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
