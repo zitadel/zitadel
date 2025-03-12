@@ -108,15 +108,18 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 // Service to manage custom executions.
-// The service provides methods to create, update, delete and list different resources.
+// The service provides methods to create, update, delete and list targets and executions.
 service ActionService {
 
-  // Create a target
+  // Create Target
   //
-  // Create a new target, which can be used in executions.
+  // Create a new target to your endpoint, which can be used in executions.
   //
   // Required permission:
   //   - `action.target.write`
+  //
+  // Required feature flag:
+  //   - `actions`
   rpc CreateTarget (CreateTargetRequest) returns (CreateTargetResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/targets"
@@ -136,15 +139,25 @@ service ActionService {
           description: "Target created successfully";
         };
       };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
     };
   }
 
-  // Update a target
+  // Update Target
   //
   // Update an existing target.
+  // To generate a new signing key set the optional expirationSigningKey.
   //
   // Required permission:
   //   - `action.target.write`
+  //
+  // Required feature flag:
+  //   - `actions`
   rpc UpdateTarget (UpdateTargetRequest) returns (UpdateTargetResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/targets/{id}"
@@ -164,15 +177,32 @@ service ActionService {
           description: "Target successfully updated or left unchanged";
         };
       };
+      responses: {
+        key: "404"
+        value: {
+          description: "The target to update does not exist.";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
     };
   }
 
-  // Delete a target
+  // Delete Target
   //
   // Delete an existing target. This will remove it from any configured execution as well.
+  // In case the target is not found, the request will return a successful response as
+  // the desired state is already achieved.
   //
   // Required permission:
   //   - `action.target.delete`
+  //
+  // Required feature flag:
+  //   - `actions`
   rpc DeleteTarget (DeleteTargetRequest) returns (DeleteTargetResponse) {
     option (google.api.http) = {
       delete: "/v2beta/actions/targets/{id}"
@@ -191,15 +221,24 @@ service ActionService {
           description: "Target deleted successfully";
         };
       };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
     };
   }
 
-  // Target by ID
+  // Get Target
   //
   // Returns the target identified by the requested ID.
   //
   // Required permission:
   //   - `action.target.read`
+  //
+  // Required feature flag:
+  //   - `actions`
   rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
     option (google.api.http) = {
       get: "/v2beta/actions/targets/{id}"
@@ -218,16 +257,25 @@ service ActionService {
           description: "Target retrieved successfully";
         }
       };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
     };
   }
 
-  // Search targets
+  // Search Targets
   //
   // Search all matching targets. By default all targets of the instance are returned.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
   //   - `action.target.read`
+  //
+  // Required feature flag:
+  //   - `actions`
   rpc ListTargets (ListTargetsRequest) returns (ListTargetsResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/targets/_search",
@@ -253,15 +301,25 @@ service ActionService {
           description: "invalid list query";
         };
       };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
     };
   }
 
-  // Sets an execution to call a target or include the targets of another execution.
+  // Set Execution
   //
+  // Sets an execution to call a target or include the targets of another execution.
   // Setting an empty list of targets will remove all targets from the execution, making it a noop.
   //
   // Required permission:
   //   - `action.execution.write`
+  //
+  // Required feature flag:
+  //   - `actions`
   rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
     option (google.api.http) = {
       put: "/v2beta/actions/executions"
@@ -281,16 +339,31 @@ service ActionService {
           description: "Execution successfully updated or left unchanged";
         };
       };
+      responses: {
+        key: "400"
+        value: {
+          description: "Condition to set execution does not exist.";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
     };
   }
 
-  // Search executions
+  // List Executions
   //
-  // Search all matching executions. By default all executions of the instance are returned that have at least one execution target.
+  // LIst all matching executions. By default all executions of the instance are returned that have at least one execution target.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
   //   - `action.execution.read`
+  //
+  // Required feature flag:
+  //   - `actions`
   rpc ListExecutions (ListExecutionsRequest) returns (ListExecutionsResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/executions/_search"
@@ -314,6 +387,12 @@ service ActionService {
         value: {
           description: "invalid list query";
         };
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
       };
     };
   }
@@ -408,10 +487,10 @@ message CreateTargetRequest {
     RESTAsync rest_async = 4;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
+  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails.
   google.protobuf.Duration timeout = 5 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "if the target doesn't respond before this timeout expires, the the connection is closed and the action fails";
       example: "\"10s\"";
     }
   ];
@@ -470,10 +549,10 @@ message UpdateTargetRequest {
     RESTAsync rest_async = 5;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
+  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails.
   optional google.protobuf.Duration timeout = 6 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "if the target doesn't respond before this timeout expires, the the connection is closed and the action fails";
       example: "\"10s\"";
     }
   ];
@@ -574,8 +653,10 @@ message ListTargetsResponse {
 }
 
 message SetExecutionRequest {
+  // Condition defining when the execution should be used.
   Condition condition = 1;
-  Execution execution = 2;
+  // Ordered list of targets/includes called during the execution.
+  repeated ExecutionTargetType targets = 2;
 }
 
 message SetExecutionResponse {

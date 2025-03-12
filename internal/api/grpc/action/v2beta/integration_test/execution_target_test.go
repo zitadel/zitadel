@@ -54,7 +54,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	fullMethod := "/zitadel.action.v2beta.ActionService/GetTarget"
+	fullMethod := action.ActionService_GetTarget_FullMethodName
 
 	tests := []struct {
 		name    string
@@ -172,8 +172,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			name: "GetTarget, request, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
-
-				fullMethod := "/zitadel.action.v2beta.ActionService/GetTarget"
 				orgID := instance.DefaultOrg.Id
 				projectID := ""
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -200,8 +198,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			name: "GetTarget, response, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
-
-				fullMethod := "/zitadel.action.v2beta.ActionService/GetTarget"
 				orgID := instance.DefaultOrg.Id
 				projectID := ""
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID

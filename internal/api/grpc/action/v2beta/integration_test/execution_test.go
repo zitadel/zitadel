@@ -60,9 +60,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						Request: &action.RequestExecution{},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -79,9 +77,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -98,9 +94,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -119,9 +113,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -138,9 +130,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -159,9 +149,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -252,9 +240,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: circularExecutionService,
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleInclude(circularExecutionMethod),
-				},
+				Targets:   executionTargetsSingleInclude(circularExecutionMethod),
 			},
 			wantErr: true,
 		},
@@ -271,9 +257,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleInclude(executionCond),
-				},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -292,9 +276,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleInclude(executionCond),
-				},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -356,9 +338,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -375,9 +355,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -394,9 +372,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -415,9 +391,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -434,9 +408,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -455,9 +427,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -521,9 +491,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						Event: &action.EventExecution{},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -561,9 +529,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -603,9 +569,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -624,9 +588,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),
@@ -688,9 +650,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -703,9 +663,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Function: &action.FunctionExecution{Name: "xxx"},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -718,9 +676,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Function: &action.FunctionExecution{Name: "presamlresponse"},
 					},
 				},
-				Execution: &action.Execution{
-					Targets: executionTargetsSingleTarget(targetResp.GetId()),
-				},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				SetDate: timestamppb.Now(),

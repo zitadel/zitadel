@@ -737,9 +737,7 @@ func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *acti
 func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
 	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
-		Execution: &action.Execution{
-			Targets: targets,
-		},
+		Targets:   targets,
 	})
 	require.NoError(t, err)
 	return target

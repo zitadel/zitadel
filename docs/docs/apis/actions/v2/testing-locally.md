@@ -69,7 +69,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 [Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target)
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v3alpha/targets' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -92,7 +92,7 @@ To call the target just created before, with the intention to print the request 
 [Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v3alpha/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

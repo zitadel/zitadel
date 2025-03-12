@@ -17,7 +17,7 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-	reqTargets := req.GetExecution().GetTargets()
+	reqTargets := req.GetTargets()
 	targets := make([]*execution.Target, len(reqTargets))
 	for i, target := range reqTargets {
 		switch t := target.GetType().(type) {

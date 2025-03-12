@@ -402,12 +402,12 @@ func TestServer_DeleteTarget(t *testing.T) {
 	ensureFeatureEnabled(t, instance)
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		prepare func(request *action.DeleteTargetRequest)
-		req     *action.DeleteTargetRequest
-		want    *action.DeleteTargetResponse
-		wantErr bool
+		name             string
+		ctx              context.Context
+		prepare          func(request *action.DeleteTargetRequest) (time.Time, time.Time)
+		req              *action.DeleteTargetRequest
+		wantDeletionDate bool
+		wantErr          bool
 	}{
 		{
 			name: "missing permission",
@@ -431,40 +431,39 @@ func TestServer_DeleteTarget(t *testing.T) {
 			req: &action.DeleteTargetRequest{
 				Id: "notexisting",
 			},
-			want: &action.DeleteTargetResponse{
-				DeletionDate: timestamppb.Now(),
-			},
+			wantDeletionDate: false,
 		},
 		{
 			name: "delete target",
 			ctx:  iamOwnerCtx,
-			prepare: func(request *action.DeleteTargetRequest) {
+			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
+				creationDate := time.Now()
 				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
+				return creationDate, time.Time{}
 			},
-			req: &action.DeleteTargetRequest{},
-			want: &action.DeleteTargetResponse{
-				DeletionDate: timestamppb.Now(),
-			},
+			req:              &action.DeleteTargetRequest{},
+			wantDeletionDate: true,
 		},
 		{
 			name: "delete target, already removed",
 			ctx:  iamOwnerCtx,
-			prepare: func(request *action.DeleteTargetRequest) {
+			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
+				creationDate := time.Now()
 				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 				instance.DeleteTarget(iamOwnerCtx, t, targetID)
+				return creationDate, time.Now()
 			},
-			req: &action.DeleteTargetRequest{},
-			want: &action.DeleteTargetResponse{
-				DeletionDate: timestamppb.Now(),
-			},
+			req:              &action.DeleteTargetRequest{},
+			wantDeletionDate: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			var creationDate, deletionDate time.Time
 			if tt.prepare != nil {
-				tt.prepare(tt.req)
+				creationDate, deletionDate = tt.prepare(tt.req)
 			}
 			got, err := instance.Client.ActionV2beta.DeleteTarget(tt.ctx, tt.req)
 			if tt.wantErr {
@@ -472,14 +471,17 @@ func TestServer_DeleteTarget(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assertDeleteTargetResponse(t, tt.want, got)
+			assertDeleteTargetResponse(t, creationDate, deletionDate, tt.wantDeletionDate, got)
 		})
 	}
 }
 
-func assertDeleteTargetResponse(t *testing.T, expectedResp *action.DeleteTargetResponse, actualResp *action.DeleteTargetResponse) {
-	if expectedResp.GetDeletionDate() == nil {
-		wantCreationDate := expectedResp.GetDeletionDate().AsTime()
-		assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
+func assertDeleteTargetResponse(t *testing.T, creationDate, deletionDate time.Time, expectedDeletionDate bool, actualResp *action.DeleteTargetResponse) {
+	if expectedDeletionDate {
+		if !deletionDate.IsZero() {
+			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, deletionDate)
+		} else {
+			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, time.Now())
+		}
 	}
 }
