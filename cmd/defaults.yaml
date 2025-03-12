@@ -464,6 +464,8 @@ Executions:
   # multi binary / pod setup and allowing only certain executables to process the events.
   Workers: 1 # ZITADEL_EXECUTIONS_WORKERS
   # The maximum duration a job can do it's work before it is considered as failed.
+  # This maximum duration is prioritised in case that the sum of the target's timeouts is higher,
+  # to limit the runtime of a singular execution.
   TransactionDuration: 10s # ZITADEL_EXECUTIONS_TRANSACTIONDURATION
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL

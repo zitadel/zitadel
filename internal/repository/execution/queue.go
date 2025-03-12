@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -36,7 +34,7 @@ func ContextInfoFromRequest(e *Request) *ContextInfoEvent {
 		Version:       string(e.Aggregate.Version),
 		Sequence:      e.Sequence,
 		EventType:     string(e.EventType),
-		CreatedAt:     e.CreatedAt.Format(time.RFC3339),
+		CreatedAt:     e.CreatedAt.Format(time.RFC3339Nano),
 		UserID:        e.UserID,
 		EventPayload:  e.EventData,
 	}
@@ -68,17 +66,6 @@ func (c *ContextInfoEvent) SetHTTPResponseBody(resp []byte) error {
 	return nil
 }
 
-func (c *ContextInfoEvent) GetContent() interface{} {
+func (c *ContextInfoEvent) GetContent() any {
 	return c.EventPayload
-}
-
-func (e *Request) WithLogFields(entry *logging.Entry) *logging.Entry {
-	return entry.
-		WithField("instanceID", e.Aggregate.InstanceID).
-		WithField("resourceOwner", e.Aggregate.ResourceOwner).
-		WithField("aggregateType", e.Aggregate.Type).
-		WithField("aggregateVersion", e.Aggregate.Version).
-		WithField("aggregateID", e.Aggregate.ID).
-		WithField("sequence", e.Sequence).
-		WithField("eventType", e.EventType)
 }

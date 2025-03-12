@@ -41,50 +41,6 @@ func (m *MockQueries) EXPECT() *MockQueriesMockRecorder {
 	return m.recorder
 }
 
-// ActiveInstances mocks base method.
-func (m *MockQueries) ActiveInstances() []string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ActiveInstances")
-	ret0, _ := ret[0].([]string)
-	return ret0
-}
-
-// ActiveInstances indicates an expected call of ActiveInstances.
-func (mr *MockQueriesMockRecorder) ActiveInstances() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveInstances", reflect.TypeOf((*MockQueries)(nil).ActiveInstances))
-}
-
-// GetInstanceFeatures mocks base method.
-func (m *MockQueries) GetInstanceFeatures(arg0 context.Context, arg1 bool) (*query.InstanceFeatures, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetInstanceFeatures", arg0, arg1)
-	ret0, _ := ret[0].(*query.InstanceFeatures)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetInstanceFeatures indicates an expected call of GetInstanceFeatures.
-func (mr *MockQueriesMockRecorder) GetInstanceFeatures(arg0, arg1 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInstanceFeatures", reflect.TypeOf((*MockQueries)(nil).GetInstanceFeatures), arg0, arg1)
-}
-
-// GetNotifyUserByID mocks base method.
-func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 string) (*query.NotifyUser, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNotifyUserByID", arg0, arg1, arg2)
-	ret0, _ := ret[0].(*query.NotifyUser)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNotifyUserByID indicates an expected call of GetNotifyUserByID.
-func (mr *MockQueriesMockRecorder) GetNotifyUserByID(arg0, arg1, arg2 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), arg0, arg1, arg2)
-}
-
 // InstanceByID mocks base method.
 func (m *MockQueries) InstanceByID(arg0 context.Context, arg1 string) (authz.Instance, error) {
 	m.ctrl.T.Helper()

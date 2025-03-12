@@ -34,7 +34,7 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 
 	targets, err := TargetsFromRequest(job.Args)
 	if err != nil {
-		return river.JobCancel(errors.New("targets not valid"))
+		return river.JobCancel(err)
 	}
 
 	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args))

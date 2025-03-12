@@ -86,7 +86,7 @@ func Test_EventExecution(t *testing.T) {
 					Version:       "v1",
 					Sequence:      1,
 					EventType:     "session.added",
-					CreatedAt:     time.Date(2024, 1, 1, 1, 1, 1, 1, time.UTC).Format(time.RFC3339),
+					CreatedAt:     time.Date(2024, 1, 1, 1, 1, 1, 1, time.UTC).Format(time.RFC3339Nano),
 					UserID:        userID,
 					EventPayload:  []byte(`{"ID":"","Seq":1,"Pos":0,"Creation":"2024-01-01T01:01:01.000000001Z"}`),
 				},
@@ -122,6 +122,21 @@ func Test_groupsFromEventType(t *testing.T) {
 		args args
 		res  res
 	}{
+		{
+			"user human mfa init skipped, ok",
+			args{
+				eventType: user.HumanMFAInitSkippedType,
+			},
+			res{
+				groups: []string{
+					"user.human.mfa.init.skipped",
+					"user.human.mfa.init.*",
+					"user.human.mfa.*",
+					"user.human.*",
+					"user.*",
+				},
+			},
+		},
 		{
 			"session added, ok",
 			args{
@@ -467,8 +482,6 @@ func mockTargetsToBytes(targets []*query.ExecutionTarget) []byte {
 func newEventExecutionsHandler(queries *mock.MockQueries, f fields) *eventHandler {
 	return &eventHandler{
 		queue: f.queue,
-		query: NewExecutionsQueries(
-			queries,
-		),
+		query: queries,
 	}
 }

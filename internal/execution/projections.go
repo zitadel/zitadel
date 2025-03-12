@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/queue"
 )
@@ -17,7 +18,7 @@ func Register(
 	ctx context.Context,
 	executionsCustomConfig projection.CustomConfig,
 	workerConfig WorkerConfig,
-	queries eventHandlerQueries,
+	queries *query.Queries,
 	eventTypes []string,
 	queue *queue.Queue,
 ) {

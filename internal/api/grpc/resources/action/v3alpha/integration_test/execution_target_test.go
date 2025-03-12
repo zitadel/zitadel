@@ -58,7 +58,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		dep     func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) (func(), func() bool, error)
+		dep     func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) (closeF func(), calledF func() bool)
 		clean   func(context.Context)
 		req     *action.GetTargetRequest
 		want    *action.GetTargetResponse
@@ -67,7 +67,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		{
 			name: "GetTarget, request and response, ok",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool, error) {
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool) {
 
 				orgID := instance.DefaultOrg.Id
 				projectID := ""
@@ -155,7 +155,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 							return false
 						}
 						return true
-					}, nil
+					}
 			},
 			clean: func(ctx context.Context) {
 				instance.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
@@ -179,7 +179,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		{
 			name: "GetTarget, request, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool, error) {
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool) {
 
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := instance.DefaultOrg.Id
@@ -198,7 +198,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						closeRequest()
 					}, func() bool {
 						return calledRequest() == 1
-					}, nil
+					}
 			},
 			clean: func(ctx context.Context) {
 				instance.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
@@ -209,7 +209,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		{
 			name: "GetTarget, response, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool, error) {
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), func() bool) {
 
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := instance.DefaultOrg.Id
@@ -269,7 +269,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						closeResponse()
 					}, func() bool {
 						return calledResponse() == 1
-					}, nil
+					}
 			},
 			clean: func(ctx context.Context) {
 				instance.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
@@ -280,8 +280,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			closeF, calledF, err := tt.dep(tt.ctx, tt.req, tt.want)
-			require.NoError(t, err)
+			closeF, calledF := tt.dep(tt.ctx, tt.req, tt.want)
 			defer closeF()
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)

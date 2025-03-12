@@ -17,13 +17,3 @@ func HandlerContext(event *eventstore.Aggregate) context.Context {
 func ContextWithExecuter(ctx context.Context, aggregate *eventstore.Aggregate) context.Context {
 	return authz.SetCtxData(ctx, authz.CtxData{UserID: ExecutionUserID, OrgID: aggregate.ResourceOwner})
 }
-
-func (q *ExecutionsQueries) HandlerContext(event *eventstore.Aggregate) (context.Context, error) {
-	ctx := context.Background()
-	instance, err := q.InstanceByID(ctx, event.InstanceID)
-	if err != nil {
-		return nil, err
-	}
-	ctx = authz.WithInstance(ctx, instance)
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: ExecutionUserID, OrgID: event.ResourceOwner}), nil
-}

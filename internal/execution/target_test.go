@@ -9,30 +9,30 @@ import (
 	"time"
 )
 
-type server struct {
+type testServer struct {
 	server *httptest.Server
 	called bool
 }
 
-func (s *server) URL() string {
+func (s *testServer) URL() string {
 	return s.server.URL
 }
 
-func (s *server) Close() {
+func (s *testServer) Close() {
 	s.server.Close()
 }
 
-func (s *server) Called() bool {
+func (s *testServer) Called() bool {
 	return s.called
 }
 
-func TestServerCall(
+func testServerCall(
 	reqBody interface{},
 	sleep time.Duration,
 	statusCode int,
 	respBody interface{},
 ) (string, func(), func() bool) {
-	server := &server{
+	server := &testServer{
 		called: false,
 	}
 

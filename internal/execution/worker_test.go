@@ -251,7 +251,7 @@ func Test_handleEventExecution(t *testing.T) {
 			closeFuncs := make([]func(), len(w.targets))
 			calledFuncs := make([]func() bool, len(w.targets))
 			for i := range w.targets {
-				url, closeF, calledF := TestServerCall(
+				url, closeF, calledF := testServerCall(
 					exec_repo.ContextInfoFromRequest(a.job.Args),
 					time.Second,
 					w.sendStatusCode,

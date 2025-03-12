@@ -8,6 +8,7 @@ import (
 
 	"github.com/riverqueue/river"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -20,18 +21,19 @@ const (
 	HandlerTable = "projections.execution_handler"
 )
 
-type eventHandlerQueries interface {
-	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
-}
-
 type Queue interface {
 	Insert(ctx context.Context, args river.JobArgs, opts ...queue.InsertOpt) error
+}
+
+type Queries interface {
+	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
+	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 }
 
 type eventHandler struct {
 	eventTypes                 []string
 	aggregateTypeFromEventType func(typ eventstore.EventType) eventstore.AggregateType
-	query                      eventHandlerQueries
+	query                      Queries
 	queue                      Queue
 }
 
@@ -40,7 +42,7 @@ func NewEventHandler(
 	config handler.Config,
 	eventTypes []string,
 	aggregateTypeFromEventType func(typ eventstore.EventType) eventstore.AggregateType,
-	query eventHandlerQueries,
+	query Queries,
 	queue Queue,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &eventHandler{
@@ -63,13 +65,7 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 		if !ok {
 			aggList[aggType] = []eventstore.EventType{eventstore.EventType(eventType)}
 		} else {
-			found := false
-			for _, aggEventType := range aggEventTypes {
-				if aggEventType == eventstore.EventType(eventType) {
-					found = true
-				}
-			}
-			if !found {
+			if !slices.Contains(aggEventTypes, eventstore.EventType(eventType)) {
 				aggList[aggType] = append(aggList[aggType], eventstore.EventType(eventType))
 			}
 		}
@@ -97,18 +93,10 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 func groupsFromEventType(s string) []string {
 	parts := strings.Split(s, ".")
 	groups := make([]string, len(parts))
-	groupBase := ""
-	for i, part := range parts {
-		if groupBase == "" {
-			groupBase = part
-		} else {
-			groupBase = groupBase + "." + part
-		}
-
-		if groupBase == s {
-			groups[i] = groupBase
-		} else {
-			groups[i] = groupBase + ".*"
+	for i := range parts {
+		groups[i] = strings.Join(parts[:i+1], ".")
+		if i < len(parts)-1 {
+			groups[i] = groups[i] + ".*"
 		}
 	}
 	// sort to end up with the most specific group first

@@ -48,7 +48,7 @@ func TestServerCall(
 	sleep time.Duration,
 	statusCode int,
 	respBody interface{},
-) (string, func(), func() int, func()) {
+) (url string, closeF func(), calledF func() int, resetCalledF func()) {
 	server := &server{
 		called: 0,
 	}
