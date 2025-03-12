@@ -22,7 +22,6 @@ import { createFeatureServiceClient, createUserServiceClient } from '@zitadel/cl
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
-import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2/Feature_serviceServiceClientPb';
 
 @Injectable({
   providedIn: 'root',

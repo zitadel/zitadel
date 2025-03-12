@@ -39,8 +39,9 @@ export class FeatureToggleComponent {
   protected ToggleState = ToggleState;
   protected Source = Source;
 
-  get source() {
-    return this.featureData[this.toggleStateKey as ToggleStateKeys]?.source;
+  get isInherited(): boolean {
+    const source = this.featureData[this.toggleStateKey as ToggleStateKeys]?.source ?? Source.UNSPECIFIED;
+    return source == Source.SYSTEM || source == Source.UNSPECIFIED;
   }
 
   get enabled() {

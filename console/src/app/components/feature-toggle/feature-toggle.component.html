@@ -13,7 +13,7 @@
           <span>{{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
 
           <div
-            *ngIf="!enabled && (source == Source.SYSTEM || source == Source.UNSPECIFIED)"
+            *ngIf="!enabled && isInherited"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.DISABLED' | translate }}"
           ></div>
@@ -23,7 +23,7 @@
         <div class="toggle-row">
           <span>{{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
           <div
-            *ngIf="enabled && (source == Source.SYSTEM || source == Source.UNSPECIFIED)"
+            *ngIf="enabled && isInherited"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
           ></div>
