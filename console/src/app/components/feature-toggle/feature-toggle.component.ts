@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -8,16 +8,16 @@ import { CopyRowComponent } from '../copy-row/copy-row.component';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { ToggleState, ToggleStateKeys, ToggleStates } from '../features/features.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
 import { FormsModule } from '@angular/forms';
-import { GetInstanceFeaturesResponse } from 'src/app/proto/generated/zitadel/feature/v2/instance_pb';
-import { FeatureFlag } from 'src/app/proto/generated/zitadel/feature/v2/feature_pb';
+import { GetInstanceFeaturesResponse } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
+import { FeatureFlag, Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
 
 @Component({
   standalone: true,
   selector: 'cnsl-feature-toggle',
   templateUrl: './feature-toggle.component.html',
   styleUrls: ['./feature-toggle.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -31,13 +31,13 @@ import { FeatureFlag } from 'src/app/proto/generated/zitadel/feature/v2/feature_
   ],
 })
 export class FeatureToggleComponent {
-  @Input() featureData: Partial<GetInstanceFeaturesResponse.AsObject> = {};
-  @Input() toggleStates: any = {}; // TODO: use ToggleStates, but get rid of the any warning of ngModel
+  @Input() featureData: Partial<GetInstanceFeaturesResponse> = {};
+  @Input() toggleStates: Partial<ToggleStates> = {};
   @Input() toggleStateKey: string = '';
   @Output() toggleChange = new EventEmitter<void>();
 
-  protected ToggleState: any = ToggleState;
-  protected Source: any = Source;
+  protected ToggleState = ToggleState;
+  protected Source = Source;
 
   get source() {
     return this.featureData[this.toggleStateKey as ToggleStateKeys]?.source;
@@ -45,7 +45,7 @@ export class FeatureToggleComponent {
 
   get enabled() {
     // TODO: remove casting as not all features are a FeatureFlag
-    return (this.featureData[this.toggleStateKey as ToggleStateKeys] as FeatureFlag.AsObject)?.enabled;
+    return (this.featureData[this.toggleStateKey as ToggleStateKeys] as FeatureFlag)?.enabled;
   }
 
   onToggleChange() {

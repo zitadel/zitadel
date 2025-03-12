@@ -1,10 +1,10 @@
-<div class="feature-row" *ngIf="toggleStates[toggleStateKey]">
+<div class="feature-row" *ngIf="$any(toggleStates)[toggleStateKey]">
   <span>{{ 'SETTING.FEATURES.' + toggleStateKey.toUpperCase() | translate }}</span>
   <div class="row">
     <mat-button-toggle-group
       class="theme-toggle"
       class="buttongroup"
-      [(ngModel)]="toggleStates[toggleStateKey].state"
+      [(ngModel)]="$any(toggleStates)[toggleStateKey].state"
       (change)="onToggleChange()"
       name="displayview"
     >
@@ -13,7 +13,7 @@
           <span>{{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
 
           <div
-            *ngIf="!enabled && (source === Source.SOURCE_SYSTEM || source === Source.SOURCE_UNSPECIFIED)"
+            *ngIf="!enabled && (source == Source.SYSTEM || source == Source.UNSPECIFIED)"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.DISABLED' | translate }}"
           ></div>
@@ -23,7 +23,7 @@
         <div class="toggle-row">
           <span>{{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
           <div
-            *ngIf="enabled && (source === Source.SOURCE_SYSTEM || source === Source.SOURCE_UNSPECIFIED)"
+            *ngIf="enabled && (source == Source.SYSTEM || source == Source.UNSPECIFIED)"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
           ></div>

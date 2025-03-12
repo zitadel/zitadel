@@ -13,14 +13,17 @@ import { InfoSectionModule } from 'src/app/modules/info-section/info-section.mod
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { FeatureToggleComponent } from '../feature-toggle/feature-toggle.component';
+import { FeatureFlag } from 'src/app/proto/generated/zitadel/feature/v2/feature_pb';
+import { NewFeatureService } from 'src/app/services/new-feature.service';
 import {
   GetInstanceFeaturesResponse,
   SetInstanceFeaturesRequest,
-} from 'src/app/proto/generated/zitadel/feature/v2/instance_pb';
-import { FeatureToggleComponent } from '../feature-toggle/feature-toggle.component';
-import { FeatureFlag } from 'src/app/proto/generated/zitadel/feature/v2/feature_pb';
+  SetInstanceFeaturesRequestSchema,
+} from '@zitadel/proto/zitadel/feature/v2/instance_pb';
+//@ts-ignore
+import { create } from '@zitadel/client';
 
 export enum ToggleState {
   ENABLED = 'ENABLED',
@@ -47,7 +50,7 @@ const FEATURE_KEYS: ToggleStateKeys[] = [
 ];
 
 type FeatureState = { source: Source; state: ToggleState };
-export type ToggleStateKeys = Exclude<keyof GetInstanceFeaturesResponse.AsObject, 'details'>;
+export type ToggleStateKeys = Exclude<keyof GetInstanceFeaturesResponse, 'details' | '$typeName' | '$unknown'>;
 
 export type ToggleStates = {
   [key in ToggleStateKeys]: FeatureState;
@@ -75,14 +78,14 @@ export type ToggleStates = {
   styleUrls: ['./features.component.scss'],
 })
 export class FeaturesComponent {
-  protected featureData: Partial<GetInstanceFeaturesResponse.AsObject> | undefined;
+  protected featureData: GetInstanceFeaturesResponse | undefined;
 
   protected toggleStates: ToggleStates | undefined;
   protected Source: any = Source;
   protected ToggleState: any = ToggleState;
 
   constructor(
-    private featureService: FeatureService,
+    private featureService: NewFeatureService,
     private breadcrumbService: BreadcrumbService,
     private toast: ToastService,
   ) {
@@ -99,48 +102,43 @@ export class FeaturesComponent {
   }
 
   public validateAndSave() {
-    this.featureService.resetInstanceFeatures().then(() => {
-      const req = new SetInstanceFeaturesRequest();
-
-      req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
-      req.setConsoleUseV2UserApi(this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED);
-      req.setDebugOidcParentError(this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED);
-      req.setDisableUserTokenEvent(this.toggleStates?.disableUserTokenEvent?.state === ToggleState.ENABLED);
-      req.setEnableBackChannelLogout(this.toggleStates?.enableBackChannelLogout?.state === ToggleState.ENABLED);
-      req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
-      req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
-      req.setOidcSingleV1SessionTermination(
-        this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
-      );
-      req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
-      req.setOidcTriggerIntrospectionProjections(
+    const req = create(SetInstanceFeaturesRequestSchema, {
+      actions: this.toggleStates?.actions?.state === ToggleState.ENABLED,
+      consoleUseV2UserApi: this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED,
+      debugOidcParentError: this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED,
+      disableUserTokenEvent: this.toggleStates?.disableUserTokenEvent?.state === ToggleState.ENABLED,
+      enableBackChannelLogout: this.toggleStates?.enableBackChannelLogout?.state === ToggleState.ENABLED,
+      loginDefaultOrg: this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED,
+      oidcLegacyIntrospection: this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED,
+      oidcSingleV1SessionTermination: this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
+      oidcTokenExchange: this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED,
+      oidcTriggerIntrospectionProjections:
         this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
-      );
-      req.setPermissionCheckV2(this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED);
-      req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
-      req.setWebKey(this.toggleStates?.webKey?.state === ToggleState.ENABLED);
-
-      this.featureService
-        .setInstanceFeatures(req)
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+      permissionCheckV2: this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED,
+      userSchema: this.toggleStates?.userSchema?.state === ToggleState.ENABLED,
+      webKey: this.toggleStates?.webKey?.state === ToggleState.ENABLED,
     });
+
+    this.featureService
+      .setInstanceFeatures(req)
+      .then(() => {
+        this.toast.showInfo('POLICY.TOAST.SET', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   private getFeatures(inheritance: boolean) {
-    this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
-      this.featureData = instanceFeaturesResponse.toObject();
+    this.featureService.getInstanceFeatures().then((instanceFeaturesResponse) => {
+      this.featureData = instanceFeaturesResponse;
 
       console.log(this.featureData);
       this.toggleStates = this.createToggleStates(this.featureData);
     });
   }
 
-  private createToggleStates(featureData: GetInstanceFeaturesResponse.AsObject): ToggleStates {
+  private createToggleStates(featureData: GetInstanceFeaturesResponse): ToggleStates {
     const toggleStates: Partial<ToggleStates> = {};
 
     FEATURE_KEYS.forEach((key) => {
