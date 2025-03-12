@@ -61,7 +61,6 @@ export default async function Page(props: {
 
     return listAuthenticationMethodTypes({
       serviceUrl,
-
       userId,
     }).then((methods) => {
       return getUserByID({ serviceUrl, userId }).then((user) => {
@@ -85,7 +84,6 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
-
       sessionParams: {
         loginName,
         organization,
@@ -108,12 +106,10 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: sessionWithData.factors?.user?.organizationId,
   });
 

@@ -56,7 +56,6 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   const users = await listUsers({
     serviceUrl,
-
     loginName: command.loginName,
     organizationId: command.organization,
   });
@@ -106,7 +105,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (!sessionCookie) {
     const users = await listUsers({
       serviceUrl,
-
       loginName: command.loginName,
       organizationId: command.organization,
     });
@@ -121,21 +119,19 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
       loginSettings = await getLoginSettings({
         serviceUrl,
-
         organization: command.organization,
       });
 
       try {
-        session = await createSessionAndUpdateCookie(
+        session = await createSessionAndUpdateCookie({
           checks,
-          command.requestId,
-          loginSettings?.passwordCheckLifetime,
-        );
+          requestId: command.requestId,
+          lifetime: loginSettings?.passwordCheckLifetime,
+        });
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
           const lockoutSettings = await getLockoutSettings({
             serviceUrl,
-
             orgId: command.organization,
           });
 
@@ -167,7 +163,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
       if ("failedAttempts" in error && error.failedAttempts) {
         const lockoutSettings = await getLockoutSettings({
           serviceUrl,
-
           orgId: command.organization,
         });
 
@@ -189,7 +184,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId: session?.factors?.user?.id,
     });
 
@@ -203,7 +197,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
       serviceUrl,
-
       organization:
         command.organization ?? session.factors?.user?.organizationId,
     });
@@ -217,7 +210,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const expirySettings = await getPasswordExpirySettings({
     serviceUrl,
-
     orgId: command.organization ?? session.factors?.user?.organizationId,
   });
 
@@ -256,7 +248,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (command.checks && command.checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
       serviceUrl,
-
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -317,7 +308,6 @@ export async function changePassword(command: {
   // check for init state
   const { user } = await getUserByID({
     serviceUrl,
-
     userId: command.userId,
   });
 
@@ -328,7 +318,6 @@ export async function changePassword(command: {
 
   return setUserPassword({
     serviceUrl,
-
     userId,
     password: command.password,
     user,
@@ -352,7 +341,6 @@ export async function checkSessionAndSetPassword({
 
   const { session } = await getSession({
     serviceUrl,
-
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -371,7 +359,6 @@ export async function checkSessionAndSetPassword({
   // check if the user has no password set in order to set a password
   const authmethods = await listAuthenticationMethodTypes({
     serviceUrl,
-
     userId: session.factors.user.id,
   });
 
@@ -392,7 +379,6 @@ export async function checkSessionAndSetPassword({
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: session.factors.user.organizationId,
   });
 

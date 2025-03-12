@@ -31,7 +31,6 @@ export async function inviteUser(command: InviteUserCommand) {
 
   const human = await addHumanUser({
     serviceUrl,
-
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,

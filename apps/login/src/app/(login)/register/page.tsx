@@ -35,24 +35,20 @@ export default async function Page(props: {
 
   const legal = await getLegalAndSupportSettings({
     serviceUrl,
-
     organization,
   });
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
-
     organization,
   });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization,
   });
 
