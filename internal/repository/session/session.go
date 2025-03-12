@@ -660,7 +660,7 @@ func NewLifetimeSetEvent(
 type TerminateEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TriggerOrigin string `json:"triggerOrigin,omitempty"`
+	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 }
 
 func (e *TerminateEvent) Payload() interface{} {
@@ -669,6 +669,10 @@ func (e *TerminateEvent) Payload() interface{} {
 
 func (e *TerminateEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *TerminateEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewTerminateEvent(
@@ -681,6 +685,7 @@ func NewTerminateEvent(
 			aggregate,
 			TerminateType,
 		),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
