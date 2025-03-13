@@ -4,7 +4,11 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     instanceId TEXT
     , userId TEXT
     , perm TEXT
-    , system_user_perms TEXT[]
+    , system_user_memeber_type INTEGER[]
+    , system_user_instance_id  TEXT[]
+    , system_user_aggregate_id  TEXT[]
+    , system_user_permissions TEXT[][]
+    , system_user_permissions_length TEXT[][]
     , filter_orgs TEXT
 
     , org_ids OUT TEXT[]
@@ -16,12 +20,12 @@ DECLARE
 	matched_roles TEXT[]; -- roles containing permission
 BEGIN
 
-  IF system_user_perms IS NOT NULL THEN
+  IF system_user_memeber_type IS NOT NULL THEN
     DECLARE
       system_user_permission_found bool;
     BEGIN
       SELECT result.perm_found INTO system_user_permission_found
-      FROM (SELECT COALESCE((SELECT array_position(system_user_perms, perm) > 0 ), false) AS perm_found) AS result;
+      FROM (SELECT eventstore.get_org_permission(perm, instanceId,filter_orgs, system_user_memeber_type, system_user_instance_id, system_user_aggregate_id, system_user_permissions, system_user_permissions_length) AS perm_found) AS result;
 
       IF system_user_permission_found THEN
         SELECT array_agg(o.org_id) INTO org_ids
@@ -75,3 +79,83 @@ BEGIN
     RETURN;
 END;
 $$;
+
+DROP FUNCTION IF EXISTS eventstore.get_org_permission; 
+CREATE OR REPLACE FUNCTION eventstore.get_org_permission(
+  perm TEXT
+  , istance_id TEXT
+  , org_id TEXT
+  , system_user_memeber_type INTEGER[]
+  , sustem_user_instance_id  TEXT[]
+  , system_user_aggregate_id  TEXT[]
+  , system_user_permissions TEXT[][]
+  , system_user_permissions_length TEXT[][]
+-- , outt OUT TEXT[]
+  , outt OUT BOOL
+)
+	LANGUAGE 'plpgsql'
+AS $$
+DECLARE
+  i INTEGER;
+  length INTEGER;
+  permission_length INTEGER;
+BEGIN
+  outt := FALSE;
+  length := array_length(system_user_memeber_type, 1);
+  -- length := 3;
+
+
+  DROP TABLE IF EXISTS permissions; 
+  CREATE TEMPORARY TABLE permissions (
+    member_type INTEGER,
+    instance_id TEXT,
+    aggregate_id TEXT,
+    permission TEXT
+    );
+
+  -- <<outer_loop>>
+  FOR i IN 1..length LOOP
+    -- only interested in organization level and higher
+    IF system_user_memeber_type[i] > 3 THEN 
+      CONTINUE;
+    END IF;
+    permission_length := system_user_permissions_length[i];
+
+    FOR j IN 1..permission_length LOOP
+    IF system_user_permissions[i][j] != perm THEN 
+      CONTINUE;
+    END IF;
+      INSERT INTO permissions (member_type, instance_id, aggregate_id, permission) VALUES
+        (system_user_memeber_type[i], sustem_user_instance_id[i], system_user_aggregate_id[i], system_user_permissions[i][j] );
+    END LOOP;
+  END LOOP;
+
+outt := 4;
+RETURN;
+
+  SELECT TRUE INTO outt
+  FROM (SELECT p.member_type FROM permissions p
+        WHERE 
+          -- check instance id
+          CASE WHEN p.member_type = 1 OR p.member_type = 2 THEN -- System or IAM
+            p.aggregate_id = instance_id 
+            OR p.instance_id IS NULL
+          ELSE 
+            p.instance_id = instance_id 
+            OR p.instance_id IS NULL
+          END
+          AND
+          -- check organization
+          CASE WHEN p.member_type = 3 THEN -- organization
+            p.aggregate_id = org_id
+          ELSE
+            TRUE
+          END
+         Limit 1
+        ) AS result;
+          
+  DROP TABLE permissions;
+
+END;
+$$;
+

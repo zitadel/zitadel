@@ -12,7 +12,7 @@ import (
 
 const (
 	// eventstore.permitted_orgs(instanceid text, userid text, perm text, system_user_perms text[], filter_orgs text)
-	wherePermittedOrgsClause              = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))"
+	wherePermittedOrgsClause              = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?, ?, ?, ?, ?))"
 	wherePermittedOrgsOrCurrentUserClause = "(" + wherePermittedOrgsClause + " OR %s = ?" + ")"
 )
 
@@ -24,7 +24,7 @@ const (
 // and is typically the `resource_owner` column in ZITADEL.
 // We use full identifiers in the query builder so this function should be
 // called with something like `UserResourceOwnerCol.identifier()` for example.
-func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, systemUserPermissions []string, filterOrgIds, orgIDColumn, permission string) sq.SelectBuilder {
+func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, systemUserAuthParams *authz.SystemUserAuthParams, filterOrgIds, orgIDColumn, permission string) sq.SelectBuilder {
 	userID := authz.GetCtxData(ctx).UserID
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
 
@@ -33,12 +33,12 @@ func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, systemUserP
 		authz.GetInstance(ctx).InstanceID(),
 		userID,
 		permission,
-		systemUserPermissions,
+		systemUserAuthParams,
 		filterOrgIds,
 	)
 }
 
-func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, systemUserPermissions []string, filterOrgIds, orgIDColumn, userIdColum, permission string) sq.SelectBuilder {
+func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, systemUserAuthParams *authz.SystemUserAuthParams, filterOrgIds, orgIDColumn, userIdColum, permission string) sq.SelectBuilder {
 	userID := authz.GetCtxData(ctx).UserID
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "user_id_colum", userIdColum, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
 
@@ -47,7 +47,11 @@ func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder
 		authz.GetInstance(ctx).InstanceID(),
 		userID,
 		permission,
-		systemUserPermissions,
+		systemUserAuthParams.MemberType,
+		systemUserAuthParams.InstanceID,
+		systemUserAuthParams.AggregateID,
+		systemUserAuthParams.Permissions,
+		systemUserAuthParams.PermissionsLength,
 		filterOrgIds,
 		userID,
 	)

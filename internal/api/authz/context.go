@@ -51,6 +51,7 @@ type Memberships []*Membership
 type Membership struct {
 	MemberType  MemberType
 	AggregateID string
+	InstanceID  string
 	//  ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
@@ -70,6 +71,12 @@ const (
 	MemberTypeIAM
 	MemberTypeSystem
 )
+
+var MemberTypeServerToMemberTypeDBMap map[MemberType]int32 = map[MemberType]int32{
+	MemberTypeSystem:       1,
+	MemberTypeIAM:          2,
+	MemberTypeOrganization: 3,
+}
 
 type TokenVerifier interface {
 	ExistsOrg(ctx context.Context, id, domain string) (string, error)

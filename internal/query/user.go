@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"fmt"
 	"slices"
 	"strings"
 	"time"
@@ -630,6 +631,7 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 		return err
 	}, stmt, args...)
 	if err != nil {
+		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 		return 0, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
 	return count, err
@@ -656,7 +658,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 	})
 	if permissionCheckV2 {
 		// extract system user roles
-		systemUserPermissions, err := authz.GetSystemUserRoles(ctx)
+		systemUserPermissions, err := authz.GetSystemUserAuthParams(ctx)
 		if err != nil {
 			return nil, zerrors.ThrowInternal(err, "QUERY-GS9gs", "Errors.Internal")
 		}
@@ -673,6 +675,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 		return err
 	}, stmt, args...)
 	if err != nil {
+		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 		return nil, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
 	users.State, err = q.latestState(ctx, userTable)

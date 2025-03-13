@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -129,46 +130,69 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 	return ctxIDs
 }
 
+type SystemUserAuthParams struct {
+	MemberType        []int32
+	InstanceID        []string
+	AggregateID       []string
+	Permissions       [][]string
+	PermissionsLength []int32
+}
+
 func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []RoleMapping, requestedPermissions []string, ctxData CtxData) context.Context {
 	if len(ctxData.SystemMemberships) == 0 {
 		return ctx
-	} else if ctxData.SystemMemberships[0].MemberType == MemberTypeSystem {
-		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func() func(ctx context.Context) ([]string, error) {
-			var permissions []string
-			return func(ctx context.Context) ([]string, error) {
-				if permissions != nil {
-					return permissions, nil
+		// } else if ctxData.SystemMemberships[0].MemberType == MemberTypeSystem {
+	} else {
+		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func() func(ctx context.Context) *SystemUserAuthParams {
+			var systemUserAuthParams *SystemUserAuthParams
+			chann := make(chan struct{}, 1)
+			return func(ctx context.Context) *SystemUserAuthParams {
+				chann <- struct{}{}
+				if systemUserAuthParams != nil {
+					return systemUserAuthParams
 				}
-				var err error
-				permissions, err = getSystemUserPermissions(ctx, systemUserRoleMap)
-				return permissions, err
+				defer func() {
+					<-chann
+					close(chann)
+				}()
+
+				systemUserAuthParams = &SystemUserAuthParams{
+					MemberType:        make([]int32, len(ctxData.SystemMemberships)),
+					InstanceID:        make([]string, len(ctxData.SystemMemberships)),
+					AggregateID:       make([]string, len(ctxData.SystemMemberships)),
+					Permissions:       make([][]string, len(ctxData.SystemMemberships)),
+					PermissionsLength: make([]int32, len(ctxData.SystemMemberships)),
+				}
+
+				for i, systemPerm := range ctxData.SystemMemberships {
+					permissions := []string{}
+					for _, role := range systemPerm.Roles {
+						permissions = append(permissions, getPermissionsFromRole(systemUserRoleMap, role)...)
+					}
+					slices.Sort(permissions)
+					permissions = slices.Compact(permissions)
+
+					systemUserAuthParams.MemberType[i] = MemberTypeServerToMemberTypeDBMap[systemPerm.MemberType]
+					systemUserAuthParams.InstanceID[i] = systemPerm.InstanceID
+					systemUserAuthParams.AggregateID[i] = systemPerm.AggregateID
+					systemUserAuthParams.Permissions[i] = permissions
+					systemUserAuthParams.PermissionsLength[i] = int32(len(permissions))
+				}
+				return systemUserAuthParams
 			}
 		}())
-	} else {
-		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func(ctx context.Context) ([]string, error) {
-			return requestedPermissions, nil
-		})
 	}
 	return ctx
 }
 
-func GetSystemUserRoles(ctx context.Context) ([]string, error) {
+func GetSystemUserAuthParams(ctx context.Context) (*SystemUserAuthParams, error) {
 	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesFuncKey)
 	if getSystemUserRolesFuncValue == nil {
-		return nil, nil
+		return &SystemUserAuthParams{}, nil
 	}
-	getSystemUserRolesFunc, ok := getSystemUserRolesFuncValue.(func(context.Context) ([]string, error))
+	getSystemUserRolesFunc, ok := getSystemUserRolesFuncValue.(func(context.Context) *SystemUserAuthParams)
 	if !ok {
 		return nil, errors.New("unable to obtain systems role func")
 	}
-	return getSystemUserRolesFunc(ctx)
-}
-
-func getSystemUserPermissions(ctx context.Context, systemUserRoleMap []RoleMapping) ([]string, error) {
-	var permissions []string
-	for _, systemUserRoles := range systemUserRoleMap {
-		permissions = append(permissions, systemUserRoles.Permissions...)
-	}
-
-	return permissions, nil
+	return getSystemUserRolesFunc(ctx), nil
 }
