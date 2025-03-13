@@ -18,7 +18,7 @@ type Provider struct {
 	options           []rp.Option
 	name              string
 	userEndpoint      string
-	userMapper        func() idp.User
+	user              func() idp.User
 	isLinkingAllowed  bool
 	isCreationAllowed bool
 	isAutoCreation    bool
@@ -65,11 +65,11 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 }
 
 // New creates a generic OAuth 2.0 provider
-func New(config *oauth2.Config, name, userEndpoint string, userMapper func() idp.User, options ...ProviderOpts) (provider *Provider, err error) {
+func New(config *oauth2.Config, name, userEndpoint string, user func() idp.User, options ...ProviderOpts) (provider *Provider, err error) {
 	provider = &Provider{
 		name:             name,
 		userEndpoint:     userEndpoint,
-		userMapper:       userMapper,
+		user:             user,
 		generateVerifier: oauth2.GenerateVerifier,
 	}
 	for _, option := range options {
@@ -136,4 +136,8 @@ func (p *Provider) IsAutoCreation() bool {
 // IsAutoUpdate implements the [idp.Provider] interface.
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
+}
+
+func (p *Provider) User() idp.User {
+	return p.user()
 }

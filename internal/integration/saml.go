@@ -17,6 +17,7 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/saml/pkg/provider"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
@@ -220,8 +221,15 @@ func (i *Instance) SuccessfulSAMLAuthRequest(ctx context.Context, userId, id str
 }
 
 func (i *Instance) GetSAMLIDPMetadata() (*saml.EntityDescriptor, error) {
-	idpEntityID := http_util.BuildHTTP(i.Domain, i.Config.Port, i.Config.Secure) + "/saml/v2/metadata"
-	resp, err := http.Get(idpEntityID)
+	issuer := i.Issuer() + "/saml/v2"
+	idpEntityID := issuer + "/metadata"
+
+	req, err := http.NewRequestWithContext(provider.ContextWithIssuer(context.Background(), issuer), http.MethodGet, idpEntityID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
