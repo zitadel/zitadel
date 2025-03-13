@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular
 import { WebKeysService } from 'src/app/services/webkeys.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { defer, EMPTY, firstValueFrom, Observable, ObservedValueOf, of, shareReplay, Subject, switchMap } from 'rxjs';
-import { catchError, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, startWith, withLatestFrom } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 // todo: use v2beta
 import { GetWebKey, WebKeyState } from '@zitadel/proto/zitadel/resources/webkey/v3alpha/key_pb';
@@ -77,7 +77,6 @@ export class OidcWebKeysComponent {
         }
         return this.webKeysService.ListWebKeys();
       }),
-      tap((resp) => console.log('resp', resp)),
       map(({ webKeys }) => webKeys),
       catchError((err) => {
         this.toast.showError(err);
