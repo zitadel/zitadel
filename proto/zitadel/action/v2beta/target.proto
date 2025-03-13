@@ -44,7 +44,7 @@ message Target {
     RESTAsync rest_async = 7;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
-  // If the target doesn't respond before this timeout expires, the the connection is closed and the action fails.
+  // If the target doesn't respond before this timeout expires, the the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   google.protobuf.Duration timeout = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
@@ -62,17 +62,14 @@ message Target {
   ];
 }
 
-// Wait for response but response body is ignored, status is checked, call is sent as post.
 message RESTWebhook {
   // Define if any error stops the whole execution. By default the process continues as normal.
   bool interrupt_on_error = 1;
 }
 
-// Wait for response and response body is used, status is checked, call is sent as post.
 message RESTCall {
   // Define if any error stops the whole execution. By default the process continues as normal.
   bool interrupt_on_error = 1;
 }
 
-// Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
 message RESTAsync {}

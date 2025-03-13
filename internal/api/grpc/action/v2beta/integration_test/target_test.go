@@ -10,9 +10,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -23,11 +21,18 @@ func TestServer_CreateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	type want struct {
+		id           bool
+		creationDate bool
+		signingKey   bool
+	}
+	alreadyExistingTargetName := gofakeit.AppName()
+	instance.CreateTarget(isolatedIAMOwnerCTX, t, alreadyExistingTargetName, "https://example.com", domain.TargetTypeAsync, false)
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *action.CreateTargetRequest
-		want    *action.CreateTargetResponse
+		name string
+		ctx  context.Context
+		req  *action.CreateTargetRequest
+		want
 		wantErr bool
 	}{
 		{
@@ -91,6 +96,19 @@ func TestServer_CreateTarget(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "async, already existing, ok",
+			ctx:  isolatedIAMOwnerCTX,
+			req: &action.CreateTargetRequest{
+				Name:     alreadyExistingTargetName,
+				Endpoint: "https://example.com",
+				TargetType: &action.CreateTargetRequest_RestAsync{
+					RestAsync: &action.RESTAsync{},
+				},
+				Timeout: durationpb.New(10 * time.Second),
+			},
+			wantErr: true,
+		},
+		{
 			name: "async, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
@@ -101,10 +119,10 @@ func TestServer_CreateTarget(t *testing.T) {
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Id:           "notempty",
-				CreationDate: timestamppb.Now(),
-				SigningKey:   "notempty",
+			want: want{
+				id:           true,
+				creationDate: true,
+				signingKey:   true,
 			},
 		},
 		{
@@ -120,10 +138,10 @@ func TestServer_CreateTarget(t *testing.T) {
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Id:           "notempty",
-				CreationDate: timestamppb.Now(),
-				SigningKey:   "notempty",
+			want: want{
+				id:           true,
+				creationDate: true,
+				signingKey:   true,
 			},
 		},
 		{
@@ -139,10 +157,10 @@ func TestServer_CreateTarget(t *testing.T) {
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Id:           "notempty",
-				CreationDate: timestamppb.Now(),
-				SigningKey:   "notempty",
+			want: want{
+				id:           true,
+				creationDate: true,
+				signingKey:   true,
 			},
 		},
 		{
@@ -158,10 +176,10 @@ func TestServer_CreateTarget(t *testing.T) {
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Id:           "notempty",
-				CreationDate: timestamppb.Now(),
-				SigningKey:   "notempty",
+			want: want{
+				id:           true,
+				creationDate: true,
+				signingKey:   true,
 			},
 		},
 
@@ -178,36 +196,49 @@ func TestServer_CreateTarget(t *testing.T) {
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Id:           "notempty",
-				CreationDate: timestamppb.Now(),
-				SigningKey:   "notempty",
+			want: want{
+				id:           true,
+				creationDate: true,
+				signingKey:   true,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
 			got, err := instance.Client.ActionV2beta.CreateTarget(tt.ctx, tt.req)
+			changeDate := time.Now().UTC()
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
 			}
 			assert.NoError(t, err)
-			assertCreateTargetResponse(t, tt.want, got)
+			assertCreateTargetResponse(t, creationDate, changeDate, tt.want.creationDate, tt.want.id, tt.want.signingKey, got)
 		})
 	}
 }
 
-func assertCreateTargetResponse(t *testing.T, expectedResp *action.CreateTargetResponse, actualResp *action.CreateTargetResponse) {
-	if expectedResp.GetCreationDate() == nil {
-		wantCreationDate := expectedResp.GetCreationDate().AsTime()
-		assert.WithinRange(t, actualResp.GetCreationDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
+func assertCreateTargetResponse(t *testing.T, creationDate, changeDate time.Time, expectedCreationDate, expectedID, expectedSigningKey bool, actualResp *action.CreateTargetResponse) {
+	if expectedCreationDate {
+		if !changeDate.IsZero() {
+			assert.WithinRange(t, actualResp.GetCreationDate().AsTime(), creationDate, changeDate)
+		} else {
+			assert.WithinRange(t, actualResp.GetCreationDate().AsTime(), creationDate, time.Now().UTC())
+		}
+	} else {
+		assert.Nil(t, actualResp.CreationDate)
 	}
-	if expectedResp.GetId() != "" {
+
+	if expectedID {
 		assert.NotEmpty(t, actualResp.GetId())
+	} else {
+		assert.Nil(t, actualResp.Id)
 	}
-	if expectedResp.GetSigningKey() != "" {
+
+	if expectedSigningKey {
 		assert.NotEmpty(t, actualResp.GetSigningKey())
+	} else {
+		assert.Nil(t, actualResp.SigningKey)
 	}
 }
 
@@ -219,19 +250,23 @@ func TestServer_UpdateTarget(t *testing.T) {
 		ctx context.Context
 		req *action.UpdateTargetRequest
 	}
+	type want struct {
+		change     bool
+		changeDate bool
+		signingKey bool
+	}
 	tests := []struct {
 		name    string
-		prepare func(request *action.UpdateTargetRequest) error
+		prepare func(request *action.UpdateTargetRequest)
 		args    args
-		want    *action.UpdateTargetResponse
+		want    want
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			prepare: func(request *action.UpdateTargetRequest) {
 				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
-				return nil
 			},
 			args: args{
 				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
@@ -243,9 +278,9 @@ func TestServer_UpdateTarget(t *testing.T) {
 		},
 		{
 			name: "not existing",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			prepare: func(request *action.UpdateTargetRequest) {
 				request.Id = "notexisting"
-				return nil
+				return
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -256,11 +291,28 @@ func TestServer_UpdateTarget(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "change name, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			name: "no change, ok",
+			prepare: func(request *action.UpdateTargetRequest) {
 				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
-				return nil
+			},
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.UpdateTargetRequest{
+					Endpoint: gu.Ptr("https://example.com"),
+				},
+			},
+			want: want{
+				change:     false,
+				changeDate: true,
+				signingKey: false,
+			},
+		},
+		{
+			name: "change name, ok",
+			prepare: func(request *action.UpdateTargetRequest) {
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				request.Id = targetID
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -268,17 +320,17 @@ func TestServer_UpdateTarget(t *testing.T) {
 					Name: gu.Ptr(gofakeit.Name()),
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				ChangeDate: timestamppb.Now(),
-				SigningKey: nil,
+			want: want{
+				change:     true,
+				changeDate: true,
+				signingKey: false,
 			},
 		},
 		{
 			name: "regenerate signingkey, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			prepare: func(request *action.UpdateTargetRequest) {
 				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
-				return nil
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -286,17 +338,17 @@ func TestServer_UpdateTarget(t *testing.T) {
 					ExpirationSigningKey: durationpb.New(0 * time.Second),
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				ChangeDate: timestamppb.Now(),
-				SigningKey: gu.Ptr("notempty"),
+			want: want{
+				change:     true,
+				changeDate: true,
+				signingKey: true,
 			},
 		},
 		{
 			name: "change type, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			prepare: func(request *action.UpdateTargetRequest) {
 				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
-				return nil
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -308,17 +360,17 @@ func TestServer_UpdateTarget(t *testing.T) {
 					},
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				ChangeDate: timestamppb.Now(),
-				SigningKey: nil,
+			want: want{
+				change:     true,
+				changeDate: true,
+				signingKey: false,
 			},
 		},
 		{
 			name: "change url, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			prepare: func(request *action.UpdateTargetRequest) {
 				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
-				return nil
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -326,17 +378,17 @@ func TestServer_UpdateTarget(t *testing.T) {
 					Endpoint: gu.Ptr("https://example.com/hooks/new"),
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				ChangeDate: timestamppb.Now(),
-				SigningKey: nil,
+			want: want{
+				change:     true,
+				changeDate: true,
+				signingKey: false,
 			},
 		},
 		{
 			name: "change timeout, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			prepare: func(request *action.UpdateTargetRequest) {
 				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
-				return nil
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -344,17 +396,17 @@ func TestServer_UpdateTarget(t *testing.T) {
 					Timeout: durationpb.New(20 * time.Second),
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				ChangeDate: timestamppb.Now(),
-				SigningKey: nil,
+			want: want{
+				change:     true,
+				changeDate: true,
+				signingKey: false,
 			},
 		},
 		{
 			name: "change type async, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
+			prepare: func(request *action.UpdateTargetRequest) {
 				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetId()
 				request.Id = targetID
-				return nil
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -364,36 +416,48 @@ func TestServer_UpdateTarget(t *testing.T) {
 					},
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				ChangeDate: timestamppb.Now(),
-				SigningKey: nil,
+			want: want{
+				change:     true,
+				changeDate: true,
+				signingKey: false,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.prepare(tt.args.req)
-			require.NoError(t, err)
-			// We want to have the same response no matter how often we call the function
-			instance.Client.ActionV2beta.UpdateTarget(tt.args.ctx, tt.args.req)
+			creationDate := time.Now().UTC()
+			tt.prepare(tt.args.req)
+
 			got, err := instance.Client.ActionV2beta.UpdateTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
 			}
+			changeDate := time.Time{}
+			if tt.want.change {
+				changeDate = time.Now().UTC()
+			}
 			assert.NoError(t, err)
-			assertUpdateTargetResponse(t, tt.want, got)
+			assertUpdateTargetResponse(t, creationDate, changeDate, tt.want.changeDate, tt.want.signingKey, got)
 		})
 	}
 }
 
-func assertUpdateTargetResponse(t *testing.T, expectedResp *action.UpdateTargetResponse, actualResp *action.UpdateTargetResponse) {
-	if expectedResp.GetChangeDate() == nil {
-		wantCreationDate := expectedResp.GetChangeDate().AsTime()
-		assert.WithinRange(t, actualResp.GetChangeDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
+func assertUpdateTargetResponse(t *testing.T, creationDate, changeDate time.Time, expectedChangeDate, expectedSigningKey bool, actualResp *action.UpdateTargetResponse) {
+	if expectedChangeDate {
+		if !changeDate.IsZero() {
+			assert.WithinRange(t, actualResp.GetChangeDate().AsTime(), creationDate, changeDate)
+		} else {
+			assert.WithinRange(t, actualResp.GetChangeDate().AsTime(), creationDate, time.Now().UTC())
+		}
+	} else {
+		assert.Nil(t, actualResp.ChangeDate)
 	}
-	if expectedResp.GetSigningKey() != "" {
+
+	if expectedSigningKey {
 		assert.NotEmpty(t, actualResp.GetSigningKey())
+	} else {
+		assert.Nil(t, actualResp.SigningKey)
 	}
 }
 
@@ -437,7 +501,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			name: "delete target",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
-				creationDate := time.Now()
+				creationDate := time.Now().UTC()
 				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 				return creationDate, time.Time{}
@@ -449,11 +513,11 @@ func TestServer_DeleteTarget(t *testing.T) {
 			name: "delete target, already removed",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
-				creationDate := time.Now()
+				creationDate := time.Now().UTC()
 				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 				instance.DeleteTarget(iamOwnerCtx, t, targetID)
-				return creationDate, time.Now()
+				return creationDate, time.Now().UTC()
 			},
 			req:              &action.DeleteTargetRequest{},
 			wantDeletionDate: true,
@@ -481,7 +545,9 @@ func assertDeleteTargetResponse(t *testing.T, creationDate, deletionDate time.Ti
 		if !deletionDate.IsZero() {
 			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, deletionDate)
 		} else {
-			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, time.Now())
+			assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, time.Now().UTC())
 		}
+	} else {
+		assert.Nil(t, actualResp.DeletionDate)
 	}
 }

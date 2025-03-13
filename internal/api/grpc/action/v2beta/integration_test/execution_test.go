@@ -9,7 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -31,11 +30,11 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *action.SetExecutionRequest
-		want    *action.SetExecutionResponse
-		wantErr bool
+		name        string
+		ctx         context.Context
+		req         *action.SetExecutionRequest
+		wantSetDate bool
+		wantErr     bool
 	}{
 		{
 			name: "missing permission",
@@ -96,9 +95,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 		{
 			name: "service, not existing",
@@ -132,9 +129,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 		{
 			name: "all, ok",
@@ -151,23 +146,22 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want to have the same response no matter how often we call the function
-			instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			creationDate := time.Now().UTC()
 			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			setDate := time.Now().UTC()
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
 			}
 			assert.NoError(t, err)
 
-			assertSetExecutionResponse(t, tt.want, got)
+			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
 			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -175,10 +169,15 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}
 }
 
-func assertSetExecutionResponse(t *testing.T, expectedResp *action.SetExecutionResponse, actualResp *action.SetExecutionResponse) {
-	if expectedResp.GetSetDate() == nil {
-		wantCreationDate := expectedResp.GetSetDate().AsTime()
-		assert.WithinRange(t, actualResp.GetSetDate().AsTime(), wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
+func assertSetExecutionResponse(t *testing.T, creationDate, setDate time.Time, expectedSetDate bool, actualResp *action.SetExecutionResponse) {
+	if expectedSetDate {
+		if !setDate.IsZero() {
+			assert.WithinRange(t, actualResp.GetSetDate().AsTime(), creationDate, setDate)
+		} else {
+			assert.WithinRange(t, actualResp.GetSetDate().AsTime(), creationDate, time.Now().UTC())
+		}
+	} else {
+		assert.Nil(t, actualResp.SetDate)
 	}
 }
 
@@ -229,11 +228,11 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 	)
 
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *action.SetExecutionRequest
-		want    *action.SetExecutionResponse
-		wantErr bool
+		name        string
+		ctx         context.Context
+		req         *action.SetExecutionRequest
+		wantSetDate bool
+		wantErr     bool
 	}{
 		{
 			name: "method, circular error",
@@ -259,9 +258,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 				},
 				Targets: executionTargetsSingleInclude(executionCond),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 		{
 			name: "service, ok",
@@ -271,30 +268,28 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Service{
-								Service: "zitadel.session.v2beta.SessionService",
+								Service: "zitadel.user.v2beta.UserService",
 							},
 						},
 					},
 				},
 				Targets: executionTargetsSingleInclude(executionCond),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// We want to have the same response no matter how often we call the function
-			instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			creationDate := time.Now().UTC()
 			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			setDate := time.Now().UTC()
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			assertSetExecutionResponse(t, tt.want, got)
+			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
 			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -309,11 +304,11 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *action.SetExecutionRequest
-		want    *action.SetExecutionResponse
-		wantErr bool
+		name        string
+		ctx         context.Context
+		req         *action.SetExecutionRequest
+		wantSetDate bool
+		wantErr     bool
 	}{
 		{
 			name: "missing permission",
@@ -374,9 +369,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 		{
 			name: "service, not existing",
@@ -410,9 +403,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 		{
 			name: "all, ok",
@@ -429,23 +420,21 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// We want to have the same response no matter how often we call the function
-			instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			creationDate := time.Now().UTC()
 			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			setDate := time.Now().UTC()
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			assertSetExecutionResponse(t, tt.want, got)
+			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
 			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -460,11 +449,11 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *action.SetExecutionRequest
-		want    *action.SetExecutionResponse
-		wantErr bool
+		name        string
+		ctx         context.Context
+		req         *action.SetExecutionRequest
+		wantSetDate bool
+		wantErr     bool
 	}{
 		{
 			name: "missing permission",
@@ -531,9 +520,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 		/*
 			// TODO:
@@ -571,9 +558,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 		{
 			name: "all, ok",
@@ -590,23 +575,21 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// We want to have the same response no matter how often we call the function
-			instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			creationDate := time.Now().UTC()
 			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			setDate := time.Now().UTC()
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			assertSetExecutionResponse(t, tt.want, got)
+			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
 			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -621,11 +604,11 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *action.SetExecutionRequest
-		want    *action.SetExecutionResponse
-		wantErr bool
+		name        string
+		ctx         context.Context
+		req         *action.SetExecutionRequest
+		wantSetDate bool
+		wantErr     bool
 	}{
 		{
 			name: "missing permission",
@@ -678,23 +661,21 @@ func TestServer_SetExecution_Function(t *testing.T) {
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
-			want: &action.SetExecutionResponse{
-				SetDate: timestamppb.Now(),
-			},
+			wantSetDate: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// We want to have the same response no matter how often we call the function
-			instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			creationDate := time.Now().UTC()
 			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			setDate := time.Now().UTC()
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			assertSetExecutionResponse(t, tt.want, got)
+			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
 			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())

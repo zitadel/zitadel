@@ -140,6 +140,12 @@ service ActionService {
         };
       };
       responses: {
+        key: "403"
+        value: {
+          description: "The target to create already exists.";
+        }
+      };
+      responses: {
         key: "409"
         value: {
           description: "The feature flag `actions` is not enabled.";
@@ -258,6 +264,12 @@ service ActionService {
         }
       };
       responses: {
+        key: "404"
+        value: {
+          description: "The target to update does not exist.";
+        }
+      };
+      responses: {
         key: "409"
         value: {
           description: "The feature flag `actions` is not enabled.";
@@ -356,7 +368,7 @@ service ActionService {
 
   // List Executions
   //
-  // LIst all matching executions. By default all executions of the instance are returned that have at least one execution target.
+  // List all matching executions. By default all executions of the instance are returned that have at least one execution target.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
@@ -397,7 +409,7 @@ service ActionService {
     };
   }
 
-  // List all available functions
+  // List Execution Functions
   //
   // List all available functions which can be used as condition for executions.
   rpc ListExecutionFunctions (ListExecutionFunctionsRequest) returns (ListExecutionFunctionsResponse) {
@@ -421,7 +433,7 @@ service ActionService {
     };
   }
 
-  // List all available methods
+  // List Execution Methods
   //
   // List all available methods which can be used as condition for executions.
   rpc ListExecutionMethods (ListExecutionMethodsRequest) returns (ListExecutionMethodsResponse) {
@@ -445,7 +457,7 @@ service ActionService {
     };
   }
 
-  // List all available service
+  // List Execution Services
   //
   // List all available services which can be used as condition for executions.
   rpc ListExecutionServices (ListExecutionServicesRequest) returns (ListExecutionServicesResponse) {
@@ -482,12 +494,15 @@ message CreateTargetRequest {
   // Defines the target type and how the response of the target is treated.
   oneof target_type {
     option (validate.required) = true;
+    // Wait for response but response body is ignored, status is checked, call is sent as post.
     RESTWebhook rest_webhook = 2;
+    // Wait for response and response body is used, status is checked, call is sent as post.
     RESTCall rest_call = 3;
+    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
     RESTAsync rest_async = 4;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
-  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails.
+  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   google.protobuf.Duration timeout = 5 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -544,12 +559,18 @@ message UpdateTargetRequest {
   ];
   // Defines the target type and how the response of the target is treated.
   oneof target_type {
+    // Wait for response but response body is ignored, status is checked, call is sent as post.
     RESTWebhook rest_webhook = 3;
+    // Wait for response and response body is used, status is checked, call is sent as post.
     RESTCall rest_call = 4;
+    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
     RESTAsync rest_async = 5;
   }
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"restWebhook:\":{\"interruptOnError\":\"true\"}}";
+  };
   // Timeout defines the duration until ZITADEL cancels the execution.
-  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails.
+  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   optional google.protobuf.Duration timeout = 6 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
