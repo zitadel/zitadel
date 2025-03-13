@@ -497,7 +497,6 @@ func startCommandsQueries(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		dbClient,
 		q,
 	)
 

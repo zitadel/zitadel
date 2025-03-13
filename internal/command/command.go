@@ -177,13 +177,11 @@ func StartCommands(
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
 		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
-		// always true for now until we can check with an eventlist
-		EventExisting: func(event string) bool { return true },
-		// always true for now until we can check with an eventlist
-		EventGroupExisting:     func(group string) bool { return true },
-		GrpcServiceExisting:    func(service string) bool { return false },
-		GrpcMethodExisting:     func(method string) bool { return false },
-		ActionFunctionExisting: domain.ActionFunctionExists(),
+		EventExisting:                   func(event string) bool { return false },
+		EventGroupExisting:              func(group string) bool { return false },
+		GrpcServiceExisting:             func(service string) bool { return false },
+		GrpcMethodExisting:              func(method string) bool { return false },
+		ActionFunctionExisting:          domain.ActionFunctionExists(),
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
 				CryptoMFA: otpEncryption,
