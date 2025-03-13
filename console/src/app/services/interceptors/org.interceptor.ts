@@ -44,7 +44,7 @@ export class OrgInterceptorProvider {
 
   getOrgId() {
     const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
-    return org?.id
+    return org?.id;
   }
 
   handleError = (error: any): never => {
