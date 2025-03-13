@@ -7,11 +7,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
 type Server struct {
-	webkey.UnimplementedZITADELWebKeysServer
+	webkey.UnimplementedWebKeyServiceServer
 	command *command.Commands
 	query   *query.Queries
 }
@@ -27,21 +27,21 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	webkey.RegisterZITADELWebKeysServer(grpcServer, s)
+	webkey.RegisterWebKeyServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return webkey.ZITADELWebKeys_ServiceDesc.ServiceName
+	return webkey.WebKeyService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return webkey.ZITADELWebKeys_ServiceDesc.ServiceName
+	return webkey.WebKeyService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return webkey.ZITADELWebKeys_AuthMethods
+	return webkey.WebKeyService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return webkey.RegisterZITADELWebKeysHandler
+	return webkey.RegisterWebKeyServiceHandler
 }

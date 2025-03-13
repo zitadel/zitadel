@@ -55,7 +55,7 @@ func New() *cobra.Command {
 		Short: "setup ZITADEL instance",
 		Long: `sets up data to start ZITADEL.
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
@@ -466,10 +466,11 @@ func startCommandsQueries(
 		config.DefaultInstance.SecretGenerators,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
+
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
-	logging.OnError(err).Fatal("unable to start queue")
+	logging.OnError(err).Fatal("unable to init queue")
 
 	notify_handler.Register(
 		ctx,

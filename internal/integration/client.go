@@ -34,7 +34,6 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
-	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
@@ -43,6 +42,7 @@ import (
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	webkey_v2beta "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
 type Client struct {
@@ -64,7 +64,7 @@ type Client struct {
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
-	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
+	WebKeyV2Beta   webkey_v2beta.WebKeyServiceClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
@@ -97,7 +97,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
-		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
+		WebKeyV2Beta:   webkey_v2beta.NewWebKeyServiceClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
@@ -472,6 +472,26 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 	return resp
 }
 
+func (i *Instance) AddGenericOIDCProvider(ctx context.Context, name string) *admin.AddGenericOIDCProviderResponse {
+	resp, err := i.Client.Admin.AddGenericOIDCProvider(ctx, &admin.AddGenericOIDCProviderRequest{
+		Name:         name,
+		Issuer:       "https://example.com",
+		ClientId:     "clientID",
+		ClientSecret: "clientSecret",
+		Scopes:       []string{"openid", "profile", "email"},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+		},
+		IsIdTokenMapping: false,
+	})
+	logging.OnError(err).Panic("create generic oidc idp")
+	return resp
+}
+
 func (i *Instance) AddSAMLProvider(ctx context.Context) string {
 	resp, err := i.Client.Admin.AddSAMLProvider(ctx, &admin.AddSAMLProviderRequest{
 		Name: "saml-idp",
@@ -523,6 +543,32 @@ func (i *Instance) AddSAMLPostProvider(ctx context.Context) string {
 		},
 	})
 	logging.OnError(err).Panic("create saml idp")
+	return resp.GetId()
+}
+
+func (i *Instance) AddLDAPProvider(ctx context.Context) string {
+	resp, err := i.Client.Admin.AddLDAPProvider(ctx, &admin.AddLDAPProviderRequest{
+		Name:              "ldap-idp-post",
+		Servers:           []string{"https://localhost:8000"},
+		StartTls:          false,
+		BaseDn:            "baseDn",
+		BindDn:            "admin",
+		BindPassword:      "admin",
+		UserBase:          "dn",
+		UserObjectClasses: []string{"user"},
+		UserFilters:       []string{"(objectclass=*)"},
+		Timeout:           durationpb.New(10 * time.Second),
+		Attributes: &idp.LDAPAttributes{
+			IdAttribute: "id",
+		},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	logging.OnError(err).Panic("create ldap idp")
 	return resp.GetId()
 }
 

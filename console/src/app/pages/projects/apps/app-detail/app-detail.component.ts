@@ -228,6 +228,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       entityId: ['', []],
       acsURL: ['', []],
       metadataXml: [{ value: '', disabled: true }],
+      loginV2: [{ value: false, disabled: true }],
+      loginV2BaseURL: [{ value: '', disabled: true }],
     });
 
     this.samlForm.valueChanges.subscribe(() => {
@@ -413,6 +415,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                   { id: 'urls', i18nKey: 'APP.URLS' },
                 ];
+                if (this.app.samlConfig?.loginVersion?.loginV1) {
+                  this.samlForm.controls['loginV2'].setValue(false);
+                } else if (this.app.samlConfig?.loginVersion?.loginV2) {
+                  this.samlForm.controls['loginV2'].setValue(true);
+                  this.samlForm.controls['loginV2BaseURL'].setValue(this.app.samlConfig.loginVersion.loginV2.baseUri);
+                }
               }
 
               if (allowed) {
@@ -668,9 +676,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
         req.setAppType(this.app.oidcConfig.appType);
         const login = new LoginVersion();
-        if (this.loginV2?.value) {
+        if (this.oidcLoginV2?.value) {
           const loginV2 = new LoginV2();
-          loginV2.setBaseUri(this.loginV2BaseURL?.value);
+          loginV2.setBaseUri(this.oidcLoginV2BaseURL?.value);
           login.setLoginV2(loginV2);
         } else {
           login.setLoginV1(new LoginV1());
@@ -757,12 +765,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       req.setProjectId(this.projectId);
       req.setAppId(this.app.id);
 
-      if (this.app.samlConfig?.metadataUrl.length > 0) {
+      if (this.app.samlConfig?.metadataUrl?.length > 0) {
         req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
       }
-      if (this.app.samlConfig?.metadataXml.length > 0) {
+      if (this.app.samlConfig?.metadataXml?.length > 0) {
         req.setMetadataXml(this.app.samlConfig?.metadataXml);
       }
+
+      const login = new LoginVersion();
+      if (this.samlLoginV2?.value) {
+        const loginV2 = new LoginV2();
+        loginV2.setBaseUri(this.samlLoginV2BaseURL?.value);
+        login.setLoginV2(loginV2);
+      } else {
+        login.setLoginV1(new LoginV1());
+      }
+      req.setLoginVersion(login);
 
       this.mgmtService
         .updateSAMLAppConfig(req)
@@ -860,11 +878,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.oidcForm.get('authMethodType');
   }
 
-  public get loginV2(): FormControl<boolean> | null {
+  public get oidcLoginV2(): FormControl<boolean> | null {
     return this.oidcForm.get('loginV2') as FormControl<boolean>;
   }
 
-  public get loginV2BaseURL(): AbstractControl | null {
+  public get oidcLoginV2BaseURL(): AbstractControl | null {
     return this.oidcForm.get('loginV2BaseURL');
   }
 
@@ -910,6 +928,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get acsURL(): AbstractControl | null {
     return this.samlForm.get('acsURL');
+  }
+
+  public get samlLoginV2(): FormControl<boolean> | null {
+    return this.samlForm.get('loginV2') as FormControl<boolean>;
+  }
+
+  public get samlLoginV2BaseURL(): AbstractControl | null {
+    return this.samlForm.get('loginV2BaseURL');
   }
 
   get decodedBase64(): string {

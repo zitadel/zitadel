@@ -9,7 +9,6 @@ Database:
     # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     Host: host.docker.internal
     Port: 5432
-    EventPushConnRatio: 0.2
     MaxOpenConns: 15
     MaxIdleConns: 10
     Database: zitadel

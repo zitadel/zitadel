@@ -29,16 +29,15 @@ const (
 )
 
 type Config struct {
-	Host               string
-	Port               int32
-	Database           string
-	EventPushConnRatio float64
-	MaxOpenConns       uint32
-	MaxIdleConns       uint32
-	MaxConnLifetime    time.Duration
-	MaxConnIdleTime    time.Duration
-	User               User
-	Admin              AdminUser
+	Host            string
+	Port            int32
+	Database        string
+	MaxOpenConns    uint32
+	MaxIdleConns    uint32
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
+	User            User
+	Admin           AdminUser
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
 	Options string
@@ -150,10 +149,6 @@ func (c *Config) Password() string {
 
 func (c *Config) Type() dialect.DatabaseType {
 	return dialect.DatabaseTypePostgres
-}
-
-func (c *Config) Timetravel(time.Duration) string {
-	return ""
 }
 
 type User struct {

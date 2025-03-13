@@ -2146,17 +2146,29 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 }
 
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
-	intentID := Instance.CreateIntent(CTX, idpID).GetIdpIntent().GetIdpIntentId()
-	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "")
+	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
+	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, gofakeit.AppName()).GetId()
+	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
+	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
+	authURL, err := url.Parse(Instance.CreateIntent(CTX, oauthIdpID).GetAuthUrl())
 	require.NoError(t, err)
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "user")
+	intentID := authURL.Query().Get("state")
+
+	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "")
 	require.NoError(t, err)
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "")
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "user")
 	require.NoError(t, err)
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "user")
+	oidcSuccessful, oidcToken, oidcChangeDate, oidcSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "")
 	require.NoError(t, err)
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), idpID, "id", "")
+	oidcSuccessfulWithUserID, oidcWithUserIDToken, oidcWithUserIDChangeDate, oidcWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "user")
+	require.NoError(t, err)
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "")
+	require.NoError(t, err)
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "user")
+	require.NoError(t, err)
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "")
+	require.NoError(t, err)
+	samlSuccessfulWithUserID, samlWithUserToken, samlWithUserChangeDate, samlWithUserSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "user")
 	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
@@ -2191,7 +2203,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "retrieve successful intent",
+			name: "retrieve successful oauth intent",
 			args: args{
 				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
@@ -2212,13 +2224,15 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    oauthIdpID,
 					UserId:   "id",
-					UserName: "username",
+					UserName: "",
 					RawInformation: func() *structpb.Struct {
 						s, err := structpb.NewStruct(map[string]interface{}{
-							"sub":                "id",
-							"preferred_username": "username",
+							"RawInfo": map[string]interface{}{
+								"id":                 "id",
+								"preferred_username": "username",
+							},
 						})
 						require.NoError(t, err)
 						return s
@@ -2250,7 +2264,85 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    oauthIdpID,
+					UserId:   "id",
+					UserName: "",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"RawInfo": map[string]interface{}{
+								"id":                 "id",
+								"preferred_username": "username",
+							},
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful oidc intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    oidcSuccessful,
+					IdpIntentToken: oidcToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(oidcChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      oidcSequence,
+				},
+				UserId: "",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    oidcIdpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful oidc intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    oidcSuccessfulWithUserID,
+					IdpIntentToken: oidcWithUserIDToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(oidcWithUserIDChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      oidcWithUserIDSequence,
+				},
+				UserId: "user",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    oidcIdpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2294,7 +2386,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    ldapIdpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2340,7 +2432,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    ldapIdpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2377,7 +2469,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    samlIdpID,
 					UserId:   "id",
 					UserName: "",
 					RawInformation: func() *structpb.Struct {
@@ -2391,6 +2483,45 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						return s
 					}(),
 				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful saml intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    samlSuccessfulWithUserID,
+					IdpIntentToken: samlWithUserToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(samlWithUserChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      samlWithUserSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Saml{
+						Saml: &user.IDPSAMLAccessInformation{
+							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+						},
+					},
+					IdpId:    samlIdpID,
+					UserId:   "id",
+					UserName: "",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id": "id",
+							"attributes": map[string]interface{}{
+								"attribute1": []interface{}{"value1"},
+							},
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				UserId: "user",
 			},
 			wantErr: false,
 		},

@@ -17,14 +17,12 @@ var (
 
 	createUserStmt           string
 	grantStmt                string
-	settingsStmt             string
 	databaseStmt             string
 	createEventstoreStmt     string
 	createProjectionsStmt    string
 	createSystemStmt         string
 	createEncryptionKeysStmt string
 	createEventsStmt         string
-	createSystemSequenceStmt string
 	createUniqueConstraints  string
 
 	roleAlreadyExistsCode = "42710"
@@ -38,7 +36,7 @@ func New() *cobra.Command {
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
 Prerequisites:
-- database (PostgreSql or cockroachdb)
+- PostgreSql database
 
 The user provided by flags needs privileges to
 - create the database if it does not exist
@@ -136,17 +134,7 @@ func ReadStmts() (err error) {
 		return err
 	}
 
-	createSystemSequenceStmt, err = readStmt("09_system_sequence")
-	if err != nil {
-		return err
-	}
-
 	createUniqueConstraints, err = readStmt("10_unique_constraints_table")
-	if err != nil {
-		return err
-	}
-
-	settingsStmt, err = readStmt("11_settings")
 	if err != nil {
 		return err
 	}

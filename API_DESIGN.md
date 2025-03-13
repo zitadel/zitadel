@@ -158,9 +158,33 @@ Additionally, state changes, specific actions or operations that do not fit into
 The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
 automatically return an error if the token is invalid.
 
-Permissions grated to the user are organization specific and might only be checked based on the queried resource.
-Therefore, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
-Required permissions need to be documented in the [API documentation](#documentation).
+Permissions grated to the user might be organization specific and can therefore only be checked based on the queried resource.
+In such case, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
+If the permission can be checked by the API itself, e.g. if the permission is instance wide, it can be annotated on the endpoint in the proto file (see below).
+In any case, the required permissions need to be documented in the [API documentation](#documentation).
+
+### Permission annotations
+
+Permissions can be annotated on the endpoint in the proto file. This allows the API to automatically check the permissions for the user.
+The permissions are checked by the middleware and an error is returned if the user does not have the required permissions.
+
+The following example requires the user to have the `iam.web_key.write` permission to call the `CreateWebKey` method.
+```protobuf
+ option (zitadel.protoc_gen_zitadel.v2.options) = {
+  auth_option: {
+    permission: "iam.web_key.write"
+  }
+};
+```
+
+In case the permission cannot be checked by the API itself, but all requests need to be from an authenticated user, the `auth_option` can be set to `authenticated`.
+```protobuf
+ option (zitadel.protoc_gen_zitadel.v2.options) = {
+  auth_option: {
+    permission: "authenticated"
+  }
+};
+```
 
 ## Pagination
 
@@ -186,6 +210,8 @@ message ListQuery {
 On the corresponding responses the `ListDetails` can be used to return the total count of the resources
 and allow the user to handle their offset and limit accordingly.
 
+The API MUST enforce a reasonable maximum limit for the number of resources that can be retrieved and returned in a single request.
+The default limit is set to 100 and the maximum limit is set to 1000. If the client requests a limit that exceeds the maximum limit, an error is returned.
 
 ## Error Handling
 
@@ -222,19 +248,21 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-  "code": "user_missing_information",
-  "message": "missing required information for the creation of the user",
+  "code": "user_invalid_information",
+  "message": "invalid or missing information provided for the creation of the user",
   "details": [
     {
       "@type": "type.googleapis.com/google.rpc.BadRequest",
       "fieldViolations": [
         {
           "field": "given_name",
-          "description": "given name is required"
+          "description": "given name is required",
+          "reason": "MISSING_VALUE"
         },
         {
           "field": "family_name",
-          "description": "family name is required"
+          "description": "family name must not exceed 200 characters",
+          "reason": "INVALID_LENGTH"
         }
       ]
     }
@@ -246,23 +274,25 @@ gRPC / connectRPC example:
 ```
 HTTP/2.0 200 OK
 Content-Type: application/grpc
-Grpc-Message: missing required information for the creation of the user
+Grpc-Message: invalid information provided for the creation of the user
 Grpc-Status: 3
 
 {
-  "code": "user_missing_information",
-  "message": "missing required information for the creation of the user",
+  "code": "user_invalid_information",
+  "message": "invalid or missing information provided for the creation of the user",
   "details": [
     {
       "@type": "type.googleapis.com/google.rpc.BadRequest",
       "fieldViolations": [
         {
           "field": "given_name",
-          "description": "given name is required"
+          "description": "given name is required",
+          "reason": "MISSING_VALUE"
         },
         {
           "field": "family_name",
-          "description": "family name is required"
+          "description": "family name must not exceed 200 characters",
+          "reason": "INVALID_LENGTH"
         }
       ]
     }
@@ -292,7 +322,7 @@ Grpc-Status: 3
 //   - user.write
 //
 // Error Codes:
-//   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) for the creation of the user. Check error details for the missing fields.
+//   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) or contains invalid data for the creation of the user. Check error details for the missing or invalid fields.
 //   - user_already_exists: The user already exists. The username must be unique.
 //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
 //   - permission_denied: You do not have the required permissions to access the requested resource.
