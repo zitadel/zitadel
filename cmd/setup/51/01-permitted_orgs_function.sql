@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     , system_user_instance_id  TEXT[]
     , system_user_aggregate_id  TEXT[]
     , system_user_permissions TEXT[][]
-    , system_user_permissions_length TEXT[][]
+  , system_user_permissions_length INTEGER[]
     , filter_orgs TEXT
 
     , org_ids OUT TEXT[]
@@ -25,7 +25,9 @@ BEGIN
       system_user_permission_found bool;
     BEGIN
       SELECT result.perm_found INTO system_user_permission_found
-      FROM (SELECT eventstore.get_org_permission(perm, instanceId,filter_orgs, system_user_memeber_type, system_user_instance_id, system_user_aggregate_id, system_user_permissions, system_user_permissions_length) AS perm_found) AS result;
+      FROM (SELECT eventstore.get_org_permission(perm, instanceId,filter_orgs, 
+          system_user_memeber_type, system_user_instance_id, system_user_aggregate_id, 
+          system_user_permissions, system_user_permissions_length) AS perm_found) AS result;
 
       IF system_user_permission_found THEN
         SELECT array_agg(o.org_id) INTO org_ids
@@ -83,13 +85,13 @@ $$;
 DROP FUNCTION IF EXISTS eventstore.get_org_permission; 
 CREATE OR REPLACE FUNCTION eventstore.get_org_permission(
   perm TEXT
-  , istance_id TEXT
+  , instance_idd TEXT
   , org_id TEXT
   , system_user_memeber_type INTEGER[]
   , sustem_user_instance_id  TEXT[]
   , system_user_aggregate_id  TEXT[]
   , system_user_permissions TEXT[][]
-  , system_user_permissions_length TEXT[][]
+  , system_user_permissions_length INTEGER[]
 -- , outt OUT TEXT[]
   , outt OUT BOOL
 )
@@ -100,10 +102,9 @@ DECLARE
   length INTEGER;
   permission_length INTEGER;
 BEGIN
-  outt := FALSE;
+  -- outt := FALSE;
   length := array_length(system_user_memeber_type, 1);
   -- length := 3;
-
 
   DROP TABLE IF EXISTS permissions; 
   CREATE TEMPORARY TABLE permissions (
@@ -127,22 +128,24 @@ BEGIN
     END IF;
       INSERT INTO permissions (member_type, instance_id, aggregate_id, permission) VALUES
         (system_user_memeber_type[i], sustem_user_instance_id[i], system_user_aggregate_id[i], system_user_permissions[i][j] );
+-- outt := 555;
+-- RETURN;
     END LOOP;
   END LOOP;
 
-outt := 4;
-RETURN;
-
-  SELECT TRUE INTO outt
-  FROM (SELECT p.member_type FROM permissions p
+  -- outt := (SELECT permission FROM permissions LIMIT 1);
+  SELECT result.res INTO outt
+  FROM (SELECT TRUE AS res FROM permissions p
         WHERE 
           -- check instance id
           CASE WHEN p.member_type = 1 OR p.member_type = 2 THEN -- System or IAM
-            p.aggregate_id = instance_id 
-            OR p.instance_id IS NULL
+            p.aggregate_id = instance_idd 
+            -- OR p.instance_id IS NULL
+            OR p.instance_id = ''
           ELSE 
-            p.instance_id = instance_id 
-            OR p.instance_id IS NULL
+            p.instance_id = instance_idd 
+            -- OR p.instance_id IS NULL
+            OR p.instance_id = ''
           END
           AND
           -- check organization
@@ -158,4 +161,5 @@ RETURN;
 
 END;
 $$;
+
 
