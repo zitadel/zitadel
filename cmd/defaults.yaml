@@ -131,7 +131,7 @@ Database:
     Admin:
       # By default, ExistingDatabase is not specified in the connection string
       # If the connection resolves to a database that is not existing in your system, configure an existing one here
-      # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
+      # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
       ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
       Username: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
       Password: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD

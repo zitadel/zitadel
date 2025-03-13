@@ -17,7 +17,6 @@ var (
 
 	createUserStmt           string
 	grantStmt                string
-	settingsStmt             string
 	databaseStmt             string
 	createEventstoreStmt     string
 	createProjectionsStmt    string
@@ -142,11 +141,6 @@ func ReadStmts() (err error) {
 	}
 
 	createUniqueConstraints, err = readStmt("10_unique_constraints_table")
-	if err != nil {
-		return err
-	}
-
-	settingsStmt, err = readStmt("11_settings")
 	if err != nil {
 		return err
 	}
