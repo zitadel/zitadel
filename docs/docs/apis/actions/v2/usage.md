@@ -62,14 +62,14 @@ There are different types of Targets:
 
 `InterruptOnError` means that the Execution gets interrupted if any of the calls return with a status code >= 400, and the next Target will not be called anymore.
 
-The API documentation to create a target can be found [here](/apis/resources/action_service_v2/zitadel-actions-create-target)
+The API documentation to create a target can be found [here](/apis/resources/action_service_v2/action-service-create-target)
 
 ### Content Signing
 
 To ensure the integrity of request content, each call includes a 'ZITADEL-Signature' in the headers. This header contains an HMAC value computed from the request content and a timestamp, which can be used to time out requests. The logic for this process is provided in 'pkg/actions/signing.go'. The goal is to verify that the HMAC value in the header matches the HMAC value computed by the Target, ensuring that the sent and received requests are identical.
 
-Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v2/zitadel-actions-create-target),
-and can also be newly generated when a Target is [patched](/apis/resources/action_service_v2/zitadel-actions-patch-target).
+Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v2/action-service-create-target),
+and can also be newly generated when a Target is [patched](/apis/resources/action_service_v2/action-service-patch-target).
 
 ## Execution
 
@@ -83,7 +83,7 @@ The condition can be defined for 4 types of processes:
 - `Functions`, handling specific functionality in the logic of ZITADEL
 - `Events`, after a specific event happened and was stored in ZITADEL
 
-The API documentation to set an Execution can be found [here](/apis/resources/action_service_v2/zitadel-actions-set-execution)
+The API documentation to set an Execution can be found [here](/apis/resources/action_service_v2/action-service-set-execution)
 
 ### Condition Best Match
 
@@ -165,8 +165,8 @@ For Request and Response there are 3 levels the condition can be defined:
 - `All`, handling any request or response under the ZITADEL API
 
 The available conditions can be found under:
-- [All available Methods](/apis/resources/action_service_v2/zitadel-actions-list-execution-methods), for example `/zitadel.user.v2.UserService/AddHumanUser`
-- [All available Services](/apis/resources/action_service_v2/zitadel-actions-list-execution-services), for example `zitadel.user.v2.UserService`
+- [All available Methods](/apis/resources/action_service_v2/action-service-list-execution-methods), for example `/zitadel.user.v2.UserService/AddHumanUser`
+- [All available Services](/apis/resources/action_service_v2/action-service-list-execution-services), for example `zitadel.user.v2.UserService`
 
 ### Condition for Functions
 
@@ -177,7 +177,7 @@ Replace the current Actions with the following flows:
 - [Complement Token](/apis/actions/complement-token)
 - [Customize SAML Response](/apis/actions/customize-samlresponse)
 
-The available conditions can be found under [all available Functions](/apis/resources/action_service_v2/zitadel-actions-list-execution-functions).
+The available conditions can be found under [all available Functions](/apis/resources/action_service_v2/action-service-list-execution-functions).
 
 ### Condition for Events
 
