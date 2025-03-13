@@ -55,7 +55,7 @@ func New() *cobra.Command {
 		Short: "setup ZITADEL instance",
 		Long: `sets up data to start ZITADEL.
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
@@ -467,9 +467,6 @@ func startCommandsQueries(
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
-	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
-		logging.Fatal("notifications must be set to LegacyEnabled=true when using CockroachDB")
-	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
