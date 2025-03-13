@@ -16,7 +16,7 @@ export class OrgInterceptor<TReq = unknown, TResp = unknown> implements UnaryInt
   public async intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
     const metadata = request.getMetadata();
 
-    const orgId = await firstValueFrom(this.orgInterceptorProvider.getOrgId());
+    const orgId = this.orgInterceptorProvider.getOrgId();
     if (orgId) {
       metadata[ORG_HEADER_KEY] = orgId;
     }
@@ -28,8 +28,10 @@ export class OrgInterceptor<TReq = unknown, TResp = unknown> implements UnaryInt
 export function NewConnectWebOrgInterceptor(orgInterceptorProvider: OrgInterceptorProvider): Interceptor {
   return (next) => async (req) => {
     if (!req.header.get(ORG_HEADER_KEY)) {
-      const orgId = await firstValueFrom(orgInterceptorProvider.getOrgId());
-      req.header.set(ORG_HEADER_KEY, orgId);
+      const orgId = orgInterceptorProvider.getOrgId();
+      if (orgId) {
+        req.header.set(ORG_HEADER_KEY, orgId);
+      }
     }
 
     return next(req).catch(orgInterceptorProvider.handleError);
@@ -40,12 +42,9 @@ export function NewConnectWebOrgInterceptor(orgInterceptorProvider: OrgIntercept
 export class OrgInterceptorProvider {
   constructor(private storageService: StorageService) {}
 
-  getOrgId(): Observable<string> {
+  getOrgId() {
     const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
-    return new Observable<string>((observer) => {
-      observer.next(org?.id);
-      observer.complete();
-    });
+    return org?.id
   }
 
   handleError = (error: any): never => {
