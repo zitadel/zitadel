@@ -19,7 +19,9 @@ To apply best practices to your production setup we created a step by step check
   - [ ] Use serverless platform such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
   - [ ] Split `zitadel init` and `zitadel setup` for fast start-up times when [scaling](/docs/self-hosting/manage/updating_scaling) ZITADEL
 - [ ] High Availability for database
-  - [ ] Follow the [Production Checklist](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) for CockroachDB if you selfhost the database or use [CockroachDB cloud](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
+  - [ ] Follow [this guide](https://www.postgresql.org/docs/current/high-availability.html) to set up the database.
+  - [ ] Configure logging
+  - [ ] Configure timeouts
   - [ ] Configure backups on a regular basis for the database
   - [ ] Test the restore scenarios before going live
   - [ ] Secure database connections from outside your network and/or use an internal subnet for database connectivity
