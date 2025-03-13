@@ -575,7 +575,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "V1 (Generally Available)",
+          label: "V1",
           collapsed: false,
           link: {
             type: "generated-index",
@@ -639,7 +639,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "V2 (Generally Available)",
+          label: "V2",
           collapsed: false,
           link: {
             type: "doc",
@@ -648,7 +648,7 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "User Lifecycle",
+              label: "User",
               link: {
                 type: "generated-index",
                 title: "User Service API",
@@ -660,7 +660,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Session Lifecycle",
+              label: "Session",
               link: {
                 type: "generated-index",
                 title: "Session Service API",
@@ -672,7 +672,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "OIDC Lifecycle",
+              label: "OIDC",
               link: {
                 type: "generated-index",
                 title: "OIDC Service API",
@@ -684,7 +684,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Settings Lifecycle",
+              label: "Settings",
               link: {
                 type: "generated-index",
                 title: "Settings Service API",
@@ -696,7 +696,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Feature Lifecycle",
+              label: "Feature",
               link: {
                 type: "generated-index",
                 title: "Feature Service API",
@@ -708,7 +708,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Organization Lifecycle",
+              label: "Organization",
               link: {
                 type: "generated-index",
                 title: "Organization Service API",
@@ -720,7 +720,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Identity Provider Lifecycle",
+              label: "Identity Provider",
               link: {
                 type: "generated-index",
                 title: "Identity Provider Service API",
@@ -732,18 +732,40 @@ module.exports = {
             },
             {
               type: "category",
+              label: "Web key (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Web Key Service API (Beta)",
+                slug: "/apis/resources/webkey_service_v2",
+                description:
+                    "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n"+
+                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n"+
+                    "\n"+
+                    "Please make sure to enable the `web_key` feature flag on your instance to use this service.",
+              },
+              items: require("./docs/apis/resources/webkey_service_v2/sidebar.ts"),
+            },
+            {
+              type: "category",
               label: "Action (Beta)",
               link: {
                 type: "generated-index",
                 title: "Action Service API (Beta)",
                 slug: "/apis/resources/action_service_v2",
                 description:
-                  "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
-                  "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
-                  "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
-                  "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
-                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n"+
-                  "Please make sure to enable the `actions` feature flag on your instance to use this service.",
+                    "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n" +
+                    "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
+                    "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
+                    "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
+                    "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n"+
+                    "\n" +
+                    "Please make sure to enable the `actions` feature flag on your instance to use this service.",
               },
               items: [
                 {
@@ -757,27 +779,6 @@ module.exports = {
               ].concat(
                 require("./docs/apis/resources/action_service_v2/sidebar.ts")
               ),
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "V3 (Preview)",
-          collapsed: false,
-          items: [
-            {
-              type: "category",
-              label: "Web key Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "Web Key Service API (Preview)",
-                slug: "/apis/resources/webkey_service_v3",
-                description:
-                  "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
-                  "\n" +
-                  "This project is in preview state. It can AND will continue breaking until a stable version is released.",
-              },
-              items: require("./docs/apis/resources/webkey_service_v3/sidebar.ts"),
             },
           ],
         },
