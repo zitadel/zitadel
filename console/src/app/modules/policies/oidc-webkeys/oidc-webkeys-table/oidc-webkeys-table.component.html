@@ -7,24 +7,18 @@
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
-            <span
-              class="state"
-              [ngClass]="{
-                active: row.state === WebKeyState.STATE_ACTIVE,
-                inactive: row.state === WebKeyState.STATE_INITIAL,
-              }"
-              [ngSwitch]="i"
-            >
-              <ng-container *ngSwitchCase="0">
-                Currently Active
-              </ng-container>
-              <ng-container *ngSwitchCase="1">
-                Next in Queue
-              </ng-container>
-              <ng-container *ngSwitchDefault>
-                Future
-              </ng-container>
-            </span>
+          <span
+            class="state"
+            [ngClass]="{
+              active: row.state === WebKeyState.STATE_ACTIVE,
+              inactive: row.state === WebKeyState.STATE_INITIAL,
+            }"
+            [ngSwitch]="i"
+          >
+            <ng-container *ngSwitchCase="0"> Currently Active </ng-container>
+            <ng-container *ngSwitchCase="1"> Next in Queue </ng-container>
+            <ng-container *ngSwitchDefault> Future </ng-container>
+          </span>
         </td>
       </ng-container>
       <ng-container matColumnDef="id">
