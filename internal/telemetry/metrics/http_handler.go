@@ -126,10 +126,6 @@ func RegisterTotalRequestCounter(r *http.Request) {
 }
 
 func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
-	// We don't want to count 404s, which have no value and introduce noise to metrics.
-	if recorder.Status == http.StatusNotFound {
-		return
-	}
 	var labels = map[string]attribute.Value{
 		URI:        attribute.StringValue(*recorder.RequestURI),
 		Method:     attribute.StringValue(r.Method),
