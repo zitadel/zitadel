@@ -24,6 +24,7 @@ import {
   MESSAGETEXTS,
   NOTIFICATIONS,
   OIDC,
+  WEBKEYS,
   PRIVACYPOLICY,
   SECRETS,
   SECURITY,
@@ -81,6 +82,7 @@ export class InstanceComponent implements OnInit, OnDestroy {
     PRIVACYPOLICY,
     LANGUAGES,
     OIDC,
+    WEBKEYS,
     SECRETS,
     SECURITY,
   ];

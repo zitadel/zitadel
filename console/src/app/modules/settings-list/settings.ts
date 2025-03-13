@@ -35,6 +35,15 @@ export const OIDC: SidenavSetting = {
   },
 };
 
+export const WEBKEYS: SidenavSetting = {
+  id: 'webkeys',
+  // tood: add translation
+  i18nKey: 'OIDC Web Keys',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
 export const SECRETS: SidenavSetting = {
   id: 'secrets',
   i18nKey: 'SETTINGS.LIST.SECRETS',
