@@ -62,6 +62,7 @@ export async function createNewSessionFromIdpIntent(
   command: CreateNewSessionCommand,
 ) {
   const _headers = await headers();
+
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
@@ -75,7 +76,6 @@ export async function createNewSessionFromIdpIntent(
 
   const userResponse = await getUserByID({
     serviceUrl,
-
     userId: command.userId,
   });
 
@@ -85,7 +85,6 @@ export async function createNewSessionFromIdpIntent(
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: userResponse.user.details?.resourceOwner,
   });
 

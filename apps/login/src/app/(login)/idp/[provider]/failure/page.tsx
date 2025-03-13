@@ -29,13 +29,11 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -54,7 +52,6 @@ export default async function Page(props: {
   if (userId) {
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId,
     });
     if (userResponse) {
@@ -70,7 +67,6 @@ export default async function Page(props: {
 
     const authMethodsResponse = await listAuthenticationMethodTypes({
       serviceUrl,
-
       userId,
     });
     if (authMethodsResponse.authMethodTypes) {

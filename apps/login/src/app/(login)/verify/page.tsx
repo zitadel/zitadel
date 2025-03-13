@@ -35,7 +35,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -51,7 +50,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
       serviceUrl,
-
       sessionParams: {
         loginName,
         organization,
@@ -86,7 +84,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId,
     });
     if (userResponse) {

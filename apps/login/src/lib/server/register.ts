@@ -38,7 +38,6 @@ export async function registerUser(command: RegisterUserCommand) {
 
   const addResponse = await addHumanUser({
     serviceUrl,
-
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -52,7 +51,6 @@ export async function registerUser(command: RegisterUserCommand) {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: command.organization,
   });
 
@@ -69,11 +67,13 @@ export async function registerUser(command: RegisterUserCommand) {
 
   const checks = create(ChecksSchema, checkPayload);
 
-  const session = await createSessionAndUpdateCookie(
+  const session = await createSessionAndUpdateCookie({
     checks,
-    command.requestId,
-    command.password ? loginSettings?.passwordCheckLifetime : undefined,
-  );
+    requestId: command.requestId,
+    lifetime: command.password
+      ? loginSettings?.passwordCheckLifetime
+      : undefined,
+  });
 
   if (!session || !session.factors?.user) {
     return { error: "Could not create session" };
@@ -93,7 +93,6 @@ export async function registerUser(command: RegisterUserCommand) {
   } else {
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId: session?.factors?.user?.id,
     });
 

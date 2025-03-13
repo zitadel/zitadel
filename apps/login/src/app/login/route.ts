@@ -162,7 +162,6 @@ export async function GET(request: NextRequest) {
           if (orgDomain) {
             const orgs = await getOrgsByDomain({
               serviceUrl,
-
               domain: orgDomain,
             });
             if (orgs.result && orgs.result.length === 1) {
@@ -370,7 +369,6 @@ export async function GET(request: NextRequest) {
         try {
           const { callbackUrl } = await createCallback({
             serviceUrl,
-
             req: create(CreateCallbackRequestSchema, {
               authRequestId: requestId.replace("oidc_", ""),
               callbackKind: {

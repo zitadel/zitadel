@@ -44,7 +44,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -54,7 +53,6 @@ export default async function Page(props: {
 
   const intent = await retrieveIDPIntent({
     serviceUrl,
-
     id,
     token,
   });
@@ -79,7 +77,6 @@ export default async function Page(props: {
 
   const idp = await getIDPByID({
     serviceUrl,
-
     id: idpInformation.idpId,
   });
   const options = idp?.config?.options;
@@ -100,7 +97,6 @@ export default async function Page(props: {
     try {
       idpLink = await addIDPLink({
         serviceUrl,
-
         idp: {
           id: idpInformation.idpId,
           userId: idpInformation.userId,
@@ -145,7 +141,6 @@ export default async function Page(props: {
     } else {
       foundUser = await listUsers({
         serviceUrl,
-
         userName: idpInformation.userName,
         email,
       }).then((response) => {
@@ -158,7 +153,6 @@ export default async function Page(props: {
       try {
         idpLink = await addIDPLink({
           serviceUrl,
-
           idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
@@ -201,7 +195,6 @@ export default async function Page(props: {
       // this just returns orgs where the suffix is set as primary domain
       const orgs = await getOrgsByDomain({
         serviceUrl,
-
         domain: suffix,
       });
       const orgToCheckForDiscovery =
@@ -209,7 +202,6 @@ export default async function Page(props: {
 
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
-
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
@@ -230,7 +222,6 @@ export default async function Page(props: {
 
     const newUser = await addHuman({
       serviceUrl,
-
       request: userData,
     });
 

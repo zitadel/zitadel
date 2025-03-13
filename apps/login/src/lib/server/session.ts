@@ -77,7 +77,6 @@ export async function continueWithSession({
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: session.factors?.user?.organizationId,
   });
 
@@ -151,7 +150,6 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -178,7 +176,6 @@ export async function updateSession(options: UpdateSessionCommand) {
   if (checks && checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
       serviceUrl,
-
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -208,7 +205,6 @@ export async function clearSession(options: ClearSessionOptions) {
 
   const deletedSession = await deleteSession({
     serviceUrl,
-
     sessionId: session.id,
     sessionToken: session.token,
   });
@@ -230,7 +226,6 @@ export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
 
   const deleteResponse = await deleteSession({
     serviceUrl,
-
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });

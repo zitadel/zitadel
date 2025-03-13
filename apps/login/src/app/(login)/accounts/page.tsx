@@ -19,7 +19,6 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   if (ids && ids.length) {
     const response = await listSessions({
       serviceUrl,
-
       ids: ids.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
@@ -56,7 +55,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization: organization ?? defaultOrganization,
   });
 

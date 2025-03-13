@@ -56,7 +56,8 @@
     "react-dom": "19.0.0",
     "react-hook-form": "7.39.5",
     "swr": "^2.2.0",
-    "tinycolor2": "1.4.2"
+    "tinycolor2": "1.4.2",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.46.0",

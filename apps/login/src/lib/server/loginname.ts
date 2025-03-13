@@ -43,7 +43,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const loginSettingsByContext = await getLoginSettings({
     serviceUrl,
-
     organization: command.organization,
   });
 
@@ -53,7 +52,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   let searchUsersRequest: SearchUsersCommand = {
     serviceUrl,
-
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
@@ -75,7 +73,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders({
       serviceUrl,
-
       orgId: command.organization,
     }).then((resp) => {
       return resp.identityProviders;
@@ -128,7 +125,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const redirectUserToIDP = async (userId: string) => {
     const identityProviders = await listIDPLinks({
       serviceUrl,
-
       userId,
     }).then((resp) => {
       return resp.result;
@@ -147,7 +143,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const idp = await getIDPByID({
         serviceUrl,
-
         id: identityProviderId,
       });
 
@@ -199,7 +194,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const userLoginSettings = await getLoginSettings({
       serviceUrl,
-
       organization: user.details?.resourceOwner,
     });
 
@@ -241,10 +235,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       user: { search: { case: "userId", value: userId } },
     });
 
-    const session = await createSessionAndUpdateCookie(
+    const session = await createSessionAndUpdateCookie({
       checks,
-      command.requestId,
-    );
+      requestId: command.requestId,
+    });
 
     if (!session.factors?.user?.id) {
       return { error: "Could not create session for user" };
@@ -257,7 +251,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const methods = await listAuthenticationMethodTypes({
       serviceUrl,
-
       userId: session.factors?.user?.id,
     });
 
@@ -416,7 +409,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // this just returns orgs where the suffix is set as primary domain
       const orgs = await getOrgsByDomain({
         serviceUrl,
-
         domain: suffix,
       });
       const orgToCheckForDiscovery =
@@ -424,7 +416,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
-
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
