@@ -5,14 +5,15 @@ import (
 	"strings"
 
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
+	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
+	pagination "github.com/zitadel/zitadel/internal/api/grpc/pagination/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
 const (
@@ -45,11 +46,11 @@ type Context interface {
 	GetOwner() InstanceContext
 }
 
-func (s *Server) SearchTargets(ctx context.Context, req *action.SearchTargetsRequest) (*action.SearchTargetsResponse, error) {
+func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest) (*action.ListTargetsResponse, error) {
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-	queries, err := s.searchTargetsRequestToModel(req)
+	queries, err := s.ListTargetsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -57,17 +58,17 @@ func (s *Server) SearchTargets(ctx context.Context, req *action.SearchTargetsReq
 	if err != nil {
 		return nil, err
 	}
-	return &action.SearchTargetsResponse{
+	return &action.ListTargetsResponse{
 		Result:  targetsToPb(resp.Targets),
-		Details: resource_object.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
+		Details: pagination.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
-func (s *Server) SearchExecutions(ctx context.Context, req *action.SearchExecutionsRequest) (*action.SearchExecutionsResponse, error) {
+func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsRequest) (*action.ListExecutionsResponse, error) {
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-	queries, err := s.searchExecutionsRequestToModel(req)
+	queries, err := s.ListExecutionsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -75,45 +76,50 @@ func (s *Server) SearchExecutions(ctx context.Context, req *action.SearchExecuti
 	if err != nil {
 		return nil, err
 	}
-	return &action.SearchExecutionsResponse{
+	return &action.ListExecutionsResponse{
 		Result:  executionsToPb(resp.Executions),
-		Details: resource_object.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
+		Details: pagination.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
-func targetsToPb(targets []*query.Target) []*action.GetTarget {
-	t := make([]*action.GetTarget, len(targets))
+func targetsToPb(targets []*query.Target) []*action.Target {
+	t := make([]*action.Target, len(targets))
 	for i, target := range targets {
 		t[i] = targetToPb(target)
 	}
 	return t
 }
 
-func targetToPb(t *query.Target) *action.GetTarget {
-	target := &action.GetTarget{
-		Details: resource_object.DomainToDetailsPb(&t.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, t.ResourceOwner),
-		Config: &action.Target{
-			Name:     t.Name,
-			Timeout:  durationpb.New(t.Timeout),
-			Endpoint: t.Endpoint,
-		},
+func targetToPb(t *query.Target) *action.Target {
+	target := &action.Target{
+		Id:         t.ObjectDetails.ID,
+		Name:       t.Name,
+		Timeout:    durationpb.New(t.Timeout),
+		Endpoint:   t.Endpoint,
 		SigningKey: t.SigningKey,
 	}
 	switch t.TargetType {
 	case domain.TargetTypeWebhook:
-		target.Config.TargetType = &action.Target_RestWebhook{RestWebhook: &action.SetRESTWebhook{InterruptOnError: t.InterruptOnError}}
+		target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.RESTWebhook{InterruptOnError: t.InterruptOnError}}
 	case domain.TargetTypeCall:
-		target.Config.TargetType = &action.Target_RestCall{RestCall: &action.SetRESTCall{InterruptOnError: t.InterruptOnError}}
+		target.TargetType = &action.Target_RestCall{RestCall: &action.RESTCall{InterruptOnError: t.InterruptOnError}}
 	case domain.TargetTypeAsync:
-		target.Config.TargetType = &action.Target_RestAsync{RestAsync: &action.SetRESTAsync{}}
+		target.TargetType = &action.Target_RestAsync{RestAsync: &action.RESTAsync{}}
 	default:
-		target.Config.TargetType = nil
+		target.TargetType = nil
+	}
+
+	if !t.ObjectDetails.EventDate.IsZero() {
+		target.ChangeDate = timestamppb.New(t.ObjectDetails.EventDate)
+	}
+	if !t.ObjectDetails.CreationDate.IsZero() {
+		target.CreationDate = timestamppb.New(t.ObjectDetails.CreationDate)
 	}
 	return target
 }
 
-func (s *Server) searchTargetsRequestToModel(req *action.SearchTargetsRequest) (*query.TargetSearchQueries, error) {
-	offset, limit, asc, err := resource_object.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+func (s *Server) ListTargetsRequestToModel(req *action.ListTargetsRequest) (*query.TargetSearchQueries, error) {
+	offset, limit, asc, err := pagination.SearchQueryPbToQuery(s.systemDefaults, req.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +161,7 @@ func targetQueryToQuery(filter *action.TargetSearchFilter) (query.SearchQuery, e
 }
 
 func targetNameQueryToQuery(q *action.TargetNameFilter) (query.SearchQuery, error) {
-	return query.NewTargetNameSearchQuery(resource_object.TextMethodPbToQuery(q.Method), q.GetTargetName())
+	return query.NewTargetNameSearchQuery(filter.TextMethodPbToQuery(q.Method), q.GetTargetName())
 }
 
 func targetInTargetIdsQueryToQuery(q *action.InTargetIDsFilter) (query.SearchQuery, error) {
@@ -210,8 +216,8 @@ func executionFieldNameToSortingColumn(field *action.ExecutionFieldName) query.C
 	}
 }
 
-func (s *Server) searchExecutionsRequestToModel(req *action.SearchExecutionsRequest) (*query.ExecutionSearchQueries, error) {
-	offset, limit, asc, err := resource_object.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+func (s *Server) ListExecutionsRequestToModel(req *action.ListExecutionsRequest) (*query.ExecutionSearchQueries, error) {
+	offset, limit, asc, err := pagination.SearchQueryPbToQuery(s.systemDefaults, req.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -319,15 +325,15 @@ func conditionToID(q *action.Condition) (string, error) {
 	}
 }
 
-func executionsToPb(executions []*query.Execution) []*action.GetExecution {
-	e := make([]*action.GetExecution, len(executions))
+func executionsToPb(executions []*query.Execution) []*action.Execution {
+	e := make([]*action.Execution, len(executions))
 	for i, execution := range executions {
 		e[i] = executionToPb(execution)
 	}
 	return e
 }
 
-func executionToPb(e *query.Execution) *action.GetExecution {
+func executionToPb(e *query.Execution) *action.Execution {
 	targets := make([]*action.ExecutionTargetType, len(e.Targets))
 	for i := range e.Targets {
 		switch e.Targets[i].Type {
@@ -342,12 +348,17 @@ func executionToPb(e *query.Execution) *action.GetExecution {
 		}
 	}
 
-	return &action.GetExecution{
-		Details: resource_object.DomainToDetailsPb(&e.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, e.ResourceOwner),
-		Execution: &action.Execution{
-			Targets: targets,
-		},
+	exec := &action.Execution{
+		Condition: executionIDToCondition(e.ID),
+		Targets:   targets,
 	}
+	if !e.ObjectDetails.EventDate.IsZero() {
+		exec.ChangeDate = timestamppb.New(e.ObjectDetails.EventDate)
+	}
+	if !e.ObjectDetails.CreationDate.IsZero() {
+		exec.CreationDate = timestamppb.New(e.ObjectDetails.CreationDate)
+	}
+	return exec
 }
 
 func executionIDToCondition(include string) *action.Condition {

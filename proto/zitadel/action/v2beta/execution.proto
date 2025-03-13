@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.resources.action.v3alpha;
+package zitadel.action.v2beta;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -10,21 +10,27 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
-import "zitadel/resources/object/v3alpha/object.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/object/v3alpha/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2beta;action";
 
 message Execution {
+  Condition condition = 1;
+  // The timestamp of the execution creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the execution.
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
   // Ordered list of targets/includes called during the execution.
-  repeated ExecutionTargetType targets = 1;
-}
-
-message GetExecution {
-  zitadel.resources.object.v3alpha.Details details = 1;
-  Condition condition = 2;
-  Execution execution = 3;
+  repeated ExecutionTargetType targets = 4;
 }
 
 message ExecutionTargetType {

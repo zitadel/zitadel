@@ -1,15 +1,16 @@
 syntax = "proto3";
 
-package zitadel.resources.action.v3alpha;
+package zitadel.action.v2beta;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2beta;action";
 
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
-import "zitadel/resources/object/v3alpha/object.proto";
-import "zitadel/resources/action/v3alpha/execution.proto";
+import "zitadel/action/v2beta/execution.proto";
+import "zitadel/filter/v2beta/filter.proto";
 
 message ExecutionSearchFilter {
   oneof filter {
@@ -52,6 +53,18 @@ message IncludeFilter {
   ];
 }
 
+enum TargetFieldName {
+  TARGET_FIELD_NAME_UNSPECIFIED = 0;
+  TARGET_FIELD_NAME_ID = 1;
+  TARGET_FIELD_NAME_CREATED_DATE = 2;
+  TARGET_FIELD_NAME_CHANGED_DATE = 3;
+  TARGET_FIELD_NAME_NAME = 4;
+  TARGET_FIELD_NAME_TARGET_TYPE = 5;
+  TARGET_FIELD_NAME_URL = 6;
+  TARGET_FIELD_NAME_TIMEOUT = 7;
+  TARGET_FIELD_NAME_INTERRUPT_ON_ERROR = 8;
+}
+
 message TargetSearchFilter {
   oneof filter {
     option (validate.required) = true;
@@ -71,7 +84,7 @@ message TargetNameFilter {
     }
   ];
   // Defines which text comparison method used for the name query.
-  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines which text equality method is used";
@@ -97,17 +110,6 @@ enum ExecutionType {
   EXECUTION_TYPE_FUNCTION = 4;
 }
 
-enum TargetFieldName {
-  TARGET_FIELD_NAME_UNSPECIFIED = 0;
-  TARGET_FIELD_NAME_ID = 1;
-  TARGET_FIELD_NAME_CREATED_DATE = 2;
-  TARGET_FIELD_NAME_CHANGED_DATE = 3;
-  TARGET_FIELD_NAME_NAME = 4;
-  TARGET_FIELD_NAME_TARGET_TYPE = 5;
-  TARGET_FIELD_NAME_URL = 6;
-  TARGET_FIELD_NAME_TIMEOUT = 7;
-  TARGET_FIELD_NAME_INTERRUPT_ON_ERROR = 8;
-}
 
 enum ExecutionFieldName {
   EXECUTION_FIELD_NAME_UNSPECIFIED = 0;

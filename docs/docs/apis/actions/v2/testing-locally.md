@@ -66,10 +66,10 @@ Where you can replace 'signingKey' with the key received in the next step 'Creat
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
 
-[Create a target](/apis/resources/action_service_v3/zitadel-actions-create-target)
+[Create a target](/apis/resources/action_service_v2/action-service-create-target)
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v3alpha/targets' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -89,10 +89,10 @@ Save the returned ID to set in the execution.
 
 To call the target just created before, with the intention to print the request used for user creation by the user V2 API, we define an execution with a method condition.
 
-[Set an execution](/apis/resources/action_service_v3/zitadel-actions-set-execution)
+[Set an execution](/apis/resources/action_service_v2/action-service-set-execution)
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v3alpha/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

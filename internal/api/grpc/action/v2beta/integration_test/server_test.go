@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
 var (
@@ -60,7 +60,7 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			_, err := instance.Client.ActionV3Alpha.ListExecutionMethods(ctx, &action.ListExecutionMethodsRequest{})
+			_, err := instance.Client.ActionV2beta.ListExecutionMethods(ctx, &action.ListExecutionMethodsRequest{})
 			assert.NoError(ttt, err)
 		},
 		retryDuration,
