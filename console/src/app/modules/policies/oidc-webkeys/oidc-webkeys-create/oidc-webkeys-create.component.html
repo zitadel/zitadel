@@ -1,4 +1,7 @@
-<cnsl-card title="Create new Web Key" description="Creating a new Web Key appends it to the list of your keys. Zitadel by default uses RSA2048 Keys with a SHA256 Bit hasher">
+<cnsl-card
+  title="Create new Web Key"
+  description="Creating a new Web Key appends it to the list of your keys. Zitadel by default uses RSA2048 Keys with a SHA256 Bit hasher"
+>
   <cnsl-form-field>
     <cnsl-label>Key Type</cnsl-label>
     <mat-select [value]="keyType()" (valueChange)="keyType.set($event)">
@@ -13,7 +16,9 @@
         <cnsl-label>BITS</cnsl-label>
         <mat-select formControlName="bits">
           <ng-container *ngFor="let bit of RSABits | keyvalue">
-            <mat-option *ngIf="Number(bit.key) as key" [value]="key">{{ $any(bit.value).replace('RSA_BITS_', '') }}</mat-option>
+            <mat-option *ngIf="Number(bit.key) as key" [value]="key">{{
+              $any(bit.value).replace('RSA_BITS_', '')
+            }}</mat-option>
           </ng-container>
         </mat-select>
       </cnsl-form-field>
@@ -21,7 +26,9 @@
         <cnsl-label>HASHER</cnsl-label>
         <mat-select formControlName="hasher">
           <ng-container *ngFor="let hasher of RSAHasher | keyvalue">
-            <mat-option *ngIf="Number(hasher.key) as key" [value]="key">{{ $any(hasher.value).replace('RSA_HASHER_', '') }}</mat-option>
+            <mat-option *ngIf="Number(hasher.key) as key" [value]="key">{{
+              $any(hasher.value).replace('RSA_HASHER_', '')
+            }}</mat-option>
           </ng-container>
         </mat-select>
       </cnsl-form-field>
@@ -32,7 +39,9 @@
         <cnsl-label>CURVE</cnsl-label>
         <mat-select formControlName="curve">
           <ng-container *ngFor="let curve of ECDSACurve | keyvalue">
-            <mat-option *ngIf="Number(curve.key) as key" [value]="key">{{ $any(curve.value).replace('ECDSA_CURVE_', '') }}</mat-option>
+            <mat-option *ngIf="Number(curve.key) as key" [value]="key">{{
+              $any(curve.value).replace('ECDSA_CURVE_', '')
+            }}</mat-option>
           </ng-container>
         </mat-select>
       </cnsl-form-field>
@@ -48,5 +57,4 @@
       </button>
     </ng-template>
   </ng-container>
-
 </cnsl-card>
