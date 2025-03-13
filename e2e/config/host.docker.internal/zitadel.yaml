@@ -5,12 +5,23 @@ ExternalDomain: host.docker.internal
 ExternalSecure: false
 
 Database:
-  cockroach:
+  postgres:
     # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
-    Host:  host.docker.internal
-    EventPushConnRatio: 0.2
+    Host: host.docker.internal
+    Port: 5432
     MaxOpenConns: 15
     MaxIdleConns: 10
+    Database: zitadel
+    User:
+      Username: zitadel
+      Password: zitadel
+      SSL:
+        Mode: disable
+    Admin:
+      Username: postgres
+      Password: postgres
+      SSL:
+        Mode: disable
 
 TLS:
   Enabled: false

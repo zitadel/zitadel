@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	//go:embed 14/cockroach/*.sql
-	//go:embed 14/postgres/*.sql
+	//go:embed 14/*.sql
 	newEventsTable embed.FS
 )
 
@@ -40,7 +39,7 @@ func (mig *NewEventsTable) Execute(ctx context.Context, _ eventstore.Event) erro
 		return err
 	}
 
-	statements, err := readStatements(newEventsTable, "14", mig.dbClient.Type())
+	statements, err := readStatements(newEventsTable, "14")
 	if err != nil {
 		return err
 	}

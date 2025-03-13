@@ -12,8 +12,7 @@ import (
 )
 
 var (
-	//go:embed 43/cockroach/*.sql
-	//go:embed 43/postgres/*.sql
+	//go:embed 43/*.sql
 	createFieldsDomainIndex embed.FS
 )
 
@@ -22,7 +21,7 @@ type CreateFieldsDomainIndex struct {
 }
 
 func (mig *CreateFieldsDomainIndex) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(createFieldsDomainIndex, "43", mig.dbClient.Type())
+	statements, err := readStatements(createFieldsDomainIndex, "43")
 	if err != nil {
 		return err
 	}

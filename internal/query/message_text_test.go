@@ -29,8 +29,7 @@ var (
 		` projections.message_texts2.text,` +
 		` projections.message_texts2.button_text,` +
 		` projections.message_texts2.footer_text` +
-		` FROM projections.message_texts2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.message_texts2`
 	prepareMessgeTextCols = []string{
 		"aggregate_id",
 		"sequence",
@@ -140,7 +139,7 @@ func Test_MessageTextPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

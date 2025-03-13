@@ -24,9 +24,9 @@ func init() {
 
 var (
 	// pushPlaceholderFmt defines how data are inserted into the events table
-	pushPlaceholderFmt string
+	pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d)"
 	// uniqueConstraintPlaceholderFmt defines the format of the unique constraint error returned from the database
-	uniqueConstraintPlaceholderFmt string
+	uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 
 	_ eventstore.Pusher = (*Eventstore)(nil)
 )
@@ -158,15 +158,6 @@ func (es *Eventstore) Client() *database.DB {
 }
 
 func NewEventstore(client *database.DB) *Eventstore {
-	switch client.Type() {
-	case "cockroach":
-		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $%d)"
-		uniqueConstraintPlaceholderFmt = "('%s', '%s', '%s')"
-	case "postgres":
-		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d)"
-		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
-	}
-
 	return &Eventstore{client: client}
 }
 
@@ -200,14 +191,8 @@ func (es *Eventstore) pushTx(ctx context.Context, client database.ContextQueryEx
 		beginner = es.client
 	}
 
-	isolationLevel := sql.LevelReadCommitted
-	// cockroach requires serializable to execute the push function
-	// because we use [cluster_logical_timestamp()](https://www.cockroachlabs.com/docs/stable/functions-and-operators#system-info-functions)
-	if es.client.Type() == "cockroach" {
-		isolationLevel = sql.LevelSerializable
-	}
 	tx, err = beginner.BeginTx(ctx, &sql.TxOptions{
-		Isolation: isolationLevel,
+		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	})
 	if err != nil {

@@ -417,7 +417,6 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AwaitOpenTransactions().
-			AllowTimeTravel().
 			AddQuery().
 			AggregateTypes(
 				keypair.AggregateType,

@@ -650,7 +650,6 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		Limit(uint64(h.bulkLimit)).
-		AllowTimeTravel().
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 

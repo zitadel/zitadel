@@ -24,8 +24,7 @@ const (
 )
 
 var (
-	//go:embed 40/cockroach/*.sql
-	//go:embed 40/postgres/*.sql
+	//go:embed 40/*.sql
 	initPushFunc embed.FS
 )
 
@@ -112,5 +111,5 @@ func (mig *InitPushFunc) inTxOrderType(ctx context.Context) (typeName string, er
 }
 
 func (mig *InitPushFunc) filePath(fileName string) string {
-	return path.Join("40", mig.dbClient.Type(), fileName)
+	return path.Join("40", fileName)
 }

@@ -39,8 +39,7 @@ var (
 		` projections.projects4.has_project_check,` +
 		` projections.projects4.private_labeling_setting,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.projects4` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.projects4`
 	prepareProjectsCols = []string{
 		"id",
 		"creation_date",
@@ -67,8 +66,7 @@ var (
 		` projections.projects4.project_role_check,` +
 		` projections.projects4.has_project_check,` +
 		` projections.projects4.private_labeling_setting` +
-		` FROM projections.projects4` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.projects4`
 	prepareProjectCols = []string{
 		"id",
 		"creation_date",
@@ -314,7 +312,7 @@ func Test_ProjectPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

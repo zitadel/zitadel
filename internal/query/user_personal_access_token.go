@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -98,7 +97,7 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := preparePersonalAccessTokenQuery(ctx, q.client)
+	query, scan := preparePersonalAccessTokenQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -128,7 +127,7 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := preparePersonalAccessTokensQuery(ctx, q.client)
+	query, scan := preparePersonalAccessTokensQuery()
 	eq := sq.Eq{
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -178,7 +177,7 @@ func (q *PersonalAccessTokenSearchQueries) toQuery(query sq.SelectBuilder) sq.Se
 	return query
 }
 
-func preparePersonalAccessTokenQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*PersonalAccessToken, error)) {
+func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*PersonalAccessToken, error)) {
 	return sq.Select(
 			PersonalAccessTokenColumnID.identifier(),
 			PersonalAccessTokenColumnCreationDate.identifier(),
@@ -188,7 +187,7 @@ func preparePersonalAccessTokenQuery(ctx context.Context, db prepareDatabase) (s
 			PersonalAccessTokenColumnUserID.identifier(),
 			PersonalAccessTokenColumnExpiration.identifier(),
 			PersonalAccessTokenColumnScopes.identifier()).
-			From(personalAccessTokensTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(personalAccessTokensTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PersonalAccessToken, error) {
 			p := new(PersonalAccessToken)
@@ -212,7 +211,7 @@ func preparePersonalAccessTokenQuery(ctx context.Context, db prepareDatabase) (s
 		}
 }
 
-func preparePersonalAccessTokensQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*PersonalAccessTokens, error)) {
+func preparePersonalAccessTokensQuery() (sq.SelectBuilder, func(*sql.Rows) (*PersonalAccessTokens, error)) {
 	return sq.Select(
 			PersonalAccessTokenColumnID.identifier(),
 			PersonalAccessTokenColumnCreationDate.identifier(),
@@ -223,7 +222,7 @@ func preparePersonalAccessTokensQuery(ctx context.Context, db prepareDatabase) (
 			PersonalAccessTokenColumnExpiration.identifier(),
 			PersonalAccessTokenColumnScopes.identifier(),
 			countColumn.identifier()).
-			From(personalAccessTokensTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(personalAccessTokensTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PersonalAccessTokens, error) {
 			personalAccessTokens := make([]*PersonalAccessToken, 0)

@@ -18,7 +18,7 @@ import (
 
 func init() {
 	config := new(Config)
-	dialect.Register(config, config, false)
+	dialect.Register(config, config, true)
 }
 
 const (
@@ -29,16 +29,15 @@ const (
 )
 
 type Config struct {
-	Host               string
-	Port               int32
-	Database           string
-	EventPushConnRatio float64
-	MaxOpenConns       uint32
-	MaxIdleConns       uint32
-	MaxConnLifetime    time.Duration
-	MaxConnIdleTime    time.Duration
-	User               User
-	Admin              AdminUser
+	Host            string
+	Port            int32
+	Database        string
+	MaxOpenConns    uint32
+	MaxIdleConns    uint32
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
+	User            User
+	Admin           AdminUser
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
 	Options string
@@ -148,12 +147,8 @@ func (c *Config) Password() string {
 	return c.User.Password
 }
 
-func (c *Config) Type() string {
-	return "postgres"
-}
-
-func (c *Config) Timetravel(time.Duration) string {
-	return ""
+func (c *Config) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypePostgres
 }
 
 type User struct {

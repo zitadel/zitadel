@@ -21,7 +21,7 @@ type AddPositionToIndexEsWm struct {
 }
 
 func (mig *AddPositionToIndexEsWm) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(addPositionToEsWmIndex, "35", "")
+	statements, err := readStatements(addPositionToEsWmIndex, "35")
 	if err != nil {
 		return err
 	}

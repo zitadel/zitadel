@@ -208,8 +208,7 @@ func TestQueries_GetActiveSigningWebKey(t *testing.T) {
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 					keyEncryptionAlgorithm: alg,
 				}
@@ -307,8 +306,7 @@ func TestQueries_ListWebKeys(t *testing.T) {
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				got, err := q.ListWebKeys(ctx)
@@ -369,8 +367,7 @@ func TestQueries_GetWebKeySet(t *testing.T) {
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				got, err := q.GetWebKeySet(ctx)
