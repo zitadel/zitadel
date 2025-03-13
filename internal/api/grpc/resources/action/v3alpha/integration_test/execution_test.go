@@ -774,7 +774,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
+						Function: &action.FunctionExecution{Name: "presamlresponse"},
 					},
 				},
 				Execution: &action.Execution{

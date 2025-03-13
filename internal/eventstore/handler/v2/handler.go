@@ -662,15 +662,15 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		}
 	}
 
-	for aggregateType, eventTypes := range h.eventTypes {
-		builder = builder.
-			AddQuery().
-			AggregateTypes(aggregateType).
-			EventTypes(eventTypes...).
-			Builder()
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(h.eventTypes))
+	eventTypes := make([]eventstore.EventType, 0, len(h.eventTypes))
+
+	for aggregate, events := range h.eventTypes {
+		aggregateTypes = append(aggregateTypes, aggregate)
+		eventTypes = append(eventTypes, events...)
 	}
 
-	return builder
+	return builder.AddQuery().AggregateTypes(aggregateTypes...).EventTypes(eventTypes...).Builder()
 }
 
 // ProjectionName returns the name of the underlying projection.
