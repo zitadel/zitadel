@@ -1,0 +1,26 @@
+<h2>OIDC Web Keys</h2>
+<ng-container [ngSwitch]="webKeysEnabled$ | async">
+  <p>Here you can manage your OIDC Web Keys for your ZITADEL instance, used to sign and validate OIDC tokens.</p>
+  <ng-container *ngSwitchCase="true">
+    <h3>Active and Future Web Keys</h3>
+    <p>
+      List of your active and future Web Keys.
+      Activating the next Web Key deactivates the currently active Web Key.
+      Note that the JWKs OIDC endpoint returns a cacheable response.
+      Therefore it is not advised to activate a key that has been created within the cache duration (default is 5min),
+      as the public key may not have been propagated to caches and clients yet.
+    </p>
+    <cnsl-oidc-webkeys-table (refresh)="refresh.next(true)" (delete)="deleteWebKey($event)" [webKeys]="webKeys$ | async">
+      <button *ngIf="nextWebKeyCandidate$ | async as nextWebKeyCandidate"  [disabled]="activateLoading()" mat-raised-button color="primary"(click)="activateWebKey(nextWebKeyCandidate)">
+        <mat-spinner diameter="20" *ngIf="activateLoading()"></mat-spinner>
+        <span *ngIf="!activateLoading()">Activate next Web Key</span>
+      </button>
+    </cnsl-oidc-webkeys-table>
+    <cnsl-oidc-webkeys-create [loading]="createLoading()" (ngSubmit)="createWebKey($event)"></cnsl-oidc-webkeys-create>
+    <cnsl-oidc-webkeys-inactive-table [InactiveWebKeys]="inactiveWebKeys$ | async"></cnsl-oidc-webkeys-inactive-table>
+  </ng-container>
+  <ng-container *ngSwitchCase="false">
+    <p>OIDC Web Keys are not enabled for your instance.</p>
+  </ng-container>
+</ng-container>
+

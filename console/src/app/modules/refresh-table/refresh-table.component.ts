@@ -29,7 +29,6 @@ const rotate = animation([
 export class RefreshTableComponent implements OnInit {
   @Input() public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
   @Input() public timestamp: Timestamp.AsObject | ConnectTimestamp | undefined = undefined;
-  @Input() public dataSize: number = 0;
   @Input() public emitRefreshAfterTimeoutInMs: number = 0;
   @Input() public loading: boolean | null = false;
   @Input() public emitRefreshOnPreviousRoutes: string[] = [];

@@ -1,0 +1,33 @@
+<cnsl-card title="Previous Web Keys" description="These are the previous Web Keys that are no longer active.">
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="(dataSource$ | async) === null">
+    <div class="table-wrapper">
+      <table *ngIf="dataSource$ | async as dataSource" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+        <ng-container matColumnDef="timestamp">
+          <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+          <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+            <!-- todo: Remove $any once typings are fixed -->
+            {{ $any(row).creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Id</th>
+          <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+            <!-- todo: Remove $any once typings are fixed -->
+            {{ $any(row).id }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+            <!-- todo: Remove $any once typings are fixed -->
+            {{ $any(row).key.case | uppercase }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['timestamp', 'id', 'type']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['timestamp', 'id', 'type']"></tr>
+      </table>
+    </div>
+  </cnsl-refresh-table>
+
+</cnsl-card>

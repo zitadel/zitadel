@@ -1,0 +1,65 @@
+<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="(dataSource$ | async) === null">
+  <div actions>
+    <ng-content></ng-content>
+  </div>
+  <div class="table-wrapper">
+    <table *ngIf="dataSource$ | async as dataSource" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
+            <span
+              class="state"
+              [ngClass]="{
+                active: row.state === WebKeyState.STATE_ACTIVE,
+                inactive: row.state === WebKeyState.STATE_INITIAL,
+              }"
+              [ngSwitch]="i"
+            >
+              <ng-container *ngSwitchCase="0">
+                Currently Active
+              </ng-container>
+              <ng-container *ngSwitchCase="1">
+                Next in Queue
+              </ng-container>
+              <ng-container *ngSwitchDefault>
+                Future
+              </ng-container>
+            </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>Id</th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          <!-- todo: Remove $any once typings are fixed -->
+          {{ $any(row).id }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          <!-- todo: Remove $any once typings are fixed -->
+          {{ $any(row).key.case | uppercase }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          <cnsl-table-actions *ngIf="row.state === WebKeyState.STATE_INITIAL">
+            <button
+              actions
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              color="warn"
+              (click)="delete.emit(row)"
+              mat-icon-button
+            >
+              <i class="las la-trash"></i>
+            </button>
+          </cnsl-table-actions>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['state', 'id', 'type', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['state', 'id', 'type', 'actions']"></tr>
+    </table>
+  </div>
+</cnsl-refresh-table>

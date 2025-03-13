@@ -5,7 +5,6 @@
     *ngIf="dataSource$ | async as dataSource"
     [loading]="loading"
     (refreshed)="refresh.emit()"
-    [dataSize]="dataSource.data.length"
   >
     <button actions [disabled]="disabled" mat-raised-button color="primary" class="edit" (click)="editClicked.emit()">
       {{ 'ACTIONS.EDIT' | translate }}
