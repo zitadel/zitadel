@@ -159,7 +159,7 @@ export class UserTableComponent implements OnInit {
   }
 
   private getMyUser() {
-    return defer(() => this.userService.getMyUser()).pipe(
+    return this.userService.user$.pipe(
       catchError((error) => {
         this.toast.showError(error);
         return EMPTY;

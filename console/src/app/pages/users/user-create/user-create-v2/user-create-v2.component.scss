@@ -1,0 +1,62 @@
+.content {
+  max-width: 45rem;
+
+  @media only screen and (max-width: 500px) {
+    padding: 0 0.5rem;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "email email"
+    "emailVerified emailVerified"
+    "givenName familyName"
+    "nickName username"
+    "authenticationFactor authenticationFactor";
+  ;
+  column-gap: 1rem;
+}
+
+.email {
+  grid-area: email;
+}
+
+.emailVerified {
+  grid-area: emailVerified;
+}
+
+.givenName {
+  grid-area: givenName;
+}
+
+.familyName {
+  grid-area: familyName;
+}
+
+.nickName {
+  grid-area: nickName;
+}
+
+.username {
+  grid-area: username;
+}
+
+.authenticationFactor {
+  grid-area: authenticationFactor;
+  margin-bottom: 1rem;
+}
+
+.authenticationFactorButton {
+  margin-top: 1rem;
+}
+
+.authenticationFactorIntroductionDone {
+  opacity: 0.5;
+}
+
+.stretchInput {
+  max-width: unset;
+}

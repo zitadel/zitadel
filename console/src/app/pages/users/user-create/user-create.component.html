@@ -1,4 +1,6 @@
+<cnsl-user-create-v2 *ngIf="(useV2Api$ | async) === true" />
 <cnsl-create-layout
+  *ngIf="(useV2Api$ | async) === false"
   title="{{ 'USER.CREATE.TITLE' | translate }}"
   [createSteps]="1"
   [currentCreateStep]="1"

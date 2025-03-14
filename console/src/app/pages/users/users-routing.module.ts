@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from 'src/app/guards/auth.guard';
-import { RoleGuard } from 'src/app/guards/role.guard';
-import { UserGuard } from 'src/app/guards/user.guard';
+import { authGuard } from 'src/app/guards/auth.guard';
+import { roleGuard } from 'src/app/guards/role-guard';
+import { userGuard } from 'src/app/guards/user-guard';
 import { Type } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { AuthUserDetailComponent } from './user-detail/auth-user-detail/auth-user-detail.component';
@@ -22,7 +22,7 @@ const routes: Routes = [
   {
     path: 'create',
     loadChildren: () => import('./user-create/user-create.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['user.write'],
     },
@@ -30,7 +30,7 @@ const routes: Routes = [
   {
     path: 'create-machine',
     loadChildren: () => import('./user-create-machine/user-create-machine.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['user.write'],
     },
@@ -38,7 +38,7 @@ const routes: Routes = [
   {
     path: 'me',
     component: AuthUserDetailComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: {
       animation: 'HomePage',
     },
@@ -46,13 +46,13 @@ const routes: Routes = [
   {
     path: 'me/password',
     component: PasswordComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { animation: 'AddPage' },
   },
   {
     path: ':id',
     component: UserDetailComponent,
-    canActivate: [AuthGuard, UserGuard, RoleGuard],
+    canActivate: [authGuard, userGuard, roleGuard],
     data: {
       roles: ['user.read'],
       animation: 'HomePage',
@@ -61,7 +61,7 @@ const routes: Routes = [
   {
     path: ':id/password',
     component: PasswordComponent,
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['user.write'],
       animation: 'AddPage',
