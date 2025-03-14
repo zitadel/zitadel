@@ -18,7 +18,7 @@ import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
-import { createFeatureServiceClient, createUserServiceClient } from '@zitadel/client/v2';
+import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
@@ -34,6 +34,7 @@ export class GrpcService {
   public feature!: FeatureServiceClient;
   public user!: UserServiceClient;
   public userNew!: ReturnType<typeof createUserServiceClient>;
+  public session!: ReturnType<typeof createSessionServiceClient>;
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
@@ -105,6 +106,7 @@ export class GrpcService {
           interceptors: [NewConnectWebAuthInterceptor(this.authInterceptorProvider)],
         });
         this.userNew = createUserServiceClient(transport);
+        this.session = createSessionServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transport);
         this.authNew = createAuthServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);

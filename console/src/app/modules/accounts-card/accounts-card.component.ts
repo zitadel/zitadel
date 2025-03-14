@@ -5,6 +5,8 @@ import { Session, User, UserState } from 'src/app/proto/generated/zitadel/user_p
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { SessionService } from 'src/app/services/session.service';
+import { ListMyUserSessionsRequest } from '@zitadel/proto/zitadel/auth_pb';
 
 @Component({
   selector: 'cnsl-accounts-card',
@@ -25,6 +27,7 @@ export class AccountsCardComponent implements OnInit {
     public authService: AuthenticationService,
     private router: Router,
     private userService: GrpcAuthService,
+    private sessionService: SessionService,
   ) {
     this.userService
       .listMyUserSessions()
@@ -35,6 +38,10 @@ export class AccountsCardComponent implements OnInit {
       .catch(() => {
         this.loadingUsers = false;
       });
+
+    this.sessionService.listMyUserSessions({}).then((sessions) => {
+      console.log('sessions', sessions);
+    });
   }
 
   ngOnInit(): void {
