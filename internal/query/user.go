@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"fmt"
 	"slices"
 	"strings"
 	"time"
@@ -630,6 +631,7 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 		return err
 	}, stmt, args...)
 	if err != nil {
+		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 		return 0, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
 	return count, err
@@ -655,7 +657,12 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	})
 	if permissionCheckV2 {
-		query = wherePermittedOrgsOrCurrentUser(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
+		// extract system user roles
+		systemUserPermissions, err := authz.GetSystemUserAuthParams(ctx)
+		if err != nil {
+			return nil, zerrors.ThrowInternal(err, "QUERY-GS9gs", "Errors.Internal")
+		}
+		query = wherePermittedOrgsOrCurrentUser(ctx, query, systemUserPermissions, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
 	}
 
 	stmt, args, err := query.ToSql()
@@ -668,6 +675,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 		return err
 	}, stmt, args...)
 	if err != nil {
+		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 		return nil, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
 	users.State, err = q.latestState(ctx, userTable)
@@ -737,15 +745,19 @@ func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 func NewUserOrSearchQuery(values []SearchQuery) (SearchQuery, error) {
 	return NewOrQuery(values...)
 }
+
 func NewUserAndSearchQuery(values []SearchQuery) (SearchQuery, error) {
 	return NewAndQuery(values...)
 }
+
 func NewUserNotSearchQuery(value SearchQuery) (SearchQuery, error) {
 	return NewNotQuery(value)
 }
+
 func NewUserInUserIdsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(UserIDCol, values)
 }
+
 func NewUserInUserEmailsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(HumanEmailCol, values)
 }
@@ -807,7 +819,7 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 }
 
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	//linking queries for the subselect
+	// linking queries for the subselect
 	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
 	if err != nil {
 		return nil, err
@@ -816,12 +828,12 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	//text query to select data from the linked sub select
+	// text query to select data from the linked sub select
 	loginNameQuery, err := NewTextQuery(LoginNameNameCol, value, comparison)
 	if err != nil {
 		return nil, err
 	}
-	//full definition of the sub select
+	// full definition of the sub select
 	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, loginNameQuery})
 	if err != nil {
 		return nil, err

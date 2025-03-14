@@ -1,6 +1,7 @@
 package start
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -11,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/saml"
@@ -65,12 +66,13 @@ type Config struct {
 	Login               login.Config
 	Console             console.Config
 	AssetStorage        static_config.AssetStorageConfig
-	InternalAuthZ       internal_authz.Config
+	InternalAuthZ       authz.Config
+	SystemAuthZ         authz.Config
 	SystemDefaults      systemdefaults.SystemDefaults
 	EncryptionKeys      *encryption.EncryptionKeyConfig
 	DefaultInstance     command.InstanceSetup
 	AuditLogRetention   time.Duration
-	SystemAPIUsers      map[string]*internal_authz.SystemAPIUser
+	SystemAPIUsers      map[string]*authz.SystemAPIUser
 	CustomerPortal      string
 	Machine             *id.Config
 	Actions             *actions.Config
@@ -94,12 +96,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
-			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
-			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.SliceTypeStringDecode[authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
-			hook.EnumHookFunc(internal_authz.MemberTypeString),
+			hook.EnumHookFunc(authz.MemberTypeString),
 			hooks.MapTypeStringDecode[domain.Feature, any],
 			hooks.SliceTypeStringDecode[*command.SetQuota],
 			hook.Base64ToBytesHookFunc(),
@@ -129,6 +131,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
+	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> config.SystemAuthZ = %+v\n", config.SystemAuthZ)
 
 	return config
 }

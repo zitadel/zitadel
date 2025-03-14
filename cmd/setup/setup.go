@@ -177,6 +177,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s48Apps7SAMLConfigsLoginVersion = &Apps7SAMLConfigsLoginVersion{dbClient: dbClient}
 	steps.s49InitPermittedOrgsFunction = &InitPermittedOrgsFunction{eventstoreClient: dbClient}
 	steps.s50IDPTemplate6UsePKCE = &IDPTemplate6UsePKCE{dbClient: dbClient}
+	steps.s51InitPermittedOrgsFunction = &InitPermittedOrgsFunction51{eventstoreClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -216,6 +217,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s47FillMembershipFields,
 		steps.s49InitPermittedOrgsFunction,
 		steps.s50IDPTemplate6UsePKCE,
+		steps.s51InitPermittedOrgsFunction,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -408,7 +410,7 @@ func startCommandsQueries(
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
 			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, nil, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 			}
 		},
 		0,   // not needed for projections
@@ -433,7 +435,7 @@ func startCommandsQueries(
 	authZRepo, err := authz.Start(queries, eventstoreClient, dbClient, keys.OIDC, config.ExternalSecure)
 	logging.OnError(err).Fatal("unable to start authz repo")
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+		return internal_authz.CheckPermission(ctx, authZRepo, nil, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
 	commands, err := command.StartCommands(ctx,
