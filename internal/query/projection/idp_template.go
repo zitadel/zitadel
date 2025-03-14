@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates7"
+	IDPTemplateTable                 = "projections.idp_templates6"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -40,7 +40,7 @@ const (
 	IDPTemplateGitLabSuffix           = "gitlab"
 	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
 	IDPTemplateGoogleSuffix           = "google"
-	IDPTemplateLDAPSuffix             = "ldap3"
+	IDPTemplateLDAPSuffix             = "ldap2"
 	IDPTemplateAppleSuffix            = "apple"
 	IDPTemplateSAMLSuffix             = "saml"
 
@@ -141,7 +141,7 @@ const (
 	LDAPUserObjectClassesCol          = "user_object_classes"
 	LDAPUserFiltersCol                = "user_filters"
 	LDAPTimeoutCol                    = "timeout"
-	LDAPRootCACol                     = "rootCA"
+	LDAPRootCACol                     = "root_ca"
 	LDAPIDAttributeCol                = "id_attribute"
 	LDAPFirstNameAttributeCol         = "first_name_attribute"
 	LDAPLastNameAttributeCol          = "last_name_attribute"
