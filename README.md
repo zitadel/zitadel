@@ -168,7 +168,7 @@ Join our [Discord Chat](https://zitadel.com/chat) to get help.
   <img src="https://contrib.rocks/image?repo=zitadel/zitadel" />
 </a>
 
-Made with [contrib.rocks](https://contrib.rocks).
+Made with [contrib.rocks](https://contrib.rocks/preview?repo=zitadel/zitadel).
 
 ## Showcase
 
