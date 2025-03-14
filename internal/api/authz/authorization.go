@@ -147,14 +147,17 @@ func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []Rol
 			var systemUserAuthParams *SystemUserAuthParams
 			chann := make(chan struct{}, 1)
 			return func(ctx context.Context) *SystemUserAuthParams {
-				chann <- struct{}{}
 				if systemUserAuthParams != nil {
 					return systemUserAuthParams
 				}
+
+				chann <- struct{}{}
 				defer func() {
 					<-chann
-					close(chann)
 				}()
+				if systemUserAuthParams != nil {
+					return systemUserAuthParams
+				}
 
 				systemUserAuthParams = &SystemUserAuthParams{
 					MemberType:        make([]int32, len(ctxData.SystemMemberships)),
