@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"time"
 
@@ -320,7 +320,7 @@ func (q *Queries) readTranslationFile(namespace i18n.Namespace, filename string)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-93njw", "Errors.TranslationFile.ReadError")
 	}
-	contents, err := ioutil.ReadAll(r)
+	contents, err := io.ReadAll(r)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-l0fse", "Errors.TranslationFile.ReadError")
 	}

@@ -3,7 +3,7 @@ package templates
 import (
 	"bytes"
 	"html/template"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -51,7 +51,7 @@ func readFile(dir http.FileSystem, fileName string) (*template.Template, error) 
 		return nil, err
 	}
 	defer f.Close()
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func readFileFromDatabase(dir http.FileSystem, fileName string) (*template.Templ
 		return nil, err
 	}
 	defer f.Close()
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
