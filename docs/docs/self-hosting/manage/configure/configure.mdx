@@ -8,6 +8,7 @@ import TabItem from "@theme/TabItem";
 import LinuxUnix from "./_linuxunix.mdx";
 import Compose from "./_compose.mdx";
 import Helm from "./_helm.mdx";
+import Login from "./_login.md";
 import CodeBlock from "@theme/CodeBlock";
 import DefaultsYamlSource from "!!raw-loader!./defaults.yaml";
 import StepsYamlSource from "!!raw-loader!./steps.yaml";
@@ -90,20 +91,16 @@ There are three ways to pass the masterkey to the `zitadel` binary:
 >
   <TabItem value="linuxunix">
     <LinuxUnix />
+    <Login/>
   </TabItem>
   <TabItem value="compose">
     <Compose />
+    <Login/>
   </TabItem>
   <TabItem value="k8s">
     <Helm />
   </TabItem>
 </Tabs>
-
-Open your favorite internet browser at [http://localhost:8080/ui/console](http://localhost:8080/ui/console).
-This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
-
-- **username**: _root@<span></span>zitadel.localhost_
-- **password**: _RootPassword1!_
 
 ## What's next
 
