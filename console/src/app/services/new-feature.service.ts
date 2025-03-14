@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   GetInstanceFeaturesResponse,
+  ResetInstanceFeaturesResponse,
   SetInstanceFeaturesRequest,
   SetInstanceFeaturesResponse,
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
-import { ResetInstanceFeaturesRequest } from '../proto/generated/zitadel/feature/v2/instance_pb';
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +21,7 @@ export class NewFeatureService {
     return this.grpcService.featureNew.setInstanceFeatures(req);
   }
 
-  public resetInstanceFeatures(): Promise<SetInstanceFeaturesResponse> {
-    const req = new ResetInstanceFeaturesRequest();
-    return this.grpcService.featureNew.resetInstanceFeatures(req);
+  public resetInstanceFeatures(): Promise<ResetInstanceFeaturesResponse> {
+    return this.grpcService.featureNew.resetInstanceFeatures({});
   }
 }

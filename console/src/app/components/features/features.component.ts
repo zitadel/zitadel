@@ -11,19 +11,17 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
-import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { FeatureToggleComponent } from '../feature-toggle/feature-toggle.component';
-import { FeatureFlag } from 'src/app/proto/generated/zitadel/feature/v2/feature_pb';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import {
   GetInstanceFeaturesResponse,
-  SetInstanceFeaturesRequest,
   SetInstanceFeaturesRequestSchema,
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
 //@ts-ignore
 import { create } from '@zitadel/client';
+import { FeatureFlag, Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
 
 export enum ToggleState {
   ENABLED = 'ENABLED',
@@ -132,8 +130,6 @@ export class FeaturesComponent {
   private getFeatures() {
     this.featureService.getInstanceFeatures().then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse;
-
-      console.log(this.featureData);
       this.toggleStates = this.createToggleStates(this.featureData);
     });
   }
@@ -143,9 +139,9 @@ export class FeaturesComponent {
 
     FEATURE_KEYS.forEach((key) => {
       // TODO: Fix this type cast as not all keys are present as FeatureFlag
-      const feature = featureData[key] as unknown as FeatureFlag.AsObject;
+      const feature = featureData[key] as unknown as FeatureFlag;
       toggleStates[key] = {
-        source: feature?.source || Source.SOURCE_SYSTEM,
+        source: feature?.source || Source.SYSTEM,
         state: !!feature?.enabled ? ToggleState.ENABLED : ToggleState.DISABLED,
       };
     });
