@@ -1,7 +1,6 @@
 <cnsl-refresh-table
   [loading]="loading$ | async"
   (refreshed)="refreshPage()"
-  [dataSize]="dataSource.data.length"
   [emitRefreshOnPreviousRoutes]="[
     '/instance/smtpprovider/aws-ses/create',
     '/instance/smtpprovider/generic/create',

@@ -1,9 +1,4 @@
-<cnsl-refresh-table
-  [hideRefresh]="true"
-  (refreshed)="refresh()"
-  [dataSize]="dataSource.data.length"
-  [loading]="loading$ | async"
->
+<cnsl-refresh-table [hideRefresh]="true" (refreshed)="refresh()" [loading]="loading$ | async">
   <cnsl-filter-org actions (filterChanged)="applySearchQuery($any($event))" (filterOpen)="filterOpen = $event">
   </cnsl-filter-org>
 

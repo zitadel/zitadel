@@ -1,12 +1,7 @@
 <cnsl-card class="metadata-details" [title]="'DESCRIPTIONS.METADATA_TITLE' | translate" [description]="description">
   <mat-spinner card-actions class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
 
-  <cnsl-refresh-table
-    *ngIf="dataSource$ | async as dataSource"
-    [loading]="loading"
-    (refreshed)="refresh.emit()"
-    [dataSize]="dataSource.data.length"
-  >
+  <cnsl-refresh-table *ngIf="dataSource$ | async as dataSource" [loading]="loading" (refreshed)="refresh.emit()">
     <button actions [disabled]="disabled" mat-raised-button color="primary" class="edit" (click)="editClicked.emit()">
       {{ 'ACTIONS.EDIT' | translate }}
     </button>
