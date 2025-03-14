@@ -87,6 +87,26 @@ var (
 	</KeyDescriptor>
   </AttributeAuthorityDescriptor>
 </EntityDescriptor>`)
+	validLDAPRootCA = []byte(`-----BEGIN CERTIFICATE-----
+MIIDITCCAgmgAwIBAgIUKjAUmxsHO44X+/TKBNciPgNl1GEwDQYJKoZIhvcNAQEL
+BQAwIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1wbGUuY29tMB4XDTI0MTIxOTEz
+Mzc1MVoXDTI1MTIxOTEzMzc1MVowIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0QYuJsayILRI
+hVT7G1DlitVSXnt1iw3gEXJZfe81Egz06fUbvXF6Yo1LJmwYpqe/rm+hf4FNUb8e
+2O+LH2FieA9FkVe4P2gKOzw87A/KxvpV8stgNgl4LlqRCokbc1AzeE/NiLr5TcTD
+RXm3DUcYxXxinprtDu2jftFysaOZmNAukvE/iL6qS3X6ggVEDDM7tY9n5FV2eJ4E
+p0ImKfypi2aZYROxOK+v5x9ryFRMl4y07lMDvmtcV45uXYmfGNCgG9PNf91Kk/mh
+JxEQbxycJwFoSi9XWljR8ahPdO11LXG7Dsj/RVbY8k2LdKNstl6Ae3aCpbe9u2Pj
+vxYs1bVJuQIDAQABo1MwUTAdBgNVHQ4EFgQU+mRVN5HYJWgnpopReaLhf2cMcoYw
+HwYDVR0jBBgwFoAU+mRVN5HYJWgnpopReaLhf2cMcoYwDwYDVR0TAQH/BAUwAwEB
+/zANBgkqhkiG9w0BAQsFAAOCAQEABJpHVuc9tGhD04infRVlofvqXIUizTlOrjZX
+vozW9pIhSWEHX8o+sJP8AMZLnrsdq+bm0HE0HvgYrw7Lb8pd4FpR46TkFHjeukoj
+izqfgckjIBl2nwPGlynbKA0/U/rTCSxVt7XiAn+lgYUGIpOzNdk06/hRMitrMNB7
+t2C97NseVC4b1ZgyFrozsefCfUmD8IJF0+XJ4Wzmsh0jRrI8koCtVmPYnKn6vw1b
+cZprg/97CWHYrsavd406wOB60CMtYl83Q16ucOF1dretDFqJC5kY+aFLvuqfag2+
+kIaoPV1MnGsxveQyyHdOsEatS5XOv/1OWcmnvePDPxcvb9jCcw==
+-----END CERTIFICATE-----
+`)
 )
 
 func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
@@ -4259,6 +4279,34 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					StartTLS:          false,
+					BaseDN:            "baseDN",
+					BindDN:            "dn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-cwqVVdBwKt", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4281,7 +4329,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
-							[]byte("certificate"),
+							nil,
 							idp.LDAPAttributes{},
 							idp.Options{},
 						),
@@ -4303,7 +4351,6 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
 				},
 			},
 			res: res{
@@ -4334,7 +4381,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
-							[]byte("certificate"),
+							validLDAPRootCA,
 							idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "firstName",
@@ -4375,7 +4422,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "firstName",
@@ -4602,6 +4649,32 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "binddn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-cwqVVdBwKt", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4651,7 +4724,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
-								[]byte("certificate"),
+								validLDAPRootCA,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4671,7 +4744,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 				},
 			},
 			res: res{
@@ -4701,7 +4774,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
-								[]byte("certificate"),
+								nil,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4748,6 +4821,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
+									idp.ChangeLDAPRootCA(validLDAPRootCA),
 								},
 							)
 							return event
@@ -4770,7 +4844,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"new object"},
 					UserFilters:       []string{"new filter"},
 					Timeout:           time.Second * 20,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "new id",
 						FirstNameAttribute:         "new firstName",

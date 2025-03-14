@@ -100,30 +100,30 @@ var (
 		` projections.idp_templates6_saml.name_id_format,` +
 		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
 		// ldap
-		` projections.idp_templates6_ldap3.idp_id,` +
-		` projections.idp_templates6_ldap3.servers,` +
-		` projections.idp_templates6_ldap3.start_tls,` +
-		` projections.idp_templates6_ldap3.base_dn,` +
-		` projections.idp_templates6_ldap3.bind_dn,` +
-		` projections.idp_templates6_ldap3.bind_password,` +
-		` projections.idp_templates6_ldap3.user_base,` +
-		` projections.idp_templates6_ldap3.user_object_classes,` +
-		` projections.idp_templates6_ldap3.user_filters,` +
-		` projections.idp_templates6_ldap3.timeout,` +
-		` projections.idp_templates6_ldap3.rootCA,` +
-		` projections.idp_templates6_ldap3.id_attribute,` +
-		` projections.idp_templates6_ldap3.first_name_attribute,` +
-		` projections.idp_templates6_ldap3.last_name_attribute,` +
-		` projections.idp_templates6_ldap3.display_name_attribute,` +
-		` projections.idp_templates6_ldap3.nick_name_attribute,` +
-		` projections.idp_templates6_ldap3.preferred_username_attribute,` +
-		` projections.idp_templates6_ldap3.email_attribute,` +
-		` projections.idp_templates6_ldap3.email_verified,` +
-		` projections.idp_templates6_ldap3.phone_attribute,` +
-		` projections.idp_templates6_ldap3.phone_verified_attribute,` +
-		` projections.idp_templates6_ldap3.preferred_language_attribute,` +
-		` projections.idp_templates6_ldap3.avatar_url_attribute,` +
-		` projections.idp_templates6_ldap3.profile_attribute,` +
+		` projections.idp_templates6_ldap2.idp_id,` +
+		` projections.idp_templates6_ldap2.servers,` +
+		` projections.idp_templates6_ldap2.start_tls,` +
+		` projections.idp_templates6_ldap2.base_dn,` +
+		` projections.idp_templates6_ldap2.bind_dn,` +
+		` projections.idp_templates6_ldap2.bind_password,` +
+		` projections.idp_templates6_ldap2.user_base,` +
+		` projections.idp_templates6_ldap2.user_object_classes,` +
+		` projections.idp_templates6_ldap2.user_filters,` +
+		` projections.idp_templates6_ldap2.timeout,` +
+		` projections.idp_templates6_ldap2.root_ca,` +
+		` projections.idp_templates6_ldap2.id_attribute,` +
+		` projections.idp_templates6_ldap2.first_name_attribute,` +
+		` projections.idp_templates6_ldap2.last_name_attribute,` +
+		` projections.idp_templates6_ldap2.display_name_attribute,` +
+		` projections.idp_templates6_ldap2.nick_name_attribute,` +
+		` projections.idp_templates6_ldap2.preferred_username_attribute,` +
+		` projections.idp_templates6_ldap2.email_attribute,` +
+		` projections.idp_templates6_ldap2.email_verified,` +
+		` projections.idp_templates6_ldap2.phone_attribute,` +
+		` projections.idp_templates6_ldap2.phone_verified_attribute,` +
+		` projections.idp_templates6_ldap2.preferred_language_attribute,` +
+		` projections.idp_templates6_ldap2.avatar_url_attribute,` +
+		` projections.idp_templates6_ldap2.profile_attribute,` +
 		// apple
 		` projections.idp_templates6_apple.idp_id,` +
 		` projections.idp_templates6_apple.client_id,` +
@@ -142,7 +142,7 @@ var (
 		` LEFT JOIN projections.idp_templates6_gitlab_self_hosted ON projections.idp_templates6.id = projections.idp_templates6_gitlab_self_hosted.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
 		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
-		` LEFT JOIN projections.idp_templates6_ldap3 ON projections.idp_templates6.id = projections.idp_templates6_ldap3.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap3.instance_id` +
+		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
 		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
@@ -240,7 +240,7 @@ var (
 		"user_object_classes",
 		"user_filters",
 		"timeout",
-		"rootCA",
+		"root_ca",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -346,30 +346,30 @@ var (
 		` projections.idp_templates6_saml.name_id_format,` +
 		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
 		// ldap
-		` projections.idp_templates6_ldap3.idp_id,` +
-		` projections.idp_templates6_ldap3.servers,` +
-		` projections.idp_templates6_ldap3.start_tls,` +
-		` projections.idp_templates6_ldap3.base_dn,` +
-		` projections.idp_templates6_ldap3.bind_dn,` +
-		` projections.idp_templates6_ldap3.bind_password,` +
-		` projections.idp_templates6_ldap3.user_base,` +
-		` projections.idp_templates6_ldap3.user_object_classes,` +
-		` projections.idp_templates6_ldap3.user_filters,` +
-		` projections.idp_templates6_ldap3.timeout,` +
-		` projections.idp_templates6_ldap3.rootCA,` +
-		` projections.idp_templates6_ldap3.id_attribute,` +
-		` projections.idp_templates6_ldap3.first_name_attribute,` +
-		` projections.idp_templates6_ldap3.last_name_attribute,` +
-		` projections.idp_templates6_ldap3.display_name_attribute,` +
-		` projections.idp_templates6_ldap3.nick_name_attribute,` +
-		` projections.idp_templates6_ldap3.preferred_username_attribute,` +
-		` projections.idp_templates6_ldap3.email_attribute,` +
-		` projections.idp_templates6_ldap3.email_verified,` +
-		` projections.idp_templates6_ldap3.phone_attribute,` +
-		` projections.idp_templates6_ldap3.phone_verified_attribute,` +
-		` projections.idp_templates6_ldap3.preferred_language_attribute,` +
-		` projections.idp_templates6_ldap3.avatar_url_attribute,` +
-		` projections.idp_templates6_ldap3.profile_attribute,` +
+		` projections.idp_templates6_ldap2.idp_id,` +
+		` projections.idp_templates6_ldap2.servers,` +
+		` projections.idp_templates6_ldap2.start_tls,` +
+		` projections.idp_templates6_ldap2.base_dn,` +
+		` projections.idp_templates6_ldap2.bind_dn,` +
+		` projections.idp_templates6_ldap2.bind_password,` +
+		` projections.idp_templates6_ldap2.user_base,` +
+		` projections.idp_templates6_ldap2.user_object_classes,` +
+		` projections.idp_templates6_ldap2.user_filters,` +
+		` projections.idp_templates6_ldap2.timeout,` +
+		` projections.idp_templates6_ldap2.root_ca,` +
+		` projections.idp_templates6_ldap2.id_attribute,` +
+		` projections.idp_templates6_ldap2.first_name_attribute,` +
+		` projections.idp_templates6_ldap2.last_name_attribute,` +
+		` projections.idp_templates6_ldap2.display_name_attribute,` +
+		` projections.idp_templates6_ldap2.nick_name_attribute,` +
+		` projections.idp_templates6_ldap2.preferred_username_attribute,` +
+		` projections.idp_templates6_ldap2.email_attribute,` +
+		` projections.idp_templates6_ldap2.email_verified,` +
+		` projections.idp_templates6_ldap2.phone_attribute,` +
+		` projections.idp_templates6_ldap2.phone_verified_attribute,` +
+		` projections.idp_templates6_ldap2.preferred_language_attribute,` +
+		` projections.idp_templates6_ldap2.avatar_url_attribute,` +
+		` projections.idp_templates6_ldap2.profile_attribute,` +
 		// apple
 		` projections.idp_templates6_apple.idp_id,` +
 		` projections.idp_templates6_apple.client_id,` +
@@ -389,7 +389,7 @@ var (
 		` LEFT JOIN projections.idp_templates6_gitlab_self_hosted ON projections.idp_templates6.id = projections.idp_templates6_gitlab_self_hosted.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
 		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
-		` LEFT JOIN projections.idp_templates6_ldap3 ON projections.idp_templates6.id = projections.idp_templates6_ldap3.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap3.instance_id` +
+		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
 		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
@@ -487,7 +487,7 @@ var (
 		"user_object_classes",
 		"user_filters",
 		"timeout",
-		"rootCA",
+		"root_ca",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
