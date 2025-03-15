@@ -5,40 +5,30 @@ import (
 
 	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/storage/cache"
+	"github.com/zitadel/zitadel/backend/storage/cache/gomap"
 )
 
 type User struct {
 	cache.Cache[string, *repository.User]
+}
 
-	next repository.UserRepository
+func NewUser() *User {
+	return &User{
+		Cache: gomap.New[string, *repository.User](),
+	}
 }
 
 // ByID implements repository.UserRepository.
 func (u *User) ByID(ctx context.Context, id string) (*repository.User, error) {
-	if user, ok := u.Get(id); ok {
-		return user, nil
-	}
+	user, _ := u.Get(id)
+	return user, nil
 
-	user, err := u.next.ByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
+}
 
+func (u *User) Set(ctx context.Context, user *repository.User) (*repository.User, error) {
 	u.set(user)
 	return user, nil
 }
-
-// Create implements repository.UserRepository.
-func (u *User) Create(ctx context.Context, user *repository.User) error {
-	err := u.next.Create(ctx, user)
-	if err != nil {
-		return err
-	}
-	u.set(user)
-	return nil
-}
-
-var _ repository.UserRepository = (*User)(nil)
 
 func (u *User) set(user *repository.User) {
 	u.Cache.Set(user.ID, user)

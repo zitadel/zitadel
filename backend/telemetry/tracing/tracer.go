@@ -10,8 +10,8 @@ import (
 
 type Tracer struct{ trace.Tracer }
 
-func NewTracer(name string) Tracer {
-	return Tracer{otel.Tracer(name)}
+func NewTracer(name string) *Tracer {
+	return &Tracer{otel.Tracer(name)}
 }
 
 type DecorateOption func(*DecorateOptions)
@@ -43,15 +43,15 @@ func WithSpanEndOptions(opts ...trace.SpanEndOption) DecorateOption {
 	}
 }
 
-func (o *DecorateOptions) Start(ctx context.Context, tracer *Tracer) context.Context {
+func (o *DecorateOptions) Start(ctx context.Context, tracer *Tracer) (context.Context, func(error)) {
 	if o.spanName == "" {
 		o.spanName = functionName()
 	}
 	ctx, o.span = tracer.Tracer.Start(ctx, o.spanName, o.startOpts...)
-	return ctx
+	return ctx, o.end
 }
 
-func (o *DecorateOptions) End(err error) {
+func (o *DecorateOptions) end(err error) {
 	o.span.RecordError(err)
 	o.span.End(o.endOpts...)
 }

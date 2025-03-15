@@ -10,7 +10,7 @@ import (
 
 // Wrap decorates the given handle function with logging.
 // The function is safe to call with nil logger.
-func Wrap[Req, Res any](logger *logging.Logger, name string, handle handler.Handle[Req, Res]) handler.Handle[Req, Res] {
+func Wrap[Req, Res any](logger *logging.Logger, name string, handle handler.Handler[Req, Res]) handler.Handler[Req, Res] {
 	if logger == nil {
 		return handle
 	}
@@ -21,23 +21,11 @@ func Wrap[Req, Res any](logger *logging.Logger, name string, handle handler.Hand
 	}
 }
 
-func WrapInside(logger *logging.Logger, name string) func(ctx context.Context, fn func(context.Context) error) {
-	logger = logger.With(slog.String("handler", name))
-	return func(ctx context.Context, fn func(context.Context) error) {
-		logger.Debug("execute")
-		var err error
-		defer func() {
-			if err != nil {
-				logger.Error("failed", slog.String("cause", err.Error()))
-			}
-			logger.Debug("done")
-		}()
-		err = fn(ctx)
-	}
-}
-
-func DecorateHandle[Req, Res any](logger *logging.Logger, handle func(context.Context, Req) (Res, error)) func(ctx context.Context, r Req) (_ Res, err error) {
-	return func(ctx context.Context, r Req) (_ Res, err error) {
+// Decorate decorates the given handle function with logging.
+// The function is safe to call with nil logger.
+func Decorate[Req, Res any](logger *logging.Logger, name string) handler.Decorator[Req, Res] {
+	logger = logger.With("handler", name)
+	return func(ctx context.Context, request Req, handle handler.Handler[Req, Res]) (res Res, err error) {
 		logger.DebugContext(ctx, "execute")
 		defer func() {
 			if err != nil {
@@ -45,24 +33,6 @@ func DecorateHandle[Req, Res any](logger *logging.Logger, handle func(context.Co
 			}
 			logger.DebugContext(ctx, "done")
 		}()
-		return handle(ctx, r)
+		return handle(ctx, request)
 	}
 }
-
-// // Handler wraps the given handle function with logging.
-// // The function is safe to call with nil logger.
-// func Handler[Req, Res any, H handler.Handle[Req, Res]](logger *logging.Logger, name string, handle H) *handler.Handler[Req, Res, H] {
-// 	return &handler.Handler[Req, Res, H]{
-// 		Handle: Wrap(logger, name, handle),
-// 	}
-// }
-
-// // Chained wraps the given handle function with logging.
-// // The function is safe to call with nil logger.
-// // The next handler is called after the handle function.
-// func Chained[Req, Res any, H, N handler.Handle[Req, Res]](logger *logging.Logger, name string, handle H, next N) *handler.Chained[Req, Res, H, N] {
-// 	return handler.NewChained(
-// 		Wrap(logger, name, handle),
-// 		next,
-// 	)
-// }

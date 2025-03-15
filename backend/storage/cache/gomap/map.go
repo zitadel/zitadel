@@ -11,6 +11,13 @@ type Map[K comparable, V any] struct {
 	items map[K]V
 }
 
+func New[K comparable, V any]() *Map[K, V] {
+	return &Map[K, V]{
+		items: make(map[K]V),
+		mu:    sync.RWMutex{},
+	}
+}
+
 // Clear implements cache.Cache.
 func (m *Map[K, V]) Clear() {
 	m.mu.Lock()

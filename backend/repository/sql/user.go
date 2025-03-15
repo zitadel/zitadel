@@ -4,22 +4,12 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/repository"
-	"github.com/zitadel/zitadel/backend/storage/database"
 )
-
-func NewUser(client database.QueryExecutor) repository.UserRepository {
-	return &User{client: client}
-}
-
-type User struct {
-	client database.QueryExecutor
-}
 
 const userByIDQuery = `SELECT id, username FROM users WHERE id = $1`
 
-// ByID implements [UserRepository].
-func (r *User) ByID(ctx context.Context, id string) (*repository.User, error) {
-	row := r.client.QueryRow(ctx, userByIDQuery, id)
+func (q *querier[C]) UserByID(ctx context.Context, id string) (res *repository.User, err error) {
+	row := q.client.QueryRow(ctx, userByIDQuery, id)
 	var user repository.User
 	if err := row.Scan(&user.ID, &user.Username); err != nil {
 		return nil, err
@@ -27,7 +17,10 @@ func (r *User) ByID(ctx context.Context, id string) (*repository.User, error) {
 	return &user, nil
 }
 
-// Create implements [UserRepository].
-func (r *User) Create(ctx context.Context, user *repository.User) error {
-	return r.client.Exec(ctx, "INSERT INTO users (id, username) VALUES ($1, $2)", user.ID, user.Username)
+func (e *executor[C]) CreateUser(ctx context.Context, user *repository.User) (res *repository.User, err error) {
+	err = e.client.Exec(ctx, "INSERT INTO users (id, username) VALUES ($1, $2)", user.ID, user.Username)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
