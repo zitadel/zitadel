@@ -4,69 +4,39 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/repository"
-	"github.com/zitadel/zitadel/backend/repository/cache"
-	"github.com/zitadel/zitadel/backend/repository/event"
-	"github.com/zitadel/zitadel/backend/repository/sql"
-	"github.com/zitadel/zitadel/backend/repository/telemetry/logged"
-	"github.com/zitadel/zitadel/backend/repository/telemetry/traced"
+	"github.com/zitadel/zitadel/backend/repository/orchestrate"
 	"github.com/zitadel/zitadel/backend/storage/database"
-	"github.com/zitadel/zitadel/backend/storage/eventstore"
 	"github.com/zitadel/zitadel/backend/telemetry/logging"
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 
 type Instance struct {
-	db     database.Pool
-	tracer *tracing.Tracer
-	logger *logging.Logger
-	cache  *cache.Instance
+	db database.Pool
+
+	orchestrator instanceOrchestrator
+}
+
+type instanceOrchestrator interface {
+	ByID(ctx context.Context, querier database.Querier, id string) (*repository.Instance, error)
+	ByDomain(ctx context.Context, querier database.Querier, domain string) (*repository.Instance, error)
+	SetUp(ctx context.Context, tx database.Transaction, instance *repository.Instance) (*repository.Instance, error)
 }
 
 func NewInstance(db database.Pool, tracer *tracing.Tracer, logger *logging.Logger) *Instance {
 	b := &Instance{
-		db:     db,
-		tracer: tracer,
-		logger: logger,
-
-		cache: &cache.Instance{},
+		db:           db,
+		orchestrator: orchestrate.Instance(),
 	}
 
 	return b
 }
 
-func (b *Instance) instanceCommandRepo(tx database.Transaction) repository.InstanceRepository {
-	return logged.NewInstance(
-		b.logger,
-		traced.NewInstance(
-			b.tracer,
-			event.NewInstance(
-				eventstore.New(tx),
-				b.cache.SetNext(
-					sql.NewInstance(tx),
-				),
-			),
-		),
-	)
-}
-
-func (b *Instance) instanceQueryRepo(tx database.QueryExecutor) repository.InstanceRepository {
-	return logged.NewInstance(
-		b.logger,
-		traced.NewInstance(
-			b.tracer,
-			b.cache.SetNext(
-				sql.NewInstance(tx),
-			),
-		),
-	)
-}
-
 func (b *Instance) ByID(ctx context.Context, id string) (*repository.Instance, error) {
-	return b.instanceQueryRepo(b.db).ByID(ctx, id)
+	return b.orchestrator.ByID(ctx, b.db, id)
 }
 
 func (b *Instance) ByDomain(ctx context.Context, domain string) (*repository.Instance, error) {
-	return b.instanceQueryRepo(b.db).ByDomain(ctx, domain)
+	return b.orchestrator.ByDomain(ctx, b.db, domain)
 }
 
 type SetUpInstance struct {
@@ -82,7 +52,7 @@ func (b *Instance) SetUp(ctx context.Context, request *SetUpInstance) (err error
 	defer func() {
 		err = tx.End(ctx, err)
 	}()
-	err = b.instanceCommandRepo(tx).SetUp(ctx, request.Instance)
+	_, err = b.orchestrator.SetUp(ctx, tx, request.Instance)
 	if err != nil {
 		return err
 	}

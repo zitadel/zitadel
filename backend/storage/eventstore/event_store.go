@@ -19,3 +19,7 @@ type Event interface{}
 func (e *Eventstore) Push(ctx context.Context, events ...Event) error {
 	return nil
 }
+
+func Push(ctx context.Context, executor database.Executor, events ...Event) error {
+	return New(executor).Push(ctx, events...)
+}

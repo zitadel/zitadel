@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/zitadel/zitadel/backend/repository"
+	"github.com/zitadel/zitadel/backend/repository/orchestrate/handler"
 	"github.com/zitadel/zitadel/backend/storage/cache"
 )
 
@@ -12,69 +13,88 @@ type Instance struct {
 	mu       *sync.RWMutex
 	byID     cache.Cache[string, *repository.Instance]
 	byDomain cache.Cache[string, *repository.Instance]
-
-	next repository.InstanceRepository
 }
 
-func (i *Instance) SetNext(next repository.InstanceRepository) *Instance {
-	return &Instance{
-		mu:       i.mu,
-		byID:     i.byID,
-		byDomain: i.byDomain,
-		next:     next,
-	}
-}
+func SetUpInstance(
+	cache *Instance,
+	handle handler.Handle[*repository.Instance, *repository.Instance],
+) handler.Handle[*repository.Instance, *repository.Instance] {
+	return func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+		instance, err := handle(ctx, instance)
+		if err != nil {
+			return nil, err
+		}
 
-// ByDomain implements repository.InstanceRepository.
-func (i *Instance) ByDomain(ctx context.Context, domain string) (instance *repository.Instance, err error) {
-	i.mu.RLock()
-	defer i.mu.RUnlock()
-
-	if instance, ok := i.byDomain.Get(domain); ok {
+		cache.set(instance, "")
 		return instance, nil
 	}
-
-	instance, err = i.next.ByDomain(ctx, domain)
-	if err != nil {
-		return nil, err
-	}
-
-	i.set(instance, domain)
-
-	return instance, nil
 }
 
-// ByID implements repository.InstanceRepository.
-func (i *Instance) ByID(ctx context.Context, id string) (*repository.Instance, error) {
-	i.mu.RLock()
-	defer i.mu.RUnlock()
-
-	if instance, ok := i.byID.Get(id); ok {
+func SetUpInstanceWithout(cache *Instance) handler.Handle[*repository.Instance, *repository.Instance] {
+	return func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+		cache.set(instance, "")
 		return instance, nil
 	}
-
-	instance, err := i.next.ByID(ctx, id)
-	if err != nil {
-		return nil, err
-
-	}
-
-	i.set(instance, "")
-	return instance, nil
 }
 
-// SetUp implements repository.InstanceRepository.
-func (i *Instance) SetUp(ctx context.Context, instance *repository.Instance) error {
-	err := i.next.SetUp(ctx, instance)
-	if err != nil {
-		return err
-	}
+func SetUpInstanceDecorated(
+	cache *Instance,
+	handle handler.Handle[*repository.Instance, *repository.Instance],
+	decorator handler.Decorate[*repository.Instance, *repository.Instance],
+) handler.Handle[*repository.Instance, *repository.Instance] {
+	return func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+		instance, err := handle(ctx, instance)
+		if err != nil {
+			return nil, err
+		}
 
-	i.set(instance, "")
-	return nil
+		return decorator(ctx, instance, func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+			cache.set(instance, "")
+			return instance, nil
+		})
+	}
 }
 
-var _ repository.InstanceRepository = (*Instance)(nil)
+func ForInstanceByID(cache *Instance, handle handler.Handle[string, *repository.Instance]) handler.Handle[string, *repository.Instance] {
+	return func(ctx context.Context, id string) (*repository.Instance, error) {
+		cache.mu.RLock()
+
+		instance, ok := cache.byID.Get(id)
+		cache.mu.RUnlock()
+		if ok {
+			return instance, nil
+		}
+
+		instance, err := handle(ctx, id)
+		if err != nil {
+			return nil, err
+
+		}
+
+		cache.set(instance, "")
+		return instance, nil
+	}
+}
+
+func ForInstanceByDomain(cache *Instance, handle handler.Handle[string, *repository.Instance]) handler.Handle[string, *repository.Instance] {
+	return func(ctx context.Context, domain string) (*repository.Instance, error) {
+		cache.mu.RLock()
+
+		instance, ok := cache.byDomain.Get(domain)
+		cache.mu.RUnlock()
+		if ok {
+			return instance, nil
+		}
+
+		instance, err := handle(ctx, domain)
+		if err != nil {
+			return nil, err
+		}
+
+		cache.set(instance, domain)
+		return instance, nil
+	}
+}
 
 func (i *Instance) set(instance *repository.Instance, domain string) {
 	i.mu.Lock()

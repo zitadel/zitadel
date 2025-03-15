@@ -4,34 +4,59 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/repository"
+	"github.com/zitadel/zitadel/backend/repository/orchestrate/handler"
+	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/eventstore"
 )
 
-var _ repository.InstanceRepository = (*Instance)(nil)
+func SetUpInstance(
+	client database.Executor,
+	next handler.Handle[*repository.Instance, *repository.Instance],
+) handler.Handle[*repository.Instance, *repository.Instance] {
+	es := eventstore.New(client)
+	return func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+		instance, err := next(ctx, instance)
+		if err != nil {
+			return nil, err
+		}
 
-type Instance struct {
-	*eventstore.Eventstore
-
-	next repository.InstanceRepository
-}
-
-func NewInstance(eventstore *eventstore.Eventstore, next repository.InstanceRepository) *Instance {
-	return &Instance{next: next, Eventstore: eventstore}
-}
-
-func (i *Instance) ByID(ctx context.Context, id string) (*repository.Instance, error) {
-	return i.next.ByID(ctx, id)
-}
-
-func (i *Instance) ByDomain(ctx context.Context, domain string) (*repository.Instance, error) {
-	return i.next.ByDomain(ctx, domain)
-}
-
-func (i *Instance) SetUp(ctx context.Context, instance *repository.Instance) error {
-	err := i.next.SetUp(ctx, instance)
-	if err != nil {
-		return err
+		err = es.Push(ctx, instance)
+		if err != nil {
+			return nil, err
+		}
+		return instance, nil
 	}
+}
 
-	return i.Push(ctx, instance)
+func SetUpInstanceWithout(client database.Executor) handler.Handle[*repository.Instance, *repository.Instance] {
+	es := eventstore.New(client)
+	return func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+		err := es.Push(ctx, instance)
+		if err != nil {
+			return nil, err
+		}
+		return instance, nil
+	}
+}
+
+func SetUpInstanceDecorated(
+	client database.Executor,
+	next handler.Handle[*repository.Instance, *repository.Instance],
+	decorate handler.Decorate[*repository.Instance, *repository.Instance],
+) handler.Handle[*repository.Instance, *repository.Instance] {
+	es := eventstore.New(client)
+	return func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+		instance, err := next(ctx, instance)
+		if err != nil {
+			return nil, err
+		}
+
+		return decorate(ctx, instance, func(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+			err = es.Push(ctx, instance)
+			if err != nil {
+				return nil, err
+			}
+			return instance, nil
+		})
+	}
 }
