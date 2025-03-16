@@ -6,25 +6,36 @@ import (
 )
 
 // options are the default options for orchestrators.
-type options struct {
+type options[T any] struct {
+	custom *T
 	tracer *tracing.Tracer
 	logger *logging.Logger
 }
 
-type Option func(*options)
+func newOptions[T any]() options[T] {
+	return options[T]{
+		custom: new(T),
+	}
+}
 
-func WithTracer(tracer *tracing.Tracer) Option {
-	return func(o *options) {
+type applier interface {
+	apply()
+}
+
+type Option[T any] func(*options[T])
+
+func WithTracer[T any](tracer *tracing.Tracer) Option[T] {
+	return func(o *options[T]) {
 		o.tracer = tracer
 	}
 }
 
-func WithLogger(logger *logging.Logger) Option {
-	return func(o *options) {
+func WithLogger[T any](logger *logging.Logger) Option[T] {
+	return func(o *options[T]) {
 		o.logger = logger
 	}
 }
 
-func (o Option) apply(opts *options) {
+func (o Option[T]) apply(opts *options[T]) {
 	o(opts)
 }

@@ -13,39 +13,30 @@ import (
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 
-type user struct {
-	options
-
+type UserOptions struct {
 	cache *cache.User
 }
 
-func User(opts ...Option) *user {
-	i := new(user)
+type user struct {
+	options[UserOptions]
+	*UserOptions
+}
+
+func User(opts ...Option[UserOptions]) *user {
+	i := user{
+		options: newOptions[UserOptions](),
+	}
+	i.UserOptions = i.options.custom
 	for _, opt := range opts {
 		opt(&i.options)
 	}
-	return i
+	return &i
 }
 
-func WithUserCache(cache *cache.User) userOption {
-	return func(i *user) {
-		i.cache = cache
+func WithUserCache(cache *cache.User) Option[UserOptions] {
+	return func(i *options[UserOptions]) {
+		i.custom.cache = cache
 	}
-}
-
-type UserConfig interface {
-	applyUser(*user)
-}
-
-// userOption applies an option to the user.
-type userOption func(*user)
-
-func (io userOption) applyUser(i *user) {
-	io(i)
-}
-
-func (o Option) applyUser(i *user) {
-	o(&i.options)
 }
 
 func (i *user) Create(ctx context.Context, tx database.Transaction, user *repository.User) (*repository.User, error) {
@@ -65,13 +56,13 @@ func (i *user) Create(ctx context.Context, tx database.Transaction, user *reposi
 
 func (i *user) ByID(ctx context.Context, querier database.Querier, id string) (*repository.User, error) {
 	return handler.SkipNext(
-		i.cache.ByID,
+		i.custom.cache.ByID,
 		handler.Chain(
 			handler.Decorate(
 				sql.Query(querier).UserByID,
 				traced.Decorate[string, *repository.User](i.tracer, tracing.WithSpanName("user.sql.ByID")),
 			),
-			handler.SkipNilHandler(i.cache, i.cache.Set),
+			handler.SkipNilHandler(i.custom.cache, i.custom.cache.Set),
 		),
 	)(ctx, id)
 }

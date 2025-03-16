@@ -24,16 +24,16 @@ func Test_instance_SetUp(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		opts    []orchestrate.InstanceConfig
+		opts    []orchestrate.Option[orchestrate.InstanceOptions]
 		args    args
 		want    *repository.Instance
 		wantErr bool
 	}{
 		{
 			name: "simple",
-			opts: []orchestrate.InstanceConfig{
-				orchestrate.WithTracer(tracing.NewTracer("test")),
-				orchestrate.WithLogger(logging.New(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))),
+			opts: []orchestrate.Option[orchestrate.InstanceOptions]{
+				orchestrate.WithTracer[orchestrate.InstanceOptions](tracing.NewTracer("test")),
+				orchestrate.WithLogger[orchestrate.InstanceOptions](logging.New(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))),
 				orchestrate.WithInstanceCache(cache.NewInstance()),
 			},
 			args: args{
@@ -52,9 +52,9 @@ func Test_instance_SetUp(t *testing.T) {
 		},
 		{
 			name: "without cache",
-			opts: []orchestrate.InstanceConfig{
-				orchestrate.WithTracer(tracing.NewTracer("test")),
-				orchestrate.WithLogger(logging.New(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))),
+			opts: []orchestrate.Option[orchestrate.InstanceOptions]{
+				orchestrate.WithTracer[orchestrate.InstanceOptions](tracing.NewTracer("test")),
+				orchestrate.WithLogger[orchestrate.InstanceOptions](logging.New(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -72,8 +72,8 @@ func Test_instance_SetUp(t *testing.T) {
 		},
 		{
 			name: "without cache, tracer",
-			opts: []orchestrate.InstanceConfig{
-				orchestrate.WithLogger(logging.New(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))),
+			opts: []orchestrate.Option[orchestrate.InstanceOptions]{
+				orchestrate.WithLogger[orchestrate.InstanceOptions](logging.New(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))),
 			},
 			args: args{
 				ctx: context.Background(),

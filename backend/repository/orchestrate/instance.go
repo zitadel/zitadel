@@ -2,7 +2,6 @@ package orchestrate
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/repository/cache"
@@ -15,43 +14,33 @@ import (
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 
-type instance struct {
-	options
-
+type InstanceOptions struct {
 	cache *cache.Instance
 }
 
-func Instance(opts ...InstanceConfig) *instance {
-	i := new(instance)
+type instance struct {
+	options[InstanceOptions]
+	*InstanceOptions
+}
+
+func Instance(opts ...Option[InstanceOptions]) *instance {
+	i := instance{
+		options: newOptions[InstanceOptions](),
+	}
+	i.InstanceOptions = i.options.custom
 	for _, opt := range opts {
-		opt.applyInstance(i)
+		opt.apply(&i.options)
 	}
-	return i
+	return &i
 }
 
-func WithInstanceCache(cache *cache.Instance) instanceOption {
-	return func(i *instance) {
-		i.cache = cache
+func WithInstanceCache(cache *cache.Instance) Option[InstanceOptions] {
+	return func(opts *options[InstanceOptions]) {
+		opts.custom.cache = cache
 	}
-}
-
-type InstanceConfig interface {
-	applyInstance(*instance)
-}
-
-// instanceOption applies an option to the instance.
-type instanceOption func(*instance)
-
-func (io instanceOption) applyInstance(i *instance) {
-	io(i)
-}
-
-func (o Option) applyInstance(i *instance) {
-	o(&i.options)
 }
 
 func (i *instance) Create(ctx context.Context, tx database.Transaction, instance *repository.Instance) (*repository.Instance, error) {
-	fmt.Println("----------------")
 	return traced.Wrap(i.tracer, "instance.SetUp",
 		handler.Chains(
 			handler.Decorates(
