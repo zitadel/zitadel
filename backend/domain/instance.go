@@ -20,7 +20,7 @@ type Instance struct {
 type instanceOrchestrator interface {
 	ByID(ctx context.Context, querier database.Querier, id string) (*repository.Instance, error)
 	ByDomain(ctx context.Context, querier database.Querier, domain string) (*repository.Instance, error)
-	SetUp(ctx context.Context, tx database.Transaction, instance *repository.Instance) (*repository.Instance, error)
+	Create(ctx context.Context, tx database.Transaction, instance *repository.Instance) (*repository.Instance, error)
 }
 
 func NewInstance(db database.Pool, tracer *tracing.Tracer, logger *logging.Logger) *Instance {
@@ -54,7 +54,7 @@ func (b *Instance) SetUp(ctx context.Context, request *SetUpInstance) (err error
 	defer func() {
 		err = tx.End(ctx, err)
 	}()
-	_, err = b.instance.SetUp(ctx, tx, request.Instance)
+	_, err = b.instance.Create(ctx, tx, request.Instance)
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 
+// options are the default options for orchestrators.
 type options struct {
 	tracer *tracing.Tracer
 	logger *logging.Logger
@@ -22,4 +23,8 @@ func WithLogger(logger *logging.Logger) Option {
 	return func(o *options) {
 		o.logger = logger
 	}
+}
+
+func (o Option) apply(opts *options) {
+	o(opts)
 }

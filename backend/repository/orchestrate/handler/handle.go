@@ -1,6 +1,8 @@
 package handler
 
-import "context"
+import (
+	"context"
+)
 
 // Handler is a function that handles the request.
 type Handler[Req, Res any] func(ctx context.Context, request Req) (res Res, err error)
@@ -20,6 +22,15 @@ func Chain[Req, Res any](handle Handler[Req, Res], next Handler[Res, Res]) Handl
 	}
 }
 
+func Chains[Req, Res any](handle Handler[Req, Res], nexts ...Handler[Res, Res]) Handler[Req, Res] {
+	return func(ctx context.Context, request Req) (res Res, err error) {
+		for _, next := range nexts {
+			handle = Chain(handle, next)
+		}
+		return handle(ctx, request)
+	}
+}
+
 // Decorate decorates the handle function with the decorate function.
 // The decorate function is called before the handle function.
 func Decorate[Req, Res any](handle Handler[Req, Res], decorate Decorator[Req, Res]) Handler[Req, Res] {
@@ -28,12 +39,12 @@ func Decorate[Req, Res any](handle Handler[Req, Res], decorate Decorator[Req, Re
 	}
 }
 
-// Decorates decorates the handle function with the decorate function.
-// The decorate function is called before the handle function.
+// Decorates decorates the handle function with the decorate functions.
+// The decorates function is called before the handle function.
 func Decorates[Req, Res any](handle Handler[Req, Res], decorates ...Decorator[Req, Res]) Handler[Req, Res] {
 	return func(ctx context.Context, request Req) (res Res, err error) {
-		for _, decorate := range decorates {
-			handle = Decorate(handle, decorate)
+		for i := len(decorates) - 1; i >= 0; i-- {
+			handle = Decorate(handle, decorates[i])
 		}
 		return handle(ctx, request)
 	}

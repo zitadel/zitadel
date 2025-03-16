@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"log"
 
 	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/storage/cache"
@@ -20,12 +21,14 @@ func NewUser() *User {
 
 // ByID implements repository.UserRepository.
 func (u *User) ByID(ctx context.Context, id string) (*repository.User, error) {
+	log.Println("cache.user.byid")
 	user, _ := u.Get(id)
 	return user, nil
 
 }
 
 func (u *User) Set(ctx context.Context, user *repository.User) (*repository.User, error) {
+	log.Println("cache.user.set")
 	u.set(user)
 	return user, nil
 }

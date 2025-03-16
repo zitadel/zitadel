@@ -19,6 +19,7 @@ func Wrap[Req, Res any](tracer *tracing.Tracer, name string, handle handler.Hand
 			ctx,
 			name,
 		)
+		log.Println("trace.wrap", name)
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -33,6 +34,9 @@ func Wrap[Req, Res any](tracer *tracing.Tracer, name string, handle handler.Hand
 // The function is safe to call with nil tracer.
 func Decorate[Req, Res any](tracer *tracing.Tracer, opts ...tracing.DecorateOption) handler.Decorator[Req, Res] {
 	return func(ctx context.Context, r Req, handle handler.Handler[Req, Res]) (_ Res, err error) {
+		if tracer == nil {
+			return handle(ctx, r)
+		}
 		o := new(tracing.DecorateOptions)
 		for _, opt := range opts {
 			opt(o)

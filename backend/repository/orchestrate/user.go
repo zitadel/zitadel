@@ -27,7 +27,24 @@ func User(opts ...Option) *user {
 	return i
 }
 
-func (i *user) apply(o Option) {
+func WithUserCache(cache *cache.User) userOption {
+	return func(i *user) {
+		i.cache = cache
+	}
+}
+
+type UserConfig interface {
+	applyUser(*user)
+}
+
+// userOption applies an option to the user.
+type userOption func(*user)
+
+func (io userOption) applyUser(i *user) {
+	io(i)
+}
+
+func (o Option) applyUser(i *user) {
 	o(&i.options)
 }
 

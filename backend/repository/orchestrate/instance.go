@@ -2,6 +2,7 @@ package orchestrate
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/repository"
 	"github.com/zitadel/zitadel/backend/repository/cache"
@@ -20,34 +21,52 @@ type instance struct {
 	cache *cache.Instance
 }
 
-func Instance(opts ...Option) *instance {
+func Instance(opts ...InstanceConfig) *instance {
 	i := new(instance)
 	for _, opt := range opts {
-		opt(&i.options)
+		opt.applyInstance(i)
 	}
 	return i
 }
 
-func (i *instance) apply(o Option) {
+func WithInstanceCache(cache *cache.Instance) instanceOption {
+	return func(i *instance) {
+		i.cache = cache
+	}
+}
+
+type InstanceConfig interface {
+	applyInstance(*instance)
+}
+
+// instanceOption applies an option to the instance.
+type instanceOption func(*instance)
+
+func (io instanceOption) applyInstance(i *instance) {
+	io(i)
+}
+
+func (o Option) applyInstance(i *instance) {
 	o(&i.options)
 }
 
-func (i *instance) SetUp(ctx context.Context, tx database.Transaction, instance *repository.Instance) (*repository.Instance, error) {
+func (i *instance) Create(ctx context.Context, tx database.Transaction, instance *repository.Instance) (*repository.Instance, error) {
+	fmt.Println("----------------")
 	return traced.Wrap(i.tracer, "instance.SetUp",
-		handler.Chain(
+		handler.Chains(
 			handler.Decorates(
 				sql.Execute(tx).CreateInstance,
 				traced.Decorate[*repository.Instance, *repository.Instance](i.tracer, tracing.WithSpanName("instance.sql.SetUp")),
 				logged.Decorate[*repository.Instance, *repository.Instance](i.logger, "instance.sql.SetUp"),
 			),
-			handler.Chain(
+			handler.Decorates(
+				event.Store(tx).CreateInstance,
+				traced.Decorate[*repository.Instance, *repository.Instance](i.tracer, tracing.WithSpanName("instance.event.SetUp")),
+				logged.Decorate[*repository.Instance, *repository.Instance](i.logger, "instance.event.SetUp"),
+			),
+			handler.SkipNilHandler(i.cache,
 				handler.Decorates(
-					event.Store(tx).CreateInstance,
-					traced.Decorate[*repository.Instance, *repository.Instance](i.tracer, tracing.WithSpanName("instance.event.SetUp")),
-					logged.Decorate[*repository.Instance, *repository.Instance](i.logger, "instance.event.SetUp"),
-				),
-				handler.Decorates(
-					handler.SkipNilHandler(i.cache, i.cache.Set),
+					i.cache.Set,
 					traced.Decorate[*repository.Instance, *repository.Instance](i.tracer, tracing.WithSpanName("instance.cache.SetUp")),
 					logged.Decorate[*repository.Instance, *repository.Instance](i.logger, "instance.cache.SetUp"),
 				),

@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"log"
 	"sync"
 
 	"github.com/zitadel/zitadel/backend/repository"
@@ -24,6 +25,7 @@ func NewInstance() *Instance {
 }
 
 func (i *Instance) Set(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
+	log.Println("cache.instance.set")
 	i.set(instance, "")
 	return instance, nil
 }
@@ -31,6 +33,7 @@ func (i *Instance) Set(ctx context.Context, instance *repository.Instance) (*rep
 func (i *Instance) ByID(ctx context.Context, id string) (*repository.Instance, error) {
 	i.mu.RLock()
 	defer i.mu.RUnlock()
+	log.Println("cache.instance.byID")
 	instance, _ := i.byID.Get(id)
 	return instance, nil
 }
@@ -38,6 +41,7 @@ func (i *Instance) ByID(ctx context.Context, id string) (*repository.Instance, e
 func (i *Instance) ByDomain(ctx context.Context, domain string) (*repository.Instance, error) {
 	i.mu.RLock()
 	defer i.mu.RUnlock()
+	log.Println("cache.instance.byDomain")
 	instance, _ := i.byDomain.Get(domain)
 	return instance, nil
 }
