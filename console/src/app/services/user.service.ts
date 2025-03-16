@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddHumanUserRequestSchema,
@@ -70,18 +70,7 @@ import { ObjectDetails } from '../proto/generated/zitadel/object_pb';
 import { Timestamp } from '../proto/generated/google/protobuf/timestamp_pb';
 import { HumanPhone, HumanPhoneSchema } from '@zitadel/proto/zitadel/user/v2/phone_pb';
 import { OAuthService } from 'angular-oauth2-oidc';
-import {
-  BehaviorSubject,
-  debounceTime,
-  defer,
-  EMPTY,
-  Observable,
-  of,
-  ReplaySubject,
-  shareReplay,
-  switchAll,
-  switchMap,
-} from 'rxjs';
+import { debounceTime, EMPTY, Observable, of, ReplaySubject, shareReplay, switchAll, switchMap } from 'rxjs';
 import { catchError, filter, map, startWith } from 'rxjs/operators';
 
 @Injectable({

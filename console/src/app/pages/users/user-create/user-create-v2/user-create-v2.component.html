@@ -5,15 +5,20 @@
   (closed)="location.back()"
 >
   <div class="content">
-    <mat-progress-bar *ngIf="loading()" color="primary" mode="indeterminate"></mat-progress-bar>
-    <form *ngIf="authenticationFactor$ | async as authenticationFactor" class="form-grid" [formGroup]="userForm" (ngSubmit)="createUserV2(authenticationFactor)">
+    <mat-progress-bar *ngIf="loading()" color="primary" mode="indeterminate" />
+    <form
+      *ngIf="authenticationFactor$ | async as authenticationFactor"
+      class="form-grid"
+      [formGroup]="userForm"
+      (ngSubmit)="createUserV2(authenticationFactor)"
+    >
       <cnsl-form-field class="email">
         <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}</cnsl-label>
         <input class="stretchInput" cnslInput matRipple formControlName="email" required />
       </cnsl-form-field>
       <div class="emailVerified">
         <mat-checkbox [disabled]="authenticationFactor.factor === 'invitation'" formControlName="emailVerified">
-          Mark Email as Verified
+          {{ 'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate }}
         </mat-checkbox>
       </div>
       <cnsl-form-field class="givenName">
@@ -30,34 +35,30 @@
       </cnsl-form-field>
       <cnsl-form-field class="username">
         <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
-        <input
-          cnslInput
-          formControlName="username"
-          required
-        />
+        <input cnslInput formControlName="username" required />
       </cnsl-form-field>
 
-
       <div class="authenticationFactor">
-        <div [class.authenticationFactorIntroductionDone]="authenticationFactor.factor !== 'none'">
-          <h3>Would you like to set up authentication methods now?</h3>
-          <div>You don't have to do this now, you can do it later</div>
-          <button class="authenticationFactorButton" mat-raised-button color="primary" [disabled]="authenticationFactor.factor !== 'none'" (click)="$event.preventDefault(); userForm.controls.authenticationFactor.setValue('invitation')">
-            Setup
-          </button>
-        </div>
-        <mat-radio-group *ngIf="authenticationFactor.factor !== 'none'" aria-label="Select an option" formControlName="authenticationFactor">
-          <mat-radio-button value="invitation">
-            Invitation
-          </mat-radio-button>
-          <mat-radio-button value="initialPassword">
-            Initial password
-          </mat-radio-button>
+        <mat-radio-group
+          class="authenticationFactorRadioGroup"
+          aria-label="Select an option"
+          formControlName="authenticationFactor"
+        >
+          <mat-radio-button value="none">{{ 'USER.CREATE.SETUPAUTHENTICATIONLATER' | translate }}</mat-radio-button>
+          <mat-radio-button value="invitation">{{ 'USER.CREATE.INVITATION' | translate }}</mat-radio-button>
+          <mat-radio-button value="initialPassword">{{ 'USER.CREATE.INITIALPASSWORD' | translate }}</mat-radio-button>
         </mat-radio-group>
         <form *ngIf="authenticationFactor.factor === 'initialPassword'" [formGroup]="authenticationFactor.form">
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
-            <input class="stretchInput" cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
+            <input
+              class="stretchInput"
+              cnslInput
+              autocomplete="off"
+              name="firstpassword"
+              formControlName="password"
+              type="password"
+            />
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
@@ -83,7 +84,9 @@
         <button
           data-e2e="create-button"
           color="primary"
-          [disabled]="userForm.invalid || (authenticationFactor.factor === 'initialPassword' && authenticationFactor.form.invalid)"
+          [disabled]="
+            userForm.invalid || (authenticationFactor.factor === 'initialPassword' && authenticationFactor.form.invalid)
+          "
           type="submit"
           class="create-button"
           mat-raised-button

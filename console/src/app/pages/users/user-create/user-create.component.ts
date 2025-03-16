@@ -53,8 +53,10 @@ export class UserCreateComponent implements OnInit {
   protected loading = false;
 
   private readonly suffix$ = new ReplaySubject<HTMLSpanElement>(1);
-  @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement>) {
-    this.suffix$.next(suffix.nativeElement);
+  @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement> | undefined) {
+    if (suffix?.nativeElement) {
+      this.suffix$.next(suffix.nativeElement);
+    }
   }
 
   protected usePassword: boolean = false;
@@ -88,10 +90,6 @@ export class UserCreateComponent implements OnInit {
     this.pwdForm$ = this.buildPwdForm(this.passwordComplexityPolicy$);
 
     this.countryPhoneCodes = countryCallingCodesService.getCountryCallingCodes();
-  }
-
-  ngOnInit(): void {
-    this.watchPhoneChanges();
 
     this.breadcrumbService.setBreadcrumb([
       new Breadcrumb({
@@ -99,6 +97,10 @@ export class UserCreateComponent implements OnInit {
         routerLink: ['/org'],
       }),
     ]);
+  }
+
+  ngOnInit(): void {
+    this.watchPhoneChanges();
   }
 
   private getEnvSuffix() {

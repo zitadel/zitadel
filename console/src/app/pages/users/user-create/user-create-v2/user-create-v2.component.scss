@@ -11,12 +11,11 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto;
   grid-template-areas:
-    "email email"
-    "emailVerified emailVerified"
-    "givenName familyName"
-    "nickName username"
-    "authenticationFactor authenticationFactor";
-  ;
+    'email email'
+    'emailVerified emailVerified'
+    'givenName familyName'
+    'nickName username'
+    'authenticationFactor authenticationFactor';
   column-gap: 1rem;
 }
 
@@ -49,12 +48,12 @@
   margin-bottom: 1rem;
 }
 
-.authenticationFactorButton {
-  margin-top: 1rem;
+.authenticationFactorRadioGroup > mat-radio-button {
+  display: block;
 }
 
-.authenticationFactorIntroductionDone {
-  opacity: 0.5;
+.authenticationFactorButton {
+  margin-top: 1rem;
 }
 
 .stretchInput {
