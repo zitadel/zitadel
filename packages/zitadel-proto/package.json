@@ -16,10 +16,7 @@
     }
   },
   "files": [
-    "index.ts",
-    "v1.ts",
-    "v2.ts",
-    "v3alpha.ts",
+    "src/**",
     "zitadel/**",
     "validate/**",
     "google/**",
@@ -32,7 +29,7 @@
     "build": "tsup",
     "test:cjs": "node test/cjs-test.cjs",
     "test:esm": "node test/esm-test.mjs",
-    "test": "pnpm build && pnpm test:cjs && pnpm test:esm"
+    "test": "pnpm test:cjs && pnpm test:esm"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2"
