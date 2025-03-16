@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastService } from 'src/app/services/toast.service';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { UserService } from 'src/app/services/user.service';
-import { LanguagesService } from 'src/app/services/languages.service';
 import { Location } from '@angular/common';
 import {
   emailValidator,
@@ -24,7 +23,7 @@ import {
   shareReplay,
   TimeoutError,
 } from 'rxjs';
-import { catchError, filter, map, startWith, tap, timeout } from 'rxjs/operators';
+import { catchError, filter, map, startWith, timeout } from 'rxjs/operators';
 import { PasswordComplexityPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { AddHumanUserRequestSchema } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
