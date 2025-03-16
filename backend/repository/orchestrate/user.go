@@ -4,17 +4,18 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/repository"
-	"github.com/zitadel/zitadel/backend/repository/cache"
 	"github.com/zitadel/zitadel/backend/repository/event"
 	"github.com/zitadel/zitadel/backend/repository/orchestrate/handler"
 	"github.com/zitadel/zitadel/backend/repository/sql"
 	"github.com/zitadel/zitadel/backend/repository/telemetry/traced"
+	"github.com/zitadel/zitadel/backend/storage/cache"
+	"github.com/zitadel/zitadel/backend/storage/cache/connector/noop"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 
 type UserOptions struct {
-	cache *cache.User
+	cache cache.Cache[repository.UserIndex, string, *repository.User]
 }
 
 type user struct {
@@ -23,17 +24,17 @@ type user struct {
 }
 
 func User(opts ...Option[UserOptions]) *user {
-	i := user{
-		options: newOptions[UserOptions](),
-	}
-	i.UserOptions = i.options.custom
+	i := new(user)
+	i.UserOptions = &i.options.custom
+	i.cache = noop.NewCache[repository.UserIndex, string, *repository.User]()
+
 	for _, opt := range opts {
 		opt(&i.options)
 	}
-	return &i
+	return i
 }
 
-func WithUserCache(cache *cache.User) Option[UserOptions] {
+func WithUserCache(cache cache.Cache[repository.UserIndex, string, *repository.User]) Option[UserOptions] {
 	return func(i *options[UserOptions]) {
 		i.custom.cache = cache
 	}
@@ -56,13 +57,13 @@ func (i *user) Create(ctx context.Context, tx database.Transaction, user *reposi
 
 func (i *user) ByID(ctx context.Context, querier database.Querier, id string) (*repository.User, error) {
 	return handler.SkipNext(
-		i.custom.cache.ByID,
+		handler.CacheGetToHandle(i.cache.Get, repository.UserByID),
 		handler.Chain(
 			handler.Decorate(
 				sql.Query(querier).UserByID,
 				traced.Decorate[string, *repository.User](i.tracer, tracing.WithSpanName("user.sql.ByID")),
 			),
-			handler.SkipNilHandler(i.custom.cache, i.custom.cache.Set),
+			handler.SkipNilHandler(i.custom.cache, handler.NoReturnToHandle(i.cache.Set)),
 		),
 	)(ctx, id)
 }

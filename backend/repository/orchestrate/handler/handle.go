@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+
+	"github.com/zitadel/zitadel/backend/storage/cache"
 )
 
 // Handler is a function that handles the request.
@@ -65,11 +67,35 @@ func SkipNext[Req, Res any](handle Handler[Req, Res], next Handler[Req, Res]) Ha
 
 // SkipNilHandler skips the handle function if the handler is nil.
 // The function is safe to call with nil handler.
-func SkipNilHandler[O, R any](handler *O, handle Handler[R, R]) Handler[R, R] {
+func SkipNilHandler[R any](handler any, handle Handler[R, R]) Handler[R, R] {
 	return func(ctx context.Context, request R) (res R, err error) {
 		if handler == nil {
 			return request, nil
 		}
 		return handle(ctx, request)
+	}
+}
+
+func ErrFuncToHandle[R any](fn func(context.Context, R) error) Handler[R, R] {
+	return func(ctx context.Context, request R) (res R, err error) {
+		err = fn(ctx, request)
+		if err != nil {
+			return res, err
+		}
+		return request, nil
+	}
+}
+
+func NoReturnToHandle[R any](fn func(context.Context, R)) Handler[R, R] {
+	return func(ctx context.Context, request R) (res R, err error) {
+		fn(ctx, request)
+		return request, nil
+	}
+}
+
+func CacheGetToHandle[I, K comparable, E cache.Entry[I, K]](fn func(context.Context, I, K) (E, bool), index I) Handler[K, E] {
+	return func(ctx context.Context, request K) (res E, err error) {
+		res, _ = fn(ctx, index, request)
+		return res, nil
 	}
 }

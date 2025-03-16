@@ -8,8 +8,9 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/backend/repository"
-	"github.com/zitadel/zitadel/backend/repository/cache"
 	"github.com/zitadel/zitadel/backend/repository/orchestrate"
+	"github.com/zitadel/zitadel/backend/storage/cache"
+	"github.com/zitadel/zitadel/backend/storage/cache/connector/gomap"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/database/mock"
 	"github.com/zitadel/zitadel/backend/telemetry/logging"
@@ -34,7 +35,9 @@ func Test_instance_SetUp(t *testing.T) {
 			opts: []orchestrate.Option[orchestrate.InstanceOptions]{
 				orchestrate.WithTracer[orchestrate.InstanceOptions](tracing.NewTracer("test")),
 				orchestrate.WithLogger[orchestrate.InstanceOptions](logging.New(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))),
-				orchestrate.WithInstanceCache(cache.NewInstance()),
+				orchestrate.WithInstanceCache(
+					gomap.NewCache[repository.InstanceIndex, string, *repository.Instance](context.Background(), repository.InstanceIndices, cache.Config{}),
+				),
 			},
 			args: args{
 				ctx: context.Background(),
