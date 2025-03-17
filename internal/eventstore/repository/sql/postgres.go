@@ -194,8 +194,11 @@ func (db *Postgres) conditionFormat(operation repository.Operation) string {
 		return "%s %s ANY(?)"
 	case repository.OperationNotIn:
 		return "%s %s ALL(?)"
+	case repository.OperationEquals, repository.OperationGreater, repository.OperationLess, repository.OperationJSONContains:
+		fallthrough
+	default:
+		return "%s %s ?"
 	}
-	return "%s %s ?"
 }
 
 func (db *Postgres) operation(operation repository.Operation) string {
