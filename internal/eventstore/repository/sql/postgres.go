@@ -220,16 +220,16 @@ var (
 
 // placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
 func (db *Postgres) placeholder(query string) string {
-	occurances := placeholder.FindAllStringIndex(query, -1)
-	if len(occurances) == 0 {
+	occurrences := placeholder.FindAllStringIndex(query, -1)
+	if len(occurrences) == 0 {
 		return query
 	}
-	replaced := query[:occurances[0][0]]
+	replaced := query[:occurrences[0][0]]
 
-	for i, l := range occurances {
+	for i, l := range occurrences {
 		nextIDX := len(query)
-		if i < len(occurances)-1 {
-			nextIDX = occurances[i+1][0]
+		if i < len(occurrences)-1 {
+			nextIDX = occurrences[i+1][0]
 		}
 		replaced = replaced + "$" + strconv.Itoa(i+1) + query[l[1]:nextIDX]
 	}
