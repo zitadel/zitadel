@@ -7,22 +7,6 @@ import (
 // Handler is a function that handles the in.
 type Handler[Out, In any] func(ctx context.Context, in Out) (out In, err error)
 
-func (h Handler[Out, In]) Chain(next Handler[In, In]) Handler[Out, In] {
-	return Chain(h, next)
-}
-
-func (h Handler[Out, In]) Decorate(decorate Decorator[Out, In]) Handler[Out, In] {
-	return Decorate(h, decorate)
-}
-
-func (h Handler[Out, In]) SkipNext(next Handler[Out, In]) Handler[Out, In] {
-	return SkipNext(h, next)
-}
-
-func (h Handler[Out, In]) SkipNilHandler(handler *Out) Handler[Out, In] {
-	return SkipNilHandler(handler, h)
-}
-
 // Decorator is a function that decorates the handle function.
 type Decorator[In, Out any] func(ctx context.Context, in In, handle Handler[In, Out]) (out Out, err error)
 
