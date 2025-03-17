@@ -17,7 +17,7 @@ DECLARE
 BEGIN
 
   -- if system user
-  IF jsonb_array_length(system_user_perms) = 0 THEN
+  IF jsonb_array_length(system_user_perms) != 0 THEN
     DECLARE
       has_instance_or_iam_permission bool;
     BEGIN
