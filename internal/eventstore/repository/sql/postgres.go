@@ -17,8 +17,8 @@ import (
 
 // awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
 var (
-	awaitOpenTransactionsV1 = `EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`
-	awaitOpenTransactionsV2 = `"position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`
+	awaitOpenTransactionsV1 = ` AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`
+	awaitOpenTransactionsV2 = ` AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`
 )
 
 func awaitOpenTransactions(useV1 bool) string {
@@ -194,8 +194,11 @@ func (db *Postgres) conditionFormat(operation repository.Operation) string {
 		return "%s %s ANY(?)"
 	case repository.OperationNotIn:
 		return "%s %s ALL(?)"
+	case repository.OperationEquals, repository.OperationGreater, repository.OperationLess, repository.OperationJSONContains:
+		fallthrough
+	default:
+		return "%s %s ?"
 	}
-	return "%s %s ?"
 }
 
 func (db *Postgres) operation(operation repository.Operation) string {
@@ -220,16 +223,16 @@ var (
 
 // placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
 func (db *Postgres) placeholder(query string) string {
-	occurances := placeholder.FindAllStringIndex(query, -1)
-	if len(occurances) == 0 {
+	occurrences := placeholder.FindAllStringIndex(query, -1)
+	if len(occurrences) == 0 {
 		return query
 	}
-	replaced := query[:occurances[0][0]]
+	replaced := query[:occurrences[0][0]]
 
-	for i, l := range occurances {
+	for i, l := range occurrences {
 		nextIDX := len(query)
-		if i < len(occurances)-1 {
-			nextIDX = occurances[i+1][0]
+		if i < len(occurrences)-1 {
+			nextIDX = occurrences[i+1][0]
 		}
 		replaced = replaced + "$" + strconv.Itoa(i+1) + query[l[1]:nextIDX]
 	}
