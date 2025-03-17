@@ -4,8 +4,10 @@ import {
   GetInstanceFeaturesResponse,
   ResetInstanceFeaturesResponse,
   SetInstanceFeaturesRequest,
+  SetInstanceFeaturesRequestSchema,
   SetInstanceFeaturesResponse,
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +19,9 @@ export class NewFeatureService {
     return this.grpcService.featureNew.getInstanceFeatures({});
   }
 
-  public setInstanceFeatures(req: SetInstanceFeaturesRequest): Promise<SetInstanceFeaturesResponse> {
+  public setInstanceFeatures(
+    req: MessageInitShape<typeof SetInstanceFeaturesRequestSchema>,
+  ): Promise<SetInstanceFeaturesResponse> {
     return this.grpcService.featureNew.setInstanceFeatures(req);
   }
 

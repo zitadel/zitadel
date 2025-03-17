@@ -19,9 +19,8 @@ import {
   GetInstanceFeaturesResponse,
   SetInstanceFeaturesRequestSchema,
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
-//@ts-ignore
-import { create } from '@zitadel/client';
 import { FeatureFlag, Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
 
 export enum ToggleState {
   ENABLED = 'ENABLED',
@@ -100,7 +99,7 @@ export class FeaturesComponent {
   }
 
   public validateAndSave() {
-    const req = create(SetInstanceFeaturesRequestSchema, {
+    const req: MessageInitShape<typeof SetInstanceFeaturesRequestSchema> = {
       actions: this.toggleStates?.actions?.state === ToggleState.ENABLED,
       consoleUseV2UserApi: this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED,
       debugOidcParentError: this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED,
@@ -115,7 +114,7 @@ export class FeaturesComponent {
       permissionCheckV2: this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED,
       userSchema: this.toggleStates?.userSchema?.state === ToggleState.ENABLED,
       webKey: this.toggleStates?.webKey?.state === ToggleState.ENABLED,
-    });
+    };
 
     this.featureService
       .setInstanceFeatures(req)
