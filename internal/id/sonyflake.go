@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"hash/fnv"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -200,7 +200,7 @@ func metadataWebhookID() (uint16, error) {
 	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
 		return 0, fmt.Errorf("metadata endpoint returned an unsuccessful status code %d", resp.StatusCode)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0, err
 	}
