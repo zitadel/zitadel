@@ -654,6 +654,8 @@ github.com/riverqueue/river/rivershared v0.16.0 h1:L1lQ3gMwdIsxA6yF0/PwAdsFP0T82
 github.com/riverqueue/river/rivershared v0.16.0/go.mod h1:y5Xu8Shcp44DUNnEQV4c6oWH4m2OTkSMCe6nRrgzT34=
 github.com/riverqueue/river/rivertype v0.16.0 h1:iDjNtCiUbXwLraqNEyQdH/OD80f1wTo8Ai6WHYCwRxs=
 github.com/riverqueue/river/rivertype v0.16.0/go.mod h1:DETcejveWlq6bAb8tHkbgJqmXWVLiFhTiEm8j7co1bE=
+github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
+github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
@@ -776,8 +778,8 @@ github.com/zitadel/oidc/v3 v3.32.0 h1:Mw0EPZRC6h+OXAuT0Uk2BZIjJQNHLqUpaJCm6c3IBy
 github.com/zitadel/oidc/v3 v3.32.0/go.mod h1:DyE/XClysRK/ozFaZSqlYamKVnTh4l6Ln25ihSNI03w=
 github.com/zitadel/passwap v0.6.0 h1:m9F3epFC0VkBXu25rihSLGyHvWiNlCzU5kk8RoI+SXQ=
 github.com/zitadel/passwap v0.6.0/go.mod h1:kqAiJ4I4eZvm3Y6oAk6hlEqlZZOkjMHraGXF90GG7LI=
-github.com/zitadel/saml v0.3.3 h1:Cn+1ZNeWlzMM7wxUxJfgNjXSW+Yu6UD4zWbpySA5GQM=
-github.com/zitadel/saml v0.3.3/go.mod h1:QqKcguOt7mMVI6tkEfpkyzwnYRdlmn3kYQj3VTPUw1g=
+github.com/zitadel/saml v0.3.4 h1:L2pybnx2Hs+kqebZmUbnZUd9L/CY2sNw5psMWw2D/6Q=
+github.com/zitadel/saml v0.3.4/go.mod h1:M0losAULJpLtAmXrYqBnf375ia2rMgJ75b1mpaU/GlA=
 github.com/zitadel/schema v1.3.0 h1:kQ9W9tvIwZICCKWcMvCEweXET1OcOyGEuFbHs4o5kg0=
 github.com/zitadel/schema v1.3.0/go.mod h1:NptN6mkBDFvERUCvZHlvWmmME+gmZ44xzwRXwhzsbtc=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=

@@ -1,21 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import {
-  BehaviorSubject,
-  combineLatestWith,
-  defer,
-  distinctUntilKeyChanged,
-  EMPTY,
-  forkJoin,
-  mergeWith,
-  NEVER,
-  Observable,
-  of,
-  shareReplay,
-  Subject,
-  TimeoutError,
-} from 'rxjs';
+import { BehaviorSubject, combineLatestWith, EMPTY, mergeWith, NEVER, Observable, of, shareReplay, Subject } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, finalize, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
 
 import {
@@ -186,7 +172,6 @@ export class GrpcAuthService {
           .then((resp) => resp.resultList)
           .catch(() => <string[]>[]),
       ),
-      filter((roles) => !!roles.length),
       distinctUntilChanged((a, b) => {
         return JSON.stringify(a.sort()) === JSON.stringify(b.sort());
       }),
@@ -302,7 +287,6 @@ export class GrpcAuthService {
     }
 
     return this.zitadelPermissions.pipe(
-      filter((permissions) => !!permissions.length),
       map((permissions) => this.hasRoles(permissions, roles, requiresAll)),
       distinctUntilChanged(),
     );

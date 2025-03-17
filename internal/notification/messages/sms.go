@@ -11,16 +11,19 @@ type SMS struct {
 	SenderPhoneNumber    string
 	RecipientPhoneNumber string
 	Content              string
-	TriggeringEvent      eventstore.Event
+	TriggeringEventType  eventstore.EventType
 
 	// VerificationID is set by the sender
 	VerificationID *string
+	InstanceID     string
+	JobID          string
+	UserID         string
 }
 
 func (msg *SMS) GetContent() (string, error) {
 	return msg.Content, nil
 }
 
-func (msg *SMS) GetTriggeringEvent() eventstore.Event {
-	return msg.TriggeringEvent
+func (msg *SMS) GetTriggeringEventType() eventstore.EventType {
+	return msg.TriggeringEventType
 }

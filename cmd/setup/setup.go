@@ -37,6 +37,7 @@ import (
 	notify_handler "github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/queue"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 	"github.com/zitadel/zitadel/internal/webauthn"
@@ -467,6 +468,14 @@ func startCommandsQueries(
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
+	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
+		logging.Fatal("notifications must be set to LegacyEnabled=true when using CockroachDB")
+	}
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	logging.OnError(err).Fatal("unable to init queue")
+
 	notify_handler.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
@@ -489,6 +498,7 @@ func startCommandsQueries(
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		dbClient,
+		q,
 	)
 
 	return commands, queries, adminView, authView
