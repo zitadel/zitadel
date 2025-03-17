@@ -136,7 +136,7 @@ Database:
     MaxOpenConns: 10
     MaxIdleConns: 5
     MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
+    MaxConnIdleTime: 5m
     //highlight-end
     Options: ""
 ```
