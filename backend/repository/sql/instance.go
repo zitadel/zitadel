@@ -7,11 +7,11 @@ import (
 	"github.com/zitadel/zitadel/backend/repository"
 )
 
-const instanceByIDQuery = `SELECT id, name FROM instances WHERE id = $1`
+const InstanceByIDStmt = `SELECT id, name FROM instances WHERE id = $1`
 
 func (q *querier[C]) InstanceByID(ctx context.Context, id string) (*repository.Instance, error) {
 	log.Println("sql.instance.byID")
-	row := q.client.QueryRow(ctx, instanceByIDQuery, id)
+	row := q.client.QueryRow(ctx, InstanceByIDStmt, id)
 	var instance repository.Instance
 	if err := row.Scan(&instance.ID, &instance.Name); err != nil {
 		return nil, err
@@ -51,9 +51,11 @@ func (q *querier[C]) ListInstances(ctx context.Context, request *repository.List
 	return res, nil
 }
 
+const InstanceCreateStmt = `INSERT INTO instances (id, name) VALUES ($1, $2)`
+
 func (e *executor[C]) CreateInstance(ctx context.Context, instance *repository.Instance) (*repository.Instance, error) {
 	log.Println("sql.instance.create")
-	err := e.client.Exec(ctx, "INSERT INTO instances (id, name) VALUES ($1, $2)", instance.ID, instance.Name)
+	err := e.client.Exec(ctx, InstanceCreateStmt, instance.ID, instance.Name)
 	if err != nil {
 		return nil, err
 	}

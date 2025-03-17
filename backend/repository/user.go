@@ -10,13 +10,13 @@ type User struct {
 type UserIndex uint8
 
 var UserIndices = []UserIndex{
-	UserByID,
-	UserByUsername,
+	UserByIDIndex,
+	UserByUsernameIndex,
 }
 
 const (
-	UserByID UserIndex = iota
-	UserByUsername
+	UserByIDIndex UserIndex = iota
+	UserByUsernameIndex
 )
 
 var _ cache.Entry[UserIndex, string] = (*User)(nil)
@@ -24,9 +24,9 @@ var _ cache.Entry[UserIndex, string] = (*User)(nil)
 // Keys implements [cache.Entry].
 func (u *User) Keys(index UserIndex) (key []string) {
 	switch index {
-	case UserByID:
+	case UserByIDIndex:
 		return []string{u.ID}
-	case UserByUsername:
+	case UserByUsernameIndex:
 		return []string{u.Username}
 	}
 	return nil

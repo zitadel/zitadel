@@ -4,18 +4,18 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/repository"
+	"github.com/zitadel/zitadel/backend/repository/cached"
 	"github.com/zitadel/zitadel/backend/repository/event"
 	"github.com/zitadel/zitadel/backend/repository/orchestrate/handler"
 	"github.com/zitadel/zitadel/backend/repository/sql"
 	"github.com/zitadel/zitadel/backend/repository/telemetry/traced"
 	"github.com/zitadel/zitadel/backend/storage/cache"
-	"github.com/zitadel/zitadel/backend/storage/cache/connector/noop"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
 )
 
 type UserOptions struct {
-	cache cache.Cache[repository.UserIndex, string, *repository.User]
+	cache *cached.User
 }
 
 type user struct {
@@ -26,7 +26,6 @@ type user struct {
 func User(opts ...Option[UserOptions]) *user {
 	i := new(user)
 	i.UserOptions = &i.options.custom
-	i.cache = noop.NewCache[repository.UserIndex, string, *repository.User]()
 
 	for _, opt := range opts {
 		opt(&i.options)
@@ -36,7 +35,7 @@ func User(opts ...Option[UserOptions]) *user {
 
 func WithUserCache(cache cache.Cache[repository.UserIndex, string, *repository.User]) Option[UserOptions] {
 	return func(i *options[UserOptions]) {
-		i.custom.cache = cache
+		i.custom.cache = cached.NewUser(cache)
 	}
 }
 
@@ -57,7 +56,9 @@ func (i *user) Create(ctx context.Context, tx database.Transaction, user *reposi
 
 func (i *user) ByID(ctx context.Context, querier database.Querier, id string) (*repository.User, error) {
 	return handler.SkipNext(
-		handler.CacheGetToHandle(i.cache.Get, repository.UserByID),
+		handler.SkipNilHandler(i.cache,
+			handler.ResFuncToHandle(i.cache.ByID),
+		),
 		handler.Chain(
 			handler.Decorate(
 				sql.Query(querier).UserByID,

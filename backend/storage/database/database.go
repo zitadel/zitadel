@@ -68,12 +68,12 @@ type QueryExecutor interface {
 }
 
 type Querier interface {
-	Query(ctx context.Context, sql string, args ...any) (Rows, error)
-	QueryRow(ctx context.Context, sql string, args ...any) Row
+	Query(ctx context.Context, stmt string, args ...any) (Rows, error)
+	QueryRow(ctx context.Context, stmt string, args ...any) Row
 }
 
 type Executor interface {
-	Exec(ctx context.Context, sql string, args ...any) error
+	Exec(ctx context.Context, stmt string, args ...any) error
 }
 
 // LoadStatements sets the sql statements strings
