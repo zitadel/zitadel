@@ -789,7 +789,10 @@
       "PHONESECTION": "電話番号",
       "PASSWORDSECTION": "初期パスワード",
       "ADDRESSANDPHONESECTION": "電話番号",
-      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。"
+      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。",
+      "SETUPAUTHENTICATIONLATER": "このユーザーの認証を後で設定します。",
+      "INVITATION": "認証設定とメール確認のための招待メールを送信してください。",
+      "INITIALPASSWORD": "ユーザーの初期パスワードを設定してください。"
     },
     "CODEDIALOG": {
       "TITLE": "電話番号の検証",

@@ -729,7 +729,10 @@
       "PHONESECTION": "Nomor telepon",
       "PASSWORDSECTION": "Kata Sandi Awal",
       "ADDRESSANDPHONESECTION": "Nomor telepon",
-      "INITMAILDESCRIPTION": "Jika kedua opsi dipilih, tidak ada email untuk inisialisasi yang akan dikirim. Jika hanya salah satu opsi yang dipilih, email untuk menyediakan/memverifikasi data akan dikirim."
+      "INITMAILDESCRIPTION": "Jika kedua opsi dipilih, tidak ada email untuk inisialisasi yang akan dikirim. Jika hanya salah satu opsi yang dipilih, email untuk menyediakan/memverifikasi data akan dikirim.",
+      "SETUPAUTHENTICATIONLATER": "Atur autentikasi nanti untuk pengguna ini.",
+      "INVITATION": "Kirim Email undangan untuk pengaturan autentikasi dan verifikasi Email.",
+      "INITIALPASSWORD": "Tetapkan kata sandi awal untuk pengguna."
     },
     "CODEDIALOG": {
       "TITLE": "Verifikasi Nomor Telepon",

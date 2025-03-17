@@ -789,7 +789,10 @@
       "PHONESECTION": "Números de Telefone",
       "PASSWORDSECTION": "Senha Inicial",
       "ADDRESSANDPHONESECTION": "Número de telefone",
-      "INITMAILDESCRIPTION": "Se ambas as opções forem selecionadas, nenhum e-mail de inicialização será enviado. Se apenas uma das opções for selecionada, um e-mail para fornecer/verificar os dados será enviado."
+      "INITMAILDESCRIPTION": "Se ambas as opções forem selecionadas, nenhum e-mail de inicialização será enviado. Se apenas uma das opções for selecionada, um e-mail para fornecer/verificar os dados será enviado.",
+      "SETUPAUTHENTICATIONLATER": "Configurar autenticação mais tarde para este usuário.",
+      "INVITATION": "Enviar um E-mail de convite para configuração de autenticação e verificação de E-mail.",
+      "INITIALPASSWORD": "Defina uma senha inicial para o usuário."
     },
     "CODEDIALOG": {
       "TITLE": "Verificar Número de Telefone",

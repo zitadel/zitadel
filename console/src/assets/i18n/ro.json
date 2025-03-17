@@ -787,7 +787,10 @@
       "PHONESECTION": "Numere de telefon",
       "PASSWORDSECTION": "Parola inițială",
       "ADDRESSANDPHONESECTION": "Număr de telefon",
-      "INITMAILDESCRIPTION": "Dacă ambele opțiuni sunt selectate, nu va fi trimis niciun e-mail pentru inițializare. Dacă este selectată doar una dintre opțiuni, va fi trimis un e-mail pentru a furniza / verifica datele."
+      "INITMAILDESCRIPTION": "Dacă ambele opțiuni sunt selectate, nu va fi trimis niciun e-mail pentru inițializare. Dacă este selectată doar una dintre opțiuni, va fi trimis un e-mail pentru a furniza / verifica datele.",
+      "SETUPAUTHENTICATIONLATER": "Configurați autentificarea mai târziu pentru acest utilizator.",
+      "INVITATION": "Trimiteți un e-mail de invitație pentru configurarea autentificării și verificarea e-mailului.",
+      "INITIALPASSWORD": "Setați o parolă inițială pentru utilizator."
     },
     "CODEDIALOG": {
       "TITLE": "Verificați numărul de telefon",

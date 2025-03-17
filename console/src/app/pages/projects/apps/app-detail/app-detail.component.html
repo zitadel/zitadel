@@ -149,10 +149,10 @@
                   </mat-checkbox>
 
                   <mat-checkbox
-                    *ngIf="loginV2"
+                    *ngIf="oidcLoginV2"
                     color="primary"
                     class="rt"
-                    [formControl]="loginV2"
+                    [formControl]="oidcLoginV2"
                     name="loginV2"
                     matTooltip="{{ 'APP.LOGINV2DESC' | translate }}"
                   >
@@ -237,6 +237,26 @@
                   mode: 'application/xml',
                 }"
               ></ngx-codemirror>
+            </div>
+
+            <div class="saml-login-version">
+              <form [formGroup]="samlForm">
+                <mat-checkbox
+                  *ngIf="samlLoginV2"
+                  color="primary"
+                  class="rt"
+                  [formControl]="samlLoginV2"
+                  name="loginV2"
+                  matTooltip="{{ 'APP.LOGINV2DESC' | translate }}"
+                >
+                  {{ 'APP.LOGINV2.USEV2' | translate }}
+                </mat-checkbox>
+
+                <cnsl-form-field class="app-formfield">
+                  <cnsl-label>{{ 'APP.LOGINV2.BASEURL' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="loginV2BaseURL" />
+                </cnsl-form-field>
+              </form>
             </div>
 
             <div class="btn-container">

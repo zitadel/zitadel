@@ -789,7 +789,10 @@
       "PHONESECTION": "Telefonszámok",
       "PASSWORDSECTION": "Kezdeti jelszó",
       "ADDRESSANDPHONESECTION": "Telefonszám",
-      "INITMAILDESCRIPTION": "Ha mindkét opció ki van választva, nem kerül kiküldésre inicializáló e-mail. Ha csak az egyik opció van kiválasztva, egy e-mailt küldünk az adatok megadására / ellenőrzésére."
+      "INITMAILDESCRIPTION": "Ha mindkét opció ki van választva, nem kerül kiküldésre inicializáló e-mail. Ha csak az egyik opció van kiválasztva, egy e-mailt küldünk az adatok megadására / ellenőrzésére.",
+      "SETUPAUTHENTICATIONLATER": "Állítsa be később az autentikációt ehhez a felhasználóhoz.",
+      "INVITATION": "Küldjön meghívó e-mailt az autentikáció beállításához és az e-mail hitelesítéséhez.",
+      "INITIALPASSWORD": "Állítson be egy kezdeti jelszót a felhasználónak."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonszám ellenőrzése",

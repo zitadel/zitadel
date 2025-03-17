@@ -789,7 +789,10 @@
       "PHONESECTION": "Telefoonnummers",
       "PASSWORDSECTION": "Initieel wachtwoord",
       "ADDRESSANDPHONESECTION": "Telefoonnummer",
-      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren."
+      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren.",
+      "SETUPAUTHENTICATIONLATER": "Authenticatie later instellen voor deze gebruiker.",
+      "INVITATION": "Stuur een uitnodigingsmail voor het instellen van authenticatie en e-mailverificatie.",
+      "INITIALPASSWORD": "Stel een initieel wachtwoord in voor de gebruiker."
     },
     "CODEDIALOG": {
       "TITLE": "Verifieer telefoonnummer",

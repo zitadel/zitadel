@@ -789,7 +789,10 @@
       "PHONESECTION": "Telefonní čísla",
       "PASSWORDSECTION": "Prvotní heslo",
       "ADDRESSANDPHONESECTION": "Telefonní číslo",
-      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů."
+      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů.",
+      "SETUPAUTHENTICATIONLATER": "Nastavte ověřování později pro tohoto uživatele.",
+      "INVITATION": "Odešlete pozvánkový e-mail pro nastavení ověřování a ověření e-mailu.",
+      "INITIALPASSWORD": "Nastavte počáteční heslo pro uživatele."
     },
     "CODEDIALOG": {
       "TITLE": "Ověření telefonního čísla",

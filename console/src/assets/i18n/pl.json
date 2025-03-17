@@ -788,7 +788,10 @@
       "PHONESECTION": "Numery telefonów",
       "PASSWORDSECTION": "Hasło początkowe",
       "ADDRESSANDPHONESECTION": "Numer telefonu",
-      "INITMAILDESCRIPTION": "Jeśli zaznaczone są obie opcje, nie zostanie wysłany żaden e-mail inicjujący. Jeśli zaznaczona jest tylko jedna opcja, zostanie wysłany e-mail, aby udostępnić/zweryfikować dane."
+      "INITMAILDESCRIPTION": "Jeśli zaznaczone są obie opcje, nie zostanie wysłany żaden e-mail inicjujący. Jeśli zaznaczona jest tylko jedna opcja, zostanie wysłany e-mail, aby udostępnić/zweryfikować dane.",
+      "SETUPAUTHENTICATIONLATER": "Skonfiguruj uwierzytelnianie później dla tego użytkownika.",
+      "INVITATION": "Wyślij e-mail zaproszeniowy do konfiguracji uwierzytelniania i weryfikacji e-maila.",
+      "INITIALPASSWORD": "Ustaw początkowe hasło dla użytkownika."
     },
     "CODEDIALOG": {
       "TITLE": "Weryfikuj numer telefonu",

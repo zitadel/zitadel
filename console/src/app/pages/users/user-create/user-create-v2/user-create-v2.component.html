@@ -5,7 +5,7 @@
   (closed)="location.back()"
 >
   <div class="content">
-    <mat-progress-bar *ngIf="loading()" color="primary" mode="indeterminate"></mat-progress-bar>
+    <mat-progress-bar *ngIf="loading()" color="primary" mode="indeterminate" />
     <form
       *ngIf="authenticationFactor$ | async as authenticationFactor"
       class="form-grid"
@@ -18,7 +18,7 @@
       </cnsl-form-field>
       <div class="emailVerified">
         <mat-checkbox [disabled]="authenticationFactor.factor === 'invitation'" formControlName="emailVerified">
-          Mark Email as Verified
+          {{ 'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate }}
         </mat-checkbox>
       </div>
       <cnsl-form-field class="givenName">
@@ -39,26 +39,14 @@
       </cnsl-form-field>
 
       <div class="authenticationFactor">
-        <div [class.authenticationFactorIntroductionDone]="authenticationFactor.factor !== 'none'">
-          <h3>Would you like to set up authentication methods now?</h3>
-          <div>You don't have to do this now, you can do it later</div>
-          <button
-            class="authenticationFactorButton"
-            mat-raised-button
-            color="primary"
-            [disabled]="authenticationFactor.factor !== 'none'"
-            (click)="$event.preventDefault(); userForm.controls.authenticationFactor.setValue('invitation')"
-          >
-            Setup
-          </button>
-        </div>
         <mat-radio-group
-          *ngIf="authenticationFactor.factor !== 'none'"
+          class="authenticationFactorRadioGroup"
           aria-label="Select an option"
           formControlName="authenticationFactor"
         >
-          <mat-radio-button value="invitation"> Invitation </mat-radio-button>
-          <mat-radio-button value="initialPassword"> Initial password </mat-radio-button>
+          <mat-radio-button value="none">{{ 'USER.CREATE.SETUPAUTHENTICATIONLATER' | translate }}</mat-radio-button>
+          <mat-radio-button value="invitation">{{ 'USER.CREATE.INVITATION' | translate }}</mat-radio-button>
+          <mat-radio-button value="initialPassword">{{ 'USER.CREATE.INITIALPASSWORD' | translate }}</mat-radio-button>
         </mat-radio-group>
         <form *ngIf="authenticationFactor.factor === 'initialPassword'" [formGroup]="authenticationFactor.form">
           <cnsl-form-field>

@@ -789,7 +789,10 @@
       "PHONESECTION": "전화번호",
       "PASSWORDSECTION": "초기 비밀번호",
       "ADDRESSANDPHONESECTION": "전화번호",
-      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다."
+      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다.",
+      "SETUPAUTHENTICATIONLATER": "이 사용자의 인증을 나중에 설정하세요.",
+      "INVITATION": "인증 설정 및 이메일 확인을 위한 초대 이메일을 보내세요.",
+      "INITIALPASSWORD": "사용자에 대한 초기 비밀번호를 설정하세요."
     },
     "CODEDIALOG": {
       "TITLE": "전화번호 확인",
