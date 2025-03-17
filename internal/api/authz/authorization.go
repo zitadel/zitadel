@@ -32,7 +32,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
-			parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, nil, ctxData)
+			parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, ctxData)
 			return context.WithValue(parent, dataKey, ctxData)
 		}, nil
 	}
@@ -53,7 +53,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		parent = context.WithValue(parent, dataKey, ctxData)
 		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
-		parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, requestedPermissions, ctxData)
+		parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, ctxData)
 		return parent
 	}, nil
 }
@@ -130,42 +130,34 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 	return ctxIDs
 }
 
-type SystemUserAuthParams struct {
-	MemberType        []int32
-	InstanceID        []string
-	AggregateID       []string
-	Permissions       [][]string
-	PermissionsLength []int32
+type SystemUserPermissionsDBQuery struct {
+	MemberType  string   `json:"member_type"`
+	AggregateID string   `json:"aggregate_id"`
+	ObjectID    string   `json:"object_id"`
+	Permissions []string `json:"permissions"`
 }
 
-func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []RoleMapping, requestedPermissions []string, ctxData CtxData) context.Context {
+func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []RoleMapping, ctxData CtxData) context.Context {
 	if len(ctxData.SystemMemberships) == 0 {
 		return ctx
-		// } else if ctxData.SystemMemberships[0].MemberType == MemberTypeSystem {
 	} else {
-		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func() func(ctx context.Context) *SystemUserAuthParams {
-			var systemUserAuthParams *SystemUserAuthParams
+		ctx = context.WithValue(ctx, systemUserRolesFuncKey, func() func(ctx context.Context) []SystemUserPermissionsDBQuery {
+			var systemUserPermissionsDbJsonQueryStruct []SystemUserPermissionsDBQuery
 			chann := make(chan struct{}, 1)
-			return func(ctx context.Context) *SystemUserAuthParams {
-				if systemUserAuthParams != nil {
-					return systemUserAuthParams
+			return func(ctx context.Context) []SystemUserPermissionsDBQuery {
+				if systemUserPermissionsDbJsonQueryStruct != nil {
+					return systemUserPermissionsDbJsonQueryStruct
 				}
 
 				chann <- struct{}{}
 				defer func() {
 					<-chann
 				}()
-				if systemUserAuthParams != nil {
-					return systemUserAuthParams
+				if systemUserPermissionsDbJsonQueryStruct != nil {
+					return systemUserPermissionsDbJsonQueryStruct
 				}
 
-				systemUserAuthParams = &SystemUserAuthParams{
-					MemberType:        make([]int32, len(ctxData.SystemMemberships)),
-					InstanceID:        make([]string, len(ctxData.SystemMemberships)),
-					AggregateID:       make([]string, len(ctxData.SystemMemberships)),
-					Permissions:       make([][]string, len(ctxData.SystemMemberships)),
-					PermissionsLength: make([]int32, len(ctxData.SystemMemberships)),
-				}
+				systemUserPermissionsDbJsonQueryStruct = make([]SystemUserPermissionsDBQuery, len(ctxData.SystemMemberships))
 
 				for i, systemPerm := range ctxData.SystemMemberships {
 					permissions := []string{}
@@ -175,25 +167,23 @@ func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []Rol
 					slices.Sort(permissions)
 					permissions = slices.Compact(permissions)
 
-					systemUserAuthParams.MemberType[i] = MemberTypeServerToMemberTypeDBMap[systemPerm.MemberType]
-					systemUserAuthParams.InstanceID[i] = systemPerm.InstanceID
-					systemUserAuthParams.AggregateID[i] = systemPerm.AggregateID
-					systemUserAuthParams.Permissions[i] = permissions
-					systemUserAuthParams.PermissionsLength[i] = int32(len(permissions))
+					systemUserPermissionsDbJsonQueryStruct[i].MemberType = MemberTypeServerToMemberTypeDBMap[systemPerm.MemberType]
+					systemUserPermissionsDbJsonQueryStruct[i].AggregateID = systemPerm.AggregateID
+					systemUserPermissionsDbJsonQueryStruct[i].Permissions = permissions
 				}
-				return systemUserAuthParams
+				return systemUserPermissionsDbJsonQueryStruct
 			}
 		}())
 	}
 	return ctx
 }
 
-func GetSystemUserAuthParams(ctx context.Context) (*SystemUserAuthParams, error) {
+func GetSystemUserPermissions(ctx context.Context) ([]SystemUserPermissionsDBQuery, error) {
 	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesFuncKey)
 	if getSystemUserRolesFuncValue == nil {
-		return &SystemUserAuthParams{}, nil
+		return nil, nil
 	}
-	getSystemUserRolesFunc, ok := getSystemUserRolesFuncValue.(func(context.Context) *SystemUserAuthParams)
+	getSystemUserRolesFunc, ok := getSystemUserRolesFuncValue.(func(context.Context) []SystemUserPermissionsDBQuery)
 	if !ok {
 		return nil, errors.New("unable to obtain systems role func")
 	}

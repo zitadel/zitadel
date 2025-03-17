@@ -4,13 +4,11 @@ import (
 	"context"
 	"crypto/rsa"
 	"errors"
-	"fmt"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
-	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -33,14 +31,7 @@ func StartSystemTokenVerifierFromConfig(issuer string, keys map[string]*SystemAP
 		}
 		for _, membership := range key.Memberships {
 			switch membership.MemberType {
-			case MemberTypeSystem, MemberTypeIAM:
-				systemUsers[userID] = key.Memberships
-			case MemberTypeOrganization:
-				if membership.AggregateID != "" && membership.InstanceID == "" {
-					errorMsg := fmt.Sprintf("system user %s must include InstancID if AggregateID is set for member type Organization", userID)
-					logging.Error(errorMsg)
-					return nil, errors.New(errorMsg)
-				}
+			case MemberTypeSystem, MemberTypeIAM, MemberTypeOrganization:
 				systemUsers[userID] = key.Memberships
 			case MemberTypeUnspecified, MemberTypeProject, MemberTypeProjectGrant:
 				return nil, errors.New("for system users, only the membership types System, IAM and Organization are supported")
@@ -76,7 +67,7 @@ func (s *SystemTokenVerifierFromConfig) VerifySystemToken(ctx context.Context, t
 	for _, membership := range systemUserMemberships {
 		if membership.MemberType == MemberTypeSystem ||
 			membership.MemberType == MemberTypeIAM && GetInstance(ctx).InstanceID() == membership.AggregateID ||
-			membership.MemberType == MemberTypeOrganization && orgID == membership.AggregateID && GetInstance(ctx).InstanceID() == membership.InstanceID {
+			membership.MemberType == MemberTypeOrganization && orgID == membership.AggregateID {
 			matchingMemberships = append(matchingMemberships, membership)
 		}
 	}

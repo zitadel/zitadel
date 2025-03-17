@@ -32,8 +32,8 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 
 	if ctxData.SystemMemberships != nil {
 		// for when we get rid of internalAuthz
-		// requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, SystemUserRoleMappings)
-		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, roleMappings)
+		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, SystemUserRoleMappings)
+		// requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, roleMappings)
 		return requestedPermissions, allPermissions, nil
 	}
 

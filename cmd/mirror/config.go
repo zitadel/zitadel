@@ -28,10 +28,8 @@ type Migration struct {
 	Machine *id.Config
 }
 
-var (
-	//go:embed defaults.yaml
-	defaultConfig []byte
-)
+//go:embed defaults.yaml
+var defaultConfig []byte
 
 func mustNewMigrationConfig(v *viper.Viper) *Migration {
 	config := new(Migration)

@@ -3,42 +3,67 @@ DROP FUNCTION IF EXISTS eventstore.permitted_orgs;
 CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     instanceId TEXT
     , userId TEXT
+    , system_user_perms JSONB
     , perm TEXT
-    , system_user_memeber_type INTEGER[]
-    , system_user_instance_id  TEXT[]
-    , system_user_aggregate_id  TEXT[]
-    , system_user_permissions TEXT[][]
-  , system_user_permissions_length INTEGER[]
     , filter_orgs TEXT
 
     , org_ids OUT TEXT[]
 )
 	LANGUAGE 'plpgsql'
-	STABLE
+	-- STABLE
 AS $$
 DECLARE
 	matched_roles TEXT[]; -- roles containing permission
 BEGIN
 
-  IF system_user_memeber_type IS NOT NULL THEN
+  -- if system user
+  IF jsonb_array_length(system_user_perms) = 0 THEN
     DECLARE
-      system_user_permission_found bool;
+      has_instance_or_iam_permission bool;
     BEGIN
-      SELECT result.perm_found INTO system_user_permission_found
-      FROM (SELECT eventstore.get_org_permission(perm, instanceId,filter_orgs, 
-          system_user_memeber_type, system_user_instance_id, system_user_aggregate_id, 
-          system_user_permissions, system_user_permissions_length) AS perm_found) AS result;
 
-      IF system_user_permission_found THEN
+    DROP TABLE IF EXISTS matching_system_user_perms;
+    CREATE TEMPORARY TABLE matching_system_user_perms (
+            member_type TEXT,
+            -- instance_id TEXT,
+            aggregate_id TEXT,
+            object_id TEXT,
+            permission TEXT
+        ) ON COMMIT DROP;
+
+
+    INSERT INTO matching_system_user_perms 
+    (SELECT * FROM eventstore.get_system_permissions(system_user_perms, perm));
+
+      -- check instance or iam level
+      SELECT true INTO has_instance_or_iam_permission
+        FROM matching_system_user_perms msup
+        WHERE (msup.member_type = 'System' AND msup.aggregate_id = '')
+        OR (msup.member_type = 'System' AND msup.aggregate_id = instanceId)
+        OR (msup.member_type = 'IAM' AND msup.aggregate_id = instanceId)
+        LIMIT 1;
+
+      IF has_instance_or_iam_permission THEN
+        -- Return all organizations or only those in filter_orgs
         SELECT array_agg(o.org_id) INTO org_ids
-        FROM eventstore.instance_orgs o
-        WHERE o.instance_id = instanceId
-        AND CASE WHEN filter_orgs != ''
-          THEN o.org_id IN (filter_orgs) 
-          ELSE TRUE END;
+          FROM eventstore.instance_orgs o
+          WHERE o.instance_id = instanceId
+          AND CASE WHEN filter_orgs != ''
+            THEN o.org_id IN (filter_orgs) 
+            ELSE TRUE END;
+        RETURN;
       END IF;
+
+    -- SELECT array_agg(msup.aggregate_id) INTO org_ids
+    --   FROM matching_system_user_perms msup
+    --   WHERE msup.instance_id = instanceId
+    --   AND msup.member_type = 'Organization'
+    --   AND CASE WHEN filter_orgs != ''
+    --     THEN msup.aggregate_id IN (filter_orgs) 
+    --     ELSE TRUE END;
+    --   RETURN;
+
     END;
-    RETURN;
   END IF;
 
 	SELECT array_agg(rp.role) INTO matched_roles
@@ -48,14 +73,14 @@ BEGIN
 
 	-- First try if the permission was granted thru an instance-level role
 	DECLARE
-		has_instance_permission bool;
+    has_instance_permission bool;
 	BEGIN
 		SELECT true INTO has_instance_permission
 			FROM eventstore.instance_members im
-      WHERE im.role = ANY(matched_roles)
-      AND im.instance_id = instanceId
-      AND im.user_id = userId
-      LIMIT 1;
+			WHERE im.role = ANY(matched_roles)
+			AND im.instance_id = instanceId
+			AND im.user_id = userId
+			LIMIT 1;
 		
 		IF has_instance_permission THEN
 			-- Return all organizations or only those in filter_orgs
@@ -82,84 +107,32 @@ BEGIN
 END;
 $$;
 
-DROP FUNCTION IF EXISTS eventstore.get_org_permission; 
-CREATE OR REPLACE FUNCTION eventstore.get_org_permission(
-  perm TEXT
-  , instance_idd TEXT
-  , org_id TEXT
-  , system_user_memeber_type INTEGER[]
-  , sustem_user_instance_id  TEXT[]
-  , system_user_aggregate_id  TEXT[]
-  , system_user_permissions TEXT[][]
-  , system_user_permissions_length INTEGER[]
--- , outt OUT TEXT[]
-  , outt OUT BOOL
+
+
+
+DROP FUNCTION IF EXISTS eventstore.get_system_permissions;
+CREATE OR REPLACE FUNCTION eventstore.get_system_permissions(
+    permissions_json JSONB
+    , permm TEXT
+    -- , res OUT eventstore.system_perms
 )
-	LANGUAGE 'plpgsql'
-AS $$
-DECLARE
-  i INTEGER;
-  length INTEGER;
-  permission_length INTEGER;
-BEGIN
-  -- outt := FALSE;
-  length := array_length(system_user_memeber_type, 1);
-  -- length := 3;
-
-  DROP TABLE IF EXISTS permissions; 
-  CREATE TEMPORARY TABLE permissions (
-    member_type INTEGER,
-    instance_id TEXT,
+RETURNS TABLE (
+    member_type TEXT,
+    -- instance_id TEXT,
     aggregate_id TEXT,
+    object_id TEXT,
     permission TEXT
-    );
-
-  -- <<outer_loop>>
-  FOR i IN 1..length LOOP
-    -- only interested in organization level and higher
-    IF system_user_memeber_type[i] > 3 THEN 
-      CONTINUE;
-    END IF;
-    permission_length := system_user_permissions_length[i];
-
-    FOR j IN 1..permission_length LOOP
-    IF system_user_permissions[i][j] != perm THEN 
-      CONTINUE;
-    END IF;
-      INSERT INTO permissions (member_type, instance_id, aggregate_id, permission) VALUES
-        (system_user_memeber_type[i], sustem_user_instance_id[i], system_user_aggregate_id[i], system_user_permissions[i][j] );
--- outt := 555;
--- RETURN;
-    END LOOP;
-  END LOOP;
-
-  -- outt := (SELECT permission FROM permissions LIMIT 1);
-  SELECT result.res INTO outt
-  FROM (SELECT TRUE AS res FROM permissions p
-        WHERE 
-          -- check instance id
-          CASE WHEN p.member_type = 1 OR p.member_type = 2 THEN -- System or IAM
-            p.aggregate_id = instance_idd 
-            -- OR p.instance_id IS NULL
-            OR p.instance_id = ''
-          ELSE 
-            p.instance_id = instance_idd 
-            -- OR p.instance_id IS NULL
-            OR p.instance_id = ''
-          END
-          AND
-          -- check organization
-          CASE WHEN p.member_type = 3 THEN -- organization
-            p.aggregate_id = org_id
-          ELSE
-            TRUE
-          END
-         Limit 1
-        ) AS result;
-          
-  DROP TABLE permissions;
-
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *  FROM (
+    SELECT 
+        (perm)->>'member_type' AS member_type,
+        (perm)->>'aggregate_id' AS agregate_id,
+        (perm)->>'object_id' AS objectId,
+        permis AS permission
+        FROM jsonb_array_elements(permissions_json) AS perm
+        CROSS JOIN jsonb_array_elements_text(perm->'permissions') AS permis) as p
+        WHERE p.permission = permm;
 END;
-$$;
-
-
+$$ LANGUAGE plpgsql;

@@ -72,10 +72,10 @@ const (
 	MemberTypeSystem
 )
 
-var MemberTypeServerToMemberTypeDBMap map[MemberType]int32 = map[MemberType]int32{
-	MemberTypeSystem:       1,
-	MemberTypeIAM:          2,
-	MemberTypeOrganization: 3,
+var MemberTypeServerToMemberTypeDBMap map[MemberType]string = map[MemberType]string{
+	MemberTypeSystem:       "System",
+	MemberTypeIAM:          "IAM",
+	MemberTypeOrganization: "Organization",
 }
 
 type TokenVerifier interface {

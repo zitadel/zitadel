@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,48 +12,63 @@ import (
 )
 
 const (
-	// eventstore.permitted_orgs(instanceid text, userid text, perm text, system_user_perms text[], filter_orgs text)
-	wherePermittedOrgsClause              = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?, ?, ?, ?, ?))"
+	// eventstore.permitted_orgs(instanceid text, userid text, system_user_perms JSONB, perm text filter_orgs text)
+	wherePermittedOrgsClause              = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))"
 	wherePermittedOrgsOrCurrentUserClause = "(" + wherePermittedOrgsClause + " OR %s = ?" + ")"
 )
 
 // wherePermittedOrgs sets a `WHERE` clause to the query that filters the orgs
 // for which the authenticated user has the requested permission for.
 // The user ID is taken from the context.
-//
 // The `orgIDColumn` specifies the table column to which this filter must be applied,
 // and is typically the `resource_owner` column in ZITADEL.
 // We use full identifiers in the query builder so this function should be
 // called with something like `UserResourceOwnerCol.identifier()` for example.
-func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, systemUserAuthParams *authz.SystemUserAuthParams, filterOrgIds, orgIDColumn, permission string) sq.SelectBuilder {
+func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, systemUserPermission []authz.SystemUserPermissionsDBQuery, filterOrgIds, orgIDColumn, permission string) (sq.SelectBuilder, error) {
 	userID := authz.GetCtxData(ctx).UserID
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
+
+	systemUserPermissionsJson := "[]"
+	if systemUserPermission != nil {
+		systemUserPermissionsBytes, err := json.Marshal(systemUserPermission)
+		if err != nil {
+			return query, err
+		}
+		systemUserPermissionsJson = string(systemUserPermissionsBytes)
+	}
 
 	return query.Where(
 		fmt.Sprintf(wherePermittedOrgsClause, orgIDColumn),
 		authz.GetInstance(ctx).InstanceID(),
 		userID,
+		systemUserPermissionsJson,
+		systemUserPermission,
 		permission,
-		systemUserAuthParams,
 		filterOrgIds,
-	)
+	), nil
 }
 
-func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, systemUserAuthParams *authz.SystemUserAuthParams, filterOrgIds, orgIDColumn, userIdColum, permission string) sq.SelectBuilder {
+func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, systemUserPermission []authz.SystemUserPermissionsDBQuery, filterOrgIds, orgIDColumn, userIdColum, permission string) (sq.SelectBuilder, error) {
 	userID := authz.GetCtxData(ctx).UserID
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "user_id_colum", userIdColum, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
+
+	systemUserPermissionsJson := "[]"
+	if systemUserPermission != nil {
+		systemUserPermissionsBytes, err := json.Marshal(systemUserPermission)
+		if err != nil {
+			return query, err
+		}
+		systemUserPermissionsJson = string(systemUserPermissionsBytes)
+	}
+	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> systemUserPermissionsJson = %+v\n", systemUserPermissionsJson)
 
 	return query.Where(
 		fmt.Sprintf(wherePermittedOrgsOrCurrentUserClause, orgIDColumn, userIdColum),
 		authz.GetInstance(ctx).InstanceID(),
 		userID,
+		systemUserPermissionsJson,
 		permission,
-		systemUserAuthParams.MemberType,
-		systemUserAuthParams.InstanceID,
-		systemUserAuthParams.AggregateID,
-		systemUserAuthParams.Permissions,
-		systemUserAuthParams.PermissionsLength,
 		filterOrgIds,
 		userID,
-	)
+	), nil
 }

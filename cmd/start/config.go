@@ -1,7 +1,6 @@
 package start
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -131,7 +130,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> config.SystemAuthZ = %+v\n", config.SystemAuthZ)
 
 	return config
 }
