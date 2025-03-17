@@ -278,7 +278,7 @@ func setRequestURIPattern(ctx context.Context) {
 		// As all unmatched paths will be handled by the gateway, any request not matching a pattern,
 		// means there's no route to the path.
 		// To prevent high cardinality on metrics and tracing, we want to make sure we don't record
-		// the actual path as name (it will still be recorded explicitly in the span http info). 
+		// the actual path as name (it will still be recorded explicitly in the span http info).
 		pattern = UnknownPath
 	}
 	span := trace.SpanFromContext(ctx)
