@@ -41,7 +41,7 @@ func Decorate[Req, Res any](tracer *tracing.Tracer, opts ...tracing.DecorateOpti
 		for _, opt := range opts {
 			opt(o)
 		}
-		log.Println("trace")
+		log.Println("traced.decorate")
 
 		ctx, end := o.Start(ctx, tracer)
 		defer end(err)

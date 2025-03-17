@@ -2,6 +2,7 @@ package orchestrate_test
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"reflect"
@@ -112,6 +113,7 @@ func Test_instance_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			fmt.Printf("------------------------ %s ------------------------\n", tt.name)
 			i := orchestrate.Instance(tt.opts...)
 			got, err := i.Create(tt.args.ctx, tt.args.tx, tt.args.instance)
 			if (err != nil) != tt.wantErr {
@@ -227,6 +229,7 @@ func Test_instance_ByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			fmt.Printf("------------------------ %s ------------------------\n", tt.name)
 			i := orchestrate.Instance(tt.opts...)
 			got, err := i.ByID(tt.args.ctx, tt.args.tx, tt.args.id)
 			if (err != nil) != tt.wantErr {

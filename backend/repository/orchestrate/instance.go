@@ -65,31 +65,36 @@ func (i *instance) Create(ctx context.Context, tx database.Transaction, instance
 }
 
 func (i *instance) ByID(ctx context.Context, querier database.Querier, id string) (*repository.Instance, error) {
-	return handler.SkipNext(
-		handler.SkipNilHandler(i.cache,
-			handler.ResFuncToHandle(i.cache.ByID),
-		),
-		handler.Chain(
-			handler.Decorate(
-				sql.Query(querier).InstanceByID,
-				traced.Decorate[string, *repository.Instance](i.tracer, tracing.WithSpanName("instance.sql.ByID")),
+	return traced.Wrap(i.tracer, "instance.byID",
+		handler.SkipNext(
+			handler.SkipNilHandler(i.cache,
+				handler.ResFuncToHandle(i.cache.ByID),
 			),
-			handler.SkipNilHandler(i.cache, handler.NoReturnToHandle(i.cache.Set)),
+			handler.Chain(
+				handler.Decorates(
+					sql.Query(querier).InstanceByID,
+					traced.Decorate[string, *repository.Instance](i.tracer, tracing.WithSpanName("instance.sql.ByID")),
+					logged.Decorate[string, *repository.Instance](i.logger, "instance.sql.ByID"),
+				),
+				handler.SkipNilHandler(i.cache, handler.NoReturnToHandle(i.cache.Set)),
+			),
 		),
 	)(ctx, id)
 }
 
 func (i *instance) ByDomain(ctx context.Context, querier database.Querier, domain string) (*repository.Instance, error) {
-	return handler.SkipNext(
-		handler.SkipNilHandler(i.cache,
-			handler.ResFuncToHandle(i.cache.ByDomain),
-		),
-		handler.Chain(
-			handler.Decorate(
-				sql.Query(querier).InstanceByDomain,
-				traced.Decorate[string, *repository.Instance](i.tracer, tracing.WithSpanName("instance.sql.ByDomain")),
+	return traced.Wrap(i.tracer, "instance.byDomain",
+		handler.SkipNext(
+			handler.SkipNilHandler(i.cache,
+				handler.ResFuncToHandle(i.cache.ByDomain),
 			),
-			handler.SkipNilHandler(i.cache, handler.NoReturnToHandle(i.cache.Set)),
+			handler.Chain(
+				handler.Decorate(
+					sql.Query(querier).InstanceByDomain,
+					traced.Decorate[string, *repository.Instance](i.tracer, tracing.WithSpanName("instance.sql.ByDomain")),
+				),
+				handler.SkipNilHandler(i.cache, handler.NoReturnToHandle(i.cache.Set)),
+			),
 		),
 	)(ctx, domain)
 }

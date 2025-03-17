@@ -15,10 +15,10 @@ func Wrap[Req, Res any](logger *logging.Logger, name string, handle handler.Hand
 	if logger == nil {
 		return handle
 	}
-	log.Println("log.wrap", name)
 	return func(ctx context.Context, r Req) (_ Res, err error) {
 		logger.Debug("execute", slog.String("handler", name))
 		defer logger.Debug("done", slog.String("handler", name))
+		log.Println("log.wrap", name)
 		return handle(ctx, r)
 	}
 }
@@ -32,7 +32,7 @@ func Decorate[Req, Res any](logger *logging.Logger, name string) handler.Decorat
 		}
 		logger = logger.With("handler", name)
 		logger.DebugContext(ctx, "execute")
-		log.Println("log.decorate", name)
+		log.Println("logged.decorate", name)
 		defer func() {
 			if err != nil {
 				logger.ErrorContext(ctx, "failed", slog.String("cause", err.Error()))
