@@ -62,7 +62,7 @@ func (c *ContextInfoEvent) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoEvent) SetHTTPResponseBody(resp []byte) error {
-	// response is irrelevant and will not be unmarshalled
+	// response is irrelevant and will not be unmarshaled
 	return nil
 }
 

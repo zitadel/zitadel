@@ -61,10 +61,8 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 	aggList := make(map[eventstore.AggregateType][]eventstore.EventType)
 	for _, eventType := range u.eventTypes {
 		aggType := u.aggregateTypeFromEventType(eventstore.EventType(eventType))
-		aggEventTypes, ok := aggList[aggType]
-		if !ok {
-			aggList[aggType] = []eventstore.EventType{eventstore.EventType(eventType)}
-		} else if !slices.Contains(aggEventTypes, eventstore.EventType(eventType)) {
+		aggEventTypes := aggList[aggType]
+		if !slices.Contains(aggEventTypes, eventstore.EventType(eventType)) {
 			aggList[aggType] = append(aggList[aggType], eventstore.EventType(eventType))
 		}
 	}
@@ -90,17 +88,14 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 
 func groupsFromEventType(s string) []string {
 	parts := strings.Split(s, ".")
-	groups := make([]string, len(parts))
+	partsLen := len(parts)
+	groups := make([]string, partsLen)
 	for i := range parts {
-		groups[i] = strings.Join(parts[:i+1], ".")
+		groups[(partsLen-1)-i] = strings.Join(parts[:i+1], ".")
 		if i < len(parts)-1 {
-			groups[i] += ".*"
+			groups[(partsLen-1)-i] += ".*"
 		}
 	}
-	// sort to end up with the most specific group first
-	slices.SortFunc(groups, func(a, b string) int {
-		return strings.Compare(a, b) * -1
-	})
 	return groups
 }
 

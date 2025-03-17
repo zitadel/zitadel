@@ -34,7 +34,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
-	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification"
@@ -70,7 +69,6 @@ type ProjectionsConfig struct {
 	Destination    database.Config
 	Projections    projection.Config
 	Notifications  handlers.WorkerConfig
-	Executions     execution.WorkerConfig
 	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config

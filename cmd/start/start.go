@@ -265,7 +265,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 
 	actionsExecutionDBEmitter, err := logstore.NewEmitter(ctx, clock, config.Quotas.Execution, emit_execution.NewDatabaseLogStorage(dbClient, commands, queries))
-
 	if err != nil {
 		return err
 	}

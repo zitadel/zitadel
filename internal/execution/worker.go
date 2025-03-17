@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/riverqueue/river"
@@ -34,12 +35,14 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 
 	targets, err := TargetsFromRequest(job.Args)
 	if err != nil {
-		return river.JobCancel(err)
+		// If we are not able to get the targets from the request, we can cancel the job, as we have nothing to call
+		return river.JobCancel(fmt.Errorf("unable to unmarshal targets because %w", err))
 	}
 
 	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args))
 	if err != nil {
-		return river.JobCancel(err)
+		// If there is an error returned from the targets, it means that the execution was interrupted
+		return river.JobCancel(fmt.Errorf("interruption during call of targets because %w", err))
 	}
 	return nil
 }
