@@ -285,7 +285,7 @@ message CreateWebKeyRequest {
     ED25519 ed25519 = 3;
   }
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"bits\":\"RSA_BITS_2048\",\"hasher\":\"RSA_HASHER_SHA5256\"}";
+    example: "{\"rsa\":{\"bits\":\"RSA_BITS_2048\",\"hasher\":\"RSA_HASHER_SHA256\"}}";
   };
 }
 
