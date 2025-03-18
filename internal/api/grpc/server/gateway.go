@@ -28,7 +28,6 @@ import (
 
 const (
 	mimeWildcard = "*/*"
-	UnknownPath  = "UNKNOWN_PATH"
 )
 
 var (
@@ -275,11 +274,7 @@ func grpcCredentials(tlsConfig *tls.Config) credentials.TransportCredentials {
 func setRequestURIPattern(ctx context.Context) {
 	pattern, ok := runtime.HTTPPathPattern(ctx)
 	if !ok {
-		// As all unmatched paths will be handled by the gateway, any request not matching a pattern,
-		// means there's no route to the path.
-		// To prevent high cardinality on metrics and tracing, we want to make sure we don't record
-		// the actual path as name (it will still be recorded explicitly in the span http info).
-		pattern = UnknownPath
+		return
 	}
 	span := trace.SpanFromContext(ctx)
 	span.SetName(pattern)

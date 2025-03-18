@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"io"
-	"os"
+	"io/ioutil"
 	"strconv"
 	"time"
 
@@ -215,7 +214,7 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		data = s3Data
 	}
 	if localInput != nil {
-		localData, err := os.ReadFile(localInput.Path)
+		localData, err := ioutil.ReadFile(localInput.Path)
 		if err != nil {
 			return nil, err
 		}
@@ -275,7 +274,7 @@ func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Inpu
 	}
 
 	defer object.Close()
-	return io.ReadAll(object)
+	return ioutil.ReadAll(object)
 }
 
 func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSInput) (_ []byte, err error) {
@@ -298,7 +297,7 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 		return nil, err
 	}
 	defer reader.Close()
-	return io.ReadAll(reader)
+	return ioutil.ReadAll(reader)
 }
 
 func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) (err error) {

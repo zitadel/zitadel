@@ -3,7 +3,7 @@ package renderer
 import (
 	"context"
 	"html/template"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -107,7 +107,7 @@ func (r *Renderer) addFileToTemplate(dir http.FileSystem, tmpl *template.Templat
 		return err
 	}
 	defer f.Close()
-	content, err := io.ReadAll(f)
+	content, err := ioutil.ReadAll(f)
 	if err != nil {
 		return err
 	}
