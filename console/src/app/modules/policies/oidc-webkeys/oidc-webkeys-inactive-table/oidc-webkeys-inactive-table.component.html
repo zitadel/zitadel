@@ -1,5 +1,7 @@
-<cnsl-card [title]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.TITLE' | translate"
-           [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DESCRIPTION' | translate">
+<cnsl-card
+  [title]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.TITLE' | translate"
+  [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DESCRIPTION' | translate"
+>
   <cnsl-refresh-table [hideRefresh]="true" [loading]="(dataSource$ | async) === null">
     <div class="table-wrapper">
       <table
@@ -10,7 +12,9 @@
         [dataSource]="dataSource"
       >
         <ng-container matColumnDef="timestamp">
-          <th mat-header-cell *matHeaderCellDef>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DEACTIVATED_ON' | translate }}</th>
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DEACTIVATED_ON' | translate }}
+          </th>
           <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
             {{ row.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}
           </td>
