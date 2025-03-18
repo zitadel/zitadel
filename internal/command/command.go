@@ -218,33 +218,6 @@ func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer
 	return AppendAndReduce(object, events...)
 }
 
-// pushChunked pushes the commands in chunks of size to the eventstore.
-// This can be used to reduce the amount of events in a single transaction.
-// When an error occurs, the events that have been pushed so far will be returned.
-//
-// Warning: chunks are pushed in separate transactions.
-// Successful pushes will not be rolled back if a later chunk fails.
-// Only use this function when the caller is able to handle partial success
-// and is able to consolidate the state on errors.
-func (c *Commands) pushChunked(ctx context.Context, size uint16, cmds ...eventstore.Command) (_ []eventstore.Event, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	events := make([]eventstore.Event, 0, len(cmds))
-	for i := 0; i < len(cmds); i += int(size) {
-		end := i + int(size)
-		if end > len(cmds) {
-			end = len(cmds)
-		}
-		chunk, err := c.eventstore.Push(ctx, cmds[i:end]...)
-		if err != nil {
-			return events, err
-		}
-		events = append(events, chunk...)
-	}
-	return events, nil
-}
-
 type AppendReducerDetails interface {
 	AppendEvents(...eventstore.Event)
 	// TODO: Why is it allowed to return an error here?

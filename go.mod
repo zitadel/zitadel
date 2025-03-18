@@ -24,6 +24,7 @@ require (
 	github.com/drone/envsubst v1.0.3
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/fatih/color v1.17.0
+	github.com/fergusstrange/embedded-postgres v1.30.0
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-jose/go-jose/v4 v4.0.4
@@ -135,6 +136,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
+	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
 	github.com/zenazn/goji v1.0.1 // indirect
 	go.uber.org/goleak v1.3.0 // indirect
@@ -174,7 +176,6 @@ require (
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
 	github.com/go-xmlfmt/xmlfmt v1.1.2 // indirect
-	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/uuid v1.6.0

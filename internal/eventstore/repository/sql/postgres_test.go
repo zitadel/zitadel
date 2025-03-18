@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
-func TestCRDB_placeholder(t *testing.T) {
+func TestPostgres_placeholder(t *testing.T) {
 	type args struct {
 		query string
 	}
@@ -50,15 +50,15 @@ func TestCRDB_placeholder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{}
+			db := &Postgres{}
 			if query := db.placeholder(tt.args.query); query != tt.res.query {
-				t.Errorf("CRDB.placeholder() = %v, want %v", query, tt.res.query)
+				t.Errorf("Postgres.placeholder() = %v, want %v", query, tt.res.query)
 			}
 		})
 	}
 }
 
-func TestCRDB_operation(t *testing.T) {
+func TestPostgres_operation(t *testing.T) {
 	type res struct {
 		op string
 	}
@@ -118,15 +118,15 @@ func TestCRDB_operation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{}
+			db := &Postgres{}
 			if got := db.operation(tt.args.operation); got != tt.res.op {
-				t.Errorf("CRDB.operation() = %v, want %v", got, tt.res.op)
+				t.Errorf("Postgres.operation() = %v, want %v", got, tt.res.op)
 			}
 		})
 	}
 }
 
-func TestCRDB_conditionFormat(t *testing.T) {
+func TestPostgres_conditionFormat(t *testing.T) {
 	type res struct {
 		format string
 	}
@@ -159,15 +159,15 @@ func TestCRDB_conditionFormat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{}
+			db := &Postgres{}
 			if got := db.conditionFormat(tt.args.operation); got != tt.res.format {
-				t.Errorf("CRDB.conditionFormat() = %v, want %v", got, tt.res.format)
+				t.Errorf("Postgres.conditionFormat() = %v, want %v", got, tt.res.format)
 			}
 		})
 	}
 }
 
-func TestCRDB_columnName(t *testing.T) {
+func TestPostgres_columnName(t *testing.T) {
 	type res struct {
 		name string
 	}
@@ -295,9 +295,9 @@ func TestCRDB_columnName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{}
+			db := &Postgres{}
 			if got := db.columnName(tt.args.field, tt.args.useV1); got != tt.res.name {
-				t.Errorf("CRDB.operation() = %v, want %v", got, tt.res.name)
+				t.Errorf("Postgres.operation() = %v, want %v", got, tt.res.name)
 			}
 		})
 	}
