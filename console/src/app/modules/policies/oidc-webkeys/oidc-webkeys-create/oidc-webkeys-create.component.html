@@ -53,7 +53,7 @@
     <ng-template #submitButton let-form="form">
       <button [disabled]="(loading$ | async) || form?.invalid" mat-raised-button color="primary" type="submit">
         <mat-spinner diameter="20" *ngIf="loading$ | async"></mat-spinner>
-        <span *ngIf="(loading$ | async) == false">{{ 'ACTIONS.CREATE' | translate }}</span>
+        <span *ngIf="(loading$ | async) === false || (loading$ | async) === null">{{ 'ACTIONS.CREATE' | translate }}</span>
       </button>
     </ng-template>
   </ng-container>
