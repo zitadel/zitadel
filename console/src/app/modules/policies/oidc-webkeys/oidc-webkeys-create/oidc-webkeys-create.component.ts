@@ -9,7 +9,6 @@ type RawValue<T extends FormGroup> = ReturnType<T['getRawValue']>;
 @Component({
   selector: 'cnsl-oidc-webkeys-create',
   templateUrl: './oidc-webkeys-create.component.html',
-  styleUrls: ['./oidc-webkeys-create.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OidcWebKeysCreateComponent {

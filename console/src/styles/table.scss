@@ -133,6 +133,11 @@
       color: if($is-dark-theme, #ffc1c1, #620e0e);
       background-color: if($is-dark-theme, map-get($background, state-inactive), #ffc1c1);
     }
+
+    &.neutral {
+      color: blue;
+      background-color: darkblue;
+    }
   }
 
   .bg-state {

@@ -20,7 +20,6 @@ const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
 @Component({
   selector: 'cnsl-oidc-webkeys',
   templateUrl: './oidc-webkeys.component.html',
-  styleUrls: ['./oidc-webkeys.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OidcWebKeysComponent implements OnInit {
