@@ -185,6 +185,32 @@
           "DESCRIPTION": "Czas życia bezczynnego tokena odświeżania to maksymalny czas, przez który token odświeżania może pozostać nieużywany."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Zarządzaj swoimi kluczami internetowymi OIDC, aby bezpiecznie podpisywać i weryfikować tokeny w swojej instancji ZITADEL.",
+        "TABLE": {
+          "TITLE": "Aktywne i Przyszłe Klucze Internetowe",
+          "DESCRIPTION": "Twoje aktywne i nadchodzące klucze internetowe. Aktywacja nowego klucza spowoduje dezaktywację obecnego.",
+          "NOTE": "Uwaga: Punkt końcowy JWKs OIDC zwraca odpowiedź możliwą do buforowania (domyślnie 5 minut). Unikaj zbyt wczesnej aktywacji klucza, ponieważ może on nie być jeszcze dostępny w pamięci podręcznej i dla klientów.",
+          "ACTIVATE": "Aktywuj następny klucz internetowy",
+          "ACTIVE": "Obecnie aktywny",
+          "NEXT": "Następny w kolejce",
+          "FUTURE": "Przyszłe",
+          "WARNING": "Klucz sieciowy ma mniej niż 5 minut"
+        },
+        "CREATE": {
+          "TITLE": "Utwórz nowy klucz internetowy",
+          "DESCRIPTION": "Utworzenie nowego klucza internetowego doda go do Twojej listy. ZITADEL domyślnie używa kluczy RSA2048 z haszowaniem SHA256.",
+          "KEY_TYPE": "Typ klucza",
+          "BITS": "Bity",
+          "HASHER": "Haszowanie",
+          "CURVE": "Krzywa"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Poprzednie Klucze Internetowe",
+          "DESCRIPTION": "To są Twoje poprzednie klucze internetowe, które nie są już aktywne.",
+          "DEACTIVATED_ON": "Dezaktywowany dnia"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Teksty wiadomości",
         "DESCRIPTION": "Dostosuj teksty swoich e-maili lub wiadomości SMS z powiadomieniami. Jeśli chcesz wyłączyć niektóre języki, ogranicz je w ustawieniach językowych swoich instancji.",
@@ -1352,6 +1378,7 @@
       "BRANDING": "Marka",
       "PRIVACYPOLICY": "Polityka prywatności",
       "OIDC": "Czas trwania tokenów OIDC i wygaśnięcie",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Wygląd sekretów",
       "SECURITY": "Ustawienia bezpieczeństwa",
       "EVENTS": "Zdarzenia",

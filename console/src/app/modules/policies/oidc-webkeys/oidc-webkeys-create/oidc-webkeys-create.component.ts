@@ -1,12 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal, WritableSignal } from '@angular/core';
-import {
-  WebKeyECDSAConfig_ECDSACurve,
-  WebKeyRSAConfig_RSABits,
-  WebKeyRSAConfig_RSAHasher,
-} from '@zitadel/proto/zitadel/resources/webkey/v3alpha/config_pb';
-import { WebKey } from '@zitadel/proto/zitadel/resources/webkey/v3alpha/key_pb';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
 import { ReplaySubject } from 'rxjs';
+import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
 
 type RawValue<T extends FormGroup> = ReturnType<T['getRawValue']>;
 
@@ -17,10 +13,10 @@ type RawValue<T extends FormGroup> = ReturnType<T['getRawValue']>;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OidcWebKeysCreateComponent {
-  protected readonly keyType: WritableSignal<NonNullable<WebKey['config']['case']>> = signal('rsa');
-  protected readonly RSAHasher = WebKeyRSAConfig_RSAHasher;
-  protected readonly RSABits = WebKeyRSAConfig_RSABits;
-  protected readonly ECDSACurve = WebKeyECDSAConfig_ECDSACurve;
+  protected readonly keyType: WritableSignal<NonNullable<WebKey['key']['case']>> = signal('rsa');
+  protected readonly RSAHasher = RSAHasher;
+  protected readonly RSABits = RSABits;
+  protected readonly ECDSACurve = ECDSACurve;
   protected readonly Number = Number;
   protected readonly rsaForm = this.buildRsaForm();
   protected readonly ecdsaForm = this.buildEcdsaForm();
@@ -38,11 +34,11 @@ export class OidcWebKeysCreateComponent {
 
   private buildRsaForm() {
     return this.fb.group({
-      bits: new FormControl<WebKeyRSAConfig_RSABits>(WebKeyRSAConfig_RSABits.RSA_BITS_2048, {
+      bits: new FormControl<RSABits>(RSABits.RSA_BITS_2048, {
         nonNullable: true,
         validators: [Validators.required],
       }),
-      hasher: new FormControl<WebKeyRSAConfig_RSAHasher>(WebKeyRSAConfig_RSAHasher.RSA_HASHER_SHA256, {
+      hasher: new FormControl<RSAHasher>(RSAHasher.RSA_HASHER_SHA256, {
         nonNullable: true,
         validators: [Validators.required],
       }),
@@ -51,7 +47,7 @@ export class OidcWebKeysCreateComponent {
 
   private buildEcdsaForm() {
     return this.fb.group({
-      curve: new FormControl<WebKeyECDSAConfig_ECDSACurve>(WebKeyECDSAConfig_ECDSACurve.ECDSA_CURVE_P256, {
+      curve: new FormControl<ECDSACurve>(ECDSACurve.ECDSA_CURVE_P256, {
         nonNullable: true,
         validators: [Validators.required],
       }),

@@ -185,6 +185,32 @@
           "DESCRIPTION": "La duración de vida del token de actualización en espera es el tiempo máximo que un token de actualización puede estar sin usar."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Administra tus claves web OIDC para firmar y validar tokens de manera segura en tu instancia de ZITADEL.",
+        "TABLE": {
+          "TITLE": "Claves Web Activas y Futuras",
+          "DESCRIPTION": "Tus claves web activas y próximas. Activar una nueva clave desactivará la actual.",
+          "NOTE": "Nota: El endpoint JWKs OIDC devuelve una respuesta almacenable en caché (por defecto 5 min). Evita activar una clave demasiado pronto, ya que puede que aún no esté disponible en cachés y clientes.",
+          "ACTIVATE": "Activar la siguiente Clave Web",
+          "ACTIVE": "Actualmente activa",
+          "NEXT": "Siguiente en la cola",
+          "FUTURE": "Futuro",
+          "WARNING": "La clave web tiene menos de 5 minutos"
+        },
+        "CREATE": {
+          "TITLE": "Crear nueva Clave Web",
+          "DESCRIPTION": "Crear una nueva clave web la añadirá a tu lista. ZITADEL usa por defecto claves RSA2048 con un algoritmo de hash SHA256.",
+          "KEY_TYPE": "Tipo de Clave",
+          "BITS": "Bits",
+          "HASHER": "Algoritmo de Hash",
+          "CURVE": "Curva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Claves Web Anteriores",
+          "DESCRIPTION": "Estas son tus claves web anteriores que ya no están activas.",
+          "DEACTIVATED_ON": "Desactivada el"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Textos de Mensajes",
         "DESCRIPTION": "Personaliza los textos de tus mensajes de correo electrónico de notificación o mensajes SMS. Si deseas desactivar algunos de los idiomas, restríngelos en la configuración de idiomas de tus instancias.",
@@ -1354,6 +1380,7 @@
       "BRANDING": "Imagen de marca",
       "PRIVACYPOLICY": "Política de privacidad",
       "OIDC": "OIDC Token lifetime and expiration",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Apariencia del secreto",
       "SECURITY": "Ajustes de seguridad",
       "EVENTS": "Eventos",

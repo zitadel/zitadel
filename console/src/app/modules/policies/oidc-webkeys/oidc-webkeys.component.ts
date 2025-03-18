@@ -1,23 +1,18 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular/core';
 import { WebKeysService } from 'src/app/services/webkeys.service';
-import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { defer, EMPTY, firstValueFrom, Observable, ObservedValueOf, of, shareReplay, Subject, switchMap } from 'rxjs';
 import { catchError, map, startWith, withLatestFrom } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
-// todo: use v2beta
-import { GetWebKey, WebKeyState } from '@zitadel/proto/zitadel/resources/webkey/v3alpha/key_pb';
-import {
-  WebKeyECDSAConfig_ECDSACurve,
-  WebKeyRSAConfig_RSABits,
-  WebKeyRSAConfig_RSAHasher,
-} from '@zitadel/proto/zitadel/resources/webkey/v3alpha/config_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { CreateWebKeyRequestSchema } from '@zitadel/proto/zitadel/resources/webkey/v3alpha/webkey_service_pb';
 import { OidcWebKeysCreateComponent } from './oidc-webkeys-create/oidc-webkeys-create.component';
 import { TimestampToDatePipe } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date.pipe';
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
+import { CreateWebKeyRequestSchema } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
+import { NewFeatureService } from 'src/app/services/new-feature.service';
 
 const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -30,9 +25,9 @@ const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
 export class OidcWebKeysComponent {
   protected readonly refresh = new Subject<true>();
   protected readonly webKeysEnabled$: Observable<boolean>;
-  protected readonly webKeys$: Observable<GetWebKey[]>;
-  protected readonly inactiveWebKeys$: Observable<GetWebKey[]>;
-  protected readonly nextWebKeyCandidate$: Observable<GetWebKey | undefined>;
+  protected readonly webKeys$: Observable<WebKey[]>;
+  protected readonly inactiveWebKeys$: Observable<WebKey[]>;
+  protected readonly nextWebKeyCandidate$: Observable<WebKey | undefined>;
 
   protected readonly activateLoading = signal(false);
   protected readonly createLoading = signal(false);
@@ -49,10 +44,8 @@ export class OidcWebKeysComponent {
 
     const webKeys$ = this.getWebKeys(this.webKeysEnabled$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
-    this.webKeys$ = webKeys$.pipe(map((webKeys) => webKeys.filter((webKey) => webKey.state !== WebKeyState.STATE_INACTIVE)));
-    this.inactiveWebKeys$ = webKeys$.pipe(
-      map((webKeys) => webKeys.filter((webKey) => webKey.state === WebKeyState.STATE_INACTIVE)),
-    );
+    this.webKeys$ = webKeys$.pipe(map((webKeys) => webKeys.filter((webKey) => webKey.state !== State.INACTIVE)));
+    this.inactiveWebKeys$ = webKeys$.pipe(map((webKeys) => webKeys.filter((webKey) => webKey.state === State.INACTIVE)));
 
     this.nextWebKeyCandidate$ = this.getNextWebKeyCandidate(this.webKeys$);
   }
@@ -85,17 +78,17 @@ export class OidcWebKeysComponent {
     );
   }
 
-  private getNextWebKeyCandidate(webKeys$: Observable<GetWebKey[]>) {
+  private getNextWebKeyCandidate(webKeys$: Observable<WebKey[]>) {
     return webKeys$.pipe(
       map((webKeys) => {
         if (webKeys.length < 2) {
           return undefined;
         }
         const [webKey, nextWebKey] = webKeys;
-        if (webKey.state !== WebKeyState.STATE_ACTIVE) {
+        if (webKey.state !== State.ACTIVE) {
           return undefined;
         }
-        if (nextWebKey.state !== WebKeyState.STATE_INITIAL) {
+        if (nextWebKey.state !== State.INITIAL) {
           return undefined;
         }
         return nextWebKey;
@@ -128,11 +121,10 @@ export class OidcWebKeysComponent {
         case: 'ed25519',
         value: {},
       },
-    } as any;
+    };
   }
 
-  private createEcdsa(curve: WebKeyECDSAConfig_ECDSACurve): MessageInitShape<typeof CreateWebKeyRequestSchema> {
-    // todo: use correct typing
+  private createEcdsa(curve: ECDSACurve): MessageInitShape<typeof CreateWebKeyRequestSchema> {
     return {
       key: {
         case: 'ecdsa',
@@ -140,14 +132,10 @@ export class OidcWebKeysComponent {
           curve,
         },
       },
-    } as any;
+    };
   }
 
-  private createRsa(
-    bits: WebKeyRSAConfig_RSABits,
-    hasher: WebKeyRSAConfig_RSAHasher,
-  ): MessageInitShape<typeof CreateWebKeyRequestSchema> {
-    // todo: use correct typing
+  private createRsa(bits: RSABits, hasher: RSAHasher): MessageInitShape<typeof CreateWebKeyRequestSchema> {
     return {
       key: {
         case: 'rsa',
@@ -156,24 +144,22 @@ export class OidcWebKeysComponent {
           hasher,
         },
       },
-    } as any;
+    };
   }
 
-  protected async deleteWebKey(row: GetWebKey) {
-    // todo: fix this when typings are correct
+  protected async deleteWebKey(row: WebKey) {
     try {
-      await this.webKeysService.DeleteWebKey((row as any).id);
+      await this.webKeysService.DeleteWebKey(row.id);
       this.refresh.next(true);
     } catch (err) {
       this.toast.showError(err);
     }
   }
 
-  protected async activateWebKey(nextWebKey: GetWebKey) {
+  protected async activateWebKey(nextWebKey: WebKey) {
     try {
       this.activateLoading.set(true);
-      // todo: fix this when typing are correct
-      const creationDate = this.timestampToDatePipe.transform((nextWebKey as any).creationDate);
+      const creationDate = this.timestampToDatePipe.transform(nextWebKey.creationDate);
       if (!creationDate) {
         // noinspection ExceptionCaughtLocallyJS
         throw new Error('Invalid creation date');
@@ -184,8 +170,7 @@ export class OidcWebKeysComponent {
         return;
       }
 
-      // todo: remove this once typing is fixed
-      await this.webKeysService.ActivateWebKey((nextWebKey as any).id);
+      await this.webKeysService.ActivateWebKey(nextWebKey.id);
       this.refresh.next(true);
     } catch (error) {
       this.toast.showError(error);
@@ -197,10 +182,10 @@ export class OidcWebKeysComponent {
   private openCacheWarnDialog() {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
-        confirmKey: 'ACTIONS.DELETE',
+        confirmKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.ACTIVATE',
         cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'IDP.DELETE_TITLE',
-        descriptionKey: 'IDP.DELETE_DESCRIPTION',
+        titleKey: 'Web Key is less then 5 min old',
+        descriptionKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.NOTE',
       },
       width: '400px',
     });

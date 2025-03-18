@@ -6,8 +6,8 @@ import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb'
   name: 'timestampToDate',
 })
 export class TimestampToDatePipe implements PipeTransform {
-  transform(date: BufTimestamp | Timestamp.AsObject, ...args: unknown[]): Date | undefined {
-    if (date?.seconds !== undefined && date?.nanos !== undefined) {
+  transform(date: BufTimestamp | Timestamp.AsObject | undefined): Date | undefined {
+    if (date?.seconds && date.nanos) {
       return new Date(Number(date.seconds) * 1000 + date.nanos / 1000 / 1000);
     }
     return undefined;

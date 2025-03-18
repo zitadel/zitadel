@@ -185,6 +185,32 @@
           "DESCRIPTION": "A vida útil do token de atualização inativo é o tempo máximo que um token de atualização pode ficar sem uso."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gerencie suas Chaves Web OIDC para assinar e validar tokens com segurança em sua instância do ZITADEL.",
+        "TABLE": {
+          "TITLE": "Chaves Web Ativas e Futuras",
+          "DESCRIPTION": "Suas chaves web ativas e futuras. Ativar uma nova chave desativará a atual.",
+          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os clientes.",
+          "ACTIVATE": "Ativar próxima Chave Web",
+          "ACTIVE": "Atualmente ativa",
+          "NEXT": "Próxima na fila",
+          "FUTURE": "Futuro",
+          "WARNING": "A chave da Web tem menos de 5 minutos"
+        },
+        "CREATE": {
+          "TITLE": "Criar nova Chave Web",
+          "DESCRIPTION": "Criar uma nova chave web a adicionará à sua lista. O ZITADEL usa, por padrão, chaves RSA2048 com um algoritmo de hash SHA256.",
+          "KEY_TYPE": "Tipo de Chave",
+          "BITS": "Bits",
+          "HASHER": "Algoritmo de Hash",
+          "CURVE": "Curva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Chaves Web Anteriores",
+          "DESCRIPTION": "Estas são suas chaves web anteriores que não estão mais ativas.",
+          "DEACTIVATED_ON": "Desativada em"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Textos de Mensagens",
         "DESCRIPTION": "Personalize os textos do seu e-mail de notificação ou mensagens SMS. Se desejar desativar alguns idiomas, restrinja-os nas configurações de idioma da sua instância.",
@@ -1354,6 +1380,7 @@
       "BRANDING": "Marca",
       "PRIVACYPOLICY": "Política de Privacidade",
       "OIDC": "Tempo de Vida e Expiração do Token OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Aparência de Segredo",
       "SECURITY": "Configurações de Segurança",
       "EVENTS": "Eventos",

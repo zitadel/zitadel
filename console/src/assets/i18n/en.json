@@ -185,6 +185,32 @@
           "DESCRIPTION": "The idle refresh token lifetime is the maximum time a refresh token can be unused."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Manage your OIDC Web Keys to securely sign and validate tokens for your ZITADEL instance.",
+        "TABLE": {
+          "TITLE": "Active and Future Web Keys",
+          "DESCRIPTION": "Your active and upcoming web keys. Activating a new key will deactivate the current one.",
+          "NOTE": "Note: The JWKs OIDC endpoint returns a cacheable response (default 5 min). Avoid activating a key too soon, as it may not be available to caches and clients yet.",
+          "ACTIVATE": "Activate next Web Key",
+          "ACTIVE": "Currently active",
+          "NEXT": "Next in queue",
+          "FUTURE": "Future",
+          "WARNING": "Web Key is less than 5 min old"
+        },
+        "CREATE": {
+          "TITLE": "Create new Web Key",
+          "DESCRIPTION": "Creating a new web key adds it to your list. ZITADEL uses RSA2048 keys with a SHA256 hasher by default.",
+          "KEY_TYPE": "Key Type",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Curve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Previous Web Keys",
+          "DESCRIPTION": "These are your previous web keys that are no longer active.",
+          "DEACTIVATED_ON": "Deactivated on"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Message Texts",
         "DESCRIPTION": "Customize the texts of your notification email or SMS messages. If you want to disable some of the languages, restrict them in your instances language settings.",
@@ -1353,6 +1379,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "External links",
       "OIDC": "OIDC Token lifetime and expiration",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Security settings",
       "EVENTS": "Events",

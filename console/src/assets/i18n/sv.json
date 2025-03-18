@@ -185,6 +185,32 @@
           "DESCRIPTION": "Den inaktiva förnyelsetokenens livslängd är den maximala tiden en förnyelsetoken kan vara oanvänd."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Hantera dina OIDC-webbnycklar för att säkert signera och validera tokens för din ZITADEL-instans.",
+        "TABLE": {
+          "TITLE": "Aktiva och framtida webbnycklar",
+          "DESCRIPTION": "Dina aktiva och kommande webbnycklar. Aktivering av en ny nyckel kommer att inaktivera den nuvarande.",
+          "NOTE": "Observera: JWKs OIDC-slutpunkten returnerar ett cachebart svar (standard 5 min). Undvik att aktivera en nyckel för tidigt, eftersom den kanske ännu inte är tillgänglig i cache och för klienter.",
+          "ACTIVATE": "Aktivera nästa webbnyckel",
+          "ACTIVE": "För närvarande aktiv",
+          "NEXT": "Nästa i kön",
+          "FUTURE": "Framtida",
+          "WARNING": "Webbnyckeln är mindre än 5 minuter gammal"
+        },
+        "CREATE": {
+          "TITLE": "Skapa ny webbnyckel",
+          "DESCRIPTION": "Att skapa en ny webbnyckel lägger till den i din lista. ZITADEL använder som standard RSA2048-nycklar med en SHA256-hasher.",
+          "KEY_TYPE": "Nyckeltyp",
+          "BITS": "Bitar",
+          "HASHER": "Hasher",
+          "CURVE": "Kurva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Tidigare webbnycklar",
+          "DESCRIPTION": "Detta är dina tidigare webbnycklar som inte längre är aktiva.",
+          "DEACTIVATED_ON": "Inaktiverad den"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Meddelandetexter",
         "DESCRIPTION": "Anpassa texterna i dina notifikationsmail eller SMS-meddelanden. Om du vill inaktivera några av språken, begränsa dem i dina instansers språkinställningar.",
@@ -1357,6 +1383,7 @@
       "BRANDING": "Varumärke",
       "PRIVACYPOLICY": "Externa länkar",
       "OIDC": "OIDC-token livstid och utgång",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Hemlighetsgenerator",
       "SECURITY": "Säkerhetsinställningar",
       "EVENTS": "Händelser",

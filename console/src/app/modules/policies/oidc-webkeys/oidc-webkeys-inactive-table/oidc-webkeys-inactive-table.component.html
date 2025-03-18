@@ -1,4 +1,5 @@
-<cnsl-card title="Previous Web Keys" description="These are the previous Web Keys that are no longer active.">
+<cnsl-card [title]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.TITLE' | translate"
+           [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DESCRIPTION' | translate">
   <cnsl-refresh-table [hideRefresh]="true" [loading]="(dataSource$ | async) === null">
     <div class="table-wrapper">
       <table
@@ -9,24 +10,21 @@
         [dataSource]="dataSource"
       >
         <ng-container matColumnDef="timestamp">
-          <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DEACTIVATED_ON' | translate }}</th>
           <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-            <!-- todo: Remove $any once typings are fixed -->
-            {{ $any(row).creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}
+            {{ row.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}
           </td>
         </ng-container>
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>Id</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.ID' | translate }}</th>
           <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-            <!-- todo: Remove $any once typings are fixed -->
-            {{ $any(row).id }}
+            {{ row.id }}
           </td>
         </ng-container>
         <ng-container matColumnDef="type">
-          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.TYPE.TITLE' | translate }}</th>
           <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-            <!-- todo: Remove $any once typings are fixed -->
-            {{ $any(row).key.case | uppercase }}
+            {{ row.key.case | uppercase }}
           </td>
         </ng-container>
 

@@ -1,9 +1,9 @@
 <cnsl-card
-  title="Create new Web Key"
-  description="Creating a new Web Key appends it to the list of your keys. Zitadel by default uses RSA2048 Keys with a SHA256 Bit hasher"
+  [title]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.TITLE' | translate"
+  [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.DESCRIPTION' | translate"
 >
   <cnsl-form-field>
-    <cnsl-label>Key Type</cnsl-label>
+    <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.KEY_TYPE' | translate }}</cnsl-label>
     <mat-select [value]="keyType()" (valueChange)="keyType.set($event)">
       <mat-option value="rsa">RSA</mat-option>
       <mat-option value="ecdsa">ECDSA</mat-option>
@@ -13,7 +13,7 @@
   <ng-container [ngSwitch]="keyType()">
     <form *ngSwitchCase="'rsa'" [formGroup]="rsaForm" (ngSubmit)="ngSubmit.emit(rsaForm.getRawValue())">
       <cnsl-form-field>
-        <cnsl-label>BITS</cnsl-label>
+        <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.BITS' | translate }}</cnsl-label>
         <mat-select formControlName="bits">
           <ng-container *ngFor="let bit of RSABits | keyvalue">
             <mat-option *ngIf="Number(bit.key) as key" [value]="key">{{
@@ -23,7 +23,7 @@
         </mat-select>
       </cnsl-form-field>
       <cnsl-form-field>
-        <cnsl-label>HASHER</cnsl-label>
+        <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.HASHER' | translate }}</cnsl-label>
         <mat-select formControlName="hasher">
           <ng-container *ngFor="let hasher of RSAHasher | keyvalue">
             <mat-option *ngIf="Number(hasher.key) as key" [value]="key">{{
@@ -36,7 +36,7 @@
     </form>
     <form *ngSwitchCase="'ecdsa'" [formGroup]="ecdsaForm" (ngSubmit)="ngSubmit.emit(ecdsaForm.getRawValue())">
       <cnsl-form-field>
-        <cnsl-label>CURVE</cnsl-label>
+        <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.CURVE' | translate }}</cnsl-label>
         <mat-select formControlName="curve">
           <ng-container *ngFor="let curve of ECDSACurve | keyvalue">
             <mat-option *ngIf="Number(curve.key) as key" [value]="key">{{
