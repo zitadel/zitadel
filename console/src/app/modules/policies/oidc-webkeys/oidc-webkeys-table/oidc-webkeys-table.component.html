@@ -8,10 +8,11 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.STATE' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
           <span
-            class="state neutral"
+            class="state"
             [ngClass]="{
               active: i === 0,
-              inactive: i === 1,
+              next: i === 1,
+              neutral: i >= 2,
             }"
             [ngSwitch]="i"
           >
