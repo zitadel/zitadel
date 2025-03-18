@@ -22,7 +22,6 @@ type LoadMostRecentSessionParams = {
 
 export async function loadMostRecentSession({
   serviceUrl,
-
   sessionParams,
 }: LoadMostRecentSessionParams): Promise<Session | undefined> {
   const recent = await getMostRecentCookieWithLoginname({
@@ -32,7 +31,6 @@ export async function loadMostRecentSession({
 
   return getSession({
     serviceUrl,
-
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((resp: GetSessionResponse) => resp.session);

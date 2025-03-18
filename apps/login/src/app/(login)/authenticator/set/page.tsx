@@ -49,7 +49,6 @@ export default async function Page(props: {
 
     return listAuthenticationMethodTypes({
       serviceUrl,
-
       userId,
     }).then((methods) => {
       return getUserByID({ serviceUrl, userId }).then((user) => {
@@ -74,7 +73,6 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
-
       sessionParams: {
         loginName,
         organization,
@@ -92,15 +90,10 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(
-        serviceUrl,
-
-        sessionResponse.session,
-      );
+      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
     });
   }
 
@@ -110,19 +103,16 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
-
     orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
   }).then((resp) => {

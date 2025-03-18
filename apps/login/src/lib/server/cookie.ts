@@ -46,24 +46,23 @@ const passwordAttemptsHandler = (error: ConnectError) => {
   throw error;
 };
 
-export async function createSessionAndUpdateCookie(
-  checks: Checks,
-  requestId: string | undefined,
-  lifetime?: Duration,
-): Promise<Session> {
+export async function createSessionAndUpdateCookie(command: {
+  checks: Checks;
+  requestId: string | undefined;
+  lifetime?: Duration;
+}): Promise<Session> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const createdSession = await createSessionFromChecks({
     serviceUrl,
-    checks,
-    lifetime,
+    checks: command.checks,
+    lifetime: command.lifetime,
   });
 
   if (createdSession) {
     return getSession({
       serviceUrl,
-
       sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
     }).then((response) => {
@@ -83,8 +82,8 @@ export async function createSessionAndUpdateCookie(
           loginName: response.session.factors.user.loginName ?? "",
         };
 
-        if (requestId) {
-          sessionCookie.requestId = requestId;
+        if (command.requestId) {
+          sessionCookie.requestId = command.requestId;
         }
 
         if (response.session.factors.user.organizationId) {
@@ -118,7 +117,6 @@ export async function createSessionForIdpAndUpdateCookie(
 
   const createdSession = await createSessionForUserIdAndIdpIntent({
     serviceUrl,
-
     userId,
     idpIntent,
     lifetime,
@@ -139,7 +137,6 @@ export async function createSessionForIdpAndUpdateCookie(
 
   const { session } = await getSession({
     serviceUrl,
-
     sessionId: createdSession.sessionId,
     sessionToken: createdSession.sessionToken,
   });
@@ -191,7 +188,6 @@ export async function setSessionAndUpdateCookie(
 
   return setSession({
     serviceUrl,
-
     sessionId: recentCookie.id,
     sessionToken: recentCookie.token,
     challenges,
@@ -219,7 +215,6 @@ export async function setSessionAndUpdateCookie(
 
         return getSession({
           serviceUrl,
-
           sessionId: sessionCookie.id,
           sessionToken: sessionCookie.token,
         }).then((response) => {

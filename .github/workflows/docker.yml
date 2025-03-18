@@ -57,6 +57,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate stubs
+        run: pnpm generate
+
       - name: Build for Docker
         run: NEXT_PUBLIC_BASE_PATH=/ui/v2/login pnpm build:docker
 

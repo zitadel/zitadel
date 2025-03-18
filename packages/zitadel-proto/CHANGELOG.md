@@ -1,5 +1,11 @@
 # @zitadel/proto
 
+## 1.0.4
+
+### Patch Changes
+
+- 97b0332: bind @zitadel/proto version to zitadel tag
+
 ## 1.0.3
 
 ### Patch Changes
