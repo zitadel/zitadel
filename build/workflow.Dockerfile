@@ -234,7 +234,7 @@ FROM test-core-base AS test-core-integration
 ENV DB_FLAVOR=cockroach
 
 # install cockroach
-COPY --from=cockroachdb/cockroach:latest /cockroach/cockroach /usr/local/bin/
+COPY --from=cockroachdb/cockroach:latest-v24.3 /cockroach/cockroach /usr/local/bin/
 ENV COCKROACH_BINARY=/cockroach/cockroach
 
 ENV ZITADEL_MASTERKEY=MasterkeyNeedsToHave32Characters
