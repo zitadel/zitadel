@@ -5,7 +5,7 @@
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
-			"version": "1.22"
+			"version": "1.23"
 		},
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/guiyomh/features/golangci-lint:0": {},
@@ -16,7 +16,9 @@
 	"forwardPorts": [
 		3000,
 		4200,
-		8080
+		443,
+		8080,
+		5050
 	],
 	"onCreateCommand": "npm install -g sass@1.64.1"
 }
