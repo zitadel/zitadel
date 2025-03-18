@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"io/ioutil"
 	"os"
 	"time"
@@ -16,6 +15,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query/projection"
