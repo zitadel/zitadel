@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
-	pagination "github.com/zitadel/zitadel/pkg/grpc/pagination/v2beta"
+	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 )
 
 func TestServer_GetTarget(t *testing.T) {
@@ -250,7 +250,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  0,
 					AppliedLimit: 100,
 				},
@@ -281,7 +281,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -321,7 +321,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -378,7 +378,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  3,
 					AppliedLimit: 100,
 				},
@@ -433,13 +433,13 @@ func TestServer_ListTargets(t *testing.T) {
 						assert.EqualExportedValues(ttt, tt.want.Result[i], got.Result[i])
 					}
 				}
-				assertListDetails(ttt, tt.want.Details, got.Details)
+				assertPaginationResponse(ttt, tt.want.Details, got.Details)
 			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}
 }
 
-func assertListDetails(t *assert.CollectT, expected *pagination.ListDetails, actual *pagination.ListDetails) {
+func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationResponse, actual *filter.PaginationResponse) {
 	assert.Equal(t, expected.AppliedLimit, actual.AppliedLimit)
 	assert.Equal(t, expected.TotalResult, actual.TotalResult)
 }
@@ -501,7 +501,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -557,7 +557,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -613,7 +613,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -695,7 +695,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  3,
 					AppliedLimit: 100,
 				},
@@ -743,7 +743,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &pagination.ListDetails{
+				Details: &filter.PaginationResponse{
 					TotalResult:  10,
 					AppliedLimit: 100,
 				},
@@ -780,7 +780,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
 					assert.EqualExportedValues(ttt, got.Result, tt.want.Result)
 				}
-				assertListDetails(ttt, tt.want.Details, got.Details)
+				assertPaginationResponse(ttt, tt.want.Details, got.Details)
 			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}

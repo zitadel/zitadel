@@ -278,9 +278,9 @@ service ActionService {
     };
   }
 
-  // Search Targets
+  // List targets
   //
-  // Search all matching targets. By default all targets of the instance are returned.
+  // List all matching targets. By default all targets of the instance are returned.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
@@ -657,6 +657,9 @@ message ListTargetsRequest {
   ];
   // Define the criteria to query for.
   repeated TargetSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"query\":{\"offset\":\"string\",\"limit\":0,\"asc\":true},\"sortingColumn\":\"TARGET_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"targetNameFilter\":{\"targetName\":\"ip_allow_list\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inTargetIdsFilter\":{\"targetIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
+  };
 }
 
 message ListTargetsResponse {
@@ -669,6 +672,9 @@ message SetExecutionRequest {
   Condition condition = 1;
   // Ordered list of targets/includes called during the execution.
   repeated ExecutionTargetType targets = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"condition\":{\"request\":{\"method\":\"zitadel.session.v2.SessionService/ListSessions\"}},\"targets\":[{\"target\":\"69629026806489455\"}]}";
+  };
 }
 
 message SetExecutionResponse {
