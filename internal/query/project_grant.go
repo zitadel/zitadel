@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -116,7 +115,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
+	stmt, scan := prepareProjectGrantQuery()
 	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():    id,
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -137,7 +136,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
+	stmt, scan := prepareProjectGrantQuery()
 	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():      id,
 		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
@@ -159,7 +158,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectGrantsQuery(ctx, q.client)
+	query, scan := prepareProjectGrantsQuery()
 	eq := sq.Eq{
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -264,7 +263,7 @@ func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBui
 	return query
 }
 
-func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
+func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -286,7 +285,7 @@ func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			grant := new(ProjectGrant)
 			var (
@@ -323,7 +322,7 @@ func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 		}
 }
 
-func prepareProjectGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
+func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -346,7 +345,7 @@ func prepareProjectGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var (
