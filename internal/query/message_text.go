@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"io/ioutil"
 	"os"
 	"time"
@@ -130,7 +131,7 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (text *MessageText, er
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMessageTextQuery()
+	stmt, scan := prepareMessageTextQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
@@ -166,7 +167,7 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMessageTextQuery()
+	stmt, scan := prepareMessageTextQuery(ctx, q.client)
 	eq := sq.Eq{
 		MessageTextColLanguage.identifier():    language,
 		MessageTextColType.identifier():        messageType,
@@ -248,7 +249,7 @@ func (q *Queries) readNotificationTextMessages(ctx context.Context, language str
 	return contents, nil
 }
 
-func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
+func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
 	return sq.Select(
 			MessageTextColAggregateID.identifier(),
 			MessageTextColSequence.identifier(),
@@ -265,7 +266,7 @@ func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, 
 			MessageTextColButtonText.identifier(),
 			MessageTextColFooter.identifier(),
 		).
-			From(messageTextTable.identifier()).
+			From(messageTextTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MessageText, error) {
 			msg := new(MessageText)
