@@ -17,6 +17,7 @@ services:
       ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      ZITADEL_EXTERNALSECURE: false
   db:
     image: postgres:latest
     restart: unless-stopped
@@ -26,18 +27,5 @@ services:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres
 
-  pgadmin:
-    container_name: pgadmin
-    image: "dpage/pgadmin4:latest"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-
-
 volumes:
   postgres-data:
-  pgadmin_data:
