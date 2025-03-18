@@ -648,7 +648,7 @@ message GetTargetResponse {
 
 message ListTargetsRequest {
   // List limitations and ordering.
-  optional zitadel.filter.v2beta.PaginationRequest query = 1;
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional TargetFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -658,12 +658,12 @@ message ListTargetsRequest {
   // Define the criteria to query for.
   repeated TargetSearchFilter filters = 3;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"query\":{\"offset\":\"string\",\"limit\":0,\"asc\":true},\"sortingColumn\":\"TARGET_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"targetNameFilter\":{\"targetName\":\"ip_allow_list\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inTargetIdsFilter\":{\"targetIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"TARGET_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"targetNameFilter\":{\"targetName\":\"ip_allow_list\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inTargetIdsFilter\":{\"targetIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
   };
 }
 
 message ListTargetsResponse {
-  zitadel.filter.v2beta.PaginationResponse details = 1;
+  zitadel.filter.v2beta.PaginationResponse pagination = 1;
   repeated Target result = 2;
 }
 
@@ -688,7 +688,7 @@ message SetExecutionResponse {
 
 message ListExecutionsRequest {
   // List limitations and ordering.
-  optional zitadel.filter.v2beta.PaginationRequest query = 1;
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional ExecutionFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -697,10 +697,13 @@ message ListExecutionsRequest {
   ];
   // Define the criteria to query for.
   repeated ExecutionSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"EXECUTION_FIELD_NAME_ID\",\"filters\":[{\"targetFilter\":{\"targetId\":\"69629023906488334\"}}]}";
+  };
 }
 
 message ListExecutionsResponse {
-  zitadel.filter.v2beta.PaginationResponse details = 1;
+  zitadel.filter.v2beta.PaginationResponse pagination = 1;
   repeated Execution result = 2;
 }
 

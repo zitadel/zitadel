@@ -32,7 +32,7 @@ func TextMethodPbToQuery(method filter.TextFilterMethod) query.TextComparison {
 	}
 }
 
-func SearchQueryPbToQuery(defaults systemdefaults.SystemDefaults, query *filter.PaginationRequest) (offset, limit uint64, asc bool, err error) {
+func PaginationPbToQuery(defaults systemdefaults.SystemDefaults, query *filter.PaginationRequest) (offset, limit uint64, asc bool, err error) {
 	limit = defaults.DefaultQueryLimit
 	if query == nil {
 		return 0, limit, asc, nil
@@ -48,7 +48,7 @@ func SearchQueryPbToQuery(defaults systemdefaults.SystemDefaults, query *filter.
 	return offset, limit, asc, nil
 }
 
-func ToSearchDetailsPb(request query.SearchRequest, response query.SearchResponse) *filter.PaginationResponse {
+func QueryToPaginationPb(request query.SearchRequest, response query.SearchResponse) *filter.PaginationResponse {
 	return &filter.PaginationResponse{
 		AppliedLimit: request.Limit,
 		TotalResult:  response.Count,

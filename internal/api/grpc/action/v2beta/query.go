@@ -58,8 +58,8 @@ func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest
 		return nil, err
 	}
 	return &action.ListTargetsResponse{
-		Result:  targetsToPb(resp.Targets),
-		Details: filter.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
+		Result:     targetsToPb(resp.Targets),
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
@@ -76,8 +76,8 @@ func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsR
 		return nil, err
 	}
 	return &action.ListExecutionsResponse{
-		Result:  executionsToPb(resp.Executions),
-		Details: filter.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
+		Result:     executionsToPb(resp.Executions),
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
@@ -118,7 +118,7 @@ func targetToPb(t *query.Target) *action.Target {
 }
 
 func (s *Server) ListTargetsRequestToModel(req *action.ListTargetsRequest) (*query.TargetSearchQueries, error) {
-	offset, limit, asc, err := filter.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func executionFieldNameToSortingColumn(field *action.ExecutionFieldName) query.C
 }
 
 func (s *Server) ListExecutionsRequestToModel(req *action.ListExecutionsRequest) (*query.ExecutionSearchQueries, error) {
-	offset, limit, asc, err := filter.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
 	if err != nil {
 		return nil, err
 	}

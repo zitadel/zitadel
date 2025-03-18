@@ -250,7 +250,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  0,
 					AppliedLimit: 100,
 				},
@@ -281,7 +281,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -321,7 +321,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -378,7 +378,7 @@ func TestServer_ListTargets(t *testing.T) {
 				},
 			},
 			want: &action.ListTargetsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  3,
 					AppliedLimit: 100,
 				},
@@ -433,7 +433,7 @@ func TestServer_ListTargets(t *testing.T) {
 						assert.EqualExportedValues(ttt, tt.want.Result[i], got.Result[i])
 					}
 				}
-				assertPaginationResponse(ttt, tt.want.Details, got.Details)
+				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
 			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}
@@ -501,7 +501,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -557,7 +557,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -613,7 +613,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
@@ -695,7 +695,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  3,
 					AppliedLimit: 100,
 				},
@@ -743,7 +743,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 			want: &action.ListExecutionsResponse{
-				Details: &filter.PaginationResponse{
+				Pagination: &filter.PaginationResponse{
 					TotalResult:  10,
 					AppliedLimit: 100,
 				},
@@ -780,7 +780,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
 					assert.EqualExportedValues(ttt, got.Result, tt.want.Result)
 				}
-				assertPaginationResponse(ttt, tt.want.Details, got.Details)
+				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
 			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}
