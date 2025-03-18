@@ -72,6 +72,14 @@ type Querier interface {
 	QueryRow(ctx context.Context, stmt string, args ...any) Row
 }
 
+func Query[Out any](q Querier, fn func(q Querier) ([]Out, error)) ([]Out, error) {
+	return fn(q)
+}
+
+func QueryRow[Out any](q Querier, fn func(q Querier) (Out, error)) (Out, error) {
+	return fn(q)
+}
+
 type Executor interface {
 	Exec(ctx context.Context, stmt string, args ...any) error
 }

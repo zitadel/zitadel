@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/repository"
-	"github.com/zitadel/zitadel/backend/repository/orchestrate"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/telemetry/logging"
 	"github.com/zitadel/zitadel/backend/telemetry/tracing"
@@ -13,11 +12,11 @@ import (
 type Instance struct {
 	db database.Pool
 
-	instance instanceOrchestrator
-	user     userOrchestrator
+	instance instanceRepository
+	user     userRepository
 }
 
-type instanceOrchestrator interface {
+type instanceRepository interface {
 	ByID(ctx context.Context, querier database.Querier, id string) (*repository.Instance, error)
 	ByDomain(ctx context.Context, querier database.Querier, domain string) (*repository.Instance, error)
 	Create(ctx context.Context, tx database.Transaction, instance *repository.Instance) (*repository.Instance, error)
@@ -25,9 +24,15 @@ type instanceOrchestrator interface {
 
 func NewInstance(db database.Pool, tracer *tracing.Tracer, logger *logging.Logger) *Instance {
 	b := &Instance{
-		db:       db,
-		instance: orchestrate.Instance(),
-		user:     orchestrate.User(),
+		db: db,
+		instance: repository.NewInstance(
+			repository.WithLogger[repository.InstanceOptions](logger),
+			repository.WithTracer[repository.InstanceOptions](tracer),
+		),
+		user: repository.NewUser(
+			repository.WithLogger[repository.UserOptions](logger),
+			repository.WithTracer[repository.UserOptions](tracer),
+		),
 	}
 
 	return b
@@ -59,5 +64,6 @@ func (b *Instance) SetUp(ctx context.Context, request *SetUpInstance) (err error
 		return err
 	}
 	_, err = b.user.Create(ctx, tx, request.User)
+	b.authorizations.authorizeusers
 	return err
 }

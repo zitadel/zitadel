@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
 
-type userOrchestrator interface {
+type userRepository interface {
 	Create(ctx context.Context, tx database.Transaction, user *repository.User) (*repository.User, error)
 	ByID(ctx context.Context, querier database.Querier, id string) (*repository.User, error)
 }
