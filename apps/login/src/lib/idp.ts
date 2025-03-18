@@ -1,11 +1,5 @@
-import { create } from "@zitadel/client";
 import { IDPType } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 // This maps the IdentityProviderType to a slug which is used in the /success and /failure routes
 export function idpTypeToSlug(idpType: IdentityProviderType) {

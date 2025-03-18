@@ -19,10 +19,7 @@ import {
 import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { AddHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
