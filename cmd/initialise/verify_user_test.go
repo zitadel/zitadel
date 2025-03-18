@@ -8,7 +8,7 @@ import (
 )
 
 func Test_verifyUser(t *testing.T) {
-	err := ReadStmts("cockroach") //TODO: check all dialects
+	err := ReadStmts()
 	if err != nil {
 		t.Errorf("unable to read stmts: %v", err)
 		t.FailNow()
@@ -28,7 +28,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS \"zitadel-user\"", sql.ErrTxDone),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\"", sql.ErrTxDone),
 				),
 				username: "zitadel-user",
 				password: "",
@@ -39,7 +39,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct without password",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS \"zitadel-user\"", nil),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\"", nil),
 				),
 				username: "zitadel-user",
 				password: "",
@@ -50,7 +50,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct with password",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS \"zitadel-user\" WITH PASSWORD 'password'", nil),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'password'", nil),
 				),
 				username: "zitadel-user",
 				password: "password",
@@ -61,7 +61,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS \"zitadel-user\" WITH PASSWORD 'password'", nil),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'password'", nil),
 				),
 				username: "zitadel-user",
 				password: "",

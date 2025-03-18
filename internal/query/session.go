@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -261,7 +260,7 @@ func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id st
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareSessionQuery(ctx, q.client)
+	query, scan := prepareSessionQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			SessionColumnID.identifier():         id,
@@ -297,7 +296,7 @@ func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQue
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSessionsQuery(ctx, q.client)
+	query, scan := prepareSessionsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -343,7 +342,7 @@ func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (Sear
 	return NewTimestampQuery(SessionColumnCreationDate, datetime, compare)
 }
 
-func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
+func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -374,7 +373,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
 			session := new(Session)
 
@@ -456,7 +455,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error)) {
+func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -487,7 +486,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
 			sessions := &Sessions{Sessions: []*Session{}}
 
