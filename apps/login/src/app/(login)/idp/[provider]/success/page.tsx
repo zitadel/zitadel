@@ -54,7 +54,8 @@ export default async function Page(props: {
     token,
   });
 
-  const { idpInformation, userId, addHumanUser } = intent;
+  const { idpInformation, userId } = intent;
+  let { addHumanUser } = intent;
 
   // sign in user. If user should be linked continue
   if (userId && !link) {
@@ -121,7 +122,7 @@ export default async function Page(props: {
   // search for potential user via username, then link
   if (options?.isLinkingAllowed) {
     let foundUser;
-    const email = addHumanUser.email?.email;
+    const email = addHumanUser?.email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
       foundUser = await listUsers({ serviceUrl, email }).then((response) => {
@@ -177,10 +178,11 @@ export default async function Page(props: {
 
   if (options?.isCreationAllowed && options.isAutoCreation) {
     let orgToRegisterOn: string | undefined = organization;
+    let newUser;
 
     if (
       !orgToRegisterOn &&
-      addHumanUser.username && // username or email?
+      addHumanUser?.username && // username or email?
       ORG_SUFFIX_REGEX.test(addHumanUser.username)
     ) {
       const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
@@ -203,21 +205,21 @@ export default async function Page(props: {
       }
     }
 
-    if (orgToRegisterOn) {
+    if (addHumanUser && orgToRegisterOn) {
       const organizationSchema = create(OrganizationSchema, {
         org: { case: "orgId", value: orgToRegisterOn },
       });
 
-      addHumanUser = create(AddHumanUserRequestSchema, {
+      const addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
         ...addHumanUser,
         organization: organizationSchema,
       });
-    }
 
-    const newUser = await addHuman({
-      serviceUrl,
-      request: addHumanUser,
-    });
+      newUser = await addHuman({
+        serviceUrl,
+        request: addHumanUserWithOrganization,
+      });
+    }
 
     if (newUser) {
       return (
