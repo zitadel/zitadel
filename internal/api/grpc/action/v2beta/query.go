@@ -8,7 +8,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
-	pagination "github.com/zitadel/zitadel/internal/api/grpc/pagination/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -60,7 +59,7 @@ func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest
 	}
 	return &action.ListTargetsResponse{
 		Result:  targetsToPb(resp.Targets),
-		Details: pagination.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
+		Details: filter.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
@@ -78,7 +77,7 @@ func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsR
 	}
 	return &action.ListExecutionsResponse{
 		Result:  executionsToPb(resp.Executions),
-		Details: pagination.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
+		Details: filter.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
@@ -119,7 +118,7 @@ func targetToPb(t *query.Target) *action.Target {
 }
 
 func (s *Server) ListTargetsRequestToModel(req *action.ListTargetsRequest) (*query.TargetSearchQueries, error) {
-	offset, limit, asc, err := pagination.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+	offset, limit, asc, err := filter.SearchQueryPbToQuery(s.systemDefaults, req.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +216,7 @@ func executionFieldNameToSortingColumn(field *action.ExecutionFieldName) query.C
 }
 
 func (s *Server) ListExecutionsRequestToModel(req *action.ListExecutionsRequest) (*query.ExecutionSearchQueries, error) {
-	offset, limit, asc, err := pagination.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+	offset, limit, asc, err := filter.SearchQueryPbToQuery(s.systemDefaults, req.Query)
 	if err != nil {
 		return nil, err
 	}

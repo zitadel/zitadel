@@ -15,7 +15,7 @@ import "zitadel/action/v2beta/target.proto";
 import "zitadel/action/v2beta/execution.proto";
 import "zitadel/action/v2beta/query.proto";
 import "google/protobuf/timestamp.proto";
-import "zitadel/pagination/v2beta/pagination.proto";
+import "zitadel/filter/v2beta/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2beta;action";
 
@@ -140,13 +140,13 @@ service ActionService {
         };
       };
       responses: {
-        key: "403"
+        key: "409"
         value: {
           description: "The target to create already exists.";
         }
       };
       responses: {
-        key: "409"
+        key: "400"
         value: {
           description: "The feature flag `actions` is not enabled.";
         }
@@ -190,7 +190,7 @@ service ActionService {
         }
       };
       responses: {
-        key: "409"
+        key: "400"
         value: {
           description: "The feature flag `actions` is not enabled.";
         }
@@ -228,7 +228,7 @@ service ActionService {
         };
       };
       responses: {
-        key: "409"
+        key: "400"
         value: {
           description: "The feature flag `actions` is not enabled.";
         }
@@ -270,7 +270,7 @@ service ActionService {
         }
       };
       responses: {
-        key: "409"
+        key: "400"
         value: {
           description: "The feature flag `actions` is not enabled.";
         }
@@ -314,7 +314,7 @@ service ActionService {
         };
       };
       responses: {
-        key: "409"
+        key: "400"
         value: {
           description: "The feature flag `actions` is not enabled.";
         }
@@ -354,13 +354,7 @@ service ActionService {
       responses: {
         key: "400"
         value: {
-          description: "Condition to set execution does not exist.";
-        }
-      };
-      responses: {
-        key: "409"
-        value: {
-          description: "The feature flag `actions` is not enabled.";
+          description: "Condition to set execution does not exist or the feature flag `actions` is not enabled.";
         }
       };
     };
@@ -397,14 +391,8 @@ service ActionService {
       responses: {
         key: "400";
         value: {
-          description: "invalid list query";
+          description: "Invalid list query or the feature flag `actions` is not enabled.";
         };
-      };
-      responses: {
-        key: "409"
-        value: {
-          description: "The feature flag `actions` is not enabled.";
-        }
       };
     };
   }
@@ -517,6 +505,9 @@ message CreateTargetRequest {
       max_length: 1000
     }
   ];
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"name\": \"ip_allow_list\",\"restWebhook\":{\"interruptOnError\":true},\"timeout\":\"10s\",\"endpoint\":\"https://example.com/hooks/ip_check\"}";
+  };
 }
 
 message CreateTargetResponse {
@@ -566,9 +557,6 @@ message UpdateTargetRequest {
     // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
     RESTAsync rest_async = 5;
   }
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"restWebhook:\":{\"interruptOnError\":\"true\"}}";
-  };
   // Timeout defines the duration until ZITADEL cancels the execution.
   // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   optional google.protobuf.Duration timeout = 6 [
@@ -600,6 +588,9 @@ message UpdateTargetRequest {
       maximum: 0
     }
   ];
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"name\": \"ip_allow_list\",\"restCall\":{\"interruptOnError\":true},\"timeout\":\"10s\",\"endpoint\":\"https://example.com/hooks/ip_check\",\"expirationSigningKey\":\"0s\"}";
+  };
 }
 
 message UpdateTargetResponse {
@@ -657,7 +648,7 @@ message GetTargetResponse {
 
 message ListTargetsRequest {
   // List limitations and ordering.
-  optional zitadel.pagination.v2beta.ListQuery query = 1;
+  optional zitadel.filter.v2beta.PaginationRequest query = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional TargetFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -669,7 +660,7 @@ message ListTargetsRequest {
 }
 
 message ListTargetsResponse {
-  zitadel.pagination.v2beta.ListDetails details = 1;
+  zitadel.filter.v2beta.PaginationResponse details = 1;
   repeated Target result = 2;
 }
 
@@ -691,7 +682,7 @@ message SetExecutionResponse {
 
 message ListExecutionsRequest {
   // List limitations and ordering.
-  optional zitadel.pagination.v2beta.ListQuery query = 1;
+  optional zitadel.filter.v2beta.PaginationRequest query = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional ExecutionFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -703,7 +694,7 @@ message ListExecutionsRequest {
 }
 
 message ListExecutionsResponse {
-  zitadel.pagination.v2beta.ListDetails details = 1;
+  zitadel.filter.v2beta.PaginationResponse details = 1;
   repeated Execution result = 2;
 }
 
