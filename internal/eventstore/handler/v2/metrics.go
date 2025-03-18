@@ -1,0 +1,74 @@
+package handler
+
+import (
+	"context"
+
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"go.opentelemetry.io/otel/attribute"
+)
+
+const (
+	ProjectionLabel = "projection"
+	SuccessLabel    = "success"
+
+	ProjectionEventsProcessed    = "projection_events_processed"
+	ProjectionHandleTimerMetric  = "projection_handle_timer"
+	ProjectionStateLatencyMetric = "projection_state_latency"
+)
+
+type ProjectionMetrics struct {
+	provider metrics.Metrics
+}
+
+func MustNewProjectionMetrics() *ProjectionMetrics {
+	// we rely on the metrics global variable being set during Setup
+	if metrics.M == nil {
+		logging.Fatal("failed to register projection metrics, metrics provider not initialized")
+	}
+
+	projectionMetrics := &ProjectionMetrics{provider: metrics.M}
+
+	err := projectionMetrics.provider.RegisterCounter(
+		ProjectionEventsProcessed,
+		"Number of events reduced to process projection updates",
+	)
+	logging.OnError(err).Error("failed to register projection events processed counter")
+	err = projectionMetrics.provider.RegisterHistogram(
+		ProjectionHandleTimerMetric,
+		"Time taken to process a projection update",
+		"s",
+		[]float64{0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 1, 5, 10},
+	)
+	logging.OnError(err).Error("failed to register projection handle timer metric")
+	err = projectionMetrics.provider.RegisterHistogram(
+		ProjectionStateLatencyMetric,
+		"Time since the last state update for a projection",
+		"s",
+		[]float64{1, 5, 10, 30, 60, 300, 600, 1800, 3600},
+	)
+	logging.OnError(err).Error("failed to register projection state latency metric")
+	return projectionMetrics
+}
+
+func (m *ProjectionMetrics) ProjectionUpdateTiming(ctx context.Context, projection string, duration float64) {
+	err := m.provider.AddHistogramMeasurement(ctx, ProjectionHandleTimerMetric, duration, map[string]attribute.Value{
+		ProjectionLabel: attribute.StringValue(projection),
+	})
+	logging.OnError(err).Debug("failed to add projection trigger timing")
+}
+
+func (m *ProjectionMetrics) ProjectionEventsProcessed(ctx context.Context, projection string, count int64, success bool) {
+	err := m.provider.AddCount(ctx, ProjectionEventsProcessed, count, map[string]attribute.Value{
+		ProjectionLabel: attribute.StringValue(projection),
+		SuccessLabel:    attribute.BoolValue(success),
+	})
+	logging.OnError(err).Debug("failed to add projection wake count")
+}
+
+func (m *ProjectionMetrics) ProjectionStateLatency(ctx context.Context, projection string, latency float64) {
+	err := m.provider.AddHistogramMeasurement(ctx, ProjectionStateLatencyMetric, latency, map[string]attribute.Value{
+		ProjectionLabel: attribute.StringValue(projection),
+	})
+	logging.OnError(err).Debug("failed to add projection state latency")
+}
