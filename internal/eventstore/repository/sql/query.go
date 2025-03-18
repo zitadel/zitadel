@@ -152,7 +152,7 @@ func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (s
 	}
 }
 
-func maxSequenceScanner(row scan, dest interface{}) (err error) {
+func maxSequenceScanner(row scan, dest any) (err error) {
 	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
 		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)

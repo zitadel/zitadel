@@ -5,8 +5,6 @@ Source:
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
     MaxOpenConns: 6 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
     MaxIdleConns: 6 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
-    EventPushConnRatio: 0.33 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-    ProjectionSpoolerConnRatio: 0.33 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
@@ -39,8 +37,6 @@ Source:
         Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
 
 Destination:
-  # Postgres is used as soon as a value is set
-  # The values describe the possible fields to set values
   postgres:
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT

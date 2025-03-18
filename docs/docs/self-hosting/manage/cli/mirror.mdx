@@ -105,8 +105,6 @@ Source:
     Database: zitadel # ZITADEL_SOURCE_COCKROACH_DATABASE
     MaxOpenConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXOPENCONNS
     MaxIdleConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXIDLECONNS
-    EventPushConnRatio: 0.33 # ZITADEL_SOURCE_COCKROACH_EVENTPUSHCONNRATIO
-    ProjectionSpoolerConnRatio: 0.33 # ZITADEL_SOURCE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
     MaxConnLifetime: 30m # ZITADEL_SOURCE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_SOURCE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_SOURCE_COCKROACH_OPTIONS
@@ -140,8 +138,6 @@ Source:
 
 # The destination database the data are copied to. Use either cockroach or postgres, by default cockroach is used
 Destination:
-  # Postgres is always used as destination
-  # The values describe the possible fields to set values
   postgres:
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT

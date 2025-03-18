@@ -115,8 +115,8 @@ Database:
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
-    MaxOpenConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: 2 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+    MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_POSTGRES_OPTIONS
@@ -131,7 +131,7 @@ Database:
     Admin:
       # By default, ExistingDatabase is not specified in the connection string
       # If the connection resolves to a database that is not existing in your system, configure an existing one here
-      # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
+      # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
       ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
       Username: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
       Password: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
@@ -413,7 +413,6 @@ Projections:
 Notifications:
   # Notifications can be processed by either a sequential mode (legacy) or a new parallel mode.
   # The parallel mode is currently only recommended for Postgres databases.
-  # For CockroachDB, the sequential mode is recommended, see: https://github.com/zitadel/zitadel/issues/9002
   # If legacy mode is enabled, the worker config below is ignored.
   LegacyEnabled: true # ZITADEL_NOTIFICATIONS_LEGACYENABLED
   # The amount of workers processing the notification request events.
@@ -1266,6 +1265,8 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "session.read"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1301,6 +1302,7 @@ InternalAuthZ:
         - "action.target.read"
         - "action.execution.read"
         - "userschema.read"
+        - "session.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"

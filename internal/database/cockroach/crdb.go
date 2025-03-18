@@ -153,10 +153,6 @@ func (c *Config) Type() dialect.DatabaseType {
 	return dialect.DatabaseTypeCockroach
 }
 
-func (c *Config) Timetravel(d time.Duration) string {
-	return ""
-}
-
 type User struct {
 	Username string
 	Password string

@@ -152,6 +152,10 @@ func ensureMinimalScope(scopes []string) []string {
 	return scopes
 }
 
+func (p *Provider) User() idp.User {
+	return p.Provider.User()
+}
+
 // User represents the structure return on the userinfo endpoint and implements the [idp.User] interface
 //
 // AzureAD does not return an `email_verified` claim.

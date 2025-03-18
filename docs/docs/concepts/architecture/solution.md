@@ -9,7 +9,6 @@ Zitadel can be run as high available system with ease.
 Since the storage layer takes the heavy lifting of making sure that data in synched across, server, data centers or regions.
 
 Depending on your projects needs our general recommendation is to run Zitadel across multiple availability zones in the same region or across multiple regions.
-Alternatively you can run Zitadel with Postgres which is [Enterprise Supported](/docs/support/software-release-cycles-support#partially-supported).
 Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgresql) before you decide to use it.
 Consult the [Postgres documentation](https://www.postgresql.org/docs/) for more details.
 
@@ -38,18 +37,18 @@ Hence our reference design for Kubernetes is to have three application nodes and
 
 > If you are using a serverless offering like Google Cloud Run you can scale Zitadel from 0 to 1000 Pods without the need of deploying the node across multiple availability zones.
 
-![Cluster Architecture](/img/zitadel_cluster_architecture_v3.png)
+![Cluster Architecture](/img/zitadel_cluster_architecture.png)
 
 ### Multi Cluster / Region
 
-To scale Zitadel across regions it is recommend to create at least three cluster.
-Each cluster is a fully independent ZITADEL instance.
-To keep the data in sync across all clusters, we recommend using Postgres as a storage layer, which is [Enterprise Supported](/docs/support/software-release-cycles-support#partially-supported).
+To scale Zitadel across regions it is recommend to create at least three clusters.
+Each cluster is a fully independent ZITADEL setup.
+To keep the data in sync across all clusters, we recommend using Postgres with read-only replicas as a storage layer.
 Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgresql) before you decide to use it.
 Consult the [Postgres documentation](https://www.postgresql.org/docs/current/high-availability.html) for more details.
 
 
-![Multi-Cluster Architecture](/img/zitadel_multicluster_architecture_v3.png)
+![Multi-Cluster Architecture](/img/zitadel_multicluster_architecture.png)
 
 ## Zero Downtime Updates
 

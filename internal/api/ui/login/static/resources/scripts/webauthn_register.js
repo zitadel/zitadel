@@ -1,42 +1,51 @@
 document.addEventListener(
   "DOMContentLoaded",
-  checkWebauthnSupported("btn-register", registerCredential)
-);
-
-function registerCredential() {
-  document.getElementById("wa-error").classList.add("hidden");
-
-  let opt = JSON.parse(
-    atob(document.getElementsByName("credentialCreationData")[0].value)
-  );
-  opt.publicKey.challenge = bufferDecode(
-    opt.publicKey.challenge,
-    "publicKey.challenge"
-  );
-  opt.publicKey.user.id = bufferDecode(
-    opt.publicKey.user.id,
-    "publicKey.user.id"
-  );
-  if (opt.publicKey.excludeCredentials) {
-    for (let i = 0; i < opt.publicKey.excludeCredentials.length; i++) {
-      if (opt.publicKey.excludeCredentials[i].id !== null) {
-        opt.publicKey.excludeCredentials[i].id = bufferDecode(
-          opt.publicKey.excludeCredentials[i].id,
-          "publicKey.excludeCredentials"
-        );
-      }
+  () => {
+    const form = document.getElementsByTagName("form")[0];
+    if (form) {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault(); // Prevent the default form submission
+        checkWebauthnSupported(registerCredential);
+      });
     }
   }
-  navigator.credentials
-    .create({
+);
+
+async function registerCredential() {
+  document.getElementById("wa-error").classList.add("hidden");
+
+  let opt;
+  try {
+    opt = JSON.parse(window.atob(document.getElementsByName("credentialCreationData")[0].value));
+  } catch (e) {
+    webauthnError({ message: "Failed to parse credential creation data." });
+    return;
+  }
+
+  try {
+    opt.publicKey.challenge = bufferDecode(opt.publicKey.challenge, "publicKey.challenge");
+    opt.publicKey.user.id = bufferDecode(opt.publicKey.user.id, "publicKey.user.id");
+    if (opt.publicKey.excludeCredentials) {
+      for (let i = 0; i < opt.publicKey.excludeCredentials.length; i++) {
+        if (opt.publicKey.excludeCredentials[i].id !== null) {
+          opt.publicKey.excludeCredentials[i].id = bufferDecode(opt.publicKey.excludeCredentials[i].id, "publicKey.excludeCredentials");
+        }
+      }
+    }
+  } catch (e) {
+    webauthnError({ message: "Failed to decode buffer data." });
+    return;
+  }
+
+  try {
+    const credential = await navigator.credentials.create({
       publicKey: opt.publicKey,
-    })
-    .then(function (credential) {
-      createCredential(credential);
-    })
-    .catch(function (err) {
-      webauthnError(err);
     });
+
+    createCredential(credential);
+  } catch (err) {
+    webauthnError(err);
+  }
 }
 
 function createCredential(newCredential) {
@@ -56,6 +65,6 @@ function createCredential(newCredential) {
     },
   });
 
-  document.getElementsByName("credentialData")[0].value = btoa(data);
+  document.getElementsByName("credentialData")[0].value = window.btoa(data);
   document.getElementsByTagName("form")[0].submit();
 }
