@@ -527,11 +527,11 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 
 		h.metrics.ProjectionEventsProcessed(ctx, h.ProjectionName(), int64(len(statements)), err == nil)
-		h.metrics.ProjectionStateLatency(ctx, h.ProjectionName(), time.Since(currentState.eventTimestamp).Seconds())
 
 		if err == nil && currentState.aggregateID != "" && len(statements) > 0 {
-			// Don't update projection timing unless we successfully processed events
-			h.metrics.ProjectionUpdateTiming(ctx, h.ProjectionName(), float64(time.Since(start).Milliseconds()))
+			// Don't update projection timing or latency unless we successfully processed events
+			h.metrics.ProjectionUpdateTiming(ctx, h.ProjectionName(), float64(time.Since(start).Seconds()))
+			h.metrics.ProjectionStateLatency(ctx, h.ProjectionName(), time.Since(currentState.eventTimestamp).Seconds())
 
 			h.invalidateCaches(ctx, aggregatesFromStatements(statements))
 		}
@@ -554,6 +554,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
+
 	err = h.setState(tx, currentState)
 
 	return additionalIteration, err

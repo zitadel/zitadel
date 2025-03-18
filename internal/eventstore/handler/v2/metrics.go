@@ -38,14 +38,14 @@ func NewProjectionMetrics() *ProjectionMetrics {
 		ProjectionHandleTimerMetric,
 		"Time taken to process a projection update",
 		"s",
-		[]float64{0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 1, 5, 10},
+		[]float64{0.005, 0.01, 0.05, 0.1, 1, 5, 10, 30, 60, 120},
 	)
 	logging.OnError(err).Error("failed to register projection handle timer metric")
 	err = projectionMetrics.provider.RegisterHistogram(
 		ProjectionStateLatencyMetric,
-		"Time since the last state update for a projection",
+		"When finishing processing a batch of events, this track the age of the last events seen from current time",
 		"s",
-		[]float64{1, 5, 10, 30, 60, 300, 600, 1800, 3600},
+		[]float64{0.1, 0.5, 1, 5, 10, 30, 60, 300, 600, 1800},
 	)
 	logging.OnError(err).Error("failed to register projection state latency metric")
 	return projectionMetrics
