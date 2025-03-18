@@ -16,10 +16,10 @@ type Config struct {
 func NewTracer(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
 	c.Fraction, err = otel.FractionFromConfig(rawConfig["fraction"])
+	c.ServiceName, _ = rawConfig["servicename"].(string)
 	if err != nil {
 		return err
 	}
-	c.ServiceName, _ = rawConfig["servicename"].(string)
 	return c.NewTracer()
 }
 
