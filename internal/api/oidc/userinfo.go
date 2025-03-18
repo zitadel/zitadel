@@ -484,23 +484,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	}
 
 	return nil
-	// zerrors.ThrowInvalidArgumentf(nil, "GROUP-IDasq", "UserInfo %s", userInfo.Claims)
 }
-
-// Set GroupInfo to the UserInfo
-
-/* Will Implement later.
-func setUserInfoGroupClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
-	if roles != nil && len(roles.projects) > 0 {
-		if roles, ok := roles.projects[roles.requestProjectID]; ok {
-			userInfo.AppendClaims(ClaimProjectRoles, roles)
-		}
-		for projectID, roles := range roles.projects {
-			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
-		}
-	}
-}
-*/
 
 func setGroupInfo(user *query.User, out *oidc.UserInfo) {
 	if len(user.GroupIDs) > 0 {

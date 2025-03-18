@@ -124,7 +124,6 @@ func prepareGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			GroupMemberResourceOwner.identifier(),
 			GroupMemberUserID.identifier(),
 			GroupMemberGroupID.identifier(),
-			// GroupMemberRoles.identifier(),
 
 			LoginNameNameCol.identifier(),
 			HumanEmailCol.identifier(),
@@ -168,7 +167,6 @@ func prepareGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&groupMember.ResourceOwner,
 					&groupMember.UserID,
 					&groupMember.GroupID,
-					// &groupMember.Roles,
 					&preferredLoginName,
 					&email,
 					&firstName,

@@ -27,6 +27,17 @@ func (s *Server) GetGroupByID(ctx context.Context, req *mgmt_pb.GetGroupByIDRequ
 	}, nil
 }
 
+func (s *Server) GetGroupByUserID(ctx context.Context, req *mgmt_pb.GetGroupByUserIDRequest) (*mgmt_pb.ListUserGroupsResponse, error) {
+	groups, err := s.query.GroupByUserID(ctx, false, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListUserGroupsResponse{
+		Result:  group_grpc.GroupViewsToPb(groups.Groups),
+		Details: object_grpc.ToListDetails(groups.Count, groups.Sequence, groups.LastRun),
+	}, nil
+}
+
 func (s *Server) ListGroups(ctx context.Context, req *mgmt_pb.ListGroupsRequest) (*mgmt_pb.ListGroupsResponse, error) {
 	queries, err := listGroupRequestToModel(req)
 	if err != nil {

@@ -78,6 +78,8 @@ type Group struct {
 
 	Name        string
 	Description string
+
+	UserID string
 }
 
 type GroupSearchQueries struct {
@@ -251,6 +253,96 @@ func prepareGroupsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 
 			if err := rows.Close(); err != nil {
 				return nil, zerrors.ThrowInternal(err, "QUERY-PNXJv", "Errors.Query.CloseRows")
+			}
+
+			return &Groups{
+				Groups: groups,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
+}
+
+func (q *Queries) GroupByUserID(ctx context.Context, shouldTriggerBulk bool, id string) (groups *Groups, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerGroupProjection")
+		ctx, err = projection.GroupProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
+	}
+
+	stmt, scan := prepareUserGroupsQuery(ctx, q.client)
+	eq := sq.Eq{
+		GroupMemberUserID.identifier():     id,
+		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	query, args, err := stmt.Where(eq).ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-2n10Q", "Errors.Query.SQLStatment")
+	}
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		groups, err = scan(rows)
+		return err
+	}, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	groups.State, err = q.latestState(ctx, groupsTable)
+	return groups, err
+}
+
+func prepareUserGroupsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
+	return sq.Select(
+			GroupColumnID.identifier(),
+			GroupColumnCreationDate.identifier(),
+			GroupColumnChangeDate.identifier(),
+			GroupColumnResourceOwner.identifier(),
+			GroupColumnState.identifier(),
+			GroupColumnSequence.identifier(),
+			GroupColumnName.identifier(),
+			GroupColumnDescription.identifier(),
+
+			GroupMemberUserID.identifier(),
+			countColumn.identifier()).
+			From(groupsTable.identifier()).
+			LeftJoin(join(GroupMemberGroupID, GroupColumnID) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*Groups, error) {
+			groups := make([]*Group, 0)
+			var count uint64
+
+			for rows.Next() {
+				group := new(Group)
+				var (
+					userId = sql.NullString{}
+				)
+				err := rows.Scan(
+					&group.ID,
+					&group.CreationDate,
+					&group.ChangeDate,
+					&group.ResourceOwner,
+					&group.State,
+					&group.Sequence,
+					&group.Name,
+					&group.Description,
+					&userId,
+					&count,
+				)
+
+				if err != nil {
+					return nil, err
+				}
+
+				group.UserID = userId.String
+				groups = append(groups, group)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, zerrors.ThrowInternal(err, "QUERY-QMcJv", "Errors.Query.CloseRows")
 			}
 
 			return &Groups{

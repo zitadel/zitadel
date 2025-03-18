@@ -718,6 +718,31 @@ service ManagementService {
         };
     }
 
+    rpc GetGroupByUserID(GetGroupByUserIDRequest) returns (ListUserGroupsResponse) {
+        option (google.api.http) = {
+            get: "/users/{id}/groups"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+            check_field_name: "Id"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users";
+            summary: "Fetch user's groups";
+            description: "Returns a list of user's group owned by the organization. A Group is a vessel for different users sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
     rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/{key}"
@@ -9000,6 +9025,22 @@ message UpdateUserNameRequest {
 
 message UpdateUserNameResponse {
     zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetGroupByUserIDRequest {
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629026806489455\"";
+        }
+    ];
+}
+
+message ListUserGroupsResponse {
+    zitadel.v1.ListDetails details = 1;
+    // the field the result is sorted
+    zitadel.group.v1.GroupFieldName sorting_column = 2;
+    repeated zitadel.group.v1.Group result = 3;
 }
 
 message ListUserMetadataRequest {

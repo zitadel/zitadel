@@ -10,8 +10,8 @@ import (
 
 func GroupViewsToPb(groups []*query.Group) []*group_pb.Group {
 	o := make([]*group_pb.Group, len(groups))
-	for i, org := range groups {
-		o[i] = GroupViewToPb(org)
+	for i, grp := range groups {
+		o[i] = GroupViewToPb(grp)
 	}
 	return o
 }
