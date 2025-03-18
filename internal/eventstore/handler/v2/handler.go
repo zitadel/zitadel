@@ -161,7 +161,7 @@ func NewHandler(
 		aggregates[reducer.Aggregate] = eventTypes
 	}
 
-	metrics := MustNewProjectionMetrics()
+	metrics := NewProjectionMetrics()
 
 	handler := &Handler{
 		projection:             projection,

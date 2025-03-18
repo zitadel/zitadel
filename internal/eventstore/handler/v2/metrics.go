@@ -21,7 +21,7 @@ type ProjectionMetrics struct {
 	provider metrics.Metrics
 }
 
-func MustNewProjectionMetrics() *ProjectionMetrics {
+func NewProjectionMetrics() *ProjectionMetrics {
 	// we rely on the metrics global variable being set during Setup
 	if metrics.M == nil {
 		logging.Fatal("failed to register projection metrics, metrics provider not initialized")
@@ -55,7 +55,7 @@ func (m *ProjectionMetrics) ProjectionUpdateTiming(ctx context.Context, projecti
 	err := m.provider.AddHistogramMeasurement(ctx, ProjectionHandleTimerMetric, duration, map[string]attribute.Value{
 		ProjectionLabel: attribute.StringValue(projection),
 	})
-	logging.OnError(err).Debug("failed to add projection trigger timing")
+	logging.OnError(err).Error("failed to add projection trigger timing")
 }
 
 func (m *ProjectionMetrics) ProjectionEventsProcessed(ctx context.Context, projection string, count int64, success bool) {
@@ -63,12 +63,12 @@ func (m *ProjectionMetrics) ProjectionEventsProcessed(ctx context.Context, proje
 		ProjectionLabel: attribute.StringValue(projection),
 		SuccessLabel:    attribute.BoolValue(success),
 	})
-	logging.OnError(err).Debug("failed to add projection wake count")
+	logging.OnError(err).Error("failed to add projection events processed metric")
 }
 
 func (m *ProjectionMetrics) ProjectionStateLatency(ctx context.Context, projection string, latency float64) {
 	err := m.provider.AddHistogramMeasurement(ctx, ProjectionStateLatencyMetric, latency, map[string]attribute.Value{
 		ProjectionLabel: attribute.StringValue(projection),
 	})
-	logging.OnError(err).Debug("failed to add projection state latency")
+	logging.OnError(err).Error("failed to add projection state latency metric")
 }
