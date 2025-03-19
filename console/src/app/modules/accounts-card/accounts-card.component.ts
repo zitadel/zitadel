@@ -38,13 +38,12 @@ interface V1AndV2Session {
   templateUrl: './accounts-card.component.html',
   styleUrls: ['./accounts-card.component.scss'],
 })
-export class AccountsCardComponent implements OnInit {
+export class AccountsCardComponent {
   @Input() public user?: User.AsObject;
   @Input() public iamuser: boolean | null = false;
 
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
 
-  public loadingUsers: boolean = false;
   public UserState: any = UserState;
   private labelpolicy = toSignal(this.userService.labelpolicy$, { initialValue: undefined });
   public readonly sessions$: Observable<V1AndV2Session[] | undefined>;
@@ -100,10 +99,6 @@ export class AccountsCardComponent implements OnInit {
           return of([]);
         }),
       );
-  }
-
-  ngOnInit(): void {
-    this.loadingUsers = true;
   }
 
   private getUseLoginV2() {
