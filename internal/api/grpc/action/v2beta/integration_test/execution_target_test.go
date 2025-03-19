@@ -32,21 +32,17 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/query"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/metadata"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
-	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 const (
-	redirectURI         = "https://callback"
-	logoutRedirectURI   = "https://logged-out"
 	redirectURIImplicit = "http://localhost:9999/callback"
 )
 
@@ -58,8 +54,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-
-	fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
+	fullMethod := action.ActionService_GetTarget_FullMethodName
 
 	tests := []struct {
 		name    string
@@ -87,50 +82,55 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
-				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetDetails().GetId()}
+				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, false)
 
-				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
-						Config: &action.Target{
-							Name:     targetCreatedName,
-							Endpoint: targetCreatedURL,
-							TargetType: &action.Target_RestCall{
-								RestCall: &action.SetRESTCall{
-									InterruptOnError: false,
-								},
-							},
-							Timeout: durationpb.New(10 * time.Second),
-						},
-						Details: targetCreated.GetDetails(),
-					},
-				}
-				// has to be set separately because of the pointers
-				response.Target = &action.GetTarget{
-					Details: targetCreated.GetDetails(),
-					Config: &action.Target{
-						Name: targetCreatedName,
+					Target: &action.Target{
+						Id:           targetCreated.GetId(),
+						CreationDate: targetCreated.GetCreationDate(),
+						ChangeDate:   targetCreated.GetCreationDate(),
+						Name:         targetCreatedName,
 						TargetType: &action.Target_RestCall{
-							RestCall: &action.SetRESTCall{
+							RestCall: &action.RESTCall{
 								InterruptOnError: false,
 							},
 						},
-						Timeout:  durationpb.New(10 * time.Second),
-						Endpoint: targetCreatedURL,
+						Timeout:    durationpb.New(10 * time.Second),
+						Endpoint:   targetCreatedURL,
+						SigningKey: targetCreated.GetSigningKey(),
 					},
+				}
+				// has to be set separately because of the pointers
+				response.Target = &action.Target{
+					Id:           targetCreated.GetId(),
+					CreationDate: targetCreated.GetCreationDate(),
+					ChangeDate:   targetCreated.GetCreationDate(),
+					Name:         targetCreatedName,
+					TargetType: &action.Target_RestCall{
+						RestCall: &action.RESTCall{
+							InterruptOnError: false,
+						},
+					},
+					Timeout:    durationpb.New(10 * time.Second),
+					Endpoint:   targetCreatedURL,
+					SigningKey: targetCreated.GetSigningKey(),
 				}
 
 				// content for partial update
 				changedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
-						Details: &resource_object.Details{
-							Id: targetCreated.GetDetails().GetId(),
+					Target: &action.Target{
+						Id: targetCreated.GetId(),
+						TargetType: &action.Target_RestCall{
+							RestCall: &action.RESTCall{
+								InterruptOnError: false,
+							},
 						},
 					},
 				}
@@ -149,7 +149,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, false)
-				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
 				return func() {
 					closeRequest()
 					closeResponse()
@@ -163,14 +163,8 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				Id: "something",
 			},
 			want: &action.GetTargetResponse{
-				Target: &action.GetTarget{
-					Details: &resource_object.Details{
-						Id: "changed",
-						Owner: &object.Owner{
-							Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-							Id:   instance.ID(),
-						},
-					},
+				Target: &action.Target{
+					Id: "changed",
 				},
 			},
 		},
@@ -178,8 +172,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			name: "GetTarget, request, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
-
-				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := instance.DefaultOrg.Id
 				projectID := ""
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -189,9 +181,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
 				// GetTarget with used target
-				request.Id = targetRequest.GetDetails().GetId()
+				request.Id = targetRequest.GetId()
 				return func() {
 					closeRequest()
 				}, nil
@@ -206,8 +198,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			name: "GetTarget, response, interrupt",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
-
-				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := instance.DefaultOrg.Id
 				projectID := ""
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
@@ -219,29 +209,33 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// GetTarget with used target
-				request.Id = targetCreated.GetDetails().GetId()
+				request.Id = targetCreated.GetId()
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
-						Details: targetCreated.GetDetails(),
-						Config: &action.Target{
-							Name:     targetCreatedName,
-							Endpoint: targetCreatedURL,
-							TargetType: &action.Target_RestCall{
-								RestCall: &action.SetRESTCall{
-									InterruptOnError: false,
-								},
+					Target: &action.Target{
+						Id:           targetCreated.GetId(),
+						CreationDate: targetCreated.GetCreationDate(),
+						ChangeDate:   targetCreated.GetCreationDate(),
+						Name:         targetCreatedName,
+						TargetType: &action.Target_RestCall{
+							RestCall: &action.RESTCall{
+								InterruptOnError: false,
 							},
-							Timeout: durationpb.New(10 * time.Second),
 						},
+						Timeout:    durationpb.New(10 * time.Second),
+						Endpoint:   targetCreatedURL,
+						SigningKey: targetCreated.GetSigningKey(),
 					},
 				}
 				// content for partial update
 				changedResponse := &action.GetTargetResponse{
-					Target: &action.GetTarget{
-						Details: &resource_object.Details{
-							Id: "changed",
+					Target: &action.Target{
+						Id: "changed",
+						TargetType: &action.Target_RestCall{
+							RestCall: &action.RESTCall{
+								InterruptOnError: false,
+							},
 						},
 					},
 				}
@@ -260,7 +254,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
 				return func() {
 					closeResponse()
 				}, nil
@@ -281,16 +275,13 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			}
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
+				got, err := instance.Client.ActionV2beta.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
 					require.Error(ttt, err)
 					return
 				}
 				require.NoError(ttt, err)
-
-				integration.AssertResourceDetails(ttt, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-				tt.want.Target.Details = got.GetTarget().GetDetails()
-				assert.EqualExportedValues(ttt, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+				assert.EqualExportedValues(ttt, tt.want.GetTarget(), got.GetTarget())
 
 			}, retryDuration, tick, "timeout waiting for expected execution result")
 
@@ -306,7 +297,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		got, err := instance.Client.ActionV3Alpha.SearchExecutions(ctx, &action.SearchExecutionsRequest{
+		got, err := instance.Client.ActionV2beta.ListExecutions(ctx, &action.ListExecutionsRequest{
 			Filters: []*action.ExecutionSearchFilter{
 				{Filter: &action.ExecutionSearchFilter_InConditionsFilter{
 					InConditionsFilter: &action.InConditionsFilter{Conditions: []*action.Condition{condition}},
@@ -319,7 +310,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 		if !assert.Len(ttt, got.GetResult(), 1) {
 			return
 		}
-		gotTargets := got.GetResult()[0].GetExecution().GetTargets()
+		gotTargets := got.GetResult()[0].GetTargets()
 		// always first check length, otherwise its failed anyway
 		if assert.Len(ttt, gotTargets, len(targets)) {
 			for i := range targets {
@@ -335,10 +326,10 @@ func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Inst
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		got, err := instance.Client.ActionV3Alpha.SearchTargets(ctx, &action.SearchTargetsRequest{
+		got, err := instance.Client.ActionV2beta.ListTargets(ctx, &action.ListTargetsRequest{
 			Filters: []*action.TargetSearchFilter{
 				{Filter: &action.TargetSearchFilter_InTargetIdsFilter{
-					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetDetails().GetId()}},
+					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetId()}},
 				}},
 			},
 		})
@@ -348,7 +339,7 @@ func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Inst
 		if !assert.Len(ttt, got.GetResult(), 1) {
 			return
 		}
-		config := got.GetResult()[0].GetConfig()
+		config := got.GetResult()[0]
 		assert.Equal(ttt, config.GetEndpoint(), endpoint)
 		switch ty {
 		case domain.TargetTypeWebhook:
@@ -646,7 +637,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetId()))
 	return userResp.GetUserId(), closeF
 }
 
@@ -952,7 +943,7 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), executionTargetsSingleTarget(targetResp.GetId()))
 	return userResp.GetUserId(), closeF
 }
 
@@ -1118,7 +1109,7 @@ func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance 
 	targetURL, closeF := testServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), executionTargetsSingleTarget(targetResp.GetId()))
 
 	return userResp.GetUserId(), closeF
 }

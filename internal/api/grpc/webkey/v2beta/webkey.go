@@ -25,7 +25,7 @@ func (s *Server) CreateWebKey(ctx context.Context, req *webkey.CreateWebKeyReque
 
 	return &webkey.CreateWebKeyResponse{
 		Id:           webKey.KeyID,
-		CreationDate: timestamppb.New(webKey.ObjectDetails.CreationDate),
+		CreationDate: timestamppb.New(webKey.ObjectDetails.EventDate),
 	}, nil
 }
 
