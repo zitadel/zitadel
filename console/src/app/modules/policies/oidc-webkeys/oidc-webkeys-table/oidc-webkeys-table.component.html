@@ -11,8 +11,7 @@
             class="state"
             [ngClass]="{
               active: i === 0,
-              next: i === 1,
-              neutral: i >= 2,
+              neutral: i === 1
             }"
             [ngSwitch]="i"
           >
