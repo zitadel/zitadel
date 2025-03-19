@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { RoleGuard } from 'src/app/guards/role.guard';
+import { roleGuard } from 'src/app/guards/role-guard';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 
 const routes: Routes = [
@@ -10,7 +10,7 @@ const routes: Routes = [
       animation: 'HomePage',
       roles: ['project.read'],
     },
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
     loadChildren: () => import('./owned-project-detail/owned-project-detail.module'),
   },
   {
@@ -19,7 +19,7 @@ const routes: Routes = [
       type: ProjectType.PROJECTTYPE_OWNED,
       roles: ['project.member.read'],
     },
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
     loadChildren: () => import('src/app/modules/project-members/project-members.module'),
   },
   {
@@ -28,7 +28,7 @@ const routes: Routes = [
       animation: 'AddPage',
       roles: ['project.app.read'],
     },
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
     loadChildren: () => import('src/app/pages/projects/apps/apps.module'),
   },
   {

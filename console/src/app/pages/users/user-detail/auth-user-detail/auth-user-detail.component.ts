@@ -185,7 +185,7 @@ export class AuthUserDetailComponent implements OnInit {
   }
 
   private getMyUser(): Observable<UserQuery> {
-    return defer(() => this.userService.getMyUser()).pipe(
+    return this.userService.user$.pipe(
       map((user) => ({ state: 'success' as const, value: user })),
       catchError((error) => of({ state: 'error', error } as const)),
       startWith({ state: 'loading' } as const),
