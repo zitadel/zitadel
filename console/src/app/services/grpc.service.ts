@@ -18,11 +18,10 @@ import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } f
 import { StorageService } from './storage.service';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
-import { createUserServiceClient } from '@zitadel/client/v2';
+import { createFeatureServiceClient, createUserServiceClient } from '@zitadel/client/v2';
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
-import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2/Feature_serviceServiceClientPb';
 
 @Injectable({
   providedIn: 'root',
@@ -31,11 +30,11 @@ export class GrpcService {
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
-  public feature!: FeatureServiceClient;
   public user!: UserServiceClient;
   public userNew!: ReturnType<typeof createUserServiceClient>;
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
+  public featureNew!: ReturnType<typeof createFeatureServiceClient>;
 
   constructor(
     private readonly envService: EnvironmentService,
@@ -87,12 +86,6 @@ export class GrpcService {
           // @ts-ignore
           interceptors,
         );
-        this.feature = new FeatureServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
         this.user = new UserServiceClient(
           env.api,
           null,
@@ -114,6 +107,7 @@ export class GrpcService {
         this.userNew = createUserServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transport);
+        this.featureNew = createFeatureServiceClient(transport);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',
