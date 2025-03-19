@@ -18,7 +18,7 @@ import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } f
 import { StorageService } from './storage.service';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
-import { createFeatureServiceClient, createUserServiceClient } from '@zitadel/client/v2';
+import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
