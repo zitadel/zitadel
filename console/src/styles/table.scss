@@ -135,8 +135,8 @@
     }
 
     &.neutral {
-      background: if($is-dark-theme, #01489c78,#47a8ff82 );
-      color: if($is-dark-theme, #47A8FF, #01489c);
+      background: if($is-dark-theme, #01489c78, #47a8ff82);
+      color: if($is-dark-theme, #47a8ff, #01489c);
     }
   }
 
