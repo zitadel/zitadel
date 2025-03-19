@@ -135,8 +135,8 @@
     }
 
     &.neutral {
-      color: #47A8FF;
-      background-color: #022248;
+      background: if($is-dark-theme, #01489c78,#47a8ff82 );
+      color: if($is-dark-theme, #47A8FF, #01489c);
     }
   }
 
