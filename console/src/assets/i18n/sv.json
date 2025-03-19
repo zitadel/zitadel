@@ -789,7 +789,10 @@
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Initialt lösenord",
       "ADDRESSANDPHONESECTION": "Telefonnummer",
-      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas."
+      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas.",
+      "SETUPAUTHENTICATIONLATER": "Ställ in autentisering senare för den här användaren.",
+      "INVITATION": "Skicka en inbjudningsmail för autentiseringsinställning och e-postverifiering.",
+      "INITIALPASSWORD": "Ställ in ett initialt lösenord för användaren."
     },
     "CODEDIALOG": {
       "TITLE": "Verifiera telefonnummer",

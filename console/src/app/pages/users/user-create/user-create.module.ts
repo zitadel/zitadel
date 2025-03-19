@@ -19,9 +19,11 @@ import { PasswordComplexityViewModule } from 'src/app/modules/password-complexit
 import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
 import { UserCreateRoutingModule } from './user-create-routing.module';
 import { UserCreateComponent } from './user-create.component';
+import { UserCreateV2Component } from './user-create-v2/user-create-v2.component';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
-  declarations: [UserCreateComponent],
+  declarations: [UserCreateComponent, UserCreateV2Component],
   providers: [CountryCallingCodesService],
   imports: [
     UserCreateRoutingModule,
@@ -42,6 +44,7 @@ import { UserCreateComponent } from './user-create.component';
     DetailLayoutModule,
     InputModule,
     MatRippleModule,
+    MatRadioModule,
   ],
 })
 export default class UserCreateModule {}

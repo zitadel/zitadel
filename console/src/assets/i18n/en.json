@@ -789,7 +789,10 @@
       "PHONESECTION": "Phone numbers",
       "PASSWORDSECTION": "Initial Password",
       "ADDRESSANDPHONESECTION": "Phone number",
-      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent."
+      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent.",
+      "SETUPAUTHENTICATIONLATER": "Setup authentication later for this User.",
+      "INVITATION": "Send an invitation E-Mail for authentication setup and E-Mail verification.",
+      "INITIALPASSWORD": "Set an initial password for the User."
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
