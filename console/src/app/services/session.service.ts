@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import type { MessageInitShape } from '@bufbuild/protobuf';
-import { ListMyUserSessionsResponse, ListMyUserSessionsResponseSchema } from '@zitadel/proto/zitadel/auth_pb';
+import { ListSessionsRequestSchema, ListSessionsResponse } from '@zitadel/proto/zitadel/session/v2/session_service_pb';
 
 @Injectable({
   providedIn: 'root',
@@ -9,9 +9,7 @@ import { ListMyUserSessionsResponse, ListMyUserSessionsResponseSchema } from '@z
 export class SessionService {
   constructor(private readonly grpcService: GrpcService) {}
 
-  public listMyUserSessions(
-    req: MessageInitShape<typeof ListMyUserSessionsResponseSchema>,
-  ): Promise<ListMyUserSessionsResponse> {
-    return this.grpcService.session.listMyUserSessions(req);
+  public listSessions(req: MessageInitShape<typeof ListSessionsRequestSchema>): Promise<ListSessionsResponse> {
+    return this.grpcService.session.listSessions(req);
   }
 }

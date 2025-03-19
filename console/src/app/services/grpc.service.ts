@@ -43,7 +43,6 @@ export class GrpcService {
     private readonly envService: EnvironmentService,
     private readonly platformLocation: PlatformLocation,
     private readonly authenticationService: AuthenticationService,
-    private readonly storageService: StorageService,
     private readonly translate: TranslateService,
     private readonly exhaustedService: ExhaustedService,
     private readonly authInterceptor: AuthInterceptor,
@@ -114,6 +113,7 @@ export class GrpcService {
           ],
         });
         this.userNew = createUserServiceClient(transport);
+        this.session = createSessionServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);

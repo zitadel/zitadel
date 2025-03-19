@@ -1,16 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
-import { Session, SessionState as V1SessionState, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { SessionState as V1SessionState, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SessionService } from 'src/app/services/session.service';
-import { ListMyUserSessionsRequest } from '@zitadel/proto/zitadel/auth_pb';
 import {
   catchError,
   defer,
-  firstValueFrom,
   map,
   mergeWith,
   NEVER,
@@ -78,16 +76,16 @@ export class AccountsCardComponent {
             );
           } else {
             return defer(() =>
-              this.sessionService.listMyUserSessions({}).then((sessions) => {
-                return sessions.result
-                  .filter((s) => s.loginName !== this.user?.preferredLoginName)
+              this.sessionService.listSessions({}).then((sessions) => {
+                return sessions.sessions
+                  .filter((s) => s.factors?.user?.loginName !== this.user?.preferredLoginName)
                   .map((s) => {
                     return {
-                      displayName: s.displayName,
-                      avatarUrl: s.avatarUrl,
-                      loginName: s.loginName,
-                      authState: s.authState,
-                      userName: s.userName,
+                      displayName: s.factors?.user?.displayName ?? '',
+                      avatarUrl: '',
+                      loginName: s.factors?.user?.loginName ?? '',
+                      authState: V2SessionState.ACTIVE,
+                      userName: s.factors?.user?.loginName ?? '',
                     };
                   });
               }),
