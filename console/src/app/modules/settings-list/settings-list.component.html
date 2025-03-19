@@ -79,4 +79,11 @@
   <ng-container *ngIf="currentSetting === 'failedevents' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-iam-failed-events></cnsl-iam-failed-events>
   </ng-container>
+  <!-- todo: figure out permissions -->
+  <ng-container *ngIf="currentSetting === 'actions'">
+    <cnsl-actions-two-actions />
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'actions_targets'">
+    <cnsl-actions-two-targets />
+  </ng-container>
 </cnsl-sidenav>

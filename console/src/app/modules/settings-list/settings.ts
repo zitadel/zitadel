@@ -214,3 +214,23 @@ export const BRANDING: SidenavSetting = {
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
 };
+
+export const ACTIONS: SidenavSetting = {
+  id: 'actions',
+  i18nKey: 'actions',
+  groupI18nKey: 'actions',
+  requiredRoles: {
+    // todo: figure out roles
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
+export const ACTIONS_TARGETS: SidenavSetting = {
+  id: 'actions_targets',
+  i18nKey: 'actions_targets',
+  groupI18nKey: 'actions',
+  requiredRoles: {
+    // todo: figure out roles
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
