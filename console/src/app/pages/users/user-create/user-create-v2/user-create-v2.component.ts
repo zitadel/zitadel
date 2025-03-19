@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastService } from 'src/app/services/toast.service';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { UserService } from 'src/app/services/user.service';
-import { LanguagesService } from 'src/app/services/languages.service';
 import { Location } from '@angular/common';
 import {
   emailValidator,
@@ -64,8 +63,8 @@ export class UserCreateV2Component implements OnInit {
     private readonly passwordComplexityValidatorFactory: PasswordComplexityValidatorFactoryService,
     private readonly featureService: NewFeatureService,
     private readonly destroyRef: DestroyRef,
+    private readonly route: ActivatedRoute,
     protected readonly location: Location,
-    public readonly langSvc: LanguagesService,
   ) {
     this.userForm = this.buildUserForm();
 
@@ -76,9 +75,23 @@ export class UserCreateV2Component implements OnInit {
 
   ngOnInit(): void {
     this.useLoginV2$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.authenticationFactor$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(async ({ factor }) => {
+      // preserve current factor choice when reloading helpful while developing
+      await this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          factor,
+        },
+        queryParamsHandling: 'merge',
+      });
+    });
   }
 
   public buildUserForm() {
+    const param = this.route.snapshot.queryParamMap.get('factor');
+    const authenticationFactor =
+      param === 'none' ? param : param === 'initialPassword' ? param : param === 'invitation' ? param : 'none';
+
     return this.fb.group({
       email: new FormControl('', { nonNullable: true, validators: [requiredValidator, emailValidator] }),
       username: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
@@ -86,7 +99,9 @@ export class UserCreateV2Component implements OnInit {
       familyName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
       nickName: new FormControl('', { nonNullable: true }),
       emailVerified: new FormControl(false, { nonNullable: true }),
-      authenticationFactor: new FormControl<AuthenticationFactor['factor']>('none', { nonNullable: true }),
+      authenticationFactor: new FormControl<AuthenticationFactor['factor']>(authenticationFactor, {
+        nonNullable: true,
+      }),
     });
   }
 
@@ -141,7 +156,7 @@ export class UserCreateV2Component implements OnInit {
 
   private getUseLoginV2() {
     return defer(() => this.featureService.getInstanceFeatures()).pipe(
-      map((features) => features.loginV2),
+      map(({ loginV2 }) => loginV2),
       timeout(1000),
       catchError((err) => {
         if (!(err instanceof TimeoutError)) {
@@ -196,14 +211,14 @@ export class UserCreateV2Component implements OnInit {
 
     const resp = await this.userService.addHumanUser(humanReq);
     if (authenticationFactor.factor === 'invitation') {
-      const useLoginV2 = await firstValueFrom(this.useLoginV2$);
+      const url = await this.getUrlTemplate();
       await this.userService.createInviteCode({
         userId: resp.userId,
         verification: {
           case: 'sendCode',
-          value: useLoginV2?.baseUri
+          value: url
             ? {
-                urlTemplate: `${useLoginV2.baseUri}verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+                urlTemplate: `${url}verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
               }
             : {},
         },
@@ -212,5 +227,33 @@ export class UserCreateV2Component implements OnInit {
 
     this.toast.showInfo('USER.TOAST.CREATED', true);
     await this.router.navigate(['users', resp.userId], { queryParams: { new: true } });
+  }
+
+  private async getUrlTemplate() {
+    const useLoginV2 = await firstValueFrom(this.useLoginV2$);
+    if (!useLoginV2?.required) {
+      // loginV2 is not enabled
+      return undefined;
+    }
+
+    const { baseUri } = useLoginV2;
+    // if base uri is not set, we use the default for the cloud hosted login v2
+    if (!baseUri) {
+      return new URL(location.origin + '/ui/v2/login/');
+    }
+
+    const baseUriWithTrailingSlash = baseUri.endsWith('/') ? baseUri : `${baseUri}/`;
+    try {
+      // first we try to create a URL directly from the baseUri
+      return new URL(baseUriWithTrailingSlash);
+    } catch (_) {
+      // if this does not work we assume that the baseUri is relative,
+      // and we need to add the location.origin
+      // we make sure the relative url has a slash at the beginning and end
+      const baseUriWithSlashes = baseUriWithTrailingSlash.startsWith('/')
+        ? baseUriWithTrailingSlash
+        : `/${baseUriWithTrailingSlash}`;
+      return new URL(location.origin + baseUriWithSlashes);
+    }
   }
 }

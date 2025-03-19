@@ -789,7 +789,10 @@
       "PHONESECTION": "手机号码",
       "PASSWORDSECTION": "初始密码",
       "ADDRESSANDPHONESECTION": "手机号码",
-      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。"
+      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。",
+      "SETUPAUTHENTICATIONLATER": "稍后为此用户设置身份验证。",
+      "INVITATION": "发送邀请邮件以进行身份验证设置和电子邮件验证。",
+      "INITIALPASSWORD": "为用户设置初始密码。"
     },
     "CODEDIALOG": {
       "TITLE": "验证手机号码",

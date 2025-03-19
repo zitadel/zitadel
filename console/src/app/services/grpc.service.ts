@@ -14,11 +14,11 @@ import { ExhaustedService } from './exhausted.service';
 import { AuthInterceptor, AuthInterceptorProvider, NewConnectWebAuthInterceptor } from './interceptors/auth.interceptor';
 import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
-import { OrgInterceptor } from './interceptors/org.interceptor';
+import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
-import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
+import { createFeatureServiceClient, createUserServiceClient } from '@zitadel/client/v2';
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
@@ -48,6 +48,7 @@ export class GrpcService {
     private readonly exhaustedService: ExhaustedService,
     private readonly authInterceptor: AuthInterceptor,
     private readonly authInterceptorProvider: AuthInterceptorProvider,
+    private readonly orgInterceptorProvider: OrgInterceptorProvider,
   ) {}
 
   public loadAppEnvironment(): Promise<any> {
@@ -64,7 +65,7 @@ export class GrpcService {
         const interceptors = {
           unaryInterceptors: [
             new ExhaustedGrpcInterceptor(this.exhaustedService, this.envService),
-            new OrgInterceptor(this.storageService),
+            new OrgInterceptor(this.orgInterceptorProvider),
             this.authInterceptor,
             new I18nInterceptor(this.translate),
           ],
@@ -105,9 +106,15 @@ export class GrpcService {
           baseUrl: env.api,
           interceptors: [NewConnectWebAuthInterceptor(this.authInterceptorProvider)],
         });
+        const transportOldAPIs = createGrpcWebTransport({
+          baseUrl: env.api,
+          interceptors: [
+            NewConnectWebAuthInterceptor(this.authInterceptorProvider),
+            NewConnectWebOrgInterceptor(this.orgInterceptorProvider),
+          ],
+        });
         this.userNew = createUserServiceClient(transport);
-        this.session = createSessionServiceClient(transport);
-        this.mgmtNew = createManagementServiceClient(transport);
+        this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);
 
