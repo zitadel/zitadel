@@ -34,7 +34,7 @@
     "@netlify/framework-info": "^9.8.13",
     "@ngx-translate/core": "^15.0.0",
     "@zitadel/client": "^1.0.6",
-    "@zitadel/proto": "^1.0.3",
+    "@zitadel/proto": "1.0.5-sha-47a2ab5",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.0",
     "buffer": "^6.0.3",
