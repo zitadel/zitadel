@@ -4,20 +4,42 @@ import (
 	"context"
 )
 
+type Parameter[P, C any] struct {
+	Previous P
+	Current  C
+}
+
 // Handle is a function that handles the in.
-type Handle[Out, In any] func(ctx context.Context, in Out) (out In, err error)
+type Handle[In, Out any] func(ctx context.Context, in In) (out Out, err error)
+
+type DeferrableHandle[In, Out any] func(ctx context.Context, in In) (out Out, deferrable func(context.Context, error) error, err error)
+
+type HandleNoReturn[In any] func(ctx context.Context, in In) error
 
 // Middleware is a function that decorates the handle function.
 // It must call the handle function but its up the the middleware to decide when and how.
 type Middleware[In, Out any] func(ctx context.Context, in In, handle Handle[In, Out]) (out Out, err error)
 
+func Deferrable[In, Out, NextOut any](handle DeferrableHandle[In, Out], next Handle[Out, NextOut]) Handle[In, NextOut] {
+	return func(ctx context.Context, in In) (nextOut NextOut, err error) {
+		out, deferrable, err := handle(ctx, in)
+		if err != nil {
+			return nextOut, err
+		}
+		defer func() {
+			err = deferrable(ctx, err)
+		}()
+		return next(ctx, out)
+	}
+}
+
 // Chain chains the handle function with the next handler.
 // The next handler is called after the handle function.
-func Chain[In, Out any](handle Handle[In, Out], next Handle[Out, Out]) Handle[In, Out] {
-	return func(ctx context.Context, in In) (out Out, err error) {
-		out, err = handle(ctx, in)
+func Chain[In, Out, NextOut any](handle Handle[In, Out], next Handle[Out, NextOut]) Handle[In, NextOut] {
+	return func(ctx context.Context, in In) (nextOut NextOut, err error) {
+		out, err := handle(ctx, in)
 		if err != nil {
-			return out, err
+			return nextOut, err
 		}
 		return next(ctx, out)
 	}
@@ -67,6 +89,15 @@ func SkipNext[In, Out any](handle Handle[In, Out], next Handle[In, Out]) Handle[
 	}
 }
 
+func HandleIf[In any](cond func(In) bool, handle Handle[In, In]) Handle[In, In] {
+	return func(ctx context.Context, in In) (out In, err error) {
+		if !cond(in) {
+			return in, nil
+		}
+		return handle(ctx, in)
+	}
+}
+
 // SkipNilHandler skips the handle function if the handler is nil.
 // If handle is nil, an empty output is returned.
 // The function is safe to call with nil handler.
@@ -87,6 +118,12 @@ func SkipReturnPreviousHandler[O, In any](handler *O, handle Handle[In, In]) Han
 			return in, nil
 		}
 		return handle(ctx, in)
+	}
+}
+
+func CtxFuncToHandle[Out any](fn func(context.Context) (Out, error)) Handle[struct{}, Out] {
+	return func(ctx context.Context, in struct{}) (out Out, err error) {
+		return fn(ctx)
 	}
 }
 

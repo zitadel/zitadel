@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/handler"
 	"github.com/zitadel/zitadel/backend/storage/database"
@@ -39,15 +40,15 @@ func WithUserCache(c *UserCache) Option[UserOptions] {
 	}
 }
 
-func (u *user) Create(ctx context.Context, tx database.Transaction, user *User) (*User, error) {
+func (u *user) Create(ctx context.Context, client database.Executor, user *User) (*User, error) {
 	return tracing.Wrap(u.tracer, "user.Create",
 		handler.Chain(
 			handler.Decorate(
-				execute(tx).CreateUser,
+				execute(client).CreateUser,
 				tracing.Decorate[*User, *User](u.tracer, tracing.WithSpanName("user.sql.Create")),
 			),
 			handler.Decorate(
-				events(tx).CreateUser,
+				events(client).CreateUser,
 				tracing.Decorate[*User, *User](u.tracer, tracing.WithSpanName("user.event.Create")),
 			),
 		),
@@ -72,26 +73,59 @@ func (u *user) ByID(ctx context.Context, client database.Querier, id string) (*U
 type ChangeEmail struct {
 	UserID string
 	Email  string
-	Opt    *ChangeEmailOption
+	// Opt    *ChangeEmailOption
 }
 
-type ChangeEmailOption struct {
-	returnCode bool
-	isVerified bool
-	sendCode   bool
+// type ChangeEmailOption struct {
+// 	returnCode bool
+// 	isVerified bool
+// 	sendCode   bool
+// }
+
+// type ChangeEmailVerifiedOption struct {
+// 	isVerified bool
+// }
+
+// type ChangeEmailReturnCodeOption struct {
+// 	alg crypto.EncryptionAlgorithm
+// }
+
+// type ChangeEmailSendCodeOption struct {
+// 	alg         crypto.EncryptionAlgorithm
+// 	urlTemplate string
+// }
+
+func (u *user) ChangeEmail(ctx context.Context, client database.Executor, change *ChangeEmail) {
+
 }
 
-type ChangeEmailVerifiedOption struct {
-	isVerified bool
+type EmailVerificationCode struct {
+	Code      *crypto.CryptoValue
+	CreatedAt time.Time
+	Expiry    time.Duration
 }
 
-type ChangeEmailReturnCodeOption struct {
-	alg crypto.EncryptionAlgorithm
+func (u *user) EmailVerificationCode(ctx context.Context, client database.Querier, userID string) (*EmailVerificationCode, error) {
+	return tracing.Wrap(u.tracer, "user.EmailVerificationCode",
+		handler.Decorate(
+			query(client).EmailVerificationCode,
+			tracing.Decorate[string, *EmailVerificationCode](u.tracer, tracing.WithSpanName("user.sql.EmailVerificationCode")),
+		),
+	)(ctx, userID)
 }
 
-type ChangeEmailSendCodeOption struct {
-	alg         crypto.EncryptionAlgorithm
-	urlTemplate string
+func (u *user) EmailVerificationFailed(ctx context.Context, client database.Executor, userID string) error {
+	_, err := tracing.Wrap(u.tracer, "user.EmailVerificationFailed",
+		handler.ErrFuncToHandle(execute(client).EmailVerificationFailed),
+	)(ctx, userID)
+
+	return err
 }
 
-func (u *user) ChangeEmail(ctx context.Context, client database.Executor, change *ChangeEmail)
+func (u *user) EmailVerificationSucceeded(ctx context.Context, client database.Executor, userID string) error {
+	_, err := tracing.Wrap(u.tracer, "user.EmailVerificationSucceeded",
+		handler.ErrFuncToHandle(execute(client).EmailVerificationSucceeded),
+	)(ctx, userID)
+
+	return err
+}

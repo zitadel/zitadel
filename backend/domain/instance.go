@@ -64,6 +64,5 @@ func (b *Instance) SetUp(ctx context.Context, request *SetUpInstance) (err error
 		return err
 	}
 	_, err = b.user.Create(ctx, tx, request.User)
-	b.authorizations.authorizeusers
 	return err
 }
