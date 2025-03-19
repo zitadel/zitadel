@@ -55,7 +55,7 @@
     "rxjs": "~7.8.0",
     "tinycolor2": "^1.6.0",
     "tslib": "^2.7.0",
-    "uuid": "^10.0.0",
+    "uuid": "^11.1.0",
     "zone.js": "~0.13.3"
   },
   "devDependencies": {
