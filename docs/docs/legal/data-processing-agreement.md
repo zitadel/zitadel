@@ -1,0 +1,331 @@
+---
+title: Data Processing Agreement
+custom_edit_url: null
+custom:
+    created_at: 2022-07-15
+    updated_at: 2023-11-16
+--- 
+
+Last updated on December 31, 2023
+
+This Data Protection Agreement and its annexes (“**DPA**”) forms part of the [Framework Agreement](./terms-of-service) between ZITADEL and the Customer in respect of the provision of certain services, including any applicable statement of work, booking, purchase order, PO or any agreed upon instructions (the "**Agreement**") and applies where, and to the extent that, ZITADEL processes Personal Data as a Processor on behalf of the Customer under the Framework Agreement (each a “**Party**” and together the “**Parties**”).
+
+All capitalized terms not defined in this DPA will have the meanings set forth in the Agreement.
+Any privacy or data protection related clauses or agreement previously entered into by ZITADEL and the Customer, with regards to the subject matter of this DPA, will be superseded by and replaced with this DPA.
+No one other than a Party to this DPA, their successors and permitted assignees will have any right to enforce any of its terms.
+
+This Addendum shall become legally binding upon Customer entering into the Agreement.
+
+## Definitions
+
+"**Applicable Data Protection Law**" means all worldwide data protection and privacy laws and regulations applicable to the Personal Data, including, where applicable, EU/UK Data Protection Law and US Data Protection Laws (in each case, as amended, adopted, or superseded from time to time).
+
+“**Controller**,” “**collecting**,” “**processor**,” and “**processing**,” shall have the meanings given to them under Applicable Data Protection Law.
+
+“**Business**,” “**service provider**,” “**contractor**,” “**selling**,” “**sharing**” and “**third party**” shall have the meanings given to them under applicable US Data Protection Laws.
+
+"**Customer Data**" means information, data and other content, in any form or medium, that is submitted, posted or otherwise transmitted by or on behalf of the Customer through the ZITADEL Cloud or Services. For the avoidance of doubt, Customer Data includes Customer Personal Data.
+
+“**Customer Personal Data**” means, in any form or medium, all Personal Data that is processed by ZITADEL or its sub-processors on behalf of Customer in connection with the Agreement.
+
+“**EU/UK Data Protection Law**” means: (i) Regulation 2016/679 of the European Parliament and of the Council on the protection of natural persons with regard to the processing of Personal Data and on the free movement of such data, also known as the General Data Protection Regulation (“**GDPR**”); (ii) the GDPR as saved into United Kingdom law by virtue of section 3 of the United Kingdom’s European Union (Withdrawal) Act 2018 (“**UK GDPR**”); (iii) the EU e-Privacy Directive (Directive 2002/58/EC); (iv) the Swiss Federal Act on Data Protection of 2020 and its Ordinance (“**Swiss FADP**”) and (v) any and all applicable national data protection laws and regulatory requirements made under, pursuant to or that apply in conjunction with any of (i), (ii) or (iii); in each case as may be amended or superseded from time to time.
+
+“**Personal Data**” shall have the meaning given to it, or to the terms “personally identifiable information” and “personal information” under applicable Data Protection Law, but shall include, at a minimum, any information related to an identified or identifiable natural person.
+
+“**Restricted Transfer**” means: (i) where the GDPR applies, a transfer of Personal Data from the EEA to a country outside of the EEA which is not subject to an adequacy determination by the European Commission;  and (ii) where UK-GDPR applies, a transfer of Personal Data from the United Kingdom to any other country which is not subject to adequacy regulations pursuant to Section 17A of the United Kingdom Data Protection Act 2018, in each case whether such transfer is direct or via onward transfer.  
+
+“**Security Incident**” means any unauthorized or unlawful breach of security leading to, or reasonably believed to have led to, the accidental or unlawful destruction, loss, or alteration of, or unauthorized disclosure or access to, Personal Data transmitted, stored or otherwise processed by ZITADEL under or in connection with the Agreement.
+
+“**Standard Contractual Clauses**” or “**SCCs**” means the contractual clauses annexed to the European Commission’s Implementing Decision 2021/914 of 4 June 2021 on standard contractual clauses for the transfer of personal data to third countries pursuant to Regulation (EU) 2016/679 of the European Parliament and of the Council.
+
+“**sub-processor**” means any third-party processor engaged by ZITADEL to process Customer Data (but shall not include ZITADEL employees, contractors or consultants).
+
+“**UK Addendum**” means the International Data Transfer Addendum (version B1.0) issued by the Information Commissioner’s Office under S119(A) of the UK Data Protection Act 2018, as updated or amended from time to time.
+
+“**US Data Protection Laws**” means any relevant U.S. federal and state privacy laws (and any implementing regulations and amendment thereto) effective as of the date of this DPA and that applies to the processing of Customer Personal Data under the Agreement, which may include, depending on the circumstances and without limitation, (i) the California Consumer Privacy Act (Cal. Civ. Code §§ 1798.100 et seq.), as amended by the California Privacy Rights Act of 2020 along with its implementing regulations (“**CCPA**”), (ii) the Colorado Privacy Act (Colo. Rev. Stat. §§ 6-1-1301 et seq.) (CPA), (iii) Connecticut’s Data Privacy Act (CTDPA), (iv) the Utah Consumer Privacy Act (Utah Code Ann. §§ 13-61-101 et seq.) (UCPA) and (v) the Virginia Consumer Data Protection Act VA Code Ann. §§ 59.1-575 et seq. (VCDPA).
+
+## Processing of Personal Data
+
+This DPA applies where and only to the extent that ZITADEL processes Customer Personal Data in connection with the provision of the Services under the Agreement involving the processing of Personal Data protected by Applicable Data Protection Law.
+This DPA reflects the commitment of both Parties to abide by Applicable Data Protection Law for the processing of Personal Data by ZITADEL as a processor for the purpose of the ZITADEL's provision of the Services and its execution of the Agreement.
+
+This DPA will become effective on the date the Agreement enters into effect and will remain in force for the term of the Agreement, unless otherwise provided for in this DPA or unless individual provisions obviously result in obligations going beyond this.
+For the avoidance of doubt, the terms of the Framework Agreement will continue in full force and effect; however, to the extent any term in any Agreement regarding either Party’s obligations with respect to Customer Data is less restrictive than or is inconsistent with this DPA, the terms of this DPA shall supersede and control.
+
+The Parties acknowledge that the following Customer Data will be processed as part of the Services:
+
+import { PiiTable } from "../../src/components/pii_table";
+
+<PiiTable />
+
+## Scope
+
+Under this Agreement, ZITADEL shall process Customer Personal Data to perform its obligations under the Agreement and and strictly in accordance with the documented instructions of Customer (the “**Permitted Purpose**”), except where otherwise required by law(s) that are not incompatible with Applicable Data Protection Law.
+
+The Parties acknowledge and agree that for the purposes of this DPA, the Customer is the controller and appoints ZITADEL as a processor to process the Customer Personal Data.
+To the extent that the Parties are subject to the California Consumer Privacy Act (CCPA), the Customer is the business whereas ZITADEL is a service provider to the Customer.
+Each Party shall comply with the obligations that apply to it under Applicable Data Protection Law.
+
+Each Party shall comply with its own obligations under Applicable Data Protection Law in respect of any Customer Personal Data processed under the Agreement.
+
+## Customer's Responsibilities
+
+The Customer’s instructions to ZITADEL shall comply with Applicable Data Protection Law.
+The Customer will have sole responsibility for the accuracy, quality and legality of the Customer Data, the means by which the Customer acquired the Customer Data, and the Customer's permissions to process the Customer Data pursuant to this DPA.
+
+As required under Applicable Data Protection Law, the Customer will provide all necessary notices to data subjects and secure the applicable lawful grounds for processing Data under the DPA, including where applicable, all necessary permissions and consents from them. To the extent required under Applicable Data Protection Law, the Customer will receive and document the appropriate consent from the data subject(s).
+
+The Customer represents and warrants that (i) it complies with Applicable Data Protection Law as relevant to the lawful processing by ZITADEL of Customer Personal Data for the purposes contemplated by this DPA and the Agreement; and (ii) to the knowledge of the Customer, the processing of Customer Personal Data by ZITADEL in accordance with the Customer’s instructions will not cause ZITADEL to be in breach of any Applicable Data Protection Law.
+
+The Customer shall not disclose any special categories of Personal Data or sensitive personal information (as these terms are defined under Applicable Data Protection Law) to ZITADEL for processing.
+
+## Obligations of the processor
+
+### Bound by the Customer's directions and instructions
+
+Customer hereby instructs ZITADEL to process Customer Data for the Permitted Purpose.
+
+ZITADEL processes Personal Data in accordance with its privacy policy (cf. [Privacy Policy](./policies/privacy-policy)) and upon the documented directions of the Customer (which includes the Agreement).
+Subsequent instructions shall be given either in writing, whereby e-mail shall suffice, or orally with immediate written confirmation.
+
+ZITADEL shall promptly inform Customer if it becomes aware that such processing instructions infringe Applicable Data Protection Law (but without obligation to actively monitor compliance with Applicable Data Protection Law).
+In such case, ZITADEL shall be entitled to suspend the processing until the infringing instruction is withdrawn or confirmed.
+
+### Confidentiality obligations
+
+ZITADEL shall ensure that any person that it authorises to process Customer Data (including ZITADEL’s staff, agents and sub-processors) (an “Authorised Person”) shall be subject to a strict duty of confidentiality (whether a contractual duty or a statutory duty) and shall not permit any person to process the Customer Data that is not under such a duty of confidentiality. 
+ZITADEL shall ensure that all Authorised Persons process the Customer Data only as necessary for the Permitted Purpose.
+
+### Technical and organizational measures
+
+ZITADEL shall implement appropriate technical and organisational measures to protect the Customer Data from a Security Incident, as described in Annex II to this DPA.
+Such measures shall comply with all Applicable Data Protection Law and shall further have regard to the state of the art, the costs of implementation and the nature, scope, context and purposes of processing as well as the risk of varying likelihood and severity for the rights and freedoms of natural persons.
+The Customer acknowledges that such measures are subject to technical progress and development and that ZITADEL may update or modify such measures from time to time, provided that such updates and modifications do not degrade or diminish overall security of the Customer Data, or of the Services under the Agreement.
+
+### Involvement of subcontracted processors
+
+Customer agrees that ZITADEL may engage sub-processors to process Customer Data on Customer’s behalf. A current and complete [list of involved and approved sub-processors](https://zitadel.com/trust) can be found on our [Trust Center](https://zitadel.com/trust) (as may be updated from time to time in accordance with this DPA).
+
+ZITADEL will notify Customer by updating the list of sub-processors and, if Customer has subscribed to notices, via email.
+If, within five (5) calendar days after such notice, Customer notifies ZITADEL in writing that Customer objects to ZITADEL's appointment of a new sub-processor based on reasonable data protection concerns, the parties will discuss such concerns in good faith with a view to achieving a commercially reasonable resolution.
+If the parties are not able to mutually agree to a resolution of such concerns, Customer, as its sole and exclusive remedy, may terminate the Agreement for convenience with no refunds and Customer will remain liable to pay any committed fees in an order form, order, statement of work or other similar ordering document.
+
+ZITADEL shall inform the Customer if it adds or replaces any sub-processor at least fifteen (15) days prior to any such change (including details of the processing it performs or will perform).
+The Customer may object in writing to ZITADEL’s engagement of a new sub-processor on reasonable grounds relating to the protection of Customer Personal Data by notifying ZITADEL promptly in writing within fifteen (15) calendar days of receipt of ZITADEL’s notice.
+In such case, the parties shall discuss Customer’s concerns in good faith with a view to achieving a commercially reasonable resolution.
+If such objection right is not exercised by Customer, silence shall be deemed to constitute an approval of the relevant sub-processor engagement.
+
+Where ZITADEL appoints a sub-processor, ZITADEL shall: (i) enter into a written agreement with each sub-processor containing data protection terms that provide at least the same level of protection for Customer Data as those contained in this DPA, to the extent applicable to the nature of the services provided by such sub-processor; and (ii) remain responsible to the Customer for ZITADEL’s sub-processors’ failure to perform their obligations with respect to the processing of Customer Data.
+
+Taking into account the safeguards set forth in this DPA, Customer Data may be processed outside of Switzerland or the EU/EAA, such as in the United States or any country in which ZITADEL or is sub-processors operate. Our [list of involved and approved sub-processors](https://zitadel.com/trust) provides additional details.
+
+### Assistance in responding to requests
+
+ZITADEL shall provide all reasonable and timely assistance (which may include by appropriate technical and organisational measures) to the Customer to enable the Customer to respond to: (i) any request from a data subject to exercise any of their rights under Applicable Data Protection Law ("**Data Subject Request**"); and (ii) any other correspondence, enquiry or complaint received from a data subject, regulator or other third party in connection with the processing of Customer Personal Data.
+
+In the event that any such request, correspondence, enquiry or complaint is made directly to ZITADEL, ZITADEL shall promptly inform the Customer providing full details of the same.
+ZITADEL will not respond to a Data Subject Request, however the Customer acknowledges and agrees that ZITADEL may at its discretion respond to confirm that such request relates to the Customer.
+
+The Customer hereby acknowledges and agrees that the Services include features which will allow the Customer to manage Data Subject Requests directly through the Services without additional assistance from the Processor.
+If the Customer does not have the ability to address a Data Subject Request, ZITADEL will, upon the Customer’s written request, provide reasonable assistance to facilitate the Customer’s response to such Data Subject Request to the extent such assistance is consistent with Applicable Data Protection Law; provided that the Customer will be responsible for paying for any reasonable costs incurred or fees charged by ZITADEL for providing such assistance.
+
+ZITADEL, unless prohibited from doing so by applicable law, will promptly notify the Customer of any requests from a regulator, law enforcement authority or any other relevant and competent authority in relation to the Customer Personal Data that is being processed on behalf of the Customer, to the extent that the request may result in the disclosure of Customer Personal Data to such regulator, law enforcement authority or any other relevant and competent authority.
+
+### Cooperation and support for the Customer
+
+ZITADEL shall provide the Customer with all such reasonable and timely assistance as Customer may require in order to enable it to conduct a data protection impact assessment (or equivalent document) where required by Applicable Data Protection Law, including, if necessary, to assist Customer to consult with its relevant data protection or other regulatory authority.
+
+### Security incidents
+
+Upon becoming aware of a Security Incident, ZITADEL shall inform Customer without undue delay and provide all such timely information and cooperation as Customer may require for the Customer to fulfil its data breach or cybersecurity incident reporting obligations under (and in accordance with the timescales required by) Applicable Data Protection Law.
+Customer shall further take all such measures and actions as are reasonable and necessary to investigate, contain, and remediate or mitigate the effects of the Security Incident, to the extent that the remediation is within ZITADEL's control, and shall keep Customer informed of all material developments in connection with the Security Incident.
+
+Notwithstanding anything to the contrary, ZITADEL's notification of or response to a Security Incident under this section will not be construed as an acknowledgment by ZITADEL of any fault or liability with respect to such Security Incident.
+
+### Deletion or destruction after termination
+
+Upon termination or expiry of the Agreement, ZITADEL shall (at the Customer’s election) destroy or return to the Customer all Customer Data (including all copies of the Customer Data) in its possession or control (including any Customer Data subcontracted to a third party for processing).
+This requirement shall not apply to the extent that ZITADEL is required by any applicable law to retain some or all Customer Data, in which case ZITADEL shall isolate and protect the Customer Data from any further processing except to the extent required by such law until deletion is possible.
+
+### Customer's information and audit rights
+
+To the extent required under Applicable Data Protection Law and on written request from the Customer, ZITADEL shall provide written responses (which may include audit report summaries/extracts) to all reasonable requests for information made by the Customer related to its processing of Customer Personal Data as necessary to confirm ZITADEL's compliance with this DPA.
+The Customer shall not exercise this right more than once in any twelve (12)-month rolling period, except (i) if and when required by instruction of a competent data protection or other regulatory authority; or (ii) if ZITADEL has experienced a Security Incident.
+
+Nothing in this section shall be construed to require ZITADEL to document or provide: (i) trade secrets or any proprietary information; (ii) any information that would violate ZITADEL’s confidentiality obligations, contractual obligations, or applicable law; or (iii) any information, the disclosure of which could threaten, compromise, or otherwise put at risk the security, confidentiality, or integrity of ZITADEL’s infrastructure, networks, systems, algorithms or data.
+
+### Service Optimization
+
+Where permitted by Applicable Data Protection Law, ZITADEL may process Customer Data: (i) for its internal uses to build or improve the quality of its services; (ii) to detect Security Incidents; and (iii) to protect against fraudulent or illegal activity.
+
+ZITADEL may: (i) compile aggregated and/or de-identified information in connection with the provision of the Services, provided that such information cannot reasonably be used to identify Customer or any data subject to whom Customer Personal Data relates (“Aggregated and/or De-Identified Data”); and (ii) use such Aggregated and/or De-Identified Data for its lawful business purposes in accordance with Applicable Data Protection Law.
+
+### Data Transfers
+
+Where either Party intends to transfer Personal Data cross-border and Applicable Data Protection Law requires certain measures to be implemented prior to such transfer, each Party agrees to implement such measures to ensure compliance with Applicable Data Protection Law.  
+
+To the extent that the transfer of Personal Data from Customer to ZITADEL involves a transfer of Personal Data outside the European Economic Area (EEA), Switzerland, or the United Kingdom to a jurisdiction which is not subject to an adequacy determination by the European Commission, United Kingdom or Swiss authorities (as applicable) that covers such transfer, then the SCCs are hereby incorporated by reference and form an integral part of the Addendum.
+
+#### EEA Transfers
+
+To the extent that Customer Personal Data is subject to the GDPR, and the transfer would be a Restricted Transfer, the SCCs apply as follows:
+
+1) the Customer is the ‘data exporter’ and ZITADEL is the ‘data importer’;  
+2) the Module Two terms (Transfer controller to processor) apply;  
+3) in Clause 7, the optional docking clause does not apply;  
+4) in Clause 9, Option 2 (General Authorisation) applies and the time period for prior notice of sub-processor changes is set out in this DPA;  
+5) in Clause 11, the optional language does not apply;  
+6) in Clause 17, Option 1 applies, and the SCCs are governed by German law;  
+7) in Clause 18(b), disputes will be resolved before the courts of Hamburg in Germany;  
+8) in Annex I, the details of the parties and the transfer are set out in the Agreement;  
+9) in Clause 13(a) and Annex I, the Hamburg data protection authority will act as competent supervisory authority;  
+10) in Annex II, the description of the technical and organizational security measures is set out in Annex 2 of this DPA or, if not set out therein, the applicable statement of work; and  
+11) in Annex III, the list of sub-processors is set out at the address [https://zitadel.com/trust](https://zitadel.com/trust) or, if not set out therein, applicable statement of work.
+
+#### Swiss Transfers
+
+To the extent that Customer Personal Data is subject to Swiss law, and the transfer would be a Restricted Transfer, the SCCs apply as set out above with the following modifications:
+
+1) references to ‘Regulation (EU) 2016/679’ are interpreted as references to the Swiss FADP or any successor thereof;  
+2) references to specific articles of ‘Regulation (EU) 2016/679’ are replaced with the equivalent article or section of the Swiss FADP,  
+3) references to ‘EU’, ‘Union’ and ‘Member State’ are replaced with ‘Switzerland’,  
+4) Clause 13(a) and Part C of Annex 2 is not used and the ‘competent supervisory authority’ is the Swiss Federal Data Protection Information Commissioner (“**FDPIC**”) or, if the transfer is subject to both the Swiss FADP and the GDPR, the FDPIC (insofar as the transfer is governed by the Swiss FADP) or the DPC (insofar as the transfer is governed by the GDPR),  
+5) references to the ‘competent supervisory authority’ and ‘competent courts’ are replaced with the FDPIC and ‘competent Swiss courts’,  
+6) in Clause 17, the SCCs are governed by the laws of Switzerland,  
+7) in Clause 18(b), disputes will be resolved before the competent Swiss courts, and  
+8) the SCCs also protect the data of legal entities until entry into force of the revised Swiss FADP.
+
+#### UK Transfers
+
+To the extent that Customer Personal Data is subject to Applicable Data Protection Law of the United Kingdom, and the transfer would be a Restricted Transfer, the SCCs as set out above shall apply as amended by Part 2 of the UK Addendum, and Part 1 of the UK Addendum is deemed completed as follows:
+
+1) in Table 1, the details of the parties are set out in the Agreement or, if not set out therein, the applicable statement of work;  
+2) in Table 2, the selected modules and clauses are set out in Section 6.3 of this Addendum;  
+3) in Table 3, the appendix information is set out in the annexes to this DPA or, if not set out therein, the applicable statement of work; and  
+4) in Table 4, the ‘Exporter’ is selected.
+
+#### Alternative Transfer Mechanism
+
+In the event that a court of competent jurisdiction or supervisory authority orders (for whatever reason) that the measures described in this DPA cannot be relied on to lawfully transfer Customer Personal Data, or ZITADEL adopts an alternative data transfer mechanism to the mechanisms described in this DPA, including any new version of or successor to the standard contractual clauses (“Alternative Transfer Mechanism”), the Customer agrees to fully co-operate with ZITADEL to agree an amendment to this Addendum and/or execute such other documents and take such other actions as may be necessary to remedy such non-compliance or give legal effect to such Alternative Transfer Mechanism.
+
+### Additional Provisions under US Data Protection Laws
+
+The Parties agree that all Customer Personal Data that is subject to US Data Protection Laws (including the CCPA) is disclosed to ZITADEL by the Customer for the Permitted Purpose and its use or sharing by the Customer with ZITADEL is necessary to perform such Permitted Purpose.
+
+ZITADEL agrees that it will not:
+
+1. sell or share any Customer Personal Data;  
+2. retain, use, or disclose any Customer Personal Data (i) for any purpose other than for the Permitted Purpose, including for any commercial purpose, or (ii) outside of the direct business relationship between the Parties, except as necessary to perform the Permitted Purpose or as otherwise permitted by US Data Protection Laws; or  
+3. combine Customer Personal Data received from or on behalf of Customer with Personal Data received from or on behalf of any third party or collected from ZITADEL’s own interaction with individuals or data subjects, except to perform a Permitted Purpose in accordance with the CCPA, the Agreement and this DPA.
+
+The Parties acknowledge that the Customer Personal Data that Customer discloses to ZITADEL is provided only for the limited and specified purposes set forth as the Permitted Purpose in the Agreement and this DPA.
+
+ZITADEL shall provide the same level of protection to Customer Personal Data as required by the CCPA and will: (i) assist the Customer in responding to any request from a data subject to exercise rights under US Data Protection Laws; and (ii) immediately notify the Customer if it is not able to meet the requirements under the CCPA.
+
+The Customer may take such reasonable and appropriate steps as may be necessary (a) to ensure that the Customer Personal Data collected is used in a manner consistent with the business’s obligations under the CCPA; and (b) to stop and remediate any unauthorized use of Customer Personal Data, and (b) to ensure that Customer Personal Data is used in a manner consistent with the CCPA.
+
+### Miscellaneous
+
+This DPA shall be governed by and construed in accordance with the governing law and jurisdiction provisions set out in the Agreement, unless required otherwise by Applicable Data Protection Law.
+
+Any liability owed by one party to the other under this DPA shall be subject to the limitations of liability set forth in the Agreement.
+
+This DPA shall terminate upon the earlier of (i) the termination or expiry of all Agreement under which Customer Data may be processed, or (ii) the written agreement of the Parties.
+
+Any notices shall be delivered to a Party in accordance with the notice provisions of the Agreement, unless otherwise specified hereunder.
+
+## Annex 1: Description of Processing Activities / Transfer
+
+### List of Parties
+
+| Data Exporter | Data Importer |
+| :---- | :---- |
+| Name: The Party identified as the Customer in the Agreement. | Name: The Party identified as ZITADEL in the Agreement. |
+| Address:  As identified in the Agreement. | Address: As identified in the Agreement. |
+| Contact Person's Name, position and contact details: As identified in the Agreement. | Contact Person's Name, position and contact details: As identified in the Agreement. |
+| Activities relevant to the transfer:  See below | Activities relevant to the transfer: See below  |
+| Role: Controller  | Role: Processor  |
+
+### Description of processing / transfer:
+
+|  | Description  |
+| :---- | :---- |
+| **Categories of data subjects:** | As described in the section "Processing of Personal Data" of the DPA |
+| **Categories of personal data:**  | As described in the section "Processing of Personal Data" of the DPA |
+| **Sensitive data:** | None. |
+| **If sensitive data, the applied restrictions or safeguards** | N/A |
+| **Frequency of the transfer:** | Continuous |
+| **Nature and subject matter of processing:** | The Services described in the Agreement.   |
+| **Purpose(s) of the data transfer and further processing:**  | As set forth in the Agreement. |
+| **Retention period (or, if not possible to determine, the criteria used to determine that period):** | The personal data may be retained until termination or expiry of the Addendum.   |
+
+### Competent supervisory authority
+
+The competent supervisory authority in connection with Customer Personal Data protected by the GDPR, is the Hamburg data protection authority. If this is not possible, then as otherwise agreed by the parties consistent with the conditions set forth in Clause 13\.
+
+In connection with Customer Personal Data that is protected by UK-GDPR, the competent supervisory authority is the Information Commissioners Office (the "ICO").
+
+## Annex 2: Technical and organizational measures
+
+ZITADEL has implemented an information security program, that is designed to protect the confidentiality, integrity and availability of Customer Data. ZITADEL's information security program includes the following organizational and technical security measures to ensure a level of protection of the Personal Data processed that is appropriate to the risk:
+
+### Pseudonymization / Encryption
+
+The following measures for pseudonymization and encryption exist:
+
+1. All communication is encrypted with TLS \>1.2 with PFS
+2. Critical data is exclusively stored in encrypted form
+3. Storage media that store customer data are always encrypted
+4. Passwords are irreversibly stored with a hash function
+5. Data for web analytics are pseudonymized and do not contain any personal data
+
+### Ensuring certain properties of the systems and services
+
+#### Confidentiality
+
+The following confidentiality measures exist:
+
+1. Information security policies
+2. Authentication policies
+3. Vendor management policies
+4. Technical measures in this annex
+
+#### Integrity
+
+The following integrity measures exist:
+
+1. Code and container images are automatically checked for vulnerabilities
+2. An automated system is used to keep dependencies up to date
+3. Secrets are automatically rotated whenever possible and are short-lived (for example, signing keys)
+4. Changes to code or infrastructure require mandatory review by at least one other employee
+
+#### Availability
+
+The following measures of availability exist:
+
+1. Operation of the systems in combination with a CDN/DDoS mitigation service
+2. High availability operation
+3. Geo-redundant operation over at least two data centers
+
+#### Load capacity
+
+The following measures of availability exist:
+
+1. Automatic scaling of resources
+2. Monitoring, logging, tracing and alerting
+
+#### Restoring availability and access
+
+The following measures exist to restore availability and access:
+
+1. Implementation of a backup concept
+2. Emergency plan
+3. Testing of the emergency plan
+
+#### Regular review, assessment and evaluation of effectiveness
+
+The following measures exist for regular review, assessment and evaluation of effectiveness:
+
+1. At least annual audit and evaluation of processes within the framework of an information security management system
+2. Responsible Disclosure and Bug Bounty policies
+3. External audit of system security ("penetration testing")
