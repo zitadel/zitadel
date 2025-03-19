@@ -18,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration/scim"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -31,10 +32,8 @@ import (
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
-	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
@@ -43,6 +42,7 @@ import (
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	webkey_v2beta "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
 type Client struct {
@@ -60,11 +60,11 @@ type Client struct {
 	OIDCv2         oidc_pb.OIDCServiceClient
 	OrgV2beta      org_v2beta.OrganizationServiceClient
 	OrgV2          org.OrganizationServiceClient
-	ActionV3Alpha  action.ZITADELActionsClient
+	ActionV2beta   action.ActionServiceClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
-	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
+	WebKeyV2Beta   webkey_v2beta.WebKeyServiceClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
@@ -93,11 +93,11 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
 		OrgV2:          org.NewOrganizationServiceClient(cc),
-		ActionV3Alpha:  action.NewZITADELActionsClient(cc),
+		ActionV2beta:   action.NewActionServiceClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
-		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
+		WebKeyV2Beta:   webkey_v2beta.NewWebKeyServiceClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
@@ -692,47 +692,52 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 	if name == "" {
 		name = gofakeit.Name()
 	}
-	reqTarget := &action.Target{
+	req := &action.CreateTargetRequest{
 		Name:     name,
 		Endpoint: endpoint,
 		Timeout:  durationpb.New(10 * time.Second),
 	}
 	switch ty {
 	case domain.TargetTypeWebhook:
-		reqTarget.TargetType = &action.Target_RestWebhook{
-			RestWebhook: &action.SetRESTWebhook{
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.RESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeCall:
-		reqTarget.TargetType = &action.Target_RestCall{
-			RestCall: &action.SetRESTCall{
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.RESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeAsync:
-		reqTarget.TargetType = &action.Target_RestAsync{
-			RestAsync: &action.SetRESTAsync{},
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.RESTAsync{},
 		}
 	}
-	target, err := i.Client.ActionV3Alpha.CreateTarget(ctx, &action.CreateTargetRequest{Target: reqTarget})
+	target, err := i.Client.ActionV2beta.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
+func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
+	_, err := i.Client.ActionV2beta.DeleteTarget(ctx, &action.DeleteTargetRequest{
+		Id: id,
+	})
+	require.NoError(t, err)
+}
+
 func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
-	_, err := i.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
+	_, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
 }
 
 func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
-	target, err := i.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
+	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
-		Execution: &action.Execution{
-			Targets: targets,
-		},
+		Targets:   targets,
 	})
 	require.NoError(t, err)
 	return target

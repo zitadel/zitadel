@@ -55,7 +55,7 @@ func New() *cobra.Command {
 		Short: "setup ZITADEL instance",
 		Long: `sets up data to start ZITADEL.
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
@@ -107,7 +107,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	esV3 := new_es.NewEventstore(dbClient)
 	config.Eventstore.Pusher = esV3
 	config.Eventstore.Searcher = esV3
@@ -137,7 +137,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
-	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.CorrectCreationDate.dbClient = dbClient
 	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}
@@ -304,8 +304,8 @@ func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Even
 // under the folder/typ/filename path.
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
-func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
-	stmt, err := fs.ReadFile(path.Join(folder, typ, filename))
+func readStmt(fs embed.FS, folder, filename string) (string, error) {
+	stmt, err := fs.ReadFile(path.Join(folder, filename))
 	return string(stmt), err
 }
 
@@ -318,16 +318,15 @@ type statement struct {
 // under the folder/type path.
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
-func readStatements(fs embed.FS, folder, typ string) ([]statement, error) {
-	basePath := path.Join(folder, typ)
-	dir, err := fs.ReadDir(basePath)
+func readStatements(fs embed.FS, folder string) ([]statement, error) {
+	dir, err := fs.ReadDir(folder)
 	if err != nil {
 		return nil, err
 	}
 	statements := make([]statement, len(dir))
 	for i, file := range dir {
 		statements[i].file = file.Name()
-		statements[i].query, err = readStmt(fs, folder, typ, file.Name())
+		statements[i].query, err = readStmt(fs, folder, file.Name())
 		if err != nil {
 			return nil, err
 		}
@@ -468,9 +467,6 @@ func startCommandsQueries(
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
-	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
-		logging.Fatal("notifications must be set to LegacyEnabled=true when using CockroachDB")
-	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})

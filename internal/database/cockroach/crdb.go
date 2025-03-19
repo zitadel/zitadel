@@ -18,7 +18,7 @@ import (
 
 func init() {
 	config := new(Config)
-	dialect.Register(config, config, true)
+	dialect.Register(config, config, false)
 }
 
 const (
@@ -52,7 +52,7 @@ func (c *Config) MatchName(name string) bool {
 	return false
 }
 
-func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+func (_ *Config) Decode(configs []any) (dialect.Connector, error) {
 	connector := new(Config)
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
@@ -149,12 +149,8 @@ func (c *Config) Password() string {
 	return c.User.Password
 }
 
-func (c *Config) Type() string {
-	return "cockroach"
-}
-
-func (c *Config) Timetravel(d time.Duration) string {
-	return ""
+func (c *Config) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypeCockroach
 }
 
 type User struct {
