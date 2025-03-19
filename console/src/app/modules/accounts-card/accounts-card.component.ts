@@ -80,15 +80,17 @@ export class AccountsCardComponent implements OnInit {
           } else {
             return defer(() =>
               this.sessionService.listMyUserSessions({}).then((sessions) => {
-                return sessions.result.map((s) => {
-                  return {
-                    displayName: s.displayName,
-                    avatarUrl: s.avatarUrl,
-                    loginName: s.loginName,
-                    authState: s.authState,
-                    userName: s.userName,
-                  };
-                });
+                return sessions.result
+                  .filter((s) => s.loginName !== this.user?.preferredLoginName)
+                  .map((s) => {
+                    return {
+                      displayName: s.displayName,
+                      avatarUrl: s.avatarUrl,
+                      loginName: s.loginName,
+                      authState: s.authState,
+                      userName: s.userName,
+                    };
+                  });
               }),
             );
           }
