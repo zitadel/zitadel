@@ -29,6 +29,7 @@ interface V1AndV2Session {
   displayName: string;
   avatarUrl: string;
   loginName: string;
+  userName: string;
   authState: V1SessionState | V2SessionState;
 }
 
@@ -71,6 +72,7 @@ export class AccountsCardComponent implements OnInit {
                       avatarUrl: s.avatarUrl,
                       loginName: s.loginName,
                       authState: s.authState,
+                      userName: s.userName,
                     };
                   });
               }),
@@ -84,6 +86,7 @@ export class AccountsCardComponent implements OnInit {
                     avatarUrl: s.avatarUrl,
                     loginName: s.loginName,
                     authState: s.authState,
+                    userName: s.userName,
                   };
                 });
               }),
