@@ -46,7 +46,7 @@ export class AccountsCardComponent implements OnInit {
   public loadingUsers: boolean = false;
   public UserState: any = UserState;
   private labelpolicy = toSignal(this.userService.labelpolicy$, { initialValue: undefined });
-  private readonly sessions$: Observable<V1AndV2Session[] | undefined>;
+  public readonly sessions$: Observable<V1AndV2Session[] | undefined>;
 
   constructor(
     public authService: AuthenticationService,
@@ -90,10 +90,10 @@ export class AccountsCardComponent implements OnInit {
             );
           }
         }),
-        // catchError((err) => {
-        //   this.toast.showError(err);
-        //   return of([]);
-        // }),
+        catchError((err) => {
+          this.toast.showError(err);
+          return of([]);
+        }),
       );
   }
 
