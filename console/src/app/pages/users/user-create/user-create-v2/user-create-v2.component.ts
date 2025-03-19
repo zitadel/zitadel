@@ -239,19 +239,21 @@ export class UserCreateV2Component implements OnInit {
     const { baseUri } = useLoginV2;
     // if base uri is not set, we use the default for the cloud hosted login v2
     if (!baseUri) {
-      return new URL(location.origin + '/ui/v2/login');
+      return new URL(location.origin + '/ui/v2/login/');
     }
 
+    const baseUriWithTrailingSlash = baseUri.endsWith('/') ? baseUri : `${baseUri}/`;
     try {
       // first we try to create a URL directly from the baseUri
-      return new URL(baseUri);
+      return new URL(baseUriWithTrailingSlash);
     } catch (_) {
       // if this does not work we assume that the baseUri is relative,
       // and we need to add the location.origin
-      const baseUriWithSlash = baseUri.startsWith('/') ? baseUri : `/${baseUri}`;
-      return new URL(
-        location.origin + baseUri.startsWith('/') ? '' : `${location.origin}${baseUriWithSlash}${useLoginV2.baseUri}`,
-      );
+      // we make sure the relative url has a slash at the beginning and end
+      const baseUriWithSlashes = baseUriWithTrailingSlash.startsWith('/')
+        ? baseUriWithTrailingSlash
+        : `/${baseUriWithTrailingSlash}`;
+      return new URL(location.origin + baseUriWithSlashes);
     }
   }
 }
