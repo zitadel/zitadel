@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	GroupGrantProjectionTable = "projections.group_grants16"
+	GroupGrantProjectionTable = "projections.group_grants"
 
 	GroupGrantCreationDate  = "creation_date"
 	GroupGrantChangeDate    = "change_date"

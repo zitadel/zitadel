@@ -8,7 +8,7 @@ with grp as (
 	g.resource_owner, 
 	g.name,
 	g.description
-	from projections.group14 g
+	from projections.group g
 	where g.id = $1 and g.state = 1 -- only allow active groups
 	and g.instance_id = $2
 ),
@@ -25,7 +25,7 @@ group_grants as (
         roles, 
         resource_owner, 
         project_id
-    from projections.group_grants16
+    from projections.group_grants
     where group_id = $1
       and instance_id = $2
       and project_id = any($3)
