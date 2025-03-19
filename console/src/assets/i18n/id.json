@@ -173,6 +173,32 @@
           "DESCRIPTION": "Masa pakai token penyegaran yang menganggur adalah waktu maksimum token penyegaran tidak dapat digunakan."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Kelola Kunci Web OIDC Anda untuk menandatangani dan memvalidasi token dengan aman untuk instance ZITADEL Anda.",
+        "TABLE": {
+          "TITLE": "Kunci Web Aktif dan Mendatang",
+          "DESCRIPTION": "Kunci web Anda yang aktif dan akan datang. Mengaktifkan kunci baru akan menonaktifkan kunci yang sedang digunakan.",
+          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan klien.",
+          "ACTIVATE": "Aktifkan Kunci Web Berikutnya",
+          "ACTIVE": "Saat ini aktif",
+          "NEXT": "Berikutnya dalam antrean",
+          "FUTURE": "Mendatang",
+          "WARNING": "Kunci Web berusia kurang dari 5 menit"
+        },
+        "CREATE": {
+          "TITLE": "Buat Kunci Web Baru",
+          "DESCRIPTION": "Membuat kunci web baru akan menambahkannya ke daftar Anda. ZITADEL secara default menggunakan kunci RSA2048 dengan fungsi hash SHA256.",
+          "KEY_TYPE": "Jenis Kunci",
+          "BITS": "Bit",
+          "HASHER": "Hasher",
+          "CURVE": "Kurva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Kunci Web Sebelumnya",
+          "DESCRIPTION": "Ini adalah kunci web sebelumnya yang tidak lagi aktif.",
+          "DEACTIVATED_ON": "Dinonaktifkan pada"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Teks Pesan",
         "DESCRIPTION": "Sesuaikan teks email notifikasi atau pesan SMS Anda. Jika Anda ingin menonaktifkan beberapa bahasa, batasi bahasa tersebut di pengaturan bahasa instance Anda.",
@@ -1231,6 +1257,7 @@
       "BRANDING": "merek",
       "PRIVACYPOLICY": "Tautan eksternal",
       "OIDC": "Masa berlaku dan masa berlaku Token OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Pembuat Rahasia",
       "SECURITY": "Pengaturan keamanan",
       "EVENTS": "Acara",

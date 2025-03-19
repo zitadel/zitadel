@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, defer, from, Observable, of, TimeoutError } from 'rxjs';
+import { catchError, finalize, map, timeout } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
@@ -24,6 +24,7 @@ import {
   MESSAGETEXTS,
   NOTIFICATIONS,
   OIDC,
+  WEBKEYS,
   PRIVACYPOLICY,
   SECRETS,
   SECURITY,
@@ -38,22 +39,25 @@ import {
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { EnvironmentService } from 'src/app/services/environment.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NewFeatureService } from '../../services/new-feature.service';
+import { withLatestFromSynchronousFix } from '../../utils/withLatestFromSynchronousFix';
 @Component({
   selector: 'cnsl-instance',
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.scss'],
 })
-export class InstanceComponent implements OnInit, OnDestroy {
-  public instance?: InstanceDetail.AsObject;
-  public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  public totalMemberResult: number = 0;
-  public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
-  public State: any = State;
+export class InstanceComponent {
+  protected instance?: InstanceDetail.AsObject;
+  protected readonly PolicyComponentServiceType = PolicyComponentServiceType;
+  private readonly loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  protected readonly loading$: Observable<boolean> = this.loadingSubject.asObservable();
+  protected totalMemberResult: number = 0;
+  protected readonly membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
+  protected readonly State = State;
 
-  public id: string = '';
-  public defaultSettingsList: SidenavSetting[] = [
+  protected id: string = '';
+  protected readonly defaultSettingsList: SidenavSetting[] = [
     ORGANIZATIONS,
     FEATURESETTINGS,
     // notifications
@@ -81,23 +85,25 @@ export class InstanceComponent implements OnInit, OnDestroy {
     PRIVACYPOLICY,
     LANGUAGES,
     OIDC,
+    WEBKEYS,
     SECRETS,
     SECURITY,
   ];
 
-  public settingsList: Observable<SidenavSetting[]> = of([]);
-  public customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
+  protected readonly settingsList: Observable<SidenavSetting[]>;
+  protected readonly customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
 
-  private destroy$: Subject<void> = new Subject();
   constructor(
-    public adminService: AdminService,
-    private dialog: MatDialog,
-    private toast: ToastService,
+    protected readonly adminService: AdminService,
+    private readonly dialog: MatDialog,
+    private readonly toast: ToastService,
     breadcrumbService: BreadcrumbService,
-    private router: Router,
-    private authService: GrpcAuthService,
-    private envService: EnvironmentService,
+    private readonly router: Router,
+    private readonly authService: GrpcAuthService,
+    private readonly envService: EnvironmentService,
     activatedRoute: ActivatedRoute,
+    private readonly destroyRef: DestroyRef,
+    private readonly featureService: NewFeatureService,
   ) {
     this.loadMembers();
 
@@ -120,12 +126,39 @@ export class InstanceComponent implements OnInit, OnDestroy {
         this.toast.showError(error);
       });
 
-    activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
+    activatedRoute.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params: Params) => {
       const { id } = params;
       if (id) {
         this.id = id;
       }
     });
+
+    this.settingsList = this.getSettingsList();
+  }
+
+  public getSettingsList(): Observable<SidenavSetting[]> {
+    const webKeysEnabled$ = defer(() => this.featureService.getInstanceFeatures()).pipe(
+      map(({ webKey }) => webKey?.enabled ?? false),
+      timeout(1000),
+      catchError((error) => {
+        if (!(error instanceof TimeoutError)) {
+          this.toast.showError(error);
+        }
+        return of(false);
+      }),
+    );
+
+    return this.authService
+      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.admin || [])
+      .pipe(
+        withLatestFromSynchronousFix(webKeysEnabled$),
+        map(([settings, webKeysEnabled]) => {
+          if (webKeysEnabled) {
+            return settings;
+          }
+          return settings.filter((setting) => setting.id !== WEBKEYS.id);
+        }),
+      );
   }
 
   public loadMembers(): void {
@@ -185,18 +218,6 @@ export class InstanceComponent implements OnInit, OnDestroy {
   }
 
   public showDetail(): void {
-    this.router.navigate(['/instance', 'members']);
-  }
-
-  ngOnInit(): void {
-    this.settingsList = this.authService.isAllowedMapper(
-      this.defaultSettingsList,
-      (setting) => setting.requiredRoles.admin || [],
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.router.navigate(['/instance', 'members']).then();
   }
 }
