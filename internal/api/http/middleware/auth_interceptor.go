@@ -71,7 +71,8 @@ func authorize(r *http.Request, verifier authz.APITokenVerifier, authConfig auth
 		return nil, zerrors.ThrowUnauthenticated(nil, "AUT-1179", "auth header missing")
 	}
 
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), "", verifier, authConfig, authConfig, authOpt, r.RequestURI)
+	// TODO look into this
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), "", verifier, nil, authConfig.RolePermissionMappings, authOpt, r.RequestURI)
 	if err != nil {
 		return nil, err
 	}

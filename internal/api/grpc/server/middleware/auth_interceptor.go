@@ -34,7 +34,7 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	}
 
 	orgID, orgDomain := orgIDAndDomainFromRequest(authCtx, req)
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, orgDomain, verifier, systemUserPermissions, authConfig, authOpt, info.FullMethod)
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, orgDomain, verifier, systemUserPermissions.RolePermissionMappings, authConfig.RolePermissionMappings, authOpt, info.FullMethod)
 	if err != nil {
 		return nil, err
 	}

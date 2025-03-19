@@ -1248,6 +1248,7 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 1*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					got, err := Client.ListUsers(tt.ctx, tt.req)
+					fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> got = %+v\n", got)
 					require.NoError(ttt, err)
 
 					if tt.checkNumberOfUsersReturned {

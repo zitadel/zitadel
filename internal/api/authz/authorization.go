@@ -21,7 +21,7 @@ const (
 // - the organisation (**either** provided by ID or verified domain) exists
 // - the user is permitted to call the requested endpoint (permission option in proto)
 // it will pass the [CtxData] and permission of the user into the ctx [context.Context]
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, SystemAuthConfig Config, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, systemRolePermissionMapping []RoleMapping, rolePermissionMapping []RoleMapping, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -32,12 +32,12 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
-			parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, ctxData)
+			parent = addGetSystemUserRolesFuncToCtx(parent, systemRolePermissionMapping, ctxData)
 			return context.WithValue(parent, dataKey, ctxData)
 		}, nil
 	}
 
-	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, SystemAuthConfig.RolePermissionMappings, authConfig.RolePermissionMappings, ctxData, ctxData.OrgID)
+	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, systemRolePermissionMapping, rolePermissionMapping, ctxData, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		parent = context.WithValue(parent, dataKey, ctxData)
 		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
-		parent = addGetSystemUserRolesFuncToCtx(parent, SystemAuthConfig.RolePermissionMappings, ctxData)
+		parent = addGetSystemUserRolesFuncToCtx(parent, systemRolePermissionMapping, ctxData)
 		return parent
 	}, nil
 }

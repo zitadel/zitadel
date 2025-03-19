@@ -52,7 +52,7 @@ type Membership struct {
 	MemberType  MemberType
 	AggregateID string
 	InstanceID  string
-	//  ObjectID differs from aggregate id if object is sub of an aggregate
+	// ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
 	Roles []string
