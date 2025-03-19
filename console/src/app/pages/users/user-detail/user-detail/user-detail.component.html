@@ -52,10 +52,9 @@
       <cnsl-meta-layout>
         <cnsl-sidenav
           *ngIf="settingsList$ | async as settingsList"
-          [ngModel]="currentSetting$ | async"
-          (ngModelChange)="goToSetting($event)"
+          [setting]="currentSetting$()"
+          (settingChange)="currentSetting$.set($event)"
           [settingsList]="settingsList"
-          queryParam="id"
         >
           <div class="max-width-container">
             <cnsl-info-section class="locked" *ngIf="user?.state === UserState.LOCKED" [type]="InfoSectionType.WARN">
@@ -72,7 +71,7 @@
               </cnsl-info-section>
             </div>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'general'">
+            <ng-container *ngIf="currentSetting$().id === 'general'">
               <ng-template
                 *ngIf="humanUser(user) as user"
                 cnslHasRole
@@ -141,13 +140,13 @@
             </ng-container>
 
             <cnsl-external-idps
-              *ngIf="(currentSetting$ | async) === 'idp' && user.type.case === 'human' && user.userId"
+              *ngIf="currentSetting$().id === 'idp' && user.type.case === 'human' && user.userId"
               [userId]="user.userId"
               [service]="mgmtService"
             />
 
             <cnsl-card
-              *ngIf="(currentSetting$ | async) === 'general' && user.type.case === 'machine'"
+              *ngIf="currentSetting$().id === 'general' && user.type.case === 'machine'"
               title="{{ 'USER.MACHINE.TITLE' | translate }}"
             >
               <cnsl-detail-form-machine
@@ -158,7 +157,7 @@
               />
             </cnsl-card>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'pat'">
+            <ng-container *ngIf="currentSetting$().id === 'pat'">
               <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.userId]">
                 <cnsl-card
                   *ngIf="user.type.case === 'machine' && user.userId"
@@ -170,7 +169,7 @@
               </ng-template>
             </ng-container>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'keys'">
+            <ng-container *ngIf="currentSetting$().id === 'keys'">
               <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.userId]">
                 <cnsl-card
                   *ngIf="user.type.case === 'machine' && user.userId"
@@ -182,7 +181,7 @@
               </ng-template>
             </ng-container>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'security'">
+            <ng-container *ngIf="currentSetting$().id === 'security'">
               <cnsl-card *ngIf="user.type.case === 'human'" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
                 <div class="contact-method-col">
                   <div class="contact-method-row">
@@ -214,7 +213,7 @@
               <cnsl-user-mfa *ngIf="user.type.case === 'human'" [user]="user"></cnsl-user-mfa>
             </ng-container>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'grants'">
+            <ng-container *ngIf="currentSetting$().id === 'grants'">
               <cnsl-card
                 *ngIf="user.userId"
                 title="{{ 'GRANTS.USER.TITLE' | translate }}"
@@ -239,7 +238,7 @@
               </cnsl-card>
             </ng-container>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'memberships'">
+            <ng-container *ngIf="currentSetting$().id === 'memberships'">
               <cnsl-card
                 *ngIf="user.userId"
                 title="{{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
@@ -249,7 +248,7 @@
               </cnsl-card>
             </ng-container>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'metadata' && (metadata$ | async) as metadataQuery">
+            <ng-container *ngIf="currentSetting$().id === 'metadata' && (metadata$ | async) as metadataQuery">
               <cnsl-metadata
                 *ngIf="user.userId && metadataQuery.state !== 'error'"
                 [metadata]="metadataQuery.value"

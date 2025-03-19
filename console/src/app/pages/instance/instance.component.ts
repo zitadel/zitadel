@@ -92,7 +92,7 @@ export class InstanceComponent {
     ACTIONS_TARGETS,
   ];
 
-  protected readonly settingsList: Observable<SidenavSetting[]>;
+  protected readonly settingsList$: Observable<SidenavSetting[]>;
   protected readonly customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
 
   constructor(
@@ -114,7 +114,6 @@ export class InstanceComponent {
       name: 'Instance',
       routerLink: ['/instance'],
     });
-
     breadcrumbService.setBreadcrumb([instanceBread]);
 
     this.adminService
@@ -128,14 +127,14 @@ export class InstanceComponent {
         this.toast.showError(error);
       });
 
-    activatedRoute.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params: Params) => {
-      const { id } = params;
+    activatedRoute.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const id = params.get('id');
       if (id) {
         this.id = id;
       }
     });
 
-    this.settingsList = this.getSettingsList();
+    this.settingsList$ = this.getSettingsList();
   }
 
   private getSettingsList(): Observable<SidenavSetting[]> {
