@@ -479,34 +479,37 @@ export async function GET(request: NextRequest) {
           SAMLResponse: binding.value.samlResponse,
         };
 
-        // Convert form data to URL-encoded string
-        const formBody = Object.entries(formData)
-          .map(
-            ([key, value]) =>
-              encodeURIComponent(key) + "=" + encodeURIComponent(value),
-          )
-          .join("&");
+        const formHtml = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Redirecting...</title>
+          </head>
+          <body>
+            <form id="samlForm" action="${url}" method="POST">
+              ${Object.entries(formData)
+                .map(
+                  ([key, value]) =>
+                    `<input type="hidden" name="${key}" value="${value}" />`,
+                )
+                .join("\n")}
+            </form>
+            <script>
+              // Automatically submit the form
+              document.getElementById('samlForm').submit();
+            </script>
+          </body>
+          </html>
+        `;
 
-        // Make a POST request to the external URL with the form data
-        const response = await fetch(url, {
-          method: "POST",
+        // Return the HTML response
+        return new NextResponse(formHtml, {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "text/html",
           },
-          body: formBody,
         });
-
-        // Handle the response from the external URL
-        if (response.ok) {
-          return NextResponse.json({
-            message: "SAML request completed successfully",
-          });
-        } else {
-          return NextResponse.json(
-            { error: "Failed to complete SAML request" },
-            { status: response.status },
-          );
-        }
       } else {
         console.log(
           "could not create response, redirect user to choose other account",
