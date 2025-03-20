@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { AuthGuard } from './guards/auth.guard';
-import { RoleGuard } from './guards/role.guard';
+import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role-guard';
 import { UserGrantContext } from './modules/user-grants/user-grants-datasource';
 import { OrgCreateComponent } from './pages/org-create/org-create.component';
 
@@ -10,7 +10,7 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./pages/home/home.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['.'],
     },
@@ -22,7 +22,7 @@ const routes: Routes = [
   {
     path: 'orgs/create',
     component: OrgCreateComponent,
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['(org.create)?(iam.write)?'],
     },
@@ -31,12 +31,12 @@ const routes: Routes = [
   {
     path: 'orgs',
     loadChildren: () => import('./pages/org-list/org-list.module'),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
   },
   {
     path: 'granted-projects',
     loadChildren: () => import('./pages/projects/granted-projects/granted-projects.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['project.grant.read'],
     },
@@ -44,20 +44,20 @@ const routes: Routes = [
   {
     path: 'projects',
     loadChildren: () => import('./pages/projects/projects.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['project.read'],
     },
   },
   {
     path: 'users',
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     loadChildren: () => import('src/app/pages/users/users.module'),
   },
   {
     path: 'instance',
     loadChildren: () => import('./pages/instance/instance.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['iam.read', 'iam.write'],
     },
@@ -65,7 +65,7 @@ const routes: Routes = [
   {
     path: 'org',
     loadChildren: () => import('./pages/orgs/org.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['org.read'],
     },
@@ -73,7 +73,7 @@ const routes: Routes = [
   {
     path: 'actions',
     loadChildren: () => import('./pages/actions/actions.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['org.action.read', 'org.flow.read'],
     },
@@ -81,7 +81,7 @@ const routes: Routes = [
   {
     path: 'grants',
     loadChildren: () => import('./pages/grants/grants.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       context: UserGrantContext.NONE,
       roles: ['user.grant.read'],
@@ -89,12 +89,12 @@ const routes: Routes = [
   },
   {
     path: 'grant-create',
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     children: [
       {
         path: 'project/:projectid/grant/:grantid',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module'),
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
         data: {
           roles: ['user.grant.write'],
         },
@@ -102,7 +102,7 @@ const routes: Routes = [
       {
         path: 'project/:projectid',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module'),
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
         data: {
           roles: ['user.grant.write'],
         },
@@ -110,7 +110,7 @@ const routes: Routes = [
       {
         path: 'user/:userid',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module'),
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
         data: {
           roles: ['user.grant.write'],
         },
@@ -118,7 +118,7 @@ const routes: Routes = [
       {
         path: '',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module'),
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
         data: {
           roles: ['user.grant.write'],
         },
@@ -128,7 +128,7 @@ const routes: Routes = [
   {
     path: 'org-settings',
     loadChildren: () => import('./pages/org-settings/org-settings.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['policy.read'],
     },
