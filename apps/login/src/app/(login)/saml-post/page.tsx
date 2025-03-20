@@ -10,8 +10,6 @@ export default function SamlPost() {
   const relayState = searchParams.get("RelayState");
   const samlResponse = searchParams.get("SAMLResponse");
 
-  console.log(relayState, samlResponse);
-
   useEffect(() => {
     // Automatically submit the form after rendering
     const form = document.getElementById("samlForm") as HTMLFormElement;
