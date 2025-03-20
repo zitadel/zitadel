@@ -18,7 +18,7 @@ BEGIN
         (perm)->>'member_type' AS member_type,
         (perm)->>'aggregate_id' AS aggregate_id,
         (perm)->>'object_id' AS object_id,
-         permission-- AS permission
+        permission
         FROM jsonb_array_elements(permissions_json) AS perm
         CROSS JOIN jsonb_array_elements_text(perm->'permissions') AS permission) AS res
         WHERE res. permission= permm;
