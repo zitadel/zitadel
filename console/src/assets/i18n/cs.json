@@ -789,7 +789,10 @@
       "PHONESECTION": "Telefonní čísla",
       "PASSWORDSECTION": "Prvotní heslo",
       "ADDRESSANDPHONESECTION": "Telefonní číslo",
-      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů."
+      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů.",
+      "SETUPAUTHENTICATIONLATER": "Nastavte ověřování později pro tohoto uživatele.",
+      "INVITATION": "Odešlete pozvánkový e-mail pro nastavení ověřování a ověření e-mailu.",
+      "INITIALPASSWORD": "Nastavte počáteční heslo pro uživatele."
     },
     "CODEDIALOG": {
       "TITLE": "Ověření telefonního čísla",
@@ -1490,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 ukončení relace",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
+      "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
+      "DISABLEUSERTOKENEVENT": "Zakázat událost uživatelského tokenu",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
+      "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
+      "WEBKEY": "Webový klíč",
+      "WEBKEY_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",
