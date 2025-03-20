@@ -473,43 +473,17 @@ export async function GET(request: NextRequest) {
       if (url && binding.case === "redirect") {
         return NextResponse.redirect(url);
       } else if (url && binding.case === "post") {
-        // Create form data after SAML standard
         const formData = {
           RelayState: binding.value.relayState,
           SAMLResponse: binding.value.samlResponse,
         };
 
-        const formHtml = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Redirecting...</title>
-          </head>
-          <body>
-            <form id="samlForm" action="${url}" method="POST">
-              ${Object.entries(formData)
-                .map(
-                  ([key, value]) =>
-                    `<input type="hidden" name="${key}" value="${value}" />`,
-                )
-                .join("\n")}
-            </form>
-            <script>
-              // Automatically submit the form
-              document.getElementById('samlForm').submit();
-            </script>
-          </body>
-          </html>
-        `;
+        const redirectUrl = new URL(request.nextUrl.origin + "/saml-post");
+        redirectUrl.searchParams.set("url", url);
+        redirectUrl.searchParams.set("RelayState", formData.RelayState);
+        redirectUrl.searchParams.set("SAMLResponse", formData.SAMLResponse);
 
-        // Return the HTML response
-        return new NextResponse(formHtml, {
-          headers: {
-            "Content-Type": "text/html",
-          },
-        });
+        return NextResponse.redirect(redirectUrl.toString());
       } else {
         console.log(
           "could not create response, redirect user to choose other account",
