@@ -72,8 +72,10 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 		instanceIDs = []string{authz.GetInstance(ctx).InstanceID()}
 	}
 	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{MilestoneInstanceIDColID.identifier(): instanceIDs},
-		sq.Eq{InstanceDomainIsPrimaryCol.identifier(): true},
+		sq.Eq{
+			MilestoneInstanceIDColID.identifier():   instanceIDs,
+			InstanceDomainIsPrimaryCol.identifier(): true,
+		},
 	).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
@@ -88,7 +90,6 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 
 	milestones.State, err = q.latestState(ctx, milestonesTable)
 	return milestones, err
-
 }
 
 func prepareMilestonesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Milestones, error)) {

@@ -815,7 +815,10 @@
       "PHONESECTION": "전화번호",
       "PASSWORDSECTION": "초기 비밀번호",
       "ADDRESSANDPHONESECTION": "전화번호",
-      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다."
+      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다.",
+      "SETUPAUTHENTICATIONLATER": "이 사용자의 인증을 나중에 설정하세요.",
+      "INVITATION": "인증 설정 및 이메일 확인을 위한 초대 이메일을 보내세요.",
+      "INITIALPASSWORD": "사용자에 대한 초기 비밀번호를 설정하세요."
     },
     "CODEDIALOG": {
       "TITLE": "전화번호 확인",
@@ -1517,6 +1520,16 @@
       "ACTIONS_DESCRIPTION": "액션 v2는 데이터 실행 및 대상을 관리할 수 있습니다. 플래그가 활성화되면 새 API 및 기능을 사용할 수 있습니다.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC 단일 V1 세션 종료",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "플래그가 활성화되면, `sid` 클레임이 있는 id_token을 사용하여 end_session 엔드포인트에서 로그인 UI의 단일 세션을 종료할 수 있습니다. 현재 동일한 사용자 에이전트(브라우저)에서 모든 세션이 로그인 UI에서 종료됩니다. Session API를 통해 관리된 세션은 이미 단일 세션 종료를 허용합니다.",
+      "DEBUGOIDCPARENTERROR": "디버그 OIDC 부모 오류",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "플래그가 활성화되면 OIDC 부모 오류가 콘솔에 기록됩니다.",
+      "DISABLEUSERTOKENEVENT": "사용자 토큰 이벤트 비활성화",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "백채널 로그아웃 활성화",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 클라이언트에게 알리는 데 사용할 수 있습니다.",
+      "PERMISSIONCHECKV2": "권한 확인 V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
+      "WEBKEY": "웹 키",
+      "WEBKEY_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
         "INHERITED": "상속",
         "ENABLED": "활성화됨",
