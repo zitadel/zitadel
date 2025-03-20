@@ -149,7 +149,9 @@ func TestListUser(t *testing.T) {
 				assert.Equal(t, totalCountOfHumanUsers, resp.TotalResults)
 				assert.Equal(t, 5, resp.StartIndex)
 				assert.Len(t, sortedResources, 2)
+				fmt.Printf("expected prefix: %s, got: %s\n", "scim-username-1: ", sortedResources[0].UserName)
 				assert.True(t, strings.HasPrefix(sortedResources[0].UserName, "scim-username-1: "))
+				fmt.Printf("expected prefix: %s, got: %s\n", "scim-username-2: ", sortedResources[1].UserName)
 				assert.True(t, strings.HasPrefix(sortedResources[1].UserName, "scim-username-2: "))
 			},
 		},
