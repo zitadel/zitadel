@@ -1,33 +1,44 @@
-<form class="form-grid" [formGroup]="typeForm" (ngSubmit)="continue.emit()">
-  <div class="executionType">
-    <mat-radio-group class="executionTypeRadioGroup" aria-label="Select an option" formControlName="executionType">
-      <mat-radio-button value="ExecutionType.REQUEST">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.REQUEST' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.RESPONSE">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.RESPONSE' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.EVENTS">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.EVENTS' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.FUNCTIONS">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.FUNCTIONS' | translate
-      }}</mat-radio-button>
-    </mat-radio-group>
+<p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
+
+<form *ngIf="conditionForm" class="form-grid" [formGroup]="conditionForm" (ngSubmit)="continue.emit()">
+  <div class="emailVerified">
+    <mat-checkbox formControlName="all">
+      <div class="execution-condition-text">
+        <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.TITLE' | translate }}</span>
+        <span class="description cnsl-secondary-text">{{
+          'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.DESCRIPTION' | translate
+        }}</span>
+      </div>
+    </mat-checkbox>
   </div>
 
-  <!-- <div>
-    <button
-      data-e2e="create-button"
-      color="primary"
-      [disabled]="
-        userForm.invalid || (authenticationFactor.factor === 'initialPassword' && authenticationFactor.form.invalid)
-      "
-      type="submit"
-      class="create-button"
-      mat-raised-button
-    >
-      {{ 'ACTIONS.CREATE' | translate }}
-    </button>
-  </div> -->
+  <cnsl-form-field class="full-width">
+    <p>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
+    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.DESCRIPTION' | translate }}</cnsl-label>
+    <input cnslInput type="text" placeholder="" #nameInput formControlName="service" [matAutocomplete]="auto" />
+
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngIf="(executionServices$ | async) == undefined" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let service of executionServices$ | async" [value]="service">
+        <span>{{ service }}</span>
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
+
+  <cnsl-form-field class="full-width">
+    <p>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.TITLE' | translate }}</p>
+    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
+    <input cnslInput type="text" placeholder="" #nameInput formControlName="method" [matAutocomplete]="auto" />
+
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngIf="(executionMethods$ | async) == undefined" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let method of executionMethods$ | async" [value]="method">
+        <span>{{ method }}</span>
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
 </form>

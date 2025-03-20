@@ -1,18 +1,40 @@
+<p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.DESCRIPTION' | translate }}</p>
+
 <form class="form-grid" [formGroup]="typeForm" (ngSubmit)="continue.emit()">
   <div class="executionType">
-    <mat-radio-group class="executionTypeRadioGroup" aria-label="Select an option" formControlName="executionType">
-      <mat-radio-button value="ExecutionType.REQUEST">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.REQUEST' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.RESPONSE">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.RESPONSE' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.EVENTS">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.EVENTS' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.FUNCTIONS">{{
-        'ACTIONS.EXECUTION.CREATE.TYPE.FUNCTIONS' | translate
-      }}</mat-radio-button>
+    <mat-radio-group class="execution-radio-group" aria-label="Select an option" formControlName="executionType">
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.REQUEST">
+        <div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.REQUEST.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.REQUEST.DESCRIPTION' | translate
+          }}</span>
+        </div>
+      </mat-radio-button>
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.RESPONSE"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.RESPONSE.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.RESPONSE.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.EVENTS"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.EVENTS.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.EVENTS.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.FUNCTIONS"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.FUNCTIONS.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.FUNCTIONS.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
     </mat-radio-group>
   </div>
 

@@ -84,7 +84,9 @@ export class ActionsTwoActionsComponent implements OnInit {
 
     ref.afterClosed().subscribe((resp) => {
       if (resp) {
-        this.actionService.setExecution({});
+        this.actionService.setExecution({
+          condition: {},
+        });
       }
     });
   }

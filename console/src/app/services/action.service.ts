@@ -6,6 +6,7 @@ import {
   CreateTargetResponse,
   GetTargetResponse,
   ListExecutionFunctionsResponse,
+  ListExecutionMethodsResponse,
   ListExecutionServicesResponse,
   SearchExecutionsRequestSchema,
   SearchExecutionsResponse,
@@ -49,5 +50,9 @@ export class ActionService {
 
   public listExecutionServices(): Promise<ListExecutionServicesResponse> {
     return this.grpcService.actionNew.listExecutionServices({});
+  }
+
+  public listExecutionMethods(): Promise<ListExecutionMethodsResponse> {
+    return this.grpcService.actionNew.listExecutionMethods({});
   }
 }

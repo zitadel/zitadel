@@ -502,6 +502,48 @@
     "DOWNLOAD": "Download",
     "APPLY": "Apply"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "CREATE": {
+        "TITLE": "Create an Action",
+        "TYPE": {
+          "DESCRIPTION": "Select when you want this Action to run",
+          "REQUEST": {
+            "TITLE": "Request",
+            "DESCRIPTION": "Requests that occur within Zitadel. This could be something as a login request call."
+          },
+          "RESPONSE": {
+            "TITLE": "Response",
+            "DESCRIPTION": "A response from a request within Zitadel. Think of the response you get back from fetching a user."
+          },
+          "EVENTS": {
+            "TITLE": "Events",
+            "DESCRIPTION": "Events that happen within Zitadel. This could be anything like a user creating an account, a successful login etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Functions",
+            "DESCRIPTION": "Functions that you can call within Zitadel. This could be anything from sending an email to creating a user."
+          }
+        },
+        "CONDITION": {
+          "DESCRIPTION": "Choose whether this action applies to all request, a specific service (ec. user management), or a single request (e.g. create user).",
+          "ALL": {
+            "TITLE": "All",
+            "DESCRIPTION": "Select this if you want to run your action on every request"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Select Service",
+            "DESCRIPTION": "Choose a Zitadel Service for you action."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Select Method",
+            "DESCRIPTION": "If you want to only execute on a specific request, select it here",
+            "NOTE": "If you don't select a method, your action will run on every request in your selected service."
+          }
+        }
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Has control over the whole instance, including all organizations",
     "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
