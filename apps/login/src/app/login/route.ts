@@ -478,7 +478,8 @@ export async function GET(request: NextRequest) {
           SAMLResponse: binding.value.samlResponse,
         };
 
-        const redirectUrl = new URL(request.nextUrl.origin + "/saml-post");
+        const redirectUrl = constructUrl(request, "/saml-post");
+
         redirectUrl.searchParams.set("url", url);
         redirectUrl.searchParams.set("RelayState", formData.RelayState);
         redirectUrl.searchParams.set("SAMLResponse", formData.SAMLResponse);
