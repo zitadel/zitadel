@@ -27,7 +27,7 @@ type Metrics struct {
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
-	resource, err := otel_resource.ResourceWithService()
+	resource, err := otel_resource.ResourceWithService("ZITADEL")
 	if err != nil {
 		return nil, err
 	}
