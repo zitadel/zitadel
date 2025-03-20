@@ -60,9 +60,6 @@ func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder
 		}
 		systemUserPermissionsJson = string(systemUserPermissionsBytes)
 	}
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> authz.GetInstance(ctx).InstanceID() = %+v\n", authz.GetInstance(ctx).InstanceID())
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> systemUserPermissionsJson = %+v\n", systemUserPermissionsJson)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> permission = %+v\n", permission)
 
 	return query.Where(
 		fmt.Sprintf(wherePermittedOrgsOrCurrentUserClause, orgIDColumn, userIdColum),
