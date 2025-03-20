@@ -1,17 +1,20 @@
-<h2 mat-dialog-title>{{ 'QUICKSTART.DIALOG.CHANGE.TITLE' | translate }}</h2>
+<h2 mat-dialog-title>{{ 'ACTIONS.EXECUTION.CREATE.TITLE' | translate }}</h2>
 <mat-dialog-content>
-  {{ 'QUICKSTART.DIALOG.CHANGE.DESCRIPTION' | translate }}
+  {{ 'ACTIONS.EXECUTION.CREATE.DESCRIPTION' | translate }}
   <div class="framework-change-block">
-    <cnsl-framework-autocomplete
-      [frameworkId]="data.framework?.id"
-      [frameworks]="data.frameworks"
-      (selectionChanged)="findFramework($event)"
-    ></cnsl-framework-autocomplete>
+    <cnsl-actions-two-add-action-type
+      *ngIf="page() == Page.Type"
+      (typeChanges$)="onTypeChanged($event)"
+    ></cnsl-actions-two-add-action-type>
+    <cnsl-actions-two-add-action-condition *ngIf="page() == Page.Condition"></cnsl-actions-two-add-action-condition>
+    <cnsl-actions-two-add-action-target *ngIf="page() == Page.Target"></cnsl-actions-two-add-action-target>
   </div>
 </mat-dialog-content>
 <div>
   <mat-dialog-actions class="actions">
     <button mat-stroked-button mat-dialog-close>{{ 'ACTIONS.CANCEL' | translate }}</button>
-    <button color="primary" mat-raised-button (click)="close()" cdkFocusInitial>{{ 'ACTIONS.CHANGE' | translate }}</button>
+    <button color="primary" mat-raised-button (click)="continue()" cdkFocusInitial>
+      {{ page() == Page.Target ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.CONTINUE' | translate) }}
+    </button>
   </mat-dialog-actions>
 </div>

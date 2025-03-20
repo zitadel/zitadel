@@ -1,4 +1,4 @@
-import { Component, Inject, signal } from '@angular/core';
+import { AfterViewInit, Component, Inject, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -10,7 +10,15 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { ActionsTwoAddActionTypeComponent } from './actions-two-add-action-type/actions-two-add-action-type.component';
+import {
+  ActionsTwoAddActionTypeComponent,
+  ExecutionType,
+} from './actions-two-add-action-type/actions-two-add-action-type.component';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
+import { ActionsTwoAddActionConditionComponent } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
+import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
+import { CommonModule } from '@angular/common';
 
 enum Page {
   Type,
@@ -23,15 +31,34 @@ enum Page {
   templateUrl: './actions-two-add-action-dialog.component.html',
   styleUrls: ['./actions-two-add-action-dialog.component.scss'],
   standalone: true,
-  imports: [MatButtonModule, MatDialogModule, TranslateModule, ActionsTwoAddActionTypeComponent],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatDialogModule,
+    TranslateModule,
+    ActionsTwoAddActionTypeComponent,
+    ActionsTwoAddActionConditionComponent,
+    ActionsTwoAddActionTargetComponent,
+  ],
 })
-export class ActionTwoAddActionDialogComponent {
+export class ActionTwoAddActionDialogComponent implements AfterViewInit {
+  public Page = Page;
+  @ViewChild('actionTypeComponent') actionTypeComponent!: ActionsTwoAddActionTypeComponent;
+
   public page = signal<Page | undefined>(Page.Type);
+  public executionType = signal<ExecutionType>(ExecutionType.REQUEST);
+  private readonly request: MessageInitShape<typeof SetExecutionRequestSchema> = {};
 
   constructor(
     public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {}
+
+  ngAfterViewInit(): void {
+    this.actionTypeComponent?.typeChanges$.subscribe((type) => {
+      console.log('Execution type changed:', type);
+    });
+  }
 
   public continue() {
     const currentPage = this.page();
@@ -46,5 +73,13 @@ export class ActionTwoAddActionDialogComponent {
 
   public close() {
     this.dialogRef.close();
+  }
+
+  public closeWithResult() {
+    this.dialogRef.close(this.request);
+  }
+
+  public onTypeChanged(type: ExecutionType): void {
+    console.log('Execution type changed:', type);
   }
 }

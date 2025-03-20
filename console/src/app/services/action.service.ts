@@ -11,7 +11,11 @@ import {
   SearchExecutionsResponse,
   SearchTargetsRequestSchema,
   SearchTargetsResponse,
+  SetExecutionRequest,
+  SetExecutionRequestSchema,
+  SetExecutionResponse,
 } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
+import { SetEmail } from '../proto/generated/zitadel/resources/user/v3alpha/communication_pb';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +33,10 @@ export class ActionService {
 
   public createTarget(req: MessageInitShape<typeof CreateTargetRequestSchema>): Promise<CreateTargetResponse> {
     return this.grpcService.actionNew.createTarget(req);
+  }
+
+  public setExecution(req: MessageInitShape<typeof SetExecutionRequestSchema>): Promise<SetExecutionResponse> {
+    return this.grpcService.actionNew.setExecution(req);
   }
 
   public searchExections(req: MessageInitShape<typeof SearchExecutionsRequestSchema>): Promise<SearchExecutionsResponse> {

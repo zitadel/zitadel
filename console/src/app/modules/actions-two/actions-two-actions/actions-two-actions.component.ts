@@ -8,6 +8,8 @@ import { GetExecution } from '@zitadel/proto/zitadel/resources/action/v3alpha/ex
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANIZATIONS } from '../../settings-list/settings';
+import { ActionTwoAddActionDialogComponent } from '../actions-two-add-action/actions-two-add-action-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -26,6 +28,7 @@ export class ActionsTwoActionsComponent implements OnInit {
     private readonly destroyRef: DestroyRef,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly dialog: MatDialog,
   ) {
     this.actionsEnabled$ = this.getActionsEnabled$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executions$ = this.getExecutions$(this.actionsEnabled$);
@@ -71,5 +74,18 @@ export class ActionsTwoActionsComponent implements OnInit {
         return of(false);
       }),
     );
+  }
+
+  public openDialog(): void {
+    const ref = this.dialog.open(ActionTwoAddActionDialogComponent, {
+      width: '400px',
+      data: {},
+    });
+
+    ref.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.actionService.setExecution({});
+      }
+    });
   }
 }

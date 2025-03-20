@@ -3,12 +3,16 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { InputModule } from 'src/app/modules/input/input.module';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
+import { MatRadioModule } from '@angular/material/radio';
+
+export enum ExecutionType {
+  REQUEST,
+  RESPONSE,
+  EVENTS,
+  FUNCTIONS,
+}
 
 @Component({
   standalone: true,
@@ -16,47 +20,29 @@ import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
   selector: 'cnsl-actions-two-add-action-type',
   templateUrl: './actions-two-add-action-type.component.html',
   styleUrls: ['./actions-two-add-action-type.component.scss'],
-  imports: [
-    TranslateModule,
-    RouterModule,
-    MatSelectModule,
-    MatAutocompleteModule,
-    ReactiveFormsModule,
-    MatProgressSpinnerModule,
-    FormsModule,
-    CommonModule,
-    MatButtonModule,
-    InputModule,
-  ],
+  imports: [TranslateModule, MatRadioModule, RouterModule, ReactiveFormsModule, FormsModule, CommonModule, MatButtonModule],
 })
 export class ActionsTwoAddActionTypeComponent implements OnInit {
-  public isLoading = signal(false);
-  @Input() public frameworkId?: string;
-  @Input() public frameworks: Framework[] = [];
-  @Input() public withCustom: boolean = false;
-  public myControl: FormControl = new FormControl();
-  @Output() public selectionChanged: EventEmitter<string> = new EventEmitter();
-  public filteredOptions: Observable<Framework[]> = of([]);
+  public ExecutionType = ExecutionType;
+  protected readonly typeForm: ReturnType<typeof this.buildActionTypeForm> = this.buildActionTypeForm();
+  @Output() public continue: EventEmitter<void> = new EventEmitter();
+  @Output() public typeChanges$: Observable<ExecutionType>;
 
-  constructor() {}
-
-  public ngOnInit() {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map((value) => {
-        return this._filter(value || '');
-      }),
+  constructor(private readonly fb: FormBuilder) {
+    // Initialize the Observable to emit form value changes
+    this.typeChanges$ = this.typeForm.get('executionType')!.valueChanges.pipe(
+      startWith(this.typeForm.get('executionType')!.value), // Emit the initial value
+      tap((value) => console.log('ExecutionType changed:', value)), // Debugging/logging
     );
   }
 
-  private _filter(value: string): Framework[] {
-    const filterValue = value.toLowerCase();
-    return this.frameworks
-      .filter((option) => option.id)
-      .filter((option) => option.title.toLowerCase().includes(filterValue));
-  }
+  public ngOnInit(): void {}
 
-  public selected(event: MatAutocompleteSelectedEvent): void {
-    this.selectionChanged.emit(event.option.value);
+  public buildActionTypeForm() {
+    return this.fb.group({
+      executionType: new FormControl<ExecutionType>(ExecutionType.REQUEST, {
+        nonNullable: true,
+      }),
+    });
   }
 }

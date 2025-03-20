@@ -1,4 +1,9 @@
 <p>actions-two-actions works!</p>
+<div>
+  <button color="primary" mat-raised-button (click)="openDialog()">
+    {{ 'ACTIONS.CREATE' | translate }}
+  </button>
+</div>
 <div *ngFor="let execution of executions$ | async">
   {{ execution | json }}
 </div>
