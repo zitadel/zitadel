@@ -13,7 +13,7 @@ services:
       - "./example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro"
 
   db:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     restart: always
     environment:
       - POSTGRES_USER=root
