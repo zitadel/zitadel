@@ -17,15 +17,15 @@ const accessTokenStorageKey = 'access_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptorProvider {
-  public triggerDialog: Subject<boolean> = new Subject();
+  private readonly triggerDialog: Subject<boolean> = new Subject();
 
   constructor(
-    private authenticationService: AuthenticationService,
-    private storageService: StorageService,
-    private dialog: MatDialog,
-    private destroyRef: DestroyRef,
+    private readonly authenticationService: AuthenticationService,
+    private readonly storageService: StorageService,
+    private readonly dialog: MatDialog,
+    destroyRef: DestroyRef,
   ) {
-    this.triggerDialog.pipe(debounceTime(1000), takeUntilDestroyed(this.destroyRef)).subscribe(() => this.openDialog());
+    this.triggerDialog.pipe(debounceTime(1000), takeUntilDestroyed(destroyRef)).subscribe(() => this.openDialog());
   }
 
   getToken(): Observable<string> {

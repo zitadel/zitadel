@@ -30,7 +30,7 @@ services:
 
   db:
     restart: 'always'
-    image: 'cockroachdb/cockroach:latest'
+    image: 'cockroachdb/cockroach:latest-v24.3'
     command: 'start-single-node --insecure --http-addr :9090'
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9090/health?ready=1']
