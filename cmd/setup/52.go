@@ -19,7 +19,7 @@ type InitPermittedOrgsFunction52 struct {
 var permittedOrgsFunction52 embed.FS
 
 func (mig *InitPermittedOrgsFunction52) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(permittedOrgsFunction52, "51", "")
+	statements, err := readStatements(permittedOrgsFunction52, "52", "")
 	if err != nil {
 		return err
 	}
