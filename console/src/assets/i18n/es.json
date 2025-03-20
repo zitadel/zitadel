@@ -789,7 +789,10 @@
       "PHONESECTION": "Números de teléfono",
       "PASSWORDSECTION": "Contraseña inicial",
       "ADDRESSANDPHONESECTION": "Número de teléfono",
-      "INITMAILDESCRIPTION": "Si ambas opciones se seleccionan, no se enviará un email para la inicialización. Si solo una de las opciones se selecciona, un email se enviará para proporcionar / verificar los datos."
+      "INITMAILDESCRIPTION": "Si ambas opciones se seleccionan, no se enviará un email para la inicialización. Si solo una de las opciones se selecciona, un email se enviará para proporcionar / verificar los datos.",
+      "SETUPAUTHENTICATIONLATER": "Configurar la autenticación más tarde para este usuario.",
+      "INVITATION": "Enviar un correo de invitación para la configuración de autenticación y verificación de correo electrónico.",
+      "INITIALPASSWORD": "Establece una contraseña inicial para el usuario."
     },
     "CODEDIALOG": {
       "TITLE": "Verificar número de teléfono",
@@ -1399,7 +1402,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1490,6 +1494,16 @@
       "ACTIONS_DESCRIPTION": "Acciones v2 permite administrar las ejecuciones y objetivos de datos. Si la bandera está habilitada, podrá utilizar la nueva API y sus funciones.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Terminación de sesión",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si la bandera está habilitada, podrá terminar una sesión única desde la interfaz de usuario de inicio de sesión proporcionando un id_token con una reclamación `sid` como id_token_hint en el punto final de end_session. Tenga en cuenta que actualmente se terminan todas las sesiones del mismo agente de usuario (navegador) en la interfaz de usuario de inicio de sesión. Las sesiones administradas a través de la API de sesión ya permiten la terminación de sesiones individuales.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera está habilitada, el error del padre OIDC se registrará en la consola.",
+      "DISABLEUSERTOKENEVENT": "Desactivar evento de token de usuario",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Habilitar Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a los clientes sobre la terminación de la sesión en el proveedor de OpenID.",
+      "PERMISSIONCHECKV2": "Verificación de permisos V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
+      "WEBKEY": "Clave web",
+      "WEBKEY_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
       "STATES": {
         "INHERITED": "Heredado",
         "ENABLED": "Habilitado",
@@ -1639,7 +1653,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -2584,7 +2600,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

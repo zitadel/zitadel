@@ -139,6 +139,7 @@ type Steps struct {
 	s48Apps7SAMLConfigsLoginVersion         *Apps7SAMLConfigsLoginVersion
 	s49InitPermittedOrgsFunction            *InitPermittedOrgsFunction
 	s50IDPTemplate6UsePKCE                  *IDPTemplate6UsePKCE
+	s51IDPTemplate6RootCA                   *IDPTemplate6RootCA
 	s52InitPermittedOrgsFunction            *InitPermittedOrgsFunction52
 }
 

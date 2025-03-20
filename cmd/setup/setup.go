@@ -177,6 +177,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s48Apps7SAMLConfigsLoginVersion = &Apps7SAMLConfigsLoginVersion{dbClient: dbClient}
 	steps.s49InitPermittedOrgsFunction = &InitPermittedOrgsFunction{eventstoreClient: dbClient}
 	steps.s50IDPTemplate6UsePKCE = &IDPTemplate6UsePKCE{dbClient: dbClient}
+	steps.s51IDPTemplate6RootCA = &IDPTemplate6RootCA{dbClient: dbClient}
 	steps.s52InitPermittedOrgsFunction = &InitPermittedOrgsFunction52{eventstoreClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
@@ -217,6 +218,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s47FillMembershipFields,
 		steps.s49InitPermittedOrgsFunction,
 		steps.s50IDPTemplate6UsePKCE,
+		steps.s51IDPTemplate6RootCA,
 		steps.s52InitPermittedOrgsFunction,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
@@ -469,10 +471,14 @@ func startCommandsQueries(
 		config.DefaultInstance.SecretGenerators,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
+
+	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
+		logging.Fatal("notifications must be set to LegacyEnabled=true when using CockroachDB")
+	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
-	logging.OnError(err).Fatal("unable to start queue")
+	logging.OnError(err).Fatal("unable to init queue")
 
 	notify_handler.Register(
 		ctx,
