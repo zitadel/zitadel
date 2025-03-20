@@ -13,6 +13,31 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./v1": {
+      "types": "./dist/v1.d.ts",
+      "import": "./dist/v1.mjs",
+      "require": "./dist/v1.js"
+    },
+    "./v2": {
+      "types": "./dist/v2.d.ts",
+      "import": "./dist/v2.mjs",
+      "require": "./dist/v2.js"
+    },
+    "./v3alpha": {
+      "types": "./dist/v3alpha.d.ts",
+      "import": "./dist/v3alpha.mjs",
+      "require": "./dist/v3alpha.js"
+    },
+    "./zitadel/*": {
+      "types": "./zitadel/*.d.ts",
+      "import": "./zitadel/*.js",
+      "require": "./zitadel/*.js"
+    },
+    "./zitadel/*.js": {
+      "types": "./zitadel/*.d.ts",
+      "import": "./zitadel/*.js",
+      "require": "./zitadel/*.js"
     }
   },
   "files": [
