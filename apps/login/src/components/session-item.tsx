@@ -9,6 +9,7 @@ import moment from "moment";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
+import { useLocale } from "next-intl";
 
 export function isSessionValid(session: Partial<Session>): {
   valid: boolean;
@@ -37,6 +38,9 @@ export function SessionItem({
   reload: () => void;
   requestId?: string;
 }) {
+  const currentLocale = useLocale();
+  moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
+
   const [loading, setLoading] = useState<boolean>(false);
 
   async function clearSession(id: string) {
