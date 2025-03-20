@@ -1,8 +1,21 @@
 {
-  "extends": ["//"],
+  "extends": [
+    "//"
+  ],
   "tasks": {
+    "build": {
+      "dependsOn": [
+        "generate"
+      ],
+      "outputs": [
+        "dist/**"
+      ],
+      "cache": false
+    },
     "generate": {
-      "outputs": ["zitadel/**"],
+      "outputs": [
+        "zitadel/**"
+      ],
       "cache": true
     }
   }
