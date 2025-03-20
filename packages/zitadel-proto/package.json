@@ -54,13 +54,16 @@
     "build": "tsup",
     "test:cjs": "node test/cjs-test.cjs",
     "test:esm": "node test/esm-test.mjs",
-    "test": "pnpm test:cjs && pnpm test:esm"
+    "test:legacy": "ts-node test/legacy-test.ts",
+    "test": "pnpm test:cjs && pnpm test:esm && pnpm test:legacy"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.47.2",
-    "tsup": "^8.0.0"
+    "tsup": "^8.0.0",
+    "ts-node": "^10.9.2",
+    "@zitadel/tsconfig": "workspace:*"
   }
 }
