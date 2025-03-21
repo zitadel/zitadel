@@ -21,6 +21,7 @@ import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { F } from '@angular/cdk/keycodes';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   standalone: true,
@@ -35,6 +36,7 @@ import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
     ReactiveFormsModule,
     InputModule,
     MatAutocompleteModule,
+    MatCheckboxModule,
     FormsModule,
     CommonModule,
     MatButtonModule,
@@ -62,7 +64,6 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
     // this.conditionChanges$ = this.conditionForm!.valueChanges.pipe(
     //   tap((value) => console.log('ExecutionType changed:', value)), // Debugging/logging
     // );
-
     this.executionServices$ = this.listExecutionServices().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionMethods$ = this.listExecutionMethods().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionFunctions$ = this.listExecutionFunctions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));

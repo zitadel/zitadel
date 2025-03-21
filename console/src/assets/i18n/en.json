@@ -540,6 +540,11 @@
             "DESCRIPTION": "If you want to only execute on a specific request, select it here",
             "NOTE": "If you don't select a method, your action will run on every request in your selected service."
           }
+        },
+        "TARGET": {
+          "TITLE": "Choose your Target",
+          "DESCRIPTION": "The target you want to execute for this action",
+          "ADD_ANOTHER": "Add another target"
         }
       }
     }

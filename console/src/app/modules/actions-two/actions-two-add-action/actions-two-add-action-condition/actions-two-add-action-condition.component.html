@@ -12,10 +12,19 @@
     </mat-checkbox>
   </div>
 
+  <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
+
   <cnsl-form-field class="full-width">
-    <p>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
     <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.DESCRIPTION' | translate }}</cnsl-label>
-    <input cnslInput type="text" placeholder="" #nameInput formControlName="service" [matAutocomplete]="auto" />
+    <input
+      cnslInput
+      type="text"
+      placeholder=""
+      #nameInput
+      formControlName="service"
+      [matAutocomplete]="auto"
+      [disabled]="conditionForm.get('all')?.value == true"
+    />
 
     <mat-autocomplete #auto="matAutocomplete">
       <mat-option *ngIf="(executionServices$ | async) == undefined" class="is-loading">
@@ -27,8 +36,9 @@
     </mat-autocomplete>
   </cnsl-form-field>
 
+  <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.TITLE' | translate }}</p>
+
   <cnsl-form-field class="full-width">
-    <p>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.TITLE' | translate }}</p>
     <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
     <input cnslInput type="text" placeholder="" #nameInput formControlName="method" [matAutocomplete]="auto" />
 

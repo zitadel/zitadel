@@ -1,33 +1,17 @@
-<form class="form-grid" [formGroup]="typeForm" (ngSubmit)="continue.emit()">
-  <div class="executionType">
-    <mat-radio-group class="executionTypeRadioGroup" aria-label="Select an option" formControlName="executionType">
-      <mat-radio-button value="ExecutionType.REQUEST">{{
-        'ACTIONSTWO.EXECUTION.CREATE.TYPE.REQUEST' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.RESPONSE">{{
-        'ACTIONSTWO.EXECUTION.CREATE.TYPE.RESPONSE' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.EVENTS">{{
-        'ACTIONSTWO.EXECUTION.CREATE.TYPE.EVENTS' | translate
-      }}</mat-radio-button>
-      <mat-radio-button value="ExecutionType.FUNCTIONS">{{
-        'ACTIONSTWO.EXECUTION.CREATE.TYPE.FUNCTIONS' | translate
-      }}</mat-radio-button>
-    </mat-radio-group>
-  </div>
+<form *ngIf="targetForm" class="form-grid" [formGroup]="targetForm" (ngSubmit)="continue.emit()">
+  <p class="target-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.TITLE' | translate }}</p>
 
-  <!-- <div>
-    <button
-      data-e2e="create-button"
-      color="primary"
-      [disabled]="
-        userForm.invalid || (authenticationFactor.factor === 'initialPassword' && authenticationFactor.form.invalid)
-      "
-      type="submit"
-      class="create-button"
-      mat-raised-button
-    >
-      {{ 'ACTIONS.CREATE' | translate }}
-    </button>
-  </div> -->
+  <cnsl-form-field class="full-width">
+    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.DESCRIPTION' | translate }}</cnsl-label>
+    <input cnslInput type="text" placeholder="" #nameInput formControlName="service" [matAutocomplete]="auto" />
+
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngIf="(executionTargets$ | async) == undefined" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let target of executionTargets$ | async" [value]="target">
+        <span>{{ target }}</span>
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
 </form>

@@ -71,8 +71,15 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
     }
   }
 
-  public close() {
-    this.dialogRef.close();
+  public previous() {
+    const currentPage = this.page();
+    if (currentPage === Page.Target) {
+      this.page.set(Page.Condition);
+    } else if (currentPage === Page.Condition) {
+      this.page.set(Page.Type);
+    } else {
+      this.dialogRef.close();
+    }
   }
 
   public closeWithResult() {
