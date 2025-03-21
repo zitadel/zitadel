@@ -14,14 +14,16 @@ import (
 )
 
 type AuthInterceptor struct {
-	verifier   authz.APITokenVerifier
-	authConfig authz.Config
+	verifier         authz.APITokenVerifier
+	authConfig       authz.Config
+	systemAuthConfig authz.Config
 }
 
-func AuthorizationInterceptor(verifier authz.APITokenVerifier, authConfig authz.Config) *AuthInterceptor {
+func AuthorizationInterceptor(verifier authz.APITokenVerifier, systemAuthConfig authz.Config, authConfig authz.Config) *AuthInterceptor {
 	return &AuthInterceptor{
-		verifier:   verifier,
-		authConfig: authConfig,
+		verifier:         verifier,
+		authConfig:       authConfig,
+		systemAuthConfig: systemAuthConfig,
 	}
 }
 
@@ -31,7 +33,7 @@ func (a *AuthInterceptor) Handler(next http.Handler) http.Handler {
 
 func (a *AuthInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, err := authorize(r, a.verifier, a.authConfig)
+		ctx, err := authorize(r, a.verifier, a.systemAuthConfig, a.authConfig)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
@@ -44,7 +46,7 @@ func (a *AuthInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 
 func (a *AuthInterceptor) HandlerFuncWithError(next HandlerFuncWithError) HandlerFuncWithError {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		ctx, err := authorize(r, a.verifier, a.authConfig)
+		ctx, err := authorize(r, a.verifier, a.systemAuthConfig, a.authConfig)
 		if err != nil {
 			return err
 		}
@@ -56,7 +58,7 @@ func (a *AuthInterceptor) HandlerFuncWithError(next HandlerFuncWithError) Handle
 
 type httpReq struct{}
 
-func authorize(r *http.Request, verifier authz.APITokenVerifier, authConfig authz.Config) (_ context.Context, err error) {
+func authorize(r *http.Request, verifier authz.APITokenVerifier, systemAuthConfig authz.Config, authConfig authz.Config) (_ context.Context, err error) {
 	ctx := r.Context()
 
 	authOpt, needsToken := checkAuthMethod(r, verifier)
@@ -71,7 +73,7 @@ func authorize(r *http.Request, verifier authz.APITokenVerifier, authConfig auth
 		return nil, zerrors.ThrowUnauthenticated(nil, "AUT-1179", "auth header missing")
 	}
 
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), "", verifier, authConfig, authOpt, r.RequestURI)
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), "", verifier, systemAuthConfig.RolePermissionMappings, authConfig.RolePermissionMappings, authOpt, r.RequestURI)
 	if err != nil {
 		return nil, err
 	}
