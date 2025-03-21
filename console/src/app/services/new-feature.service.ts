@@ -3,7 +3,6 @@ import { GrpcService } from './grpc.service';
 import {
   GetInstanceFeaturesResponse,
   ResetInstanceFeaturesResponse,
-  SetInstanceFeaturesRequest,
   SetInstanceFeaturesRequestSchema,
   SetInstanceFeaturesResponse,
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';

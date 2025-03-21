@@ -1,0 +1,55 @@
+<p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.DESCRIPTION' | translate }}</p>
+
+<form class="form-grid" [formGroup]="typeForm" (ngSubmit)="continue.emit()">
+  <div class="executionType">
+    <mat-radio-group class="execution-radio-group" aria-label="Select an option" formControlName="executionType">
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.REQUEST">
+        <div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.REQUEST.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.REQUEST.DESCRIPTION' | translate
+          }}</span>
+        </div>
+      </mat-radio-button>
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.RESPONSE"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.RESPONSE.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.RESPONSE.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.EVENTS"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.EVENTS.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.EVENTS.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+      <mat-radio-button class="execution-radio-button" value="ExecutionType.FUNCTIONS"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.FUNCTIONS.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.TYPE.FUNCTIONS.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+    </mat-radio-group>
+  </div>
+
+  <!-- <div>
+    <button
+      data-e2e="create-button"
+      color="primary"
+      [disabled]="
+        userForm.invalid || (authenticationFactor.factor === 'initialPassword' && authenticationFactor.form.invalid)
+      "
+      type="submit"
+      class="create-button"
+      mat-raised-button
+    >
+      {{ 'ACTIONS.CREATE' | translate }}
+    </button>
+  </div> -->
+</form>

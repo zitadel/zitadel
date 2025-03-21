@@ -22,6 +22,12 @@ import { createFeatureServiceClient, createUserServiceClient } from '@zitadel/cl
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
+// @ts-ignore
+import { createClientFor } from '@zitadel/client';
+import { ZITADELActions } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
+import { Client, Transport } from '@connectrpc/connect';
+
+const createActionServiceClient: (transport: Transport) => Client<typeof ZITADELActions> = createClientFor(ZITADELActions);
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +41,7 @@ export class GrpcService {
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
+  public actionNew!: ReturnType<typeof createActionServiceClient>;
 
   constructor(
     private readonly envService: EnvironmentService,
@@ -108,6 +115,7 @@ export class GrpcService {
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);
+        this.actionNew = createActionServiceClient(transport);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',
