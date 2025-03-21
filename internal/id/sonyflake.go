@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/drone/envsubst"
@@ -138,7 +139,7 @@ func machineID() (uint16, error) {
 		errors = append(errors, "No machine identification method enabled.")
 	}
 
-	// logging.WithFields("errors", strings.Join(errors, ", ")).Panic("none of the enabled methods for identifying the machine succeeded")
+	logging.WithFields("errors", strings.Join(errors, ", ")).Panic("none of the enabled methods for identifying the machine succeeded")
 	// this return will never happen because of panic one line before
 	return 0, nil
 }

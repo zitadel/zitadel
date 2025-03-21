@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -24,17 +25,18 @@ const (
 // and is typically the `resource_owner` column in ZITADEL.
 // We use full identifiers in the query builder so this function should be
 // called with something like `UserResourceOwnerCol.identifier()` for example.
-func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, systemUserPermission []authz.SystemUserPermissionsDBQuery, filterOrgIds, orgIDColumn, permission string) (sq.SelectBuilder, error) {
+func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, permission string) (sq.SelectBuilder, error) {
 	userID := authz.GetCtxData(ctx).UserID
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
 
-	systemUserPermissionsJson := "[]"
-	if systemUserPermission != nil {
-		systemUserPermissionsBytes, err := json.Marshal(systemUserPermission)
+	systemUserPermissions := authz.GetSystemUserPermissions(ctx)
+	var systemUserPermissionsJson []byte
+	if systemUserPermissions != nil {
+		var err error
+		systemUserPermissionsJson, err = json.Marshal(systemUserPermissions)
 		if err != nil {
-			return query, err
+			return query, zerrors.ThrowInternal(err, "AUTHZ-HS4us", "Errors.Internal")
 		}
-		systemUserPermissionsJson = string(systemUserPermissionsBytes)
 	}
 
 	return query.Where(
@@ -42,23 +44,23 @@ func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, systemUserP
 		authz.GetInstance(ctx).InstanceID(),
 		userID,
 		systemUserPermissionsJson,
-		systemUserPermission,
 		permission,
 		filterOrgIds,
 	), nil
 }
 
-func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, systemUserPermission []authz.SystemUserPermissionsDBQuery, filterOrgIds, orgIDColumn, userIdColum, permission string) (sq.SelectBuilder, error) {
+func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, userIdColum, permission string) (sq.SelectBuilder, error) {
 	userID := authz.GetCtxData(ctx).UserID
 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "user_id_colum", userIdColum, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
 
-	systemUserPermissionsJson := "[]"
-	if systemUserPermission != nil {
-		systemUserPermissionsBytes, err := json.Marshal(systemUserPermission)
+	systemUserPermissions := authz.GetSystemUserPermissions(ctx)
+	var systemUserPermissionsJson []byte
+	if systemUserPermissions != nil {
+		var err error
+		systemUserPermissionsJson, err = json.Marshal(systemUserPermissions)
 		if err != nil {
-			return query, err
+			return query, zerrors.ThrowInternal(err, "AUTHZ-HS4us", "Errors.Internal")
 		}
-		systemUserPermissionsJson = string(systemUserPermissionsBytes)
 	}
 
 	return query.Where(

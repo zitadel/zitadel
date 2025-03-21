@@ -655,12 +655,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	})
 	if permissionCheckV2 {
-		// extract system user roles
-		systemUserPermissions, err := authz.GetSystemUserPermissions(ctx)
-		if err != nil {
-			return nil, zerrors.ThrowInternal(err, "QUERY-GS9gs", "Errors.Internal")
-		}
-		query, err = wherePermittedOrgsOrCurrentUser(ctx, query, systemUserPermissions, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
+		query, err = wherePermittedOrgsOrCurrentUser(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
 		if err != nil {
 			return nil, err
 		}

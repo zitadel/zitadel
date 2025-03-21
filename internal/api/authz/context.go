@@ -56,9 +56,6 @@ type Membership struct {
 	ObjectID string
 
 	Roles []string
-
-	// aggregate all the permissions for each role
-	Permissions []string
 }
 
 type MemberType int32
@@ -71,12 +68,6 @@ const (
 	MemberTypeIAM
 	MemberTypeSystem
 )
-
-var MemberTypeServerToMemberTypeDBMap map[MemberType]string = map[MemberType]string{
-	MemberTypeSystem:       "System",
-	MemberTypeIAM:          "IAM",
-	MemberTypeOrganization: "Organization",
-}
 
 type TokenVerifier interface {
 	ExistsOrg(ctx context.Context, id, domain string) (string, error)

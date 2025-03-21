@@ -12,7 +12,7 @@ import (
 )
 
 type InitPermittedOrgsFunction52 struct {
-	eventstoreClient *database.DB
+	dbClient *database.DB
 }
 
 //go:embed 52/*.sql
@@ -25,7 +25,7 @@ func (mig *InitPermittedOrgsFunction52) Execute(ctx context.Context, _ eventstor
 	}
 	for _, stmt := range statements {
 		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
-		if _, err := mig.eventstoreClient.ExecContext(ctx, stmt.query); err != nil {
+		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
 			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
 		}
 	}

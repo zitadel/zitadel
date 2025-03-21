@@ -2,6 +2,22 @@ DROP FUNCTION IF EXISTS eventstore.get_system_permissions;
 
 CREATE OR REPLACE FUNCTION eventstore.get_system_permissions(
     permissions_json JSONB
+    /*
+    [
+      {
+        "member_type": "System",
+        "aggregate_id": "",
+        "object_id": "",
+        "permissions": ["iam.read", "iam.write", "iam.polic.read"]
+      },
+      {
+        "member_type": "IAM",
+        "aggregate_id": "310716990375453665",
+        "object_id": "",
+        "permissions": ["iam.read", "iam.write", "iam.polic.read"]
+      }
+    ]
+    */
     , permm TEXT
 )
 RETURNS TABLE (

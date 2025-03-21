@@ -2,12 +2,12 @@ package authz
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"reflect"
 	"slices"
 	"strings"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -167,7 +167,7 @@ func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []Rol
 					slices.Sort(permissions)
 					permissions = slices.Compact(permissions)
 
-					systemUserPermissionsDbJsonQueryStruct[i].MemberType = MemberTypeServerToMemberTypeDBMap[systemPerm.MemberType]
+					systemUserPermissionsDbJsonQueryStruct[i].MemberType = systemPerm.MemberType.String()
 					systemUserPermissionsDbJsonQueryStruct[i].AggregateID = systemPerm.AggregateID
 					systemUserPermissionsDbJsonQueryStruct[i].Permissions = permissions
 				}
@@ -178,14 +178,15 @@ func addGetSystemUserRolesFuncToCtx(ctx context.Context, systemUserRoleMap []Rol
 	return ctx
 }
 
-func GetSystemUserPermissions(ctx context.Context) ([]SystemUserPermissionsDBQuery, error) {
+func GetSystemUserPermissions(ctx context.Context) []SystemUserPermissionsDBQuery {
 	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesFuncKey)
 	if getSystemUserRolesFuncValue == nil {
-		return nil, nil
+		return nil
 	}
 	getSystemUserRolesFunc, ok := getSystemUserRolesFuncValue.(func(context.Context) []SystemUserPermissionsDBQuery)
 	if !ok {
-		return nil, errors.New("unable to obtain systems role func")
+		logging.WithFields("Authz").Error("unable to cast []SystemUserPermissionsDBQuery")
+		return nil
 	}
-	return getSystemUserRolesFunc(ctx), nil
+	return getSystemUserRolesFunc(ctx)
 }
