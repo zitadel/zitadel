@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/superseriousbusiness/exifremove/pkg/exifremove"
+	"github.com/zitadel/exifremove/pkg/exifremove"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/static"
