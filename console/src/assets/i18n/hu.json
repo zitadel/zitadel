@@ -185,6 +185,32 @@
           "DESCRIPTION": "A tétlen frissítő token élettartama az a maximális idő, ameddig a frissítő token használaton kívül maradhat."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Kezelje az OIDC Webkulcsokat, hogy biztonságosan aláírja és érvényesítse a tokeneket a ZITADEL példányában.",
+        "TABLE": {
+          "TITLE": "Aktív és Jövőbeli Webkulcsok",
+          "DESCRIPTION": "Az aktív és közelgő webkulcsai. Egy új kulcs aktiválása deaktiválja az aktuálisat.",
+          "NOTE": "Megjegyzés: A JWKs OIDC végpont egy gyorsítótárazható választ ad vissza (alapértelmezett: 5 perc). Kerülje a kulcs túl korai aktiválását, mivel lehet, hogy még nem érhető el a gyorsítótárakban és a klienseknél.",
+          "ACTIVATE": "Következő Webkulcs aktiválása",
+          "ACTIVE": "Jelenleg aktív",
+          "NEXT": "Következő a sorban",
+          "FUTURE": "Jövőbeli",
+          "WARNING": "A webkulcs kevesebb mint 5 perces"
+        },
+        "CREATE": {
+          "TITLE": "Új Webkulcs létrehozása",
+          "DESCRIPTION": "Egy új webkulcs létrehozása hozzáadja azt a listájához. A ZITADEL alapértelmezés szerint RSA2048 kulcsokat használ SHA256 hasheléssel.",
+          "KEY_TYPE": "Kulcstípus",
+          "BITS": "Bitek",
+          "HASHER": "Hasher",
+          "CURVE": "Görbe"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Korábbi Webkulcsok",
+          "DESCRIPTION": "Ezek a korábbi webkulcsai, amelyek már nem aktívak.",
+          "DEACTIVATED_ON": "Deaktiválva ekkor"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Üzenet Szövegek",
         "DESCRIPTION": "Testreszabhatod az értesítési e-mailjeid vagy SMS üzeneteid szövegeit. Ha le szeretnél tiltani néhány nyelvet, korlátozd azokat az instance nyelvi beállításaiban.",
@@ -789,7 +815,10 @@
       "PHONESECTION": "Telefonszámok",
       "PASSWORDSECTION": "Kezdeti jelszó",
       "ADDRESSANDPHONESECTION": "Telefonszám",
-      "INITMAILDESCRIPTION": "Ha mindkét opció ki van választva, nem kerül kiküldésre inicializáló e-mail. Ha csak az egyik opció van kiválasztva, egy e-mailt küldünk az adatok megadására / ellenőrzésére."
+      "INITMAILDESCRIPTION": "Ha mindkét opció ki van választva, nem kerül kiküldésre inicializáló e-mail. Ha csak az egyik opció van kiválasztva, egy e-mailt küldünk az adatok megadására / ellenőrzésére.",
+      "SETUPAUTHENTICATIONLATER": "Állítsa be később az autentikációt ehhez a felhasználóhoz.",
+      "INVITATION": "Küldjön meghívó e-mailt az autentikáció beállításához és az e-mail hitelesítéséhez.",
+      "INITIALPASSWORD": "Állítson be egy kezdeti jelszót a felhasználónak."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonszám ellenőrzése",
@@ -1353,6 +1382,7 @@
       "BRANDING": "Márkaépítés",
       "PRIVACYPOLICY": "Külső hivatkozások",
       "OIDC": "OIDC token élettartam és lejárat",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Titokgenerátor",
       "SECURITY": "Biztonsági beállítások",
       "EVENTS": "Események",
@@ -1488,6 +1518,16 @@
       "ACTIONS_DESCRIPTION": "A Műveletek v2 lehetővé teszik az adat futtatások és célok kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Egyedüli V1 Munkamenet Befejezése",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ha a zászló engedélyezve van, képes leszel egyetlen munkamenetet megszüntetni a bejelentkezési UI-ben, ha egy id_tokent biztosítasz egy `sid` claim-mel mint id_token_hint az end_session végpontnál. Megjegyzendő, hogy jelenleg az összes munkamenet ugyanabból a felhasználói ügynökből (böngésző) leállításra kerül a bejelentkezési UI-ben. A Session API-val kezelt munkamenetek már lehetővé teszik egyes munkamenetek megszüntetését.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ha a zászló engedélyezve van, az OIDC szülő hiba naplózva lesz a konzolban.",
+      "DISABLEUSERTOKENEVENT": "Felhasználói token esemény letiltása",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout engedélyezése",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az ügyfelek értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
+      "PERMISSIONCHECKV2": "Engedély ellenőrzés V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
+      "WEBKEY": "Webkulcs",
+      "WEBKEY_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
       "STATES": {
         "INHERITED": "Örököl",
         "ENABLED": "Engedélyezve",

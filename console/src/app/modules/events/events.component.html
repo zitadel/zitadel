@@ -6,12 +6,7 @@
 </div>
 <p class="events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IAM_EVENTS.DESCRIPTION' | translate }}</p>
 
-<cnsl-refresh-table
-  [hideRefresh]="true"
-  (refreshed)="refresh()"
-  [dataSize]="dataSource.data.length"
-  [loading]="_loading | async"
->
+<cnsl-refresh-table [hideRefresh]="true" (refreshed)="refresh()" [loading]="_loading | async">
   <div actions>
     <cnsl-filter-events (requestChanged)="filterChanged($event)"></cnsl-filter-events>
   </div>

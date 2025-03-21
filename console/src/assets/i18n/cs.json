@@ -185,6 +185,32 @@
           "DESCRIPTION": "Životnost nečinného refresh tokenu je maximální doba, po kterou může být refresh token nepoužitý."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Spravujte své OIDC webové klíče pro bezpečné podepisování a ověřování tokenů ve vaší instanci ZITADEL.",
+        "TABLE": {
+          "TITLE": "Aktivní a budoucí webové klíče",
+          "DESCRIPTION": "Vaše aktivní a nadcházející webové klíče. Aktivací nového klíče dojde k deaktivaci aktuálního.",
+          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a klientům.",
+          "ACTIVATE": "Aktivovat další webový klíč",
+          "ACTIVE": "Aktuálně aktivní",
+          "NEXT": "Další v řadě",
+          "FUTURE": "Budoucí",
+          "WARNING": "Webový klíč je starý méně než 5 minut"
+        },
+        "CREATE": {
+          "TITLE": "Vytvořit nový webový klíč",
+          "DESCRIPTION": "Vytvořením nového webového klíče jej přidáte do svého seznamu. ZITADEL používá klíče RSA2048 s hashováním SHA256 jako výchozí.",
+          "KEY_TYPE": "Typ klíče",
+          "BITS": "Bity",
+          "HASHER": "Hasher",
+          "CURVE": "Křivka"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Předchozí webové klíče",
+          "DESCRIPTION": "Toto jsou vaše předchozí webové klíče, které již nejsou aktivní.",
+          "DEACTIVATED_ON": "Deaktivováno dne"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Texty zpráv",
         "DESCRIPTION": "Přizpůsob si texty svých e-mailových nebo SMS notifikací. Pokud chceš některé z jazyků zakázat, omez je ve svém nastavení jazyků instance.",
@@ -789,7 +815,10 @@
       "PHONESECTION": "Telefonní čísla",
       "PASSWORDSECTION": "Prvotní heslo",
       "ADDRESSANDPHONESECTION": "Telefonní číslo",
-      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů."
+      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů.",
+      "SETUPAUTHENTICATIONLATER": "Nastavte ověřování později pro tohoto uživatele.",
+      "INVITATION": "Odešlete pozvánkový e-mail pro nastavení ověřování a ověření e-mailu.",
+      "INITIALPASSWORD": "Nastavte počáteční heslo pro uživatele."
     },
     "CODEDIALOG": {
       "TITLE": "Ověření telefonního čísla",
@@ -1353,6 +1382,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Zásady ochrany osobních údajů",
       "OIDC": "Životnost a expirace OIDC tokenu",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Generátor tajemství",
       "SECURITY": "Bezpečnostní nastavení",
       "EVENTS": "Události",
@@ -1490,6 +1520,16 @@
       "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 ukončení relace",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
+      "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
+      "DISABLEUSERTOKENEVENT": "Zakázat událost uživatelského tokenu",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
+      "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
+      "WEBKEY": "Webový klíč",
+      "WEBKEY_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",

@@ -185,6 +185,32 @@
           "DESCRIPTION": "De levensduur van het inactieve vernieuwingstoken is de maximale tijd dat een vernieuwingstoken ongebruikt kan zijn."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Beheer je OIDC Web Keys om tokens veilig te ondertekenen en te valideren voor je ZITADEL-instantie.",
+        "TABLE": {
+          "TITLE": "Actieve en Toekomstige Websleutels",
+          "DESCRIPTION": "Je actieve en aankomende websleutels. Het activeren van een nieuwe sleutel deactiveert de huidige.",
+          "NOTE": "Opmerking: Het JWKs OIDC-eindpunt geeft een cachebare respons terug (standaard 5 minuten). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is in caches en bij clients.",
+          "ACTIVATE": "Volgende Websleutel activeren",
+          "ACTIVE": "Momenteel actief",
+          "NEXT": "Volgende in de wachtrij",
+          "FUTURE": "Toekomstig",
+          "WARNING": "De websleutel is minder dan 5 minuten oud"
+        },
+        "CREATE": {
+          "TITLE": "Nieuwe Websleutel aanmaken",
+          "DESCRIPTION": "Het aanmaken van een nieuwe websleutel voegt deze toe aan je lijst. ZITADEL gebruikt standaard RSA2048-sleutels met een SHA256-hasher.",
+          "KEY_TYPE": "Sleuteltype",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Curve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Vorige Websleutels",
+          "DESCRIPTION": "Dit zijn je vorige websleutels die niet langer actief zijn.",
+          "DEACTIVATED_ON": "Gedeactiveerd op"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Berichtteksten",
         "DESCRIPTION": "Pas de teksten van je notificatie-e-mail of SMS-berichten aan. Als je sommige talen wilt uitschakelen, beperk ze dan in de taalinstellingen van je instanties.",
@@ -789,7 +815,10 @@
       "PHONESECTION": "Telefoonnummers",
       "PASSWORDSECTION": "Initieel wachtwoord",
       "ADDRESSANDPHONESECTION": "Telefoonnummer",
-      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren."
+      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren.",
+      "SETUPAUTHENTICATIONLATER": "Authenticatie later instellen voor deze gebruiker.",
+      "INVITATION": "Stuur een uitnodigingsmail voor het instellen van authenticatie en e-mailverificatie.",
+      "INITIALPASSWORD": "Stel een initieel wachtwoord in voor de gebruiker."
     },
     "CODEDIALOG": {
       "TITLE": "Verifieer telefoonnummer",
@@ -1353,6 +1382,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacybeleid",
       "OIDC": "OIDC Token levensduur en vervaldatum",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Beveiligingsinstellingen",
       "EVENTS": "Evenementen",
@@ -1490,6 +1520,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
+      "DISABLEUSERTOKENEVENT": "Gebruikerstokengebeurtenis uitschakelen",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
+      "PERMISSIONCHECKV2": "Permissiecontrole V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
+      "WEBKEY": "Websleutel",
+      "WEBKEY_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",

@@ -185,6 +185,32 @@
           "DESCRIPTION": "Den inaktiva förnyelsetokenens livslängd är den maximala tiden en förnyelsetoken kan vara oanvänd."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Hantera dina OIDC-webbnycklar för att säkert signera och validera tokens för din ZITADEL-instans.",
+        "TABLE": {
+          "TITLE": "Aktiva och framtida webbnycklar",
+          "DESCRIPTION": "Dina aktiva och kommande webbnycklar. Aktivering av en ny nyckel kommer att inaktivera den nuvarande.",
+          "NOTE": "Observera: JWKs OIDC-slutpunkten returnerar ett cachebart svar (standard 5 min). Undvik att aktivera en nyckel för tidigt, eftersom den kanske ännu inte är tillgänglig i cache och för klienter.",
+          "ACTIVATE": "Aktivera nästa webbnyckel",
+          "ACTIVE": "För närvarande aktiv",
+          "NEXT": "Nästa i kön",
+          "FUTURE": "Framtida",
+          "WARNING": "Webbnyckeln är mindre än 5 minuter gammal"
+        },
+        "CREATE": {
+          "TITLE": "Skapa ny webbnyckel",
+          "DESCRIPTION": "Att skapa en ny webbnyckel lägger till den i din lista. ZITADEL använder som standard RSA2048-nycklar med en SHA256-hasher.",
+          "KEY_TYPE": "Nyckeltyp",
+          "BITS": "Bitar",
+          "HASHER": "Hasher",
+          "CURVE": "Kurva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Tidigare webbnycklar",
+          "DESCRIPTION": "Detta är dina tidigare webbnycklar som inte längre är aktiva.",
+          "DEACTIVATED_ON": "Inaktiverad den"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Meddelandetexter",
         "DESCRIPTION": "Anpassa texterna i dina notifikationsmail eller SMS-meddelanden. Om du vill inaktivera några av språken, begränsa dem i dina instansers språkinställningar.",
@@ -789,7 +815,10 @@
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Initialt lösenord",
       "ADDRESSANDPHONESECTION": "Telefonnummer",
-      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas."
+      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas.",
+      "SETUPAUTHENTICATIONLATER": "Ställ in autentisering senare för den här användaren.",
+      "INVITATION": "Skicka en inbjudningsmail för autentiseringsinställning och e-postverifiering.",
+      "INITIALPASSWORD": "Ställ in ett initialt lösenord för användaren."
     },
     "CODEDIALOG": {
       "TITLE": "Verifiera telefonnummer",
@@ -1357,6 +1386,7 @@
       "BRANDING": "Varumärke",
       "PRIVACYPOLICY": "Externa länkar",
       "OIDC": "OIDC-token livstid och utgång",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Hemlighetsgenerator",
       "SECURITY": "Säkerhetsinställningar",
       "EVENTS": "Händelser",
@@ -1494,6 +1524,16 @@
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
+      "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
+      "DISABLEUSERTOKENEVENT": "Inaktivera Användartokenhändelse",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela klienter om sessionens avslutning hos OpenID-leverantören.",
+      "PERMISSIONCHECKV2": "Behörighetskontroll V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
+      "WEBKEY": "Webbnyckel",
+      "WEBKEY_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
