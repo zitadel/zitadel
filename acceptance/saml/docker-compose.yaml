@@ -1,0 +1,35 @@
+services:
+  samlsp:
+    image: golang:1.24-alpine
+    container_name: samlsp
+    command: go run main.go -host 'http://localhost' -port '8001' -idp 'http://host.docker.internal:3000/saml/v2/metadata'
+    working_dir: /saml
+    ports:
+      - 8001:8001
+    volumes:
+      - "./:/saml"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  wait_for_samlsp:
+    image: curlimages/curl:8.00.1
+    command: /bin/sh -c "until curl -s -o /dev/null -i -f http://samlsp:8001/saml/metadata; do echo 'waiting' && sleep 1; done; echo 'ready' && sleep 5;" || false
+    depends_on:
+      - samlsp
+
+  setup-samlsp:
+    user: "${ZITADEL_DEV_UID}"
+    container_name: setup-samlsp
+    build: .
+    environment:
+      PAT_FILE: /pat/zitadel-admin-sa.pat
+      ZITADEL_API_URL: http://host.docker.internal:8080
+      LOGIN_URI: http://localhost:3000
+      SAML_SP_METADATA: http://host.docker.internal:8001/saml/metadata
+    volumes:
+      - "../pat:/pat"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      wait_for_samlsp:
+        condition: "service_completed_successfully"

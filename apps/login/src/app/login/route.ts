@@ -473,16 +473,11 @@ export async function GET(request: NextRequest) {
       if (url && binding.case === "redirect") {
         return NextResponse.redirect(url);
       } else if (url && binding.case === "post") {
-        const formData = {
-          RelayState: binding.value.relayState,
-          SAMLResponse: binding.value.samlResponse,
-        };
-
         const redirectUrl = constructUrl(request, "/saml-post");
 
         redirectUrl.searchParams.set("url", url);
-        redirectUrl.searchParams.set("RelayState", formData.RelayState);
-        redirectUrl.searchParams.set("SAMLResponse", formData.SAMLResponse);
+        redirectUrl.searchParams.set("RelayState", binding.value.relayState);
+        redirectUrl.searchParams.set("SAMLResponse", binding.value.samlResponse);
 
         return NextResponse.redirect(redirectUrl.toString());
       } else {
