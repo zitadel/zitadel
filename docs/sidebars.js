@@ -118,6 +118,7 @@ module.exports = {
           items: [
             "guides/manage/cloud/start",
             "guides/manage/cloud/instances",
+            "guides/manage/cloud/settings",
             "guides/manage/cloud/billing",
             "guides/manage/cloud/users",
             "guides/manage/cloud/support",
