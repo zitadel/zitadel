@@ -657,7 +657,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 	if permissionCheckV2 {
 		query, err = wherePermittedOrgsOrCurrentUser(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
 		if err != nil {
-			return nil, err
+			return nil, zerrors.ThrowInternal(err, "AUTHZ-HS4us", "Errors.Internal")
 		}
 	}
 

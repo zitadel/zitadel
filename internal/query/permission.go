@@ -35,7 +35,7 @@ func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, filterOrgId
 		var err error
 		systemUserPermissionsJson, err = json.Marshal(systemUserPermissions)
 		if err != nil {
-			return query, zerrors.ThrowInternal(err, "AUTHZ-HS4us", "Errors.Internal")
+			return query, err
 		}
 	}
 
