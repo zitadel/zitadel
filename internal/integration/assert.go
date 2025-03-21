@@ -6,6 +6,8 @@ import (
 
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -17,6 +19,7 @@ import (
 type Details interface {
 	comparable
 	GetSequence() uint64
+	GetCreationDate() *timestamppb.Timestamp
 	GetChangeDate() *timestamppb.Timestamp
 	GetResourceOwner() string
 }
@@ -59,6 +62,12 @@ func AssertDetails[D Details, M DetailsMsg[D]](t assert.TestingT, expected, actu
 	}
 
 	assert.NotZero(t, gotDetails.GetSequence())
+
+	if wantDetails.GetCreationDate() != nil {
+		wantCreationDate := time.Now()
+		gotCreationDate := gotDetails.GetCreationDate().AsTime()
+		assert.WithinRange(t, gotCreationDate, wantCreationDate.Add(-time.Minute), wantCreationDate.Add(time.Minute))
+	}
 
 	if wantDetails.GetChangeDate() != nil {
 		wantChangeDate := time.Now()
@@ -126,6 +135,13 @@ func AssertResourceListDetails[D ResourceListDetailsMsg](t assert.TestingT, expe
 		wantCD := time.Now()
 		assert.WithinRange(t, gotCD, wantCD.Add(-10*time.Minute), wantCD.Add(time.Minute))
 	}
+}
+
+func AssertGrpcStatus(t assert.TestingT, expected codes.Code, err error) {
+	assert.Error(t, err)
+	statusErr, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, expected, statusErr.Code())
 }
 
 // EqualProto is inspired by [assert.Equal], only that it tests equality of a proto message.

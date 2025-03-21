@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"os"
 	"strconv"
 	"time"
 
@@ -214,7 +215,7 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		data = s3Data
 	}
 	if localInput != nil {
-		localData, err := ioutil.ReadFile(localInput.Path)
+		localData, err := os.ReadFile(localInput.Path)
 		if err != nil {
 			return nil, err
 		}
@@ -274,7 +275,7 @@ func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Inpu
 	}
 
 	defer object.Close()
-	return ioutil.ReadAll(object)
+	return io.ReadAll(object)
 }
 
 func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSInput) (_ []byte, err error) {
@@ -297,7 +298,7 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 		return nil, err
 	}
 	defer reader.Close()
-	return ioutil.ReadAll(reader)
+	return io.ReadAll(reader)
 }
 
 func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) (err error) {
@@ -644,7 +645,15 @@ func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	}
 	for _, app := range org.GetOidcApps() {
 		logging.Debugf("import oidcapplication: %s", app.GetAppId())
-		_, err := s.command.AddOIDCApplicationWithID(ctx, management.AddOIDCAppRequestToDomain(app.App), org.GetOrgId(), app.GetAppId())
+		oidcApp, err := management.AddOIDCAppRequestToDomain(app.App)
+		if err != nil {
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
+			if isCtxTimeout(ctx) {
+				return err
+			}
+			continue
+		}
+		_, err = s.command.AddOIDCApplicationWithID(ctx, oidcApp, org.GetOrgId(), app.GetAppId())
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {

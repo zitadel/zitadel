@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
@@ -27,13 +28,17 @@ func generateSms(
 	data templates.TemplateData,
 	args map[string]interface{},
 	lastPhone bool,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
+	instanceID string,
+	jobID string,
 	generatorInfo *senders.CodeGeneratorInfo,
 ) error {
 	smsChannels, config, err := channels.SMS(ctx)
 	logging.OnError(err).Error("could not create sms channel")
 	if smsChannels == nil || smsChannels.Len() == 0 {
-		return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
+		return zchannels.NewCancelError(
+			zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent"),
+		)
 	}
 	recipient := user.VerifiedPhone
 	if lastPhone {
@@ -48,7 +53,10 @@ func generateSms(
 			SenderPhoneNumber:    number,
 			RecipientPhoneNumber: recipient,
 			Content:              data.Text,
-			TriggeringEvent:      triggeringEvent,
+			TriggeringEventType:  triggeringEventType,
+			InstanceID:           instanceID,
+			JobID:                jobID,
+			UserID:               user.ID,
 		}
 		err = smsChannels.HandleMessage(message)
 		if err != nil {
@@ -67,7 +75,7 @@ func generateSms(
 		}
 		contextInfo := map[string]interface{}{
 			"recipientPhoneNumber": recipient,
-			"eventType":            triggeringEvent.Type(),
+			"eventType":            triggeringEventType,
 			"provider":             config.ProviderConfig,
 		}
 
@@ -77,7 +85,7 @@ func generateSms(
 				Args:         caseArgs,
 				ContextInfo:  contextInfo,
 			},
-			TriggeringEvent: triggeringEvent,
+			TriggeringEventType: triggeringEventType,
 		}
 		webhookChannels, err := channels.Webhook(ctx, *config.WebhookConfig)
 		if err != nil {
@@ -85,5 +93,7 @@ func generateSms(
 		}
 		return webhookChannels.HandleMessage(message)
 	}
-	return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
+	return zchannels.NewCancelError(
+		zerrors.ThrowPreconditionFailed(nil, "PHONE-83nof", "Errors.Notification.Channels.NotPresent"),
+	)
 }

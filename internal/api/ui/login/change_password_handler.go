@@ -35,10 +35,6 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errType, errMessage string
-	if err != nil {
-		errType, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil || len(authReq.PossibleSteps) < 1 {
 		l.renderError(w, r, authReq, err)
@@ -50,7 +46,7 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		return
 	}
 	data := passwordData{
-		baseData:    l.getBaseData(r, authReq, translator, "PasswordChange.Title", "PasswordChange.Description", errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "PasswordChange.Title", "PasswordChange.Description", err),
 		profileData: l.getProfileData(authReq),
 		Expired:     step.Expired,
 	}
@@ -75,6 +71,6 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 
 func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "PasswordChange.Title", "PasswordChange.Description", "", "")
+	data := l.getUserData(r, authReq, translator, "PasswordChange.Title", "PasswordChange.Description", nil)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

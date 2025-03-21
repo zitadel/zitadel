@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
@@ -22,12 +23,14 @@ func generateEmail(
 	data templates.TemplateData,
 	args map[string]interface{},
 	lastEmail bool,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 ) error {
 	emailChannels, config, err := channels.Email(ctx)
 	logging.OnError(err).Error("could not create email channel")
 	if emailChannels == nil || emailChannels.Len() == 0 {
-		return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
+		return zchannels.NewCancelError(
+			zerrors.ThrowPreconditionFailed(nil, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
+		)
 	}
 	recipient := user.VerifiedEmail
 	if lastEmail {
@@ -35,10 +38,10 @@ func generateEmail(
 	}
 	if config.SMTPConfig != nil {
 		message := &messages.Email{
-			Recipients:      []string{recipient},
-			Subject:         data.Subject,
-			Content:         html.UnescapeString(template),
-			TriggeringEvent: triggeringEvent,
+			Recipients:          []string{recipient},
+			Subject:             data.Subject,
+			Content:             html.UnescapeString(template),
+			TriggeringEventType: triggeringEventType,
 		}
 		return emailChannels.HandleMessage(message)
 	}
@@ -49,7 +52,7 @@ func generateEmail(
 		}
 		contextInfo := map[string]interface{}{
 			"recipientEmailAddress": recipient,
-			"eventType":             triggeringEvent.Type(),
+			"eventType":             triggeringEventType,
 			"provider":              config.ProviderConfig,
 		}
 
@@ -59,7 +62,7 @@ func generateEmail(
 				TemplateData: data,
 				Args:         caseArgs,
 			},
-			TriggeringEvent: triggeringEvent,
+			TriggeringEventType: triggeringEventType,
 		}
 		webhookChannels, err := channels.Webhook(ctx, *config.WebhookConfig)
 		if err != nil {
@@ -67,7 +70,9 @@ func generateEmail(
 		}
 		return webhookChannels.HandleMessage(message)
 	}
-	return zerrors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
+	return zchannels.NewCancelError(
+		zerrors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent"),
+	)
 }
 
 func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) map[string]interface{} {

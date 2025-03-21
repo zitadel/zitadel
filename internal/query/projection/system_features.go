@@ -88,6 +88,14 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Event:  feature_v2.SystemEnableBackChannelLogout,
 				Reduce: reduceSystemSetFeature[bool],
 			},
+			{
+				Event:  feature_v2.SystemLoginVersion,
+				Reduce: reduceSystemSetFeature[*feature.LoginV2],
+			},
+			{
+				Event:  feature_v2.SystemPermissionCheckV2,
+				Reduce: reduceSystemSetFeature[bool],
+			},
 		},
 	}}
 }

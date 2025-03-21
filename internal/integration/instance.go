@@ -49,6 +49,7 @@ const (
 	UserTypeIAMOwner
 	UserTypeOrgOwner
 	UserTypeLogin
+	UserTypeNoPermission
 )
 
 const (
@@ -94,22 +95,6 @@ type Instance struct {
 
 	Client   *Client
 	WebAuthN *webauthn.Client
-}
-
-// GetFirstInstance returns the default instance and org information,
-// with authorized machine users.
-// Using the first instance is not recommended as parallel test might
-// interfere with each other.
-// It is recommended to use [NewInstance] instead.
-func GetFirstInstance(ctx context.Context) *Instance {
-	i := &Instance{
-		Config: loadedConfig,
-		Domain: loadedConfig.Hostname,
-	}
-	token := loadInstanceOwnerPAT()
-	i.setClient(ctx)
-	i.setupInstance(ctx, token)
-	return i
 }
 
 // NewInstance returns a new instance that can be used for integration tests.
@@ -196,6 +181,7 @@ func (i *Instance) setupInstance(ctx context.Context, token string) {
 	i.createMachineUserInstanceOwner(ctx, token)
 	i.createMachineUserOrgOwner(ctx)
 	i.createLoginClient(ctx)
+	i.createMachineUserNoPermission(ctx)
 	i.createWebAuthNClient()
 }
 
@@ -238,7 +224,17 @@ func (i *Instance) createMachineUserOrgOwner(ctx context.Context) {
 }
 
 func (i *Instance) createLoginClient(ctx context.Context) {
-	i.createMachineUser(ctx, UserTypeLogin)
+	_, err := i.Client.Admin.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
+		UserId: i.createMachineUser(ctx, UserTypeLogin),
+		Roles:  []string{"IAM_LOGIN_CLIENT"},
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (i *Instance) createMachineUserNoPermission(ctx context.Context) {
+	i.createMachineUser(ctx, UserTypeNoPermission)
 }
 
 func (i *Instance) setClient(ctx context.Context) {

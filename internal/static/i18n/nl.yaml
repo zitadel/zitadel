@@ -543,12 +543,23 @@ Errors:
     AlreadyExists: Auth Verzoek bestaat al
     NotExisting: Auth Verzoek bestaat niet
     WrongLoginClient: Auth Verzoek aangemaakt door andere login client
+    AlreadyHandled: Authenticatieverzoek is al verwerkt
   OIDCSession:
     RefreshTokenInvalid: Refresh Token is ongeldig
     Token:
       Invalid: Token is ongeldig
       Expired: Token is verlopen
     InvalidClient: Token is niet uitgegeven voor deze client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest bestaat al
+    NotExisting: SAMLRequest bestaat niet
+    WrongLoginClient: SAMLRequest aangemaakt door andere login client
+    AlreadyHandled: SAML-verzoek is al verwerkt
+  SAMLSession:
+    InvalidClient: SAMLResponse is niet uitgegeven voor deze client
+  DeviceAuth:
+    NotFound: Apparaatautorisatieverzoek bestaat niet
+    AlreadyHandled: Apparaatautorisatieverzoek is al verwerkt
   Feature:
     NotExisting: Functie bestaat niet
     TypeNotSupported: Functie type wordt niet ondersteund
@@ -623,6 +634,8 @@ AggregateTypes:
   system: Systeem
   session: Sessie
   web_key: Websleutel
+  saml_request: SAML-aanvraag
+  saml_session: SAML-sessie
 
 EventTypes:
   execution:

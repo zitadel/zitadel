@@ -265,6 +265,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -308,6 +309,7 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -385,6 +387,7 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
 
 DeviceAuth:
   Title: Autorisation de l'appareil
@@ -506,6 +509,10 @@ Errors:
       CreationNotAllowed: La création d'un nouvel utilisateur n'est pas autorisée sur ce fournisseur.
       LinkingNotAllowed: La création d'un lien vers un utilisateur n'est pas autorisée pour ce fournisseur.
       NoOptionAllowed: Ni la création ni la liaison sont autorisées pour ce fournisseur. Veuillez contacter votre administrateur.
+      LoginFailedSwitchLocal: |
+        Échec de la connexion au fournisseur d'identité externe. Retour à la connexion locale.
+
+        Détails de l'erreur: {{.Details}}
     GrantRequired: Connexion impossible. L'utilisateur doit avoir au moins une subvention sur l'application. Veuillez contacter votre administrateur.
     ProjectRequired: Connexion impossible. L'organisation de l'utilisateur doit être accordée au projet. Veuillez contacter votre administrateur.
   IdentityProvider:

@@ -512,11 +512,13 @@
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
+    "ORG_SETTINGS_MANAGER": "Má oprávnění spravovat nastavení organizace",
     "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat uživatelská pověření",
     "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
     "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
     "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
     "ORG_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele z organizace",
+    "ORG_USER_SELF_MANAGER": "Má oprávnění spravovat svůj vlastní uživatelský účet",
     "PROJECT_OWNER": "Má oprávnění nad celým projektem",
     "PROJECT_OWNER_VIEWER": "Má oprávnění prohlížet celý projekt",
     "PROJECT_OWNER_GLOBAL": "Má oprávnění nad celým projektem",
@@ -787,7 +789,10 @@
       "PHONESECTION": "Telefonní čísla",
       "PASSWORDSECTION": "Prvotní heslo",
       "ADDRESSANDPHONESECTION": "Telefonní číslo",
-      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů."
+      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů.",
+      "SETUPAUTHENTICATIONLATER": "Nastavte ověřování později pro tohoto uživatele.",
+      "INVITATION": "Odešlete pozvánkový e-mail pro nastavení ověřování a ověření e-mailu.",
+      "INITIALPASSWORD": "Nastavte počáteční heslo pro uživatele."
     },
     "CODEDIALOG": {
       "TITLE": "Ověření telefonního čísla",
@@ -809,6 +814,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefonní číslo",
       "PHONE_HINT": "Použijte symbol + následovaný mezinárodním kódem země, nebo ze seznamu vyberte zemi a nakonec zadejte telefonní číslo",
+      "PHONE_VERIFIED": "Telefonní číslo ověřeno",
+      "SEND_SMS": "Odeslat ověřovací SMS",
+      "SEND_EMAIL": "Odeslat E-mail",
       "USERNAME": "Uživatelské jméno",
       "CHANGEUSERNAME": "upravit",
       "CHANGEUSERNAME_TITLE": "Změna uživatelského jména",
@@ -948,6 +956,14 @@
       "4": "Uzamčený",
       "5": "Pozastavený",
       "6": "Počáteční"
+    },
+    "STATEV2": {
+      "0": "Neznámý",
+      "1": "Aktivní",
+      "2": "Neaktivní",
+      "3": "Smazaný",
+      "4": "Uzamčený",
+      "5": "Počáteční"
     },
     "SEARCH": {
       "ADDITIONAL": "Přihlašovací jméno (současná organizace)",
@@ -1385,7 +1401,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1476,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 ukončení relace",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
+      "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
+      "DISABLEUSERTOKENEVENT": "Zakázat událost uživatelského tokenu",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
+      "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
+      "WEBKEY": "Webový klíč",
+      "WEBKEY_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",
@@ -1486,7 +1513,9 @@
         "ENABLED": "„Povoleno“ je zděděno",
         "DISABLED": "„Zakázáno“ je zděděno"
       },
-      "RESET": "Nastavit vše na děděné"
+      "RESET": "Nastavit vše na děděné",
+      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro vytvoření uživatele",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu."
     },
     "DIALOG": {
       "RESET": {
@@ -1623,7 +1652,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2200,7 +2231,9 @@
       "REMOVED": "Úspěšně odebráno."
     },
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
-    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo."
+    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
+    "USEPKCE": "Použijte PKCE",
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
   },
   "MFA": {
     "LIST": {
@@ -2550,6 +2583,10 @@
       "CLIENTSECRETREGENERATED": "klient tajemství regenerováno.",
       "DELETED": "Aplikace smazána.",
       "CONFIGCHANGED": "Zjištěny změny!"
+    },
+    "LOGINV2": {
+      "USEV2": "Použít nové uživatelské rozhraní pro přihlášení",
+      "BASEURL": "Vlastní základní adresa URL pro nové uživatelské rozhraní pro přihlášení"
     }
   },
   "GENDERS": {
@@ -2575,7 +2612,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

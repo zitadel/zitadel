@@ -1,0 +1,165 @@
+---
+title: Support for the Device Authorization Grant in a Custom Login UI
+sidebar_label: Device Authorization
+---
+
+In case one of your applications requires the [OAuth2 Device Authorization Grant](/docs/guides/integrate/login/oidc/device-authorization) this guide will show you how to implement
+this in your application as well as the custom login UI.
+
+The following flow shows you the different components you need to enable OAuth2 Device Authorization Grant for your login.
+![Device Auth Flow](/img/guides/login-ui/device-auth-flow.png)
+
+1. Your application makes a device authorization request to your login UI
+2. The login UI proxies the request to ZITADEL.
+3. ZITADEL parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
+4. ZITADEL returns the device authorization response
+5. Your application presents the `user_code` and `verification_uri` or maybe even renders a QR code with the `verification_uri_complete` for the user to scan
+6. Your application starts a polling mechanism to check if the user has approved the device authorization request on the token endpoint
+7. When the user opens the browser at the verification_uri, he can enter the user_code, or it's automatically filled in, if they scan the QR code
+8. Request the device authorization request from the ZITADEL API using the user_code
+9. Your login UI allows to approve or deny the device request
+10. In case they approved, authenticate the user in your login UI by creating and updating a session with all the checks you need.
+11. Inform ZITADEL about the decision:
+    1. Authorize the device authorization request by sending the session and the previously retrieved id of the device authorization request to the ZITADEL API
+    2. In case they denied, deny the device authorization from the ZITADEL API using the previously retrieved id of the device authorization request
+12. Notify the user that they can close the window now and return to the application.
+13. Your applications request to the token endpoint now receives the tokens or an error if the user denied the request.
+
+## Example
+
+Let's assume you host your login UI on the following URL:
+```
+https://login.example.com
+```
+
+## Device Authorization Request
+
+A user opens your application and is unauthenticated, the application will create the following request:
+```HTTP
+POST /oauth/v2/device_authorization HTTP/1.1
+Host: login.example.com
+Content-type: application/x-www-form-urlencoded
+
+client_id=170086824411201793&
+scope=openid%20email%20profile
+```
+
+The request includes all the relevant information for the OAuth2 Device Authorization Grant and in this example we also have some scopes for the user.
+
+You now have to proxy the auth request from your own UI to the device authorization Endpoint of ZITADEL.
+For more information, see [OIDC Proxy](./typescript-repo#oidc-proxy) for the necessary headers.
+
+:::note
+The version and the optional custom URI for the available login UI is configurable under the application settings.
+:::
+
+The endpoint will return the device authorization response:
+```json
+{
+  "device_code": "0jbAZbU3ClK-Mkt0li4U1A",
+  "user_code": "FWRK-JGWK",
+  "verification_uri": "https://login.example.com/device",
+  "verification_uri_complete": "https://login.example.com/device?user_code=FWRK-JGWK",
+  "expires_in": 300,
+  "interval": 5
+}
+```
+
+The device presents the `user_code` and `verification_uri` or maybe even render a QR code with the `verification_uri_complete` for the user to scan.
+
+Your login will have to provide a page on the `verification_uri` where the user can enter the `user_code`, or it's automatically filled in, if they scan the QR code.
+
+### Get the Device Authorization Request by User Code
+
+With the user_code entered by the user you will now be able to get the information of the device authorization request.
+[Get Device Authorization Request Documentation](/docs/apis/resources/oidc_service_v2/oidc-service-get-device-authorization-request)
+
+```bash
+curl --request GET \
+  --url https://$ZITADEL_DOMAIN/v2/oidc/device_authorization/FWRK-JGWK \
+  --header 'Authorization: Bearer '"$TOKEN"''
+```
+
+Response Example:
+
+```json
+{
+  "deviceAuthorizationRequest": {
+    "id": "XzNejv6NxqVU8Qur5uxEh7f_Wi1p0qUu4PJTJ6JUIx0xtJ2uqmU",
+    "clientId": "170086824411201793",
+    "scope": [
+      "openid",
+      "profile"
+    ],
+    "appName": "TV App",
+    "projectName": "My Project"
+  }
+}
+```
+
+Present the user with the information of the device authorization request and allow them to approve or deny the request.
+
+### Perform Login
+
+After you have initialized the OIDC flow you can implement the login.
+Implement all the steps you like the user the go trough by [creating](/docs/apis/resources/session_service_v2/session-service-create-session) and [updating](/docs/apis/resources/session_service/session-service-set-session) the user-session.
+
+Read the following resources for more information about the different checks:
+- [Username and Password](./username-password)
+- [External Identity Provider](./external-login)
+- [Passkeys](./passkey)
+- [Multi-Factor](./mfa)
+
+### Authorize the Device Authorization Request
+
+To finalize the auth request and connect an existing user session with it, you have to update the auth request with the session token.
+On the create and update user session request you will always get a session token in the response.
+
+The latest session token has to be sent to the following request:
+
+Read more about the [Authorize or Deny Device Authorization Request Documentation](/docs/apis/resources/oidc_service_v2/oidc-service-authorize-device-authorization)
+
+Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
+```bash
+curl --request POST \
+  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization/XzNejv6NxqVU8Qur5uxEh7f_Wi1p0qUu4PJTJ6JUIx0xtJ2uqmU \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "session": {
+    "sessionId": "225307381909694508",
+    "sessionToken": "7N5kQCvC4jIf2OuBjwfyWSX2FUKbQqg4iG3uWT-TBngMhlS9miGUwpyUaN0HJ8OcbSzk4QHZy_Bvvv"
+  }
+}'
+```
+
+If you don't get any error back, the request succeeded, and you can notify the user that they can close the window now and return to the application.
+
+### Deny the Device Authorization Request
+
+If the user denies the device authorization request, you can deny the request by sending the following request:
+
+```bash
+curl --request POST \
+  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization/ \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "deny": {}
+}'
+```
+
+If you don't get any error back, the request succeeded, and you can notify the user that they can close the window now and return to the application.
+
+### Device Authorization Endpoints
+
+All OAuth2 Device Authorization Grant endpoints are provided by ZITADEL. In your login UI you just have to proxy them through and send them directly to the backend.
+
+These endpoints are:
+- Well-known
+- Device Authorization Endpoint
+- Token
+
+Additionally, we recommend you to proxy all the other [OIDC relevant endpoints](./oidc-standard#endpoints).

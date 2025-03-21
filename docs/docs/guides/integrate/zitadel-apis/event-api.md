@@ -142,12 +142,27 @@ curl --request POST \
 }'
 ```
 
-<!--
 ### SAML session
 
-TODO: https://github.com/zitadel/zitadel/issues/6053
+The following example shows you how you could use the events search to get all events where a user has authenticated using SAML.
 
--->
+```bash
+curl --request POST \
+  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
+  --header "Authorization: Bearer $TOKEN" \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"asc": true,
+	"limit": 1000,
+	"eventTypes": [
+    "saml_session.added",
+    "saml_session.saml_response.added"
+  ],
+  "aggregateTypes": [
+    "saml_session"
+  ]
+}'
+```
 
 
 ## Example: Get failed login attempt

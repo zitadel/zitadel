@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
@@ -16,6 +17,8 @@ type Server struct {
 	session.UnimplementedSessionServiceServer
 	command *command.Commands
 	query   *query.Queries
+
+	checkPermission domain.PermissionCheck
 }
 
 type Config struct{}
@@ -23,10 +26,12 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
+	checkPermission domain.PermissionCheck,
 ) *Server {
 	return &Server{
-		command: command,
-		query:   query,
+		command:         command,
+		query:           query,
+		checkPermission: checkPermission,
 	}
 }
 

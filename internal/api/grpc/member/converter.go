@@ -34,6 +34,7 @@ func MemberToPb(assetAPIPrefix string, m *query.Member) *member_pb.Member {
 			m.ChangeDate,
 			m.ResourceOwner,
 		),
+		UserResourceOwner: m.UserResourceOwner,
 	}
 }
 

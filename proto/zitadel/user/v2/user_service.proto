@@ -252,9 +252,34 @@ service UserService {
     };
   }
 
+  // Send code to verify user email
+  //
+  // Send code to verify user email.
+  rpc SendEmailCode (SendEmailCodeRequest) returns (SendEmailCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/email/send"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   // Verify the email
   //
-  // Verify the email with the generated code..
+  // Verify the email with the generated code.
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/verify"
@@ -1085,6 +1110,28 @@ service UserService {
     };
   }
 
+  rpc ListAuthenticationFactors(ListAuthenticationFactorsRequest) returns (ListAuthenticationFactorsResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/authentication_factors/_search"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+
+  }
+
   // Create an invite code for a user
   //
   // Create an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
@@ -1159,6 +1206,32 @@ service UserService {
       };
     };
   }
+
+  // MFA Init Skipped
+  //
+  // Update the last time the user has skipped MFA initialization. The server timestamp is used.
+  rpc HumanMFAInitSkipped(HumanMFAInitSkippedRequest) returns (HumanMFAInitSkippedResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/mfa_init_skipped"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
 }
 
 message AddHumanUserRequest{
@@ -1305,6 +1378,29 @@ message ResendEmailCodeRequest{
 }
 
 message ResendEmailCodeResponse{
+  zitadel.object.v2.Details details = 1;
+  // in case the verification was set to return_code, the code will be returned
+  optional string verification_code = 2;
+}
+
+message SendEmailCodeRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendEmailVerificationCode send_code = 2;
+    ReturnEmailVerificationCode return_code = 3;
+  }
+}
+
+message SendEmailCodeResponse{
   zitadel.object.v2.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
@@ -1998,6 +2094,7 @@ message RetrieveIdentityProviderIntentResponse{
       example: "\"163840776835432345\"";
     }
   ];
+  AddHumanUserRequest add_human_user = 4;
 }
 
 message AddIDPLinkRequest{
@@ -2168,6 +2265,41 @@ enum AuthenticationMethodType {
   AUTHENTICATION_METHOD_TYPE_OTP_EMAIL = 7;
 }
 
+message ListAuthenticationFactorsRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  repeated AuthFactors auth_factors = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the Auth Factors you are interested in"
+      default: "All Auth Factors"
+    }
+  ];
+  repeated AuthFactorState states = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the state of the Auth Factors"
+      default: "Auth Factors that are ready"
+    }
+  ];
+}
+
+enum AuthFactors {
+  OTP = 0;
+  OTP_SMS = 1;
+  OTP_EMAIL = 2;
+  U2F = 3;
+}
+
+message ListAuthenticationFactorsResponse {
+  repeated zitadel.user.v2.AuthFactor result = 1;
+}
+
 message CreateInviteCodeRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -2229,5 +2361,21 @@ message VerifyInviteCodeRequest {
 }
 
 message VerifyInviteCodeResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message HumanMFAInitSkippedRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+}
+
+message HumanMFAInitSkippedResponse {
   zitadel.object.v2.Details details = 1;
 }

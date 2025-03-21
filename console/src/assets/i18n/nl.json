@@ -512,11 +512,13 @@
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
+    "ORG_SETTINGS_MANAGER": "Heeft toestemming om de instellingen van de organisatie te beheren",
     "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
     "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
     "ORG_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van de organisatie na te bootsen",
+    "ORG_USER_SELF_MANAGER": "Heeft toestemming om zijn eigen gebruiker te beheren",
     "PROJECT_OWNER": "Heeft toestemming over het hele project",
     "PROJECT_OWNER_VIEWER": "Heeft toestemming om het hele project te bekijken",
     "PROJECT_OWNER_GLOBAL": "Heeft toestemming over het hele project",
@@ -787,7 +789,10 @@
       "PHONESECTION": "Telefoonnummers",
       "PASSWORDSECTION": "Initieel wachtwoord",
       "ADDRESSANDPHONESECTION": "Telefoonnummer",
-      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren."
+      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren.",
+      "SETUPAUTHENTICATIONLATER": "Authenticatie later instellen voor deze gebruiker.",
+      "INVITATION": "Stuur een uitnodigingsmail voor het instellen van authenticatie en e-mailverificatie.",
+      "INITIALPASSWORD": "Stel een initieel wachtwoord in voor de gebruiker."
     },
     "CODEDIALOG": {
       "TITLE": "Verifieer telefoonnummer",
@@ -809,6 +814,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefoonnummer",
       "PHONE_HINT": "Gebruik het + symbool gevolgd door de landcode, of selecteer het land uit de dropdown en voer ten slotte het telefoonnummer in",
+      "PHONE_VERIFIED": "Telefoonnummer geverifieerd",
+      "SEND_SMS": "Verificatie-SMS verzenden",
+      "SEND_EMAIL": "E-mail verzenden",
       "USERNAME": "Gebruikersnaam",
       "CHANGEUSERNAME": "wijzigen",
       "CHANGEUSERNAME_TITLE": "Gebruikersnaam wijzigen",
@@ -948,6 +956,14 @@
       "4": "Vergrendeld",
       "5": "Opgeschort",
       "6": "Initieel"
+    },
+    "STATEV2": {
+      "0": "Onbekend",
+      "1": "Actief",
+      "2": "Inactief",
+      "3": "Verwijderd",
+      "4": "Vergrendeld",
+      "5": "Initieel"
     },
     "SEARCH": {
       "ADDITIONAL": "Loginnaam (huidige organisatie)",
@@ -1383,7 +1399,10 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "hu": "Magyar"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1474,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
+      "DISABLEUSERTOKENEVENT": "Gebruikerstokengebeurtenis uitschakelen",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
+      "PERMISSIONCHECKV2": "Permissiecontrole V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
+      "WEBKEY": "Websleutel",
+      "WEBKEY_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1484,7 +1513,9 @@
         "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
         "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
       },
-      "RESET": "Alles instellen op overgenomen"
+      "RESET": "Alles instellen op overgenomen",
+      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de console voor het aanmaken van gebruikers",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status."
     },
     "DIALOG": {
       "RESET": {
@@ -1621,7 +1652,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -2207,7 +2240,9 @@
       "REMOVED": "Succesvol verwijderd."
     },
     "ISIDTOKENMAPPING": "Kaart van de ID token",
-    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt."
+    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
+    "USEPKCE": "Gebruik PKCE",
+    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
   },
   "MFA": {
     "LIST": {
@@ -2557,6 +2592,10 @@
       "CLIENTSECRETREGENERATED": "client geheim gegenereerd.",
       "DELETED": "App verwijderd.",
       "CONFIGCHANGED": "Wijzigingen gedetecteerd!"
+    },
+    "LOGINV2": {
+      "USEV2": "Nieuwe login-gebruikersinterface gebruiken",
+      "BASEURL": "Aangepaste basis-URL voor de nieuwe login-gebruikersinterface"
     }
   },
   "GENDERS": {
@@ -2582,7 +2621,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

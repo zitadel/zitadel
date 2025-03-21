@@ -9,13 +9,15 @@ import (
 )
 
 type Config struct {
-	ProjectID string
-	Fraction  float64
+	ProjectID   string
+	Fraction    float64
+	ServiceName string
 }
 
 func NewTracer(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
 	c.ProjectID, _ = rawConfig["projectid"].(string)
+	c.ServiceName, _ = rawConfig["servicename"].(string)
 	c.Fraction, err = otel.FractionFromConfig(rawConfig["fraction"])
 	if err != nil {
 		return err
@@ -28,12 +30,12 @@ type Tracer struct {
 }
 
 func (c *Config) NewTracer() error {
-	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
+	sampler := otel.NewSampler(sdk_trace.TraceIDRatioBased(c.Fraction))
 	exporter, err := texporter.New(texporter.WithProjectID(c.ProjectID))
 	if err != nil {
 		return err
 	}
 
-	tracing.T, err = otel.NewTracer(sampler, exporter)
+	tracing.T, err = otel.NewTracer(sampler, exporter, c.ServiceName)
 	return err
 }

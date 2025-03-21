@@ -543,12 +543,23 @@ Errors:
     AlreadyExists: Permintaan Otentikasi sudah ada
     NotExisting: Permintaan Otentikasi tidak ada
     WrongLoginClient: Permintaan Otentikasi dibuat oleh klien login lain
+    AlreadyHandled: Permintaan Otentikasi sudah ditangani
   OIDCSession:
     RefreshTokenInvalid: Token Penyegaran tidak valid
     Token:
       Invalid: Token tidak valid
       Expired: Token sudah habis masa berlakunya
     InvalidClient: Token tidak dikeluarkan untuk klien ini
+  SAMLRequest:
+    AlreadyExists: SAMLRequest sudah ada
+    NotExisting: SAMLRequest tidak ada
+    WrongLoginClient: SAMLRequest dibuat oleh klien login lainnya
+    AlreadyHandled: SAMLRequest sudah ditangani
+  SAMLSession:
+    InvalidClient: SAMLResponse tidak dikeluarkan untuk klien ini
+  DeviceAuth:
+    NotFound: Permintaan Otorisasi Perangkat tidak ada
+    AlreadyHandled: Permintaan Otorisasi Perangkat sudah ditangani
   Feature:
     NotExisting: Fitur tidak ada
     TypeNotSupported: Jenis fitur tidak didukung
@@ -594,6 +605,7 @@ Errors:
     FeatureDisabled: Fitur kunci web dinonaktifkan
     NoActive: Tidak ditemukan kunci web aktif
     NotFound: Kunci web tidak ditemukan
+
 AggregateTypes:
   action: Tindakan
   instance: Contoh
@@ -617,6 +629,9 @@ AggregateTypes:
   system: Sistem
   session: Sidang
   web_key: Kunci Web
+  saml_request: Sesi SAML
+  saml_session: Permintaan SAML
+
 EventTypes:
   execution:
     set: Kumpulan eksekusi

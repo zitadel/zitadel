@@ -34,9 +34,9 @@ type AuthRequest struct {
 	HintUserID   *string
 }
 
-func (a *AuthRequest) checkLoginClient(ctx context.Context) error {
+func (a *AuthRequest) checkLoginClient(ctx context.Context, permissionCheck domain.PermissionCheck) error {
 	if uid := authz.GetCtxData(ctx).UserID; uid != a.LoginClient {
-		return zerrors.ThrowPermissionDenied(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient")
+		return permissionCheck(ctx, domain.PermissionSessionRead, authz.GetInstance(ctx).InstanceID(), "")
 	}
 	return nil
 }
@@ -89,7 +89,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	dst.UiLocales = locales
 
 	if checkLoginClient {
-		if err = dst.checkLoginClient(ctx); err != nil {
+		if err = dst.checkLoginClient(ctx, q.checkPermission); err != nil {
 			return nil, err
 		}
 	}

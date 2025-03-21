@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -87,10 +88,10 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
-			return path.Join(r.pathPrefix, EndpointResources, file)
+			return path.Join(r.pathPrefix, EndpointResources, file) + "?v=" + build.Date().Format(time.RFC3339)
 		},
 		"resourceThemeUrl": func(file, theme string) string {
-			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
+			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file) + "?v=" + build.Date().Format(time.RFC3339)
 		},
 		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
 			return policy != nil
@@ -341,7 +342,6 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var msg string
 	if err != nil {
 		log := logging.WithError(err)
 		if authReq != nil {
@@ -352,17 +352,15 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 		} else {
 			log.Info()
 		}
-
-		_, msg = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getBaseData(r, authReq, translator, "Errors.Internal", "", "Internal", msg)
+	data := l.getBaseData(r, authReq, translator, "Errors.Internal", "", err)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, err error) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, err),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -371,7 +369,7 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, transl
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, err error) baseData {
 	title := ""
 	if titleI18nKey != "" {
 		title = translator.LocalizeWithoutArgs(titleI18nKey)
@@ -383,10 +381,16 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 	}
 
 	lang, _ := l.renderer.ReqLang(translator, r).Base()
+	var errID, errMessage string
+	var errPopup bool
+	if err != nil {
+		errID, errMessage, errPopup = l.getErrorMessage(r, err)
+	}
 	baseData := baseData{
 		errorData: errorData{
-			ErrID:      errType,
+			ErrID:      errID,
 			ErrMessage: errMessage,
+			ErrPopup:   errPopup,
 		},
 		Lang:                   lang.String(),
 		Title:                  title,
@@ -482,14 +486,17 @@ func (l *Login) setLinksOnBaseData(baseData baseData, privacyPolicy *domain.Priv
 	return baseData
 }
 
-func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
+func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string, popup bool) {
+	idpErr := new(IdPError)
+	if errors.Is(err, idpErr) {
+		popup = true
+	}
 	caosErr := new(zerrors.ZitadelError)
 	if errors.As(err, &caosErr) {
-		localized := l.renderer.LocalizeFromRequest(l.getTranslator(r.Context(), nil), r, caosErr.Message, nil)
-		return caosErr.ID, localized
-
+		localized := l.renderer.LocalizeFromRequest(l.getTranslator(r.Context(), nil), r, caosErr.Message, map[string]interface{}{"Details": caosErr.Parent})
+		return caosErr.ID, localized, popup
 	}
-	return "", err.Error()
+	return "", err.Error(), popup
 }
 
 func (l *Login) getTheme(r *http.Request) string {
@@ -662,6 +669,7 @@ type baseData struct {
 type errorData struct {
 	ErrID      string
 	ErrMessage string
+	ErrPopup   bool
 }
 
 type userData struct {

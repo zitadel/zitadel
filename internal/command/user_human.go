@@ -59,6 +59,8 @@ type AddHuman struct {
 	Passwordless           bool
 	ExternalIDP            bool
 	Register               bool
+	// SetInactive whether the user initially should be set as inactive
+	SetInactive bool
 	// UserAgentID is optional and can be passed in case the user registered themselves.
 	// This will be used in the login UI to handle authentication automatically.
 	UserAgentID string

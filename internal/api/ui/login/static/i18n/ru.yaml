@@ -1,6 +1,6 @@
 Login:
   Title: Добро пожаловать!
-  Description: Введите свои данные дял входа.
+  Description: Введите свои данные для входа.
   TitleLinking: Вход для привязки пользователей
   DescriptionLinking: Введите данные для входа, чтобы привязать внешнего пользователя к учётной записи ZITADEL.
   LoginNameLabel: Логин
@@ -265,6 +265,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   GenderLabel: Пол
   Female: Женский
   Male: Мужской
@@ -308,6 +309,7 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Условия использования
   TosConfirm: Я согласен с
   TosLinkText: Пользовательским соглашением
@@ -385,7 +387,8 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
-  
+  Romanian: Română
+
 DeviceAuth:
   Title: Авторизация устройства
   UserCode:
@@ -506,6 +509,10 @@ Errors:
       CreationNotAllowed: Создание нового пользователя для этого провайдера запрещено
       LinkingNotAllowed: Привязка к этому провайдеру запрещена
       NoOptionAllowed: Ни создание, ни привязка пользователя к этому провайдеру невозможны. Обратитесь к администратору.
+      LoginFailedSwitchLocal: |
+        Вход в внешний поставщик идентификации не удался. Возвращаемся к локальному входу.
+
+        Подробности об ошибке: {{.Details}}
     GrantRequired: Вход невозможен. Пользователь должен иметь хотя бы один допуск к приложению. Обратитесь к администратору.
     ProjectRequired: Вход невозможен. Организация пользователя должна иметь доступ к проекту. Обратитесь к администратору.
   IdentityProvider:

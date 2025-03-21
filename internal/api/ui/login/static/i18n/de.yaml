@@ -108,7 +108,7 @@ InitMFAPrompt:
 InitMFAOTP:
   Title: Zwei-Faktor-Authentifizierung
   Description: Erstelle deinen Zweitfaktor. Installiere eine Authentifizierungs-App, wenn du noch keine hast.
-  OTPDescription: Scanne den Code mit einer Authentifizierungs-App (z.B. Google/Mircorsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
+  OTPDescription: Scanne den Code mit einer Authentifizierungs-App (z.B. Google/Microsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: Weiter
@@ -264,6 +264,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -307,6 +308,7 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -384,6 +386,7 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
 DeviceAuth:
   Title: Gerät verbinden
   UserCode:
@@ -504,6 +507,10 @@ Errors:
       CreationNotAllowed: Erstellen eines neuen Benutzers mit diesem Provider ist nicht erlaubt
       LinkingNotAllowed: Verknüpfen eines Benutzers mit diesem Provider ist nicht erlaubt
       NoOptionAllowed: Weder Erstellung noch Verknüpfung ist für diesen Provider erlaubt. Bitte wenden Sie sich an Ihren Administrator.
+      LoginFailedSwitchLocal: |
+        Anmeldung beim externen Identitätsanbieter fehlgeschlagen. Zurück zur lokalen Anmeldung.
+
+        Fehlerdetails: {{.Details}}
     GrantRequired: Die Anmeldung an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte wende dich an deinen Administrator.
     ProjectRequired: Die Anmeldung an dieser Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte wende dich an deinen Administrator.
   IdentityProvider:

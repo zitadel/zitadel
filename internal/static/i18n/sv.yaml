@@ -543,12 +543,23 @@ Errors:
     AlreadyExists: Autentiseringsbegäran finns redan
     NotExisting: Autentiseringsbegäran existerar inte
     WrongLoginClient: Autentiseringsbegäran skapad av annan inloggningsklient
+    AlreadyHandled: Autentiseringsbegäran har redan hanterats
   OIDCSession:
     RefreshTokenInvalid: Uppdateringstoken är ogiltig
     Token:
       Invalid: Token är ogiltig
       Expired: Token har gått ut
     InvalidClient: Token utfärdades inte för denna klient
+  SAMLRequest:
+    AlreadyExists: SAMLRequest finns redan
+    NotExisting: SAMLRequest finns inte
+    WrongLoginClient: SAMLRequest skapad av annan inloggningsklient
+    AlreadyHandled: SAML-begäran har redan hanterats
+  SAMLSession:
+    InvalidClient: SAMLResponse utfärdades inte för den här klienten
+  DeviceAuth:
+    NotFound: Begäran om enhetsauktorisering finns inte
+    AlreadyHandled: Begäran om enhetsauktorisering har redan hanterats
   Feature:
     NotExisting: Funktionen existerar inte
     TypeNotSupported: Funktionstypen stöds inte
@@ -623,6 +634,8 @@ AggregateTypes:
   system: System
   session: Session
   web_key: Webbnyckel
+  saml_request: SAML-förfrågan
+  saml_session: SAML-session
 
 EventTypes:
   execution:

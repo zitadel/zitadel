@@ -512,11 +512,13 @@
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
+    "ORG_SETTINGS_MANAGER": "조직 설정을 관리할 수 있는 권한이 있습니다",
     "ORG_USER_PERMISSION_EDITOR": "사용자 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_PERMISSION_EDITOR": "프로젝트 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_CREATOR": "자신의 프로젝트와 하위 설정을 생성할 수 있는 권한이 있습니다",
     "ORG_ADMIN_IMPERSONATOR": "조직의 관리자 및 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "ORG_END_USER_IMPERSONATOR": "조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
+    "ORG_USER_SELF_MANAGER": "자신의 사용자 계정을 관리할 수 있는 권한이 있습니다",
     "PROJECT_OWNER": "프로젝트에 대한 전체 권한이 있습니다",
     "PROJECT_OWNER_VIEWER": "프로젝트 전체를 검토할 수 있는 권한이 있습니다",
     "PROJECT_OWNER_GLOBAL": "프로젝트에 대한 전체 권한이 있습니다",
@@ -787,7 +789,10 @@
       "PHONESECTION": "전화번호",
       "PASSWORDSECTION": "초기 비밀번호",
       "ADDRESSANDPHONESECTION": "전화번호",
-      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다."
+      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다.",
+      "SETUPAUTHENTICATIONLATER": "이 사용자의 인증을 나중에 설정하세요.",
+      "INVITATION": "인증 설정 및 이메일 확인을 위한 초대 이메일을 보내세요.",
+      "INITIALPASSWORD": "사용자에 대한 초기 비밀번호를 설정하세요."
     },
     "CODEDIALOG": {
       "TITLE": "전화번호 확인",
@@ -809,6 +814,9 @@
       "EMAIL": "이메일",
       "PHONE": "전화번호",
       "PHONE_HINT": "+ 기호 다음에 국가 코드를 입력하거나 드롭다운에서 국가를 선택한 후 전화번호를 입력하세요.",
+      "PHONE_VERIFIED": "전화번호 확인됨",
+      "SEND_SMS": "인증 SMS 보내기",
+      "SEND_EMAIL": "이메일 보내기",
       "USERNAME": "사용자 이름",
       "CHANGEUSERNAME": "수정",
       "CHANGEUSERNAME_TITLE": "사용자 이름 변경",
@@ -948,6 +956,14 @@
       "4": "잠김",
       "5": "일시 중단됨",
       "6": "초기"
+    },
+    "STATEV2": {
+      "0": "알 수 없음",
+      "1": "활성",
+      "2": "비활성",
+      "3": "삭제됨",
+      "4": "잠김",
+      "5": "초기"
     },
     "SEARCH": {
       "ADDITIONAL": "로그인 이름 (현재 조직)",
@@ -1385,7 +1401,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1476,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "액션 v2는 데이터 실행 및 대상을 관리할 수 있습니다. 플래그가 활성화되면 새 API 및 기능을 사용할 수 있습니다.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC 단일 V1 세션 종료",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "플래그가 활성화되면, `sid` 클레임이 있는 id_token을 사용하여 end_session 엔드포인트에서 로그인 UI의 단일 세션을 종료할 수 있습니다. 현재 동일한 사용자 에이전트(브라우저)에서 모든 세션이 로그인 UI에서 종료됩니다. Session API를 통해 관리된 세션은 이미 단일 세션 종료를 허용합니다.",
+      "DEBUGOIDCPARENTERROR": "디버그 OIDC 부모 오류",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "플래그가 활성화되면 OIDC 부모 오류가 콘솔에 기록됩니다.",
+      "DISABLEUSERTOKENEVENT": "사용자 토큰 이벤트 비활성화",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "백채널 로그아웃 활성화",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 클라이언트에게 알리는 데 사용할 수 있습니다.",
+      "PERMISSIONCHECKV2": "권한 확인 V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
+      "WEBKEY": "웹 키",
+      "WEBKEY_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
         "INHERITED": "상속",
         "ENABLED": "활성화됨",
@@ -1486,7 +1513,9 @@
         "ENABLED": "\"활성화됨\"은 상속되었습니다.",
         "DISABLED": "\"비활성화됨\"은 상속되었습니다."
       },
-      "RESET": "모두 상속으로 설정"
+      "RESET": "모두 상속으로 설정",
+      "CONSOLEUSEV2USERAPI": "콘솔에서 사용자 생성을 위해 V2 API를 사용하세요",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "이 플래그가 활성화되면 콘솔은 V2 사용자 API를 사용하여 새 사용자를 생성합니다. V2 API를 사용하면 새로 생성된 사용자는 초기 상태 없이 시작합니다."
     },
     "DIALOG": {
       "RESET": {
@@ -1623,7 +1652,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "이메일 인증 완료",
@@ -2212,7 +2243,9 @@
       "REMOVED": "성공적으로 제거되었습니다."
     },
     "ISIDTOKENMAPPING": "ID 토큰에서 매핑",
-    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다."
+    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다.",
+    "USEPKCE": "PKCE 사용",
+    "USEPKCE_DESC": "code_challenge 및 code_challenge_method 매개변수가 인증 요청에 포함되는지 여부를 결정합니다"
   },
   "MFA": {
     "LIST": {
@@ -2591,7 +2624,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "매니저 추가",

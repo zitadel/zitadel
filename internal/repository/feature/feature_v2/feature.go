@@ -22,6 +22,8 @@ var (
 	SystemOIDCSingleV1SessionTerminationEventType  = setEventTypeFromFeature(feature.LevelSystem, feature.KeyOIDCSingleV1SessionTermination)
 	SystemDisableUserTokenEvent                    = setEventTypeFromFeature(feature.LevelSystem, feature.KeyDisableUserTokenEvent)
 	SystemEnableBackChannelLogout                  = setEventTypeFromFeature(feature.LevelSystem, feature.KeyEnableBackChannelLogout)
+	SystemLoginVersion                             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLoginV2)
+	SystemPermissionCheckV2                        = setEventTypeFromFeature(feature.LevelSystem, feature.KeyPermissionCheckV2)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceLoginDefaultOrgEventType                 = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
@@ -36,6 +38,9 @@ var (
 	InstanceOIDCSingleV1SessionTerminationEventType  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyOIDCSingleV1SessionTermination)
 	InstanceDisableUserTokenEvent                    = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDisableUserTokenEvent)
 	InstanceEnableBackChannelLogout                  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyEnableBackChannelLogout)
+	InstanceLoginVersion                             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginV2)
+	InstancePermissionCheckV2                        = setEventTypeFromFeature(feature.LevelInstance, feature.KeyPermissionCheckV2)
+	InstanceConsoleUseV2UserApi                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyConsoleUseV2UserApi)
 )
 
 const (

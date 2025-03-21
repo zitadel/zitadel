@@ -23,6 +23,7 @@ func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSet
 		Settings: loginSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.OrgID,
 		},
@@ -38,6 +39,7 @@ func (s *Server) GetPasswordComplexitySettings(ctx context.Context, req *setting
 		Settings: passwordComplexitySettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -53,6 +55,7 @@ func (s *Server) GetPasswordExpirySettings(ctx context.Context, req *settings.Ge
 		Settings: passwordExpirySettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -68,6 +71,7 @@ func (s *Server) GetBrandingSettings(ctx context.Context, req *settings.GetBrand
 		Settings: brandingSettingsToPb(current, s.assetsAPIDomain(ctx)),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -83,6 +87,7 @@ func (s *Server) GetDomainSettings(ctx context.Context, req *settings.GetDomainS
 		Settings: domainSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -98,6 +103,7 @@ func (s *Server) GetLegalAndSupportSettings(ctx context.Context, req *settings.G
 		Settings: legalAndSupportSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -113,6 +119,7 @@ func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockou
 		Settings: lockoutSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -120,7 +127,12 @@ func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockou
 }
 
 func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.GetActiveIdentityProvidersRequest) (*settings.GetActiveIdentityProvidersResponse, error) {
-	links, err := s.query.IDPLoginPolicyLinks(ctx, object.ResourceOwnerFromReq(ctx, req.GetCtx()), &query.IDPLoginPolicyLinksSearchQuery{}, false)
+	queries, err := activeIdentityProvidersToQuery(req)
+	if err != nil {
+		return nil, err
+	}
+
+	links, err := s.query.IDPLoginPolicyLinks(ctx, object.ResourceOwnerFromReq(ctx, req.GetCtx()), &query.IDPLoginPolicyLinksSearchQuery{Queries: queries}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -129,6 +141,43 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.G
 		Details:           object.ToListDetails(links.SearchResponse),
 		IdentityProviders: identityProvidersToPb(links.Links),
 	}, nil
+}
+
+func activeIdentityProvidersToQuery(req *settings.GetActiveIdentityProvidersRequest) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, 0, 4)
+	if req.CreationAllowed != nil {
+		creationQuery, err := query.NewIDPTemplateIsCreationAllowedSearchQuery(*req.CreationAllowed)
+		if err != nil {
+			return nil, err
+		}
+		q = append(q, creationQuery)
+	}
+	if req.LinkingAllowed != nil {
+		creationQuery, err := query.NewIDPTemplateIsLinkingAllowedSearchQuery(*req.LinkingAllowed)
+		if err != nil {
+			return nil, err
+		}
+		q = append(q, creationQuery)
+	}
+	if req.AutoCreation != nil {
+		creationQuery, err := query.NewIDPTemplateIsAutoCreationSearchQuery(*req.AutoCreation)
+		if err != nil {
+			return nil, err
+		}
+		q = append(q, creationQuery)
+	}
+	if req.AutoLinking != nil {
+		compare := query.NumberEquals
+		if *req.AutoLinking {
+			compare = query.NumberNotEquals
+		}
+		creationQuery, err := query.NewIDPTemplateAutoLinkingSearchQuery(0, compare)
+		if err != nil {
+			return nil, err
+		}
+		q = append(q, creationQuery)
+	}
+	return q, nil
 }
 
 func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralSettingsRequest) (*settings.GetGeneralSettingsResponse, error) {

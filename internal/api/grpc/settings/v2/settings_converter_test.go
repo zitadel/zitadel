@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
@@ -382,14 +383,24 @@ func Test_lockoutSettingsToPb(t *testing.T) {
 func Test_identityProvidersToPb(t *testing.T) {
 	arg := []*query.IDPLoginPolicyLink{
 		{
-			IDPID:   "1",
-			IDPName: "foo",
-			IDPType: domain.IDPTypeOIDC,
+			IDPID:             "1",
+			IDPName:           "foo",
+			IDPType:           domain.IDPTypeOIDC,
+			IsCreationAllowed: true,
+			IsLinkingAllowed:  true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       domain.AutoLinkingOptionUsername,
 		},
 		{
-			IDPID:   "2",
-			IDPName: "bar",
-			IDPType: domain.IDPTypeGitHub,
+			IDPID:             "2",
+			IDPName:           "bar",
+			IDPType:           domain.IDPTypeGitHub,
+			IsCreationAllowed: true,
+			IsLinkingAllowed:  true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       domain.AutoLinkingOptionEmail,
 		},
 	}
 	want := []*settings.IdentityProvider{
@@ -397,11 +408,25 @@ func Test_identityProvidersToPb(t *testing.T) {
 			Id:   "1",
 			Name: "foo",
 			Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OIDC,
+			Options: &idp.Options{
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
 		},
 		{
 			Id:   "2",
 			Name: "bar",
 			Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITHUB,
+			Options: &idp.Options{
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
 		},
 	}
 	got := identityProvidersToPb(arg)
