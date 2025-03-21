@@ -1,5 +1,5 @@
 ---
-title: Mirror data to another database
+title: Mirror data from cockroach to postgres
 sidebar_label: Mirror command
 ---
 
@@ -57,7 +57,7 @@ zitadel mirror --system --config /path/to/your/mirror/config.yaml # make sure to
 
 ### Initialize the data and verify
 
-The last step is to setup the permissions and verify the data, there might be differences between source destination, refer to [`zitadel mirror verify`](#zitadel-mirror-verify) to get an overview of possible diffs.
+The last step is to setup the permissions and verify the data, there might be differences between source and destination, refer to [`zitadel mirror verify`](#zitadel-mirror-verify) to get an overview of possible diffs.
 
 ```bash
 zitadel setup --for-mirror --config /path/to/your/new/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
