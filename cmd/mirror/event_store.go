@@ -81,9 +81,6 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	destConn, err := dest.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
-	sourceES := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
-		MaxRetries: 3,
-	}))
 	destinationES := eventstore.NewEventstoreFromOne(postgres.New(dest, &postgres.Config{
 		MaxRetries: 3,
 	}))
@@ -91,8 +88,14 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	previousMigration, err := queryLastSuccessfulMigration(ctx, destinationES, source.DatabaseName())
 	logging.OnError(err).Fatal("unable to query latest successful migration")
 
-	maxPosition, err := writeMigrationStart(ctx, sourceES, migrationID, dest.DatabaseName())
-	logging.OnError(err).Fatal("unable to write migration started event")
+	var maxPosition float64
+	err = source.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			return row.Scan(&maxPosition)
+		},
+		"SELECT MAX(position) FROM eventstore.events2 "+instanceClause(),
+	)
+	logging.OnError(err).Fatal("unable to query max position from source")
 
 	logging.WithFields("from", previousMigration.Position, "to", maxPosition).Info("start event migration")
 
