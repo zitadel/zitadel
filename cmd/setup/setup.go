@@ -178,6 +178,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s49InitPermittedOrgsFunction = &InitPermittedOrgsFunction{eventstoreClient: dbClient}
 	steps.s50IDPTemplate6UsePKCE = &IDPTemplate6UsePKCE{dbClient: dbClient}
 	steps.s51IDPTemplate6RootCA = &IDPTemplate6RootCA{dbClient: dbClient}
+	steps.s52IDPTemplate6LDAP2 = &IDPTemplate6LDAP2{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -218,6 +219,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s49InitPermittedOrgsFunction,
 		steps.s50IDPTemplate6UsePKCE,
 		steps.s51IDPTemplate6RootCA,
+		steps.s52IDPTemplate6LDAP2,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
