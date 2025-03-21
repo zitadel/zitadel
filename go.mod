@@ -25,8 +25,8 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/fatih/color v1.17.0
 	github.com/gabriel-vasile/mimetype v1.4.4
-	github.com/go-chi/chi/v5 v5.1.0
-	github.com/go-jose/go-jose/v4 v4.0.4
+	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/goccy/go-json v0.10.3
@@ -71,7 +71,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/twilio/twilio-go v1.22.2
 	github.com/zitadel/logging v0.6.1
-	github.com/zitadel/oidc/v3 v3.32.0
+	github.com/zitadel/oidc/v3 v3.36.1
 	github.com/zitadel/passwap v0.7.0
 	github.com/zitadel/saml v0.3.4
 	github.com/zitadel/schema v1.3.0
@@ -89,7 +89,7 @@ require (
 	golang.org/x/crypto v0.36.0
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/net v0.33.0
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.26.0
 	golang.org/x/sync v0.12.0
 	golang.org/x/text v0.23.0
 	google.golang.org/api v0.187.0
@@ -104,7 +104,7 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.0 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
-	github.com/bmatcuk/doublestar/v4 v4.7.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
