@@ -16,7 +16,6 @@ type SearchQuery struct {
 	Tx                    *sql.Tx
 	LockRows              bool
 	LockOption            eventstore.LockOption
-	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
 	Offset                uint32
@@ -51,11 +50,11 @@ const (
 	OperationGreater
 	// OperationLess compares if the given values is less than the stored one
 	OperationLess
-	//OperationIn checks if a stored value matches one of the passed value list
+	// OperationIn checks if a stored value matches one of the passed value list
 	OperationIn
-	//OperationJSONContains checks if a stored value matches the given json
+	// OperationJSONContains checks if a stored value matches the given json
 	OperationJSONContains
-	//OperationNotIn checks if a stored value does not match one of the passed value list
+	// OperationNotIn checks if a stored value does not match one of the passed value list
 	OperationNotIn
 
 	operationCount
@@ -65,25 +64,25 @@ const (
 type Field int32
 
 const (
-	//FieldAggregateType represents the aggregate type field
+	// FieldAggregateType represents the aggregate type field
 	FieldAggregateType Field = iota + 1
-	//FieldAggregateID represents the aggregate id field
+	// FieldAggregateID represents the aggregate id field
 	FieldAggregateID
-	//FieldSequence represents the sequence field
+	// FieldSequence represents the sequence field
 	FieldSequence
-	//FieldResourceOwner represents the resource owner field
+	// FieldResourceOwner represents the resource owner field
 	FieldResourceOwner
-	//FieldInstanceID represents the instance id field
+	// FieldInstanceID represents the instance id field
 	FieldInstanceID
-	//FieldEditorService represents the editor service field
+	// FieldEditorService represents the editor service field
 	FieldEditorService
-	//FieldEditorUser represents the editor user field
+	// FieldEditorUser represents the editor user field
 	FieldEditorUser
-	//FieldEventType represents the event type field
+	// FieldEventType represents the event type field
 	FieldEventType
-	//FieldEventData represents the event data field
+	// FieldEventData represents the event data field
 	FieldEventData
-	//FieldCreationDate represents the creation date field
+	// FieldCreationDate represents the creation date field
 	FieldCreationDate
 	// FieldPosition represents the field of the global sequence
 	FieldPosition
@@ -129,7 +128,6 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		Offset:                builder.GetOffset(),
 		Desc:                  builder.GetDesc(),
 		Tx:                    builder.GetTx(),
-		AllowTimeTravel:       builder.GetAllowTimeTravel(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 	}

@@ -117,7 +117,7 @@ func projections(
 	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
 	logging.OnError(err).Fatal("unable create static storage")
 
-	config.Eventstore.Querier = old_es.NewCRDB(client)
+	config.Eventstore.Querier = old_es.NewPostgres(client)
 	config.Eventstore.Pusher = new_es.NewEventstore(client)
 	es := eventstore.NewEventstore(config.Eventstore)
 	esV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(client, &es_v4_pg.Config{

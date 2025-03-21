@@ -185,6 +185,32 @@
           "DESCRIPTION": "A vida útil do token de atualização inativo é o tempo máximo que um token de atualização pode ficar sem uso."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gerencie suas Chaves Web OIDC para assinar e validar tokens com segurança em sua instância do ZITADEL.",
+        "TABLE": {
+          "TITLE": "Chaves Web Ativas e Futuras",
+          "DESCRIPTION": "Suas chaves web ativas e futuras. Ativar uma nova chave desativará a atual.",
+          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os clientes.",
+          "ACTIVATE": "Ativar próxima Chave Web",
+          "ACTIVE": "Atualmente ativa",
+          "NEXT": "Próxima na fila",
+          "FUTURE": "Futuro",
+          "WARNING": "A chave da Web tem menos de 5 minutos"
+        },
+        "CREATE": {
+          "TITLE": "Criar nova Chave Web",
+          "DESCRIPTION": "Criar uma nova chave web a adicionará à sua lista. O ZITADEL usa, por padrão, chaves RSA2048 com um algoritmo de hash SHA256.",
+          "KEY_TYPE": "Tipo de Chave",
+          "BITS": "Bits",
+          "HASHER": "Algoritmo de Hash",
+          "CURVE": "Curva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Chaves Web Anteriores",
+          "DESCRIPTION": "Estas são suas chaves web anteriores que não estão mais ativas.",
+          "DEACTIVATED_ON": "Desativada em"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Textos de Mensagens",
         "DESCRIPTION": "Personalize os textos do seu e-mail de notificação ou mensagens SMS. Se desejar desativar alguns idiomas, restrinja-os nas configurações de idioma da sua instância.",
@@ -789,7 +815,10 @@
       "PHONESECTION": "Números de Telefone",
       "PASSWORDSECTION": "Senha Inicial",
       "ADDRESSANDPHONESECTION": "Número de telefone",
-      "INITMAILDESCRIPTION": "Se ambas as opções forem selecionadas, nenhum e-mail de inicialização será enviado. Se apenas uma das opções for selecionada, um e-mail para fornecer/verificar os dados será enviado."
+      "INITMAILDESCRIPTION": "Se ambas as opções forem selecionadas, nenhum e-mail de inicialização será enviado. Se apenas uma das opções for selecionada, um e-mail para fornecer/verificar os dados será enviado.",
+      "SETUPAUTHENTICATIONLATER": "Configurar autenticação mais tarde para este usuário.",
+      "INVITATION": "Enviar um E-mail de convite para configuração de autenticação e verificação de E-mail.",
+      "INITIALPASSWORD": "Defina uma senha inicial para o usuário."
     },
     "CODEDIALOG": {
       "TITLE": "Verificar Número de Telefone",
@@ -1354,6 +1383,7 @@
       "BRANDING": "Marca",
       "PRIVACYPOLICY": "Política de Privacidade",
       "OIDC": "Tempo de Vida e Expiração do Token OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Aparência de Segredo",
       "SECURITY": "Configurações de Segurança",
       "EVENTS": "Eventos",
@@ -1491,6 +1521,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Término de sessão",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
+      "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
+      "DISABLEUSERTOKENEVENT": "Desativar Evento de Token de Usuário",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os clientes sobre a terminação da sessão no Provedor de OpenID.",
+      "PERMISSIONCHECKV2": "Verificação de Permissão V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
+      "WEBKEY": "Chave Web",
+      "WEBKEY_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
         "INHERITED": "Herdade",
         "ENABLED": "Habilitado",

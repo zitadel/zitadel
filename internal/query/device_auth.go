@@ -63,7 +63,7 @@ func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode stri
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareDeviceAuthQuery(ctx, q.client)
+	stmt, scan := prepareDeviceAuthQuery()
 	eq := sq.Eq{
 		DeviceAuthRequestColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		DeviceAuthRequestColumnUserCode.identifier():   userCode,
@@ -90,7 +90,7 @@ var deviceAuthSelectColumns = []string{
 	ProjectColumnName.identifier(),
 }
 
-func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
+func prepareDeviceAuthQuery() (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
 	return sq.Select(deviceAuthSelectColumns...).
 			From(deviceAuthRequestTable.identifier()).
 			LeftJoin(join(AppOIDCConfigColumnClientID, DeviceAuthRequestColumnClientID)).

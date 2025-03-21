@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -141,12 +142,15 @@ func TestListUser(t *testing.T) {
 				SortBy:     gu.Ptr("username"),
 			},
 			assert: func(t assert.TestingT, resp *scim.ListResponse[*resources.ScimUser]) {
+				// sort the created users with usernames instead of creation date
+				sortedResources := sortScimUserByUsername(resp.Resources)
+
 				assert.Equal(t, 2, resp.ItemsPerPage)
 				assert.Equal(t, totalCountOfHumanUsers, resp.TotalResults)
 				assert.Equal(t, 5, resp.StartIndex)
-				assert.Len(t, resp.Resources, 2)
-				assert.True(t, strings.HasPrefix(resp.Resources[0].UserName, "scim-username-1: "))
-				assert.True(t, strings.HasPrefix(resp.Resources[1].UserName, "scim-username-2: "))
+				assert.Len(t, sortedResources, 2)
+				assert.True(t, strings.HasPrefix(sortedResources[0].UserName, "scim-username-1: "), "got %q", resp.Resources[0].UserName)
+				assert.True(t, strings.HasPrefix(sortedResources[1].UserName, "scim-username-2: "), "got %q", resp.Resources[1].UserName)
 			},
 		},
 		{
@@ -174,11 +178,14 @@ func TestListUser(t *testing.T) {
 				Filter:     gu.Ptr(`emails sw "scim-email-1" and emails ew "@example.com"`),
 			},
 			assert: func(t assert.TestingT, resp *scim.ListResponse[*resources.ScimUser]) {
+				// sort the created users with usernames instead of creation date
+				sortedResources := sortScimUserByUsername(resp.Resources)
+
 				assert.Equal(t, 5, resp.ItemsPerPage)
 				assert.Equal(t, 2, resp.TotalResults)
 				assert.Equal(t, 1, resp.StartIndex)
-				assert.Len(t, resp.Resources, 2)
-				for _, resource := range resp.Resources {
+				assert.Len(t, sortedResources, 2)
+				for _, resource := range sortedResources {
 					assert.True(t, strings.HasPrefix(resource.UserName, "scim-username-1"))
 					assert.Len(t, resource.Emails, 1)
 					assert.True(t, strings.HasPrefix(resource.Emails[0].Value, "scim-email-1"))
@@ -198,11 +205,14 @@ func TestListUser(t *testing.T) {
 				SendAsPost: true,
 			},
 			assert: func(t assert.TestingT, resp *scim.ListResponse[*resources.ScimUser]) {
+				// sort the created users with usernames instead of creation date
+				sortedResources := sortScimUserByUsername(resp.Resources)
+
 				assert.Equal(t, 5, resp.ItemsPerPage)
 				assert.Equal(t, 2, resp.TotalResults)
 				assert.Equal(t, 1, resp.StartIndex)
-				assert.Len(t, resp.Resources, 2)
-				for _, resource := range resp.Resources {
+				assert.Len(t, sortedResources, 2)
+				for _, resource := range sortedResources {
 					assert.True(t, strings.HasPrefix(resource.UserName, "scim-username-1"))
 					assert.Len(t, resource.Emails, 1)
 					assert.True(t, strings.HasPrefix(resource.Emails[0].Value, "scim-email-1"))
@@ -431,6 +441,14 @@ func TestListUser(t *testing.T) {
 			}
 		})
 	}
+}
+
+func sortScimUserByUsername(users []*resources.ScimUser) []*resources.ScimUser {
+	sortedResources := users
+	slices.SortFunc(sortedResources, func(a, b *resources.ScimUser) int {
+		return strings.Compare(a.UserName, b.UserName)
+	})
+	return sortedResources
 }
 
 func createUsers(t *testing.T, ctx context.Context, orgID string) []string {

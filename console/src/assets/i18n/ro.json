@@ -185,6 +185,32 @@
           "DESCRIPTION": "Durata de viață inactivă a tokenului de reîmprospătare este timpul maxim în care un token de reîmprospătare poate fi neutilizat."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gestionează-ți cheile web OIDC pentru a semna și valida în siguranță tokenurile pentru instanța ta ZITADEL.",
+        "TABLE": {
+          "TITLE": "Chei Web Active și Viitoare",
+          "DESCRIPTION": "Cheile tale web active și viitoare. Activarea unei noi chei va dezactiva cheia curentă.",
+          "NOTE": "Notă: Endpoint-ul JWKs OIDC returnează un răspuns care poate fi stocat în cache (implicit 5 min). Evită activarea unei chei prea devreme, deoarece este posibil să nu fie încă disponibilă în cache și pentru clienți.",
+          "ACTIVATE": "Activează următoarea Cheie Web",
+          "ACTIVE": "În prezent activă",
+          "NEXT": "Următoarea în coadă",
+          "FUTURE": "Viitoare",
+          "WARNING": "Cheia web are mai puțin de 5 minute"
+        },
+        "CREATE": {
+          "TITLE": "Creează o nouă Cheie Web",
+          "DESCRIPTION": "Crearea unei noi chei web o va adăuga pe lista ta. ZITADEL folosește implicit chei RSA2048 cu un algoritm de hash SHA256.",
+          "KEY_TYPE": "Tip de Cheie",
+          "BITS": "Biti",
+          "HASHER": "Algoritm de Hash",
+          "CURVE": "Curbă"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Chei Web Anterioare",
+          "DESCRIPTION": "Acestea sunt cheile tale web anterioare care nu mai sunt active.",
+          "DEACTIVATED_ON": "Dezactivată pe"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Texte de mesaje",
         "DESCRIPTION": "Personalizați textele mesajelor de e-mail sau SMS de notificare. Dacă doriți să dezactivați unele dintre limbi, restricționați-le în setările de limbă ale instanțelor dvs.",
@@ -787,7 +813,10 @@
       "PHONESECTION": "Numere de telefon",
       "PASSWORDSECTION": "Parola inițială",
       "ADDRESSANDPHONESECTION": "Număr de telefon",
-      "INITMAILDESCRIPTION": "Dacă ambele opțiuni sunt selectate, nu va fi trimis niciun e-mail pentru inițializare. Dacă este selectată doar una dintre opțiuni, va fi trimis un e-mail pentru a furniza / verifica datele."
+      "INITMAILDESCRIPTION": "Dacă ambele opțiuni sunt selectate, nu va fi trimis niciun e-mail pentru inițializare. Dacă este selectată doar una dintre opțiuni, va fi trimis un e-mail pentru a furniza / verifica datele.",
+      "SETUPAUTHENTICATIONLATER": "Configurați autentificarea mai târziu pentru acest utilizator.",
+      "INVITATION": "Trimiteți un e-mail de invitație pentru configurarea autentificării și verificarea e-mailului.",
+      "INITIALPASSWORD": "Setați o parolă inițială pentru utilizator."
     },
     "CODEDIALOG": {
       "TITLE": "Verificați numărul de telefon",
@@ -1351,6 +1380,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Linkuri externe",
       "OIDC": "Durata de viață și expirarea tokenului OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Generator de secrete",
       "SECURITY": "Setări de securitate",
       "EVENTS": "Evenimente",
@@ -1488,6 +1518,16 @@
       "ACTIONS_DESCRIPTION": "Acțiunile v2 permit gestionarea execuțiilor și țintelor de date. Dacă indicatorul este activat, veți putea utiliza noul API și caracteristicile sale.",
       "OIDCSINGLEV1SESSIONTERMINATION": "Terminarea sesiunii unice OIDC V1",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Dacă indicatorul este activat, veți putea termina o singură sesiune din UI-ul de conectare furnizând un id_token cu o revendicare sid ca id_token_hint pe endpointul end_session. Rețineți că în prezent toate sesiunile de la același agent utilizator (browser) sunt terminate în UI-ul de conectare. Sesiunile gestionate prin API-ul Session permit deja terminarea sesiunilor individuale.",
+      "DEBUGOIDCPARENTERROR": "Eroare de Depanare Părinte OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Dacă steagul este activat, eroarea părinte OIDC va fi înregistrată în consolă.",
+      "DISABLEUSERTOKENEVENT": "Dezactivează Evenimentul Token Utilizator",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Activează Logout Backchannel",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout-ul Back-Channel implementează OpenID Connect Back-Channel Logout 1.0 și poate fi folosit pentru a notifica clienții despre terminarea sesiunii la Producătorul OpenID.",
+      "PERMISSIONCHECKV2": "Verificare Permisiuni V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
+      "WEBKEY": "Cheie Web",
+      "WEBKEY_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
       "STATES": {
         "INHERITED": "Moșteniți",
         "ENABLED": "Activat",

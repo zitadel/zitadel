@@ -185,6 +185,32 @@
           "DESCRIPTION": "La durée de vie du token de rafraîchissement inactif est le temps maximum qu'un token de rafraîchissement peut être inutilisé."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gérez vos clés Web OIDC pour signer et valider en toute sécurité les jetons de votre instance ZITADEL.",
+        "TABLE": {
+          "TITLE": "Clés Web Actives et Futures",
+          "DESCRIPTION": "Vos clés Web actives et à venir. L'activation d'une nouvelle clé désactivera l'actuelle.",
+          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les clients.",
+          "ACTIVATE": "Activer la prochaine Clé Web",
+          "ACTIVE": "Actuellement active",
+          "NEXT": "Prochaine dans la file d'attente",
+          "FUTURE": "Futur",
+          "WARNING": "La clé Web a moins de 5 minutes"
+        },
+        "CREATE": {
+          "TITLE": "Créer une nouvelle Clé Web",
+          "DESCRIPTION": "Créer une nouvelle clé Web l'ajoutera à votre liste. ZITADEL utilise par défaut des clés RSA2048 avec un hacheur SHA256.",
+          "KEY_TYPE": "Type de Clé",
+          "BITS": "Bits",
+          "HASHER": "Hacheur",
+          "CURVE": "Courbe"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Clés Web Précédentes",
+          "DESCRIPTION": "Voici vos anciennes clés Web qui ne sont plus actives.",
+          "DEACTIVATED_ON": "Désactivée le"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Textes des Messages",
         "DESCRIPTION": "Personnalisez les textes de vos e-mails de notification ou messages SMS. Si vous souhaitez désactiver certaines langues, restreignez-les dans les paramètres de langue de vos instances.",
@@ -789,7 +815,10 @@
       "PHONESECTION": "Numéro de téléphone",
       "PASSWORDSECTION": "Mot de passe initial",
       "ADDRESSANDPHONESECTION": "Numéro de téléphone",
-      "INITMAILDESCRIPTION": "Si les deux options sont sélectionnées, aucun mail d'initialisation ne sera envoyé. Si une seule des options est sélectionnée, un mail pour fournir / vérifier les données sera envoyé."
+      "INITMAILDESCRIPTION": "Si les deux options sont sélectionnées, aucun mail d'initialisation ne sera envoyé. Si une seule des options est sélectionnée, un mail pour fournir / vérifier les données sera envoyé.",
+      "SETUPAUTHENTICATIONLATER": "Configurer l'authentification plus tard pour cet utilisateur.",
+      "INVITATION": "Envoyer un e-mail d'invitation pour la configuration de l'authentification et la vérification de l'e-mail.",
+      "INITIALPASSWORD": "Définissez un mot de passe initial pour l'utilisateur."
     },
     "CODEDIALOG": {
       "TITLE": "Vérifier le numéro de téléphone",
@@ -1353,6 +1382,7 @@
       "BRANDING": "Image de marque",
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Générateur de secrets",
       "SECURITY": "Paramètres de sécurité",
       "EVENTS": "Événements",
@@ -1490,6 +1520,16 @@
       "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Fin de session",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si le drapeau est activé, l'erreur parent OIDC sera enregistrée dans la console.",
+      "DISABLEUSERTOKENEVENT": "Désactiver l'événement de jeton utilisateur",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Activer le Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les clients de la fin de session chez le fournisseur OpenID.",
+      "PERMISSIONCHECKV2": "Vérification des permissions V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "WEBKEY": "Clé web",
+      "WEBKEY_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
         "INHERITED": "Hérité",
         "ENABLED": "Activé",

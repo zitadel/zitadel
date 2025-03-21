@@ -173,6 +173,32 @@
           "DESCRIPTION": "Masa pakai token penyegaran yang menganggur adalah waktu maksimum token penyegaran tidak dapat digunakan."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Kelola Kunci Web OIDC Anda untuk menandatangani dan memvalidasi token dengan aman untuk instance ZITADEL Anda.",
+        "TABLE": {
+          "TITLE": "Kunci Web Aktif dan Mendatang",
+          "DESCRIPTION": "Kunci web Anda yang aktif dan akan datang. Mengaktifkan kunci baru akan menonaktifkan kunci yang sedang digunakan.",
+          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan klien.",
+          "ACTIVATE": "Aktifkan Kunci Web Berikutnya",
+          "ACTIVE": "Saat ini aktif",
+          "NEXT": "Berikutnya dalam antrean",
+          "FUTURE": "Mendatang",
+          "WARNING": "Kunci Web berusia kurang dari 5 menit"
+        },
+        "CREATE": {
+          "TITLE": "Buat Kunci Web Baru",
+          "DESCRIPTION": "Membuat kunci web baru akan menambahkannya ke daftar Anda. ZITADEL secara default menggunakan kunci RSA2048 dengan fungsi hash SHA256.",
+          "KEY_TYPE": "Jenis Kunci",
+          "BITS": "Bit",
+          "HASHER": "Hasher",
+          "CURVE": "Kurva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Kunci Web Sebelumnya",
+          "DESCRIPTION": "Ini adalah kunci web sebelumnya yang tidak lagi aktif.",
+          "DEACTIVATED_ON": "Dinonaktifkan pada"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Teks Pesan",
         "DESCRIPTION": "Sesuaikan teks email notifikasi atau pesan SMS Anda. Jika Anda ingin menonaktifkan beberapa bahasa, batasi bahasa tersebut di pengaturan bahasa instance Anda.",
@@ -729,7 +755,10 @@
       "PHONESECTION": "Nomor telepon",
       "PASSWORDSECTION": "Kata Sandi Awal",
       "ADDRESSANDPHONESECTION": "Nomor telepon",
-      "INITMAILDESCRIPTION": "Jika kedua opsi dipilih, tidak ada email untuk inisialisasi yang akan dikirim. Jika hanya salah satu opsi yang dipilih, email untuk menyediakan/memverifikasi data akan dikirim."
+      "INITMAILDESCRIPTION": "Jika kedua opsi dipilih, tidak ada email untuk inisialisasi yang akan dikirim. Jika hanya salah satu opsi yang dipilih, email untuk menyediakan/memverifikasi data akan dikirim.",
+      "SETUPAUTHENTICATIONLATER": "Atur autentikasi nanti untuk pengguna ini.",
+      "INVITATION": "Kirim Email undangan untuk pengaturan autentikasi dan verifikasi Email.",
+      "INITIALPASSWORD": "Tetapkan kata sandi awal untuk pengguna."
     },
     "CODEDIALOG": {
       "TITLE": "Verifikasi Nomor Telepon",
@@ -1231,6 +1260,7 @@
       "BRANDING": "merek",
       "PRIVACYPOLICY": "Tautan eksternal",
       "OIDC": "Masa berlaku dan masa berlaku Token OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Pembuat Rahasia",
       "SECURITY": "Pengaturan keamanan",
       "EVENTS": "Acara",
@@ -1362,6 +1392,15 @@
       "USERSCHEMA_DESCRIPTION": "Skema Pengguna memungkinkan untuk mengelola skema data pengguna. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "ACTIONS": "Tindakan",
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
+      "DISABLEUSERTOKENEVENT": "Disable User Token Event",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
+      "PERMISSIONCHECKV2": "Permission Check V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
+      "WEBKEY": "Web Key",
+      "WEBKEY_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": { "INHERITED": "Mewarisi", "ENABLED": "Diaktifkan", "DISABLED": "Dengan disabilitas" },
       "INHERITED_DESCRIPTION": "Ini menetapkan nilai ke nilai default sistem.",
       "INHERITEDINDICATOR_DESCRIPTION": {

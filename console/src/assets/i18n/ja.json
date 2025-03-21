@@ -185,6 +185,32 @@
           "DESCRIPTION": "アイドル状態のリフレッシュトークンの有効期間は、リフレッシュトークンが使用されない最大時間です。"
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "ZITADELインスタンスのトークンを安全に署名および検証するために、OIDC Webキーを管理します。",
+        "TABLE": {
+          "TITLE": "アクティブおよび今後のWebキー",
+          "DESCRIPTION": "現在アクティブなWebキーと、今後使用予定のWebキーです。新しいキーをアクティブ化すると、現在のキーは無効になります。",
+          "NOTE": "注意: JWKs OIDCエンドポイントはキャッシュ可能なレスポンスを返します（デフォルト5分）。キーを早くアクティブ化しすぎると、キャッシュやクライアントでまだ利用できない可能性があります。",
+          "ACTIVATE": "次のWebキーをアクティブ化",
+          "ACTIVE": "現在アクティブ",
+          "NEXT": "次のキュー",
+          "FUTURE": "今後",
+          "WARNING": "ウェブキーは5分未満です。"
+        },
+        "CREATE": {
+          "TITLE": "新しいWebキーを作成",
+          "DESCRIPTION": "新しいWebキーを作成すると、リストに追加されます。ZITADELはデフォルトでRSA2048キーとSHA256ハッシュを使用します。",
+          "KEY_TYPE": "キーの種類",
+          "BITS": "ビット",
+          "HASHER": "ハッシュ方式",
+          "CURVE": "カーブ"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "以前のWebキー",
+          "DESCRIPTION": "これらは、すでに無効になった以前のWebキーです。",
+          "DEACTIVATED_ON": "無効化日"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "メッセージテキスト",
         "DESCRIPTION": "通知メールやSMSメッセージのテキストをカスタマイズします。一部の言語を無効にしたい場合は、インスタンスの言語設定で制限してください。",
@@ -789,7 +815,10 @@
       "PHONESECTION": "電話番号",
       "PASSWORDSECTION": "初期パスワード",
       "ADDRESSANDPHONESECTION": "電話番号",
-      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。"
+      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。",
+      "SETUPAUTHENTICATIONLATER": "このユーザーの認証を後で設定します。",
+      "INVITATION": "認証設定とメール確認のための招待メールを送信してください。",
+      "INITIALPASSWORD": "ユーザーの初期パスワードを設定してください。"
     },
     "CODEDIALOG": {
       "TITLE": "電話番号の検証",
@@ -1353,6 +1382,7 @@
       "BRANDING": "ブランディング",
       "PRIVACYPOLICY": "プライバシーポリシー",
       "OIDC": "OIDCトークンのライフタイムと有効期限",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "シークレット設定",
       "SECURITY": "セキュリティ設定",
       "EVENTS": "イベント",
@@ -1490,6 +1520,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 セッション終了",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
+      "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
+      "DISABLEUSERTOKENEVENT": "ユーザートークンイベントを無効にする",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
+      "PERMISSIONCHECKV2": "権限チェック V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
+      "WEBKEY": "ウェブキー",
+      "WEBKEY_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
