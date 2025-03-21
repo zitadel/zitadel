@@ -32,7 +32,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
-	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 	profiler "github.com/zitadel/zitadel/internal/telemetry/profiler/config"
 	tracing "github.com/zitadel/zitadel/internal/telemetry/tracing/config"
 )
@@ -52,7 +51,6 @@ type Config struct {
 	Database            database.Config
 	Caches              *connector.CachesConfig
 	Tracing             tracing.Config
-	Metrics             metrics.Config
 	Profiler            profiler.Config
 	Projections         projection.Config
 	Notifications       handlers.WorkerConfig
@@ -117,9 +115,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err = config.Tracing.NewTracer()
 	logging.OnError(err).Fatal("unable to set tracer")
-
-	err = config.Metrics.NewMeter()
-	logging.OnError(err).Fatal("unable to set meter")
 
 	err = config.Profiler.NewProfiler()
 	logging.OnError(err).Fatal("unable to set profiler")

@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
+	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 )
 
 type Config struct {
@@ -38,6 +39,7 @@ type Config struct {
 	ExternalPort    uint16
 	ExternalSecure  bool
 	Log             *logging.Config
+	Metrics         metrics.Config
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
@@ -84,6 +86,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
+
+	err = config.Metrics.NewMeter()
+	logging.OnError(err).Fatal("unable to set meter")
 
 	id.Configure(config.Machine)
 
