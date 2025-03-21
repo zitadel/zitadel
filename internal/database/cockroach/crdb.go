@@ -73,12 +73,6 @@ func (_ *Config) Decode(configs []any) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
-	dialect.RegisterAfterConnect(func(ctx context.Context, c *pgx.Conn) error {
-		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-		// This is needed to fill the fields table of the eventstore during eventstore.Push.
-		_, err := c.Exec(ctx, "SET enable_multiple_modifications_of_table = on")
-		return err
-	})
 	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
 
 	config, err := pgxpool.ParseConfig(c.String(useAdmin))
