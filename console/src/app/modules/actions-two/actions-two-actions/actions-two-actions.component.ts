@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
 import { ActionService } from 'src/app/services/action.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
-import { defer, firstValueFrom, Observable, of, shareReplay, TimeoutError } from 'rxjs';
+import { defer, firstValueFrom, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
 import { catchError, map, timeout } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
-import { GetExecution } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
+import { Execution, GetExecution } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANIZATIONS } from '../../settings-list/settings';
@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActionsTwoActionsComponent implements OnInit {
+  protected readonly refresh = new Subject<true>();
   private readonly actionsEnabled$: Observable<boolean>;
   protected readonly executions$: Observable<GetExecution[]>;
 
@@ -90,4 +91,6 @@ export class ActionsTwoActionsComponent implements OnInit {
       }
     });
   }
+
+  public deleteExecution(execution: GetExecution) {}
 }

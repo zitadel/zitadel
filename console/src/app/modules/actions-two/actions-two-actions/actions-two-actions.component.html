@@ -1,9 +1,12 @@
-<p>actions-two-actions works!</p>
-<div>
+<h2>{{ 'ACTIONSTWO.EXECUTION.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DESCRIPTION' | translate }}</p>
+
+<cnsl-actions-two-actions-table
+  (refresh)="refresh.next(true)"
+  (delete)="deleteExecution($event)"
+  [executions]="executions$ | async"
+>
   <button color="primary" mat-raised-button (click)="openDialog()">
     {{ 'ACTIONS.CREATE' | translate }}
   </button>
-</div>
-<div *ngFor="let execution of executions$ | async">
-  {{ execution | json }}
-</div>
+</cnsl-actions-two-actions-table>

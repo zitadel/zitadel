@@ -504,6 +504,8 @@
   },
   "ACTIONSTWO": {
     "EXECUTION": {
+      "TITLE": "Actions",
+      "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and itegrate with other systems.",
       "CREATE": {
         "TITLE": "Create an Action",
         "TYPE": {
@@ -546,6 +548,24 @@
           "DESCRIPTION": "The target you want to execute for this action",
           "ADD_ANOTHER": "Add another target"
         }
+      }
+    },
+    "TARGET": {
+      "TITLE": "Targets",
+      "DESCRIPTION": "A target is the destination of the code you want to execute from an action. Create a target here and at it to your actions.",
+      "CREATE": {
+        "TITLE": "Create your Target",
+        "DESCRIPTION": "Create your own target outside of Zitadel",
+        "NAME": "Name",
+        "NAME_DESCRIPTION": "Give your target a clear, descriptive name to make it easy to identify later",
+        "ENDPOINT": "Endpoint",
+        "ENDPOINT_DESCRIPTION": "Enter the endpoint where your code is hosted. Make sure it is accessible to us!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Set the maximum time your target has to respond. If it takes longer, we will stop the request.",
+        "INTERRUPT_ON_ERROR": "Interrupt on Error",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop all executions when the targets returns with an error",
+        "AWAIT_RESPONSE": "Await Response",
+        "AWAIT_RESPONSE_DESCRIPTION": "We'll Wait for a response before we do anything else. Useful if you intend to use multiple targets for a single action"
       }
     }
   },
@@ -1407,7 +1427,9 @@
       "SECURITY": "Security settings",
       "EVENTS": "Events",
       "FAILEDEVENTS": "Failed Events",
-      "VIEWS": "Views"
+      "VIEWS": "Views",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "General Information",
@@ -1417,7 +1439,8 @@
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
       "OTHER": "Other",
-      "STORAGE": "Storage"
+      "STORAGE": "Storage",
+      "ACTIONS": "Actions"
     }
   },
   "SETTING": {
