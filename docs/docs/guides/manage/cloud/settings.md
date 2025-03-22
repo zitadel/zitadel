@@ -2,7 +2,10 @@
 title: Settings
 ---
 
-Manage your team, email subscriptions, and billing information on the [Settings](https://zitadel.com/admin/settings) page.
+
+In the settings you can change your team name, notification settings and delete your team.
+
+![Customer Portal Settings General](/img/manuals/portal/customer_portal_settings_general.png)
 
 ## Team name
 
