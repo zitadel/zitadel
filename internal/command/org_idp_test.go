@@ -210,6 +210,7 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 							"user",
 							"idAttribute",
 							nil,
+							false,
 							idp.Options{},
 						),
 					),
@@ -256,6 +257,7 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 							"user",
 							"idAttribute",
 							[]string{"user"},
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -280,6 +282,7 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 					UserEndpoint:          "user",
 					Scopes:                []string{"user"},
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -520,6 +523,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -536,6 +540,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					IDAttribute:           "idAttribute",
+					UsePKCE:               false,
 				},
 			},
 			res: res{
@@ -563,6 +568,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -585,6 +591,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 									idp.ChangeOAuthUserEndpoint("new user"),
 									idp.ChangeOAuthScopes([]string{"openid", "profile"}),
 									idp.ChangeOAuthIDAttribute("newAttribute"),
+									idp.ChangeOAuthUsePKCE(true),
 									idp.ChangeOAuthOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -612,6 +619,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 					UserEndpoint:          "new user",
 					Scopes:                []string{"openid", "profile"},
 					IDAttribute:           "newAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -763,6 +771,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 							},
 							nil,
 							false,
+							false,
 							idp.Options{},
 						),
 					),
@@ -804,6 +813,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 							},
 							[]string{openid.ScopeOpenID},
 							true,
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -826,6 +836,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "clientSecret",
 					Scopes:           []string{openid.ScopeOpenID},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -995,6 +1006,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1033,6 +1045,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1053,6 +1066,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 									}),
 									idp.ChangeOIDCScopes([]string{"openid", "profile"}),
 									idp.ChangeOIDCIsIDTokenMapping(true),
+									idp.ChangeOIDCUsePKCE(true),
 									idp.ChangeOIDCOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -1078,6 +1092,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "newSecret",
 					Scopes:           []string{"openid", "profile"},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -1225,6 +1240,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1283,6 +1299,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 									Crypted:    []byte("clientSecret"),
 								},
 								nil,
+								false,
 								false,
 								idp.Options{},
 							)),
@@ -1452,6 +1469,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1504,6 +1522,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 									Crypted:    []byte("clientSecret"),
 								},
 								nil,
+								false,
 								false,
 								idp.Options{},
 							)),
@@ -4306,6 +4325,35 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					StartTLS:          false,
+					BaseDN:            "baseDN",
+					BindDN:            "dn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-cwqVVdBwKt", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4381,7 +4429,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
-							[]byte("certificate"),
+							validLDAPRootCA,
 							idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "firstName",
@@ -4423,7 +4471,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "firstName",
@@ -4659,6 +4707,31 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "bindDN",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-aBx901n", ""))
+				},
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4709,7 +4782,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
-								[]byte("certificate"),
+								validLDAPRootCA,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4729,7 +4802,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 					UserFilters:       []string{"filter"},
 					UserBase:          "user",
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 				},
 			},
 			res: res{
@@ -4759,7 +4832,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
-								[]byte("certificate"),
+								nil,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4806,6 +4879,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
+									idp.ChangeLDAPRootCA(validLDAPRootCA),
 								},
 							)
 							return event
@@ -4829,7 +4903,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"new object"},
 					UserFilters:       []string{"new filter"},
 					Timeout:           time.Second * 20,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "new id",
 						FirstNameAttribute:         "new firstName",

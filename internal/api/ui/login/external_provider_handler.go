@@ -149,14 +149,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID)
-	if err != nil {
-		l.externalAuthFailed(w, r, authReq, err)
-		return
-	}
 	var provider idp.Provider
-
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -194,6 +187,13 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	}
 	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
 	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
+	if err != nil {
+		l.externalAuthFailed(w, r, authReq, err)
+		return
+	}
+
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID, session.PersistentParameters())
 	if err != nil {
 		l.externalAuthFailed(w, r, authReq, err)
 		return
@@ -271,79 +271,78 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 		return
 	}
-	var provider idp.Provider
 	var session idp.Session
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
-		provider, err = l.oauthProvider(r.Context(), identityProvider)
+		provider, err := l.oauthProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*oauth.Provider), Code: data.Code}
+		session = oauth.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeOIDC:
-		provider, err = l.oidcProvider(r.Context(), identityProvider)
+		provider, err := l.oidcProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+		session = openid.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeAzureAD:
-		provider, err = l.azureProvider(r.Context(), identityProvider)
+		provider, err := l.azureProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &azuread.Session{Provider: provider.(*azuread.Provider), Code: data.Code}
+		session = azuread.NewSession(provider, data.Code)
 	case domain.IDPTypeGitHub:
-		provider, err = l.githubProvider(r.Context(), identityProvider)
+		provider, err := l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHubEnterprise:
-		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
+		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLab:
-		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLabSelfHosted:
-		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGoogle:
-		provider, err = l.googleProvider(r.Context(), identityProvider)
+		provider, err := l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeApple:
-		provider, err = l.appleProvider(r.Context(), identityProvider)
+		provider, err := l.appleProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
+		session = apple.NewSession(provider, data.Code, data.User)
 	case domain.IDPTypeSAML:
-		provider, err = l.samlProvider(r.Context(), identityProvider)
+		provider, err := l.samlProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session, err = saml.NewSession(provider.(*saml.Provider), authReq.SAMLRequestID, r)
+		session, err = saml.NewSession(provider, authReq.SAMLRequestID, r)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
@@ -440,7 +439,7 @@ func (l *Login) handleExternalUserAuthenticated(
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// ensure the linked IDP is added to the login policy
-	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID, authReq.SelectedIDPConfigArgs); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -473,21 +472,25 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	// if a user was linked, we don't want to do any more renderings
+	var userLinked bool
 	// if action is done and no user linked then link or register
 	if zerrors.IsNotFound(externalErr) {
-		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
-		return
+		userLinked = l.createOrLinkUser(w, r, authReq, provider, externalUser, externalUserChange)
+		if !userLinked {
+			return
+		}
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
-		if err != nil {
+		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
 		}
 	}
 	if len(externalUser.Metadatas) > 0 {
 		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
-		if err != nil {
+		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
 		}
@@ -499,12 +502,12 @@ func (l *Login) handleExternalUserAuthenticated(
 // The decision, which information will be checked is based on the IdP template option.
 // The function returns a boolean whether a user was found or not.
 // If single a user was found, it will be automatically linked.
-func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) (bool, error) {
 	queries := make([]query.SearchQuery, 0, 2)
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUnspecified:
 		// is auto linking is disable, we shouldn't even get here, but in case we do we can directly return
-		return false
+		return false, nil
 	case domain.AutoLinkingOptionUsername:
 		// if we're checking for usernames there are to options:
 		//
@@ -513,22 +516,24 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 		if authReq.RequestedOrgID == "" {
 			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
 			if err != nil {
-				return false
+				return false, nil
 			}
-			l.autoLinkUser(w, r, authReq, user)
-			return true
+			if err = l.autoLinkUser(r, authReq, user); err != nil {
+				return false, err
+			}
+			return true, nil
 		}
 		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
 		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, usernameQuery)
 	case domain.AutoLinkingOptionEmail:
 		// Email will always be checked against verified email addresses.
 		emailQuery, err := query.NewUserVerifiedEmailSearchQuery(string(externalUser.Email))
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, emailQuery)
 	}
@@ -536,38 +541,39 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 	if authReq.RequestedOrgID != "" {
 		resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(authReq.RequestedOrgID, query.TextEquals)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, resourceOwnerQuery)
 	}
 	user, err := l.query.GetNotifyUser(r.Context(), false, queries...)
 	if err != nil {
-		return false
+		return false, nil
 	}
-	l.autoLinkUser(w, r, authReq, user)
-	return true
+	if err = l.autoLinkUser(r, authReq, user); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
-func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) {
+func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) error {
 	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID); err != nil {
-		l.renderError(w, r, authReq, err)
-		return
+		return err
 	}
 	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
-		l.renderError(w, r, authReq, err)
-		return
+		return err
 	}
-	l.renderNextStep(w, r, authReq)
+	authReq.UserID = user.ID
+	return nil
 }
 
-// externalUserNotExisting is called if an externalAuthentication couldn't find a corresponding externalID
+// createOrLinkUser is called if an externalAuthentication couldn't find a corresponding externalID
 // possible solutions are:
 //
 // * auto creation
 // * external not found overview:
 //   - creation by user
 //   - linking to existing user
-func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) {
+func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) (userLinked bool) {
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	orgIAMPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
@@ -578,8 +584,13 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
-		if l.checkAutoLinking(w, r, authReq, provider, externalUser) {
-			return
+		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return false
+		}
+		if userLinked {
+			return userLinked
 		}
 	}
 
@@ -603,6 +614,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 	l.autoCreateExternalUser(w, r, authReq)
+	return false
 }
 
 // autoCreateExternalUser takes the externalUser and creates it automatically (without user interaction)
@@ -1005,11 +1017,17 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 2)
+	opts := make([]openid.ProviderOpts, 1, 3)
 	opts[0] = openid.WithSelectAccount()
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
+
+	if identityProvider.OIDCIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, openid.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
+
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -1047,6 +1065,12 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
 		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
 	}
+
+	opts := make([]oauth.ProviderOpts, 0, 1)
+	if identityProvider.OAuthIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
 	return oauth.New(
 		config,
 		identityProvider.Name,
@@ -1054,6 +1078,7 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+		opts...,
 	)
 }
 

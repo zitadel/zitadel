@@ -511,11 +511,13 @@
     "ORG_OWNER": "Има разрешение за цялата организация",
     "ORG_USER_MANAGER": "Има разрешение да създава и управлява потребители на организацията",
     "ORG_OWNER_VIEWER": "Има разрешение за преглед на цялата организация",
+    "ORG_SETTINGS_MANAGER": "Има разрешение за управление на настройките на организацията",
     "ORG_USER_PERMISSION_EDITOR": "Има разрешение за управление на потребителски безвъзмездни средства",
     "ORG_PROJECT_PERMISSION_EDITOR": "Има разрешение за управление на грантове по проекти",
     "ORG_PROJECT_CREATOR": "Има разрешение да създава свои собствени проекти и основни настройки",
     "ORG_ADMIN_IMPERSONATOR": "Има разрешение да се представя за администратор и крайни потребители от организацията",
     "ORG_END_USER_IMPERSONATOR": "Има разрешение да се представя за крайни потребители от организацията",
+    "ORG_USER_SELF_MANAGER": "Има разрешение да управлява собствените си потребители",
     "PROJECT_OWNER": "Има разрешение върху целия проект",
     "PROJECT_OWNER_VIEWER": "Има разрешение за преглед на целия проект",
     "PROJECT_OWNER_GLOBAL": "Има разрешение върху целия проект",
@@ -786,7 +788,10 @@
       "PHONESECTION": "Телефонни номера",
       "PASSWORDSECTION": "Първоначална парола",
       "ADDRESSANDPHONESECTION": "Телефонен номер",
-      "INITMAILDESCRIPTION": "Ако са избрани и двете опции, няма да бъде изпратен имейл за инициализация. "
+      "INITMAILDESCRIPTION": "Ако са избрани и двете опции, няма да бъде изпратен имейл за инициализация. ",
+      "SETUPAUTHENTICATIONLATER": "Настройте удостоверяване по-късно за този потребител.",
+      "INVITATION": "Изпратете покана по имейл за настройка на удостоверяване и потвърждение на имейл.",
+      "INITIALPASSWORD": "Задайте начална парола за потребителя."
     },
     "CODEDIALOG": {
       "TITLE": "Потвърдете телефонния номер",
@@ -1395,7 +1400,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1486,6 +1492,16 @@
       "ACTIONS_DESCRIPTION": "Действия v2 позволяват управление на выполнения на данни и цели. Ако флагът е активиран, ще можете да използвате новия API и неговите функции.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Завършване на сесия",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ако флагът е активиран, ще можете да прекратите единична сесия от UI за вход, като предоставите id_token с `sid` претенция като id_token_hint на крайната точка на end_session. Имайте предвид, че в момента всички сесии от същия потребителски агент (браузър) се прекратяват в UI за вход. Сесиите, управлявани чрез API на сесията, вече позволяват прекратяването на единични сесии.",
+      "DEBUGOIDCPARENTERROR": "Отстраняване на грешки на OIDC родителя",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ако флагът е активиран, грешката на OIDC родителя ще бъде записана в конзолата.",
+      "DISABLEUSERTOKENEVENT": "Деактивиране на събитие за потребителски токен",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Активиране на Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout имплементира OpenID Connect Back-Channel Logout 1.0 и може да се използва за уведомяване на клиентите за прекратяване на сесията при OpenID доставчика.",
+      "PERMISSIONCHECKV2": "Проверка на разрешения V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Ако флагът е активиран, ще можете да използвате новия API и неговите функции.",
+      "WEBKEY": "Уеб ключ",
+      "WEBKEY_DESCRIPTION": "Ако флагът е активиран, ще можете да използвате новия API и неговите функции.",
       "STATES": {
         "INHERITED": "Наследено",
         "ENABLED": "Активирано",
@@ -1635,7 +1651,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -2200,7 +2218,9 @@
       "REMOVED": "Премахнато успешно."
     },
     "ISIDTOKENMAPPING": "Съответствие от ID токен",
-    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информацията на доставчика се съответства от ID токена, а не от userinfo крайната точка."
+    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информацията на доставчика се съответства от ID токена, а не от userinfo крайната точка.",
+    "USEPKCE": "Използвайте PKCE",
+    "USEPKCE_DESC": "Определя дали параметрите code_challenge и code_challenge_method са включени в заявката за удостоверяване"
   },
   "MFA": {
     "LIST": {
@@ -2579,7 +2599,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",

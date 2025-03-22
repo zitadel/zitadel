@@ -192,6 +192,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
  	"userEndpoint": "user",
 	"scopes": ["profile"],
 	"idAttribute": "id-attribute",
+	"usePKCE": false,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -227,7 +228,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -238,6 +239,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"user",
 								database.TextArray[string]{"profile"},
 								"id-attribute",
+								false,
 							},
 						},
 					},
@@ -265,6 +267,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
  	"userEndpoint": "user",
 	"scopes": ["profile"],
 	"idAttribute": "id-attribute",
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -300,7 +303,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -311,6 +314,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"user",
 								database.TextArray[string]{"profile"},
 								"id-attribute",
+								true,
 							},
 						},
 					},
@@ -380,6 +384,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
  	"userEndpoint": "user",
 	"scopes": ["profile"],
 	"idAttribute": "id-attribute",
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -410,7 +415,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_oauth2 SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) = ($1, $2, $3, $4, $5, $6, $7) WHERE (idp_id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates6_oauth2 SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
@@ -419,6 +424,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"user",
 								database.TextArray[string]{"profile"},
 								"id-attribute",
+								true,
 								"idp-id",
 								"instance-id",
 							},
@@ -2117,7 +2123,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootcA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte("certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2166,7 +2172,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_ldap3 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, rootCA, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_ldap2 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, root_ca, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2222,7 +2228,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootcA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte("certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2271,7 +2277,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_ldap3 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, rootCA, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_ldap2 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, root_ca, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2335,7 +2341,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_ldap3 SET base_dn = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates6_ldap2 SET base_dn = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"basedn",
 								"idp-id",
@@ -2369,7 +2375,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootcA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte("certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2413,7 +2419,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_ldap3 SET (servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, rootCA, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23) WHERE (idp_id = $24) AND (instance_id = $25)",
+							expectedStmt: "UPDATE projections.idp_templates6_ldap2 SET (servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, root_ca, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23) WHERE (idp_id = $24) AND (instance_id = $25)",
 							expectedArgs: []interface{}{
 								database.TextArray[string]{"server"},
 								false,
@@ -3081,6 +3087,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
     },
 	"scopes": ["profile"],
 	"idTokenMapping": true,
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -3116,7 +3123,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3124,6 +3131,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"client_id",
 								anyArg{},
 								database.TextArray[string]{"profile"},
+								true,
 								true,
 							},
 						},
@@ -3149,6 +3157,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
     },
 	"scopes": ["profile"],
 	"idTokenMapping": true,
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -3184,7 +3193,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3192,6 +3201,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"client_id",
 								anyArg{},
 								database.TextArray[string]{"profile"},
+								true,
 								true,
 							},
 						},
@@ -3260,6 +3270,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
     },
 	"scopes": ["profile"],
 	"idTokenMapping": true,
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -3290,12 +3301,13 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_oidc SET (client_id, client_secret, issuer, scopes, id_token_mapping) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.idp_templates6_oidc SET (client_id, client_secret, issuer, scopes, id_token_mapping, use_pkce) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
 								"issuer",
 								database.TextArray[string]{"profile"},
+								true,
 								true,
 								"idp-id",
 								"instance-id",
@@ -3810,7 +3822,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -3819,6 +3831,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								anyArg{},
 								database.TextArray[string]{"profile"},
 								true,
+								false,
 							},
 						},
 					},
@@ -3864,7 +3877,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -3873,6 +3886,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								anyArg{},
 								database.TextArray[string]{"profile"},
 								true,
+								false,
 							},
 						},
 					},

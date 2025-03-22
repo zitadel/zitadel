@@ -512,11 +512,13 @@
     "ORG_OWNER": "組織全体に対する権限を持ちます",
     "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
     "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",
+    "ORG_SETTINGS_MANAGER": "組織の設定を管理する権限を持ちます",
     "ORG_USER_PERMISSION_EDITOR": "ユーザーグラントを管理する権限を持ちます",
     "ORG_PROJECT_PERMISSION_EDITOR": "プロジェクトグラントを管理する権限を持ちます",
     "ORG_PROJECT_CREATOR": "所有するプロジェクトと配下の設定を作成する権限を持ちます",
     "ORG_ADMIN_IMPERSONATOR": "組織の管理者およびエンドユーザーになりすます権限がある",
     "ORG_END_USER_IMPERSONATOR": "組織のエンドユーザーになりすます権限がある",
+    "ORG_USER_SELF_MANAGER": "自身を管理する権限がある",
     "PROJECT_OWNER": "特定のプロジェクト全体を管理する権限を持ちます",
     "PROJECT_OWNER_VIEWER": "特定のプロジェクト全体を閲覧する権限を持ちます",
     "PROJECT_OWNER_GLOBAL": "全てのプロジェクトを管理する権限を持ちます",
@@ -787,7 +789,10 @@
       "PHONESECTION": "電話番号",
       "PASSWORDSECTION": "初期パスワード",
       "ADDRESSANDPHONESECTION": "電話番号",
-      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。"
+      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。",
+      "SETUPAUTHENTICATIONLATER": "このユーザーの認証を後で設定します。",
+      "INVITATION": "認証設定とメール確認のための招待メールを送信してください。",
+      "INITIALPASSWORD": "ユーザーの初期パスワードを設定してください。"
     },
     "CODEDIALOG": {
       "TITLE": "電話番号の検証",
@@ -1396,7 +1401,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1487,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 セッション終了",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
+      "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
+      "DISABLEUSERTOKENEVENT": "ユーザートークンイベントを無効にする",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
+      "PERMISSIONCHECKV2": "権限チェック V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
+      "WEBKEY": "ウェブキー",
+      "WEBKEY_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
@@ -1636,7 +1652,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2225,7 +2243,9 @@
       "REMOVED": "正常に削除されました。"
     },
     "ISIDTOKENMAPPING": "IDトークンからのマッピング",
-    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。",
+    "USEPKCE": "PKCEを使用する",
+    "USEPKCE_DESC": "code_challenge パラメータと code_challenge_method パラメータが認証リクエストに含まれるかどうかを決定します。"
   },
   "MFA": {
     "LIST": {
@@ -2608,7 +2628,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

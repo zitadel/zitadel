@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   debounceTime,
@@ -8,25 +8,19 @@ import {
   of,
   Observable,
   shareReplay,
-  firstValueFrom,
   forkJoin,
   ObservedValueOf,
   EMPTY,
   ReplaySubject,
+  TimeoutError,
 } from 'rxjs';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import {
-  containsLowerCaseValidator,
-  containsNumberValidator,
-  containsSymbolValidator,
-  containsUpperCaseValidator,
   emailValidator,
   minLengthValidator,
   passwordConfirmValidator,
@@ -34,16 +28,13 @@ import {
   requiredValidator,
 } from 'src/app/modules/form-field/validators/validators';
 import { LanguagesService } from 'src/app/services/languages.service';
-import { UserService } from 'src/app/services/user.service';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
-import { AddHumanUserRequestSchema } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
-import { create } from '@bufbuild/protobuf';
-import { SetHumanPhoneSchema } from '@zitadel/proto/zitadel/user/v2/phone_pb';
-import { PasswordSchema } from '@zitadel/proto/zitadel/user/v2/password_pb';
-import { SetHumanEmailSchema } from '@zitadel/proto/zitadel/user/v2/email_pb';
-import { FeatureService } from 'src/app/services/feature.service';
-import { catchError, filter, map, startWith, timeout } from 'rxjs/operators';
+import { catchError, map, startWith, timeout } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NewFeatureService } from 'src/app/services/new-feature.service';
+import { PasswordComplexityPolicy } from '@zitadel/proto/zitadel/policy_pb';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
+import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
 
 @Component({
   selector: 'cnsl-user-create',
@@ -51,27 +42,29 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./user-create.component.scss'],
 })
 export class UserCreateComponent implements OnInit {
-  public readonly genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public selected: CountryPhoneCode | undefined = {
+  protected readonly genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
+  protected selected: CountryPhoneCode | undefined = {
     countryCallingCode: '1',
     countryCode: 'US',
     countryName: 'United States of America',
   };
-  public readonly countryPhoneCodes: CountryPhoneCode[];
+  protected readonly countryPhoneCodes: CountryPhoneCode[];
 
-  public loading = false;
+  protected loading = false;
 
   private readonly suffix$ = new ReplaySubject<HTMLSpanElement>(1);
-  @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement>) {
-    this.suffix$.next(suffix.nativeElement);
+  @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement> | undefined) {
+    if (suffix?.nativeElement) {
+      this.suffix$.next(suffix.nativeElement);
+    }
   }
 
-  public usePassword: boolean = false;
-  protected readonly useV2Api$: Observable<boolean>;
+  protected usePassword: boolean = false;
   protected readonly envSuffix$: Observable<string>;
   protected readonly userForm: ReturnType<typeof this.buildUserForm>;
   protected readonly pwdForm$: ReturnType<typeof this.buildPwdForm>;
-  protected readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy.AsObject>;
+  protected readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy | undefined>;
+  protected readonly useV2Api$: Observable<boolean>;
   protected readonly suffixPadding$: Observable<string>;
 
   constructor(
@@ -79,29 +72,24 @@ export class UserCreateComponent implements OnInit {
     private readonly toast: ToastService,
     private readonly fb: FormBuilder,
     private readonly mgmtService: ManagementService,
-    private readonly userService: UserService,
-    public readonly langSvc: LanguagesService,
-    private readonly featureService: FeatureService,
+    private readonly newMgmtService: NewMgmtService,
     private readonly destroyRef: DestroyRef,
     private readonly breadcrumbService: BreadcrumbService,
     protected readonly location: Location,
+    protected readonly langSvc: LanguagesService,
+    private readonly featureService: NewFeatureService,
+    private readonly passwordComplexityValidatorFactory: PasswordComplexityValidatorFactoryService,
     countryCallingCodesService: CountryCallingCodesService,
   ) {
-    this.useV2Api$ = this.getUseV2Api().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.envSuffix$ = this.getEnvSuffix();
     this.suffixPadding$ = this.getSuffixPadding();
     this.passwordComplexityPolicy$ = this.getPasswordComplexityPolicy().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.useV2Api$ = this.getUseV2Api().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.userForm = this.buildUserForm();
     this.pwdForm$ = this.buildPwdForm(this.passwordComplexityPolicy$);
 
     this.countryPhoneCodes = countryCallingCodesService.getCountryCallingCodes();
-  }
-
-  ngOnInit(): void {
-    // already start loading if we should use v2 api
-    this.useV2Api$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-    this.watchPhoneChanges();
 
     this.breadcrumbService.setBreadcrumb([
       new Breadcrumb({
@@ -111,12 +99,8 @@ export class UserCreateComponent implements OnInit {
     ]);
   }
 
-  private getUseV2Api(): Observable<boolean> {
-    return defer(() => this.featureService.getInstanceFeatures(true)).pipe(
-      map((features) => !!features.getConsoleUseV2UserApi()?.getEnabled()),
-      timeout(1000),
-      catchError(() => of(false)),
-    );
+  ngOnInit(): void {
+    this.watchPhoneChanges();
   }
 
   private getEnvSuffix() {
@@ -145,9 +129,8 @@ export class UserCreateComponent implements OnInit {
   }
 
   private getPasswordComplexityPolicy() {
-    return defer(() => this.mgmtService.getPasswordComplexityPolicy()).pipe(
+    return defer(() => this.newMgmtService.getPasswordComplexityPolicy()).pipe(
       map(({ policy }) => policy),
-      filter(Boolean),
       catchError((error) => {
         this.toast.showError(error);
         return EMPTY;
@@ -155,7 +138,20 @@ export class UserCreateComponent implements OnInit {
     );
   }
 
-  public buildUserForm() {
+  private getUseV2Api() {
+    return defer(() => this.featureService.getInstanceFeatures()).pipe(
+      map((features) => features.consoleUseV2UserApi?.enabled ?? false),
+      timeout(1000),
+      catchError((err) => {
+        if (!(err instanceof TimeoutError)) {
+          this.toast.showError(err);
+        }
+        return of(false);
+      }),
+    );
+  }
+
+  private buildUserForm() {
     return this.fb.group({
       email: new FormControl('', { nonNullable: true, validators: [requiredValidator, emailValidator] }),
       userName: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
@@ -166,33 +162,17 @@ export class UserCreateComponent implements OnInit {
       preferredLanguage: new FormControl('', { nonNullable: true }),
       phone: new FormControl('', { nonNullable: true, validators: [phoneValidator] }),
       emailVerified: new FormControl(false, { nonNullable: true }),
-      sendEmail: new FormControl(true, { nonNullable: true }),
-      phoneVerified: new FormControl(false, { nonNullable: true }),
-      sendSms: new FormControl(true, { nonNullable: true }),
     });
   }
 
-  public buildPwdForm(passwordComplexityPolicy$: Observable<PasswordComplexityPolicy.AsObject>) {
+  private buildPwdForm(passwordComplexityPolicy$: Observable<PasswordComplexityPolicy | undefined>) {
     return passwordComplexityPolicy$.pipe(
       map((policy) => {
-        const validators: [ValidatorFn] = [requiredValidator];
-        if (policy.minLength) {
-          validators.push(minLengthValidator(policy.minLength));
-        }
-        if (policy.hasLowercase) {
-          validators.push(containsLowerCaseValidator);
-        }
-        if (policy.hasUppercase) {
-          validators.push(containsUpperCaseValidator);
-        }
-        if (policy.hasNumber) {
-          validators.push(containsNumberValidator);
-        }
-        if (policy.hasSymbol) {
-          validators.push(containsSymbolValidator);
-        }
         return this.fb.group({
-          password: new FormControl('', { nonNullable: true, validators }),
+          password: new FormControl('', {
+            nonNullable: true,
+            validators: this.passwordComplexityValidatorFactory.buildValidators(policy),
+          }),
           confirmPassword: new FormControl('', {
             nonNullable: true,
             validators: [requiredValidator, passwordConfirmValidator()],
@@ -214,15 +194,7 @@ export class UserCreateComponent implements OnInit {
     });
   }
 
-  public async createUser(pwdForm: ObservedValueOf<typeof this.pwdForm$>): Promise<void> {
-    if (await firstValueFrom(this.useV2Api$)) {
-      await this.createUserV2(pwdForm);
-    } else {
-      await this.createUserV1(pwdForm);
-    }
-  }
-
-  public async createUserV1(pwdForm: ObservedValueOf<typeof this.pwdForm$>): Promise<void> {
+  protected async createUser(pwdForm: ObservedValueOf<typeof this.pwdForm$>): Promise<void> {
     this.loading = true;
 
     const controls = this.userForm.controls;
@@ -258,107 +230,6 @@ export class UserCreateComponent implements OnInit {
     try {
       const data = await this.mgmtService.addHumanUser(humanReq);
       this.toast.showInfo('USER.TOAST.CREATED', true);
-      this.router.navigate(['users', data.userId], { queryParams: { new: true } }).then();
-    } catch (error) {
-      this.toast.showError(error);
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  public async createUserV2(pwdForm: ObservedValueOf<typeof this.pwdForm$>): Promise<void> {
-    this.loading = true;
-
-    const controls = this.userForm.controls;
-    const humanReq = create(AddHumanUserRequestSchema, {
-      username: controls.userName.value,
-      profile: {
-        givenName: controls.firstName.value,
-        familyName: controls.lastName.value,
-        nickName: controls.nickName.value,
-        preferredLanguage: controls.preferredLanguage.value,
-        // the enum numbers of v1 gender are the same as v2 gender
-        gender: controls.gender.value as unknown as any,
-      },
-    });
-
-    if (this.usePassword) {
-      const password = create(PasswordSchema, { password: pwdForm.controls.password.value });
-      humanReq.passwordType = { case: 'password', value: password };
-    }
-    if (controls.emailVerified.value) {
-      humanReq.email = create(SetHumanEmailSchema, {
-        email: controls.email.value,
-        verification: {
-          value: true,
-          case: 'isVerified',
-        },
-      });
-    } else {
-      if (controls.sendEmail.value) {
-        humanReq.email = create(SetHumanEmailSchema, {
-          email: controls.email.value,
-          verification: {
-            case: 'sendCode',
-            value: {},
-          },
-        });
-      } else {
-        humanReq.email = create(SetHumanEmailSchema, {
-          email: controls.email.value,
-          verification: {
-            value: false,
-            case: 'isVerified',
-          },
-        });
-      }
-    }
-
-    const phoneNumber = formatPhone(controls.phone.value);
-    if (phoneNumber) {
-      const country = phoneNumber.country;
-      this.selected = this.countryPhoneCodes.find((code) => code.countryCode === country);
-      if (controls.phoneVerified.value) {
-        humanReq.phone = create(SetHumanPhoneSchema, {
-          phone: phoneNumber.phone,
-          verification: {
-            case: 'isVerified',
-            value: true,
-          },
-        });
-      } else {
-        if (controls.sendSms.value) {
-          humanReq.phone = create(SetHumanPhoneSchema, {
-            phone: phoneNumber.phone,
-            verification: {
-              case: 'sendCode',
-              value: {},
-            },
-          });
-        } else {
-          humanReq.phone = create(SetHumanPhoneSchema, {
-            phone: phoneNumber.phone,
-            verification: {
-              case: 'isVerified',
-              value: false,
-            },
-          });
-        }
-      }
-    }
-
-    try {
-      const data = await this.userService.addHumanUser(humanReq);
-      if (this.sendEmailAfterCreation) {
-        await this.userService.passwordReset({
-          userId: data.userId,
-          medium: {
-            case: 'sendLink',
-            value: {},
-          },
-        });
-      }
-      this.toast.showInfo('USER.TOAST.CREATED', true);
       await this.router.navigate(['users', data.userId], { queryParams: { new: true } });
     } catch (error) {
       this.toast.showError(error);
@@ -367,14 +238,7 @@ export class UserCreateComponent implements OnInit {
     }
   }
 
-  public get sendEmailAfterCreation() {
-    const controls = this.userForm.controls;
-
-    const sendEmailAfterCreationIsAOption = controls.emailVerified.value && !this.usePassword;
-    return sendEmailAfterCreationIsAOption && controls.sendEmail.value;
-  }
-
-  public setCountryCallingCode(): void {
+  protected setCountryCallingCode(): void {
     let value = this.userForm.controls.phone.value;
     this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
     value = value.trim();
@@ -382,7 +246,7 @@ export class UserCreateComponent implements OnInit {
     this.userForm.controls.phone.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
   }
 
-  public compareCountries(i1: CountryPhoneCode, i2: CountryPhoneCode) {
+  protected compareCountries(i1: CountryPhoneCode, i2: CountryPhoneCode) {
     return (
       i1 &&
       i2 &&

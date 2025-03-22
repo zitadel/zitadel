@@ -5,19 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import {
-  combineLatestWith,
-  defer,
-  EMPTY,
-  fromEvent,
-  mergeWith,
-  Observable,
-  of,
-  shareReplay,
-  Subject,
-  switchMap,
-  take,
-} from 'rxjs';
+import { defer, EMPTY, fromEvent, mergeWith, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -37,7 +25,7 @@ import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogData, EditDialogResult, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { Gender, HumanProfile, HumanUser, User, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
-import { catchError, filter, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, startWith, withLatestFrom } from 'rxjs/operators';
 import { pairwiseStartWith } from 'src/app/utils/pairwiseStartWith';
 import { NewAuthService } from 'src/app/services/new-auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -47,12 +35,12 @@ import { UserService } from 'src/app/services/user.service';
 import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { query } from '@angular/animations';
 
-type UserQuery = { state: 'success'; value: User } | { state: 'error'; value: string } | { state: 'loading'; value?: User };
+type UserQuery = { state: 'success'; value: User } | { state: 'error'; error: any } | { state: 'loading'; value?: User };
 
 type MetadataQuery =
   | { state: 'success'; value: Metadata[] }
   | { state: 'loading'; value: Metadata[] }
-  | { state: 'error'; value: string };
+  | { state: 'error'; error: any };
 
 type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: HumanUser } };
 
@@ -92,9 +80,9 @@ export class AuthUserDetailComponent implements OnInit {
   protected readonly userName$: Observable<string>;
 
   constructor(
-    public translate: TranslateService,
+    private translate: TranslateService,
     private toast: ToastService,
-    public grpcAuthService: GrpcAuthService,
+    protected grpcAuthService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
     private breadcrumbService: BreadcrumbService,
@@ -111,7 +99,7 @@ export class AuthUserDetailComponent implements OnInit {
     this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.userName$ = this.getUserName(this.user$);
     this.savedLanguage$ = this.getSavedLanguage$(this.user$);
-    this.metadata$ = this.getMetadata$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.metadata$ = this.getMetadata$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
       catchError(() => EMPTY),
@@ -164,7 +152,7 @@ export class AuthUserDetailComponent implements OnInit {
     });
     this.user$.pipe(mergeWith(this.metadata$), takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
       if (query.state == 'error') {
-        this.toast.showError(query.value);
+        this.toast.showError(query.error);
       }
     });
 
@@ -204,26 +192,17 @@ export class AuthUserDetailComponent implements OnInit {
   }
 
   private getMyUser(): Observable<UserQuery> {
-    return defer(() => this.userService.getMyUser()).pipe(
+    return this.userService.user$.pipe(
       map((user) => ({ state: 'success' as const, value: user })),
-      catchError((error) => of({ state: 'error', value: error.message ?? '' } as const)),
+      catchError((error) => of({ state: 'error', error } as const)),
       startWith({ state: 'loading' } as const),
     );
   }
 
-  getMetadata$(user$: Observable<UserQuery>): Observable<MetadataQuery> {
+  getMetadata$(): Observable<MetadataQuery> {
     return this.refreshMetadata$.pipe(
       startWith(true),
-      combineLatestWith(user$),
-      switchMap(([_, user]) => {
-        if (!(user.state === 'success' || user.state === 'loading')) {
-          return EMPTY;
-        }
-        if (!user.value) {
-          return EMPTY;
-        }
-        return this.getMetadataById(user.value.userId);
-      }),
+      switchMap(() => this.getMetadata()),
       pairwiseStartWith(undefined),
       map(([prev, curr]) => {
         if (prev?.state === 'success' && curr.state === 'loading') {
@@ -234,11 +213,11 @@ export class AuthUserDetailComponent implements OnInit {
     );
   }
 
-  private getMetadataById(userId: string): Observable<MetadataQuery> {
-    return defer(() => this.newMgmtService.listUserMetadata(userId)).pipe(
+  private getMetadata(): Observable<MetadataQuery> {
+    return defer(() => this.newAuthService.listMyMetadata()).pipe(
       map((metadata) => ({ state: 'success', value: metadata.result }) as const),
       startWith({ state: 'loading', value: [] as Metadata[] } as const),
-      catchError((err) => of({ state: 'error', value: err.message ?? '' } as const)),
+      catchError((error) => of({ state: 'error', error } as const)),
     );
   }
 

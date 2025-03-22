@@ -2,74 +2,99 @@ package queue
 
 import (
 	"context"
-	"sync"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
-	"github.com/riverqueue/river/rivermigrate"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 )
-
-const (
-	schema          = "queue"
-	applicationName = "zitadel_queue"
-)
-
-var conns = &sync.Map{}
-
-type queueKey struct{}
-
-func WithQueue(parent context.Context) context.Context {
-	return context.WithValue(parent, queueKey{}, struct{}{})
-}
-
-func init() {
-	dialect.RegisterBeforeAcquire(func(ctx context.Context, c *pgx.Conn) error {
-		if _, ok := ctx.Value(queueKey{}).(struct{}); !ok {
-			return nil
-		}
-		_, err := c.Exec(ctx, "SET search_path TO "+schema+"; SET application_name TO "+applicationName)
-		if err != nil {
-			return err
-		}
-		conns.Store(c, struct{}{})
-		return nil
-	})
-	dialect.RegisterAfterRelease(func(c *pgx.Conn) error {
-		_, ok := conns.LoadAndDelete(c)
-		if !ok {
-			return nil
-		}
-		_, err := c.Exec(context.Background(), "SET search_path TO DEFAULT; SET application_name TO "+dialect.DefaultAppName)
-		return err
-	})
-}
 
 // Queue abstracts the underlying queuing library
 // For more information see github.com/riverqueue/river
-// TODO(adlerhurst): maybe it makes more sense to split the effective queue from the migrator.
 type Queue struct {
 	driver riverdriver.Driver[pgx.Tx]
+	client *river.Client[pgx.Tx]
+
+	config      *river.Config
+	shouldStart bool
 }
 
-func New(client *database.DB) *Queue {
-	return &Queue{driver: riverpgxv5.New(client.Pool)}
+type Config struct {
+	Client *database.DB `mapstructure:"-"` // mapstructure is needed if we would like to use viper to configure the queue
 }
 
-func (q *Queue) ExecuteMigrations(ctx context.Context) error {
-	_, err := q.driver.GetExecutor().Exec(ctx, "CREATE SCHEMA IF NOT EXISTS "+schema)
-	if err != nil {
-		return err
+func NewQueue(config *Config) (_ *Queue, err error) {
+	if config.Client.Type() == "cockroach" {
+		return nil, nil
 	}
+	return &Queue{
+		driver: riverpgxv5.New(config.Client.Pool),
+		config: &river.Config{
+			Workers:    river.NewWorkers(),
+			Queues:     make(map[string]river.QueueConfig),
+			JobTimeout: -1,
+		},
+	}, nil
+}
 
-	migrator, err := rivermigrate.New(q.driver, nil)
-	if err != nil {
-		return err
+func (q *Queue) ShouldStart() {
+	if q == nil {
+		return
+	}
+	q.shouldStart = true
+}
+
+func (q *Queue) Start(ctx context.Context) (err error) {
+	if q == nil || !q.shouldStart {
+		return nil
 	}
 	ctx = WithQueue(ctx)
-	_, err = migrator.Migrate(ctx, rivermigrate.DirectionUp, nil)
+
+	q.client, err = river.NewClient(q.driver, q.config)
+	if err != nil {
+		return err
+	}
+
+	return q.client.Start(ctx)
+}
+
+func (q *Queue) AddWorkers(w ...Worker) {
+	if q == nil {
+		logging.Info("skip adding workers because queue is not set")
+		return
+	}
+	for _, worker := range w {
+		worker.Register(q.config.Workers, q.config.Queues)
+	}
+}
+
+type InsertOpt func(*river.InsertOpts)
+
+func WithMaxAttempts(maxAttempts uint8) InsertOpt {
+	return func(opts *river.InsertOpts) {
+		opts.MaxAttempts = int(maxAttempts)
+	}
+}
+
+func WithQueueName(name string) InsertOpt {
+	return func(opts *river.InsertOpts) {
+		opts.Queue = name
+	}
+}
+
+func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...InsertOpt) error {
+	options := new(river.InsertOpts)
+	ctx = WithQueue(ctx)
+	for _, opt := range opts {
+		opt(options)
+	}
+	_, err := q.client.Insert(ctx, args, options)
 	return err
+}
+
+type Worker interface {
+	Register(workers *river.Workers, queues map[string]river.QueueConfig)
 }

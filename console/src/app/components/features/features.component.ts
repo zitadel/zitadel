@@ -1,46 +1,56 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject, Subject } from 'rxjs';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
-import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
-import { Event } from 'src/app/proto/generated/zitadel/event_pb';
-import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { FeatureToggleComponent } from '../feature-toggle/feature-toggle.component';
+import { NewFeatureService } from 'src/app/services/new-feature.service';
 import {
   GetInstanceFeaturesResponse,
-  SetInstanceFeaturesRequest,
-} from '../../proto/generated/zitadel/feature/v2/instance_pb';
-import { withIdentifier } from 'codelyzer/util/astQuery';
+  SetInstanceFeaturesRequestSchema,
+} from '@zitadel/proto/zitadel/feature/v2/instance_pb';
+import { FeatureFlag, Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
 
-enum ToggleState {
+export enum ToggleState {
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED',
-  INHERITED = 'INHERITED',
 }
 
+// TODO: to add a new feature, add the key here and in the FEATURE_KEYS array
+const FEATURE_KEYS: ToggleStateKeys[] = [
+  'actions',
+  'consoleUseV2UserApi',
+  'debugOidcParentError',
+  'disableUserTokenEvent',
+  'enableBackChannelLogout',
+  // 'improvedPerformance',
+  'loginDefaultOrg',
+  // 'loginV2',
+  'oidcLegacyIntrospection',
+  'oidcSingleV1SessionTermination',
+  'oidcTokenExchange',
+  'oidcTriggerIntrospectionProjections',
+  'permissionCheckV2',
+  'userSchema',
+  // 'webKey',
+];
+
 type FeatureState = { source: Source; state: ToggleState };
-type ToggleStates = {
-  loginDefaultOrg?: FeatureState;
-  oidcTriggerIntrospectionProjections?: FeatureState;
-  oidcLegacyIntrospection?: FeatureState;
-  userSchema?: FeatureState;
-  oidcTokenExchange?: FeatureState;
-  actions?: FeatureState;
-  oidcSingleV1SessionTermination?: FeatureState;
-  consoleUseV2UserApi?: FeatureState;
+export type ToggleStateKeys = Exclude<keyof GetInstanceFeaturesResponse, 'details' | '$typeName' | '$unknown'>;
+
+export type ToggleStates = {
+  [key in ToggleStateKeys]: FeatureState;
 };
 
 @Component({
@@ -57,27 +67,24 @@ type ToggleStates = {
     InfoSectionModule,
     MatTooltipModule,
     HasRoleModule,
+    FeatureToggleComponent,
   ],
   standalone: true,
   selector: 'cnsl-features',
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.scss'],
 })
-export class FeaturesComponent implements OnDestroy {
-  private destroy$: Subject<void> = new Subject();
+export class FeaturesComponent {
+  protected featureData: GetInstanceFeaturesResponse | undefined;
 
-  public _loading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public featureData: GetInstanceFeaturesResponse.AsObject | undefined = undefined;
-
-  public toggleStates: ToggleStates | undefined = undefined;
-  public Source: any = Source;
-  public ToggleState: any = ToggleState;
+  protected toggleStates: ToggleStates | undefined;
+  protected Source: any = Source;
+  protected ToggleState: any = ToggleState;
 
   constructor(
-    private featureService: FeatureService,
+    private featureService: NewFeatureService,
     private breadcrumbService: BreadcrumbService,
     private toast: ToastService,
-    private dialog: MatDialog,
   ) {
     const breadcrumbs = [
       new Breadcrumb({
@@ -88,159 +95,57 @@ export class FeaturesComponent implements OnDestroy {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.getFeatures(true);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  public openDialog(event: Event): void {
-    this.dialog.open(DisplayJsonDialogComponent, {
-      data: {
-        event: event,
-      },
-      width: '450px',
-    });
+    this.getFeatures();
   }
 
   public validateAndSave() {
-    this.featureService.resetInstanceFeatures().then(() => {
-      const req = new SetInstanceFeaturesRequest();
-      let changed = false;
+    const req: MessageInitShape<typeof SetInstanceFeaturesRequestSchema> = {
+      actions: this.toggleStates?.actions?.state === ToggleState.ENABLED,
+      consoleUseV2UserApi: this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED,
+      debugOidcParentError: this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED,
+      disableUserTokenEvent: this.toggleStates?.disableUserTokenEvent?.state === ToggleState.ENABLED,
+      enableBackChannelLogout: this.toggleStates?.enableBackChannelLogout?.state === ToggleState.ENABLED,
+      loginDefaultOrg: this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED,
+      oidcLegacyIntrospection: this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED,
+      oidcSingleV1SessionTermination: this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
+      oidcTokenExchange: this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED,
+      oidcTriggerIntrospectionProjections:
+        this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
+      permissionCheckV2: this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED,
+      userSchema: this.toggleStates?.userSchema?.state === ToggleState.ENABLED,
+      // webKey: this.toggleStates?.webKey?.state === ToggleState.ENABLED,
+    };
 
-      console.log(this.toggleStates);
+    this.featureService
+      .setInstanceFeatures(req)
+      .then(() => {
+        this.toast.showInfo('POLICY.TOAST.SET', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
 
-      if (this.toggleStates?.loginDefaultOrg?.state !== ToggleState.INHERITED) {
-        req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.oidcTriggerIntrospectionProjections?.state !== ToggleState.INHERITED) {
-        req.setOidcTriggerIntrospectionProjections(
-          this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
-        );
-        changed = true;
-      }
-      if (this.toggleStates?.oidcLegacyIntrospection?.state !== ToggleState.INHERITED) {
-        req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.userSchema?.state !== ToggleState.INHERITED) {
-        req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.oidcTokenExchange?.state !== ToggleState.INHERITED) {
-        req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.actions?.state !== ToggleState.INHERITED) {
-        req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
-        changed = true;
-      }
-      if (this.toggleStates?.oidcSingleV1SessionTermination?.state !== ToggleState.INHERITED) {
-        req.setOidcSingleV1SessionTermination(
-          this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
-        );
-        changed = true;
-      }
-      req.setConsoleUseV2UserApi(this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED);
-
-      if (changed) {
-        this.featureService
-          .setInstanceFeatures(req)
-          .then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
+  private getFeatures() {
+    this.featureService.getInstanceFeatures().then((instanceFeaturesResponse) => {
+      this.featureData = instanceFeaturesResponse;
+      this.toggleStates = this.createToggleStates(this.featureData);
     });
   }
 
-  private getFeatures(inheritance: boolean) {
-    this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
-      this.featureData = instanceFeaturesResponse.toObject();
-      console.log(this.featureData);
+  private createToggleStates(featureData: GetInstanceFeaturesResponse): ToggleStates {
+    const toggleStates: Partial<ToggleStates> = {};
 
-      this.toggleStates = {
-        loginDefaultOrg: {
-          source: this.featureData.loginDefaultOrg?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.loginDefaultOrg?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcTriggerIntrospectionProjections: {
-          source: this.featureData.oidcTriggerIntrospectionProjections?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcTriggerIntrospectionProjections?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcLegacyIntrospection: {
-          source: this.featureData.oidcLegacyIntrospection?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcLegacyIntrospection?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        userSchema: {
-          source: this.featureData.userSchema?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.userSchema?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcTokenExchange: {
-          source: this.featureData.oidcTokenExchange?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcTokenExchange?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        actions: {
-          source: Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.actions?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.actions?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.actions?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        oidcSingleV1SessionTermination: {
-          source: this.featureData.oidcSingleV1SessionTermination?.source || Source.SOURCE_SYSTEM,
-          state:
-            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_SYSTEM ||
-            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_UNSPECIFIED
-              ? ToggleState.INHERITED
-              : !!this.featureData.oidcSingleV1SessionTermination?.enabled
-                ? ToggleState.ENABLED
-                : ToggleState.DISABLED,
-        },
-        consoleUseV2UserApi: {
-          source: this.featureData.consoleUseV2UserApi?.source || Source.SOURCE_INSTANCE,
-          state: this.featureData.consoleUseV2UserApi?.enabled ? ToggleState.ENABLED : ToggleState.DISABLED,
-        },
+    FEATURE_KEYS.forEach((key) => {
+      // TODO: Fix this type cast as not all keys are present as FeatureFlag
+      const feature = featureData[key] as unknown as FeatureFlag;
+      toggleStates[key] = {
+        source: feature?.source || Source.SYSTEM,
+        state: !!feature?.enabled ? ToggleState.ENABLED : ToggleState.DISABLED,
       };
     });
+
+    return toggleStates as ToggleStates;
   }
 
   public resetSettings(): void {
@@ -249,11 +154,15 @@ export class FeaturesComponent implements OnDestroy {
       .then(() => {
         this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
         setTimeout(() => {
-          this.getFeatures(true);
+          this.getFeatures();
         }, 1000);
       })
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public get toggleStateKeys() {
+    return Object.keys(this.toggleStates ?? {});
   }
 }

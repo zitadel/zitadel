@@ -511,11 +511,13 @@
     "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
     "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
+    "ORG_SETTINGS_MANAGER": "Ha il permesso di gestire le impostazioni dell'organizzazione",
     "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
     "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
     "ORG_ADMIN_IMPERSONATOR": "Ha il permesso per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
     "ORG_END_USER_IMPERSONATOR": "Ha il permesso per rappresentare gli utenti finali dell'organizzazione",
+    "ORG_USER_SELF_MANAGER": "Ha il permesso per gestire il proprio account utente",
     "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
     "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
     "PROJECT_OWNER_GLOBAL": "Ha il permesso per l'intero progetto",
@@ -786,7 +788,10 @@
       "PHONESECTION": "Phone numbers",
       "PASSWORDSECTION": "Password iniziale",
       "ADDRESSANDPHONESECTION": "Numero di telefono",
-      "INITMAILDESCRIPTION": "Se vengono selezionate entrambe le opzioni, non verrà inviata alcuna e-mail per l'inizializzazione. Se solo una delle opzioni viene selezionata, verrà inviata una mail per fornire/verificare i dati."
+      "INITMAILDESCRIPTION": "Se vengono selezionate entrambe le opzioni, non verrà inviata alcuna e-mail per l'inizializzazione. Se solo una delle opzioni viene selezionata, verrà inviata una mail per fornire/verificare i dati.",
+      "SETUPAUTHENTICATIONLATER": "Configura l'autenticazione più tardi per questo utente.",
+      "INVITATION": "Invia un'e-mail di invito per la configurazione dell'autenticazione e la verifica dell'e-mail.",
+      "INITIALPASSWORD": "Imposta una password iniziale per l'utente."
     },
     "CODEDIALOG": {
       "TITLE": "Verificare il numero di telefono",
@@ -1396,7 +1401,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1487,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "Le azioni v2 consentono di gestire le esecuzioni e gli obiettivi dei dati. Se l'indicatore è abilitato, potrai utilizzare la nuova API e le sue funzionalità.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Terminazione sessione",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se il flag è abilitato, sarai in grado di terminare una singola sessione dall'interfaccia utente di accesso fornendo un id_token con una richiesta `sid` come id_token_hint nel punto finale di end_session. Tieni presente che attualmente tutte le sessioni dello stesso agente utente (browser) vengono terminate nell'interfaccia utente di accesso. Le sessioni gestite tramite l'API di sessione consentono già la terminazione di singole sessioni.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se il flag è abilitato, l'errore del genitore OIDC verrà registrato nella console.",
+      "DISABLEUSERTOKENEVENT": "Disabilita evento token utente",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Abilita Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Il Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 e può essere utilizzato per notificare ai client la terminazione della sessione presso il provider OpenID.",
+      "PERMISSIONCHECKV2": "Controllo permessi V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Se il flag è abilitato, potrai utilizzare la nuova API e le sue funzionalità.",
+      "WEBKEY": "Chiave Web",
+      "WEBKEY_DESCRIPTION": "Se il flag è abilitato, potrai utilizzare la nuova API e le sue funzionalità.",
       "STATES": {
         "INHERITED": "Predefinito",
         "ENABLED": "Abilitato",
@@ -1636,7 +1652,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -2205,7 +2223,9 @@
       "REMOVED": "Rimosso con successo."
     },
     "ISIDTOKENMAPPING": "Mappatura dal token ID",
-    "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo."
+    "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo.",
+    "USEPKCE": "Usa PKCE",
+    "USEPKCE_DESC": "Determina se i parametri code_challenge e code_challenge_method sono inclusi nella richiesta di autenticazione"
   },
   "MFA": {
     "LIST": {
@@ -2584,7 +2604,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

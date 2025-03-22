@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/passwap/bcrypt"
 	"github.com/zitadel/passwap/md5"
 	"github.com/zitadel/passwap/md5plain"
+	"github.com/zitadel/passwap/md5salted"
 	"github.com/zitadel/passwap/pbkdf2"
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/verifier"
@@ -43,14 +44,15 @@ func (h *Hasher) EncodingSupported(encodedHash string) bool {
 type HashName string
 
 const (
-	HashNameArgon2   HashName = "argon2"   // used for the common argon2 verifier
-	HashNameArgon2i  HashName = "argon2i"  // hash only
-	HashNameArgon2id HashName = "argon2id" // hash only
-	HashNameBcrypt   HashName = "bcrypt"   // hash and verify
-	HashNameMd5      HashName = "md5"      // verify only, as hashing with md5 is insecure and deprecated
-	HashNameMd5Plain HashName = "md5plain" // verify only, as hashing with md5 is insecure and deprecated
-	HashNameScrypt   HashName = "scrypt"   // hash and verify
-	HashNamePBKDF2   HashName = "pbkdf2"   // hash and verify
+	HashNameArgon2    HashName = "argon2"    // used for the common argon2 verifier
+	HashNameArgon2i   HashName = "argon2i"   // hash only
+	HashNameArgon2id  HashName = "argon2id"  // hash only
+	HashNameBcrypt    HashName = "bcrypt"    // hash and verify
+	HashNameMd5       HashName = "md5"       // verify only, as hashing with md5 is insecure and deprecated
+	HashNameMd5Plain  HashName = "md5plain"  // verify only, as hashing with md5 is insecure and deprecated
+	HashNameMd5Salted HashName = "md5salted" // verify only, as hashing with md5 is insecure and deprecated
+	HashNameScrypt    HashName = "scrypt"    // hash and verify
+	HashNamePBKDF2    HashName = "pbkdf2"    // hash and verify
 )
 
 type HashMode string
@@ -118,6 +120,10 @@ var knowVerifiers = map[HashName]prefixVerifier{
 	HashNamePBKDF2: {
 		prefixes: []string{pbkdf2.Prefix},
 		verifier: pbkdf2.Verifier,
+	},
+	HashNameMd5Salted: {
+		prefixes: []string{md5salted.Prefix},
+		verifier: md5salted.Verifier,
 	},
 }
 

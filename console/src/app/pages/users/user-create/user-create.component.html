@@ -1,4 +1,6 @@
+<cnsl-user-create-v2 *ngIf="(useV2Api$ | async) === true" />
 <cnsl-create-layout
+  *ngIf="(useV2Api$ | async) === false"
   title="{{ 'USER.CREATE.TITLE' | translate }}"
   [createSteps]="1"
   [currentCreateStep]="1"
@@ -51,17 +53,10 @@
           <mat-checkbox class="block-checkbox" formControlName="emailVerified">
             {{ 'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate }}
           </mat-checkbox>
-          <mat-checkbox
-            *ngIf="((useV2Api$ | async) && !usePassword) || !userForm.controls.emailVerified.value"
-            class="block-checkbox"
-            formControlName="sendEmail"
-          >
-            {{ 'USER.PROFILE.SEND_EMAIL' | translate }}
-          </mat-checkbox>
           <mat-checkbox class="block-checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{ standalone: true }">
             {{ 'ORG.PAGES.USEPASSWORD' | translate }}
           </mat-checkbox>
-          <cnsl-info-section *ngIf="(useV2Api$ | async) === false" class="full-width desc">
+          <cnsl-info-section class="full-width desc">
             <span>{{ 'USER.CREATE.INITMAILDESCRIPTION' | translate }}</span>
           </cnsl-info-section>
         </div>
@@ -144,18 +139,6 @@
             <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>
             <input cnslInput formControlName="phone" matTooltip="{{ 'USER.PROFILE.PHONE_HINT' | translate }}" />
           </cnsl-form-field>
-        </div>
-        <div class="phone-is-verified">
-          <mat-checkbox *ngIf="useV2Api$ | async" class="block-checkbox" formControlName="phoneVerified">
-            {{ 'USER.PROFILE.PHONE_VERIFIED' | translate }}
-          </mat-checkbox>
-          <mat-checkbox
-            *ngIf="(useV2Api$ | async) && !userForm.controls.phoneVerified.value"
-            class="block-checkbox"
-            formControlName="sendSms"
-          >
-            {{ 'USER.PROFILE.SEND_SMS' | translate }}
-          </mat-checkbox>
         </div>
       </div>
       <div class="user-create-btn-container">

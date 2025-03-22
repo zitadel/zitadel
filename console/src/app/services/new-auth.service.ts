@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
-import { create } from '@bufbuild/protobuf';
 import {
-  AddMyAuthFactorOTPSMSRequestSchema,
   AddMyAuthFactorOTPSMSResponse,
-  GetMyUserRequestSchema,
+  GetMyPasswordComplexityPolicyResponse,
   GetMyUserResponse,
-  VerifyMyPhoneRequestSchema,
+  ListMyMetadataResponse,
   VerifyMyPhoneResponse,
 } from '@zitadel/proto/zitadel/auth_pb';
 
@@ -17,14 +15,22 @@ export class NewAuthService {
   constructor(private readonly grpcService: GrpcService) {}
 
   public getMyUser(): Promise<GetMyUserResponse> {
-    return this.grpcService.authNew.getMyUser(create(GetMyUserRequestSchema));
+    return this.grpcService.authNew.getMyUser({});
   }
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
-    return this.grpcService.authNew.verifyMyPhone(create(VerifyMyPhoneRequestSchema, { code }));
+    return this.grpcService.authNew.verifyMyPhone({});
   }
 
   public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse> {
-    return this.grpcService.authNew.addMyAuthFactorOTPSMS(create(AddMyAuthFactorOTPSMSRequestSchema));
+    return this.grpcService.authNew.addMyAuthFactorOTPSMS({});
+  }
+
+  public listMyMetadata(): Promise<ListMyMetadataResponse> {
+    return this.grpcService.authNew.listMyMetadata({});
+  }
+
+  public getMyPasswordComplexityPolicy(): Promise<GetMyPasswordComplexityPolicyResponse> {
+    return this.grpcService.authNew.getMyPasswordComplexityPolicy({});
   }
 }

@@ -15,6 +15,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	crewjam_saml "github.com/crewjam/saml"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -23,11 +24,10 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
-	crewjam_saml "github.com/crewjam/saml"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 )
@@ -53,6 +53,24 @@ func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string,
 		Scheme: "http",
 		Host:   host,
 		Path:   successfulIntentOAuthPath(),
+	}
+	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
+		InstanceID: instanceID,
+		IDPID:      idpID,
+		IDPUserID:  idpUserID,
+		UserID:     userID,
+	})
+	if err != nil {
+		return "", "", time.Time{}, uint64(0), err
+	}
+	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
+}
+
+func SuccessfulOIDCIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+	u := url.URL{
+		Scheme: "http",
+		Host:   host,
+		Path:   successfulIntentOIDCPath(),
 	}
 	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
 		InstanceID: instanceID,
@@ -120,6 +138,7 @@ func StartServer(commands *command.Commands) (close func()) {
 		router.HandleFunc(rootPath(ch), fwd.receiveHandler)
 		router.HandleFunc(subscribePath(ch), fwd.subscriptionHandler)
 		router.HandleFunc(successfulIntentOAuthPath(), successfulIntentHandler(commands, createSuccessfulOAuthIntent))
+		router.HandleFunc(successfulIntentOIDCPath(), successfulIntentHandler(commands, createSuccessfulOIDCIntent))
 		router.HandleFunc(successfulIntentSAMLPath(), successfulIntentHandler(commands, createSuccessfulSAMLIntent))
 		router.HandleFunc(successfulIntentLDAPPath(), successfulIntentHandler(commands, createSuccessfulLDAPIntent))
 	}
@@ -158,6 +177,10 @@ func successfulIntentPath() string {
 
 func successfulIntentOAuthPath() string {
 	return path.Join(successfulIntentPath(), "/", "oauth")
+}
+
+func successfulIntentOIDCPath() string {
+	return path.Join(successfulIntentPath(), "/", "oidc")
 }
 
 func successfulIntentSAMLPath() string {
@@ -327,7 +350,7 @@ func successfulIntentHandler(cmd *command.Commands, createIntent func(ctx contex
 }
 
 func createIntent(ctx context.Context, cmd *command.Commands, instanceID, idpID string) (string, error) {
-	writeModel, _, err := cmd.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", instanceID)
+	writeModel, _, err := cmd.CreateIntent(ctx, "", idpID, "https://example.com/success", "https://example.com/failure", instanceID, nil)
 	if err != nil {
 		return "", err
 	}
@@ -335,6 +358,41 @@ func createIntent(ctx context.Context, cmd *command.Commands, instanceID, idpID 
 }
 
 func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	if err != nil {
+		return nil, err
+	}
+	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	if err != nil {
+		return nil, err
+	}
+	idAttribute := "id"
+	idpUser := oauth.NewUserMapper(idAttribute)
+	idpUser.RawInfo = map[string]interface{}{
+		idAttribute:          req.IDPUserID,
+		"preferred_username": "username",
+	}
+	idpSession := &oauth.Session{
+		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+			Token: &oauth2.Token{
+				AccessToken: "accessToken",
+			},
+			IDToken: "idToken",
+		},
+	}
+	token, err := cmd.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &SuccessfulIntentResponse{
+		intentID,
+		token,
+		writeModel.ChangeDate,
+		writeModel.ProcessedSequence,
+	}, nil
+}
+
+func createSuccessfulOIDCIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
 	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
 	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
 	idpUser := openid.NewUser(

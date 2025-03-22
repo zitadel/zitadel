@@ -479,11 +479,13 @@
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
+    "ORG_SETTINGS_MANAGER": "Memiliki izin untuk mengelola pengaturan organisasi",
     "ORG_USER_PERMISSION_EDITOR": "Memiliki izin untuk mengelola izin pengguna",
     "ORG_PROJECT_PERMISSION_EDITOR": "Memiliki izin untuk mengelola hibah proyek",
     "ORG_PROJECT_CREATOR": "Memiliki izin untuk membuat proyeknya sendiri dan pengaturan yang mendasarinya",
     "ORG_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari organisasi",
     "ORG_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari organisasi",
+    "ORG_USER_SELF_MANAGER": "Memiliki izin untuk mengelola pengguna sendiri",
     "PROJECT_OWNER": "Memiliki izin atas keseluruhan proyek",
     "PROJECT_OWNER_VIEWER": "Memiliki izin untuk meninjau keseluruhan proyek",
     "PROJECT_OWNER_GLOBAL": "Memiliki izin atas keseluruhan proyek",
@@ -727,7 +729,10 @@
       "PHONESECTION": "Nomor telepon",
       "PASSWORDSECTION": "Kata Sandi Awal",
       "ADDRESSANDPHONESECTION": "Nomor telepon",
-      "INITMAILDESCRIPTION": "Jika kedua opsi dipilih, tidak ada email untuk inisialisasi yang akan dikirim. Jika hanya salah satu opsi yang dipilih, email untuk menyediakan/memverifikasi data akan dikirim."
+      "INITMAILDESCRIPTION": "Jika kedua opsi dipilih, tidak ada email untuk inisialisasi yang akan dikirim. Jika hanya salah satu opsi yang dipilih, email untuk menyediakan/memverifikasi data akan dikirim.",
+      "SETUPAUTHENTICATIONLATER": "Atur autentikasi nanti untuk pengguna ini.",
+      "INVITATION": "Kirim Email undangan untuk pengaturan autentikasi dan verifikasi Email.",
+      "INITIALPASSWORD": "Tetapkan kata sandi awal untuk pengguna."
     },
     "CODEDIALOG": {
       "TITLE": "Verifikasi Nomor Telepon",
@@ -1274,7 +1279,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1359,6 +1365,15 @@
       "USERSCHEMA_DESCRIPTION": "Skema Pengguna memungkinkan untuk mengelola skema data pengguna. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "ACTIONS": "Tindakan",
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
+      "DISABLEUSERTOKENEVENT": "Disable User Token Event",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
+      "PERMISSIONCHECKV2": "Permission Check V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
+      "WEBKEY": "Web Key",
+      "WEBKEY_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": { "INHERITED": "Mewarisi", "ENABLED": "Diaktifkan", "DISABLED": "Dengan disabilitas" },
       "INHERITED_DESCRIPTION": "Ini menetapkan nilai ke nilai default sistem.",
       "INHERITEDINDICATOR_DESCRIPTION": {
@@ -1501,7 +1516,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -2006,7 +2023,9 @@
       "REMOVED": "Berhasil dihapus."
     },
     "ISIDTOKENMAPPING": "Peta dari token ID",
-    "ISIDTOKENMAPPING_DESC": "Jika dipilih, informasi penyedia akan dipetakan dari token ID, bukan dari titik akhir info pengguna."
+    "ISIDTOKENMAPPING_DESC": "Jika dipilih, informasi penyedia akan dipetakan dari token ID, bukan dari titik akhir info pengguna.",
+    "USEPKCE": "Gunakan PKCE",
+    "USEPKCE_DESC": "Menentukan apakah parameter code_challenge dan code_challenge_method disertakan dalam permintaan autentikasi"
   },
   "MFA": {
     "LIST": {
@@ -2292,7 +2311,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",
