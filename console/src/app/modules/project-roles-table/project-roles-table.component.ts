@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { Role, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -32,6 +32,8 @@ export class ProjectRolesTableComponent implements OnInit {
   @Output() public changedSelection: EventEmitter<Array<string>> = new EventEmitter();
   @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'changeDate', 'actions'];
 
+  public filterOpen: boolean = false;
+  private searchQueries: RoleQuery[] = [];
   constructor(
     private mgmtService: ManagementService,
     private toast: ToastService,
@@ -58,6 +60,8 @@ export class ProjectRolesTableComponent implements OnInit {
       this.grantId,
       this.paginator?.pageIndex ?? 0,
       this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
+      '',
+      this.searchQueries,
     );
   }
 
@@ -137,5 +141,10 @@ export class ProjectRolesTableComponent implements OnInit {
 
   public get selectionAllowed(): boolean {
     return this.displayedColumns.includes('select');
+  }
+
+  public applySearchQuery(searchQueries: RoleQuery[]): void {
+    this.searchQueries = searchQueries;
+    this.loadRolesPage();
   }
 }

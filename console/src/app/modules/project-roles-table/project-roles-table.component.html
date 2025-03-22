@@ -25,7 +25,11 @@
       </div>
     </a>
   </ng-template>
-
+  <cnsl-filter-project-roles
+      actions
+      (filterChanged)="applySearchQuery($any($event))"
+      (filterOpen)="filterOpen = $event"
+    ></cnsl-filter-project-roles>
   <div class="table-wrapper">
     <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">
       <ng-container matColumnDef="select">
