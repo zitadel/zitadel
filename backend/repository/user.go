@@ -13,6 +13,7 @@ import (
 type User struct {
 	ID       string
 	Username string
+	Email    string
 }
 
 type UserOptions struct {
@@ -114,18 +115,18 @@ func (u *user) EmailVerificationCode(ctx context.Context, client database.Querie
 	)(ctx, userID)
 }
 
-func (u *user) EmailVerificationFailed(ctx context.Context, client database.Executor, userID string) error {
+func (u *user) EmailVerificationFailed(ctx context.Context, client database.Executor, code *EmailVerificationCode) error {
 	_, err := tracing.Wrap(u.tracer, "user.EmailVerificationFailed",
 		handler.ErrFuncToHandle(execute(client).EmailVerificationFailed),
-	)(ctx, userID)
+	)(ctx, code)
 
 	return err
 }
 
-func (u *user) EmailVerificationSucceeded(ctx context.Context, client database.Executor, userID string) error {
+func (u *user) EmailVerificationSucceeded(ctx context.Context, client database.Executor, code *EmailVerificationCode) error {
 	_, err := tracing.Wrap(u.tracer, "user.EmailVerificationSucceeded",
 		handler.ErrFuncToHandle(execute(client).EmailVerificationSucceeded),
-	)(ctx, userID)
+	)(ctx, code)
 
 	return err
 }

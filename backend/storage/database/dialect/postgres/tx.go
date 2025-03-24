@@ -44,11 +44,22 @@ func (tx *pgxTx) QueryRow(ctx context.Context, sql string, args ...any) database
 	return tx.Tx.QueryRow(ctx, sql, args...)
 }
 
-// Exec implements [database.Pool].
+// Exec implements [database.Transaction].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
 func (tx *pgxTx) Exec(ctx context.Context, sql string, args ...any) error {
 	_, err := tx.Tx.Exec(ctx, sql, args...)
 	return err
+}
+
+// Begin implements [database.Transaction].
+// As postgres does not support nested transactions we use savepoints to emulate them.
+// TransactionOptions are ignored as savepoints do not support changing isolation levels.
+func (tx *pgxTx) Begin(ctx context.Context, _ *database.TransactionOptions) (database.Transaction, error) {
+	savepoint, err := tx.Tx.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &pgxTx{savepoint}, nil
 }
 
 func transactionOptionsToPgx(opts *database.TransactionOptions) pgx.TxOptions {

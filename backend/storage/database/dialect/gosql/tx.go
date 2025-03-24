@@ -3,6 +3,7 @@ package gosql
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
@@ -47,6 +48,12 @@ func (tx *sqlTx) QueryRow(ctx context.Context, sql string, args ...any) database
 func (tx *sqlTx) Exec(ctx context.Context, sql string, args ...any) error {
 	_, err := tx.Tx.ExecContext(ctx, sql, args...)
 	return err
+}
+
+// Begin implements [database.Transaction].
+// it is unimplemented
+func (tx *sqlTx) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+	return nil, errors.New("nested transactions are not supported")
 }
 
 func transactionOptionsToSql(opts *database.TransactionOptions) *sql.TxOptions {

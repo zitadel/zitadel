@@ -118,6 +118,12 @@ func (tx *Transaction) Exec(ctx context.Context, stmt string, args ...any) error
 	return nil
 }
 
+// Begin implements [database.Transaction].
+// it is unimplemented
+func (tx *Transaction) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+	return nil, errors.New("nested transactions are not supported")
+}
+
 // Query implements [database.Transaction].
 func (tx *Transaction) Query(ctx context.Context, stmt string, args ...any) (database.Rows, error) {
 	e := tx.nextExpecter()

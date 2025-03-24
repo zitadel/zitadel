@@ -45,10 +45,14 @@ func (e *executor) CreateUser(ctx context.Context, user *User) (res *User, err e
 	return user, nil
 }
 
-func (e *executor) EmailVerificationFailed(ctx context.Context, userID string) error {
+func (e *executor) EmailVerificationFailed(ctx context.Context, code *EmailVerificationCode) error {
 	return errors.New("not implemented")
 }
 
-func (e *executor) EmailVerificationSucceeded(ctx context.Context, userID string) error {
+func (e *executor) EmailVerificationSucceeded(ctx context.Context, code *EmailVerificationCode) error {
+	return errors.New("not implemented")
+}
+
+func (e *executor) SetEmail(ctx context.Context, userID, email string) error {
 	return errors.New("not implemented")
 }

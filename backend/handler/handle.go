@@ -14,6 +14,8 @@ type Handle[In, Out any] func(ctx context.Context, in In) (out Out, err error)
 
 type DeferrableHandle[In, Out any] func(ctx context.Context, in In) (out Out, deferrable func(context.Context, error) error, err error)
 
+type Defer[In, Out, NextOut any] func(handle DeferrableHandle[In, Out], next Handle[Out, NextOut]) Handle[In, NextOut]
+
 type HandleNoReturn[In any] func(ctx context.Context, in In) error
 
 // Middleware is a function that decorates the handle function.
@@ -92,6 +94,15 @@ func SkipNext[In, Out any](handle Handle[In, Out], next Handle[In, Out]) Handle[
 func HandleIf[In any](cond func(In) bool, handle Handle[In, In]) Handle[In, In] {
 	return func(ctx context.Context, in In) (out In, err error) {
 		if !cond(in) {
+			return in, nil
+		}
+		return handle(ctx, in)
+	}
+}
+
+func SkipIf[In any](cond func(In) bool, handle Handle[In, In]) Handle[In, In] {
+	return func(ctx context.Context, in In) (out In, err error) {
+		if cond(in) {
 			return in, nil
 		}
 		return handle(ctx, in)
