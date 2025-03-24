@@ -117,7 +117,8 @@ This includes instances for development, production, or user acceptance testing,
 For example, you might create an instance for each product in a B2C scenario, or an instance for each tenant or customer in a B2B scenario.
 The possibilities are endless. You can create your first instance for free.
 
-1. Let’s create an instance. Click on “Create Instance”.
+1. Create an instance.
+by clicking on “Create Instance”.
 
 ![Create Instance](/img/guides/quickstart/create_instance.png)
 
@@ -151,21 +152,21 @@ Because applications are always associated with a project, we'll guide you throu
 
 ![Project Name and Framework/Language](/img/guides/quickstart/create_project_react.png)
 
-3. You will now see an overview of the configuration for the framework you have selected
+3. An overview of the configuration for the framework you have selected is shown
 
 ![Project Configuration Overview - React App](/img/guides/quickstart/project_config_overview_react.png)
 
-For some clarification what the configuration does:
+What the configuration does:
 - We recommend using the [Authentication Code Flow](/docs/apis/openidoauth/grant-types#authorization-code) with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#authorization-code) for secure OIDC configuration. This setup includes specific App, Grant, and Response Types, as well as an Authentication Method. More about the different app types can be found [here](/docs/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
 - The redirect URI is where the ZITADEL authorization server redirects the user after they have been authenticated. The "Redirect URI" is preconfigured to [http://localhost:3000/callback](http://localhost:3000/callback) and the “Post Logout URI” to [http://localhost:3000/](http://localhost:3000/) for the React example
 
-4. Now you will see the detail configuration of your app.
+4. The detailed configuration of your app will be shown
 
 ![Project Name and Framework/Language](/img/guides/quickstart/app_detail_overview_react.png)
 
 ### 5. Add users (optional)
 
-[Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the Obtain ClientId and OIDC endpoints.
+[Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the obtain ClientId and OIDC endpoints.
 
 1. To add users, click on “Users” at the top menu. You will see that the user you already created is listed as a user here. Click on the “New” button to create a new user.
 
