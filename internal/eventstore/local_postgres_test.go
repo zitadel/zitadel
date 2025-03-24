@@ -14,6 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_sql "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
@@ -122,7 +123,7 @@ func (*testDB) DatabaseName() string { return "db" }
 
 func (*testDB) Username() string { return "user" }
 
-func (*testDB) Type() string { return "postgres" }
+func (*testDB) Type() dialect.DatabaseType { return dialect.DatabaseTypePostgres }
 
 func generateCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
 	e := &testEvent{
