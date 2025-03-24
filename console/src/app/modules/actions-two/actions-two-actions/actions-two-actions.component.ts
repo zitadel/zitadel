@@ -52,7 +52,7 @@ export class ActionsTwoActionsComponent implements OnInit {
   }
 
   private getExecutions$(actionsEnabled$: Observable<boolean>) {
-    return defer(() => this.actionService.searchExections({})).pipe(
+    return defer(() => this.actionService.searchExecutions({})).pipe(
       map(({ result }) => result),
       catchError(async (err) => {
         const actionsEnabled = await firstValueFrom(actionsEnabled$);

@@ -14,6 +14,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { TypeSafeCellDefDirective } from './actions-two-targets/actions-two-targets-table/type-safe-cell-def.directive';
 import { ActionsTwoActionsTableComponent } from './actions-two-actions/actions-two-actions-table/actions-two-actions-table.component';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,9 @@ import { ActionsTwoActionsTableComponent } from './actions-two-actions/actions-t
     FormsModule,
     MatButtonModule,
     TableActionsModule,
+    TimestampToDatePipeModule,
     ActionsTwoRoutingModule,
+    LocalizedDatePipeModule,
     ReactiveFormsModule,
     TranslateModule,
     MatTableModule,

@@ -4,19 +4,21 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import {
   CreateTargetRequestSchema,
   CreateTargetResponse,
+  DeleteTargetRequestSchema,
+  DeleteTargetResponse,
   GetTargetResponse,
   ListExecutionFunctionsResponse,
   ListExecutionMethodsResponse,
   ListExecutionServicesResponse,
+  PatchTargetRequestSchema,
+  PatchTargetResponse,
   SearchExecutionsRequestSchema,
   SearchExecutionsResponse,
   SearchTargetsRequestSchema,
   SearchTargetsResponse,
-  SetExecutionRequest,
   SetExecutionRequestSchema,
   SetExecutionResponse,
 } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
-import { SetEmail } from '../proto/generated/zitadel/resources/user/v3alpha/communication_pb';
 
 @Injectable({
   providedIn: 'root',
@@ -36,11 +38,19 @@ export class ActionService {
     return this.grpcService.actionNew.createTarget(req);
   }
 
+  public deleteTarget(req: MessageInitShape<typeof DeleteTargetRequestSchema>): Promise<DeleteTargetResponse> {
+    return this.grpcService.actionNew.deleteTarget(req);
+  }
+
+  public patchTarget(req: MessageInitShape<typeof PatchTargetRequestSchema>): Promise<PatchTargetResponse> {
+    return this.grpcService.actionNew.patchTarget(req);
+  }
+
   public setExecution(req: MessageInitShape<typeof SetExecutionRequestSchema>): Promise<SetExecutionResponse> {
     return this.grpcService.actionNew.setExecution(req);
   }
 
-  public searchExections(req: MessageInitShape<typeof SearchExecutionsRequestSchema>): Promise<SearchExecutionsResponse> {
+  public searchExecutions(req: MessageInitShape<typeof SearchExecutionsRequestSchema>): Promise<SearchExecutionsResponse> {
     return this.grpcService.actionNew.searchExecutions(req);
   }
 

@@ -28,9 +28,21 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.ID' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.NAME' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
           {{ row.config?.name }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="endpoint">
+        <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.ENDPOINT' | translate }}</th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          {{ row.config?.endpoint }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.TABLE.CREATIONDATE' | translate }}</th>
+        <td mat-cell *matCellDef="let row; dataSource: dataSource">
+          <span class="no-break">{{ row.details.created | timestampToDate | localizedDate: 'regular' }}</span>
         </td>
       </ng-container>
       <!-- <ng-container matColumnDef="type">
@@ -56,8 +68,8 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="['id', 'name', 'actions']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'actions']"></tr>
+      <tr mat-header-row *matHeaderRowDef="['name', 'endpoint', 'creationDate', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['name', 'endpoint', 'creationDate', 'actions']"></tr>
     </table>
   </div>
 </cnsl-refresh-table>
