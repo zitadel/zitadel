@@ -18,7 +18,7 @@ export class NewAuthService {
   }
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
-    return this.grpcService.authNew.verifyMyPhone({});
+    return this.grpcService.authNew.verifyMyPhone({ code });
   }
 
   public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse> {
