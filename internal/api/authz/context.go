@@ -18,11 +18,11 @@ import (
 type key int
 
 const (
-	requestPermissionsKey  key = 1
-	dataKey                key = 2
-	allPermissionsKey      key = 3
-	instanceKey            key = 4
-	systemUserRolesFuncKey key = 5
+	requestPermissionsKey key = 1
+	dataKey               key = 2
+	allPermissionsKey     key = 3
+	instanceKey           key = 4
+	systemUserRolesKey    key = 5
 )
 
 type CtxData struct {
