@@ -21,24 +21,42 @@
           </span>
         </td>
       </ng-container> -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.ID' | translate }}</th>
+      <!-- <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
           {{ row.details?.id }}
         </td>
-      </ng-container>
+      </ng-container> -->
       <ng-container matColumnDef="condition">
-        <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.ID' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.CONDITION' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
           {{ row?.condition | json }}
         </td>
       </ng-container>
-      <!-- <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.TYPE.TITLE' | translate }}</th>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TYPE' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row.key.case | uppercase }}
+          {{ row?.condition | json }}
         </td>
-      </ng-container> -->
+      </ng-container>
+
+      <ng-container matColumnDef="target">
+        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TARGET' | translate }}</th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          {{ row?.condition | json }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'ACTIONSTWO.EXECUTION.TABLE.CREATIONDATE' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let row; dataSource: dataSource">
+          <span class="no-break">{{ row.details.created | timestampToDate | localizedDate: 'regular' }}</span>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="actions" stickyEnd>
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
@@ -56,8 +74,8 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="['id', 'condition', 'actions']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['id', 'condition', 'actions']"></tr>
+      <tr mat-header-row *matHeaderRowDef="['condition', 'type', 'target', 'creationDate', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['condition', 'type', 'target', 'creationDate', 'actions']"></tr>
     </table>
   </div>
 </cnsl-refresh-table>

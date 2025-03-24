@@ -22,6 +22,9 @@ export class ActionsTwoTargetsTableComponent {
     this.targets$.next(targets);
   }
 
+  @Output()
+  public readonly selected = new EventEmitter<GetTarget>();
+
   private readonly targets$ = new ReplaySubject<GetTarget[] | null>(1);
   protected readonly dataSource$ = this.targets$.pipe(
     filter(Boolean),

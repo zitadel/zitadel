@@ -1,17 +1,20 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
-import { defer, firstValueFrom, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
+import { defer, firstValueFrom, merge, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
 import { ActionService } from 'src/app/services/action.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ORGANIZATIONS } from '../../settings-list/settings';
-import { catchError, map, tap, timeout } from 'rxjs/operators';
+import { catchError, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
 import { GetTarget } from '@zitadel/proto/zitadel/resources/action/v3alpha/target_pb';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionTwoAddTargetDialogComponent } from '../actions-two-add-target/actions-two-add-target-dialog.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { CreateTargetRequestSchema } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
+import {
+  CreateTargetRequestSchema,
+  PatchTargetRequestSchema,
+} from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
 
 @Component({
   selector: 'cnsl-actions-two-targets',
@@ -54,11 +57,12 @@ export class ActionsTwoTargetsComponent implements OnInit {
   }
 
   private getTargets$(actionsEnabled$: Observable<boolean>) {
-    return defer(() => this.actionService.searchTargets({})).pipe(
-      map(({ result }) => result),
-      tap((targets) => {
-        console.log(targets);
+    return this.refresh.pipe(
+      startWith(true),
+      switchMap(() => {
+        return this.actionService.searchTargets({});
       }),
+      map(({ result }) => result),
       catchError(async (err) => {
         const actionsEnabled = await firstValueFrom(actionsEnabled$);
         if (actionsEnabled) {
@@ -82,18 +86,40 @@ export class ActionsTwoTargetsComponent implements OnInit {
     );
   }
 
-  public openDialog(): void {
+  public async deleteTarget(target: GetTarget) {
+    this.actionService.deleteTarget({ id: target.details?.id });
+    setTimeout(() => {
+      this.refresh.next(true);
+    }, 1000);
+  }
+
+  public openDialog(target?: GetTarget): void {
     const ref = this.dialog.open(ActionTwoAddTargetDialogComponent, {
       width: '400px',
-      data: {},
+      data: target
+        ? {
+            target: target,
+          }
+        : {},
     });
 
-    ref.afterClosed().subscribe((resp: MessageInitShape<typeof CreateTargetRequestSchema>) => {
-      if (resp) {
-        this.actionService.createTarget(resp);
+    ref.afterClosed().subscribe((dialogResponse) => {
+      if (target?.details?.id && dialogResponse) {
+        const req: MessageInitShape<typeof PatchTargetRequestSchema> = dialogResponse;
+
+        this.actionService.patchTarget({ ...req, id: target.details?.id });
+        setTimeout(() => {
+          this.refresh.next(true);
+        }, 1000);
+      }
+      if (dialogResponse) {
+        const req: MessageInitShape<typeof CreateTargetRequestSchema> = dialogResponse;
+
+        this.actionService.createTarget(req);
+        setTimeout(() => {
+          this.refresh.next(true);
+        }, 1000);
       }
     });
   }
-
-  public deleteTarget(target: GetTarget) {}
 }

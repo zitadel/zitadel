@@ -548,6 +548,12 @@
           "DESCRIPTION": "The target you want to execute for this action",
           "ADD_ANOTHER": "Add another target"
         }
+      },
+      "TABLE": {
+        "CONDITION": "Name",
+        "TYPE": "Endpoint",
+        "TARGET": "Creation Date",
+        "CREATIONDATE": "Creation Date"
       }
     },
     "TARGET": {
@@ -566,6 +572,11 @@
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop all executions when the targets returns with an error",
         "AWAIT_RESPONSE": "Await Response",
         "AWAIT_RESPONSE_DESCRIPTION": "We'll Wait for a response before we do anything else. Useful if you intend to use multiple targets for a single action"
+      },
+      "TABLE": {
+        "NAME": "Name",
+        "ENDPOINT": "Endpoint",
+        "CREATIONDATE": "Creation Date"
       }
     }
   },
