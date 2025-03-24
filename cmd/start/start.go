@@ -311,9 +311,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		eventstoreClient.EventTypes(),
 		q,
 	)
-	// set here to use the same base as in the handling
-	commands.EventExisting = checkExisting(eventstoreClient.EventTypes())
-	commands.EventGroupExisting = checkExistingGroup(eventstoreClient.EventTypes())
 	execution.Start(ctx)
 
 	if err = q.Start(ctx); err != nil {

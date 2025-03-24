@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -177,11 +179,18 @@ func StartCommands(
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
 		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
-		EventExisting:                   func(event string) bool { return false },
-		EventGroupExisting:              func(group string) bool { return false },
-		GrpcServiceExisting:             func(service string) bool { return false },
-		GrpcMethodExisting:              func(method string) bool { return false },
-		ActionFunctionExisting:          domain.ActionFunctionExists(),
+		EventExisting: func(value string) bool {
+			return slices.Contains(es.EventTypes(), value)
+		},
+		EventGroupExisting: func(group string) bool {
+			return slices.ContainsFunc(es.EventTypes(), func(value string) bool {
+				return strings.HasPrefix(value, group)
+			},
+			)
+		},
+		GrpcServiceExisting:    func(service string) bool { return false },
+		GrpcMethodExisting:     func(method string) bool { return false },
+		ActionFunctionExisting: domain.ActionFunctionExists(),
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
 				CryptoMFA: otpEncryption,
