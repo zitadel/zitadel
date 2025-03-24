@@ -13,34 +13,39 @@ import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx
 
 Follow the [Knative quickstart guide](https://knative.dev/docs/getting-started/quickstart-install/) to get a local kind/minikube environment with Knative capabilities.
 
-## Run CockroachDB
+For example, to install Knative on a kind cluster, run `kn quickstart kind`.
 
-Start a single-node cockroachdb as statefulset
+## Run PostgreSQL
+
+If you are following the Knative Tutorial, you can deploy Postgres as a StatefulSet for the tutorials Bookstore sample app. For example:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/knative/cockroachdb-statefulset-single-node.yaml
+git clone https://github.com/knative/docs.git
+kubectl apply -f docs/code-samples/eventing/bookstore-sample-app/solution/db-service/
 ```
 
-## Start ZITADEL
-
-### Knative Command
+## Start Zitadel as a Knative Service
 
 ```bash
 kn service create zitadel \
 --image ghcr.io/zitadel/zitadel:latest \
 --port 8080 \
---env ZITADEL_DATABASE_COCKROACH_HOST=cockroachdb \
+--env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
 --env ZITADEL_EXTERNALSECURE=false \
 --env ZITADEL_EXTERNALPORT=80 \
 --env ZITADEL_TLS_ENABLED=false \
---env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
---arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters"
-```
-
-### Knavite yaml
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/knative/zitadel-knative-service.yaml
+--env ZITADEL_DATABASE_POSTGRES_HOST=postgresql \
+--env ZITADEL_DATABASE_POSTGRES_PORT=5432 \
+--env ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
+--env ZITADEL_DATABASE_POSTGRES_USER_USERNAME=myzitadeluser \
+--env ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=myzitadelpassword \
+--env ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable \
+--env ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=myuser \
+--env ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=mypassword \
+--env ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable \
+--env ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED=false \
+--env ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MFAINITSKIPLIFETIME="0s" \
+--arg "start-from-init" --arg "--masterkey=MasterkeyNeedsToHave32Characters"
 ```
 
 ## Access ZITADEL
@@ -54,17 +59,9 @@ NAME      URL                                         LATEST          AGE   COND
 zitadel   http://zitadel.default.127.0.0.1.sslip.io   zitadel-00001   10m   3 OK / 3     True
 ```
 
-Add the console path to the URL and open in browser
-http://zitadel.default.127.0.0.1.sslip.io/ui/console
-
-If you didn't configure something else, this is the default IAM admin users login:
-
-* username: zitadel-admin@<span></span>zitadel.zitadel.default.127.0.0.1.sslip.io
-* password: Password1!
+Open your browser at http://zitadel.default.127.0.0.1.sslip.io/ui/console?login_hint=zitadel-admin@zitadel.zitadel.default.127.0.0.1.sslip.io and use the initial password _Password1!_
 
 <NoteInstanceNotFound/>
 
-## VideoGuide
-<iframe width="100%" height="315" src="https://www.youtube.com/embed/m3TXmz3cK7E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <Next components={props.components} />
 <Disclaimer components={props.components} />
