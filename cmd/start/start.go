@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"slices"
-	"strings"
 	"syscall"
 	"time"
 
@@ -671,14 +670,5 @@ func showBasicInformation(startConfig *Config) {
 func checkExisting(values []string) func(string) bool {
 	return func(value string) bool {
 		return slices.Contains(values, value)
-	}
-}
-
-func checkExistingGroup(values []string) func(string) bool {
-	return func(group string) bool {
-		return slices.ContainsFunc(values, func(value string) bool {
-			return strings.HasPrefix(value, group)
-		},
-		)
 	}
 }
