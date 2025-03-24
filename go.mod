@@ -1,6 +1,6 @@
 module github.com/zitadel/zitadel
 
-go 1.23.4
+go 1.23.7
 
 require (
 	cloud.google.com/go/profiler v0.4.1
@@ -25,8 +25,8 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/fatih/color v1.17.0
 	github.com/gabriel-vasile/mimetype v1.4.4
-	github.com/go-chi/chi/v5 v5.1.0
-	github.com/go-jose/go-jose/v4 v4.0.4
+	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/goccy/go-json v0.10.3
@@ -67,14 +67,14 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
-	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/twilio/twilio-go v1.22.2
-	github.com/zitadel/logging v0.6.1
-	github.com/zitadel/oidc/v3 v3.32.0
-	github.com/zitadel/passwap v0.6.0
+	github.com/zitadel/exifremove v0.1.0
+	github.com/zitadel/logging v0.6.2
+	github.com/zitadel/oidc/v3 v3.36.1
+	github.com/zitadel/passwap v0.7.0
 	github.com/zitadel/saml v0.3.4
-	github.com/zitadel/schema v1.3.0
+	github.com/zitadel/schema v1.3.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
 	go.opentelemetry.io/otel v1.29.0
@@ -86,12 +86,12 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.29.0
 	go.opentelemetry.io/otel/trace v1.29.0
 	go.uber.org/mock v0.5.0
-	golang.org/x/crypto v0.31.0
+	golang.org/x/crypto v0.36.0
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
-	golang.org/x/net v0.33.0
-	golang.org/x/oauth2 v0.23.0
-	golang.org/x/sync v0.11.0
-	golang.org/x/text v0.21.0
+	golang.org/x/net v0.37.0
+	golang.org/x/oauth2 v0.26.0
+	golang.org/x/sync v0.12.0
+	golang.org/x/text v0.23.0
 	google.golang.org/api v0.187.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240822170219-fc7c04adadcd
 	google.golang.org/grpc v1.65.0
@@ -104,7 +104,7 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.0 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
-	github.com/bmatcuk/doublestar/v4 v4.7.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -173,9 +173,9 @@ require (
 	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
-	github.com/go-xmlfmt/xmlfmt v1.1.2 // indirect
+	github.com/go-xmlfmt/xmlfmt v1.1.3 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
-	github.com/golang/geo v0.0.0-20230421003525-6adc56603217 // indirect
+	github.com/golang/geo v0.0.0-20250319145452-ed1c8b99c3d7 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/uuid v1.6.0
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
@@ -216,7 +216,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.29.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-	golang.org/x/sys v0.28.0
+	golang.org/x/sys v0.31.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
