@@ -67,8 +67,7 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 		}
 	}
 
-	aggReducers := make([]handler.AggregateReducer, len(aggList))
-	i := 0
+	aggReducers := make([]handler.AggregateReducer, 0, len(aggList))
 	for aggType, aggEventTypes := range aggList {
 		eventReducers := make([]handler.EventReducer, len(aggEventTypes))
 		for j, eventType := range aggEventTypes {
@@ -77,11 +76,10 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 				Reduce: u.reduce,
 			}
 		}
-		aggReducers[i] = handler.AggregateReducer{
+		aggReducers = append(aggReducers, handler.AggregateReducer{
 			Aggregate:     aggType,
 			EventReducers: eventReducers,
-		}
-		i++
+		})
 	}
 	return aggReducers
 }

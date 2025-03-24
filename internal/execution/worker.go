@@ -20,6 +20,9 @@ type Worker struct {
 	now    nowFunc
 }
 
+// Timeout implements the Timeout-function of [river.Worker].
+// Maximum time a job can run before the context gets cancelled.
+// The time can be shorter than the sum of target timeouts, this is expected behavior to not block the request indefinitely.
 func (w *Worker) Timeout(*river.Job[*exec_repo.Request]) time.Duration {
 	return w.config.TransactionDuration
 }

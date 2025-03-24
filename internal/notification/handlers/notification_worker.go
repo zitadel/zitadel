@@ -37,6 +37,8 @@ type NotificationWorker struct {
 	now      nowFunc
 }
 
+// Timeout implements the Timeout-function of [river.Worker].
+// Maximum time a job can run before the context gets cancelled.
 func (w *NotificationWorker) Timeout(*river.Job[*notification.Request]) time.Duration {
 	return w.config.TransactionDuration
 }
