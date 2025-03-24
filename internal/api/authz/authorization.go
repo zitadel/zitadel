@@ -155,11 +155,11 @@ func addGetSystemUserRolesToCtx(ctx context.Context, systemUserRoleMap []RoleMap
 		systemUserPermissions[i].AggregateID = systemPerm.AggregateID
 		systemUserPermissions[i].Permissions = permissions
 	}
-	return context.WithValue(ctx, systemUserRolesFuncKey, systemUserPermissions)
+	return context.WithValue(ctx, systemUserRolesKey, systemUserPermissions)
 }
 
 func GetSystemUserPermissions(ctx context.Context) []SystemUserPermissionsDBQuery {
-	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesFuncKey)
+	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesKey)
 	if getSystemUserRolesFuncValue == nil {
 		return nil
 	}
