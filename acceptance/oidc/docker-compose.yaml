@@ -1,22 +1,22 @@
 services:
-  samlsp:
+  oidcrp:
     image: golang:1.24-alpine
-    container_name: samlsp
+    container_name: oidcrp
     command: go run main.go
     environment:
       API_URL: 'http://localhost:8080'
       API_DOMAIN: 'localhost:8080'
       PAT_FILE: '/pat/zitadel-admin-sa.pat'
       LOGIN_URL: 'http://localhost:3000'
-      IDP_URL: 'http://localhost:3000/saml/v2/metadata'
+      ISSUER: 'http://localhost:3000'
       HOST: 'http://localhost'
-      PORT: '8001'
-    working_dir: /saml
+      PORT: '8000'
+      SCOPES: 'openid profile email'
+    working_dir: /oidc
     ports:
-      - 8001:8001
+      - 8000:8000
     volumes:
       - "../pat:/pat"
-      - "./:/saml"
+      - "./:/oidc"
     extra_hosts:
       - "localhost:host-gateway"
-

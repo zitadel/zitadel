@@ -1,14 +1,25 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
-	"flag"
+	"encoding/base64"
+	"encoding/json"
+	"encoding/xml"
+	"errors"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
+	"time"
 
 	"github.com/crewjam/saml/samlsp"
 )
@@ -80,13 +91,25 @@ func hello(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	idpURL := flag.String("idp", "http://localhost:3000/saml/v2/metadata", "url to idp metadata, proxied through typescript")
-	host := flag.String("host", "http://localhost", "url for sp")
-	port := flag.String("port", "8001", "port for sp")
+	apiURL := os.Getenv("API_URL")
+	patFile := os.Getenv("PAT_FILE")
+	domain := os.Getenv("API_DOMAIN")
+	loginURL := os.Getenv("LOGIN_URL")
+	idpURL := os.Getenv("IDP_URL")
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
 
-	flag.Parse()
+	f, err := os.Open(patFile)
+	if err != nil {
+		panic(err)
+	}
+	pat, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	patStr := strings.Trim(string(pat), "\n")
 
-	idpMetadataURL, err := url.Parse(*idpURL)
+	idpMetadataURL, err := url.Parse(idpURL)
 	if err != nil {
 		panic(err)
 	}
@@ -96,7 +119,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("idpMetadata: %+v\n", idpMetadata)
-	rootURL, err := url.Parse(*host + ":" + *port)
+	rootURL, err := url.Parse(host + ":" + port)
 	if err != nil {
 		panic(err)
 	}
@@ -111,8 +134,136 @@ func main() {
 		panic(err)
 	}
 
+	server := &http.Server{
+		Addr: ":" + port,
+	}
 	app := http.HandlerFunc(hello)
 	http.Handle("/hello", samlSP.RequireAccount(app))
 	http.Handle("/saml/", samlSP)
-	http.ListenAndServe(":"+*port, nil)
+	go func() {
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+		log.Println("Stopped serving new connections.")
+	}()
+
+	metadata, err := xml.MarshalIndent(samlSP.ServiceProvider.Metadata(), "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	if err := createZitadelResources(apiURL, patStr, domain, metadata, loginURL); err != nil {
+		panic(err)
+	}
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+
+	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownRelease()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("HTTP shutdown error: %v", err)
+	}
+}
+
+func createZitadelResources(apiURL, pat, domain string, metadata []byte, loginURL string) error {
+	projectID, err := CreateProject(apiURL, pat, domain)
+	if err != nil {
+		return err
+	}
+	return CreateApp(apiURL, pat, domain, projectID, metadata, loginURL)
+}
+
+type project struct {
+	ID string `json:"id"`
+}
+type createProject struct {
+	Name                   string `json:"name"`
+	ProjectRoleAssertion   bool   `json:"projectRoleAssertion"`
+	ProjectRoleCheck       bool   `json:"projectRoleCheck"`
+	HasProjectCheck        bool   `json:"hasProjectCheck"`
+	PrivateLabelingSetting string `json:"privateLabelingSetting"`
+}
+
+func CreateProject(apiURL, pat, domain string) (string, error) {
+	createProject := &createProject{
+		Name:                   "SAML",
+		ProjectRoleAssertion:   false,
+		ProjectRoleCheck:       false,
+		HasProjectCheck:        false,
+		PrivateLabelingSetting: "PRIVATE_LABELING_SETTING_UNSPECIFIED",
+	}
+	body, err := json.Marshal(createProject)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := doRequestWithHeaders(apiURL+"/management/v1/projects", pat, domain, body)
+	if err != nil {
+		return "", err
+	}
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	p := new(project)
+	if err := json.Unmarshal(data, p); err != nil {
+		return "", err
+	}
+	return p.ID, nil
+}
+
+type createApp struct {
+	Name         string  `json:"name"`
+	MetadataXml  string  `json:"metadataXml"`
+	LoginVersion version `json:"loginVersion"`
+}
+type version struct {
+	LoginV2 loginV2 `json:"loginV2"`
+}
+type loginV2 struct {
+	BaseUri string `json:"baseUri"`
+}
+
+func CreateApp(apiURL, pat, domain, projectID string, spMetadata []byte, loginURL string) error {
+	encoded := make([]byte, base64.URLEncoding.EncodedLen(len(spMetadata)))
+	base64.URLEncoding.Encode(encoded, spMetadata)
+
+	createApp := &createApp{
+		Name:        "SAML",
+		MetadataXml: string(encoded),
+		LoginVersion: version{
+			LoginV2: loginV2{
+				BaseUri: loginURL,
+			},
+		},
+	}
+	body, err := json.Marshal(createApp)
+	if err != nil {
+		return err
+	}
+
+	_, err = doRequestWithHeaders(apiURL+"/management/v1/projects/"+projectID+"/apps/saml", pat, domain, body)
+	return err
+}
+
+func doRequestWithHeaders(apiURL, pat, domain string, body []byte) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodPost, apiURL, io.NopCloser(bytes.NewReader(body)))
+	if err != nil {
+		return nil, err
+	}
+	values := http.Header{}
+	values.Add("Authorization", "Bearer "+pat)
+	values.Add("x-forwarded-host", domain)
+	values.Add("Content-Type", "application/json")
+	req.Header = values
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
