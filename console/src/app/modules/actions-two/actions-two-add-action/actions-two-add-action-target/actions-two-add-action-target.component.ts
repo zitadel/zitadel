@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EMPTY, Observable, catchError, defer, map, of, shareReplay } from 'rxjs';
+import { EMPTY, Observable, catchError, defer, map, of, shareReplay, startWith, tap } from 'rxjs';
 import { ExecutionType } from '../actions-two-add-action-type/actions-two-add-action-type.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
@@ -33,10 +33,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   ],
 })
 export class ActionsTwoAddActionTargetComponent implements OnInit {
-  public ExecutionType = ExecutionType;
   protected readonly targetForm: ReturnType<typeof this.buildActionTargetForm> = this.buildActionTargetForm();
 
   @Output() public continue: EventEmitter<void> = new EventEmitter();
+  @Output() public targetChanges$: Observable<string>;
+
   // @Output() public conditionChanges$: Observable<RequestExecution | ResponseExecution | FunctionExecution | EventExecution>;
 
   public readonly executionTargets$: Observable<string[] | undefined> = of(undefined);
@@ -47,15 +48,18 @@ export class ActionsTwoAddActionTargetComponent implements OnInit {
     private toast: ToastService,
   ) {
     this.executionTargets$ = this.listExecutionTargets().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+
+    this.targetChanges$ = this.targetForm.get('service')!.valueChanges.pipe(
+      map((value) => value ?? ''),
+      tap((value) => console.log('target type changed:', value)),
+    );
   }
 
   public ngOnInit(): void {}
 
   public buildActionTargetForm() {
     return this.fb.group({
-      all: new FormControl<boolean>(true),
       service: new FormControl<string>(''),
-      method: new FormControl<string>(''),
     });
   }
 

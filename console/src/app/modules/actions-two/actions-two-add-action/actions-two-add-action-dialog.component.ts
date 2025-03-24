@@ -19,6 +19,7 @@ import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/acti
 import { ActionsTwoAddActionConditionComponent } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
 import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
+import { forkJoin, map, merge, Observable, of } from 'rxjs';
 
 enum Page {
   Type,
@@ -44,10 +45,12 @@ enum Page {
 export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   public Page = Page;
   @ViewChild('actionTypeComponent') actionTypeComponent!: ActionsTwoAddActionTypeComponent;
+  @ViewChild('actionConditionComponent') actionConditionComponent!: ActionsTwoAddActionConditionComponent;
+  @ViewChild('actionTargetComponent') actionTargetComponent!: ActionsTwoAddActionTargetComponent;
 
   public page = signal<Page | undefined>(Page.Type);
   public executionType = signal<ExecutionType>(ExecutionType.REQUEST);
-  private readonly request: MessageInitShape<typeof SetExecutionRequestSchema> = {};
+  private request$: Observable<MessageInitShape<typeof SetExecutionRequestSchema>> = of({});
 
   constructor(
     public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>,
@@ -58,6 +61,20 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
     this.actionTypeComponent?.typeChanges$.subscribe((type) => {
       console.log('Execution type changed:', type);
     });
+
+    this.request$ = forkJoin({
+      type: this.actionTypeComponent?.typeChanges$,
+      condition: this.actionConditionComponent.conditionChanges$,
+      target: this.actionTargetComponent.targetChanges$,
+    }).pipe(
+      map(({ type, condition, target }) => {
+        const req: MessageInitShape<typeof SetExecutionRequestSchema> = {
+          condition: {},
+          execution: {},
+        };
+        return req;
+      }),
+    );
   }
 
   public continue() {
@@ -83,7 +100,7 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   }
 
   public closeWithResult() {
-    this.dialogRef.close(this.request);
+    this.dialogRef.close();
   }
 
   public onTypeChanged(type: ExecutionType): void {

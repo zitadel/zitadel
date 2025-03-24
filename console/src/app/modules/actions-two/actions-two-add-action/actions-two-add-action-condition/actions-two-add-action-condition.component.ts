@@ -55,6 +55,8 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
   public readonly executionMethods$: Observable<string[] | undefined> = of(undefined);
   public readonly executionFunctions$: Observable<string[] | undefined> = of(undefined);
 
+  public readonly conditionChanges$: Observable<string[] | undefined> = of(undefined);
+
   constructor(
     private readonly fb: FormBuilder,
     private actionService: ActionService,
@@ -62,6 +64,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
   ) {
     // Initialize the Observable to emit form value changes
     // this.conditionChanges$ = this.conditionForm!.valueChanges.pipe(
+    //   startWith(this.conditionForm!.value), // Emit the initial value
     //   tap((value) => console.log('ExecutionType changed:', value)), // Debugging/logging
     // );
     this.executionServices$ = this.listExecutionServices().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
