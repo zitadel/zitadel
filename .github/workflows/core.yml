@@ -3,9 +3,6 @@ name: Build core
 on: 
   workflow_call:
     inputs:
-      go_version:
-        required: true
-        type: string
       buf_version:
         required: true
         type: string
@@ -70,7 +67,7 @@ jobs:
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/setup-go@v5
           with:
-            go-version: ${{ inputs.go_version }}
+            go-version-file: 'go.mod'
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           run: make core_build
