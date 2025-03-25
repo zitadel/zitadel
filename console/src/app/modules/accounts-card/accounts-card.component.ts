@@ -75,26 +75,21 @@ export class AccountsCardComponent {
               }),
             );
           } else {
-            const fingerprintId = '123';
-
             return defer(() =>
               this.sessionService
                 .listSessions({
                   queries: [
-                    // {
-                    //   query: {
-                    //     case: 'userAgentQuery',
-                    //     value: {
-                    //       fingerprintId,
-                    //     },
-                    //   },
-                    // },
+                    {
+                      query: {
+                        case: 'userAgentQuery',
+                        value: {},
+                      },
+                    },
                   ],
                 })
                 .then((sessions) => {
                   return sessions.sessions
                     .filter((s) => {
-                      console.log(this.user);
                       return s.factors?.user?.loginName !== this.user?.preferredLoginName;
                     })
                     .map((s) => {
@@ -119,12 +114,12 @@ export class AccountsCardComponent {
 
   private getUseLoginV2() {
     return defer(() => this.featureService.getInstanceFeatures()).pipe(
-      map(({ loginV2 }) => loginV2),
+      map((features) => {
+        return features.loginV2;
+      }),
       timeout(1000),
       catchError((err) => {
-        if (!(err instanceof TimeoutError)) {
-          this.toast.showError(err);
-        }
+        console.error(err);
         return of(undefined);
       }),
       mergeWith(NEVER),
