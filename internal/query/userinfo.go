@@ -194,3 +194,21 @@ func (q *Queries) GetOIDCGroupInfos(ctx context.Context, groupIDs []string, role
 
 	return groupInfos, nil
 }
+
+func (q *Queries) GetOIDCGroupInfosV2(ctx context.Context, groups *Groups, roleAudience []string, roleOrgIDs ...string) (groupInfos *OIDCGroupInfos, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	groupInfos = &OIDCGroupInfos{
+		Group: make([]OIDCGroupInfo, 0, len(groups.Groups)),
+	}
+	for _, group := range groups.Groups {
+		groupInfo, err := q.getOIDCGroupInfo(ctx, group.ID, roleAudience, roleOrgIDs...)
+		if err != nil {
+			return nil, err
+		}
+		groupInfos.Group = append(groupInfos.Group, *groupInfo)
+	}
+
+	return groupInfos, nil
+}

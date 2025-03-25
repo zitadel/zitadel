@@ -112,11 +112,19 @@ func (s *Server) userInfo(
 			roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
 			roleOrgIDs := domain.RoleOrgIDsFromScope(scope)
 			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, roleOrgIDs...)
-			qg, err = s.query.GetOIDCGroupInfos(ctx, qu.User.GroupIDs, roleAudience, roleOrgIDs...)
 			if err != nil {
 				return
 			}
-			rawUserInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
+			grp, err := s.query.GroupByUserID(ctx, true, userID)
+			if err != nil {
+				return
+			}
+			// qg, err = s.query.GetOIDCGroupInfos(ctx, qu.User.GroupIDs, roleAudience, roleOrgIDs...)
+			qg, err = s.query.GetOIDCGroupInfosV2(ctx, grp, roleAudience, roleOrgIDs...)
+			if err != nil {
+				return
+			}
+			rawUserInfo = userInfoToOIDCV2(qu, grp, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
 		})
 		if err != nil {
 			return nil, err
@@ -212,7 +220,51 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 		}
 	}
 	return out
-	//zerrors.ThrowInvalidArgumentf(nil, "GROUP-IDasq", "UserInfo %s", user.User.GroupIDs)
+}
+
+func userInfoToOIDCV2(user *query.OIDCUserInfo, group *query.Groups, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
+	out := &oidc.UserInfo{
+		Subject: user.User.ID,
+	}
+	for _, s := range scope {
+		switch s {
+		case oidc.ScopeEmail:
+			if !userInfoAssertion {
+				continue
+			}
+			out.UserInfoEmail = userInfoEmailToOIDC(user.User)
+		case oidc.ScopeProfile:
+			if !userInfoAssertion {
+				continue
+			}
+			out.UserInfoProfile = userInfoProfileToOidc(user.User, assetPrefix)
+		case oidc.ScopePhone:
+			if !userInfoAssertion {
+				continue
+			}
+			out.UserInfoPhone = userInfoPhoneToOIDC(user.User)
+		case oidc.ScopeAddress:
+			if !userInfoAssertion {
+				continue
+			}
+			// TODO: handle address for human users as soon as implemented
+		case ScopeUserMetaData:
+			setUserInfoMetadata(user.Metadata, out)
+		case ScopeResourceOwner:
+			setUserInfoOrgClaims(user, out)
+		case ScopeIAMGroups:
+			setGroupInfoV2(group, out)
+		default:
+			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
+				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
+			}
+			if claim, ok := strings.CutPrefix(s, domain.OrgIDScope); ok {
+				out.AppendClaims(domain.OrgIDClaim, claim)
+				setUserInfoOrgClaims(user, out)
+			}
+		}
+	}
+	return out
 }
 
 func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, requestedRoles []string, assertion bool, info *oidc.UserInfo) {
@@ -489,6 +541,20 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 func setGroupInfo(user *query.User, out *oidc.UserInfo) {
 	if len(user.GroupIDs) > 0 {
 		out.AppendClaims(ClaimGroups, user.GroupIDs)
+	}
+}
+
+func fetchGroupName(groups *query.Groups) []string {
+	names := make([]string, 0, len(groups.Groups))
+	for _, group := range groups.Groups {
+		names = append(names, group.Name)
+	}
+	return names
+}
+
+func setGroupInfoV2(groups *query.Groups, out *oidc.UserInfo) {
+	if len(groups.Groups) > 0 {
+		out.AppendClaims(ClaimGroups, fetchGroupName(groups))
 	}
 }
 

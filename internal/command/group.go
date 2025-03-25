@@ -367,18 +367,18 @@ func (c *Commands) RemoveGroup(ctx context.Context, groupID, resourceOwner strin
 		}
 		events = append(events, event)
 	}
-	var userEvents []eventstore.Command
-	for _, userID := range userIds {
-		m, err := c.userGroupMemberWriteModelByID(ctx, groupID, userID, resourceOwner)
-		if zerrors.IsNotFound(err) {
-			// empty response because we have no data that match the request
-			return &domain.ObjectDetails{}, err
-		}
-		userGroupAgg := GroupAggregateFromWriteModel(&m.WriteModel)
+	// var userEvents []eventstore.Command
+	// for _, userID := range userIds {
+	// 	m, err := c.userGroupMemberWriteModelByID(ctx, groupID, userID, resourceOwner)
+	// 	if zerrors.IsNotFound(err) {
+	// 		// empty response because we have no data that match the request
+	// 		return &domain.ObjectDetails{}, err
+	// 	}
+	// 	userGroupAgg := GroupAggregateFromWriteModel(&m.WriteModel)
 
-		userEvent := c.removeUserGroupMember(ctx, userGroupAgg, groupID, true)
-		userEvents = append(userEvents, userEvent)
-	}
+	// 	userEvent := c.removeUserGroupMember(ctx, userGroupAgg, groupID, true)
+	// 	userEvents = append(userEvents, userEvent)
+	// }
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -390,15 +390,15 @@ func (c *Commands) RemoveGroup(ctx context.Context, groupID, resourceOwner strin
 		return nil, err
 	}
 
-	userPushedEvents, err := c.eventstore.Push(ctx, userEvents...)
-	if err != nil {
-		return nil, err
-	}
+	// userPushedEvents, err := c.eventstore.Push(ctx, userEvents...)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	err = AppendAndReduce(existingGroup, userPushedEvents...)
-	if err != nil {
-		return nil, err
-	}
+	// err = AppendAndReduce(existingGroup, userPushedEvents...)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return writeModelToObjectDetails(&existingGroup.WriteModel), nil
 }

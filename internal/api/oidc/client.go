@@ -43,12 +43,8 @@ const (
 
 	oidcCtx = "oidc"
 
-	ScopeIAMGroups = "urn:zitadel:iam:org:groups"
-	/* Clean This
-	ScopeIAMGroupsRoles = "urn:zitadel:iam:org:groups:roles"
-	ClaimIAMGroupsRoles = ScopeIAMGroupsRoles
-	*/
-	ClaimGroups = ScopeIAMGroups
+	ScopeIAMGroups = "groups"
+	ClaimGroups    = ScopeIAMGroups
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
@@ -340,6 +336,10 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if user.State != domain.UserStateActive {
 		return zerrors.ThrowUnauthenticated(nil, "OIDC-S3tha", "Errors.Users.NotActive")
 	}
+	group, err := o.query.GroupByUserID(ctx, true, userID)
+	if err != nil {
+		return err
+	}
 	var allRoles bool
 	roles := make([]string, 0)
 	for _, scope := range scopes {
@@ -365,7 +365,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 		case ScopeProjectsRoles:
 			allRoles = true
 		case ScopeIAMGroups:
-			setGroupInfo(user, userInfo)
+			setGroupInfoV2(group, userInfo)
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))

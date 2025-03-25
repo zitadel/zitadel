@@ -6,7 +6,7 @@ import (
 
 const (
 	AggregateType    = "group"
-	AggregateVersion = "v1" // v1 --> or v2 ?
+	AggregateVersion = "v1"
 )
 
 type Aggregate struct {
