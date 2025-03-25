@@ -20,6 +20,15 @@
     </cnsl-form-field>
 
     <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TYPE' | translate }}</cnsl-label>
+      <mat-select formControlName="type" name="type">
+        <mat-option *ngFor="let type of targetTypeValues" [value]="type">
+          {{ 'ACTIONSTWO.TARGET.CREATE.TYPES.' + type | translate }}
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TIMEOUT' | translate }}</cnsl-label>
       <input cnslInput type="number" placeholder="10" #nameInput formControlName="timeout" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
@@ -27,7 +36,11 @@
       }}</span>
     </cnsl-form-field>
 
-    <mat-checkbox class="target-checkbox" formControlName="interrupt_on_error">
+    <mat-checkbox
+      *ngIf="targetType == TargetType.RestWebhook || targetType == TargetType.RestCall"
+      class="target-checkbox"
+      formControlName="interrupt_on_error"
+    >
       <div class="target-condition-text">
         <span>{{ 'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR' | translate }}</span>
         <span class="description cnsl-secondary-text">{{
@@ -35,15 +48,6 @@
         }}</span>
       </div>
     </mat-checkbox>
-
-    <!-- <mat-checkbox class="target-checkbox" formControlName="await_response">
-      <div class="target-condition-text">
-        <span>{{ 'ACTIONSTWO.TARGET.CREATE.AWAIT_RESPONSE' | translate }}</span>
-        <span class="description cnsl-secondary-text">{{
-          'ACTIONSTWO.TARGET.CREATE.AWAIT_RESPONSE_DESCRIPTION' | translate
-        }}</span>
-      </div>
-    </mat-checkbox> -->
   </form>
 </mat-dialog-content>
 <div>

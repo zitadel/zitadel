@@ -95,7 +95,7 @@ export class ActionsTwoTargetsComponent implements OnInit {
 
   public openDialog(target?: GetTarget): void {
     const ref = this.dialog.open(ActionTwoAddTargetDialogComponent, {
-      width: '400px',
+      width: '550px',
       data: target
         ? {
             target: target,

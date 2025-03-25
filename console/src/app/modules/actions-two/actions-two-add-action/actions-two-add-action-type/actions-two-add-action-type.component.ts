@@ -8,10 +8,10 @@ import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 
 export enum ExecutionType {
-  REQUEST,
-  RESPONSE,
-  EVENTS,
-  FUNCTIONS,
+  REQUEST = 'request',
+  RESPONSE = 'response',
+  EVENTS = 'event',
+  FUNCTIONS = 'function',
 }
 
 @Component({
@@ -22,21 +22,17 @@ export enum ExecutionType {
   styleUrls: ['./actions-two-add-action-type.component.scss'],
   imports: [TranslateModule, MatRadioModule, RouterModule, ReactiveFormsModule, FormsModule, CommonModule, MatButtonModule],
 })
-export class ActionsTwoAddActionTypeComponent implements OnInit {
+export class ActionsTwoAddActionTypeComponent {
   public ExecutionType = ExecutionType;
   protected readonly typeForm: ReturnType<typeof this.buildActionTypeForm> = this.buildActionTypeForm();
   @Output() public continue: EventEmitter<void> = new EventEmitter();
   @Output() public typeChanges$: Observable<ExecutionType>;
 
   constructor(private readonly fb: FormBuilder) {
-    // Initialize the Observable to emit form value changes
     this.typeChanges$ = this.typeForm.get('executionType')!.valueChanges.pipe(
       startWith(this.typeForm.get('executionType')!.value), // Emit the initial value
-      tap((value) => console.log('ExecutionType changed:', value)), // Debugging/logging
     );
   }
-
-  public ngOnInit(): void {}
 
   public buildActionTypeForm() {
     return this.fb.group({

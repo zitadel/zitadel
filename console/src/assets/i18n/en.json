@@ -564,6 +564,12 @@
         "DESCRIPTION": "Create your own target outside of Zitadel",
         "NAME": "Name",
         "NAME_DESCRIPTION": "Give your target a clear, descriptive name to make it easy to identify later",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Call",
+          "restAsync": "REST Async"
+        },
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Enter the endpoint where your code is hosted. Make sure it is accessible to us!",
         "TIMEOUT": "Timeout",

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Inject, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Inject, OnChanges, signal, SimpleChanges, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -19,7 +19,7 @@ import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/acti
 import { ActionsTwoAddActionConditionComponent } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
 import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
-import { forkJoin, map, merge, Observable, of } from 'rxjs';
+import { forkJoin, map, merge, Observable, of, ReplaySubject } from 'rxjs';
 
 enum Page {
   Type,
@@ -49,8 +49,9 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   @ViewChild('actionTargetComponent') actionTargetComponent!: ActionsTwoAddActionTargetComponent;
 
   public page = signal<Page | undefined>(Page.Type);
-  public executionType = signal<ExecutionType>(ExecutionType.REQUEST);
   private request$: Observable<MessageInitShape<typeof SetExecutionRequestSchema>> = of({});
+
+  public executionType$ = new ReplaySubject<ExecutionType>(1);
 
   constructor(
     public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>,
@@ -58,9 +59,9 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
-    this.actionTypeComponent?.typeChanges$.subscribe((type) => {
-      console.log('Execution type changed:', type);
-    });
+    // this.actionTypeComponent?.typeChanges$.subscribe((type) => {
+    //   console.log('Execution type changed:', type);
+    // });
 
     this.request$ = forkJoin({
       type: this.actionTypeComponent?.typeChanges$,
@@ -68,8 +69,12 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
       target: this.actionTargetComponent.targetChanges$,
     }).pipe(
       map(({ type, condition, target }) => {
+        console.log('Request:', type, condition, target);
         const req: MessageInitShape<typeof SetExecutionRequestSchema> = {
-          condition: {},
+          condition: {
+            // conditionType: {
+            // }
+          },
           execution: {},
         };
         return req;
@@ -104,6 +109,15 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   }
 
   public onTypeChanged(type: ExecutionType): void {
-    console.log('Execution type changed:', type);
+    console.log(type);
+    this.executionType$.next(type);
+  }
+
+  public onConditionChanged(condition: any): void {
+    console.log('condition changed:', condition);
+  }
+
+  public onTargetChanged(target: string): void {
+    console.log('target changed:', target);
   }
 }

@@ -22,7 +22,14 @@ import { InputModule } from '../../input/input.module';
 import { requiredValidator } from '../../form-field/validators/validators';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { DurationSchema } from '@bufbuild/protobuf/wkt';
-import { GetTarget } from '@zitadel/proto/zitadel/resources/action/v3alpha/target_pb';
+import { GetTarget, Target } from '@zitadel/proto/zitadel/resources/action/v3alpha/target_pb';
+import { MatSelectModule } from '@angular/material/select';
+
+enum TargetType {
+  RestWebhook = 'restWebhook',
+  RestCall = 'restCall',
+  RestAsync = 'restAsync',
+}
 
 @Component({
   selector: 'cnsl-actions-two-add-target-dialog',
@@ -37,9 +44,13 @@ import { GetTarget } from '@zitadel/proto/zitadel/resources/action/v3alpha/targe
     TranslateModule,
     InputModule,
     MatCheckboxModule,
+    MatSelectModule,
   ],
 })
 export class ActionTwoAddTargetDialogComponent {
+  public TargetType = TargetType;
+  public targetTypeValues = Object.values(TargetType); // Get enum values
+
   protected readonly targetForm: ReturnType<typeof this.buildTargetForm>;
 
   constructor(
@@ -70,10 +81,10 @@ export class ActionTwoAddTargetDialogComponent {
   public buildTargetForm() {
     return this.fb.group({
       name: new FormControl<string>('', [requiredValidator]),
+      type: new FormControl<TargetType>(TargetType.RestWebhook, [requiredValidator]),
       endpoint: new FormControl<string>('', [requiredValidator]),
       timeout: new FormControl<number>(10, [requiredValidator]),
       interrupt_on_error: new FormControl<boolean>(true),
-      // await_response: new FormControl<boolean>(false),
     });
   }
 
@@ -84,42 +95,28 @@ export class ActionTwoAddTargetDialogComponent {
         nanos: 0,
       };
 
-      let req: MessageInitShape<typeof PatchTargetRequestSchema> | MessageInitShape<typeof CreateTargetRequestSchema>;
-      if (this.data.target) {
-        req = {
-          // instance_id: this.data.instance_id,
-          target: {
-            name: this.targetForm.get('name')?.value ?? '',
-            endpoint: this.targetForm.get('endpoint')?.value ?? '',
-            timeout: timeoutDuration,
-            targetType: {
-              case: 'restWebhook',
-              value: {
-                interruptOnError: !!this.targetForm.get('interrupt_on_error')?.value,
-              },
+      let req: MessageInitShape<typeof PatchTargetRequestSchema> | MessageInitShape<typeof CreateTargetRequestSchema> = {
+        target: {
+          name: this.targetForm.get('name')?.value ?? '',
+          endpoint: this.targetForm.get('endpoint')?.value ?? '',
+          timeout: timeoutDuration,
+          targetType: {
+            case: this.targetType as 'restWebhook' | 'restCall',
+            value: {
+              interruptOnError:
+                this.targetType == 'restWebhook' || this.targetType == 'restCall'
+                  ? !!this.targetForm.get('interrupt_on_error')?.value
+                  : undefined,
             },
-            // await_response: this.targetForm.value.await_response,
           },
-        };
-      } else {
-        req = {
-          // instance_id: this.data.instance_id,
-          target: {
-            name: this.targetForm.get('name')?.value ?? '',
-            endpoint: this.targetForm.get('endpoint')?.value ?? '',
-            timeout: timeoutDuration,
-            targetType: {
-              case: 'restWebhook',
-              value: {
-                interruptOnError: !!this.targetForm.get('interrupt_on_error')?.value,
-              },
-            },
-            // await_response: this.targetForm.value.await_response,
-          },
-        };
-      }
+        },
+      };
 
       this.dialogRef.close(req);
     }
+  }
+
+  public get targetType(): TargetType {
+    return this.targetForm.get('type')?.value as TargetType;
   }
 }
