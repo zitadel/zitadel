@@ -32,7 +32,6 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 
 	if ctxData.SystemMemberships != nil {
 		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, systemUserRoleMappings)
-		// requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, roleMappings)
 		return requestedPermissions, allPermissions, nil
 	}
 

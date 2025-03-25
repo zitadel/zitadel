@@ -47,7 +47,7 @@ BEGIN
                                 GROUP BY member_type
                                 LIMIT 1
                             )::TEXT[])
-        END
+          END
         WHEN (SELECT TRUE WHERE found_permissions.member_type = 'Organization' LIMIT 1) THEN
           -- aggregate_id not present
           CASE WHEN (SELECT TRUE WHERE '' = ANY (
