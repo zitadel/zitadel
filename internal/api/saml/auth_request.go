@@ -36,8 +36,7 @@ func (p *Provider) CreateResponse(ctx context.Context, authReq models.AuthReques
 		Audience:        authReq.GetIssuer(),
 	}
 
-	issuer := ContextToIssuer(ctx)
-	req, err := http.NewRequestWithContext(provider.ContextWithIssuer(ctx, issuer), http.MethodGet, issuer, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
 	if err != nil {
 		return "", "", err
 	}
