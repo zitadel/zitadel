@@ -3,9 +3,6 @@ name: Unit test core
 on: 
   workflow_call:
     inputs:
-      go_version:
-        required: true
-        type: string
       core_cache_key:
         required: true
         type: string
@@ -29,7 +26,7 @@ jobs:
       -
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.go_version }}
+          go-version-file: 'go.mod'
       - 
         uses: actions/cache/restore@v4
         timeout-minutes: 1
