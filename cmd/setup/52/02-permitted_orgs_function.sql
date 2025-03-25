@@ -16,23 +16,23 @@ DECLARE
       check_aggregates bool;
 BEGIN
 
-    WITH tmp(member_type, aggregate_id, object_id ) AS (
+    WITH found_permissions(member_type, aggregate_id, object_id ) AS (
       SELECT * FROM eventstore.get_system_permissions(
           system_user_perms,
           perm)
     )
 
     SELECT array_agg(DISTINCT o.org_id) INTO org_ids
-      FROM eventstore.instance_orgs o, tmp
+      FROM eventstore.instance_orgs o, found_permissions
       WHERE
-        CASE WHEN (SELECT TRUE WHERE tmp.member_type = 'System' LIMIT 1) THEN
+        CASE WHEN (SELECT TRUE WHERE found_permissions.member_type = 'System' LIMIT 1) THEN
           TRUE
-        WHEN (SELECT TRUE WHERE tmp.member_type = 'IAM' LIMIT 1) THEN
+        WHEN (SELECT TRUE WHERE found_permissions.member_type = 'IAM' LIMIT 1) THEN
           -- aggregate_id not present
           CASE WHEN (SELECT TRUE WHERE '' = ANY (
                               (
-                                SELECT array_agg(tmp.aggregate_id)
-                                  FROM tmp
+                                SELECT array_agg(found_permissions.aggregate_id)
+                                  FROM found_permissions
                                   WHERE member_type = 'IAM'
                                   GROUP BY member_type
                                   LIMIT 1
@@ -41,19 +41,19 @@ BEGIN
           ELSE 
             o.instance_id = ANY (
                             (
-                              SELECT array_agg(tmp.aggregate_id)
-                                FROM tmp
+                              SELECT array_agg(found_permissions.aggregate_id)
+                                FROM found_permissions
                                 WHERE member_type = 'IAM'
                                 GROUP BY member_type
                                 LIMIT 1
                             )::TEXT[])
         END
-        WHEN (SELECT TRUE WHERE tmp.member_type = 'Organization' LIMIT 1) THEN
+        WHEN (SELECT TRUE WHERE found_permissions.member_type = 'Organization' LIMIT 1) THEN
           -- aggregate_id not present
           CASE WHEN (SELECT TRUE WHERE '' = ANY (
                               (
-                                SELECT array_agg(tmp.aggregate_id)
-                                  FROM tmp
+                                SELECT array_agg(found_permissions.aggregate_id)
+                                  FROM found_permissions
                                   WHERE member_type = 'Organization'
                                   GROUP BY member_type
                                   LIMIT 1
@@ -62,8 +62,8 @@ BEGIN
           ELSE 
             o.org_id = ANY (
                         (
-                          SELECT array_agg(tmp.aggregate_id)
-                            FROM tmp
+                          SELECT array_agg(found_permissions.aggregate_id)
+                            FROM found_permissions
                             WHERE member_type = 'Organization'
                             GROUP BY member_type
                             LIMIT 1
