@@ -78,6 +78,7 @@ BEGIN
 END;
 $$;
 
+
 DROP FUNCTION IF EXISTS eventstore.permitted_orgs;
 
 CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
@@ -93,9 +94,9 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
 AS $$
 BEGIN
 
-  -- if system user
+~/go/src/zitadel/cmd/setup/52/02-permitted_orgs_function.sql  -- if system user
   IF system_user_perms IS NOT NULL THEN
-    org_ids := eventstore.check_system_user_perms(system_user_perms, perm, filter_orgs)
+    org_ids := eventstore.check_system_user_perms(system_user_perms, perm, filter_orgs);
   -- if human/machine user
   ELSE
     DECLARE
