@@ -23,7 +23,7 @@ jobs:
 
   lint-skip:
     name: lint skip
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04-4
     if: ${{ github.event_name != 'pull_request' }}
     steps:
       - name: Lint skip
@@ -32,7 +32,7 @@ jobs:
 
   api:
     name: api
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04-4
     continue-on-error: true
     if: ${{ github.event_name == 'pull_request' }}
     steps:
@@ -54,7 +54,7 @@ jobs:
   console:
     if: ${{ github.event_name == 'pull_request' }}
     name: console
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04-4
     steps:
     -
       name: Checkout
@@ -73,7 +73,7 @@ jobs:
 
   core:
     name: core
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04-4
     if: ${{ github.event_name == 'pull_request' }}
     steps:
     -
