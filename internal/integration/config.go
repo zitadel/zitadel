@@ -20,10 +20,8 @@ type Config struct {
 	WebAuthNName string
 }
 
-var (
-	//go:embed config/client.yaml
-	clientYAML []byte
-)
+//go:embed config/client.yaml
+var clientYAML []byte
 
 var (
 	tmpDir       string
@@ -49,5 +47,6 @@ func init() {
 	if err := loadedConfig.Log.SetLogger(); err != nil {
 		panic(err)
 	}
-	SystemToken = systemUserToken()
+	SystemToken = createSystemUserToken()
+	SystemUserWithNoPermissionsToken = createSystemUserWithNoPermissionsToken()
 }

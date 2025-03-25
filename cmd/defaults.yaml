@@ -113,36 +113,67 @@ PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
-  # Postgres is the default database of ZITADEL
-  postgres:
-    Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
-    Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
-    Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
-    MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
-    MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
-    MaxConnIdleTime: 5m # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
-    Options: "" # ZITADEL_DATABASE_POSTGRES_OPTIONS
+  # CockroachDB is the default database of ZITADEL
+  cockroach:
+    Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
+    Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
+    Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
+    MaxOpenConns: 5 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 2 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
+    Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
     User:
-      Username: zitadel # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
-      Password: "" # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
+      Username: zitadel # ZITADEL_DATABASE_COCKROACH_USER_USERNAME
+      Password: "" # ZITADEL_DATABASE_COCKROACH_USER_PASSWORD
       SSL:
-        Mode: disable # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
+        Mode: disable # ZITADEL_DATABASE_COCKROACH_USER_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
     Admin:
       # By default, ExistingDatabase is not specified in the connection string
       # If the connection resolves to a database that is not existing in your system, configure an existing one here
+      # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
+      ExistingDatabase: # ZITADEL_DATABASE_COCKROACH_ADMIN_EXISTINGDATABASE
+      Username: root # ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME
+      Password: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD
+      SSL:
+        Mode: disable # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_KEY
+  # Postgres is used as soon as a value is set
+  # The values describe the possible fields to set values
+  postgres:
+    Host: # ZITADEL_DATABASE_POSTGRES_HOST
+    Port: # ZITADEL_DATABASE_POSTGRES_PORT
+    Database: # ZITADEL_DATABASE_POSTGRES_DATABASE
+    MaxOpenConns: # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
+    Options: # ZITADEL_DATABASE_POSTGRES_OPTIONS
+    User:
+      Username: # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
+      Password: # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
+      SSL:
+        Mode: # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
+        RootCert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
+        Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
+    Admin:
+      # The default ExistingDatabase is postgres
+      # If your db system doesn't have a database named postgres, configure an existing database here
       # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
       ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
-      Username: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
-      Password: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
+      Username: # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
+      Password: # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
       SSL:
-        Mode: disable # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
+        Mode: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
+        RootCert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
+        Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
+        Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
 # Caches are EXPERIMENTAL. The following config may have breaking changes in the future.
 # If no config is provided, caching is disabled by default.
@@ -416,6 +447,7 @@ Projections:
 Notifications:
   # Notifications can be processed by either a sequential mode (legacy) or a new parallel mode.
   # The parallel mode is currently only recommended for Postgres databases.
+  # For CockroachDB, the sequential mode is recommended, see: https://github.com/zitadel/zitadel/issues/9002
   # If legacy mode is enabled, the worker config below is ignored.
   LegacyEnabled: true # ZITADEL_NOTIFICATIONS_LEGACYENABLED
   # The amount of workers processing the notification request events.
@@ -604,12 +636,17 @@ SystemAPIUsers:
 #       - MemberType: System
 #         Roles:
 #           - "SYSTEM_OWNER"
+#           - "SYSTEM_OWNER_VIEWER"
 #           # Actually, we don't recommend adding IAM_OWNER and ORG_OWNER to the System membership, as this basically enables god mode for the system user
+#       - MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
+#         Roles:
 #           - "IAM_OWNER"
-#           - "ORG_OWNER"
-#       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
-#       - MemberType: IAM
-#         Roles: "IAM_OWNER"
+#           - "IAM_OWNER_VIEWER"
+#           - "IAM_ORG_MANAGER"
+#           - "IAM_USER_MANAGER"
+#           - "IAM_ADMIN_IMPERSONATOR"
+#           - "IAM_END_USER_IMPERSONATOR"
+#           - "IAM_LOGIN_CLIENT"
 #         AggregateID: "123456789012345678"
 #       - MemberType: Organization
 #         Roles: "ORG_OWNER"
@@ -1700,6 +1737,298 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+
+SystemAuthZ:
+  RolePermissionMappings:
+    - Role: "SYSTEM_OWNER"
+      Permissions:
+        - "system.instance.read"
+        - "system.instance.write"
+        - "system.instance.delete"
+        - "system.domain.read"
+        - "system.domain.write"
+        - "system.domain.delete"
+        - "system.debug.read"
+        - "system.debug.write"
+        - "system.debug.delete"
+        - "system.feature.read"
+        - "system.feature.write"
+        - "system.feature.delete"
+        - "system.limits.write"
+        - "system.limits.delete"
+        - "system.quota.write"
+        - "system.quota.delete"
+        - "system.iam.member.read"
+    - Role: "SYSTEM_OWNER_VIEWER"
+      Permissions:
+        - "system.instance.read"
+        - "system.domain.read"
+        - "system.debug.read"
+        - "system.feature.read"
+        - "system.iam.member.read"
+    - Role: "IAM_OWNER"
+      Permissions:
+        - "iam.read"
+        - "iam.write"
+        - "iam.policy.read"
+        - "iam.policy.write"
+        - "iam.policy.delete"
+        - "iam.member.read"
+        - "iam.member.write"
+        - "iam.member.delete"
+        - "iam.idp.read"
+        - "iam.idp.write"
+        - "iam.idp.delete"
+        - "iam.action.read"
+        - "iam.action.write"
+        - "iam.action.delete"
+        - "iam.flow.read"
+        - "iam.flow.write"
+        - "iam.flow.delete"
+        - "iam.feature.read"
+        - "iam.feature.write"
+        - "iam.feature.delete"
+        - "iam.restrictions.read"
+        - "iam.restrictions.write"
+        - "iam.web_key.write"
+        - "iam.web_key.delete"
+        - "iam.web_key.read"
+        - "iam.debug.write"
+        - "iam.debug.read"
+        - "org.read"
+        - "org.global.read"
+        - "org.create"
+        - "org.write"
+        - "org.delete"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.member.delete"
+        - "org.idp.read"
+        - "org.idp.write"
+        - "org.idp.delete"
+        - "org.action.read"
+        - "org.action.write"
+        - "org.action.delete"
+        - "org.flow.read"
+        - "org.flow.write"
+        - "org.flow.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
+        - "user.read"
+        - "user.global.read"
+        - "user.write"
+        - "user.delete"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
+        - "policy.read"
+        - "policy.write"
+        - "policy.delete"
+        - "project.read"
+        - "project.create"
+        - "project.write"
+        - "project.delete"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.member.delete"
+        - "project.role.read"
+        - "project.role.write"
+        - "project.role.delete"
+        - "project.app.read"
+        - "project.app.write"
+        - "project.app.delete"
+        - "project.grant.read"
+        - "project.grant.write"
+        - "project.grant.delete"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "project.grant.member.delete"
+        - "events.read"
+        - "milestones.read"
+        - "session.read"
+        - "session.delete"
+        - "action.target.read"
+        - "action.target.write"
+        - "action.target.delete"
+        - "action.execution.read"
+        - "action.execution.write"
+        - "userschema.read"
+        - "userschema.write"
+        - "userschema.delete"
+        - "session.read"
+        - "session.delete"
+    - Role: "IAM_OWNER_VIEWER"
+      Permissions:
+        - "iam.read"
+        - "iam.policy.read"
+        - "iam.member.read"
+        - "iam.idp.read"
+        - "iam.action.read"
+        - "iam.flow.read"
+        - "iam.restrictions.read"
+        - "iam.feature.read"
+        - "iam.web_key.read"
+        - "iam.debug.read"
+        - "org.read"
+        - "org.member.read"
+        - "org.idp.read"
+        - "org.action.read"
+        - "org.flow.read"
+        - "org.feature.read"
+        - "user.read"
+        - "user.global.read"
+        - "user.grant.read"
+        - "user.membership.read"
+        - "user.feature.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "events.read"
+        - "milestones.read"
+        - "action.target.read"
+        - "action.execution.read"
+        - "userschema.read"
+        - "session.read"
+    - Role: "IAM_ORG_MANAGER"
+      Permissions:
+        - "org.read"
+        - "org.global.read"
+        - "org.create"
+        - "org.write"
+        - "org.delete"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.member.delete"
+        - "org.idp.read"
+        - "org.idp.write"
+        - "org.idp.delete"
+        - "org.action.read"
+        - "org.action.write"
+        - "org.action.delete"
+        - "org.flow.read"
+        - "org.flow.write"
+        - "org.flow.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
+        - "user.read"
+        - "user.global.read"
+        - "user.write"
+        - "user.delete"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
+        - "policy.read"
+        - "policy.write"
+        - "policy.delete"
+        - "project.read"
+        - "project.create"
+        - "project.write"
+        - "project.delete"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.member.delete"
+        - "project.role.read"
+        - "project.role.write"
+        - "project.role.delete"
+        - "project.app.read"
+        - "project.app.write"
+        - "project.app.delete"
+        - "project.grant.read"
+        - "project.grant.write"
+        - "project.grant.delete"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "project.grant.member.delete"
+        - "session.delete"
+    - Role: "IAM_USER_MANAGER"
+      Permissions:
+        - "org.read"
+        - "org.global.read"
+        - "org.member.read"
+        - "org.member.delete"
+        - "user.read"
+        - "user.global.read"
+        - "user.write"
+        - "user.delete"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "user.membership.read"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.grant.read"
+        - "project.grant.write"
+        - "project.grant.delete"
+        - "project.grant.member.read"
+        - "session.delete"
+    - Role: "IAM_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "IAM_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
+    - Role: "IAM_LOGIN_CLIENT"
+      Permissions:
+        - "iam.read"
+        - "iam.policy.read"
+        - "iam.member.read"
+        - "iam.member.write"
+        - "iam.idp.read"
+        - "iam.feature.read"
+        - "iam.restrictions.read"
+        - "org.read"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.idp.read"
+        - "org.feature.read"
+        - "user.read"
+        - "user.write"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "session.read"
+        - "session.link"
+        - "session.delete"
+        - "userschema.read"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:

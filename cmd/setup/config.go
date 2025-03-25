@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/cache/connector"
@@ -33,7 +33,8 @@ type Config struct {
 	Database        database.Config
 	Caches          *connector.CachesConfig
 	SystemDefaults  systemdefaults.SystemDefaults
-	InternalAuthZ   internal_authz.Config
+	InternalAuthZ   authz.Config
+	SystemAuthZ     authz.Config
 	ExternalDomain  string
 	ExternalPort    uint16
 	ExternalSecure  bool
@@ -51,7 +52,7 @@ type Config struct {
 	Login           login.Config
 	WebAuthNName    string
 	Telemetry       *handlers.TelemetryPusherConfig
-	SystemAPIUsers  map[string]*internal_authz.SystemAPIUser
+	SystemAPIUsers  map[string]*authz.SystemAPIUser
 }
 
 type InitProjections struct {
@@ -66,12 +67,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
-			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
-			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.SliceTypeStringDecode[authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
-			database.DecodeHook(false),
+			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
-			hook.EnumHookFunc(internal_authz.MemberTypeString),
+			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
@@ -140,6 +141,7 @@ type Steps struct {
 	s49InitPermittedOrgsFunction            *InitPermittedOrgsFunction
 	s50IDPTemplate6UsePKCE                  *IDPTemplate6UsePKCE
 	s51IDPTemplate6RootCA                   *IDPTemplate6RootCA
+	s52InitPermittedOrgsFunction            *InitPermittedOrgsFunction52
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
