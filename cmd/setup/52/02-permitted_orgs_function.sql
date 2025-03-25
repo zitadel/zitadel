@@ -9,11 +9,6 @@ CREATE OR REPLACE FUNCTION eventstore.check_system_user_perms(
 )
 	LANGUAGE 'plpgsql'
 AS $$
-DECLARE
-      has_instance_or_iam_permission bool;
-      member_type_found bool;
-      aggregate_ids TEXT;
-      check_aggregates bool;
 BEGIN
 
     WITH found_permissions(member_type, aggregate_id, object_id ) AS (
