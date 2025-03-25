@@ -244,7 +244,14 @@
       </p>
     </div>
 
-    <div class="info-wrapper" *ngIf="app && app.oidcConfig && app.oidcConfig.authMethodType">
+    <div class="info-wrapper" *ngIf="app && app.apiConfig && app.apiConfig.authMethodType !== undefined">
+      <p class="info-row-title">{{ 'APP.AUTHMETHOD' | translate }}</p>
+      <p class="info-row-desc">
+        {{ 'APP.API.AUTHMETHOD.' + app.apiConfig.authMethodType | translate }}
+      </p>
+    </div>
+
+    <div class="info-wrapper" *ngIf="app && app.oidcConfig && app.oidcConfig.authMethodType !== undefined">
       <p class="info-row-title">{{ 'APP.AUTHMETHOD' | translate }}</p>
       <p class="info-row-desc">
         {{ 'APP.OIDC.AUTHMETHOD.' + app.oidcConfig.authMethodType | translate }}
