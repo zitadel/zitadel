@@ -25,29 +25,29 @@ const (
 // and is typically the `resource_owner` column in ZITADEL.
 // We use full identifiers in the query builder so this function should be
 // called with something like `UserResourceOwnerCol.identifier()` for example.
-func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, permission string) (sq.SelectBuilder, error) {
-	userID := authz.GetCtxData(ctx).UserID
-	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
+// func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, permission string) (sq.SelectBuilder, error) {
+// 	userID := authz.GetCtxData(ctx).UserID
+// 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
 
-	systemUserPermissions := authz.GetSystemUserPermissions(ctx)
-	var systemUserPermissionsJson []byte
-	if systemUserPermissions != nil {
-		var err error
-		systemUserPermissionsJson, err = json.Marshal(systemUserPermissions)
-		if err != nil {
-			return query, err
-		}
-	}
+// 	systemUserPermissions := authz.GetSystemUserPermissions(ctx)
+// 	var systemUserPermissionsJson []byte
+// 	if systemUserPermissions != nil {
+// 		var err error
+// 		systemUserPermissionsJson, err = json.Marshal(systemUserPermissions)
+// 		if err != nil {
+// 			return query, err
+// 		}
+// 	}
 
-	return query.Where(
-		fmt.Sprintf(wherePermittedOrgsClause, orgIDColumn),
-		authz.GetInstance(ctx).InstanceID(),
-		userID,
-		systemUserPermissionsJson,
-		permission,
-		filterOrgIds,
-	), nil
-}
+// 	return query.Where(
+// 		fmt.Sprintf(wherePermittedOrgsClause, orgIDColumn),
+// 		authz.GetInstance(ctx).InstanceID(),
+// 		userID,
+// 		systemUserPermissionsJson,
+// 		permission,
+// 		filterOrgIds,
+// 	), nil
+// }
 
 func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, userIdColum, permission string) (sq.SelectBuilder, error) {
 	userID := authz.GetCtxData(ctx).UserID
