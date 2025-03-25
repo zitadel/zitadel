@@ -9,8 +9,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func ValidationHandler() grpc.UnaryServerInterceptor {
@@ -26,9 +24,6 @@ type validator interface {
 }
 
 func validate(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.End()
-
 	validate, ok := req.(validator)
 	if !ok {
 		return handler(ctx, req)

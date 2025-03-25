@@ -11,14 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 	ainfo "github.com/zitadel/zitadel/internal/api/info"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func ActivityInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		ctx, span := tracing.NewSpan(ctx)
-		defer span.End()
-
 		ctx = activityInfoFromGateway(ctx).SetMethod(info.FullMethod).IntoContext(ctx)
 		resp, err := handler(ctx, req)
 		if isResourceAPI(info.FullMethod) {
