@@ -244,6 +244,13 @@
       </p>
     </div>
 
+    <div class="info-wrapper" *ngIf="app && app.oidcConfig && app.oidcConfig.authMethodType">
+      <p class="info-row-title">{{ 'APP.AUTHMETHOD' | translate }}</p>
+      <p class="info-row-desc">
+        {{ 'APP.OIDC.AUTHMETHOD.' + app.oidcConfig.authMethodType | translate }}
+      </p>
+    </div>
+
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'APP.PAGES.ID' | translate }}</p>
       <p *ngIf="app && app.id" class="info-row-desc">{{ app.id }}</p>
