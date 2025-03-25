@@ -663,7 +663,7 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 			return nil
 		}
 
-		notificationPolicy, err := u.queries.NotificationPolicyByOrg(ctx, true, e.Aggregate().ResourceOwner, false)
+		notificationPolicy, err := u.queries.NotificationPolicyByOrg(ctx, false, e.Aggregate().ResourceOwner, false)
 		if zerrors.IsNotFound(err) {
 			return nil
 		}

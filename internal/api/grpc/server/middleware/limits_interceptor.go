@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -17,6 +18,9 @@ func LimitsInterceptor(ignoreService ...string) grpc.UnaryServerInterceptor {
 		}
 	}
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
+		ctx, span := tracing.NewSpan(ctx)
+		defer span.End()
+
 		for _, service := range ignoreService {
 			if strings.HasPrefix(info.FullMethod, service) {
 				return handler(ctx, req)
@@ -26,6 +30,7 @@ func LimitsInterceptor(ignoreService ...string) grpc.UnaryServerInterceptor {
 		if block := instance.Block(); block != nil && *block {
 			return nil, zerrors.ThrowResourceExhausted(nil, "LIMITS-molsj", "Errors.Limits.Instance.Blocked")
 		}
+		span.End()
 		return handler(ctx, req)
 	}
 }

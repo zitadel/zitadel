@@ -15,6 +15,9 @@ import (
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		ctx, span := tracing.NewSpan(ctx)
+		defer span.End()
+
 		requestTargets, responseTargets := execution.QueryExecutionTargetsForRequestAndResponse(ctx, queries, info.FullMethod)
 
 		// call targets otherwise return req
@@ -22,7 +25,7 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 		if err != nil {
 			return nil, err
 		}
-
+		span.End()
 		response, err := handler(ctx, handledReq)
 		if err != nil {
 			return nil, err

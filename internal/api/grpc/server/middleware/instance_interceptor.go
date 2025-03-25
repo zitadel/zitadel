@@ -34,7 +34,7 @@ func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string,
 
 func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer span.EndWithError(err)
 
 	for _, service := range idFromRequestsServices {
 		if !strings.HasPrefix(service, "/") {
@@ -90,6 +90,8 @@ func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.Unar
 }
 
 func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (interface{}, error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
 	requestContext := zitadel_http.DomainContext(ctx)
 	if requestContext.InstanceHost == "" {
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).Error("unable to set instance")
@@ -107,5 +109,6 @@ func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler gr
 		}
 		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
+	span.End()
 	return handler(authz.WithInstance(ctx, instance), req)
 }

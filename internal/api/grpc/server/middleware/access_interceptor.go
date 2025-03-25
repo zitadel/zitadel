@@ -20,6 +20,8 @@ func AccessStorageInterceptor(svc *logstore.Service[*record.AccessLog]) grpc.Una
 		if !svc.Enabled() {
 			return handler(ctx, req)
 		}
+		ctx, span := tracing.NewSpan(ctx)
+		defer span.End()
 
 		reqMd, _ := metadata.FromIncomingContext(ctx)
 

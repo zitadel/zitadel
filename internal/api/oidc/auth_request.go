@@ -149,7 +149,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, true)
+	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -533,7 +533,9 @@ func CreateErrorCallbackURL(authReq op.AuthRequest, reason, description, uri str
 	return callback, nil
 }
 
-func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authorizer op.Authorizer) (string, error) {
+func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authorizer op.Authorizer) (callback string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
 	code, err := op.CreateAuthRequestCode(ctx, authReq, authorizer.Storage(), authorizer.Crypto())
 	if err != nil {
 		return "", err
@@ -545,11 +547,11 @@ func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authoriz
 		code:  code,
 		state: authReq.GetState(),
 	}
-	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
+	callback, err = op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
 	if err != nil {
 		return "", err
 	}
-	return callback, err
+	return callback, nil
 }
 
 func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest) (string, error) {
