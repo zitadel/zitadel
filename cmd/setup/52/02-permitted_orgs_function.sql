@@ -16,93 +16,65 @@ DECLARE
       check_aggregates bool;
 BEGIN
 
-  DROP TABLE IF EXISTS matching_system_user_perms;
-  CREATE TEMPORARY TABLE matching_system_user_perms (
-          member_type TEXT,
-          aggregate_id TEXT,
-          object_id TEXT
-      ) ON COMMIT DROP;
+    WITH tmp(member_type, aggregate_id, object_id ) AS (
+      SELECT * FROM eventstore.get_system_permissions(
+          system_user_perms,
+          perm)
+    )
 
-  INSERT INTO matching_system_user_perms 
-  (SELECT * FROM eventstore.get_system_permissions(system_user_perms, perm));
-
-  -- System member type
-  SELECT TRUE INTO member_type_found
-    FROM matching_system_user_perms msup
-    WHERE msup.member_type = 'System'
-    LIMIT 1;
-
-  IF member_type_found THEN
-    -- Return all organizations or only those in filter_orgs
-    SELECT array_agg(o.org_id) INTO org_ids
-      FROM eventstore.instance_orgs o
+    SELECT array_agg(DISTINCT o.org_id) INTO org_ids
+      FROM eventstore.instance_orgs o, tmp
       WHERE
+        CASE WHEN (SELECT TRUE WHERE tmp.member_type = 'System' LIMIT 1) THEN
+          TRUE
+        WHEN (SELECT TRUE WHERE tmp.member_type = 'IAM' LIMIT 1) THEN
+          -- aggregate_id not present
+          CASE WHEN (SELECT TRUE WHERE '' = ANY (
+                              (
+                                SELECT array_agg(tmp.aggregate_id)
+                                  FROM tmp
+                                  WHERE member_type = 'IAM'
+                                  GROUP BY member_type
+                                  LIMIT 1
+                              )::TEXT[])) THEN
+            TRUE
+          ELSE 
+            o.instance_id = ANY (
+                            (
+                              SELECT array_agg(tmp.aggregate_id)
+                                FROM tmp
+                                WHERE member_type = 'IAM'
+                                GROUP BY member_type
+                                LIMIT 1
+                            )::TEXT[])
+        END
+        WHEN (SELECT TRUE WHERE tmp.member_type = 'Organization' LIMIT 1) THEN
+          -- aggregate_id not present
+          CASE WHEN (SELECT TRUE WHERE '' = ANY (
+                              (
+                                SELECT array_agg(tmp.aggregate_id)
+                                  FROM tmp
+                                  WHERE member_type = 'Organization'
+                                  GROUP BY member_type
+                                  LIMIT 1
+                              )::TEXT[])) THEN
+            TRUE
+          ELSE 
+            o.org_id = ANY (
+                        (
+                          SELECT array_agg(tmp.aggregate_id)
+                            FROM tmp
+                            WHERE member_type = 'Organization'
+                            GROUP BY member_type
+                            LIMIT 1
+                        )::TEXT[])
+          END
+        END
+        AND
         CASE WHEN filter_orgs != ''
         THEN o.org_id IN (filter_orgs) 
-        ELSE TRUE END;
-    RETURN;
-  END IF;
-
-  -- IAM member type
-  SELECT TRUE, array_agg(msup.aggregate_id) INTO member_type_found, aggregate_ids
-    FROM matching_system_user_perms msup
-    WHERE msup.member_type = 'IAM'
-    GROUP BY msup.member_type
-    LIMIT 1;
-
-  IF member_type_found THEN
-    IF (SELECT FALSE WHERE '' = ANY (aggregate_ids::TEXT[])) = FALSE THEN 
-      check_aggregates := FALSE;
-    ELSE
-      check_aggregates := TRUE;
-    END IF;
-
-    -- Return all organizations or only those in filter_orgs
-    SELECT array_agg(o.org_id) INTO org_ids
-      FROM eventstore.instance_orgs o
-      WHERE CASE  
-        WHEN check_aggregates THEN 
-          o.instance_id = ANY (aggregate_ids::TEXT[])
-        ELSE
-          TRUE
-        END
-      AND CASE WHEN filter_orgs != ''
-        THEN o.org_id IN (filter_orgs) 
-        ELSE TRUE END;
-    RETURN;
-  END IF;
-
-  -- Organization member type
-  SELECT TRUE, array_agg(msup.aggregate_id) INTO member_type_found, aggregate_ids
-    FROM matching_system_user_perms msup
-    WHERE msup.member_type = 'Organization'
-    GROUP BY msup.member_type
-    LIMIT 1;
-
-  IF member_type_found THEN
-    member_type_found := FALSE;
-    -- if any of the aggregate_ids = '', then we search on all organization
-    IF (SELECT FALSE WHERE '' = ANY (aggregate_ids::TEXT[])) = FALSE THEN 
-      check_aggregates := FALSE;
-    ELSE
-      check_aggregates := TRUE;
-    END IF;
-
-    -- Return all organizations or only those in filter_orgs
-    SELECT array_agg(o.org_id) INTO org_ids
-      FROM eventstore.instance_orgs o
-      WHERE 
-        CASE  
-          WHEN check_aggregates THEN 
-            o.org_id = ANY (aggregate_ids::TEXT[])
-          ELSE
-            TRUE
-          END
-      AND CASE WHEN filter_orgs != ''
-        THEN o.org_id IN (filter_orgs) 
-        ELSE TRUE END;
-    RETURN;
-  END IF;
+        ELSE TRUE END
+      LIMIT 1;
 END;
 $$;
 
@@ -124,7 +96,7 @@ BEGIN
   -- if system user
   IF system_user_perms IS NOT NULL THEN
     org_ids := eventstore.check_system_user_perms(system_user_perms, perm, filter_orgs)
-    RETURN;
+  -- if human/machine user
   ELSE
     DECLARE
       matched_roles TEXT[]; -- roles containing permission
