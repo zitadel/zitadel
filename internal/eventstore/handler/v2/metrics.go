@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"go.opentelemetry.io/otel/attribute"
+
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
