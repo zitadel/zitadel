@@ -86,6 +86,7 @@ var (
 	OrgDomainVerifiedFields *handler.FieldHandler
 	InstanceDomainFields    *handler.FieldHandler
 	MembershipFields        *handler.FieldHandler
+	PermissionFields        *handler.FieldHandler
 )
 
 type projection interface {
@@ -97,6 +98,7 @@ type projection interface {
 
 var (
 	projections []projection
+	fields      []*handler.FieldHandler
 )
 
 func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) error {
@@ -176,8 +178,11 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
 	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsInstanceDomain]))
 	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
+	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
+	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
 	newProjectionsList()
+	newFieldsList()
 	return nil
 }
 
@@ -210,6 +215,16 @@ func ProjectInstance(ctx context.Context) error {
 	return nil
 }
 
+func ProjectInstanceFields(ctx context.Context) error {
+	for _, fieldProjection := range fields {
+		err := fieldProjection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
@@ -232,6 +247,16 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	}
 
 	return config
+}
+
+func newFieldsList() {
+	fields = []*handler.FieldHandler{
+		ProjectGrantFields,
+		OrgDomainVerifiedFields,
+		InstanceDomainFields,
+		MembershipFields,
+		PermissionFields,
+	}
 }
 
 // we know this is ugly, but we need to have a singleton slice of all projections
