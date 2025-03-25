@@ -20,7 +20,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 
-	"github.com/joho/godotenv"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"
@@ -33,11 +32,6 @@ var (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	apiURL := os.Getenv("API_URL")
 	patFile := os.Getenv("PAT_FILE")
 	domain := os.Getenv("API_DOMAIN")
@@ -206,12 +200,7 @@ func CreateProject(apiURL, pat, domain string) (string, error) {
 		HasProjectCheck:        false,
 		PrivateLabelingSetting: "PRIVATE_LABELING_SETTING_UNSPECIFIED",
 	}
-	body, err := json.Marshal(createProject)
-	if err != nil {
-		return "", err
-	}
-
-	resp, err := doRequestWithHeaders(apiURL+"/management/v1/projects", pat, domain, body)
+	resp, err := doRequestWithHeaders(apiURL+"/management/v1/projects", pat, domain, createProject)
 	if err != nil {
 		return "", err
 	}
@@ -284,12 +273,8 @@ func CreateApp(apiURL, pat, domain, projectID string, redirectURI, loginURL stri
 			},
 		},
 	}
-	body, err := json.Marshal(createApp)
-	if err != nil {
-		return "", "", err
-	}
 
-	resp, err := doRequestWithHeaders(apiURL+"/management/v1/projects/"+projectID+"/apps/oidc", pat, domain, body)
+	resp, err := doRequestWithHeaders(apiURL+"/management/v1/projects/"+projectID+"/apps/oidc", pat, domain, createApp)
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", err
@@ -303,8 +288,12 @@ func CreateApp(apiURL, pat, domain, projectID string, redirectURI, loginURL stri
 	return a.ClientID, a.ClientSecret, err
 }
 
-func doRequestWithHeaders(apiURL, pat, domain string, body []byte) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPost, apiURL, io.NopCloser(bytes.NewReader(body)))
+func doRequestWithHeaders(apiURL, pat, domain string, body any) (*http.Response, error) {
+	data, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPost, apiURL, io.NopCloser(bytes.NewReader(data)))
 	if err != nil {
 		return nil, err
 	}

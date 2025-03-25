@@ -194,12 +194,7 @@ func CreateProject(apiURL, pat, domain string) (string, error) {
 		HasProjectCheck:        false,
 		PrivateLabelingSetting: "PRIVATE_LABELING_SETTING_UNSPECIFIED",
 	}
-	body, err := json.Marshal(createProject)
-	if err != nil {
-		return "", err
-	}
-
-	resp, err := doRequestWithHeaders(apiURL+"/management/v1/projects", pat, domain, body)
+	resp, err := doRequestWithHeaders(apiURL+"/management/v1/projects", pat, domain, createProject)
 	if err != nil {
 		return "", err
 	}
@@ -241,17 +236,17 @@ func CreateApp(apiURL, pat, domain, projectID string, spMetadata []byte, loginUR
 			},
 		},
 	}
-	body, err := json.Marshal(createApp)
-	if err != nil {
-		return err
-	}
 
-	_, err = doRequestWithHeaders(apiURL+"/management/v1/projects/"+projectID+"/apps/saml", pat, domain, body)
+	_, err := doRequestWithHeaders(apiURL+"/management/v1/projects/"+projectID+"/apps/saml", pat, domain, createApp)
 	return err
 }
 
-func doRequestWithHeaders(apiURL, pat, domain string, body []byte) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPost, apiURL, io.NopCloser(bytes.NewReader(body)))
+func doRequestWithHeaders(apiURL, pat, domain string, body any) (*http.Response, error) {
+	data, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPost, apiURL, io.NopCloser(bytes.NewReader(data)))
 	if err != nil {
 		return nil, err
 	}
