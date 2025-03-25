@@ -75,20 +75,38 @@ export class AccountsCardComponent {
               }),
             );
           } else {
+            const fingerprintId = '123';
+
             return defer(() =>
-              this.sessionService.listSessions({}).then((sessions) => {
-                return sessions.sessions
-                  .filter((s) => s.factors?.user?.loginName !== this.user?.preferredLoginName)
-                  .map((s) => {
-                    return {
-                      displayName: s.factors?.user?.displayName ?? '',
-                      avatarUrl: '',
-                      loginName: s.factors?.user?.loginName ?? '',
-                      authState: V2SessionState.ACTIVE,
-                      userName: s.factors?.user?.loginName ?? '',
-                    };
-                  });
-              }),
+              this.sessionService
+                .listSessions({
+                  queries: [
+                    // {
+                    //   query: {
+                    //     case: 'userAgentQuery',
+                    //     value: {
+                    //       fingerprintId,
+                    //     },
+                    //   },
+                    // },
+                  ],
+                })
+                .then((sessions) => {
+                  return sessions.sessions
+                    .filter((s) => {
+                      console.log(this.user);
+                      return s.factors?.user?.loginName !== this.user?.preferredLoginName;
+                    })
+                    .map((s) => {
+                      return {
+                        displayName: s.factors?.user?.displayName ?? '',
+                        avatarUrl: '',
+                        loginName: s.factors?.user?.loginName ?? '',
+                        authState: V2SessionState.ACTIVE,
+                        userName: s.factors?.user?.loginName ?? '',
+                      };
+                    });
+                }),
             );
           }
         }),
