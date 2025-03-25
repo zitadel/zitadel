@@ -86,14 +86,14 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 
 func groupsFromEventType(s string) []string {
 	parts := strings.Split(s, ".")
-	partsLen := len(parts)
-	groups := make([]string, partsLen)
+	groups := make([]string, len(parts))
 	for i := range parts {
-		groups[(partsLen-1)-i] = strings.Join(parts[:i+1], ".")
+		groups[i] = strings.Join(parts[:i+1], ".")
 		if i < len(parts)-1 {
-			groups[(partsLen-1)-i] += ".*"
+			groups[i] += ".*"
 		}
 	}
+	slices.Reverse(groups)
 	return groups
 }
 
