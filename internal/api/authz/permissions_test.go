@@ -120,7 +120,7 @@ func Test_GetUserPermissions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, perms, err := getUserPermissions(context.Background(), tt.args.membershipsResolver, tt.args.requiredPerm, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData, tt.args.ctxData.OrgID)
+			_, perms, err := getUserPermissions(context.Background(), tt.args.membershipsResolver, tt.args.requiredPerm, nil, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData, tt.args.ctxData.OrgID)
 
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)

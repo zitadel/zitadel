@@ -94,13 +94,13 @@ func DefaultErrorHandler(translator *i18n.Translator) func(w http.ResponseWriter
 	}
 }
 
-func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
+func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, systemAuthCOnfig authz.Config, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
 	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler(translator),
-		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
+		authInterceptor: http_mw.AuthorizationInterceptor(verifier, systemAuthCOnfig, authConfig),
 		idGenerator:     idGenerator,
 		storage:         storage,
 		query:           queries,
@@ -129,8 +129,10 @@ func (l *publicFileDownloader) ResourceOwner(_ context.Context, ownerPath string
 	return ownerPath
 }
 
-const maxMemory = 2 << 20
-const paramFile = "file"
+const (
+	maxMemory = 2 << 20
+	paramFile = "file"
+)
 
 func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
