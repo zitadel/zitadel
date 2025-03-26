@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -77,6 +78,10 @@ func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID str
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
+	responseIssuer := authReq.ResponseIssuer
+	if responseIssuer == "" {
+		responseIssuer = http_utils.DomainContext(ctx).Origin()
+	}
 	ctx = provider.ContextWithIssuer(ctx, authReq.ResponseIssuer)
 	url, body, err := s.idp.CreateResponse(ctx, authReq)
 	if err != nil {

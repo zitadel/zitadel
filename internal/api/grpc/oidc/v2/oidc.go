@@ -10,6 +10,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -157,7 +158,11 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 		return nil, err
 	}
 	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
-	ctx = op.ContextWithIssuer(ctx, authReq.Issuer)
+	issuer := authReq.Issuer
+	if issuer == "" {
+		issuer = http_utils.DomainContext(ctx).Origin()
+	}
+	ctx = op.ContextWithIssuer(ctx, issuer)
 	var callback string
 	if aar.ResponseType == domain.OIDCResponseTypeCode {
 		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op.Provider())
