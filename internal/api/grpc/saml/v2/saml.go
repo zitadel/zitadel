@@ -82,7 +82,7 @@ func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID str
 	if responseIssuer == "" {
 		responseIssuer = http_utils.DomainContext(ctx).Origin()
 	}
-	ctx = provider.ContextWithIssuer(ctx, authReq.ResponseIssuer)
+	ctx = provider.ContextWithIssuer(ctx, responseIssuer)
 	url, body, err := s.idp.CreateResponse(ctx, authReq)
 	if err != nil {
 		return nil, err
