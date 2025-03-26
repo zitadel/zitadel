@@ -21,7 +21,7 @@ type Transaction interface {
 	Rollback(ctx context.Context) error
 	End(ctx context.Context, err error) error
 
-	Begin(ctx context.Context, opts *TransactionOptions) (Transaction, error)
+	Begin(ctx context.Context) (Transaction, error)
 
 	QueryExecutor
 }

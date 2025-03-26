@@ -53,8 +53,7 @@ func (tx *pgxTx) Exec(ctx context.Context, sql string, args ...any) error {
 
 // Begin implements [database.Transaction].
 // As postgres does not support nested transactions we use savepoints to emulate them.
-// TransactionOptions are ignored as savepoints do not support changing isolation levels.
-func (tx *pgxTx) Begin(ctx context.Context, _ *database.TransactionOptions) (database.Transaction, error) {
+func (tx *pgxTx) Begin(ctx context.Context) (database.Transaction, error) {
 	savepoint, err := tx.Tx.Begin(ctx)
 	if err != nil {
 		return nil, err

@@ -120,7 +120,7 @@ func (tx *Transaction) Exec(ctx context.Context, stmt string, args ...any) error
 
 // Begin implements [database.Transaction].
 // it is unimplemented
-func (tx *Transaction) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+func (tx *Transaction) Begin(ctx context.Context) (database.Transaction, error) {
 	return nil, errors.New("nested transactions are not supported")
 }
 
