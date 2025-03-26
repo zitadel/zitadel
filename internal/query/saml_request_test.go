@@ -22,7 +22,6 @@ import (
 func TestQueries_SamlRequestByID(t *testing.T) {
 	expQuery := regexp.QuoteMeta(fmt.Sprintf(
 		samlRequestByIDQuery,
-		asOfSystemTime,
 	))
 
 	cols := []string{
@@ -148,8 +147,7 @@ func TestQueries_SamlRequestByID(t *testing.T) {
 				q := &Queries{
 					checkPermission: tt.permissionCheck,
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")

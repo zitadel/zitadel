@@ -117,8 +117,11 @@ func projections(
 	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
 	logging.OnError(err).Fatal("unable create static storage")
 
-	config.Eventstore.Querier = old_es.NewCRDB(client)
-	config.Eventstore.Pusher = new_es.NewEventstore(client)
+	newEventstore := new_es.NewEventstore(client)
+	config.Eventstore.Querier = old_es.NewPostgres(client)
+	config.Eventstore.Pusher = newEventstore
+	config.Eventstore.Searcher = newEventstore
+
 	es := eventstore.NewEventstore(config.Eventstore)
 	esV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(client, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
@@ -220,7 +223,6 @@ func projections(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		client,
 		nil,
 	)
 
@@ -248,7 +250,7 @@ func projections(
 		}
 	}()
 
-	for i := 0; i < int(config.Projections.ConcurrentInstances); i++ {
+	for range int(config.Projections.ConcurrentInstances) {
 		go execProjections(ctx, instances, failedInstances, &wg)
 	}
 
@@ -270,31 +272,39 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 
 		err := projection.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).OnError(err).Info("trigger failed")
+			logging.WithFields("instance", instance).WithError(err).Info("trigger failed")
+			failedInstances <- instance
+			continue
+		}
+
+		err = projection.ProjectInstanceFields(ctx)
+		if err != nil {
+			logging.WithFields("instance", instance).WithError(err).Info("trigger fields failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = admin_handler.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).OnError(err).Info("trigger admin handler failed")
+			logging.WithFields("instance", instance).WithError(err).Info("trigger admin handler failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = auth_handler.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).OnError(err).Info("trigger auth handler failed")
+			logging.WithFields("instance", instance).WithError(err).Info("trigger auth handler failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = notification.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).OnError(err).Info("trigger notification failed")
+			logging.WithFields("instance", instance).WithError(err).Info("trigger notification failed")
 			failedInstances <- instance
 			continue
 		}
+
 		logging.WithFields("instance", instance).Info("projections done")
 	}
 	wg.Done()

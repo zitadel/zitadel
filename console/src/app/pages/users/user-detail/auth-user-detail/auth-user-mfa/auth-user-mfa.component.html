@@ -9,12 +9,7 @@
     <mat-icon class="icon">refresh</mat-icon>
   </button>
 
-  <cnsl-refresh-table
-    [hideRefresh]="true"
-    [loading]="loading$ | async"
-    (refreshed)="getMFAs()"
-    [dataSize]="dataSource.data.length"
-  >
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="getMFAs()">
     <button
       actions
       class="button"

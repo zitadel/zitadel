@@ -5,13 +5,11 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -39,10 +37,6 @@ func (a *SamlRequest) checkLoginClient(ctx context.Context, permissionCheck doma
 //go:embed saml_request_by_id.sql
 var samlRequestByIDQuery string
 
-func (q *Queries) samlRequestByIDQuery(ctx context.Context) string {
-	return fmt.Sprintf(samlRequestByIDQuery, q.client.Timetravel(call.Took(ctx)))
-}
-
 func (q *Queries) SamlRequestByID(ctx context.Context, shouldTriggerBulk bool, id string, checkLoginClient bool) (_ *SamlRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -62,7 +56,7 @@ func (q *Queries) SamlRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 				&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.Issuer, &dst.ACS, &dst.RelayState, &dst.Binding,
 			)
 		},
-		q.samlRequestByIDQuery(ctx),
+		samlRequestByIDQuery,
 		id, authz.GetInstance(ctx).InstanceID(),
 	)
 	if errors.Is(err, sql.ErrNoRows) {

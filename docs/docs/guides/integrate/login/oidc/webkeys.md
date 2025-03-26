@@ -112,7 +112,7 @@ When the request does not contain any specific configuration,
 [RSA](#rsa) is used as default with the default options as described below:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
+curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -136,7 +136,7 @@ The RSA generator config takes two enum values.
 For example, to create a RSA web key with the size of 3072 bits and the SHA512 algorithm (RS512):
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
+curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -160,7 +160,7 @@ The ECDSA generator config takes a single `curve` enum value which determines bo
 For example, to create a ECDSA web key with a P-256 curve and the SHA256 algorithm:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
+curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -184,7 +184,7 @@ Clients which support both curves must inspect `crv` header value to assert the 
 For example, to create a ed25519 web key:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
+curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -246,11 +246,11 @@ For the sake of this example we will use simplified IDs and restrict timestamps 
 After one month, on 2025-02-01, we wish to activate the next available key and create a new key to be available for activation next month. This fulfills requirements 1 and 2.
 
 ```bash
-curl -L -X POST 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/2/_activate' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/web_keys/2/_activate' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
+curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -282,7 +282,7 @@ In addition to the activate and create calls we made on this iteration,
 we can now safely delete the oldest key, as both requirement 3 and 4 are now fulfilled:
 
 ```bash
-curl -L -X DELETE 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/1' \
+curl -L -X DELETE 'https://$CUSTOM-DOMAIN/v2beta/web_keys/1' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```

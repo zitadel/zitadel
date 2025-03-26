@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -149,7 +148,7 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMSConfigQuery(ctx, q.client)
+	query, scan := prepareSMSConfigQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			SMSColumnID.identifier():         id,
@@ -171,7 +170,7 @@ func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMSConfigQuery(ctx, q.client)
+	query, scan := prepareSMSConfigQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			SMSColumnInstanceID.identifier(): instanceID,
@@ -193,7 +192,7 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMSConfigsQuery(ctx, q.client)
+	query, scan := prepareSMSConfigsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SMSColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -217,7 +216,7 @@ func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) 
 	return NewNumberQuery(SMSColumnState, state, NumberEquals)
 }
 
-func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, error)) {
+func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, error)) {
 	return sq.Select(
 			SMSColumnID.identifier(),
 			SMSColumnAggregateID.identifier(),
@@ -238,7 +237,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			SMSHTTPColumnEndpoint.identifier(),
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
-			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*SMSConfig, error) {
 			config := new(SMSConfig)
 
@@ -281,7 +280,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, error)) {
+func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, error)) {
 	return sq.Select(
 			SMSColumnID.identifier(),
 			SMSColumnAggregateID.identifier(),
@@ -304,7 +303,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			countColumn.identifier(),
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
-			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*SMSConfigs, error) {
 			configs := &SMSConfigs{Configs: []*SMSConfig{}}
 

@@ -3,8 +3,6 @@ package postgres
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
@@ -15,9 +13,8 @@ var (
 )
 
 type Storage struct {
-	client           *database.DB
-	config           *Config
-	pushPositionStmt string
+	client *database.DB
+	config *Config
 }
 
 type Config struct {
@@ -25,23 +22,9 @@ type Config struct {
 }
 
 func New(client *database.DB, config *Config) *Storage {
-	initPushStmt(client.Type())
 	return &Storage{
-		client:           client,
-		config:           config,
-		pushPositionStmt: initPushStmt(client.Type()),
-	}
-}
-
-func initPushStmt(typ string) string {
-	switch typ {
-	case "cockroach":
-		return ", hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp()"
-	case "postgres":
-		return ", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())"
-	default:
-		logging.WithFields("database_type", typ).Panic("position statement for type not implemented")
-		return ""
+		client: client,
+		config: config,
 	}
 }
 

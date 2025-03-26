@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -43,6 +44,7 @@ type Config struct {
 	Machine         *id.Config
 	Projections     projection.Config
 	Notifications   handlers.WorkerConfig
+	Executions      execution.WorkerConfig
 	Eventstore      *eventstore.Config
 
 	InitProjections InitProjections
@@ -69,7 +71,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
 			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
-			database.DecodeHook,
+			database.DecodeHook(false),
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
