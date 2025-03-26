@@ -44,7 +44,7 @@ enum Page {
 })
 export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   public Page = Page;
-  @ViewChild('actionTypeComponent') actionTypeComponent!: ActionsTwoAddActionTypeComponent;
+  @ViewChild('actionTypeComponent', { static: false }) actionTypeComponent!: ActionsTwoAddActionTypeComponent;
   @ViewChild('actionConditionComponent') actionConditionComponent!: ActionsTwoAddActionConditionComponent;
   @ViewChild('actionTargetComponent') actionTargetComponent!: ActionsTwoAddActionTargetComponent;
 

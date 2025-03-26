@@ -1,5 +1,3 @@
-<p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
-
 <form
   *ngIf="conditionForm && executionType$ | async as type"
   class="form-grid"
@@ -7,6 +5,8 @@
   (ngSubmit)="continue.emit()"
 >
   <ng-container *ngIf="type == ExecutionType.REQUEST || type == ExecutionType.RESPONSE">
+    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
+
     <div class="emailVerified">
       <mat-checkbox formControlName="all">
         <div class="execution-condition-text">
@@ -56,6 +56,105 @@
           <span>{{ method }}</span>
         </mat-option>
       </mat-autocomplete>
+    </cnsl-form-field>
+  </ng-container>
+
+  <ng-container *ngIf="type == ExecutionType.FUNCTIONS">
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        type="text"
+        placeholder=""
+        #nameInput
+        formControlName="name"
+        [matAutocomplete]="autofunctionname"
+        [disabled]="conditionForm?.get('all')?.value == true"
+      />
+
+      <mat-autocomplete #autofunctionname="matAutocomplete">
+        <mat-option *ngIf="(executionFunctions$ | async) == undefined" class="is-loading">
+          <mat-spinner diameter="30"></mat-spinner>
+        </mat-option>
+        <mat-option *ngFor="let function of executionFunctions$ | async" [value]="function">
+          <span>{{ function }}</span>
+        </mat-option>
+      </mat-autocomplete>
+
+      <span class="name-hint cnsl-secondary-text" cnslHint>{{
+        'ACTIONSTWO.EXECUTION.CREATE.CONDITION.FUNCTIONNAME.DESCRIPTION' | translate
+      }}</span>
+    </cnsl-form-field>
+  </ng-container>
+
+  <ng-container *ngIf="type == ExecutionType.EVENTS">
+    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
+
+    <div class="emailVerified">
+      <mat-checkbox formControlName="all">
+        <div class="execution-condition-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.DESCRIPTION' | translate
+          }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
+
+    <!-- <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.DESCRIPTION' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        type="text"
+        placeholder=""
+        #nameInput
+        formControlName="service"
+        [matAutocomplete]="autogroup"
+        [disabled]="conditionForm?.get('all')?.value == true"
+      />
+
+      <mat-autocomplete #autogroup="matAutocomplete">
+        <mat-option *ngIf="(executionServices$ | async) == undefined" class="is-loading">
+          <mat-spinner diameter="30"></mat-spinner>
+        </mat-option>
+        <mat-option *ngFor="let group of executionServices$ | async" [value]="group">
+          <span>{{ group }}</span>
+        </mat-option>
+      </mat-autocomplete>
+    </cnsl-form-field> -->
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.GROUP.TITLE' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" #nameInput formControlName="group" />
+      <span class="name-hint cnsl-secondary-text" cnslHint>{{
+        'ACTIONSTWO.TARGET.CREATE.GROUP.DESCRIPTION' | translate
+      }}</span>
+    </cnsl-form-field>
+
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.TITLE' | translate }}</p>
+
+    <!-- <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.DESCRIPTION' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" #nameInput formControlName="method" [matAutocomplete]="autoevents" />
+
+      <mat-autocomplete #autoevents="matAutocomplete">
+        <mat-option *ngIf="(executionEvents$ | async) == undefined" class="is-loading">
+          <mat-spinner diameter="30"></mat-spinner>
+        </mat-option>
+        <mat-option *ngFor="let event of executionEvents$ | async" [value]="event">
+          <span>{{ event }}</span>
+        </mat-option>
+      </mat-autocomplete>
+    </cnsl-form-field> -->
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.EVENT.TITLE' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" #nameInput formControlName="event" />
+      <span class="name-hint cnsl-secondary-text" cnslHint>{{
+        'ACTIONSTWO.TARGET.CREATE.EVENT.DESCRIPTION' | translate
+      }}</span>
     </cnsl-form-field>
   </ng-container>
 </form>

@@ -38,10 +38,10 @@ import { Condition } from '@zitadel/proto/zitadel/resources/action/v3alpha/execu
 })
 export class ActionsTwoAddActionConditionComponent implements OnInit {
   public ExecutionType = ExecutionType;
-  protected conditionForm:
+  protected conditionForm!:
     | ReturnType<typeof this.buildActionConditionFormForRequestOrResponse>
     | ReturnType<typeof this.buildActionConditionFormForFunctions>
-    | ReturnType<typeof this.buildActionConditionFormForEvents> = this.buildActionConditionFormForRequestOrResponse();
+    | ReturnType<typeof this.buildActionConditionFormForEvents>;
 
   public readonly executionServices$: Observable<string[] | undefined> = of(undefined);
   public readonly executionMethods$: Observable<string[] | undefined> = of(undefined);
@@ -111,7 +111,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
       }),
       // TODO - fix this to map valueChanges
       switchMap((executionType) =>
-        this.conditionForm.statusChanges.pipe(
+        this.conditionForm.valueChanges.pipe(
           tap((status) => console.log('Form status:', status)), // Debugging
           startWith(this.conditionForm.value),
           map((formValues) => this.mapToCondition(executionType, this.conditionForm.value)),
@@ -122,8 +122,6 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
   }
 
   private mapToCondition(executionType: ExecutionType, formValues: any): Condition {
-    type ExecutionTypeValue = (typeof ExecutionType)[keyof typeof ExecutionType];
-
     switch (executionType) {
       case ExecutionType.FUNCTIONS:
         return {
@@ -136,7 +134,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
         } as Condition;
 
       case ExecutionType.EVENTS:
-        const conditionValue: any = formValues.all
+        const conditionValue = formValues.all
           ? { condition: { case: 'all', value: true } }
           : formValues.service
             ? {
@@ -156,7 +154,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
 
         return {
           conditionType: {
-            case: executionType as ExecutionTypeValue,
+            case: executionType,
             value: conditionValue,
           },
         } as Condition;
@@ -182,7 +180,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
 
         return {
           conditionType: {
-            case: executionType as ExecutionTypeValue,
+            case: executionType,
             value: defaultConditionValue,
           },
         } as Condition;
@@ -190,6 +188,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
   }
 
   public buildActionConditionFormForRequestOrResponse() {
+    console.log('build request response form');
     return this.fb.group({
       all: new FormControl<boolean>(true),
       service: new FormControl<string>(''),
@@ -198,16 +197,20 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
   }
 
   public buildActionConditionFormForFunctions() {
+    console.log('build functions form');
+
     return this.fb.group({
       name: new FormControl<string>('', [requiredValidator]),
     });
   }
 
   public buildActionConditionFormForEvents() {
+    console.log('build events form');
+
     return this.fb.group({
-      event: new FormControl<string>('', [requiredValidator]),
-      group: new FormControl<string>('', [requiredValidator]),
       all: new FormControl<boolean>(true),
+      group: new FormControl<string>('', [requiredValidator]),
+      event: new FormControl<string>('', [requiredValidator]),
     });
   }
 
