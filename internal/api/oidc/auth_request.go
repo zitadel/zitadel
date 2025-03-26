@@ -111,6 +111,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		Prompt:           PromptToBusiness(req.Prompt),
 		UILocales:        UILocalesToBusiness(req.UILocales),
 		MaxAge:           MaxAgeToBusiness(req.MaxAge),
+		Issuer:           o.contextToIssuer(ctx),
 	}
 	if req.LoginHint != "" {
 		authRequest.LoginHint = &req.LoginHint
