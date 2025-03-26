@@ -23,11 +23,6 @@ type ProjectionMetrics struct {
 }
 
 func NewProjectionMetrics() *ProjectionMetrics {
-	// we rely on the metrics global variable being set during Setup
-	if metrics.M == nil {
-		logging.Fatal("failed to register projection metrics, metrics provider not initialized")
-	}
-
 	projectionMetrics := &ProjectionMetrics{provider: metrics.M}
 
 	err := projectionMetrics.provider.RegisterCounter(

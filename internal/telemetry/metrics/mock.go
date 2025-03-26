@@ -18,6 +18,9 @@ type MockMetrics struct {
 	counterLabels   map[string][]map[string]attribute.Value
 }
 
+var _ Metrics = new(MockMetrics)
+
+// NewMockMetrics creates a new Metrics instance for testing
 func NewMockMetrics() *MockMetrics {
 	return &MockMetrics{
 		histogramValues: make(map[string][]float64),
