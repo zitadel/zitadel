@@ -12,7 +12,6 @@ import (
 	"slices"
 	"syscall"
 	"time"
-	webkey "zitadel/internal/api/grpc/webkey/v2beta"
 
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/common-nighthawk/go-figure"
@@ -57,6 +56,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/internal/api/grpc/webkey/v2beta"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/idp"
