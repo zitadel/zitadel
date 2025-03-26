@@ -109,7 +109,6 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   }
 
   public onTypeChanged(type: ExecutionType): void {
-    console.log(type);
     this.executionType$.next(type);
   }
 
@@ -120,4 +119,6 @@ export class ActionTwoAddActionDialogComponent implements AfterViewInit {
   public onTargetChanged(target: string): void {
     console.log('target changed:', target);
   }
+
+  public reconstructRequest(): void {}
 }

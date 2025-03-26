@@ -43,13 +43,11 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
     | ReturnType<typeof this.buildActionConditionFormForFunctions>
     | ReturnType<typeof this.buildActionConditionFormForEvents> = this.buildActionConditionFormForRequestOrResponse();
 
-  @Output() public continue: EventEmitter<void> = new EventEmitter();
-  // @Output() public conditionChanges$: Observable<RequestExecution | ResponseExecution | FunctionExecution | EventExecution>;
-
   public readonly executionServices$: Observable<string[] | undefined> = of(undefined);
   public readonly executionMethods$: Observable<string[] | undefined> = of(undefined);
   public readonly executionFunctions$: Observable<string[] | undefined> = of(undefined);
 
+  @Output() public continue: EventEmitter<void> = new EventEmitter();
   @Output() public conditionChanges$: Observable<Condition | undefined> = of(undefined);
   @Input() public executionType$!: Observable<ExecutionType>;
 
@@ -94,42 +92,33 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
     //     },
     //   },
     // };
-
-    const r = this.conditionForm.valueChanges.pipe();
   }
 
   public ngOnInit(): void {
     // Subscribe to executionType$ to get the latest value
-    this.executionType$
-      .pipe(
-        tap((type) => console.log('ExecutionType received in condition component:', type)),
-        map((type) => {
-          // Dynamically update the form based on the execution type
-          switch (type) {
-            case ExecutionType.EVENTS:
-              return this.buildActionConditionFormForEvents();
-            case ExecutionType.FUNCTIONS:
-              return this.buildActionConditionFormForFunctions();
-            default:
-              return this.buildActionConditionFormForRequestOrResponse();
-          }
-        }),
-      )
-      .subscribe((form) => {
-        this.conditionForm = form; // Update the form dynamically
-      });
-
-    // // @ts-ignore
-    // this.conditionChanges$ = this.executionType$.pipe(
-    //   switchMap((executionType) =>
-    //     this.conditionForm.valueChanges.pipe(
-    //       //@ts-ignore
-    //       startWith(this.conditionForm.value),
-    //       map((formValues) => this.mapToCondition(executionType, formValues)),
-    //     ),
-    //   ),
-    //   tap((condition) => console.log('Mapped Condition:', condition)), // Debugging
-    // );
+    this.conditionChanges$ = this.executionType$.pipe(
+      tap((type) => console.log('ExecutionType received in condition component:', type)),
+      tap((type) => {
+        // Dynamically update the form based on the execution type
+        switch (type) {
+          case ExecutionType.EVENTS:
+            return this.buildActionConditionFormForEvents();
+          case ExecutionType.FUNCTIONS:
+            return this.buildActionConditionFormForFunctions();
+          default:
+            return this.buildActionConditionFormForRequestOrResponse();
+        }
+      }),
+      // TODO - fix this to map valueChanges
+      switchMap((executionType) =>
+        this.conditionForm.statusChanges.pipe(
+          tap((status) => console.log('Form status:', status)), // Debugging
+          startWith(this.conditionForm.value),
+          map((formValues) => this.mapToCondition(executionType, this.conditionForm.value)),
+        ),
+      ),
+      tap((condition) => console.log('Mapped Condition:', condition)), // Debugging
+    );
   }
 
   private mapToCondition(executionType: ExecutionType, formValues: any): Condition {
