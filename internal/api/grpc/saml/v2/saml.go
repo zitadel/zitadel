@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/saml/pkg/provider"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -76,6 +77,7 @@ func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID str
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
+	ctx = provider.ContextWithIssuer(ctx, authReq.ResponseIssuer)
 	url, body, err := s.idp.CreateResponse(ctx, authReq)
 	if err != nil {
 		return nil, err
