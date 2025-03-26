@@ -32,7 +32,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatProgressSpinnerModule,
   ],
 })
-export class ActionsTwoAddActionTargetComponent implements OnInit {
+export class ActionsTwoAddActionTargetComponent {
   protected readonly targetForm: ReturnType<typeof this.buildActionTargetForm> = this.buildActionTargetForm();
 
   @Output() public continue: EventEmitter<void> = new EventEmitter();
@@ -52,8 +52,6 @@ export class ActionsTwoAddActionTargetComponent implements OnInit {
       tap((value) => console.log('target type changed:', value)),
     );
   }
-
-  public ngOnInit(): void {}
 
   public buildActionTargetForm() {
     return this.fb.group({

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular
 import { ActionService } from 'src/app/services/action.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { defer, firstValueFrom, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
-import { catchError, map, timeout } from 'rxjs/operators';
+import { catchError, filter, map, timeout } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 import { Execution, GetExecution } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -78,18 +78,19 @@ export class ActionsTwoActionsComponent implements OnInit {
   }
 
   public openDialog(): void {
-    const ref = this.dialog.open(ActionTwoAddActionDialogComponent, {
+    // todo: currently dialog always returns nothing
+    const ref = this.dialog.open<ActionTwoAddActionDialogComponent, undefined, void>(ActionTwoAddActionDialogComponent, {
       width: '400px',
-      data: {},
     });
 
-    ref.afterClosed().subscribe((resp) => {
-      if (resp) {
+    ref
+      .afterClosed()
+      .pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() =>
         this.actionService.setExecution({
           condition: {},
-        });
-      }
-    });
+        }),
+      );
   }
 
   public deleteExecution(execution: GetExecution) {}

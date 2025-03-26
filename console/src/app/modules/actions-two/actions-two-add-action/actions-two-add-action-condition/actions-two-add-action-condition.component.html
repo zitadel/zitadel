@@ -1,10 +1,10 @@
 <form
-  *ngIf="conditionForm && executionType$ | async as type"
+  *ngIf="form$ | async as form"
+  [formGroup]="form.form"
   class="form-grid"
-  [formGroup]="conditionForm"
-  (ngSubmit)="continue.emit()"
+  (ngSubmit)="submit(form)"
 >
-  <ng-container *ngIf="type == ExecutionType.REQUEST || type == ExecutionType.RESPONSE">
+  <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
     <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
 
     <div class="emailVerified">
@@ -29,7 +29,7 @@
         #nameInput
         formControlName="service"
         [matAutocomplete]="autoservice"
-        [disabled]="conditionForm?.get('all')?.value == true"
+        [disabled]="form.form.controls.all.value"
       />
 
       <mat-autocomplete #autoservice="matAutocomplete">
@@ -59,17 +59,15 @@
     </cnsl-form-field>
   </ng-container>
 
-  <ng-container *ngIf="type == ExecutionType.FUNCTIONS">
+  <ng-container *ngIf="form.case === 'function'">
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
       <input
         cnslInput
         type="text"
         placeholder=""
-        #nameInput
         formControlName="name"
         [matAutocomplete]="autofunctionname"
-        [disabled]="conditionForm?.get('all')?.value == true"
       />
 
       <mat-autocomplete #autofunctionname="matAutocomplete">
@@ -87,7 +85,7 @@
     </cnsl-form-field>
   </ng-container>
 
-  <ng-container *ngIf="type == ExecutionType.EVENTS">
+  <ng-container *ngIf="form.case === 'event'">
     <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
 
     <div class="emailVerified">

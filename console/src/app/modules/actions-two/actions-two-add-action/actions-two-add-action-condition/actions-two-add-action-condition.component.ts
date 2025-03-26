@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,14 +7,38 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EMPTY, Observable, catchError, defer, filter, map, of, shareReplay, startWith, switchMap, tap } from 'rxjs';
-import { ExecutionType } from '../actions-two-add-action-type/actions-two-add-action-type.component';
+import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Condition } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
+import { Message } from '@bufbuild/protobuf';
+
+export type ConditionType = NonNullable<Condition['conditionType']['case']>;
+type ConditionTypeValue<T extends ConditionType> = Omit<
+  NonNullable<Extract<Condition['conditionType'], { case: T }>['value']>,
+  // we remove the message keys so $typeName is not required
+  keyof Message
+>;
+
+type Form = Observable<
+  | {
+      case: 'request' | 'response';
+      form: ReturnType<
+        ActionsTwoAddActionConditionComponent<'request' | 'response'>['buildActionConditionFormForRequestOrResponse']
+      >;
+    }
+  | {
+      case: 'event';
+      form: ReturnType<ActionsTwoAddActionConditionComponent<'event'>['buildActionConditionFormForEvents']>;
+    }
+  | {
+      case: 'function';
+      form: ReturnType<ActionsTwoAddActionConditionComponent<'event'>['buildActionConditionFormForFunctions']>;
+    }
+>;
 
 @Component({
   standalone: true,
@@ -36,181 +60,82 @@ import { Condition } from '@zitadel/proto/zitadel/resources/action/v3alpha/execu
     MatProgressSpinnerModule,
   ],
 })
-export class ActionsTwoAddActionConditionComponent implements OnInit {
-  public ExecutionType = ExecutionType;
-  protected conditionForm!:
-    | ReturnType<typeof this.buildActionConditionFormForRequestOrResponse>
-    | ReturnType<typeof this.buildActionConditionFormForFunctions>
-    | ReturnType<typeof this.buildActionConditionFormForEvents>;
+export class ActionsTwoAddActionConditionComponent<T extends ConditionType> {
+  @Input({ required: true }) public set conditionType(conditionType: T) {
+    this.conditionType$.next(conditionType);
+  }
+  @Output() public conditionTypeValue = new EventEmitter<ConditionTypeValue<T>>();
 
-  public readonly executionServices$: Observable<string[] | undefined> = of(undefined);
-  public readonly executionMethods$: Observable<string[] | undefined> = of(undefined);
-  public readonly executionFunctions$: Observable<string[] | undefined> = of(undefined);
+  private readonly conditionType$ = new ReplaySubject<T>(1);
+  protected readonly form$: Form;
 
-  @Output() public continue: EventEmitter<void> = new EventEmitter();
-  @Output() public conditionChanges$: Observable<Condition | undefined> = of(undefined);
-  @Input() public executionType$!: Observable<ExecutionType>;
+  protected readonly executionServices$: Observable<string[]>;
+  protected readonly executionMethods$: Observable<string[]>;
+  protected readonly executionFunctions$: Observable<string[]>;
 
   constructor(
     private readonly fb: FormBuilder,
     private actionService: ActionService,
     private toast: ToastService,
   ) {
-    // Initialize the Observable to emit form value changes
-    // this.conditionChanges$ = this.conditionForm!.valueChanges.pipe(
-    //   startWith(this.conditionForm!.value), // Emit the initial value
-    //   tap((value) => console.log('ExecutionType changed:', value)), // Debugging/logging
-    // );
+    this.form$ = this.buildForm();
     this.executionServices$ = this.listExecutionServices().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionMethods$ = this.listExecutionMethods().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionFunctions$ = this.listExecutionFunctions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-
-    // const condition: MessageInitShape<typeof ConditionSchema> = {
-    //   conditionType: {
-    //     case: 'request',
-    //     value: {
-    //       condition: this.conditionForm.get('all').value
-    //         ? {
-    //             case: 'all',
-    //           }
-    //         : this.conditionForm.get('service')?.value
-    //           ? {
-    //               case: 'service',
-    //               value: {
-    //                 service: this.conditionForm.get('service')?.value,
-    //                 method: this.conditionForm.get('method')?.value,
-    //               },
-    //             }
-    //           : this.conditionForm.get('method')?.value
-    //             ? {
-    //                 case: 'method',
-    //                 value: {
-    //                   method: this.conditionForm.get('method')?.value,
-    //                 },
-    //               }
-    //             : undefined,
-    //     },
-    //   },
-    // };
   }
 
-  public ngOnInit(): void {
-    // Subscribe to executionType$ to get the latest value
-    this.conditionChanges$ = this.executionType$.pipe(
-      tap((type) => console.log('ExecutionType received in condition component:', type)),
-      tap((type) => {
-        // Dynamically update the form based on the execution type
-        switch (type) {
-          case ExecutionType.EVENTS:
-            return this.buildActionConditionFormForEvents();
-          case ExecutionType.FUNCTIONS:
-            return this.buildActionConditionFormForFunctions();
-          default:
-            return this.buildActionConditionFormForRequestOrResponse();
+  public buildForm(): Form {
+    return this.conditionType$.pipe(
+      map((conditionType) => {
+        if (conditionType === 'request') {
+          return {
+            case: 'request',
+            form: this.buildActionConditionFormForRequestOrResponse(),
+          };
         }
+        if (conditionType === 'response') {
+          return {
+            case: 'response',
+            form: this.buildActionConditionFormForRequestOrResponse(),
+          };
+        }
+        if (conditionType === 'event') {
+          return {
+            case: 'event',
+            form: this.buildActionConditionFormForEvents(),
+          };
+        }
+        if (conditionType === 'function') {
+          return {
+            case: 'function',
+            form: this.buildActionConditionFormForFunctions(),
+          };
+        }
+
+        throw new Error('Invalid conditionType');
       }),
-      // TODO - fix this to map valueChanges
-      switchMap((executionType) =>
-        this.conditionForm.valueChanges.pipe(
-          tap((status) => console.log('Form status:', status)), // Debugging
-          startWith(this.conditionForm.value),
-          map((formValues) => this.mapToCondition(executionType, this.conditionForm.value)),
-        ),
-      ),
-      tap((condition) => console.log('Mapped Condition:', condition)), // Debugging
     );
   }
 
-  private mapToCondition(executionType: ExecutionType, formValues: any): Condition {
-    switch (executionType) {
-      case ExecutionType.FUNCTIONS:
-        return {
-          conditionType: {
-            case: 'function',
-            value: {
-              name: formValues.name,
-            },
-          },
-        } as Condition;
-
-      case ExecutionType.EVENTS:
-        const conditionValue = formValues.all
-          ? { condition: { case: 'all', value: true } }
-          : formValues.service
-            ? {
-                condition: {
-                  case: 'service',
-                  value: formValues.service as string,
-                },
-              }
-            : formValues.method
-              ? {
-                  condition: {
-                    case: 'method',
-                    value: formValues.method as string,
-                  },
-                }
-              : undefined;
-
-        return {
-          conditionType: {
-            case: executionType,
-            value: conditionValue,
-          },
-        } as Condition;
-
-      default:
-        const defaultConditionValue = formValues.all
-          ? { condition: { case: 'all', value: true } }
-          : formValues.service
-            ? {
-                condition: {
-                  case: 'service',
-                  value: formValues.service as string,
-                },
-              }
-            : formValues.method
-              ? {
-                  condition: {
-                    case: 'method',
-                    value: formValues.method as string,
-                  },
-                }
-              : undefined;
-
-        return {
-          conditionType: {
-            case: executionType,
-            value: defaultConditionValue,
-          },
-        } as Condition;
-    }
-  }
-
-  public buildActionConditionFormForRequestOrResponse() {
-    console.log('build request response form');
+  private buildActionConditionFormForRequestOrResponse() {
     return this.fb.group({
-      all: new FormControl<boolean>(true),
-      service: new FormControl<string>(''),
-      method: new FormControl<string>(''),
+      all: new FormControl<boolean>(true, { nonNullable: true }),
+      service: new FormControl<string>('', { nonNullable: true }),
+      method: new FormControl<string>('', { nonNullable: true }),
     });
   }
 
   public buildActionConditionFormForFunctions() {
-    console.log('build functions form');
-
     return this.fb.group({
-      name: new FormControl<string>('', [requiredValidator]),
+      name: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
     });
   }
 
   public buildActionConditionFormForEvents() {
-    console.log('build events form');
-
     return this.fb.group({
-      all: new FormControl<boolean>(true),
-      group: new FormControl<string>('', [requiredValidator]),
-      event: new FormControl<string>('', [requiredValidator]),
+      all: new FormControl<boolean>(true, { nonNullable: true }),
+      group: new FormControl<string>('', { nonNullable: true }),
+      event: new FormControl<string>('', { nonNullable: true }),
     });
   }
 
@@ -219,7 +144,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
       map(({ services }) => services),
       catchError((error) => {
         this.toast.showError(error);
-        return EMPTY;
+        return of([]);
       }),
     );
   }
@@ -229,7 +154,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
       map(({ functions }) => functions),
       catchError((error) => {
         this.toast.showError(error);
-        return EMPTY;
+        return of([]);
       }),
     );
   }
@@ -239,8 +164,86 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
       map(({ methods }) => methods),
       catchError((error) => {
         this.toast.showError(error);
-        return EMPTY;
+        return of([]);
       }),
     );
+  }
+
+  protected submit(form: ObservedValueOf<Form>) {
+    if (form.case === 'request' || form.case === 'response') {
+      (this as unknown as ActionsTwoAddActionConditionComponent<'request' | 'response'>).submitRequestOrResponse(form.form);
+    } else if (form.case === 'event') {
+      (this as unknown as ActionsTwoAddActionConditionComponent<'event'>).submitEvent(form.form);
+    } else if (form.case === 'function') {
+      (this as unknown as ActionsTwoAddActionConditionComponent<'function'>).submitFunction(form.form);
+    }
+  }
+
+  private submitRequestOrResponse(
+    this: ActionsTwoAddActionConditionComponent<'request' | 'response'>,
+    form: ReturnType<typeof this.buildActionConditionFormForRequestOrResponse>,
+  ) {
+    const { all, service, method } = form.getRawValue();
+    if (all) {
+      this.conditionTypeValue.emit({
+        condition: {
+          case: 'all',
+          value: true,
+        },
+      });
+    } else if (method) {
+      this.conditionTypeValue.emit({
+        condition: {
+          case: 'method',
+          value: method,
+        },
+      });
+    } else if (service) {
+      this.conditionTypeValue.emit({
+        condition: {
+          case: 'service',
+          value: service,
+        },
+      });
+    }
+  }
+
+  private submitEvent(
+    this: ActionsTwoAddActionConditionComponent<'event'>,
+    form: ReturnType<typeof this.buildActionConditionFormForEvents>,
+  ) {
+    const { all, event, group } = form.getRawValue();
+    if (all) {
+      this.conditionTypeValue.emit({
+        condition: {
+          case: 'all',
+          value: true,
+        },
+      });
+    } else if (event) {
+      this.conditionTypeValue.emit({
+        condition: {
+          case: 'event',
+          value: event,
+        },
+      });
+    } else if (group) {
+      this.conditionTypeValue.emit({
+        condition: {
+          case: 'group',
+          value: group,
+        },
+      });
+    }
+  }
+
+  private submitFunction(
+    this: ActionsTwoAddActionConditionComponent<'function'>,
+    form: ReturnType<typeof this.buildActionConditionFormForFunctions>,
+  ) {
+    const { name } = form.getRawValue();
+    this.conditionTypeValue.emit({
+      name,
+    });
   }
 }
