@@ -5,12 +5,12 @@ import (
 	_ "embed"
 	"errors"
 	"log/slog"
+	"slices"
 	"strings"
 	"text/template"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-	"golang.org/x/exp/slices"
 
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
