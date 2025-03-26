@@ -17,7 +17,7 @@ import { Condition } from '@zitadel/proto/zitadel/resources/action/v3alpha/execu
 import { Message } from '@bufbuild/protobuf';
 
 export type ConditionType = NonNullable<Condition['conditionType']['case']>;
-type ConditionTypeValue<T extends ConditionType> = Omit<
+export type ConditionTypeValue<T extends ConditionType> = Omit<
   NonNullable<Extract<Condition['conditionType'], { case: T }>['value']>,
   // we remove the message keys so $typeName is not required
   keyof Message

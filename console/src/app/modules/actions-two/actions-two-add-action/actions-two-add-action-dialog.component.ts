@@ -39,7 +39,7 @@ enum Page {
   ],
 })
 export class ActionTwoAddActionDialogComponent {
-  protected readonly conditionType: 'function' = 'function';
+  protected readonly conditionType: ConditionType = 'function';
   public Page = Page;
   @ViewChild('actionTypeComponent', { static: false }) actionTypeComponent!: ActionsTwoAddActionTypeComponent;
   @ViewChild('actionConditionComponent') actionConditionComponent!: ActionsTwoAddActionConditionComponent<ConditionType>;
