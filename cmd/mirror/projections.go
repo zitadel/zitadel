@@ -224,7 +224,6 @@ func projections(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		client,
 		nil,
 	)
 
@@ -306,6 +305,7 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			failedInstances <- instance
 			continue
 		}
+
 		logging.WithFields("instance", instance).Info("projections done")
 	}
 	wg.Done()
