@@ -38,8 +38,6 @@ export class ActionsTwoAddActionTargetComponent implements OnInit {
   @Output() public continue: EventEmitter<void> = new EventEmitter();
   @Output() public targetChanges$: Observable<string>;
 
-  // @Output() public conditionChanges$: Observable<RequestExecution | ResponseExecution | FunctionExecution | EventExecution>;
-
   public readonly executionTargets$: Observable<string[] | undefined> = of(undefined);
 
   constructor(

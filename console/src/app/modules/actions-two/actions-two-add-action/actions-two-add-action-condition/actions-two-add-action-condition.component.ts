@@ -50,7 +50,7 @@ export class ActionsTwoAddActionConditionComponent implements OnInit {
   public readonly executionMethods$: Observable<string[] | undefined> = of(undefined);
   public readonly executionFunctions$: Observable<string[] | undefined> = of(undefined);
 
-  @Output() public conditionChanges$!: Observable<Condition>;
+  @Output() public conditionChanges$: Observable<Condition | undefined> = of(undefined);
   @Input() public executionType$!: Observable<ExecutionType>;
 
   constructor(
