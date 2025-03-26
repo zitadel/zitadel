@@ -34,7 +34,7 @@ func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string,
 
 func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	for _, service := range idFromRequestsServices {
 		if !strings.HasPrefix(service, "/") {

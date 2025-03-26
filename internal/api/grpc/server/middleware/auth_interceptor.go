@@ -26,7 +26,7 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	}
 
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	authToken := grpc_util.GetAuthorizationHeader(authCtx)
 	if authToken == "" {

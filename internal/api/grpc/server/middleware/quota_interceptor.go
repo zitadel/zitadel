@@ -24,7 +24,7 @@ func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreS
 			return handler(ctx, req)
 		}
 		interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
-		defer span.EndWithError(err)
+		defer func() { span.EndWithError(err) }()
 
 		// The auth interceptor will ensure that only authorized or public requests are allowed.
 		// So if there's no authorization context, we don't need to check for limitation

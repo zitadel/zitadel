@@ -198,7 +198,7 @@ func (c *Commands) GetCurrentAuthRequest(ctx context.Context, id string) (_ *Cur
 
 func (c *Commands) getAuthRequestWriteModel(ctx context.Context, id string) (writeModel *AuthRequestWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewAuthRequestWriteModel(ctx, id)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
