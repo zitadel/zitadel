@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	_ "embed"
-	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 	"slices"
 	"syscall"
 	"time"
+	webkey "zitadel/internal/api/grpc/webkey/v2beta"
 
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/common-nighthawk/go-figure"
@@ -35,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	action_v2_beta "github.com/zitadel/zitadel/internal/api/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
@@ -45,11 +46,9 @@ import (
 	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
 	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
-	action_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/action/v3alpha"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/debug_events/debug_events"
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
 	userschema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/userschema/v3alpha"
-	"github.com/zitadel/zitadel/internal/api/grpc/resources/webkey/v3"
 	saml_v2 "github.com/zitadel/zitadel/internal/api/grpc/saml/v2"
 	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
@@ -107,7 +106,7 @@ func New(server chan<- *Server) *cobra.Command {
 		Short: "starts ZITADEL instance",
 		Long: `starts ZITADEL.
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := cmd_tls.ModeFromFlag(cmd)
 			if err != nil {
@@ -163,7 +162,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
 	config.Eventstore.Searcher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
@@ -269,9 +268,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
-		return errors.New("notifications must be set to LegacyEnabled=true when using CockroachDB")
-	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
@@ -411,8 +407,7 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.SystemAuthZ, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}
@@ -478,7 +473,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, idp_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
+	if err := apis.RegisterService(ctx, action_v2_beta.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
