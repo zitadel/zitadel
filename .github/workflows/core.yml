@@ -31,8 +31,7 @@ env:
 
 jobs:
   build:
-    runs-on:
-      group: zitadel-public
+    runs-on: ubuntu-latest
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}
