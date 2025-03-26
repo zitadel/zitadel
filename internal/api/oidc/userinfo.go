@@ -177,6 +177,7 @@ func prepareRoles(ctx context.Context, scope []string, projectID string, project
 	return roleAudience, requestedRoles
 }
 
+/*
 func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
 	out := &oidc.UserInfo{
 		Subject: user.User.ID,
@@ -221,6 +222,7 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 	}
 	return out
 }
+*/
 
 func userInfoToOIDCV2(user *query.OIDCUserInfo, group *query.Groups, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
 	out := &oidc.UserInfo{
@@ -538,11 +540,11 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	return nil
 }
 
-func setGroupInfo(user *query.User, out *oidc.UserInfo) {
-	if len(user.GroupIDs) > 0 {
-		out.AppendClaims(ClaimGroups, user.GroupIDs)
-	}
-}
+// func setGroupInfo(user *query.User, out *oidc.UserInfo) {
+// 	if len(user.GroupIDs) > 0 {
+// 		out.AppendClaims(ClaimGroups, user.GroupIDs)
+// 	}
+// }
 
 func fetchGroupName(groups *query.Groups) []string {
 	names := make([]string, 0, len(groups.Groups))

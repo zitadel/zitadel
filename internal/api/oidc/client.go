@@ -628,7 +628,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 				claims = appendClaim(claims, claim, value)
 			}
 		case ScopeIAMGroups:
-			userGroups, err := o.assertUserGroup(ctx, userID)
+			userGroups, err := o.assertUserGroupV2(ctx, userID)
 			if err != nil {
 				return nil, err
 			}
@@ -1151,10 +1151,18 @@ func (s *Server) checkOrgScopes(ctx context.Context, resourceOwner string, scope
 	}), nil
 }
 
-func (o *OPStorage) assertUserGroup(ctx context.Context, userID string) ([]string, error) {
-	user, err := o.query.GetUserByID(ctx, true, userID)
+// func (o *OPStorage) assertUserGroup(ctx context.Context, userID string) ([]string, error) {
+// 	user, err := o.query.GetUserByID(ctx, true, userID)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return user.GroupIDs, nil
+// }
+
+func (o *OPStorage) assertUserGroupV2(ctx context.Context, userID string) ([]string, error) {
+	grp, err := o.query.GroupByUserID(ctx, true, userID)
 	if err != nil {
 		return nil, err
 	}
-	return user.GroupIDs, nil
+	return fetchGroupName(grp), nil
 }
