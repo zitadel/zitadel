@@ -45,6 +45,7 @@ type Connector interface {
 type Database interface {
 	DatabaseName() string
 	Username() string
+	Type() DatabaseType
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {
