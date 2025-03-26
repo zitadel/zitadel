@@ -1,13 +1,6 @@
 ---
-title: Settings / Billing
+title: Billing
 ---
-
-## General
-
-In the general settings you can change your team name, notification settings and delete your team.
-
-![Customer Portal Settings General](/img/manuals/portal/customer_portal_settings_general.png)
-
 
 ## Billing
 
