@@ -791,7 +791,19 @@ module.exports = {
                 },
                 {
                   type: "doc",
-                  id: "apis/actions/v2/testing-locally",
+                  id: "apis/actions/v2/testing-locally-request",
+                },
+                {
+                  type: "doc",
+                  id: "apis/actions/v2/testing-locally-response",
+                },
+                {
+                  type: "doc",
+                  id: "apis/actions/v2/testing-locally-function",
+                },
+                {
+                  type: "doc",
+                  id: "apis/actions/v2/testing-locally-event",
                 },
               ].concat(sidebar_api_actions_v2),
             },
