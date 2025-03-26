@@ -695,7 +695,7 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 	req := &action.CreateTargetRequest{
 		Name:     name,
 		Endpoint: endpoint,
-		Timeout:  durationpb.New(10 * time.Second),
+		Timeout:  durationpb.New(5 * time.Second),
 	}
 	switch ty {
 	case domain.TargetTypeWebhook:
