@@ -98,7 +98,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hooks.SliceTypeStringDecode[authz.RoleMapping],
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
-			database.DecodeHook,
+			database.DecodeHook(false),
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hooks.MapTypeStringDecode[domain.Feature, any],
