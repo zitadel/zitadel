@@ -54,9 +54,8 @@ To upgrade you must enter your billing information.
 If you hit a limit from the free tier you will automatically be asked to add your credit card information and to subscribe to the pro tier.
 You can also upgrade manually at any time.
 
-1. Go to the settings tab
-2. You can now see your Plan: "FREE" 
-3. Click "Upgrade"
+1. Click the "Upgrade to PRO" button in the menu or go to the billing menu
+2. If you choose the billing menu, you can now see your Free plan, click "Upgrade to Pro"
 4. Add the missing data
    - Payment method: Credit Card Information
    - Customer: At least you have to fill the country
@@ -70,7 +69,7 @@ We recommend register a custom domain to access your ZITADEL instance.
 The primary custom domain of your ZITADEL instance will be the issuer of the instance. All other custom domains can be used to access the instance itself
 
 1. Browse to the "Custom Domains" Tab
-2. Click **Add**
+2. Click **Add domain**
 3. Enter the domain you want and select the instance where the domain should belong to
 4. In the next screen you will get all the information you will have to add to your DNS provider to verify your domain
 

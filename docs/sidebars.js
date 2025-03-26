@@ -1,3 +1,19 @@
+
+const sidebar_api_auth  = require("./docs/apis/resources/auth/sidebar.ts").default
+const sidebar_api_mgmt = require("./docs/apis/resources/mgmt/sidebar.ts").default
+const sidebar_api_admin = require("./docs/apis/resources/admin/sidebar.ts").default
+const sidebar_api_system = require("./docs/apis/resources/system/sidebar.ts").default
+
+const sidebar_api_user_service_v2 = require("./docs/apis/resources/user_service_v2/sidebar.ts").default
+const sidebar_api_session_service_v2 = require("./docs/apis/resources/session_service_v2/sidebar.ts").default
+const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_v2/sidebar.ts").default
+const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
+const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
+const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
+const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
+const sidebar_api_actions_v3 = require("./docs/apis/resources/action_service_v3/sidebar.ts").default
+const sidebar_api_webkey_service_v3 = require("./docs/apis/resources/webkey_service_v3/sidebar.ts").default
+
 module.exports = {
   guides: [
     "guides/overview",
@@ -123,6 +139,7 @@ module.exports = {
           items: [
             "guides/manage/cloud/start",
             "guides/manage/cloud/instances",
+            "guides/manage/cloud/settings",
             "guides/manage/cloud/billing",
             "guides/manage/cloud/users",
             "guides/manage/cloud/support",
@@ -595,7 +612,7 @@ module.exports = {
                 description:
                   "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
               },
-              items: require("./docs/apis/resources/auth/sidebar.ts"),
+              items: sidebar_api_auth,
             },
             {
               type: "category",
@@ -607,7 +624,7 @@ module.exports = {
                 description:
                   "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
               },
-              items: require("./docs/apis/resources/mgmt/sidebar.ts"),
+              items: sidebar_api_mgmt,
             },
             {
               type: "category",
@@ -619,7 +636,7 @@ module.exports = {
                 description:
                   "This API is intended to configure and manage one ZITADEL instance itself.",
               },
-              items: require("./docs/apis/resources/admin/sidebar.ts"),
+              items: sidebar_api_admin,
             },
             {
               type: "category",
@@ -633,7 +650,7 @@ module.exports = {
                   "\n" +
                   "Checkout the guide how to access the ZITADEL System API.",
               },
-              items: require("./docs/apis/resources/system/sidebar.ts"),
+              items: sidebar_api_system,
             },
           ],
         },
@@ -656,7 +673,7 @@ module.exports = {
                 description:
                   "This API is intended to manage users in a ZITADEL instance.\n",
               },
-              items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
+              items: sidebar_api_user_service_v2,
             },
             {
               type: "category",
@@ -668,7 +685,7 @@ module.exports = {
                 description:
                   "This API is intended to manage sessions in a ZITADEL instance.\n",
               },
-              items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
+              items: sidebar_api_session_service_v2,
             },
             {
               type: "category",
@@ -680,7 +697,7 @@ module.exports = {
                 description:
                   "Get OIDC Auth Request details and create callback URLs.\n",
               },
-              items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
+              items: sidebar_api_oidc_service_v2,
             },
             {
               type: "category",
@@ -692,7 +709,7 @@ module.exports = {
                 description:
                   "This API is intended to manage settings in a ZITADEL instance.\n",
               },
-              items: require("./docs/apis/resources/settings_service_v2/sidebar.ts"),
+              items: sidebar_api_settings_service_v2,
             },
             {
               type: "category",
@@ -704,7 +721,7 @@ module.exports = {
                 description:
                   'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n',
               },
-              items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
+              items: sidebar_api_feature_service_v2,
             },
             {
               type: "category",
@@ -716,7 +733,7 @@ module.exports = {
                 description:
                   "This API is intended to manage organizations for ZITADEL. \n",
               },
-              items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
+              items: sidebar_api_org_service_v2,
             },
             {
               type: "category",
@@ -728,7 +745,7 @@ module.exports = {
                 description:
                   "This API is intended to manage identity providers (IdPs) for ZITADEL.\n",
               },
-              items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
+              items: sidebar_api_idp_service_v2,
             },
           ],
         },
@@ -762,9 +779,7 @@ module.exports = {
                   type: "doc",
                   id: "apis/actions/v3/testing-locally",
                 },
-              ].concat(
-                require("./docs/apis/resources/action_service_v3/sidebar.ts")
-              ),
+              ].concat(sidebar_api_actions_v3),
             },
             {
               type: "category",
@@ -778,7 +793,7 @@ module.exports = {
                   "\n" +
                   "This project is in preview state. It can AND will continue breaking until a stable version is released.",
               },
-              items: require("./docs/apis/resources/webkey_service_v3/sidebar.ts"),
+              items: sidebar_api_webkey_service_v3,
             },
           ],
         },
@@ -854,8 +869,8 @@ module.exports = {
     },
     {
       type: "link",
-      label: "Rate Limits (Cloud)", // The link label
-      href: "/legal/policies/rate-limit-policy", // The internal path
+      label: "Rate Limits (Cloud)",
+      href: "/legal/policies/rate-limit-policy",
     },
     {
       type: "category",
@@ -939,7 +954,6 @@ module.exports = {
             "self-hosting/manage/reverseproxy/traefik/traefik",
             "self-hosting/manage/reverseproxy/nginx/nginx",
             "self-hosting/manage/reverseproxy/caddy/caddy",
-            //            "self-hosting/manage/reverseproxy/httpd/httpd", grpc NOT WORKING
             "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
             "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
             "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
