@@ -113,67 +113,36 @@ PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
-  # CockroachDB is the default database of ZITADEL
-  cockroach:
-    Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
-    Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
-    Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 5 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 2 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
-    MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
-    MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
-    Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
+  # Postgres is the default database of ZITADEL
+  postgres:
+    Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
+    Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
+    Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
+    Options: "" # ZITADEL_DATABASE_POSTGRES_OPTIONS
     User:
-      Username: zitadel # ZITADEL_DATABASE_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_USER_PASSWORD
+      Username: zitadel # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
+      Password: "" # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
       SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
+        Mode: disable # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
     Admin:
       # By default, ExistingDatabase is not specified in the connection string
       # If the connection resolves to a database that is not existing in your system, configure an existing one here
-      # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
-      ExistingDatabase: # ZITADEL_DATABASE_COCKROACH_ADMIN_EXISTINGDATABASE
-      Username: root # ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD
-      SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_KEY
-  # Postgres is used as soon as a value is set
-  # The values describe the possible fields to set values
-  postgres:
-    Host: # ZITADEL_DATABASE_POSTGRES_HOST
-    Port: # ZITADEL_DATABASE_POSTGRES_PORT
-    Database: # ZITADEL_DATABASE_POSTGRES_DATABASE
-    MaxOpenConns: # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
-    MaxConnLifetime: # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
-    MaxConnIdleTime: # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
-    Options: # ZITADEL_DATABASE_POSTGRES_OPTIONS
-    User:
-      Username: # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
-      SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
-    Admin:
-      # The default ExistingDatabase is postgres
-      # If your db system doesn't have a database named postgres, configure an existing database here
       # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
       ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
-      Username: # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
+      Username: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
+      Password: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
       SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
+        Mode: disable # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
 # Caches are EXPERIMENTAL. The following config may have breaking changes in the future.
 # If no config is provided, caching is disabled by default.
@@ -447,7 +416,6 @@ Projections:
 Notifications:
   # Notifications can be processed by either a sequential mode (legacy) or a new parallel mode.
   # The parallel mode is currently only recommended for Postgres databases.
-  # For CockroachDB, the sequential mode is recommended, see: https://github.com/zitadel/zitadel/issues/9002
   # If legacy mode is enabled, the worker config below is ignored.
   LegacyEnabled: true # ZITADEL_NOTIFICATIONS_LEGACYENABLED
   # The amount of workers processing the notification request events.
@@ -636,17 +604,12 @@ SystemAPIUsers:
 #       - MemberType: System
 #         Roles:
 #           - "SYSTEM_OWNER"
-#           - "SYSTEM_OWNER_VIEWER"
 #           # Actually, we don't recommend adding IAM_OWNER and ORG_OWNER to the System membership, as this basically enables god mode for the system user
-#       - MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
-#         Roles:
 #           - "IAM_OWNER"
-#           - "IAM_OWNER_VIEWER"
-#           - "IAM_ORG_MANAGER"
-#           - "IAM_USER_MANAGER"
-#           - "IAM_ADMIN_IMPERSONATOR"
-#           - "IAM_END_USER_IMPERSONATOR"
-#           - "IAM_LOGIN_CLIENT"
+#           - "ORG_OWNER"
+#       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
+#       - MemberType: IAM
+#         Roles: "IAM_OWNER"
 #         AggregateID: "123456789012345678"
 #       - MemberType: Organization
 #         Roles: "ORG_OWNER"
