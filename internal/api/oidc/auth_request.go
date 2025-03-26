@@ -533,9 +533,7 @@ func CreateErrorCallbackURL(authReq op.AuthRequest, reason, description, uri str
 	return callback, nil
 }
 
-func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authorizer op.Authorizer) (callback string, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authorizer op.Authorizer) (string, error) {
 	code, err := op.CreateAuthRequestCode(ctx, authReq, authorizer.Storage(), authorizer.Crypto())
 	if err != nil {
 		return "", err
@@ -547,11 +545,7 @@ func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authoriz
 		code:  code,
 		state: authReq.GetState(),
 	}
-	callback, err = op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
-	if err != nil {
-		return "", err
-	}
-	return callback, nil
+	return op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
 }
 
 func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest) (string, error) {

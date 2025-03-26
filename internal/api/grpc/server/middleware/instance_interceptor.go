@@ -45,10 +45,9 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 				GetInstanceId() string
 			})
 			if !ok {
-				span.End()
 				return handler(ctx, req)
 			}
-			return addInstanceByID(interceptorCtx, span, req, handler, verifier, translator, withInstanceIDProperty.GetInstanceId())
+			return addInstanceByID(interceptorCtx, req, handler, verifier, translator, withInstanceIDProperty.GetInstanceId())
 		}
 	}
 	explicitInstanceRequest, ok := req.(interface {
@@ -57,16 +56,16 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	if ok {
 		instance := explicitInstanceRequest.GetInstance()
 		if id := instance.GetId(); id != "" {
-			return addInstanceByID(interceptorCtx, span, req, handler, verifier, translator, id)
+			return addInstanceByID(interceptorCtx, req, handler, verifier, translator, id)
 		}
 		if domain := instance.GetDomain(); domain != "" {
-			return addInstanceByDomain(interceptorCtx, span, req, handler, verifier, translator, domain)
+			return addInstanceByDomain(interceptorCtx, req, handler, verifier, translator, domain)
 		}
 	}
-	return addInstanceByRequestedHost(interceptorCtx, span, req, handler, verifier, translator, externalDomain)
+	return addInstanceByRequestedHost(interceptorCtx, req, handler, verifier, translator, externalDomain)
 }
 
-func addInstanceByID(ctx context.Context, span *tracing.Span, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (interface{}, error) {
+func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (interface{}, error) {
 	instance, err := verifier.InstanceByID(ctx, id)
 	if err != nil {
 		notFoundErr := new(zerrors.ZitadelError)
@@ -75,11 +74,10 @@ func addInstanceByID(ctx context.Context, span *tracing.Span, req interface{}, h
 		}
 		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using id %s: %w", id, notFoundErr).Error())
 	}
-	span.End()
 	return handler(authz.WithInstance(ctx, instance), req)
 }
 
-func addInstanceByDomain(ctx context.Context, span *tracing.Span, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (interface{}, error) {
+func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (interface{}, error) {
 	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
 		notFoundErr := new(zerrors.NotFoundError)
@@ -88,11 +86,10 @@ func addInstanceByDomain(ctx context.Context, span *tracing.Span, req interface{
 		}
 		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr).Error())
 	}
-	span.End()
 	return handler(authz.WithInstance(ctx, instance), req)
 }
 
-func addInstanceByRequestedHost(ctx context.Context, span *tracing.Span, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (interface{}, error) {
+func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (interface{}, error) {
 	requestContext := zitadel_http.DomainContext(ctx)
 	if requestContext.InstanceHost == "" {
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).Error("unable to set instance")
@@ -110,6 +107,5 @@ func addInstanceByRequestedHost(ctx context.Context, span *tracing.Span, req int
 		}
 		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
-	span.End()
 	return handler(authz.WithInstance(ctx, instance), req)
 }

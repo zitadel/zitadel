@@ -80,10 +80,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	return authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, projectPermissionCheck domain.ProjectPermissionCheck) (_ *domain.ObjectDetails, _ *CurrentAuthRequest, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
-
+func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, projectPermissionCheck domain.ProjectPermissionCheck) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -100,32 +97,24 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		}
 	}
 
-	ctx, sessionSpan := tracing.NewNamedSpan(ctx, "sessionWriteModel")
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
-		sessionSpan.EndWithError(err)
 		return nil, nil, err
 	}
 	if err = sessionWriteModel.CheckIsActive(); err != nil {
-		sessionSpan.End()
 		return nil, nil, err
 	}
 	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
-		sessionSpan.EndWithError(err)
 		return nil, nil, err
 	}
 
 	if projectPermissionCheck != nil {
 		if err := projectPermissionCheck(ctx, writeModel.ClientID, sessionWriteModel.UserID); err != nil {
-			sessionSpan.EndWithError(err)
 			return nil, nil, err
 		}
 	}
-	sessionSpan.End()
 
-	ctx, pushSpan := tracing.NewNamedSpan(ctx, "pushAppendAndReduce")
-	defer pushSpan.EndWithError(err)
 	if err := c.pushAppendAndReduce(ctx, writeModel, authrequest.NewSessionLinkedEvent(
 		ctx, &authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
 		sessionID,
