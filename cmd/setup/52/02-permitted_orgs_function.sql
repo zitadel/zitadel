@@ -33,6 +33,7 @@ BEGIN
                                   LIMIT 1
                               )::TEXT[])) THEN
             TRUE
+          -- aggregate_id is present
           ELSE 
             o.instance_id = ANY (
                             (
@@ -54,6 +55,7 @@ BEGIN
                                   LIMIT 1
                               )::TEXT[])) THEN
             TRUE
+          -- aggregate_id is present
           ELSE 
             o.org_id = ANY (
                         (
