@@ -28,11 +28,11 @@
         placeholder=""
         #nameInput
         formControlName="service"
-        [matAutocomplete]="auto"
+        [matAutocomplete]="autoservice"
         [disabled]="conditionForm?.get('all')?.value == true"
       />
 
-      <mat-autocomplete #auto="matAutocomplete">
+      <mat-autocomplete #autoservice="matAutocomplete">
         <mat-option *ngIf="(executionServices$ | async) == undefined" class="is-loading">
           <mat-spinner diameter="30"></mat-spinner>
         </mat-option>
@@ -46,9 +46,9 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput formControlName="method" [matAutocomplete]="auto" />
+      <input cnslInput type="text" placeholder="" #nameInput formControlName="method" [matAutocomplete]="automethod" />
 
-      <mat-autocomplete #auto="matAutocomplete">
+      <mat-autocomplete #automethod="matAutocomplete">
         <mat-option *ngIf="(executionMethods$ | async) == undefined" class="is-loading">
           <mat-spinner diameter="30"></mat-spinner>
         </mat-option>
