@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
 import { SessionState as V1SessionState, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
@@ -9,19 +9,22 @@ import { SessionService } from 'src/app/services/session.service';
 import {
   catchError,
   defer,
+  from,
   map,
-  mergeWith,
-  NEVER,
+  mergeMap,
   Observable,
   of,
+  ReplaySubject,
   shareReplay,
   switchMap,
   timeout,
   TimeoutError,
+  toArray,
 } from 'rxjs';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { SessionState as V2SessionState } from '@zitadel/proto/zitadel/user_pb';
+import { filter, withLatestFrom } from 'rxjs/operators';
 
 interface V1AndV2Session {
   displayName: string;
@@ -37,104 +40,108 @@ interface V1AndV2Session {
   styleUrls: ['./accounts-card.component.scss'],
 })
 export class AccountsCardComponent {
-  @Input() public user?: User.AsObject;
+  @Input({ required: true })
+  public set user(user: User.AsObject) {
+    this.user$.next(user);
+  }
+
   @Input() public iamuser: boolean | null = false;
 
-  @Output() public closedCard: EventEmitter<void> = new EventEmitter();
+  @Output() public closedCard = new EventEmitter<void>();
 
-  public UserState: any = UserState;
-  private labelpolicy = toSignal(this.userService.labelpolicy$, { initialValue: undefined });
-  public readonly sessions$: Observable<V1AndV2Session[] | undefined>;
+  protected readonly user$ = new ReplaySubject<User.AsObject>(1);
+  protected readonly UserState = UserState;
+  private readonly labelpolicy = toSignal(this.userService.labelpolicy$, { initialValue: undefined });
+  protected readonly sessions$: Observable<V1AndV2Session[] | undefined>;
 
   constructor(
-    public authService: AuthenticationService,
-    private router: Router,
-    private userService: GrpcAuthService,
-    private sessionService: SessionService,
+    protected readonly authService: AuthenticationService,
+    private readonly router: Router,
+    private readonly userService: GrpcAuthService,
+    private readonly sessionService: SessionService,
     private readonly featureService: NewFeatureService,
-    private toast: ToastService,
+    private readonly toast: ToastService,
   ) {
-    this.sessions$ = this.getUseLoginV2()
-      .pipe(shareReplay({ refCount: true, bufferSize: 1 }))
-      .pipe(
-        switchMap((loginV2) => {
-          if (!loginV2?.required) {
-            return defer(() =>
-              this.userService.listMyUserSessions().then((sessions) => {
-                return sessions.resultList
-                  .filter((user) => user.loginName !== this.user?.preferredLoginName)
-                  .map((s) => {
-                    return {
-                      displayName: s.displayName,
-                      avatarUrl: s.avatarUrl,
-                      loginName: s.loginName,
-                      authState: s.authState,
-                      userName: s.userName,
-                    };
-                  });
-              }),
-            );
-          } else {
-            return defer(() =>
-              this.sessionService
-                .listSessions({
-                  queries: [
-                    {
-                      query: {
-                        case: 'userAgentQuery',
-                        value: {},
-                      },
-                    },
-                  ],
-                })
-                .then((sessions) => {
-                  return sessions.sessions
-                    .filter((s) => {
-                      return s.factors?.user?.loginName !== this.user?.preferredLoginName;
-                    })
-                    .map((s) => {
-                      return {
-                        displayName: s.factors?.user?.displayName ?? '',
-                        avatarUrl: '',
-                        loginName: s.factors?.user?.loginName ?? '',
-                        authState: V2SessionState.ACTIVE,
-                        userName: s.factors?.user?.loginName ?? '',
-                      };
-                    });
-                }),
-            );
-          }
-        }),
-        catchError((err) => {
-          this.toast.showError(err);
-          return of([]);
-        }),
-      );
+    this.sessions$ = this.getSessions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
   }
 
   private getUseLoginV2() {
     return defer(() => this.featureService.getInstanceFeatures()).pipe(
-      map((features) => {
-        return features.loginV2;
-      }),
+      map(({ loginV2 }) => loginV2?.required ?? false),
       timeout(1000),
       catchError((err) => {
-        console.error(err);
-        return of(undefined);
+        if (!(err instanceof TimeoutError)) {
+          this.toast.showError(err);
+        }
+        return of(false);
       }),
-      mergeWith(NEVER),
+    );
+  }
+
+  private getSessions(): Observable<V1AndV2Session[]> {
+    const useLoginV2$ = this.getUseLoginV2();
+
+    return useLoginV2$.pipe(
+      switchMap((useLoginV2) => {
+        if (useLoginV2) {
+          return this.getV2Sessions();
+        } else {
+          return this.getV1Sessions();
+        }
+      }),
+      catchError((err) => {
+        this.toast.showError(err);
+        return of([]);
+      }),
+    );
+  }
+
+  private getV1Sessions(): Observable<V1AndV2Session[]> {
+    return defer(() => this.userService.listMyUserSessions()).pipe(
+      mergeMap(({ resultList }) => from(resultList)),
+      withLatestFrom(this.user$),
+      filter(([{ loginName }, user]) => loginName !== user.preferredLoginName),
+      map(([s]) => ({
+        displayName: s.displayName,
+        avatarUrl: s.avatarUrl,
+        loginName: s.loginName,
+        authState: s.authState,
+        userName: s.userName,
+      })),
+      toArray(),
+    );
+  }
+
+  private getV2Sessions(): Observable<V1AndV2Session[]> {
+    return defer(() =>
+      this.sessionService.listSessions({
+        queries: [
+          {
+            query: {
+              case: 'userAgentQuery',
+              value: {},
+            },
+          },
+        ],
+      }),
+    ).pipe(
+      mergeMap(({ sessions }) => from(sessions)),
+      withLatestFrom(this.user$),
+      filter(([s, user]) => s.factors?.user?.loginName !== user.preferredLoginName),
+      map(([s]) => ({
+        displayName: s.factors?.user?.displayName ?? '',
+        avatarUrl: '',
+        loginName: s.factors?.user?.loginName ?? '',
+        authState: V2SessionState.ACTIVE,
+        userName: s.factors?.user?.loginName ?? '',
+      })),
+      toArray(),
     );
   }
 
   public editUserProfile(): void {
-    this.router.navigate(['users/me']);
+    this.router.navigate(['users/me']).then();
     this.closedCard.emit();
-  }
-
-  public closeCard(element: HTMLElement): void {
-    if (!element.classList.contains('dontcloseonclick')) {
-      this.closedCard.emit();
-    }
   }
 
   public selectAccount(loginHint: string): void {
@@ -143,7 +150,7 @@ export class AccountsCardComponent {
         login_hint: loginHint,
       },
     };
-    this.authService.authenticate(configWithPrompt);
+    this.authService.authenticate(configWithPrompt).then();
   }
 
   public selectNewAccount(): void {
@@ -152,7 +159,7 @@ export class AccountsCardComponent {
         prompt: 'login',
       } as any,
     };
-    this.authService.authenticate(configWithPrompt);
+    this.authService.authenticate(configWithPrompt).then();
   }
 
   public logout(): void {
