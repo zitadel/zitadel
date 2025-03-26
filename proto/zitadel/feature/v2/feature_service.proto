@@ -310,7 +310,7 @@ service FeatureService {
   // Deletes ALL configured features for an organization, reverting the behaviors to instance defaults.
   //
   // Required permissions:
-  //  - org.feature.write
+  //  - org.feature.delete
   rpc ResetOrganizationFeatures (ResetOrganizationFeaturesRequest) returns (ResetOrganizationFeaturesResponse) {
     option (google.api.http) = {
       delete: "/v2/features/organization/{organization_id}"
