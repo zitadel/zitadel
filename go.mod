@@ -2,7 +2,6 @@ module github.com/zitadel/zitadel
 
 go 1.23.7
 
-replace github.com/zitadel/saml => /Users/stebenz/.go/src/github.com/zitadel/saml
 require (
 	cloud.google.com/go/profiler v0.4.2
 	cloud.google.com/go/storage v1.51.0
