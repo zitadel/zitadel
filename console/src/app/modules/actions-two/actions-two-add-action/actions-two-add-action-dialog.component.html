@@ -7,7 +7,7 @@
     ></cnsl-actions-two-add-action-type>
     <cnsl-actions-two-add-action-condition
       *ngSwitchCase="Page.Condition"
-      [conditionType]="conditionType"
+      [conditionType]="typeSignal()"
     ></cnsl-actions-two-add-action-condition>
     <cnsl-actions-two-add-action-target
       *ngSwitchCase="Page.Target"

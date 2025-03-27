@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, catchError, defer, map, of, shareReplay, startWith, tap } from 'rxjs';
-import { ExecutionType } from '../actions-two-add-action-type/actions-two-add-action-type.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';

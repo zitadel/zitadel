@@ -3,7 +3,7 @@
 <form class="form-grid" [formGroup]="typeForm" (ngSubmit)="continue.emit()">
   <div class="executionType">
     <mat-radio-group class="execution-radio-group" aria-label="Select an option" formControlName="executionType">
-      <mat-radio-button class="execution-radio-button" [value]="ExecutionType.REQUEST">
+      <mat-radio-button class="execution-radio-button" [value]="'request'">
         <div class="execution-type-text">
           <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.REQUEST.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{
@@ -11,7 +11,7 @@
           }}</span>
         </div>
       </mat-radio-button>
-      <mat-radio-button class="execution-radio-button" [value]="ExecutionType.RESPONSE"
+      <mat-radio-button class="execution-radio-button" [value]="'response'"
         ><div class="execution-type-text">
           <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.RESPONSE.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{
@@ -19,7 +19,7 @@
           }}</span>
         </div></mat-radio-button
       >
-      <mat-radio-button class="execution-radio-button" [value]="ExecutionType.EVENTS"
+      <mat-radio-button class="execution-radio-button" [value]="'event'"
         ><div class="execution-type-text">
           <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.EVENTS.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{
@@ -27,7 +27,7 @@
           }}</span>
         </div></mat-radio-button
       >
-      <mat-radio-button class="execution-radio-button" [value]="ExecutionType.FUNCTIONS"
+      <mat-radio-button class="execution-radio-button" [value]="'function'"
         ><div class="execution-type-text">
           <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.FUNCTIONS.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{

@@ -6,13 +6,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
+import { ConditionType } from '../actions-two-add-action-condition/actions-two-add-action-condition.component';
 
-export enum ExecutionType {
-  REQUEST = 'request',
-  RESPONSE = 'response',
-  EVENTS = 'event',
-  FUNCTIONS = 'function',
-}
+// export enum ExecutionType {
+//   REQUEST = 'request',
+//   RESPONSE = 'response',
+//   EVENTS = 'event',
+//   FUNCTIONS = 'function',
+// }
 
 @Component({
   standalone: true,
@@ -23,10 +24,9 @@ export enum ExecutionType {
   imports: [TranslateModule, MatRadioModule, RouterModule, ReactiveFormsModule, FormsModule, CommonModule, MatButtonModule],
 })
 export class ActionsTwoAddActionTypeComponent {
-  public ExecutionType = ExecutionType;
   protected readonly typeForm: ReturnType<typeof this.buildActionTypeForm> = this.buildActionTypeForm();
   @Output() public continue: EventEmitter<void> = new EventEmitter();
-  @Output() public typeChanges$: Observable<ExecutionType>;
+  @Output() public typeChanges$: Observable<ConditionType>;
 
   constructor(private readonly fb: FormBuilder) {
     this.typeChanges$ = this.typeForm.get('executionType')!.valueChanges.pipe(
@@ -36,7 +36,7 @@ export class ActionsTwoAddActionTypeComponent {
 
   public buildActionTypeForm() {
     return this.fb.group({
-      executionType: new FormControl<ExecutionType>(ExecutionType.REQUEST, {
+      executionType: new FormControl<ConditionType>('request', {
         nonNullable: true,
       }),
     });
