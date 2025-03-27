@@ -149,7 +149,7 @@ type Steps struct {
 	s50IDPTemplate6UsePKCE                  *IDPTemplate6UsePKCE
 	s51IDPTemplate6RootCA                   *IDPTemplate6RootCA
 	s52IDPTemplate6LDAP2                    *IDPTemplate6LDAP2
-	s53InitPermittedOrgsFunction            *InitPermittedOrgsFunction52
+	s53InitPermittedOrgsFunction            *InitPermittedOrgsFunction53
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
