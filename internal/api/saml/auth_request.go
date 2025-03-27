@@ -3,7 +3,6 @@ package saml
 import (
 	"context"
 	"encoding/base64"
-	"net/http"
 	"net/url"
 
 	"github.com/zitadel/saml/pkg/provider"
@@ -34,14 +33,8 @@ func (p *Provider) CreateResponse(ctx context.Context, authReq models.AuthReques
 		AcsUrl:          authReq.GetAccessConsumerServiceURL(),
 		RequestID:       authReq.GetAuthRequestID(),
 		Audience:        authReq.GetIssuer(),
+		Issuer:          p.GetEntityID(ctx),
 	}
-
-	issuer := ContextToIssuer(ctx)
-	req, err := http.NewRequestWithContext(provider.ContextWithIssuer(ctx, issuer), http.MethodGet, issuer, nil)
-	if err != nil {
-		return "", "", err
-	}
-	resp.Issuer = p.GetEntityID(req)
 
 	samlResponse, err := p.AuthCallbackResponse(ctx, authReq, resp)
 	if err != nil {

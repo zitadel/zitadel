@@ -28,6 +28,11 @@ import { ZITADELActions } from '@zitadel/proto/zitadel/resources/action/v3alpha/
 import { Client, Transport } from '@connectrpc/connect';
 
 const createActionServiceClient: (transport: Transport) => Client<typeof ZITADELActions> = createClientFor(ZITADELActions);
+import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+// @ts-ignore
+import { createClientFor } from '@zitadel/client';
+
+const createWebKeyServiceClient = createClientFor(WebKeyService);
 
 @Injectable({
   providedIn: 'root',
@@ -42,6 +47,7 @@ export class GrpcService {
   public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
   public actionNew!: ReturnType<typeof createActionServiceClient>;
+  public webKey!: ReturnType<typeof createWebKeyServiceClient>;
 
   constructor(
     private readonly envService: EnvironmentService,
@@ -116,6 +122,7 @@ export class GrpcService {
         this.authNew = createAuthServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);
         this.actionNew = createActionServiceClient(transport);
+        this.webKey = createWebKeyServiceClient(transport);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',

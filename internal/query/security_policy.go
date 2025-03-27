@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -63,7 +62,7 @@ type SecurityPolicy struct {
 }
 
 func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, err error) {
-	stmt, scan := prepareSecurityPolicyQuery(ctx, q.client)
+	stmt, scan := prepareSecurityPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SecurityPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -78,7 +77,7 @@ func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, e
 	return policy, err
 }
 
-func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SecurityPolicy, error)) {
+func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPolicy, error)) {
 	return sq.Select(
 			SecurityPolicyColumnInstanceID.identifier(),
 			SecurityPolicyColumnCreationDate.identifier(),
@@ -88,7 +87,7 @@ func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			SecurityPolicyColumnEnableIframeEmbedding.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
 			SecurityPolicyColumnEnableImpersonation.identifier()).
-			From(securityPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(securityPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecurityPolicy, error) {
 			securityPolicy := new(SecurityPolicy)

@@ -23,8 +23,7 @@ var (
 		` projections.custom_texts2.key,` +
 		` projections.custom_texts2.text,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.custom_texts2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.custom_texts2`
 	prepareCustomTextsCols = []string{
 		"aggregate_id",
 		"sequence",
@@ -185,7 +184,7 @@ func Test_CustomTextPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

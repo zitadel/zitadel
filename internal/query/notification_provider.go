@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -74,7 +73,7 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareDebugNotificationProviderQuery(ctx, q.client)
+	query, scan := prepareDebugNotificationProviderQuery()
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{NotificationProviderColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
@@ -97,7 +96,7 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 	return provider, err
 }
 
-func prepareDebugNotificationProviderQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DebugNotificationProvider, error)) {
+func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(*sql.Row) (*DebugNotificationProvider, error)) {
 	return sq.Select(
 			NotificationProviderColumnAggID.identifier(),
 			NotificationProviderColumnCreationDate.identifier(),
@@ -107,7 +106,7 @@ func prepareDebugNotificationProviderQuery(ctx context.Context, db prepareDataba
 			NotificationProviderColumnState.identifier(),
 			NotificationProviderColumnType.identifier(),
 			NotificationProviderColumnCompact.identifier(),
-		).From(notificationProviderTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(notificationProviderTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*DebugNotificationProvider, error) {
 			p := new(DebugNotificationProvider)

@@ -25,7 +25,6 @@ type SearchQueryBuilder struct {
 	tx                    *sql.Tx
 	lockRows              bool
 	lockOption            LockOption
-	allowTimeTravel       bool
 	positionAfter         float64
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
@@ -75,10 +74,6 @@ func (b *SearchQueryBuilder) GetExcludeAggregateIDs() *ExclusionQuery {
 
 func (b *SearchQueryBuilder) GetTx() *sql.Tx {
 	return b.tx
-}
-
-func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
-	return b.allowTimeTravel
 }
 
 func (b SearchQueryBuilder) GetPositionAfter() float64 {
@@ -286,13 +281,6 @@ func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
 
 func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 	builder.editorUser = id
-	return builder
-}
-
-// AllowTimeTravel activates the time travel feature of the database if supported
-// The queries will be made based on the call time
-func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
-	builder.allowTimeTravel = true
 	return builder
 }
 

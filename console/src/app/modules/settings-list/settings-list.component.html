@@ -1,9 +1,4 @@
-<cnsl-sidenav
-  [indented]="true"
-  [setting]="setting()"
-  (settingChange)="setting.set($event)"
-  [settingsList]="settingsList"
->
+<cnsl-sidenav [indented]="true" [setting]="setting()" (settingChange)="setting.set($event)" [settingsList]="settingsList">
   <ng-container *ngIf="setting()?.id === 'organizations'">
     <h2>{{ 'ORG.PAGES.LIST' | translate }}</h2>
     <p class="org-desc cnsl-secondary-text">{{ 'ORG.PAGES.LISTDESCRIPTION' | translate }}</p>
@@ -45,6 +40,9 @@
   </ng-container>
   <ng-container *ngIf="setting()?.id === 'oidc' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-oidc-configuration></cnsl-oidc-configuration>
+  </ng-container>
+  <ng-container *ngIf="setting()?.id === 'webkeys' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-oidc-webkeys />
   </ng-container>
   <ng-container *ngIf="setting()?.id === 'secrets' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-secret-generator></cnsl-secret-generator>

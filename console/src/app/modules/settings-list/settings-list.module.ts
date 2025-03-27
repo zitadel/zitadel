@@ -33,6 +33,7 @@ import { FeaturesComponent } from 'src/app/components/features/features.componen
 import OrgListModule from 'src/app/pages/org-list/org-list.module';
 import ActionsTwoModule from '../actions-two/actions-two.module';
 import { provideRouter } from '@angular/router';
+import { OidcWebkeysModule } from '../policies/oidc-webkeys/oidc-webkeys.module';
 
 @NgModule({
   declarations: [SettingsListComponent],
@@ -65,6 +66,7 @@ import { provideRouter } from '@angular/router';
     NotificationSMTPProviderModule,
     NotificationSMSProviderModule,
     OIDCConfigurationModule,
+    OidcWebkeysModule,
     SecretGeneratorModule,
     FailedEventsModule,
     IamViewsModule,
