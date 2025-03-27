@@ -14,6 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+const (
+	aggregateTypeNotification = "notification"
+)
+
 func InitChannel(config Config) channels.NotificationChannel {
 	client := twilio.NewRestClientWithParams(twilio.ClientParams{Username: config.SID, Password: config.Token})
 	logging.Debug("successfully initialized twilio sms channel")
@@ -30,13 +34,18 @@ func InitChannel(config Config) channels.NotificationChannel {
 
 			resp, err := client.VerifyV2.CreateVerification(config.VerifyServiceSID, params)
 
+			// In case of any client error (4xx), we should not retry sending the verification code
+			// as it would be a waste of resources and could potentially result in a rate limit.
 			var twilioErr *twilioClient.TwilioRestError
-			if errors.As(err, &twilioErr) && twilioErr.Code == 60203 {
-				// If there were too many attempts to send a verification code (more than 5 times)
-				// without a verification check, even retries with backoff might not solve the problem.
-				// Instead, let the user initiate the verification again (e.g. using "resend code")
-				// https://www.twilio.com/docs/api/errors/60203
-				logging.WithFields("error", twilioErr.Message, "code", twilioErr.Code).Warn("twilio create verification error")
+			if errors.As(err, &twilioErr) && twilioErr.Status >= 400 && twilioErr.Status < 500 {
+				logging.WithFields(
+					"error", twilioErr.Message,
+					"status", twilioErr.Status,
+					"code", twilioErr.Code,
+					"instanceID", twilioMsg.InstanceID,
+					"jobID", twilioMsg.JobID,
+					"userID", twilioMsg.UserID,
+				).Warn("twilio create verification error")
 				return channels.NewCancelError(twilioErr)
 			}
 

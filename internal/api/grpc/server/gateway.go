@@ -10,6 +10,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -27,6 +28,7 @@ import (
 
 const (
 	mimeWildcard = "*/*"
+	UnknownPath  = "UNKNOWN_PATH"
 )
 
 var (
@@ -56,6 +58,13 @@ var (
 		},
 	)
 
+	// we need the errorHandler to set the request URI pattern in case of an error
+	errorHandler = runtime.ErrorHandlerFunc(
+		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
+			setRequestURIPattern(ctx)
+			runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
+		})
+
 	serveMuxOptions = func(hostHeaders []string) []runtime.ServeMuxOption {
 		return []runtime.ServeMuxOption{
 			runtime.WithMarshalerOption(jsonMarshaler.ContentType(nil), jsonMarshaler),
@@ -65,6 +74,7 @@ var (
 			runtime.WithOutgoingHeaderMatcher(runtime.DefaultHeaderMatcher),
 			runtime.WithForwardResponseOption(responseForwarder),
 			runtime.WithRoutingErrorHandler(httpErrorHandler),
+			runtime.WithErrorHandler(errorHandler),
 		}
 	}
 
@@ -81,6 +91,7 @@ var (
 	}
 
 	responseForwarder = func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
+		setRequestURIPattern(ctx)
 		t, ok := resp.(CustomHTTPResponse)
 		if ok {
 			// TODO: find a way to return a location header if needed w.Header().Set("location", t.Location())
@@ -118,9 +129,9 @@ func CreateGatewayWithPrefix(
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
 		grpc.WithChainUnaryInterceptor(
-			client_middleware.DefaultTracingClient(),
 			client_middleware.UnaryActivityClientInterceptor(),
 		),
+		grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -145,9 +156,9 @@ func CreateGateway(
 		[]grpc.DialOption{
 			grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
 			grpc.WithChainUnaryInterceptor(
-				client_middleware.DefaultTracingClient(),
 				client_middleware.UnaryActivityClientInterceptor(),
 			),
+			grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
 		})
 	if err != nil {
 		return nil, err
@@ -259,4 +270,18 @@ func grpcCredentials(tlsConfig *tls.Config) credentials.TransportCredentials {
 		creds = credentials.NewTLS(tlsConfigClone)
 	}
 	return creds
+}
+
+func setRequestURIPattern(ctx context.Context) {
+	pattern, ok := runtime.HTTPPathPattern(ctx)
+	if !ok {
+		// As all unmatched paths will be handled by the gateway, any request not matching a pattern,
+		// means there's no route to the path.
+		// To prevent high cardinality on metrics and tracing, we want to make sure we don't record
+		// the actual path as name (it will still be recorded explicitly in the span http info).
+		pattern = UnknownPath
+	}
+	span := trace.SpanFromContext(ctx)
+	span.SetName(pattern)
+	metrics.SetRequestURIPattern(ctx, pattern)
 }

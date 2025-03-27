@@ -512,11 +512,13 @@
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
+    "ORG_SETTINGS_MANAGER": "有权管理组织的设置",
     "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
     "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
     "ORG_ADMIN_IMPERSONATOR": "有权模拟组织的管理员和最终用户",
     "ORG_END_USER_IMPERSONATOR": "有权模拟组织的最终用户",
+    "ORG_USER_SELF_MANAGER": "有权管理自己的用户",
     "PROJECT_OWNER": "拥有整个项目的权限",
     "PROJECT_OWNER_VIEWER": "有权审查整个项目",
     "PROJECT_OWNER_GLOBAL": "拥有整个项目的权限",
@@ -787,7 +789,10 @@
       "PHONESECTION": "手机号码",
       "PASSWORDSECTION": "初始密码",
       "ADDRESSANDPHONESECTION": "手机号码",
-      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。"
+      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。",
+      "SETUPAUTHENTICATIONLATER": "稍后为此用户设置身份验证。",
+      "INVITATION": "发送邀请邮件以进行身份验证设置和电子邮件验证。",
+      "INITIALPASSWORD": "为用户设置初始密码。"
     },
     "CODEDIALOG": {
       "TITLE": "验证手机号码",
@@ -809,6 +814,9 @@
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
       "PHONE_HINT": "使用+号，后跟呼叫者的国家/地区代码，或从下拉列表中选择国家/地区，最后输入电话号码",
+      "PHONE_VERIFIED": "电话号码已验证",
+      "SEND_SMS": "发送验证短信",
+      "SEND_EMAIL": "发送电子邮件",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -948,6 +956,14 @@
       "4": "已锁定",
       "5": "已暂停",
       "6": "初始化"
+    },
+    "STATEV2": {
+      "0": "未知",
+      "1": "启用",
+      "2": "停用",
+      "3": "已删除",
+      "4": "已锁定",
+      "5": "初始化"
     },
     "SEARCH": {
       "ADDITIONAL": "登录名 (当前组织)",
@@ -1385,7 +1401,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1476,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 终止会话",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
+      "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
+      "DISABLEUSERTOKENEVENT": "禁用用户令牌事件",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
+      "PERMISSIONCHECKV2": "权限检查 V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
+      "WEBKEY": "Web 密钥",
+      "WEBKEY_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",
@@ -1486,7 +1513,9 @@
         "ENABLED": "“已启用” 是继承的",
         "DISABLED": "“已禁用” 是继承的"
       },
-      "RESET": "全部设置为继承"
+      "RESET": "全部设置为继承",
+      "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。"
     },
     "DIALOG": {
       "RESET": {
@@ -1622,7 +1651,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2191,7 +2222,9 @@
       "REMOVED": "成功删除。"
     },
     "ISIDTOKENMAPPING": "从ID令牌映射",
-    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。"
+    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。",
+    "USEPKCE": "使用PKCE",
+    "USEPKCE_DESC": "确定 auth 请求中是否包含 code_challenge 和 code_challenge_method 参数"
   },
   "MFA": {
     "LIST": {
@@ -2570,7 +2603,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "添加管理者",

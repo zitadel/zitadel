@@ -28,6 +28,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-oauth',
+  styleUrls: ['./provider-oauth.component.scss'],
   templateUrl: './provider-oauth.component.html',
 })
 export class ProviderOAuthComponent {
@@ -88,6 +89,7 @@ export class ProviderOAuthComponent {
       userEndpoint: new UntypedFormControl('', [requiredValidator]),
       idAttribute: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+      usePkce: new UntypedFormControl(false),
     });
 
     this.authService
@@ -187,6 +189,7 @@ export class ProviderOAuthComponent {
     req.setClientSecret(this.clientSecret?.value);
     req.setScopesList(this.scopesList?.value);
     req.setProviderOptions(this.options);
+    req.setUsePkce(this.usePkce?.value);
 
     this.loading = true;
     this.service
@@ -217,6 +220,7 @@ export class ProviderOAuthComponent {
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
       req.setProviderOptions(this.options);
+      req.setUsePkce(this.usePkce?.value);
 
       this.loading = true;
       this.service
@@ -296,5 +300,9 @@ export class ProviderOAuthComponent {
 
   public get scopesList(): AbstractControl | null {
     return this.form.get('scopesList');
+  }
+
+  public get usePkce(): AbstractControl | null {
+    return this.form.get('usePkce');
   }
 }

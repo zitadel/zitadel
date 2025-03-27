@@ -512,11 +512,13 @@
     "ORG_OWNER": "Tiene permisos sobre toda la organización",
     "ORG_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios de la organización",
     "ORG_OWNER_VIEWER": "TIene permiso para revisar toda la organización",
+    "ORG_SETTINGS_MANAGER": "Tiene permiso para gestionar las configuraciones de la organización",
     "ORG_USER_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de usuario",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de proyecto",
     "ORG_PROJECT_CREATOR": "Tiene permiso para crear sus propios proyectos y ajustes subyacentes",
     "ORG_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de la organización",
     "ORG_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de la organización",
+    "ORG_USER_SELF_MANAGER": "Tiene permiso para gestionar su propio usuario",
     "PROJECT_OWNER": "Tiene permiso sobre todo el proyecto",
     "PROJECT_OWNER_VIEWER": "Tiene permiso para revisar todo el proyecto",
     "PROJECT_OWNER_GLOBAL": "Tiene permiso sobre todo el proyecto",
@@ -787,7 +789,10 @@
       "PHONESECTION": "Números de teléfono",
       "PASSWORDSECTION": "Contraseña inicial",
       "ADDRESSANDPHONESECTION": "Número de teléfono",
-      "INITMAILDESCRIPTION": "Si ambas opciones se seleccionan, no se enviará un email para la inicialización. Si solo una de las opciones se selecciona, un email se enviará para proporcionar / verificar los datos."
+      "INITMAILDESCRIPTION": "Si ambas opciones se seleccionan, no se enviará un email para la inicialización. Si solo una de las opciones se selecciona, un email se enviará para proporcionar / verificar los datos.",
+      "SETUPAUTHENTICATIONLATER": "Configurar la autenticación más tarde para este usuario.",
+      "INVITATION": "Enviar un correo de invitación para la configuración de autenticación y verificación de correo electrónico.",
+      "INITIALPASSWORD": "Establece una contraseña inicial para el usuario."
     },
     "CODEDIALOG": {
       "TITLE": "Verificar número de teléfono",
@@ -809,6 +814,9 @@
       "EMAIL": "Email",
       "PHONE": "Número de teléfono",
       "PHONE_HINT": "Usa el símbolo + seguido del prefijo del país o selecciona el país del menú desplegable y finalmente introduce el número de teléfono",
+      "PHONE_VERIFIED": "Número de teléfono verificado",
+      "SEND_SMS": "Enviar SMS de verificación",
+      "SEND_EMAIL": "Enviar correo electrónico",
       "USERNAME": "Nombre de usuario",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Cambiar nombre de usuario",
@@ -948,6 +956,14 @@
       "4": "Bloqueado",
       "5": "Suspendido",
       "6": "Inicial"
+    },
+    "STATEV2": {
+      "0": "Desconocido",
+      "1": "Activo",
+      "2": "Inactivo",
+      "3": "Borrado",
+      "4": "Bloqueado",
+      "5": "Inicial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nombre de inicio de sesión (organización actual)",
@@ -1386,7 +1402,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1477,6 +1494,16 @@
       "ACTIONS_DESCRIPTION": "Acciones v2 permite administrar las ejecuciones y objetivos de datos. Si la bandera está habilitada, podrá utilizar la nueva API y sus funciones.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Terminación de sesión",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si la bandera está habilitada, podrá terminar una sesión única desde la interfaz de usuario de inicio de sesión proporcionando un id_token con una reclamación `sid` como id_token_hint en el punto final de end_session. Tenga en cuenta que actualmente se terminan todas las sesiones del mismo agente de usuario (navegador) en la interfaz de usuario de inicio de sesión. Las sesiones administradas a través de la API de sesión ya permiten la terminación de sesiones individuales.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera está habilitada, el error del padre OIDC se registrará en la consola.",
+      "DISABLEUSERTOKENEVENT": "Desactivar evento de token de usuario",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Habilitar Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a los clientes sobre la terminación de la sesión en el proveedor de OpenID.",
+      "PERMISSIONCHECKV2": "Verificación de permisos V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
+      "WEBKEY": "Clave web",
+      "WEBKEY_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
       "STATES": {
         "INHERITED": "Heredado",
         "ENABLED": "Habilitado",
@@ -1487,7 +1514,9 @@
         "ENABLED": "\"Habilitado\" se hereda",
         "DISABLED": "\"Deshabilitado\" se hereda"
       },
-      "RESET": "Establecer todo a heredado"
+      "RESET": "Establecer todo a heredado",
+      "CONSOLEUSEV2USERAPI": "Utilice la API V2 en la consola para la creación de usuarios",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial."
     },
     "DIALOG": {
       "RESET": {
@@ -1624,7 +1653,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -2188,7 +2219,9 @@
       "REMOVED": "Eliminado con éxito."
     },
     "ISIDTOKENMAPPING": "Asignación del ID token",
-    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo."
+    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo.",
+    "USEPKCE": "Usa PKCE",
+    "USEPKCE_DESC": "Determina si los parámetros code_challenge y code_challenge_method son incluidos en la solicitud de autenticación."
   },
   "MFA": {
     "LIST": {
@@ -2567,7 +2600,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

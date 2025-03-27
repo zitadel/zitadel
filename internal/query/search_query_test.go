@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -905,6 +906,19 @@ func TestNewTextQuery(t *testing.T) {
 			},
 		},
 		{
+			name: "not equal ignore case",
+			args: args{
+				column:  testCol,
+				value:   "h_urst%",
+				compare: TextNotEqualsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "h\\_urst\\%",
+				Compare: TextNotEqualsIgnoreCase,
+			},
+		},
+		{
 			name: "starts with",
 			args: args{
 				column:  testCol,
@@ -1191,6 +1205,28 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.ILike{"test_table.test_col": "Hurst"},
+			},
+		},
+		{
+			name: "not equals",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hurst",
+				Compare: TextNotEquals,
+			},
+			want: want{
+				query: sq.NotEq{"test_table.test_col": "Hurst"},
+			},
+		},
+		{
+			name: "not equals ignore case",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hurst",
+				Compare: TextNotEqualsIgnoreCase,
+			},
+			want: want{
+				query: sq.NotILike{"test_table.test_col": "Hurst"},
 			},
 		},
 		{
@@ -1541,6 +1577,17 @@ func TestNumberQuery_comp(t *testing.T) {
 			},
 		},
 		{
+			name: "less or equal",
+			fields: fields{
+				Column:  testCol,
+				Number:  42,
+				Compare: NumberLessOrEqual,
+			},
+			want: want{
+				query: sq.LtOrEq{"test_table.test_col": 42},
+			},
+		},
+		{
 			name: "greater",
 			fields: fields{
 				Column:  testCol,
@@ -1549,6 +1596,17 @@ func TestNumberQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Gt{"test_table.test_col": 42},
+			},
+		},
+		{
+			name: "greater or equal",
+			fields: fields{
+				Column:  testCol,
+				Number:  42,
+				Compare: NumberGreaterOrEqual,
+			},
+			want: want{
+				query: sq.GtOrEq{"test_table.test_col": 42},
 			},
 		},
 		{
@@ -2186,6 +2244,101 @@ func TestInTextQuery_comp(t *testing.T) {
 			} else if tt.want.isNil && query != nil {
 				t.Error("query should not be nil")
 			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+
+func TestBytesQuery_comp(t *testing.T) {
+	type fields struct {
+		Column  Column
+		Value   []byte
+		Compare BytesComparison
+	}
+	type want struct {
+		query interface{}
+		err   bool
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "equals",
+			fields: fields{
+				Column:  testCol,
+				Value:   []byte("foo"),
+				Compare: BytesEquals,
+			},
+			want: want{
+				query: sq.Eq{"test_table.test_col": []byte("foo")},
+			},
+		},
+		{
+			name: "not equals",
+			fields: fields{
+				Column:  testCol,
+				Value:   []byte("foo"),
+				Compare: BytesNotEquals,
+			},
+			want: want{
+				query: sq.NotEq{"test_table.test_col": []byte("foo")},
+			},
+		},
+		{
+			name: "unknown comparison",
+			fields: fields{
+				Column:  testCol,
+				Value:   []byte("foo"),
+				Compare: -1,
+			},
+			want: want{
+				err:   true,
+				isNil: true,
+			},
+		},
+		{
+			name: "zero col",
+			fields: fields{
+				Column:  Column{},
+				Value:   []byte("foo"),
+				Compare: BytesEquals,
+			},
+			want: want{
+				err:   true,
+				query: sq.Eq{"": []byte("foo")},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s, err := NewBytesQuery(tt.fields.Column, tt.fields.Value, tt.fields.Compare)
+			if tt.want.err {
+				require.Error(t, err)
+
+				// still test comp
+				s = &BytesQuery{
+					Column:  tt.fields.Column,
+					Value:   tt.fields.Value,
+					Compare: tt.fields.Compare,
+				}
+			} else {
+				require.NoError(t, err)
+			}
+
+			query := s.comp()
+
+			if tt.want.isNil {
+				require.Nil(t, query)
+				return
+			}
+
+			require.NotNil(t, query)
 
 			if !reflect.DeepEqual(query, tt.want.query) {
 				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)

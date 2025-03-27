@@ -15,12 +15,8 @@ type passwordFormData struct {
 }
 
 func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "Password.Title", "Password.Description", errID, errMessage)
+	data := l.getUserData(r, authReq, translator, "Password.Title", "Password.Description", err)
 	funcs := map[string]interface{}{
 		"showPasswordReset": func() bool {
 			if authReq.LoginPolicy != nil {

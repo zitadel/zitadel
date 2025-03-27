@@ -26,13 +26,8 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 	if projectID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-nDXf5vXoUj", "Errors.IDMissing")
 	}
-
-	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if existingProject.State != domain.ProjectStateUnspecified {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
+	if !project.IsValid() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
 	project, err = c.addProjectWithID(ctx, project, resourceOwner, projectID)
 	if err != nil {
@@ -41,15 +36,14 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 	return project, nil
 }
 
-func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
+func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner string) (_ *domain.Project, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	if !project.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-fmq7bqQX1s", "Errors.ResourceOwnerMissing")
-	}
-	if ownerUserID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xe95Gl3Dro", "Errors.IDMissing")
 	}
 
 	projectID, err := c.idGenerator.Next()
@@ -57,7 +51,7 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 		return nil, err
 	}
 
-	project, err = c.addProjectWithIDWithOwner(ctx, project, resourceOwner, ownerUserID, projectID)
+	project, err = c.addProjectWithID(ctx, project, resourceOwner, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,13 +60,19 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 
 func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
 	projectAdd.AggregateID = projectID
-	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
-	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
+	projectWriteModel, err := c.getProjectWriteModelByID(ctx, projectAdd.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if isProjectStateExists(projectWriteModel.State) {
+		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
+	}
 
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(
 			ctx,
-			projectAgg,
+			//nolint: contextcheck
+			ProjectAggregateFromWriteModel(&projectWriteModel.WriteModel),
 			projectAdd.Name,
 			projectAdd.ProjectRoleAssertion,
 			projectAdd.ProjectRoleCheck,
@@ -88,47 +88,11 @@ func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Proj
 		return nil, err
 	}
 	postCommit(ctx)
-	err = AppendAndReduce(addedProject, pushedEvents...)
+	err = AppendAndReduce(projectWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return projectWriteModelToProject(addedProject), nil
-}
-
-func (c *Commands) addProjectWithIDWithOwner(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID, projectID string) (_ *domain.Project, err error) {
-	if !projectAdd.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
-	}
-	projectAdd.AggregateID = projectID
-	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
-	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
-
-	projectRole := domain.RoleProjectOwner
-	events := []eventstore.Command{
-		project.NewProjectAddedEvent(
-			ctx,
-			projectAgg,
-			projectAdd.Name,
-			projectAdd.ProjectRoleAssertion,
-			projectAdd.ProjectRoleCheck,
-			projectAdd.HasProjectCheck,
-			projectAdd.PrivateLabelingSetting),
-		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
-	}
-	postCommit, err := c.projectCreatedMilestone(ctx, &events)
-	if err != nil {
-		return nil, err
-	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
-	if err != nil {
-		return nil, err
-	}
-	postCommit(ctx)
-	err = AppendAndReduce(addedProject, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return projectWriteModelToProject(addedProject), nil
+	return projectWriteModelToProject(projectWriteModel), nil
 }
 
 func AddProjectCommand(
@@ -159,9 +123,6 @@ func AddProjectCommand(
 					hasProjectCheck,
 					privateLabelingSetting,
 				),
-				project.NewProjectMemberAddedEvent(ctx, &a.Aggregate,
-					owner,
-					domain.RoleProjectOwner),
 			}, nil
 		}, nil
 	}
@@ -180,20 +141,6 @@ func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryRedu
 	}
 
 	return project, nil
-}
-
-func (c *Commands) getProjectByID(ctx context.Context, projectID, resourceOwner string) (_ *domain.Project, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	projectWriteModel, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if projectWriteModel.State == domain.ProjectStateUnspecified || projectWriteModel.State == domain.ProjectStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "PROJECT-Gd2hh", "Errors.Project.NotFound")
-	}
-	return projectWriteModelToProject(projectWriteModel), nil
 }
 
 func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resourceOwner string) (*eventstore.Aggregate, domain.ProjectState, error) {
@@ -250,15 +197,11 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
 	}
 
-	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProject) {
-		return c.changeProjectOld(ctx, projectChange, resourceOwner)
-	}
-
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectChange.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
+	if !isProjectStateExists(existingProject.State) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
@@ -277,11 +220,7 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.NoChangesFound")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingProject, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx, existingProject, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +241,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 		return nil, err
 	}
 
-	if state == domain.ProjectStateUnspecified || state == domain.ProjectStateRemoved {
+	if !isProjectStateExists(state) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-112M9", "Errors.Project.NotFound")
 	}
 	if state != domain.ProjectStateActive {
@@ -312,17 +251,6 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
 	if err != nil {
 		return nil, err
-	}
-
-	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-112M9", "Errors.Project.NotFound")
-	}
-	if existingProject.State != domain.ProjectStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-mki55", "Errors.Project.NotActive")
 	}
 
 	return &domain.ObjectDetails{
@@ -346,22 +274,10 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 		return nil, err
 	}
 
-	if state == domain.ProjectStateUnspecified || state == domain.ProjectStateRemoved {
+	if !isProjectStateExists(state) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
-
 	if state != domain.ProjectStateInactive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInactive")
-	}
-
-	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
-	}
-	if existingProject.State != domain.ProjectStateInactive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInactive")
 	}
 
@@ -382,15 +298,11 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
 	}
 
-	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProject) {
-		return c.removeProjectOld(ctx, projectID, resourceOwner)
-	}
-
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
+	if !isProjectStateExists(existingProject.State) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 

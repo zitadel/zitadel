@@ -6,12 +6,15 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/actions"
@@ -152,4 +155,60 @@ func HandleResponse(resp *http.Response) ([]byte, error) {
 type ErrorBody struct {
 	ForwardedStatusCode   int    `json:"forwardedStatusCode,omitempty"`
 	ForwardedErrorMessage string `json:"forwardedErrorMessage,omitempty"`
+}
+
+type ExecutionTargetsQueries interface {
+	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
+	TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
+}
+
+func QueryExecutionTargetsForRequestAndResponse(
+	ctx context.Context,
+	queries ExecutionTargetsQueries,
+	fullMethod string,
+) ([]Target, []Target) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	targets, err := queries.TargetsByExecutionIDs(ctx,
+		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
+		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
+	)
+	requestTargets := make([]Target, 0, len(targets))
+	responseTargets := make([]Target, 0, len(targets))
+	if err != nil {
+		logging.WithFields("fullMethod", fullMethod).WithError(err).Info("unable to query targets")
+		return requestTargets, responseTargets
+	}
+
+	for _, target := range targets {
+		if strings.HasPrefix(target.GetExecutionID(), execution.IDAll(domain.ExecutionTypeRequest)) {
+			requestTargets = append(requestTargets, target)
+		} else if strings.HasPrefix(target.GetExecutionID(), execution.IDAll(domain.ExecutionTypeResponse)) {
+			responseTargets = append(responseTargets, target)
+		}
+	}
+
+	return requestTargets, responseTargets
+}
+
+func idsForFullMethod(fullMethod string, executionType domain.ExecutionType) []string {
+	return []string{execution.ID(executionType, fullMethod), execution.ID(executionType, serviceFromFullMethod(fullMethod)), execution.IDAll(executionType)}
+}
+
+func serviceFromFullMethod(s string) string {
+	parts := strings.Split(s, "/")
+	return parts[1]
+}
+
+func QueryExecutionTargetsForFunction(ctx context.Context, query ExecutionTargetsQueries, function string) ([]Target, error) {
+	queriedActionsV2, err := query.TargetsByExecutionID(ctx, []string{function})
+	if err != nil {
+		return nil, err
+	}
+	executionTargets := make([]Target, len(queriedActionsV2))
+	for i, action := range queriedActionsV2 {
+		executionTargets[i] = action
+	}
+	return executionTargets, nil
 }

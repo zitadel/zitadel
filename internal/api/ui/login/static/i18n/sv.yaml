@@ -265,6 +265,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   GenderLabel: Kön
   Female: Man
   Male: Kvinna
@@ -308,6 +309,7 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Användarvillkor
   TosConfirm: Jag accepterar
   TosLinkText: Användarvillkoren
@@ -385,6 +387,7 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
 DeviceAuth:
   Title: Tillgång från hårdvaruenhet
   UserCode:
@@ -505,6 +508,10 @@ Errors:
       CreationNotAllowed: Det är inte tillåtet att skapa nya konton från den här externa leverantören
       LinkingNotAllowed: Det är inte tillåtet att koppla ihop konton från den här externa leverantören
       NoOptionAllowed: Varken skapande eller länkande är tillåtet för denna leverantör. Kontakta administratören.
+      LoginFailedSwitchLocal: |
+        Inloggning vid extern identitetsprovider misslyckades. Återgår till lokal inloggning.
+
+        Felaktighetsdetaljer: {{.Details}}
     GrantRequired: Det går inte att logga in just nu. Användarkontot har inte tillgång till någonting i tjänsten. Ta kontakt med systemansvarig.
     ProjectRequired: Det går inte att logga in just nu. Användarkontots organisation har inte tillgång till tjänsten. Ta kontakt med systemansvarig.
   IdentityProvider:

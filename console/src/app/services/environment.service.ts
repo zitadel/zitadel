@@ -13,6 +13,8 @@ export interface Environment {
   issuer: string;
   customer_portal?: string;
   instance_management_url?: string;
+  posthog_token?: string;
+  posthog_url?: string;
   exhausted?: boolean;
 }
 

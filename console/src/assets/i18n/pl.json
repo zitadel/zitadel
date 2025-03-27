@@ -511,11 +511,13 @@
     "ORG_OWNER": "Ma uprawnienie nad całą organizacją",
     "ORG_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami organizacji",
     "ORG_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej organizacji",
+    "ORG_SETTINGS_MANAGER": "Ma uprawnienie do zarządzania ustawieniami organizacji",
     "ORG_USER_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami użytkowników",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami projektu",
     "ORG_PROJECT_CREATOR": "Ma uprawnienie do tworzenia własnych projektów i podstawowych ustawień",
     "ORG_ADMIN_IMPERSONATOR": "Ma uprawnienia do podszywania się pod administratora i użytkowników końcowych z organizacji",
     "ORG_END_USER_IMPERSONATOR": "Ma uprawnienia do podszywania się pod użytkowników końcowych z organizacji",
+    "ORG_USER_SELF_MANAGER": "Ma uprawnienie do zarządzania swoim własnym kontem użytkownika",
     "PROJECT_OWNER": "Ma uprawnienie nad całym projektem",
     "PROJECT_OWNER_VIEWER": "Ma uprawnienie do przeglądania całego projektu",
     "PROJECT_OWNER_GLOBAL": "Ma uprawnienia do całego projektu",
@@ -786,7 +788,10 @@
       "PHONESECTION": "Numery telefonów",
       "PASSWORDSECTION": "Hasło początkowe",
       "ADDRESSANDPHONESECTION": "Numer telefonu",
-      "INITMAILDESCRIPTION": "Jeśli zaznaczone są obie opcje, nie zostanie wysłany żaden e-mail inicjujący. Jeśli zaznaczona jest tylko jedna opcja, zostanie wysłany e-mail, aby udostępnić/zweryfikować dane."
+      "INITMAILDESCRIPTION": "Jeśli zaznaczone są obie opcje, nie zostanie wysłany żaden e-mail inicjujący. Jeśli zaznaczona jest tylko jedna opcja, zostanie wysłany e-mail, aby udostępnić/zweryfikować dane.",
+      "SETUPAUTHENTICATIONLATER": "Skonfiguruj uwierzytelnianie później dla tego użytkownika.",
+      "INVITATION": "Wyślij e-mail zaproszeniowy do konfiguracji uwierzytelniania i weryfikacji e-maila.",
+      "INITIALPASSWORD": "Ustaw początkowe hasło dla użytkownika."
     },
     "CODEDIALOG": {
       "TITLE": "Weryfikuj numer telefonu",
@@ -808,6 +813,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Numer telefonu",
       "PHONE_HINT": "Użyj symbolu +, a następnie kodu kraju, z którego dzwonisz, lub wybierz kraj z listy rozwijanej i wprowadź numer telefonu.",
+      "PHONE_VERIFIED": "Numer telefonu zweryfikowany",
+      "SEND_SMS": "Wyślij SMS weryfikacyjny",
+      "SEND_EMAIL": "Wyślij E-mail",
       "USERNAME": "Nazwa użytkownika",
       "CHANGEUSERNAME": "modyfikuj",
       "CHANGEUSERNAME_TITLE": "Zmień nazwę użytkownika",
@@ -947,6 +955,14 @@
       "4": "Zablokowany",
       "5": "Zawieszony",
       "6": "Początkowy"
+    },
+    "STATEV2": {
+      "0": "Nieznany",
+      "1": "Aktywny",
+      "2": "Nieaktywny",
+      "3": "Usunięty",
+      "4": "Zablokowany",
+      "5": "Początkowy"
     },
     "SEARCH": {
       "ADDITIONAL": "Nazwa użytkownika (obecna organizacja)",
@@ -1384,7 +1400,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1475,6 +1492,16 @@
       "ACTIONS_DESCRIPTION": "Akcje v2 umożliwiają zarządzanie wykonaniami danych i celami. Jeżeli flaga jest włączona, będziesz mógł korzystać z nowego interfejsu API i jego funkcji.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Zakończenie sesji",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł zakończyć pojedynczą sesję z interfejsu użytkownika logowania, podając id_token z roszczeniem `sid` jako id_token_hint w punkcie końcowym end_session. Należy pamiętać, że obecnie wszystkie sesje z tego samego agenta użytkownika (przeglądarki) są kończone w interfejsie użytkownika logowania. Sesje zarządzane za pomocą interfejsu API sesji już pozwalają na zakończenie pojedynczych sesji.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Błąd nadrzędny",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Jeśli flaga jest włączona, błąd nadrzędny OIDC zostanie zarejestrowany w konsoli.",
+      "DISABLEUSERTOKENEVENT": "Wyłącz zdarzenie tokena użytkownika",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Włącz Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 i może być używany do powiadamiania klientów o zakończeniu sesji u dostawcy OpenID.",
+      "PERMISSIONCHECKV2": "Sprawdzanie uprawnień V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł korzystać z nowego API i jego funkcji.",
+      "WEBKEY": "Klucz Web",
+      "WEBKEY_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł korzystać z nowego API i jego funkcji.",
       "STATES": {
         "INHERITED": "Dziedziczony",
         "ENABLED": "Włączony",
@@ -1485,7 +1512,9 @@
         "ENABLED": "„Włączony” jest dziedziczone",
         "DISABLED": "„Wyłączony” jest dziedziczone"
       },
-      "RESET": "Ustaw wszystko na dziedziczone"
+      "RESET": "Ustaw wszystko na dziedziczone",
+      "CONSOLEUSEV2USERAPI": "Użyj API V2 w konsoli do tworzenia użytkowników",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego."
     },
     "DIALOG": {
       "RESET": {
@@ -1622,7 +1651,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -2191,7 +2222,9 @@
       "REMOVED": "Usunięto pomyślnie."
     },
     "ISIDTOKENMAPPING": "Mapowanie z tokena ID",
-    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo."
+    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo.",
+    "USEPKCE": "Skorzystaj z PKCE",
+    "USEPKCE_DESC": "Określa, czy parametry code_challenge i code_challenge_method są uwzględnione w żądaniu uwierzytelnienia"
   },
   "MFA": {
     "LIST": {
@@ -2570,7 +2603,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

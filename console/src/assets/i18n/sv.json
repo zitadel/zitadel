@@ -512,11 +512,13 @@
     "ORG_OWNER": "Har behörighet över hela organisationen",
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
+    "ORG_SETTINGS_MANAGER": "Har behörighet att hantera organisationens inställningar",
     "ORG_USER_PERMISSION_EDITOR": "Har behörighet att hantera användarbehörigheter",
     "ORG_PROJECT_PERMISSION_EDITOR": "Har behörighet att hantera projektbehörigheter",
     "ORG_PROJECT_CREATOR": "Har behörighet att skapa egna projekt och underliggande inställningar",
     "ORG_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från organisationen",
     "ORG_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från organisationen",
+    "ORG_USER_SELF_MANAGER": "Har behörighet att hantera sin egen användare",
     "PROJECT_OWNER": "Har behörighet över hela projektet",
     "PROJECT_OWNER_VIEWER": "Har behörighet att granska hela projektet",
     "PROJECT_OWNER_GLOBAL": "Har behörighet över hela projektet",
@@ -787,7 +789,10 @@
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Initialt lösenord",
       "ADDRESSANDPHONESECTION": "Telefonnummer",
-      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas."
+      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas.",
+      "SETUPAUTHENTICATIONLATER": "Ställ in autentisering senare för den här användaren.",
+      "INVITATION": "Skicka en inbjudningsmail för autentiseringsinställning och e-postverifiering.",
+      "INITIALPASSWORD": "Ställ in ett initialt lösenord för användaren."
     },
     "CODEDIALOG": {
       "TITLE": "Verifiera telefonnummer",
@@ -809,6 +814,9 @@
       "EMAIL": "E-post",
       "PHONE": "Telefonnummer",
       "PHONE_HINT": "Använd + symbolen följt av landskoden, eller välj landet från rullgardinsmenyn och ange sedan telefonnumret",
+      "PHONE_VERIFIED": "Telefonnummer verifierat",
+      "SEND_SMS": "Skicka verifierings-SMS",
+      "SEND_EMAIL": "Skicka E-post",
       "USERNAME": "Användarnamn",
       "CHANGEUSERNAME": "ändra",
       "CHANGEUSERNAME_TITLE": "Ändra användarnamn",
@@ -948,6 +956,14 @@
       "4": "Låst",
       "5": "Suspenderad",
       "6": "Initial"
+    },
+    "STATEV2": {
+      "0": "Okänd",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Raderad",
+      "4": "Låst",
+      "5": "Initial"
     },
     "SEARCH": {
       "ADDITIONAL": "Inloggningsnamn (nuvarande organisation)",
@@ -1389,7 +1405,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1480,6 +1497,16 @@
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
+      "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
+      "DISABLEUSERTOKENEVENT": "Inaktivera Användartokenhändelse",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela klienter om sessionens avslutning hos OpenID-leverantören.",
+      "PERMISSIONCHECKV2": "Behörighetskontroll V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
+      "WEBKEY": "Webbnyckel",
+      "WEBKEY_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
@@ -1490,7 +1517,9 @@
         "ENABLED": "\"Aktiverad\" ärvs",
         "DISABLED": "\"Inaktiverad\" ärvs"
       },
-      "RESET": "Återställ allt till arv"
+      "RESET": "Återställ allt till arv",
+      "CONSOLEUSEV2USERAPI": "Använd V2 API i konsolen för att skapa användare",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd."
     },
     "DIALOG": {
       "RESET": {
@@ -1627,7 +1656,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -2216,7 +2247,9 @@
       "REMOVED": "Borttagen framgångsrikt."
     },
     "ISIDTOKENMAPPING": "Mappa från ID-token",
-    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten."
+    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten.",
+    "USEPKCE": "Använd PKCE",
+    "USEPKCE_DESC": "Avgör om parametrarna code_challenge och code_challenge_method ingår i autentiseringsbegäran"
   },
   "MFA": {
     "LIST": {
@@ -2599,7 +2632,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",

@@ -14,6 +14,7 @@ Tracing:
   # for type 'otel' is used for standard [open telemetry](https://opentelemetry.io)
   # Fraction: 1.0
   # Endpoint: 'otel.collector.endpoint'
+  # ServiceName: 'ZITADEL' # Name of the service in traces
   #
   # type 'log' or '' disables tracing
   #
@@ -24,6 +25,8 @@ Tracing:
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
   # The endpoint of the otel collector endpoint
   Endpoint: "" #ZITADEL_TRACING_ENDPOINT
+  # The name of the service in traces
+  ServiceName: "ZITADEL" #ZITADEL_TRACING_SERVICENAME
 
 # Profiler enables capturing profiling data (CPU, Memory, ...) for performance analysis
 Profiler:
@@ -110,24 +113,13 @@ PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
-  # ZITADEL manages three database connection pools.
-  # The *ConnRatio settings define the ratio of how many connections from
-  # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
-  # Remaining connection are used for queries (search).
-  # Values may not be negative and the sum of the ratios must always be less than 1.
-  # For example this defaults define 15 MaxOpenConns overall.
-  # - 15*0.2=3 connections are allocated to the event pusher;
-  # - 15*0.135=2 connections are allocated to the projection spooler;
-  # - 15-(3+2)=10 connections are remaining for queries;
-  EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-  ProjectionSpoolerConnRatio: 0.135 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
     Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 15 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 12 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
+    MaxOpenConns: 5 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 2 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
@@ -427,12 +419,10 @@ Projections:
       TransactionDuration: 0s
       BulkLimit: 2000
 
-    # The Notifications projection is used for sending emails and SMS to users
+    # The Notifications projection is used for preparing the messages (emails and SMS) to be sent to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
-      # Sending emails can take longer than 500ms
-      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_TRANSACTIONDURATION
     password_complexities:
       TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PASSWORD_COMPLEXITIES_TRANSACTIONDURATION
     lockout_policy:
@@ -464,34 +454,12 @@ Notifications:
   # If set to 0, no notification request events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
   Workers: 1 # ZITADEL_NOTIFIACATIONS_WORKERS
-  # The amount of events a single worker will process in a run.
-  BulkLimit: 10 # ZITADEL_NOTIFIACATIONS_BULKLIMIT
-  # Time interval between scheduled notifications for request events
-  RequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
-  # The amount of workers processing the notification retry events.
-  # If set to 0, no notification retry events will be handled. This can be useful when running in
-  # multi binary / pod setup and allowing only certain executables to process the events.
-  RetryWorkers: 1 # ZITADEL_NOTIFIACATIONS_RETRYWORKERS
-  # Time interval between scheduled notifications for retry events
-  RetryRequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_RETRYREQUEUEEVERY
-  # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
-  # from HandleActiveInstances duration in the past until the projection's current time
-  # If set to 0 (default), every instance is always considered active
-  HandleActiveInstances: 0s # ZITADEL_NOTIFIACATIONS_HANDLEACTIVEINSTANCES
-  # The maximum duration a transaction remains open
-  # before it spots left folding additional events
-  # and updates the table.
+  # The maximum duration a job can do it's work before it is considered as failed.
   TransactionDuration: 10s # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
   # Automatically cancel the notification after the amount of failed attempts
   MaxAttempts: 3 # ZITADEL_NOTIFIACATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
-  # Failed attempts are retried after a confogired delay (with exponential backoff).
-  # Set a minimum and maximum delay and a factor for the backoff
-  MinRetryDelay: 5s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
-  MaxRetryDelay: 1m # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
-  # Any factor below 1 will be set to 1
-  RetryDelayFactor: 1.5 # ZITADEL_NOTIFIACATIONS_RETRYDELAYFACTOR
 
 Auth:
   # See Projections.BulkLimit
@@ -591,9 +559,19 @@ SAML:
     #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
 
 SCIM:
+  DocumentationUrl: https://zitadel.com/docs/guides/manage/user/scim2
+  AuthenticationSchemes:
+    - Name: Zitadel authentication token
+      Description: Authentication scheme using the OAuth Bearer Token Standard
+      SpecUri: https://www.rfc-editor.org/info/rfc6750
+      DocumentationUri: https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users
+      Type: oauthbearertoken
   # default values whether an email/phone is considered verified when a users email/phone is created or updated
   EmailVerified: true # ZITADEL_SCIM_EMAILVERIFIED
   PhoneVerified: true # ZITADEL_SCIM_PHONEVERIFIED
+  MaxRequestBodySize: 1_000_000 # ZITADEL_SCIM_MAXREQUESTBODYSIZE
+  Bulk:
+    MaxOperationsCount: 100 # ZITADEL_SCIM_BULK_MAXOPERATIONSCOUNT
 
 Login:
   LanguageCookieName: zitadel.login.lang # ZITADEL_LOGIN_LANGUAGECOOKIENAME
@@ -719,6 +697,7 @@ SystemDefaults:
     #   - "bcrypt"
     #   - "md5"      # md5Crypt with salt and password shuffling.
     #   - "md5plain" # md5 digest of a password without salt
+    #   - "md5salted" # md5 digest of a salted password
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
@@ -1132,6 +1111,7 @@ DefaultInstance:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
     # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
+    # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
@@ -1195,6 +1175,9 @@ InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
   # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'
   # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
+  #
+  # Warning: RolePermissionMappings are synhronized to the database.
+  # Changes here will only be applied after running `zitadel setup` or `zitadel start-from-setup`.
   RolePermissionMappings:
     - Role: "SYSTEM_OWNER"
       Permissions:
@@ -1318,6 +1301,8 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "session.read"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1353,6 +1338,7 @@ InternalAuthZ:
         - "action.target.read"
         - "action.execution.read"
         - "userschema.read"
+        - "session.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"

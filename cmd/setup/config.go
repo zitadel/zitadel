@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
+	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 )
 
 type Config struct {
@@ -38,6 +39,7 @@ type Config struct {
 	ExternalPort    uint16
 	ExternalSecure  bool
 	Log             *logging.Config
+	Metrics         metrics.Config
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
@@ -85,7 +87,13 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 
+	err = config.Metrics.NewMeter()
+	logging.OnError(err).Fatal("unable to set meter")
+
 	id.Configure(config.Machine)
+
+	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
+	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
 
 	return config
 }
@@ -130,6 +138,14 @@ type Steps struct {
 	s42Apps7OIDCConfigsLoginVersion         *Apps7OIDCConfigsLoginVersion
 	s43CreateFieldsDomainIndex              *CreateFieldsDomainIndex
 	s44ReplaceCurrentSequencesIndex         *ReplaceCurrentSequencesIndex
+	s45CorrectProjectOwners                 *CorrectProjectOwners
+	s46InitPermissionFunctions              *InitPermissionFunctions
+	s47FillMembershipFields                 *FillMembershipFields
+	s48Apps7SAMLConfigsLoginVersion         *Apps7SAMLConfigsLoginVersion
+	s49InitPermittedOrgsFunction            *InitPermittedOrgsFunction
+	s50IDPTemplate6UsePKCE                  *IDPTemplate6UsePKCE
+	s51IDPTemplate6RootCA                   *IDPTemplate6RootCA
+	s52IDPTemplate6LDAP2                    *IDPTemplate6LDAP2
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

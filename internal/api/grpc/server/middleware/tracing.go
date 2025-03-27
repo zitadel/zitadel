@@ -1,34 +1,29 @@
 package middleware
 
 import (
-	"context"
 	"strings"
 
 	grpc_trace "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"google.golang.org/grpc"
+	"google.golang.org/grpc/stats"
 
 	grpc_utils "github.com/zitadel/zitadel/internal/api/grpc"
 )
 
 type GRPCMethod string
 
-func DefaultTracingServer() grpc.UnaryServerInterceptor {
+func DefaultTracingServer() stats.Handler {
 	return TracingServer(grpc_utils.Healthz, grpc_utils.Readiness, grpc_utils.Validation)
 }
 
-func TracingServer(ignoredMethods ...GRPCMethod) grpc.UnaryServerInterceptor {
-	return func(
-		ctx context.Context,
-		req interface{},
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler,
-	) (interface{}, error) {
-
-		for _, ignoredMethod := range ignoredMethods {
-			if strings.HasSuffix(info.FullMethod, string(ignoredMethod)) {
-				return handler(ctx, req)
+func TracingServer(ignoredMethods ...GRPCMethod) stats.Handler {
+	return grpc_trace.NewServerHandler(grpc_trace.WithFilter(
+		func(info *stats.RPCTagInfo) bool {
+			for _, ignoredMethod := range ignoredMethods {
+				if strings.HasSuffix(info.FullMethodName, string(ignoredMethod)) {
+					return false
+				}
 			}
-		}
-		return grpc_trace.UnaryServerInterceptor()(ctx, req, info, handler)
-	}
+			return true
+		},
+	))
 }

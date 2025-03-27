@@ -308,25 +308,17 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
+          saml_v2: {
+            specPath: ".artifacts/openapi/zitadel/saml/v2/saml_service.swagger.json",
+            outputDir: "docs/apis/resources/saml_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
           settings_v2: {
             specPath: ".artifacts/openapi/zitadel/settings/v2/settings_service.swagger.json",
             outputDir: "docs/apis/resources/settings_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          user_schema_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/userschema/v3alpha/user_schema_service.swagger.json",
-            outputDir: "docs/apis/resources/user_schema_service_v3",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          user_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/user/v3alpha/user_service.swagger.json",
-            outputDir: "docs/apis/resources/user_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "auto",

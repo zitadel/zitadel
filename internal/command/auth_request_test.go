@@ -62,6 +62,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								false,
+								"issuer",
 							),
 						),
 					),
@@ -101,6 +102,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 							gu.Ptr("loginHint"),
 							gu.Ptr("hintUserID"),
 							false,
+							"issuer",
 						),
 					),
 				),
@@ -127,6 +129,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 					MaxAge:     gu.Ptr(time.Duration(0)),
 					LoginHint:  gu.Ptr("loginHint"),
 					HintUserID: gu.Ptr("hintUserID"),
+					Issuer:     "issuer",
 				},
 			},
 			&CurrentAuthRequest{
@@ -150,6 +153,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 					MaxAge:     gu.Ptr(time.Duration(0)),
 					LoginHint:  gu.Ptr("loginHint"),
 					HintUserID: gu.Ptr("hintUserID"),
+					Issuer:     "issuer",
 				},
 			},
 			nil,
@@ -181,6 +185,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 		sessionID        string
 		sessionToken     string
 		checkLoginClient bool
+		permissionCheck  domain.ProjectPermissionCheck
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -233,6 +238,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(
@@ -275,6 +281,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -316,6 +323,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -355,6 +363,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -417,6 +426,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -468,6 +478,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -526,6 +537,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
 						ResponseMode: domain.OIDCResponseModeQuery,
+						Issuer:       "issuer",
 					},
 					SessionID:   "sessionID",
 					UserID:      "userID",
@@ -556,6 +568,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -615,6 +628,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
 						ResponseMode: domain.OIDCResponseModeQuery,
+						Issuer:       "issuer",
 					},
 					SessionID:   "sessionID",
 					UserID:      "userID",
@@ -645,6 +659,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -705,11 +720,172 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
 						ResponseMode: domain.OIDCResponseModeQuery,
+						Issuer:       "issuer",
 					},
 					SessionID:   "sessionID",
 					UserID:      "userID",
 					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				},
+			},
+		},
+		{
+			"linked with permission, application permission check",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"otherLoginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								true,
+								"issuer",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+					expectPush(
+						authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							"sessionID",
+							"userID",
+							testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLoginClient: true,
+				permissionCheck:  newMockProjectPermissionCheckAllowed(),
+			},
+			res{
+				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+				authReq: &CurrentAuthRequest{
+					AuthRequest: &AuthRequest{
+						ID:           "V2_id",
+						LoginClient:  "otherLoginClient",
+						ClientID:     "clientID",
+						RedirectURI:  "redirectURI",
+						State:        "state",
+						Nonce:        "nonce",
+						Scope:        []string{"openid"},
+						Audience:     []string{"audience"},
+						ResponseType: domain.OIDCResponseTypeCode,
+						ResponseMode: domain.OIDCResponseModeQuery,
+						Issuer:       "issuer",
+					},
+					SessionID:   "sessionID",
+					UserID:      "userID",
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				},
+			},
+		},
+		{
+			"linked with permission, no application permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"otherLoginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								true,
+								"issuer",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLoginClient: true,
+				permissionCheck:  newMockProjectPermissionCheckOIDCNotAllowed(),
+			},
+			res{
+				wantErr: zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.PermissionDenied"),
 			},
 		},
 	}
@@ -720,7 +896,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
-			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
+			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient, tt.args.permissionCheck)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {
@@ -792,6 +968,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 								nil,
 								nil,
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -820,6 +997,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
 						ResponseMode: domain.OIDCResponseModeQuery,
+						Issuer:       "issuer",
 					},
 				},
 			},
@@ -892,6 +1070,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 					),
@@ -930,6 +1109,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(

@@ -512,11 +512,13 @@
     "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
+    "ORG_SETTINGS_MANAGER": "Hat die Berechtigung, die Einstellungen der Organisation zu verwalten",
     "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von User grants",
     "ORG_PROJECT_PERMISSION_EDITOR": "Hat die Berechtigung, Projektberechtigungen für externe Organisationen zu verwalten",
     "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und dessen Einstellungen zu erstellen",
     "ORG_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer der Organisation auszugeben",
     "ORG_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer der Organisation auszugeben",
+    "ORG_USER_SELF_MANAGER": "Hat die Berechtigung, seinen eigenen Benutzer zu verwalten",
     "PROJECT_OWNER": "Hat die Berechtigung für das gesamte Projekt",
     "PROJECT_OWNER_VIEWER": "Hat die Leseberechtigung, das gesamte Projekt zu überprüfen",
     "PROJECT_OWNER_GLOBAL": "Hat die Berechtigung für das gesamte Projekt",
@@ -787,7 +789,10 @@
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Setze ein initiales Passwort.",
       "ADDRESSANDPHONESECTION": "Telefonnummer",
-      "INITMAILDESCRIPTION": "Wenn beide Optionen ausgewählt sind, wird keine E-Mail zur Initialisierung gesendet. Wenn nur eine der Optionen ausgewählt ist, wird eine E-Mail zur Verifikation der Daten gesendet."
+      "INITMAILDESCRIPTION": "Wenn beide Optionen ausgewählt sind, wird keine E-Mail zur Initialisierung gesendet. Wenn nur eine der Optionen ausgewählt ist, wird eine E-Mail zur Verifikation der Daten gesendet.",
+      "SETUPAUTHENTICATIONLATER": "Authentifizierung später für diesen Benutzer einrichten.",
+      "INVITATION": "Eine Einladung per E-Mail für die Authentifizierungseinrichtung und E-Mail-Verifizierung senden.",
+      "INITIALPASSWORD": "Setze ein initiales Passwort für den Benutzer."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonnummer verifizieren",
@@ -809,6 +814,9 @@
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
       "PHONE_HINT": "Verwenden das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wähle das Land aus der Dropdown-Liste aus und gebe anschließend die Telefonnummer ein.",
+      "PHONE_VERIFIED": "Telefonnummer verifiziert",
+      "SEND_SMS": "Bestätigungs-SMS senden",
+      "SEND_EMAIL": "E-Mail senden",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -948,6 +956,14 @@
       "4": "Gesperrt",
       "5": "Suspendiert",
       "6": "Initialisiert"
+    },
+    "STATEV2": {
+      "0": "Unbekannt",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Gelöscht",
+      "4": "Gesperrt",
+      "5": "Initialisiert"
     },
     "SEARCH": {
       "ADDITIONAL": "Benutzer Name (eigene Organisation)",
@@ -1385,7 +1401,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1476,6 +1493,16 @@
       "ACTIONS_DESCRIPTION": "Aktionen v2 ermöglichen die Verwaltung von Datenausführungen und Zielen. Wenn das Flag aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sitzungsbeendigung",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
+      "DISABLEUSERTOKENEVENT": "Benutzer-Token-Ereignis deaktivieren",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Clients über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
+      "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
+      "WEBKEY": "Web-Schlüssel",
+      "WEBKEY_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
         "INHERITED": "Erben",
         "ENABLED": "Aktiviert",
@@ -1486,7 +1513,9 @@
         "ENABLED": "„Aktiviert“ wird vererbt",
         "DISABLED": "„Deaktiviert“ wird vererbt"
       },
-      "RESET": "Alle auf Erben setzen"
+      "RESET": "Alle auf Erben setzen",
+      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Konsole zur Erstellung von Benutzern",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand."
     },
     "DIALOG": {
       "RESET": {
@@ -1623,7 +1652,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2191,7 +2222,9 @@
       "REMOVED": "Erfolgreich entfernt."
     },
     "ISIDTOKENMAPPING": "Zuordnung vom ID-Token",
-    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints."
+    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints.",
+    "USEPKCE": "Verwenden Sie PKCE",
+    "USEPKCE_DESC": "Bestimmt, ob die Parameter code_challenge und code_challenge_method in der Authentifizierungsanforderung enthalten sind"
   },
   "MFA": {
     "LIST": {
@@ -2570,7 +2603,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",
