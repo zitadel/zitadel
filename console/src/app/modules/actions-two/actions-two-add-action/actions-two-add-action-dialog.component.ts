@@ -9,7 +9,10 @@ import {
   ActionsTwoAddActionConditionComponent,
   ConditionType,
 } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
-import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
+import {
+  ActionsTwoAddActionTargetComponent,
+  TargetInit,
+} from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
 
 enum Page {
@@ -17,6 +20,8 @@ enum Page {
   Condition,
   Target,
 }
+
+type ConditionInit = NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['condition']>['conditionType'];
 
 @Component({
   selector: 'cnsl-actions-two-add-action-dialog',
@@ -38,33 +43,22 @@ export class ActionTwoAddActionDialogComponent {
   public page = signal<Page | undefined>(Page.Type);
 
   public typeSignal = signal<ConditionType>('request');
-  public conditionSignal = signal<any>(undefined);
-  public targetSignal = signal<string>('');
+  public conditionSignal = signal<ConditionInit | undefined>(undefined);
+  public targetSignal = signal<TargetInit | undefined>(undefined);
 
-  public request = computed(() => {
-    const condition = this.conditionSignal();
-    const target = this.targetSignal();
-
+  public request = computed<MessageInitShape<typeof SetExecutionRequestSchema>>(() => {
     return {
       condition: {
-        conditionType: {
-          case: 'function',
-          value: {
-            name: 'Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostCreation',
-          },
-        },
+        conditionType: this.conditionSignal(),
       },
       execution: {
         targets: [
           {
-            type: {
-              case: 'target',
-              value: target,
-            },
+            type: this.targetSignal(),
           },
         ],
       },
-    } as MessageInitShape<typeof SetExecutionRequestSchema>;
+    };
   });
 
   constructor(public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>) {}

@@ -25,8 +25,8 @@ import { ConditionType } from '../actions-two-add-action-condition/actions-two-a
 })
 export class ActionsTwoAddActionTypeComponent {
   protected readonly typeForm: ReturnType<typeof this.buildActionTypeForm> = this.buildActionTypeForm();
-  @Output() public continue: EventEmitter<void> = new EventEmitter();
-  @Output() public typeChanges$: Observable<ConditionType>;
+  @Output() public readonly continue = new EventEmitter<void>();
+  @Output() public readonly typeChanges$: Observable<ConditionType>;
 
   constructor(private readonly fb: FormBuilder) {
     this.typeChanges$ = this.typeForm.get('executionType')!.valueChanges.pipe(

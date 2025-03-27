@@ -48,7 +48,7 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
   @Input({ required: true }) public set conditionType(conditionType: T) {
     this.conditionType$.next(conditionType);
   }
-  @Output() public conditionTypeValue = new EventEmitter<ConditionTypeValue<T>>();
+  @Output() public readonly conditionTypeValue = new EventEmitter<ConditionTypeValue<T>>();
 
   private readonly conditionType$ = new ReplaySubject<T>(1);
   protected readonly form$: ReturnType<typeof this.buildForm>;
