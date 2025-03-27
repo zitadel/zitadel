@@ -97,7 +97,6 @@ export class UserCreateV2Component implements OnInit {
       username: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
       givenName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
       familyName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
-      nickName: new FormControl('', { nonNullable: true }),
       emailVerified: new FormControl(false, { nonNullable: true }),
       authenticationFactor: new FormControl<AuthenticationFactor['factor']>(authenticationFactor, {
         nonNullable: true,
@@ -188,7 +187,6 @@ export class UserCreateV2Component implements OnInit {
       profile: {
         givenName: userValues.givenName,
         familyName: userValues.familyName,
-        nickName: userValues.nickName,
       },
       email: {
         email: userValues.email,
