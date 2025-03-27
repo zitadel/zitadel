@@ -185,6 +185,32 @@
           "DESCRIPTION": "La durée de vie du token de rafraîchissement inactif est le temps maximum qu'un token de rafraîchissement peut être inutilisé."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gérez vos clés Web OIDC pour signer et valider en toute sécurité les jetons de votre instance ZITADEL.",
+        "TABLE": {
+          "TITLE": "Clés Web Actives et Futures",
+          "DESCRIPTION": "Vos clés Web actives et à venir. L'activation d'une nouvelle clé désactivera l'actuelle.",
+          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les clients.",
+          "ACTIVATE": "Activer la prochaine Clé Web",
+          "ACTIVE": "Actuellement active",
+          "NEXT": "Prochaine dans la file d'attente",
+          "FUTURE": "Futur",
+          "WARNING": "La clé Web a moins de 5 minutes"
+        },
+        "CREATE": {
+          "TITLE": "Créer une nouvelle Clé Web",
+          "DESCRIPTION": "Créer une nouvelle clé Web l'ajoutera à votre liste. ZITADEL utilise par défaut des clés RSA2048 avec un hacheur SHA256.",
+          "KEY_TYPE": "Type de Clé",
+          "BITS": "Bits",
+          "HASHER": "Hacheur",
+          "CURVE": "Courbe"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Clés Web Précédentes",
+          "DESCRIPTION": "Voici vos anciennes clés Web qui ne sont plus actives.",
+          "DEACTIVATED_ON": "Désactivée le"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Textes des Messages",
         "DESCRIPTION": "Personnalisez les textes de vos e-mails de notification ou messages SMS. Si vous souhaitez désactiver certaines langues, restreignez-les dans les paramètres de langue de vos instances.",
@@ -1356,6 +1382,7 @@
       "BRANDING": "Image de marque",
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Générateur de secrets",
       "SECURITY": "Paramètres de sécurité",
       "EVENTS": "Événements",

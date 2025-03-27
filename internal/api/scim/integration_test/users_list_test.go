@@ -149,8 +149,8 @@ func TestListUser(t *testing.T) {
 				assert.Equal(t, totalCountOfHumanUsers, resp.TotalResults)
 				assert.Equal(t, 5, resp.StartIndex)
 				assert.Len(t, sortedResources, 2)
-				assert.True(t, strings.HasPrefix(sortedResources[0].UserName, "scim-username-1: "))
-				assert.True(t, strings.HasPrefix(sortedResources[1].UserName, "scim-username-2: "))
+				assert.True(t, strings.HasPrefix(sortedResources[0].UserName, "scim-username-1: "), "got %q", resp.Resources[0].UserName)
+				assert.True(t, strings.HasPrefix(sortedResources[1].UserName, "scim-username-2: "), "got %q", resp.Resources[1].UserName)
 			},
 		},
 		{
