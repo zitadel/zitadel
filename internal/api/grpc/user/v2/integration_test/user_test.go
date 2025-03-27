@@ -31,12 +31,13 @@ import (
 )
 
 var (
-	CTX       context.Context
-	IamCTX    context.Context
-	UserCTX   context.Context
-	SystemCTX context.Context
-	Instance  *integration.Instance
-	Client    user.UserServiceClient
+	CTX                            context.Context
+	IamCTX                         context.Context
+	UserCTX                        context.Context
+	SystemCTX                      context.Context
+	SystemUserWithNoPermissionsCTX context.Context
+	Instance                       *integration.Instance
+	Client                         user.UserServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -46,6 +47,7 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 
+		SystemUserWithNoPermissionsCTX = integration.WithSystemUserWithNoPermissionsAuthorization(ctx)
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
@@ -1306,7 +1308,6 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -3048,7 +3049,6 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 
 				assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
 			}, retryDuration, tick, "timeout waiting for expected auth methods result")
-
 		})
 	}
 }
