@@ -99,6 +99,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -129,6 +130,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						eventFromEventPusher(
@@ -167,6 +169,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						eventFromEventPusher(
@@ -248,6 +251,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						eventFromEventPusher(
