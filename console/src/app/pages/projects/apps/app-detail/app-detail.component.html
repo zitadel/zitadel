@@ -41,12 +41,7 @@
       {{ 'ACTIONS.REACTIVATE' | translate }}
     </button>
     <ng-template cnslHasRole [hasRole]="['project.app.delete:' + projectId, 'project.app.delete']">
-      <button
-        *ngIf="!isZitadel"
-        mat-menu-item
-        matTooltip="{{ 'APP.PAGES.DELETE' | translate }}"
-        (click)="deleteApp()"
-      >
+      <button *ngIf="!isZitadel" mat-menu-item matTooltip="{{ 'APP.PAGES.DELETE' | translate }}" (click)="deleteApp()">
         <span [style.color]="'var(--warn)'">{{ 'APP.PAGES.DELETE' | translate }}</span>
       </button>
     </ng-template>
@@ -234,7 +229,7 @@
                 [options]="{
                   lineNumbers: true,
                   theme: 'material',
-                  mode: 'application/xml'
+                  mode: 'application/xml',
                 }"
               ></ngx-codemirror>
             </div>

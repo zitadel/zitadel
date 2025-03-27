@@ -12,25 +12,25 @@
       </button>
 
       <ng-container *ngFor="let setting of settingsList; index as i; trackBy: trackSettings">
-          <span
-            class="sidenav-setting-group hide-on-mobile"
-            *ngIf="
-              (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
-              (i === 0 && setting.groupI18nKey)
-            "
-            >{{ setting.groupI18nKey | translate }}</span
-          >
+        <span
+          class="sidenav-setting-group hide-on-mobile"
+          *ngIf="
+            (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
+            (i === 0 && setting.groupI18nKey)
+          "
+          >{{ setting.groupI18nKey | translate }}</span
+        >
 
-          <button
-            (click)="setting$.set(setting)"
-            class="sidenav-setting-list-element hide-on-mobile"
-            [ngClass]="{ active: setting$()?.id === setting.id }"
-            [attr.data-e2e]="'sidenav-element-' + setting.id"
-          >
-            <span>{{ setting.i18nKey | translate }}</span>
-            <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
-          </button>
-        </ng-container>
+        <button
+          (click)="setting$.set(setting)"
+          class="sidenav-setting-list-element hide-on-mobile"
+          [ngClass]="{ active: setting$()?.id === setting.id }"
+          [attr.data-e2e]="'sidenav-element-' + setting.id"
+        >
+          <span>{{ setting.i18nKey | translate }}</span>
+          <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
+        </button>
+      </ng-container>
     </div>
   </div>
 

@@ -1,9 +1,9 @@
-<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit(form)">
+<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid">
   <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
     <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
 
     <div class="emailVerified">
-      <mat-checkbox formControlName="all">
+      <mat-checkbox [formControl]="form.form.controls.all">
         <div class="execution-condition-text">
           <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{
@@ -22,9 +22,8 @@
         type="text"
         placeholder=""
         #nameInput
-        formControlName="service"
+        [formControl]="form.form.controls.service"
         [matAutocomplete]="autoservice"
-        [disabled]="form.form.controls.all.value"
       />
 
       <mat-autocomplete #autoservice="matAutocomplete">
@@ -41,7 +40,14 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput formControlName="method" [matAutocomplete]="automethod" />
+      <input
+        cnslInput
+        type="text"
+        placeholder=""
+        #nameInput
+        [formControl]="form.form.controls.method"
+        [matAutocomplete]="automethod"
+      />
 
       <mat-autocomplete #automethod="matAutocomplete">
         <mat-option *ngIf="(executionMethods$ | async) == undefined" class="is-loading">
@@ -57,7 +63,13 @@
   <ng-container *ngIf="form.case === 'function'">
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" formControlName="name" [matAutocomplete]="autofunctionname" />
+      <input
+        cnslInput
+        type="text"
+        placeholder=""
+        [formControl]="form.form.controls.name"
+        [matAutocomplete]="autofunctionname"
+      />
 
       <mat-autocomplete #autofunctionname="matAutocomplete">
         <mat-option *ngIf="(executionFunctions$ | async) == undefined" class="is-loading">
@@ -78,7 +90,7 @@
     <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
 
     <div class="emailVerified">
-      <mat-checkbox formControlName="all">
+      <mat-checkbox [formControl]="form.form.controls.all">
         <div class="execution-condition-text">
           <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{
@@ -97,9 +109,8 @@
         type="text"
         placeholder=""
         #nameInput
-        formControlName="service"
+        [formControl]="form.form.controls.service"
         [matAutocomplete]="autogroup"
-        [disabled]="conditionForm?.get('all')?.value == true"
       />
 
       <mat-autocomplete #autogroup="matAutocomplete">
@@ -114,7 +125,7 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.GROUP.TITLE' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput formControlName="group" />
+      <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.group" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
         'ACTIONSTWO.TARGET.CREATE.GROUP.DESCRIPTION' | translate
       }}</span>
@@ -124,7 +135,7 @@
 
     <!-- <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.DESCRIPTION' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput formControlName="method" [matAutocomplete]="autoevents" />
+      <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.method" [matAutocomplete]="autoevents" />
 
       <mat-autocomplete #autoevents="matAutocomplete">
         <mat-option *ngIf="(executionEvents$ | async) == undefined" class="is-loading">
@@ -138,7 +149,7 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.EVENT.TITLE' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput formControlName="event" />
+      <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.event" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
         'ACTIONSTWO.TARGET.CREATE.EVENT.DESCRIPTION' | translate
       }}</span>

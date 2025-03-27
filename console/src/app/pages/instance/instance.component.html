@@ -41,11 +41,7 @@
 <div class="max-width-container">
   <div class="instance-settings-wrapper">
     <ng-container *ngIf="settingsList$ | async as list">
-      <cnsl-settings-list
-        [selectedId]="id"
-        [serviceType]="PolicyComponentServiceType.ADMIN"
-        [settingsList]="list"
-      >
+      <cnsl-settings-list [selectedId]="id" [serviceType]="PolicyComponentServiceType.ADMIN" [settingsList]="list">
         <router-outlet />
       </cnsl-settings-list>
     </ng-container>

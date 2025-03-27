@@ -66,12 +66,12 @@ export class OwnedProjectDetailComponent implements OnInit {
     private breadcrumbService: BreadcrumbService,
   ) {
     route.queryParamMap.pipe(take(1)).subscribe((params) => {
-      const id = params.get('id')
+      const id = params.get('id');
       if (!id) {
         return;
       }
-      const setting = this.settingsList.find(setting => setting.id === id);
-      if(setting) {
+      const setting = this.settingsList.find((setting) => setting.id === id);
+      if (setting) {
         this.currentSetting = setting;
       }
     });
