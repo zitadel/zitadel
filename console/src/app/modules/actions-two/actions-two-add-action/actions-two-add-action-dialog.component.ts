@@ -43,17 +43,23 @@ export class ActionTwoAddActionDialogComponent {
 
   constructor(public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>) {
     effect(() => {
-      const type = this.typeSignal();
       const condition = this.conditionSignal();
       const target = this.targetSignal();
 
-      console.log('Request:', type, condition, target);
+      console.log('Request:', condition, target);
       const req: MessageInitShape<typeof SetExecutionRequestSchema> = {
         condition: {
-          // Map condition here
+          conditionType: condition,
         },
         execution: {
-          // Map execution here
+          targets: [
+            {
+              type: {
+                case: 'target',
+                value: target,
+              },
+            },
+          ],
         },
       };
       return req;

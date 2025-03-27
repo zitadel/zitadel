@@ -43,7 +43,7 @@ const FEATURE_KEYS: ToggleStateKeys[] = [
   'oidcTriggerIntrospectionProjections',
   'permissionCheckV2',
   'userSchema',
-  // 'webKey',
+  'webKey',
 ];
 
 type FeatureState = { source: Source; state: ToggleState };
@@ -113,7 +113,7 @@ export class FeaturesComponent {
         this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
       permissionCheckV2: this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED,
       userSchema: this.toggleStates?.userSchema?.state === ToggleState.ENABLED,
-      // webKey: this.toggleStates?.webKey?.state === ToggleState.ENABLED,
+      webKey: this.toggleStates?.webKey?.state === ToggleState.ENABLED,
     };
 
     this.featureService
