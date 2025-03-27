@@ -7,7 +7,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf } from 'rxjs';
+import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -82,6 +82,15 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType> {
     this.executionServices$ = this.listExecutionServices().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionMethods$ = this.listExecutionMethods().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionFunctions$ = this.listExecutionFunctions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+
+    this.form$
+      .pipe(
+        switchMap((form) => {
+          console.log(form);
+          return form.form.valueChanges;
+        }),
+      )
+      .subscribe(console.log);
   }
 
   public buildForm(): Form {

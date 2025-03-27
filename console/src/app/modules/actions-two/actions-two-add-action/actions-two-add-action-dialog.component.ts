@@ -11,10 +11,6 @@ import {
 } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
 import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject, combineLatest, forkJoin, map, merge, Observable, of, ReplaySubject } from 'rxjs';
-import { FunctionExecution } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
-import { ActionsTwoTargetsComponent } from '../actions-two-targets/actions-two-targets.component';
-import { Condition } from 'src/app/proto/generated/zitadel/action/v2beta/execution_pb';
 
 enum Page {
   Type,
@@ -90,17 +86,5 @@ export class ActionTwoAddActionDialogComponent {
 
   public closeWithResult() {
     this.dialogRef.close();
-  }
-
-  public onTypeChanged(type: ConditionType): void {
-    this.typeSignal.set(type);
-  }
-
-  public onConditionChanged(condition: any): void {
-    this.conditionSignal.set(condition);
-  }
-
-  public onTargetChanged(target: string): void {
-    this.targetSignal.set(target);
   }
 }

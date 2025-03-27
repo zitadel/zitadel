@@ -3,15 +3,16 @@
   <div class="framework-change-block" [ngSwitch]="page()">
     <cnsl-actions-two-add-action-type
       *ngSwitchCase="Page.Type"
-      (typeChanges$)="onTypeChanged($event)"
+      (typeChanges$)="typeSignal.set($event)"
     ></cnsl-actions-two-add-action-type>
     <cnsl-actions-two-add-action-condition
       *ngSwitchCase="Page.Condition"
       [conditionType]="typeSignal()"
+      (conditionChanges$)="conditionSignal.set($event)"
     ></cnsl-actions-two-add-action-condition>
     <cnsl-actions-two-add-action-target
       *ngSwitchCase="Page.Target"
-      (targetChanges$)="onTargetChanged($event)"
+      (targetChanges$)="targetSignal.set($event)"
     ></cnsl-actions-two-add-action-target>
   </div>
 </mat-dialog-content>
