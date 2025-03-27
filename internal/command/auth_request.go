@@ -29,6 +29,7 @@ type AuthRequest struct {
 	LoginHint        *string
 	HintUserID       *string
 	NeedRefreshToken bool
+	Issuer           string
 }
 
 type CurrentAuthRequest struct {
@@ -73,6 +74,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 		authRequest.LoginHint,
 		authRequest.HintUserID,
 		authRequest.NeedRefreshToken,
+		authRequest.Issuer,
 	))
 	if err != nil {
 		return nil, err
@@ -180,6 +182,7 @@ func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel
 			MaxAge:        writeModel.MaxAge,
 			LoginHint:     writeModel.LoginHint,
 			HintUserID:    writeModel.HintUserID,
+			Issuer:        writeModel.Issuer,
 		},
 		SessionID:   writeModel.SessionID,
 		UserID:      writeModel.UserID,

@@ -84,6 +84,7 @@ type ProjectionsConfig struct {
 	ExternalDomain  string
 	ExternalSecure  bool
 	InternalAuthZ   internal_authz.Config
+	SystemAuthZ     internal_authz.Config
 	SystemDefaults  systemdefaults.SystemDefaults
 	Telemetry       *handlers.TelemetryPusherConfig
 	Login           login.Config
@@ -150,7 +151,7 @@ func projections(
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
 			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 			}
 		},
 		0,
@@ -187,7 +188,7 @@ func projections(
 		keys.Target,
 		&http.Client{},
 		func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-			return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+			return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 		},
 		sessionTokenVerifier,
 		config.OIDC.DefaultAccessTokenLifetime,
@@ -223,7 +224,6 @@ func projections(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		client,
 		nil,
 	)
 
@@ -305,6 +305,7 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			failedInstances <- instance
 			continue
 		}
+
 		logging.WithFields("instance", instance).Info("projections done")
 	}
 	wg.Done()
