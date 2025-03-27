@@ -3,7 +3,14 @@
 
   <cnsl-form-field class="full-width">
     <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.DESCRIPTION' | translate }}</cnsl-label>
-    <input cnslInput type="text" placeholder="" #serviceInput [formControl]="targetForm.controls.target" [matAutocomplete]="targetauto" />
+    <input
+      cnslInput
+      type="text"
+      placeholder=""
+      #serviceInput
+      [formControl]="targetForm.controls.target"
+      [matAutocomplete]="targetauto"
+    />
 
     <mat-autocomplete #targetauto="matAutocomplete" [displayWith]="displayTarget">
       <mat-option *ngIf="(executionTargets$ | async) === null" class="is-loading">

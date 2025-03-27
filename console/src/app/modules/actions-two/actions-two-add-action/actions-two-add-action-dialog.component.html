@@ -9,7 +9,7 @@
       <cnsl-actions-two-add-action-condition
         *ngIf="typeSignal() as type"
         [conditionType]="type"
-        (conditionTypeValue)="conditionSignal.set({ case: type, value: $event})"
+        (conditionTypeValue)="conditionSignal.set({ case: type, value: $event })"
       ></cnsl-actions-two-add-action-condition>
     </ng-container>
     <cnsl-actions-two-add-action-target
