@@ -131,9 +131,30 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 ```
 
 Should print out something like, also described under [Sent information Event](./usage#sent-information-event):
-```shell
+```json
 {
-  TODO
+  "aggregateID" : "313014806065971608",
+  "aggregateType" : "user",
+  "resourceOwner" : "312909075211944344",
+  "instanceID" : "312909075211878808",
+  "version" : "v2",
+  "sequence" : 1,
+  "event_type" : "user.human.added",
+  "created_at" : "2025-03-27T10:22:43.262665+01:00",
+  "userID" : "312909075212468632",
+  "event_payload" : "eyJ1c2VyTmFtZSI6ImV4YW1wbGVAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJ0ZXN0IiwibGFzdE5hbWUiOiJ0ZXN0IiwiZGlzcGxheU5hbWUiOiJ0ZXN0IHRlc3QiLCJwcmVmZXJyZWRMYW5ndWFnZSI6InVuZCIsImVtYWlsIjoiZXhhbXBsZUB0ZXN0LmNvbSJ9"
+}
+```
+
+The event_payload is base64 encoded and has the following content:
+```json
+{
+  "userName": "example@test.com",
+  "firstName": "test",
+  "lastName": "test",
+  "displayName": "test test",
+  "preferredLanguage": "und",
+  "email": "example@test.com"
 }
 ```
 
