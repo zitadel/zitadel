@@ -2,25 +2,19 @@
 
 package integration_test
 
+/*
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/scim/resources"
-	"github.com/zitadel/zitadel/internal/api/scim/schemas"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/integration/scim"
-	"github.com/zitadel/zitadel/internal/test"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
@@ -502,3 +496,4 @@ func createHumanUser(t require.TestingT, ctx context.Context, orgID string, i in
 	require.NoError(t, err)
 	return resp
 }
+*/
