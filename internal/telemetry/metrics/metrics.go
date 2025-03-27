@@ -22,8 +22,10 @@ type Metrics interface {
 	GetMetricsProvider() metric.MeterProvider
 	RegisterCounter(name, description string) error
 	AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error
+	AddHistogramMeasurement(ctx context.Context, name string, value float64, labels map[string]attribute.Value) error
 	RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64Callback) error
 	RegisterValueObserver(name, description string, callbackFunc metric.Int64Callback) error
+	RegisterHistogram(name, description, unit string, buckets []float64) error
 }
 
 var M Metrics
@@ -54,6 +56,20 @@ func AddCount(ctx context.Context, name string, value int64, labels map[string]a
 		return nil
 	}
 	return M.AddCount(ctx, name, value, labels)
+}
+
+func AddHistogramMeasurement(ctx context.Context, name string, value float64, labels map[string]attribute.Value) error {
+	if M == nil {
+		return nil
+	}
+	return M.AddHistogramMeasurement(ctx, name, value, labels)
+}
+
+func RegisterHistogram(name, description, unit string, buckets []float64) error {
+	if M == nil {
+		return nil
+	}
+	return M.RegisterHistogram(name, description, unit, buckets)
 }
 
 func RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64Callback) error {

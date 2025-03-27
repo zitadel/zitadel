@@ -2,36 +2,26 @@ package setup
 
 import (
 	"context"
-	"embed"
-	"fmt"
-
-	"github.com/zitadel/logging"
+	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-type InitPermittedOrgsFunction52 struct {
+var (
+	//go:embed 52.sql
+	renameTableIfNotExisting string
+)
+
+type IDPTemplate6LDAP2 struct {
 	dbClient *database.DB
 }
 
-//go:embed 52/*.sql
-var permittedOrgsFunction52 embed.FS
-
-func (mig *InitPermittedOrgsFunction52) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(permittedOrgsFunction52, "52")
-	if err != nil {
-		return err
-	}
-	for _, stmt := range statements {
-		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
-		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
-			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
-		}
-	}
-	return nil
+func (mig *IDPTemplate6LDAP2) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, renameTableIfNotExisting)
+	return err
 }
 
-func (*InitPermittedOrgsFunction52) String() string {
-	return "52_init_permitted_orgs_function"
+func (mig *IDPTemplate6LDAP2) String() string {
+	return "52_idp_templates6_ldap2"
 }
