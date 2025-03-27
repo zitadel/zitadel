@@ -131,7 +131,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 ```
 
 Should print out something like, also described under [Sent information Response](./usage#sent-information-response):
-```shell
+```json
 {
   "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
   "instanceID": "262851882718855632",

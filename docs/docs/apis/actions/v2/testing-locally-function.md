@@ -150,9 +150,45 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 Now on every OIDC flow this action will get executed.
 
 Should print out something like, also described under [Sent information Function](./usage#sent-information-function):
-```shell
+```json
 {
-  TODO
+  "function" : "function/preuserinfo",
+  "userinfo" : {
+    "sub" : "312909075212468632"
+  },
+  "user" : {
+    "id" : "312909075212468632",
+    "creation_date" : "2025-03-26T15:52:23.917636Z",
+    "change_date" : "2025-03-26T15:52:23.917636Z",
+    "resource_owner" : "312909075211944344",
+    "sequence" : 2,
+    "state" : 1,
+    "username" : "user@example.com",
+    "preferred_login_name" : "zitadel@zitadel.localhost",
+    "human" : {
+      "first_name" : "Example firstname",
+      "last_name" : "Example lastname",
+      "display_name" : "Example displayname",
+      "preferred_language" : "en",
+      "email" : "user@example.com",
+      "is_email_verified" : true,
+      "password_changed" : "0001-01-01T00:00:00Z",
+      "mfa_init_skipped" : "0001-01-01T00:00:00Z"
+    }
+  },
+  "user_metadata" : [ {
+    "creation_date" : "2025-03-27T09:10:25.879677Z",
+    "change_date" : "2025-03-27T09:10:25.879677Z",
+    "resource_owner" : "312909075211944344",
+    "sequence" : 18,
+    "key" : "key",
+    "value" : "dmFsdWU="
+  } ],
+  "org" : {
+    "id" : "312909075211944344",
+    "name" : "ZITADEL",
+    "primary_domain" : "example.com"
+  }
 }
 ```
 
