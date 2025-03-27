@@ -1,9 +1,4 @@
-<form
-  *ngIf="form$ | async as form"
-  [formGroup]="form.form"
-  class="form-grid"
-  (ngSubmit)="submit(form)"
->
+<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit(form)">
   <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
     <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
 
@@ -62,13 +57,7 @@
   <ng-container *ngIf="form.case === 'function'">
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
-      <input
-        cnslInput
-        type="text"
-        placeholder=""
-        formControlName="name"
-        [matAutocomplete]="autofunctionname"
-      />
+      <input cnslInput type="text" placeholder="" formControlName="name" [matAutocomplete]="autofunctionname" />
 
       <mat-autocomplete #autofunctionname="matAutocomplete">
         <mat-option *ngIf="(executionFunctions$ | async) == undefined" class="is-loading">

@@ -7,7 +7,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap } from 'rxjs';
+import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap, tap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -85,6 +85,9 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType> {
 
     this.form$
       .pipe(
+        tap((form) => {
+          console.log(form);
+        }),
         switchMap((form) => {
           console.log(form);
           return form.form.valueChanges;
