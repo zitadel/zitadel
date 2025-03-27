@@ -12,14 +12,13 @@ import { TableActionsModule } from '../table-actions/table-actions.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
-import { TypeSafeCellDefDirective } from './actions-two-targets/actions-two-targets-table/type-safe-cell-def.directive';
 import { ActionsTwoActionsTableComponent } from './actions-two-actions/actions-two-actions-table/actions-two-actions-table.component';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/type-safe-cell-def.module';
 
 @NgModule({
   declarations: [
-    TypeSafeCellDefDirective,
     ActionsTwoActionsComponent,
     ActionsTwoTargetsComponent,
     ActionsTwoTargetsTableComponent,
@@ -39,6 +38,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
     MatTooltipModule,
     RefreshTableModule,
     ActionKeysModule,
+    TypeSafeCellDefModule,
   ],
   exports: [ActionsTwoActionsComponent, ActionsTwoTargetsComponent, ActionsTwoTargetsTableComponent],
 })

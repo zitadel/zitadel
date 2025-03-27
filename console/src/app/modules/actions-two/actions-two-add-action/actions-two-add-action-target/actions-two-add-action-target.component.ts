@@ -49,7 +49,7 @@ export class ActionsTwoAddActionTargetComponent {
 
     this.targetChanges$ = this.targetForm.get('service')!.valueChanges.pipe(
       map((value) => value ?? ''),
-      tap((value) => console.log('target type changed:', value)),
+      tap((value) => console.log('type changed:', value)),
     );
   }
 
