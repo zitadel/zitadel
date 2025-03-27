@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, effect, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
@@ -41,32 +41,33 @@ export class ActionTwoAddActionDialogComponent {
   public conditionSignal = signal<any>(undefined);
   public targetSignal = signal<string>('');
 
-  constructor(public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>) {
-    effect(() => {
-      const condition = this.conditionSignal();
-      const target = this.targetSignal();
+  public request = computed(() => {
+    const condition = this.conditionSignal();
+    const target = this.targetSignal();
 
-      console.log('Request:', condition, target);
-      const req: MessageInitShape<typeof SetExecutionRequestSchema> = {
-        condition: {
-          conditionType: condition,
+    return {
+      condition: {
+        conditionType: {
+          case: 'function',
+          value: {
+            name: 'Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostCreation',
+          },
         },
-        execution: {
-          targets: [
-            {
-              type: {
-                case: 'target',
-                value: target,
-              },
+      },
+      execution: {
+        targets: [
+          {
+            type: {
+              case: 'target',
+              value: target,
             },
-          ],
-        },
-      };
-      return req;
-      // Perform any additional logic here
-      // this.executionType$.next(type); // Example: Update executionType$ with the new value
-    });
-  }
+          },
+        ],
+      },
+    } as MessageInitShape<typeof SetExecutionRequestSchema>;
+  });
+
+  constructor(public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>) {}
 
   public continue() {
     const currentPage = this.page();
@@ -75,7 +76,7 @@ export class ActionTwoAddActionDialogComponent {
     } else if (currentPage === Page.Condition) {
       this.page.set(Page.Target);
     } else {
-      this.dialogRef.close();
+      this.dialogRef.close(this.request());
     }
   }
 
@@ -88,9 +89,5 @@ export class ActionTwoAddActionDialogComponent {
     } else {
       this.dialogRef.close();
     }
-  }
-
-  public closeWithResult() {
-    this.dialogRef.close();
   }
 }

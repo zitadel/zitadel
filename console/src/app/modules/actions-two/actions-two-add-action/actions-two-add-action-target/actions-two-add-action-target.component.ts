@@ -11,6 +11,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { GetTarget } from '@zitadel/proto/zitadel/resources/action/v3alpha/target_pb';
 
 @Component({
   standalone: true,
@@ -37,7 +38,7 @@ export class ActionsTwoAddActionTargetComponent {
   @Output() public continue: EventEmitter<void> = new EventEmitter();
   @Output() public targetChanges$: Observable<string>;
 
-  public readonly executionTargets$: Observable<string[] | undefined> = of(undefined);
+  public readonly executionTargets$: Observable<GetTarget[] | undefined> = of(undefined);
 
   constructor(
     private readonly fb: FormBuilder,
@@ -46,21 +47,18 @@ export class ActionsTwoAddActionTargetComponent {
   ) {
     this.executionTargets$ = this.listExecutionTargets().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
-    this.targetChanges$ = this.targetForm.get('service')!.valueChanges.pipe(
-      map((value) => value ?? ''),
-      tap((value) => console.log('type changed:', value)),
-    );
+    this.targetChanges$ = this.targetForm.get('target')!.valueChanges.pipe(map((target) => target?.details?.id ?? ''));
   }
 
   public buildActionTargetForm() {
     return this.fb.group({
-      service: new FormControl<string>(''),
+      target: new FormControl<GetTarget | undefined>(undefined),
     });
   }
 
   private listExecutionTargets() {
-    return defer(() => this.actionService.listExecutionFunctions()).pipe(
-      map(({ functions }) => functions),
+    return defer(() => this.actionService.searchTargets({})).pipe(
+      map(({ result }) => result),
       catchError((error) => {
         this.toast.showError(error);
         return EMPTY;

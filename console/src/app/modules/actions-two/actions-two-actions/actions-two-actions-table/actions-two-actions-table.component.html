@@ -4,29 +4,6 @@
   </div>
   <div class="table-wrapper">
     <table *ngIf="dataSource$ | async as dataSource" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
-      <!-- <ng-container matColumnDef="state">
-        <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.STATE' | translate }}</th>
-        <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
-          <span
-            class="state"
-            [ngClass]="{
-              active: i === 0,
-              neutral: i === 1,
-            }"
-            [ngSwitch]="i"
-          >
-            <ng-container *ngSwitchCase="0">{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.ACTIVE' | translate }}</ng-container>
-            <ng-container *ngSwitchCase="1">{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.NEXT' | translate }}</ng-container>
-            <ng-container *ngSwitchDefault>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.FUTURE' | translate }}</ng-container>
-          </span>
-        </td>
-      </ng-container> -->
-      <!-- <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE' | translate }}</th>
-        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row.details?.id }}
-        </td>
-      </ng-container> -->
       <ng-container matColumnDef="condition">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.CONDITION' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">

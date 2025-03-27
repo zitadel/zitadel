@@ -10,6 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANIZATIONS } from '../../settings-list/settings';
 import { ActionTwoAddActionDialogComponent } from '../actions-two-add-action/actions-two-add-action-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -79,18 +81,23 @@ export class ActionsTwoActionsComponent implements OnInit {
 
   public openDialog(): void {
     // todo: currently dialog always returns nothing
-    const ref = this.dialog.open<ActionTwoAddActionDialogComponent, undefined, void>(ActionTwoAddActionDialogComponent, {
+    const ref = this.dialog.open<ActionTwoAddActionDialogComponent>(ActionTwoAddActionDialogComponent, {
       width: '400px',
     });
 
-    ref
-      .afterClosed()
-      .pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() =>
-        this.actionService.setExecution({
-          condition: {},
-        }),
-      );
+    ref.afterClosed().subscribe((request?: MessageInitShape<typeof SetExecutionRequestSchema>) => {
+      console.log('request', request);
+      if (request) {
+        this.actionService
+          .setExecution(request)
+          .then(() => {
+            this.refresh.next(true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 
   public deleteExecution(execution: GetExecution) {}
