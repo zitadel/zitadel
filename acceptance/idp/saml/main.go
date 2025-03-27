@@ -86,21 +86,11 @@ UzreO96WzlBBMtY=
 // Example from https://github.com/crewjam/saml/blob/main/example/idp/idp.go
 func main() {
 	apiURL := os.Getenv("API_URL")
-	patFile := os.Getenv("PAT_FILE")
+	pat := readPAT(os.Getenv("PAT_FILE"))
 	domain := os.Getenv("API_DOMAIN")
 	schema := os.Getenv("SCHEMA")
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
-
-	f, err := os.Open(patFile)
-	if err != nil {
-		panic(err)
-	}
-	pat, err := io.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	patStr := strings.Trim(string(pat), "\n")
 
 	baseURL, err := url.Parse(schema + "://" + host + ":" + port)
 	if err != nil {
@@ -124,7 +114,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	idpID, err := createZitadelResources(apiURL, patStr, domain, metadata)
+	idpID, err := createZitadelResources(apiURL, pat, domain, metadata)
 	if err != nil {
 		panic(err)
 	}
@@ -146,6 +136,18 @@ func main() {
 	if err := lis.Close(); err != nil {
 		log.Fatalf("HTTP shutdown error: %v", err)
 	}
+}
+
+func readPAT(path string) string {
+	f, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	pat, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	return strings.Trim(string(pat), "\n")
 }
 
 func addService(idpServer *samlidp.Server, spURLStr string) {

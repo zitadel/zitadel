@@ -33,7 +33,7 @@ var (
 
 func main() {
 	apiURL := os.Getenv("API_URL")
-	patFile := os.Getenv("PAT_FILE")
+	pat := readPAT(os.Getenv("PAT_FILE"))
 	domain := os.Getenv("API_DOMAIN")
 	loginURL := os.Getenv("LOGIN_URL")
 	issuer := os.Getenv("ISSUER")
@@ -41,20 +41,10 @@ func main() {
 	port := os.Getenv("PORT")
 	scopeList := strings.Split(os.Getenv("SCOPES"), " ")
 
-	f, err := os.Open(patFile)
-	if err != nil {
-		panic(err)
-	}
-	pat, err := io.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	patStr := strings.Trim(string(pat), "\n")
-
 	redirectURI := fmt.Sprintf("%v:%v%v", host, port, callbackPath)
 	cookieHandler := httphelper.NewCookieHandler(key, key, httphelper.WithUnsecure())
 
-	clientID, clientSecret, err := createZitadelResources(apiURL, patStr, domain, redirectURI, loginURL)
+	clientID, clientSecret, err := createZitadelResources(apiURL, pat, domain, redirectURI, loginURL)
 	if err != nil {
 		panic(err)
 	}
@@ -171,6 +161,18 @@ func main() {
 	if err := server.Shutdown(shutdownCtx); err != nil {
 		log.Fatalf("HTTP shutdown error: %v", err)
 	}
+}
+
+func readPAT(path string) string {
+	f, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	pat, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	return strings.Trim(string(pat), "\n")
 }
 
 func createZitadelResources(apiURL, pat, domain, redirectURI, loginURL string) (string, string, error) {

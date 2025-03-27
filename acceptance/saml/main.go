@@ -87,27 +87,17 @@ FHHEZ+dR4eMaJp6PhNm8hu2O
 }()
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %s!", samlsp.AttributeFromContext(r.Context(), "displayName"))
+	fmt.Fprintf(w, "Hello, %s!", samlsp.AttributeFromContext(r.Context(), "UserName"))
 }
 
 func main() {
 	apiURL := os.Getenv("API_URL")
-	patFile := os.Getenv("PAT_FILE")
+	pat := readPAT(os.Getenv("PAT_FILE"))
 	domain := os.Getenv("API_DOMAIN")
 	loginURL := os.Getenv("LOGIN_URL")
 	idpURL := os.Getenv("IDP_URL")
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
-
-	f, err := os.Open(patFile)
-	if err != nil {
-		panic(err)
-	}
-	pat, err := io.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	patStr := strings.Trim(string(pat), "\n")
 
 	idpMetadataURL, err := url.Parse(idpURL)
 	if err != nil {
@@ -151,7 +141,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if err := createZitadelResources(apiURL, patStr, domain, metadata, loginURL); err != nil {
+	if err := createZitadelResources(apiURL, pat, domain, metadata, loginURL); err != nil {
 		panic(err)
 	}
 
@@ -165,6 +155,18 @@ func main() {
 	if err := server.Shutdown(shutdownCtx); err != nil {
 		log.Fatalf("HTTP shutdown error: %v", err)
 	}
+}
+
+func readPAT(path string) string {
+	f, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	pat, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	return strings.Trim(string(pat), "\n")
 }
 
 func createZitadelResources(apiURL, pat, domain string, metadata []byte, loginURL string) error {
