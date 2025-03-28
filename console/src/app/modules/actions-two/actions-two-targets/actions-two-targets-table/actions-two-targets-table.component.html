@@ -30,7 +30,9 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.TARGET.TABLE.NAME' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row.name }}
+          <div class="target-key">
+            <cnsl-project-role-chip [roleName]="row.name">{{ row.name }}</cnsl-project-role-chip>
+          </div>
         </td>
       </ng-container>
       <ng-container matColumnDef="endpoint">
