@@ -57,35 +57,6 @@ export class GroupMembersTableComponent implements OnInit, OnDestroy {
     this.destroyed.next();
   }
 
-  public removeRole(member: Member.AsObject, role: string) {
-    if (member.rolesList.length === 1) {
-      this.triggerDeleteMember(member);
-    } else {
-      const dialogRef = this.dialog.open(WarnDialogComponent, {
-        data: {
-          confirmKey: 'ACTIONS.DELETE',
-          cancelKey: 'ACTIONS.CANCEL',
-          titleKey: 'ROLES.DIALOG.DELETE_TITLE',
-          descriptionKey: 'ROLES.DIALOG.DELETE_DESCRIPTION',
-        },
-        width: '400px',
-      });
-
-      dialogRef.afterClosed().subscribe((resp) => {
-        if (resp) {
-          const newRoles = Object.assign([], member.rolesList);
-
-          const index = newRoles.findIndex((r) => r === role);
-          if (index > -1) {
-            newRoles.splice(index, 1);
-            member.rolesList = newRoles;
-            this.updateRoles.emit({ member: member, change: newRoles });
-          }
-        }
-      });
-    }
-  }
-
   public addRole(member: Member.AsObject) {
     const dialogRef = this.dialog.open(AddMemberRolesDialogComponent, {
       data: {

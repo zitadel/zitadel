@@ -632,7 +632,8 @@
       "PAT": "Personal Access Tokens",
       "USERGRANTS": "Authorizations",
       "MEMBERSHIPS": "Memberships",
-      "METADATA": "Metadata"
+      "METADATA": "Metadata",
+      "GROUPS": "Groups"
     },
     "TITLE": "Personal Information",
     "DESCRIPTION": "Manage your information and security settings.",
@@ -958,6 +959,11 @@
         "2": "filter for projectname",
         "3": "filter for rolename"
       }
+    },
+    "GROUPS": {
+      "TITLE": "User Groups",
+      "DELETE_TITLE": "Remove User Group",
+      "DELETE_DESCRIPTION": "You are about to remove a group. Are you sure?"
     },
     "STATE": {
       "0": "Unknown",

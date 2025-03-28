@@ -191,6 +191,7 @@ import {
   GetGrantedProjectByIDResponse,
   GetGroupByIDRequest,
   GetGroupByIDResponse,
+  GetGroupByUserIDRequest,
   GetHumanEmailRequest,
   GetHumanEmailResponse,
   GetHumanPhoneRequest,
@@ -310,6 +311,7 @@ import {
   ListUserChangesResponse,
   ListUserGrantRequest,
   ListUserGrantResponse,
+  ListUserGroupsResponse,
   ListUserMembershipsRequest,
   ListUserMembershipsResponse,
   ListUserMetadataRequest,
@@ -2180,6 +2182,12 @@ export class ManagementService {
       req.setQueriesList(queriesList);
     }
     return this.grpcService.mgmt.listGroups(req, null).then((resp) => resp.toObject());
+  }
+
+  public getGroupByUserID(user: string): Promise<ListUserGroupsResponse.AsObject> {
+    const req = new GetGroupByUserIDRequest();
+    req.setId(user);
+    return this.grpcService.mgmt.getGroupByUserID(req, null).then((resp) => resp.toObject());
   }
 
   public getUserByLoginNameGlobal(loginname: string): Promise<GetUserByLoginNameGlobalResponse.AsObject> {

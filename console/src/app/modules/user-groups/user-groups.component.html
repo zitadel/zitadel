@@ -1,0 +1,106 @@
+<cnsl-refresh-table
+    [loading]="loading$ | async"
+    (refreshed)="refreshPage()"
+    [dataSize]="totalResult"
+    [hideRefresh]="true"
+    [timestamp]="viewTimestamp"
+    [selection]="selection"
+    [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
+    [showBorder]="true"
+>
+    <ng-template cnslHasRole [hasRole]="['user.write']" actions>
+        <button color="primary" (click)="openAddGroup()" class="cnsl-action-button" mat-raised-button>
+            <mat-icon class="icon">add</mat-icon>
+            <span>{{ 'ACTIONS.NEW' | translate }}</span>
+            <cnsl-action-keys (actionTriggered)="openAddGroup()"> </cnsl-action-keys>
+        </button>
+    </ng-template>
+    <div class="table-wrapper">
+        <table class="table" mat-table [dataSource]="dataSource" matSort>
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <div class="selection">
+                        <mat-checkbox
+                            class="checkbox"
+                            [disabled]="(canWrite$ | async) === false"
+                            color="primary"
+                            (change)="$event ? masterToggle() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        >
+                            <cnsl-avatar class="hidden" [isMachine]="true">
+                                <i class="las la-robot"></i>
+                            </cnsl-avatar>
+                        </mat-checkbox>
+                    </div>
+                </th>
+                <td mat-cell *matCellDef="let user">
+                    <div class="selection">
+                        <mat-checkbox class="checkbox" [disabled]="(canWrite$ | async) === false" color="primary" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
+                        </mat-checkbox>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    {{ 'GROUP.CREATE.NAME' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/groups', user.id] : null">
+                    <span>{{ user.name }}</span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="state">
+                <th mat-header-cell *matHeaderCellDef>{{ 'USER.DATA.STATE' | translate }}</th>
+                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/groups', user.id] : null">
+                    <span
+                        class="state"
+                        [ngClass]="{
+		              active: user.state === GroupState.GROUP_STATE_ACTIVE,
+		              inactive: user.state === GroupState.GROUP_STATE_INACTIVE,
+		          	}"
+                    >
+                        {{ 'USER.DATA.STATE' + user.state | translate }}
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="creationDate">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>{{ 'USER.TABLE.CREATIONDATE' | translate }}</th>
+                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/groups', user.id] : null">
+                    <span class="no-break">{{ user.details.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="changeDate">
+                <th mat-header-cell *matHeaderCellDef>{{ 'USER.TABLE.CHANGEDATE' | translate }}</th>
+                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/groups', user.id] : null">
+                    <span class="no-break">{{ user.details.changeDate | timestampToDate | localizedDate: 'regular' }}</span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="actions" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef class="group-tr-actions"></th>
+                <td mat-cell *matCellDef="let user" class="group-tr-actions">
+                    <cnsl-table-actions>
+                        <button
+                            actions
+                            matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+                            color="warn"
+                            (click)="deleteGroup(user)"
+                            [disabled]="(canWrite$ | async) === false || (canDelete$ | async) === false"
+                            [attr.data-e2e]="
+                (canWrite$ | async) === false || (canDelete$ | async) === false
+                  ? 'disabled-delete-button'
+                  : 'enabled-delete-button'
+              "
+                            mat-icon-button
+                        >
+                            <i class="las la-trash"></i>
+                        </button>
+                    </cnsl-table-actions>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsHuman"></tr>
+            <tr class="highlight pointer" mat-row *matRowDef="let user; columns: displayedColumnsHuman"></tr>
+        </table>
+    </div>
+</cnsl-refresh-table>
