@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,19 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap, tap } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  defer,
+  map,
+  of,
+  shareReplay,
+  ReplaySubject,
+  ObservedValueOf,
+  switchMap,
+  tap,
+  Subject,
+} from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -44,12 +56,12 @@ export type ConditionTypeValue<T extends ConditionType> = Omit<
     MatProgressSpinnerModule,
   ],
 })
-export class ActionsTwoAddActionConditionComponent<T extends ConditionType = ConditionType> {
+export class ActionsTwoAddActionConditionComponent<T extends ConditionType = ConditionType> implements OnInit {
   @Input({ required: true }) public set conditionType(conditionType: T) {
     this.conditionType$.next(conditionType);
   }
   @Output() public readonly conditionTypeValue = new EventEmitter<ConditionTypeValue<T>>();
-
+  @Input() public continue: Subject<void> = new Subject<void>();
   private readonly conditionType$ = new ReplaySubject<T>(1);
   protected readonly form$: ReturnType<typeof this.buildForm>;
 
@@ -68,19 +80,17 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     this.executionMethods$ = this.listExecutionMethods().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionFunctions$ = this.listExecutionFunctions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
-    this.form$
+    this.form$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((form) => this.submit(form));
+  }
+
+  ngOnInit(): void {
+    this.continue
       .pipe(
-        switchMap((form) =>
-          form.form.valueChanges.pipe(
-            //@ts-ignore
-            map(() => form), // Pass the form object along with the value changes
-          ),
-        ),
-        takeUntilDestroyed(this.destroyRef), // Ensure cleanup on component destruction
+        takeUntilDestroyed(this.destroyRef),
+        switchMap(() => this.form$),
       )
       .subscribe((form) => {
-        // console.log('Form value changed:', form.form.getRawValue());
-        this.submit(form as any); // Call the submit method with the form
+        this.submit(form);
       });
   }
 
@@ -214,6 +224,8 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     { form }: ObservedValueOf<ReturnType<typeof this.buildRequestOrResponseForm>>,
   ) {
     const { all, service, method } = form.getRawValue();
+    console.log(all, service, method);
+
     if (all) {
       this.conditionTypeValue.emit({
         condition: {

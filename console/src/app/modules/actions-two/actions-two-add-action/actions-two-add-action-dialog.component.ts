@@ -7,13 +7,24 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import {
   ActionsTwoAddActionConditionComponent,
   ConditionType,
+  ConditionTypeValue,
 } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
 import {
   ActionsTwoAddActionTargetComponent,
   TargetInit,
 } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
-import { ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import {
+  Condition,
+  EventExecution,
+  Execution,
+  ExecutionSchema,
+  FunctionExecution,
+  RequestExecution,
+  ResponseExecution,
+} from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Subject } from 'rxjs';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
 enum Page {
   Type,
@@ -43,27 +54,18 @@ export class ActionTwoAddActionDialogComponent {
   public page = signal<Page | undefined>(Page.Type);
 
   public typeSignal = signal<ConditionType>('request');
-  public conditionSignal = signal<ConditionInit | undefined>(undefined);
+  public conditionSignal = signal<ConditionTypeValue<ConditionType> | undefined>(undefined); // TODO: fix this type
   public targetSignal = signal<TargetInit | undefined>(undefined);
 
-  public request = computed<MessageInitShape<typeof ExecutionSchema>>(() => {
-    return {
+  public continueSubject = new Subject<void>();
+
+  // TODO as the condition component is demounted when the page changes we need a workaround
+  public request = computed<MessageInitShape<typeof SetExecutionRequestSchema>>(() => {
+    const req = {
       condition: {
-        // conditionType: this.conditionSignal(),
-        // conditionType: {
-        //   case: 'function',
-        //   value: {
-        //     name: 'Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PreCreation',
-        //   },
-        // },
         conditionType: {
-          case: 'request',
-          value: {
-            condition: {
-              case: 'service',
-              value: 'zitadel.saml.v2.SAMLService',
-            },
-          },
+          case: this.typeSignal(),
+          value: this.conditionSignal() as any, // TODO: fix this type
         },
       },
       execution: {
@@ -74,9 +76,19 @@ export class ActionTwoAddActionDialogComponent {
         ],
       },
     };
+
+    console.log(req);
+    return req;
   });
 
-  constructor(public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>) {}
+  constructor(public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>) {
+    effect(() => {
+      const currentPage = this.page();
+      if (currentPage === Page.Target) {
+        this.continueSubject.next(); // Trigger the Subject to request condition form when the page changes to "Target"
+      }
+    });
+  }
 
   public continue() {
     const currentPage = this.page();

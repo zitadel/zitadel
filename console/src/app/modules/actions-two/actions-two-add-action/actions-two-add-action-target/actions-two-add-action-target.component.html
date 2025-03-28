@@ -17,7 +17,7 @@
         <mat-spinner diameter="30"></mat-spinner>
       </mat-option>
       <mat-option *ngFor="let target of executionTargets$ | async" [value]="target">
-        <span>{{ target.config.name }}</span>
+        <span>{{ target.name }}</span>
       </mat-option>
     </mat-autocomplete>
   </cnsl-form-field>

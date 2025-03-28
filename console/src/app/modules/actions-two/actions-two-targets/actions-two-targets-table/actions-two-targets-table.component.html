@@ -24,25 +24,25 @@
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.TARGET.TABLE.ID' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row.details?.id }}
+          {{ row.id }}
         </td>
       </ng-container>
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.TARGET.TABLE.NAME' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row.config?.name }}
+          {{ row.name }}
         </td>
       </ng-container>
       <ng-container matColumnDef="endpoint">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.TARGET.TABLE.ENDPOINT' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row.config?.endpoint }}
+          {{ row.endpoint }}
         </td>
       </ng-container>
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'ACTIONSTWO.TARGET.TABLE.CREATIONDATE' | translate }}</th>
         <td mat-cell *matCellDef="let row; dataSource: dataSource">
-          <span class="no-break">{{ row.details.created | timestampToDate | localizedDate: 'regular' }}</span>
+          <span class="no-break">{{ row.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
         </td>
       </ng-container>
       <!-- <ng-container matColumnDef="type">

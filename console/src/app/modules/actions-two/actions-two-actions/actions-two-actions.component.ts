@@ -85,23 +85,24 @@ export class ActionsTwoActionsComponent implements OnInit {
   }
 
   public openDialog(): void {
-    // todo: currently dialog always returns nothing
     const ref = this.dialog.open<ActionTwoAddActionDialogComponent>(ActionTwoAddActionDialogComponent, {
       width: '400px',
     });
 
     ref.afterClosed().subscribe((request?: MessageInitShape<typeof SetExecutionRequestSchema>) => {
       console.log('request', request);
-      if (request) {
-        this.actionService
-          .setExecution(request)
-          .then(() => {
-            this.refresh.next(true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
+      // if (request) {
+      //   this.actionService
+      //     .setExecution(request)
+      //     .then(() => {
+      //       setTimeout(() => {
+      //         this.refresh.next(true);
+      //       }, 1000);
+      //     })
+      //     .catch((error) => {
+      //       this.toast.showError(error);
+      //     });
+      // }
     });
   }
 
