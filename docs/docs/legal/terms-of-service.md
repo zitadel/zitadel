@@ -3,28 +3,28 @@ title: Terms of Service Agreement
 custom_edit_url: null
 --- 
 
-Last updated on November 15, 2023
+Last updated on December 31, 2024
 
 ## General
 
 ### Introduction
 
-CAOS Ltd. (**"We"**, **ZITADEL**, **CAOS AG**, or simply **CAOS**), with head office in Lerchenfeldstrasse 3, 9014 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
+Zitadel, Inc. (**"We/Us"**, **Zitadel**), with head office in Four Embarcadero Center, Suite 1400
+San Francisco, CA 94111-4164, United States of America, and it's **Affiliates** offer "Identity and Access Management as service" with the brand name "Zitadel Cloud Services" (**Services** or **Zitadel Cloud**) and all of our websites.
 
-The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by creating a user or organization within the ZITADEL Cloud Service or with signature of a purchase order between you and ZITADEL (jointly referred to as **Parties**).
-On the basis of this Framework Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages yourself at any time (**Booking**, **Purchase Order**, **PO**) and subsequently terminate them.
+The customer relationship (**Framework Agreement** or **Agreement**) is created by the **Customer** (**"you"**) when a user or organization within the ZITADEL Cloud Service is created, with signature of a purchase order between you and Zitadel (jointly referred to as **Parties**), or any other legal act that results in an Agreement.
+On the basis of this Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages at any time (**Booking**, **Purchase Order**, **PO**) and subsequently terminate them.
 
-The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any services.
+The terms of service (**"TOS"**) outlined in this document establish the most important points of this Agreement – independently of the use of any services.
 
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
 * [**Service Descriptions**](./service-description/) - How we provide services to yo
-* [**Policies**](./policies/) - Policies that apply for use of our services
 * [**Enterprise Agreement**](./annex-support-services/) - Annex for Enterprise Agreement and Support Services
 
-The outlined policies complement these terms of service.
-When accepting the TOS, you accept these policies.
+Our [policies](./policies/) complement these terms of service.
+When accepting the TOS, you acknowledge these policies.
 
 ### Alterations
 
@@ -32,7 +32,7 @@ Any provisions which deviate from these TOS must be agreed in writing between th
 
 ### Transfer
 
-You may only transfer the Framework Agreement or Services used in the context of the Framework Agreement to third parties with our prior written consent.
+You may only transfer the  Agreement or Services used in the context of the Agreement to third parties with our prior written consent.
 
 ## Our Services
 
@@ -45,9 +45,9 @@ We provide the Services under the conditions stated on our websites, or the late
 We are entitled to offer new services, to withdraw existing services (**Termination**) or to modify the specifications and prices of existing services (**Modification**) at any time.
 If the modification or termination affects a service that you are using at that time, we will inform you via email that said service will be automatically modified and/or is no longer available after a period of 30 days.
 
-If such modification would have a disadvantageous impact on the Customer use of service, ZITADEL and Customer must discuss the change with the Customer first and, to the best of its ability, find a solution that is acceptable to both Parties.
-If such a solution cannot be found, ZITADEL may implement the modification and Customer may submit notice of termination of the relevant Service (email is sufficient) before the modification becomes effective without being obliged to pay contractual penalties or termination fees.
-ZITADEL may modify the prices for a service after the minimum term of the agreement.
+If such modification would have a disadvantageous impact on the Customer use of service, Zitadel and Customer must discuss the change with the Customer first and, to the best of its ability, find a solution that is acceptable to both Parties.
+If such a solution cannot be found, Zitadel may implement the modification and Customer may submit notice of termination of the relevant Service (email is sufficient) before the modification becomes effective without being obliged to pay contractual penalties or termination fees.
+Zitadel may modify the prices for a service after the minimum term of the agreement.
 
 ### Modification of services booked by you
 
@@ -65,11 +65,11 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 ### Support
 
 We offer Support Services directly related to the use of our Services.
-The Description of Support Services is available as [Annex](./service-description/support-services) to this document.
+The [Description of Support Services](./service-description/support-services) is available as Annex to this document.
 
 Customers without a subscription can contact us via the official [communication channels](https://zitadel.com/contact).
 The parties may enter a service level agreement, as specified in our [Support Service Description](./service-description/support-services), for booked Support Services.
-Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with ZITADEL.
+Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with Zitadel.
 
 ### Service level
 
@@ -77,10 +77,10 @@ Customers with a Subscription may be eligible for a SLA as outlined in our [Serv
 
 ### Service credit
 
-Failure to provide the agreed service level objectives during the term of the Agreement results in compensation via service credits, as outlined in the [Annex](./service-description/support-services) per service level objective.
+Failure to provide the agreed service level objectives during the term of the Agreement results in compensation via service credits, as outlined in the [Support Service Annex](./service-description/support-services) per service level objective.
 
-Customer must request service credit and must notify ZITADEL in writing (email sufficient) within 30 days of becoming eligible for service credit and must prove failure of ZITADEL to meet the stated objective.
-ZITADEL will confirm or reject the claim with reasons for a refusal within 10 days.
+Customer must request service credit and must notify Zitadel in writing (email sufficient) within 30 days of becoming eligible for service credit and must prove failure of us to meet the stated objective.
+Zitadel will confirm or reject the claim with reasons for a refusal within 10 days.
 Service credit will in no case be paid as a cash equivalent.
 No further guarantees are provided.
 
@@ -91,7 +91,8 @@ Portions of our services, i.e. software components, may also be beyond our influ
 
 ### Inclusion of third parties
 
-We may include third parties in the provision of our services. See our [Privacy Policy](./policies/privacy-policy), [Third Party Sub-Processor List](subprocessors), and our [Data Processing Agreement](data-processing-agreement) for more information.
+We may include third parties in the provision of our services.
+You will find the full list of [Third Party Sub-Processor List](subprocessors) in our [Trust Center](https://zitadel.com/trust).
 
 ## Your obligations
 
@@ -150,23 +151,23 @@ In the event of default we reserve the right to transfer our claim to a collecti
 
 ### Termination by you
 
-You may terminate the Framework Agreement at any time by ceasing your use of the services and deleting your customer account on our website.
+You may terminate the Agreement at any time by ceasing your use of the services and deleting your customer account on our website.
 
 For purchase orders, the term must be terminated by providing written notice (email is sufficient) of termination at least 30 days prior to the end of the term.
 
 ### Termination by us
 
-We may terminate the Framework Agreement at any time via email message with a notice period of 90 days. Any use of the services will cease at the end of this period and the Framework Agreement will be terminated.
+We may terminate the Agreement at any time via email message with a notice period of 90 days. Any use of the services will cease at the end of this period and the Agreement will be terminated.
 
 ### Automatic termination
 
-If you have neither used services nor made payment for a period of 180 days, the Framework Agreement will be considered automatically terminated at the end of this period.
+If you have neither used services nor made payment for a period of 180 days, the Agreement will be considered automatically terminated at the end of this period.
 
-If you have a Subscription to any free plans, that don't require payment, we automatically the Framework Agreement will be considered automatically terminated after 30 days without any Daily Active User on the Unit.
+If you have a Subscription to any free plans, that don't require payment, we automatically the Agreement will be considered automatically terminated after 30 days without any Daily Active User on the Unit.
 
 ### No reimbursement
 
-Any remaining credit shall automatically expire upon termination of the Framework Agreement.
+Any remaining credit shall automatically expire upon termination of the Agreement.
 
 ### Termination of services
 
@@ -178,7 +179,7 @@ We are entitled to suspend and terminate services used by you if
 * Other customers' services are being negatively affected in breach of the fair use provision, including in the event of your services being subject to attacks by third parties (i.e. DoS/DDoS attacks);
 * We consider the suspension or termination of the services to be necessary for the protection of ourselves, our infrastructure or other customers.
 
-We reserve the right to immediately terminate the Framework Agreement in such cases.
+We reserve the right to immediately terminate the Agreement in such cases.
 
 ### Deletion of data
 
@@ -186,7 +187,15 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](./policies/privacy-policy), [Data Processing Agreement](data-processing-agreement), [Third Party Sub-Processors](subprocessors), and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Agreement, specifically our [Data Processing Agreement](data-processing-agreement) and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
+
+## Customer Mention & Communications
+
+During the term of this Agreement, Customer grants Zitadel a non-exclusive, royalty-free, fully-paid up license to use and reproduce trademarks, tradenames, and logos and publicly disclose that Customer is a customer of our Services and may use Customer’s name and logo to identify Customer as a Zitadel customer, in Zitadel's marketing materials and Websites.
+Any use shall be subject to Zitadel complying with any written guidelines that Customer may deliver to Zitadel regarding the use of its name and logo.
+
+By entering this Agreement, Customer thereby consents to receiving information from Zitadel about our and its products and services, via the contact information that Customer provides to Zitadel.
+Customer may opt-out of any such communications at any time, by providing Zitadel with notification of your intent to opt-out in accordance with the instructions contained in such communications.
 
 ## Liability
 
@@ -211,11 +220,12 @@ We are not liable for any damages in such cases.
 
 ### Applicable law
 
-The Framework Agreement is subject to Swiss law.
+The Agreement is subject to Swiss law.
 
 ### Place of jurisdiction
 
-The exclusive place of jurisdiction is St. Gallen, Switzerland.
+This Agreement will be governed by the laws of the State of California, U.S.A. without regard to its conflict of laws provisions.
+The federal and state courts sitting in San Francisco County, California, U.S.A. will have proper and exclusive jurisdiction and venue with respect to any disputes arising from or related to the subject matter of this Agreement.
 
 ### Severability clause
 
@@ -227,4 +237,4 @@ We are entitled to unilaterally amend this Agreement at any time.
 The current version is accessible via our website.
 We will inform you of any amendments via email.
 These amendments shall be considered as accepted upon booking additional services or at the latest after 30 days.
-In the case of a rejection on your part we reserve the right to terminate the Framework Agreement.
+In the case of a rejection on your part we reserve the right to terminate the Agreement.
