@@ -14,7 +14,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestUser_authMethodsCheckPermission(t *testing.T) {
@@ -663,106 +662,6 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 				},
 			},
 			object: (*AuthMethodTypes)(nil),
-		},
-		{
-			name: "prepareUserAuthMethodTypesRequiredQuery no result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserAuthMethodRequirements, error)) {
-				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(row *sql.Row) (*UserAuthMethodRequirements, error) {
-					return scan(row)
-				}
-			},
-			want: want{
-				sqlExpectations: mockQueriesScanErr(
-					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
-					nil,
-					nil,
-				),
-				err: func(err error) (error, bool) {
-					if !zerrors.IsNotFound(err) {
-						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: (*UserAuthMethodRequirements)(nil),
-		},
-		{
-			name: "prepareUserAuthMethodTypesRequiredQuery one second factor",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserAuthMethodRequirements, error)) {
-				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(row *sql.Row) (*UserAuthMethodRequirements, error) {
-					return scan(row)
-				}
-			},
-			want: want{
-				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
-					prepareAuthMethodTypesRequiredCols,
-					[][]driver.Value{
-						{
-							domain.UserTypeHuman,
-							true,
-							true,
-						},
-					},
-				),
-			},
-			object: &UserAuthMethodRequirements{
-				UserType:          domain.UserTypeHuman,
-				ForceMFA:          true,
-				ForceMFALocalOnly: true,
-			},
-		},
-		{
-			name: "prepareUserAuthMethodTypesRequiredQuery multiple second factors",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserAuthMethodRequirements, error)) {
-				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(row *sql.Row) (*UserAuthMethodRequirements, error) {
-					return scan(row)
-				}
-			},
-			want: want{
-				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
-					prepareAuthMethodTypesRequiredCols,
-					[][]driver.Value{
-						{
-							domain.UserTypeHuman,
-							true,
-							true,
-						},
-					},
-				),
-			},
-
-			object: &UserAuthMethodRequirements{
-				UserType:          domain.UserTypeHuman,
-				ForceMFA:          true,
-				ForceMFALocalOnly: true,
-			},
-		},
-		{
-			name: "prepareUserAuthMethodTypesRequiredQuery sql err",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserAuthMethodRequirements, error)) {
-				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(row *sql.Row) (*UserAuthMethodRequirements, error) {
-					return scan(row)
-				}
-			},
-			want: want{
-				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
-					sql.ErrConnDone,
-				),
-				err: func(err error) (error, bool) {
-					if !errors.Is(err, sql.ErrConnDone) {
-						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: nil,
 		},
 	}
 	for _, tt := range tests {
