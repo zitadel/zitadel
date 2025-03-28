@@ -73,7 +73,7 @@ func privateIPv4() (net.IP, error) {
 		}
 	}
 
-	//change: use "POD_IP"
+	// change: use "POD_IP"
 	ip := net.ParseIP(os.Getenv("POD_IP"))
 	if ip == nil {
 		return nil, errors.New("no private ip address")
@@ -140,7 +140,7 @@ func machineID() (uint16, error) {
 	}
 
 	logging.WithFields("errors", strings.Join(errors, ", ")).Panic("none of the enabled methods for identifying the machine succeeded")
-	//this return will never happen because of panic one line before
+	// this return will never happen because of panic one line before
 	return 0, nil
 }
 

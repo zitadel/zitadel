@@ -18,7 +18,7 @@ import (
 
 func init() {
 	config := new(Config)
-	dialect.Register(config, config, true)
+	dialect.Register(config, config, false)
 }
 
 const (
@@ -52,7 +52,7 @@ func (c *Config) MatchName(name string) bool {
 	return false
 }
 
-func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+func (_ *Config) Decode(configs []any) (dialect.Connector, error) {
 	connector := new(Config)
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
@@ -73,12 +73,6 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
-	dialect.RegisterAfterConnect(func(ctx context.Context, c *pgx.Conn) error {
-		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-		// This is needed to fill the fields table of the eventstore during eventstore.Push.
-		_, err := c.Exec(ctx, "SET enable_multiple_modifications_of_table = on")
-		return err
-	})
 	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
 
 	config, err := pgxpool.ParseConfig(c.String(useAdmin))
@@ -149,12 +143,8 @@ func (c *Config) Password() string {
 	return c.User.Password
 }
 
-func (c *Config) Type() string {
-	return "cockroach"
-}
-
-func (c *Config) Timetravel(d time.Duration) string {
-	return ""
+func (c *Config) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypeCockroach
 }
 
 type User struct {

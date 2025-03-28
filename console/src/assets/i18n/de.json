@@ -185,6 +185,32 @@
           "DESCRIPTION": "Die maximale Inaktivitätsdauer eines Aktualisierungstokens ist die maximale Zeit, in der ein Aktualisierungstoken unbenutzt sein kann."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Verwalte deine OIDC Web Keys, um Tokens für deine ZITADEL-Instanz sicher zu signieren und zu validieren.",
+        "TABLE": {
+          "TITLE": "Aktive und zukünftige Web Keys",
+          "DESCRIPTION": "Deine aktiven und kommenden Web Keys. Das Aktivieren eines neuen Schlüssels deaktiviert den aktuellen.",
+          "NOTE": "Hinweis: Der JWKs OIDC-Endpunkt gibt eine zwischenspeicherbare Antwort zurück (Standard: 5 Min.). Vermeide es, einen Schlüssel zu früh zu aktivieren, da er möglicherweise noch nicht in Caches und Clients verfügbar ist.",
+          "ACTIVATE": "Nächsten Web Key aktivieren",
+          "ACTIVE": "Derzeit aktiv",
+          "NEXT": "Als Nächstes in der Warteschlange",
+          "FUTURE": "Zukünftig",
+          "WARNING": "Der Web Key ist weniger als 5 Minuten alt"
+        },
+        "CREATE": {
+          "TITLE": "Neuen Web Key erstellen",
+          "DESCRIPTION": "Das Erstellen eines neuen Web Keys fügt ihn zu deiner Liste hinzu. ZITADEL verwendet standardmäßig RSA2048-Schlüssel mit einem SHA256-Hasher.",
+          "KEY_TYPE": "Schlüsseltyp",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Kurve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Frühere Web Keys",
+          "DESCRIPTION": "Dies sind deine früheren Web Keys, die nicht mehr aktiv sind.",
+          "DEACTIVATED_ON": "Deaktiviert am"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Nachrichtentexte",
         "DESCRIPTION": "Passe die Texte deiner Benachrichtigungs-E-Mails oder SMS-Nachrichten an. Wenn du einige der Sprachen deaktivieren möchtest, beschränke sie in den Spracheinstellungen deiner Instanz.",
@@ -1356,6 +1382,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
       "OIDC": "OIDC Token Lifetime und Expiration",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Sicherheitseinstellungen",
       "EVENTS": "Events",

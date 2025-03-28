@@ -111,14 +111,15 @@ but in the Projections.Customizations.Telemetry section
 
 ### Prefer PostgreSQL
 
-ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
-We recommend using PostgreSQL, as it is the better choice when you want to prioritize performance and latency.
+ZITADEL supports [PostgreSQL](https://www.postgresql.org/).
 
-However, if [multi-regional data locality](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html) is a critical requirement, CockroachDB might be a suitable option.
+:::info
+ZITADEL v2 supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/). Please refer to [the mirror guide](cli/mirror) to migrate to postgres.
+:::
 
 The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
 which runs with PostgreSQL.
-If you identify problems with your CockroachDB during load tests that indicate that the indexes are not optimized,
+If you identify problems with your database during load tests that indicate that the indexes are not optimized,
 please create an issue in our [github repository](https://github.com/zitadel/zitadel).
 
 ### Configure ZITADEL
@@ -129,12 +130,13 @@ Depending on your environment, you maybe would want to tweak some settings about
 Database:
   postgres:
     Host: localhost
-    Port: 26257
+    Port: 5432
     Database: zitadel
     //highlight-start
-    MaxOpenConns: 20
+    MaxOpenConns: 10
+    MaxIdleConns: 5
     MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
+    MaxConnIdleTime: 5m
     //highlight-end
     Options: ""
 ```
@@ -192,9 +194,7 @@ The ZITADEL binary itself is stateless,
 so there is no need for a special backup job.
 
 Generally, for maintaining your database management system in production,
-please refer to the corresponding docs
-[for CockroachDB](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html)
-or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
+please refer to the corresponding docs [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
 
 
 ## Data initialization
@@ -240,8 +240,7 @@ you might want to [limit usage and/or execute tasks on certain usage units and l
 
 ### General resource usage
 
-ZITADEL consumes around 512MB RAM and can run with less than 1 CPU core.
-The database consumes around 2 CPU under normal conditions and 6GB RAM with some caching to it.
+ZITADEL itself requires approximately 512MB of RAM and can operate with less than one CPU core. The database component, under typical conditions, utilizes about one CPU core per 100 requests per second (req/s) and 4GB of RAM per core, which includes some caching.
 
 :::info Password hashing
 Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores available for this purpose.
@@ -249,5 +248,6 @@ Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores 
 
 ### Production HA cluster
 
-It is recommended to build a minimal high-availability with 3 Nodes with 4 CPU and 16GB memory each.
-Excluding non-essential services, such as log collection, metrics etc, the resources could be reduced to around 4 CPU and  8GB memory each.
+For a minimal high-availability setup, we recommend a cluster of 3 nodes, each with 4 CPU cores and 16GB of memory. 
+
+If you exclude non-essential services like log collection and metrics, you can reduce the resources to approximately 4 CPU cores and 8GB of memory per node.

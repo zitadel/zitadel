@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/cache/connector"
@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -34,7 +35,8 @@ type Config struct {
 	Database        database.Config
 	Caches          *connector.CachesConfig
 	SystemDefaults  systemdefaults.SystemDefaults
-	InternalAuthZ   internal_authz.Config
+	InternalAuthZ   authz.Config
+	SystemAuthZ     authz.Config
 	ExternalDomain  string
 	ExternalPort    uint16
 	ExternalSecure  bool
@@ -45,6 +47,7 @@ type Config struct {
 	Machine         *id.Config
 	Projections     projection.Config
 	Notifications   handlers.WorkerConfig
+	Executions      execution.WorkerConfig
 	Eventstore      *eventstore.Config
 
 	InitProjections InitProjections
@@ -53,7 +56,7 @@ type Config struct {
 	Login           login.Config
 	WebAuthNName    string
 	Telemetry       *handlers.TelemetryPusherConfig
-	SystemAPIUsers  map[string]*internal_authz.SystemAPIUser
+	SystemAPIUsers  map[string]*authz.SystemAPIUser
 }
 
 type InitProjections struct {
@@ -68,12 +71,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
-			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
-			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.SliceTypeStringDecode[authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
-			database.DecodeHook,
+			database.DecodeHook(false),
 			actions.HTTPConfigDecodeHook,
-			hook.EnumHookFunc(internal_authz.MemberTypeString),
+			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
@@ -146,6 +149,7 @@ type Steps struct {
 	s50IDPTemplate6UsePKCE                  *IDPTemplate6UsePKCE
 	s51IDPTemplate6RootCA                   *IDPTemplate6RootCA
 	s52IDPTemplate6LDAP2                    *IDPTemplate6LDAP2
+	s53InitPermittedOrgsFunction            *InitPermittedOrgsFunction53
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

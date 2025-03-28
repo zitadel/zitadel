@@ -30,8 +30,7 @@ var (
 		` FROM projections.project_grants4 ` +
 		` LEFT JOIN projections.projects4 ON projections.project_grants4.project_id = projections.projects4.id AND projections.project_grants4.instance_id = projections.projects4.instance_id ` +
 		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants4.resource_owner = r.id AND projections.project_grants4.instance_id = r.instance_id` +
-		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants4.granted_org_id = o.id AND projections.project_grants4.instance_id = o.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants4.granted_org_id = o.id AND projections.project_grants4.instance_id = o.instance_id`
 	projectGrantsCols = []string{
 		"project_id",
 		"grant_id",
@@ -62,8 +61,7 @@ var (
 		` FROM projections.project_grants4 ` +
 		` LEFT JOIN projections.projects4 ON projections.project_grants4.project_id = projections.projects4.id AND projections.project_grants4.instance_id = projections.projects4.instance_id ` +
 		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants4.resource_owner = r.id AND projections.project_grants4.instance_id = r.instance_id` +
-		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants4.granted_org_id = o.id AND projections.project_grants4.instance_id = o.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants4.granted_org_id = o.id AND projections.project_grants4.instance_id = o.instance_id`
 	projectGrantCols = []string{
 		"project_id",
 		"grant_id",
@@ -573,7 +571,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

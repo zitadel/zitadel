@@ -17,15 +17,9 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const (
-	CockroachRollPermissionChunkSize uint16 = 50
-)
-
 // SynchronizeRolePermission checks the current state of role permissions in the eventstore for the aggregate.
 // It pushes the commands required to reach the desired state passed in target.
 // For system level permissions aggregateID must be set to `SYSTEM`, else it is the instance ID.
-//
-// In case cockroachDB is used, the commands are pushed in chunks of CockroachRollPermissionChunkSize.
 func (c *Commands) SynchronizeRolePermission(ctx context.Context, aggregateID string, target []authz.RoleMapping) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -36,13 +30,9 @@ func (c *Commands) SynchronizeRolePermission(ctx context.Context, aggregateID st
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "COMMA-Iej2r", "Errors.Internal")
 	}
-	var events []eventstore.Event
-	if c.eventstore.Client().Database.Type() == "cockroach" {
-		events, err = c.pushChunked(ctx, CockroachRollPermissionChunkSize, cmds...)
-	} else {
-		events, err = c.eventstore.Push(ctx, cmds...)
-	}
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
+		logging.WithError(err).Error("failed to push role permission commands")
 		return nil, zerrors.ThrowInternal(err, "COMMA-AiV3u", "Errors.Internal")
 	}
 	return pushedEventsToObjectDetails(events), nil

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -156,27 +157,28 @@ func (c *Commands) getAllWebKeys(ctx context.Context) (_ map[string]*WebKeyWrite
 	return models.keys, models.activeID, nil
 }
 
-func (c *Commands) DeleteWebKey(ctx context.Context, keyID string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) DeleteWebKey(ctx context.Context, keyID string) (_ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	model := NewWebKeyWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	if err = c.eventstore.FilterToQueryReducer(ctx, model); err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	if model.State == domain.WebKeyStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ooCa7", "Errors.WebKey.NotFound")
+	if model.State == domain.WebKeyStateUnspecified ||
+		model.State == domain.WebKeyStateRemoved {
+		return model.WriteModel.ChangeDate, nil
 	}
 	if model.State == domain.WebKeyStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Chai1", "Errors.WebKey.ActiveDelete")
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Chai1", "Errors.WebKey.ActiveDelete")
 	}
 	err = c.pushAppendAndReduce(ctx, model, webkey.NewRemovedEvent(ctx,
 		webkey.AggregateFromWriteModel(ctx, &model.WriteModel),
 	))
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&model.WriteModel), nil
+	return model.WriteModel.ChangeDate, nil
 }
 
 func (c *Commands) prepareGenerateInitialWebKeys(instanceID string, conf crypto.WebKeyConfig) preparation.Validation {

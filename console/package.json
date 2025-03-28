@@ -32,7 +32,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@ngx-translate/core": "^15.0.0",
     "@zitadel/client": "^1.0.7",
-    "@zitadel/proto": "^1.0.4",
+    "@zitadel/proto": "1.0.5-sha-47a2ab5",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.2",
     "buffer": "^6.0.3",

@@ -35,8 +35,7 @@ var (
 		` projections.sms_configs3_http.endpoint` +
 		` FROM projections.sms_configs3` +
 		` LEFT JOIN projections.sms_configs3_twilio ON projections.sms_configs3.id = projections.sms_configs3_twilio.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_twilio.instance_id` +
-		` LEFT JOIN projections.sms_configs3_http ON projections.sms_configs3.id = projections.sms_configs3_http.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_http.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.sms_configs3_http ON projections.sms_configs3.id = projections.sms_configs3_http.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_http.instance_id`)
 	expectedSMSConfigsQuery = regexp.QuoteMeta(`SELECT projections.sms_configs3.id,` +
 		` projections.sms_configs3.aggregate_id,` +
 		` projections.sms_configs3.creation_date,` +
@@ -59,8 +58,7 @@ var (
 		` COUNT(*) OVER ()` +
 		` FROM projections.sms_configs3` +
 		` LEFT JOIN projections.sms_configs3_twilio ON projections.sms_configs3.id = projections.sms_configs3_twilio.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_twilio.instance_id` +
-		` LEFT JOIN projections.sms_configs3_http ON projections.sms_configs3.id = projections.sms_configs3_http.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_http.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.sms_configs3_http ON projections.sms_configs3.id = projections.sms_configs3_http.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_http.instance_id`)
 
 	smsConfigCols = []string{
 		"id",
@@ -353,7 +351,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -494,7 +492,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

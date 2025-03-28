@@ -3,9 +3,34 @@ To create a new user, go to Users and click on **New**. Enter the required conta
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
+:::note
+If you started with Zitadel before version 3, you might have the "Human User [deprecated]" UI.
+In this case please enable the Feature Flag "Use V2 Api in Console for User creation" in the Default Settings.
+:::
+
 <Tabs>
     <TabItem value="human" label="Human User" default>
+        <img src="/docs/img/guides/console/invitehuman.png" width="680px" alt="Invite Human" />
+
+        When creating a new user you have different options.
+        First add the email, and select if the email address should be added automatically as "verified".
+
+        In the last section you can choose the authentication options:
+        - **Setup authentication later for this user**: This flow might be useful if an employee starts at a later point but you already want to prepare the account. The user will not have an authentication method, before they will be able to login, they need to setup a method.
+        - **Send an invitation E-Mail for authentication setup and E-Mail verification**: The user will receive an email and be able to setup an authentication method (e.g Password, Passkey, External SSO).
+            - When using the [Zitadel Login V1](/docs/guides/integrate/login/hosted-login) the user will be prompted to setup a password
+            - When using the [Zitadel Login V2](/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta) the user has the option to choose the authentication method (password, passkey, identity provider), based on the configuration of the organization
+                <img src="/docs/img/guides/console/setupauthmethod.png" width="680px" alt="Invite Human - Setup authentication method" />
+        - **Set an initial password for the user**: The user will receive an email and be able to setup an authentication method (e.g Password, Passkey, External SSO)
+
+    </TabItem>
+    <TabItem value="human_deprecated" label="Human User [deprecated]">
         <img src="/docs/img/guides/console/addhuman.png" width="680px" alt="Add Human" />
+
+        After a human user is created, by default, an initialization mail with a code is sent to the registered email. This code then has to be verified on first login.
+        If you want to omit this mail, you can check the **email verified** and **set initial password** toggle.
+        If no password is set initially, the initialization mail prompting the user to set his password is sent.
+
     </TabItem>
     <TabItem value="service" label="Service User">
         <img
@@ -15,10 +40,6 @@ import TabItem from "@theme/TabItem";
         />
     </TabItem>
 </Tabs>
-
-After a human user is created, by default, an initialization mail with a code is sent to the registered email. This code then has to be verified on first login.
-If you want to omit this mail, you can check the **email verified** and **set initial password** toggle.
-If no password is set initially, the initialization mail prompting the user to set his password is sent.
 
 You can prompt the user to add a second factor method too by checking the **Force MFA** toggle in [Login behaviour settings](/docs/guides/manage/console/default-settings#login-behavior-and-access).
 

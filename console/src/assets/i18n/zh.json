@@ -185,6 +185,32 @@
           "DESCRIPTION": "空闲刷新令牌的生命周期是刷新令牌可以未使用的最长时间。"
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "管理您的 OIDC Web 密钥，以安全地签署和验证您的 ZITADEL 实例的令牌。",
+        "TABLE": {
+          "TITLE": "活动和未来的 Web 密钥",
+          "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "ACTIVATE": "激活下一个 Web 密钥",
+          "ACTIVE": "当前活动",
+          "NEXT": "队列中的下一个",
+          "FUTURE": "未来",
+          "WARNING": "Web密钥不到5分钟。"
+        },
+        "CREATE": {
+          "TITLE": "创建新的 Web 密钥",
+          "DESCRIPTION": "创建新的 Web 密钥会将其添加到您的列表。ZITADEL 默认使用 RSA2048 密钥和 SHA256 哈希算法。",
+          "KEY_TYPE": "密钥类型",
+          "BITS": "位数",
+          "HASHER": "哈希算法",
+          "CURVE": "曲线"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "先前的 Web 密钥",
+          "DESCRIPTION": "这些是您之前使用但不再活动的 Web 密钥。",
+          "DEACTIVATED_ON": "停用时间"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "消息文本",
         "DESCRIPTION": "自定义您的通知电子邮件或短信消息的文本。如果您想禁用某些语言，请在您的实例语言设置中限制它们。",
@@ -1356,6 +1382,7 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "验证码外观",
       "SECURITY": "安全设置",
       "EVENTS": "活动",

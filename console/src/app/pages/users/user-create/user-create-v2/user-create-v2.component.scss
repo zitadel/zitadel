@@ -13,8 +13,8 @@
   grid-template-areas:
     'email email'
     'emailVerified emailVerified'
+    'username username'
     'givenName familyName'
-    'nickName username'
     'authenticationFactor authenticationFactor';
   column-gap: 1rem;
 }
@@ -33,10 +33,6 @@
 
 .familyName {
   grid-area: familyName;
-}
-
-.nickName {
-  grid-area: nickName;
 }
 
 .username {

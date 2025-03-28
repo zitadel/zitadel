@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/logging"
 
 	db "github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -57,9 +58,9 @@ func copyEventstore(ctx context.Context, config *Migration) {
 
 func positionQuery(db *db.DB) string {
 	switch db.Type() {
-	case "postgres":
+	case dialect.DatabaseTypePostgres:
 		return "SELECT EXTRACT(EPOCH FROM clock_timestamp())"
-	case "cockroach":
+	case dialect.DatabaseTypeCockroach:
 		return "SELECT cluster_logical_timestamp()"
 	default:
 		logging.WithFields("db_type", db.Type()).Fatal("database type not recognized")
@@ -80,9 +81,6 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	destConn, err := dest.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
-	sourceES := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
-		MaxRetries: 3,
-	}))
 	destinationES := eventstore.NewEventstoreFromOne(postgres.New(dest, &postgres.Config{
 		MaxRetries: 3,
 	}))
@@ -90,8 +88,14 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	previousMigration, err := queryLastSuccessfulMigration(ctx, destinationES, source.DatabaseName())
 	logging.OnError(err).Fatal("unable to query latest successful migration")
 
-	maxPosition, err := writeMigrationStart(ctx, sourceES, migrationID, dest.DatabaseName())
-	logging.OnError(err).Fatal("unable to write migration started event")
+	var maxPosition float64
+	err = source.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			return row.Scan(&maxPosition)
+		},
+		"SELECT MAX(position) FROM eventstore.events2 "+instanceClause(),
+	)
+	logging.OnError(err).Fatal("unable to query max position from source")
 
 	logging.WithFields("from", previousMigration.Position, "to", maxPosition).Info("start event migration")
 

@@ -165,7 +165,7 @@ ZITADEL serves traffic as soon as you can see the following log line:
 ### Backend/login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) on your local machine.
 With [make](https://www.gnu.org/software/make/), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
@@ -200,7 +200,7 @@ make compile
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
-Also, you can verify the data by running `cockroach sql --database zitadel --insecure` and running SQL queries.
+Also, you can verify the data by running `psql "host=localhost dbname=zitadel sslmode=disable"` and running SQL queries.
 
 #### Run Local Unit Tests
 
@@ -215,12 +215,6 @@ make core_unit_test
 Integration tests are run as gRPC clients against a running ZITADEL server binary.
 The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
 It is also possible to run a ZITADEL sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
-
-The database flavor can **optionally** be set in the environment to `cockroach` or `postgres`. The default is `postgres`.
-
-```bash
-export INTEGRATION_DB_FLAVOR="cockroach"
-```
 
 In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
 
@@ -306,7 +300,7 @@ docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ### Console
 
 By executing the commands from this section, you run everything you need to develop the console locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](https://www.postgresql.org/download/) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 

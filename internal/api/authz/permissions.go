@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
-	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, roleMappings, GetCtxData(ctx), orgID)
+func CheckPermission(ctx context.Context, resolver MembershipsResolver, systemUserRoleMapping []RoleMapping, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
+	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, systemUserRoleMapping, roleMappings, GetCtxData(ctx), orgID)
 	if err != nil {
 		return err
 	}
@@ -22,7 +22,7 @@ func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMapp
 
 // getUserPermissions retrieves the memberships of the authenticated user (on instance and provided organisation level),
 // and maps them to permissions. It will return the requested permission(s) and all other granted permissions separately.
-func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requiredPerm string, roleMappings []RoleMapping, ctxData CtxData, orgID string) (requestedPermissions, allPermissions []string, err error) {
+func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requiredPerm string, systemUserRoleMappings []RoleMapping, roleMappings []RoleMapping, ctxData CtxData, orgID string) (requestedPermissions, allPermissions []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -31,7 +31,7 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 	}
 
 	if ctxData.SystemMemberships != nil {
-		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, roleMappings)
+		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, systemUserRoleMappings)
 		return requestedPermissions, allPermissions, nil
 	}
 

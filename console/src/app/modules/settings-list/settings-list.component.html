@@ -49,6 +49,9 @@
   <ng-container *ngIf="currentSetting === 'oidc' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-oidc-configuration></cnsl-oidc-configuration>
   </ng-container>
+  <ng-container *ngIf="currentSetting === 'webkeys' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-oidc-webkeys />
+  </ng-container>
   <ng-container *ngIf="currentSetting === 'secrets' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-secret-generator></cnsl-secret-generator>
   </ng-container>

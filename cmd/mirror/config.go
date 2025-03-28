@@ -71,7 +71,7 @@ func mustNewConfig(v *viper.Viper, config any) {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			database.DecodeHook,
+			database.DecodeHook(true),
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 			mapstructure.TextUnmarshallerHookFunc(),

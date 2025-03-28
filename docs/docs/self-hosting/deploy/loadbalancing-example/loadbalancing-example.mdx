@@ -81,5 +81,5 @@ Read more about [the login process](/guides/integrate/login/oidc/login-users).
 
 ## Troubleshooting
 
-You can connect to cockroach like this: `docker exec -it loadbalancing-example-my-cockroach-db-1 cockroach sql --host my-cockroach-db --certs-dir /cockroach/certs/`
-For example, to show all login names: `docker exec -it loadbalancing-example-my-cockroach-db-1 cockroach sql --database zitadel --host my-cockroach-db --certs-dir /cockroach/certs/ --execute "select * from projections.login_names3"`
+You can connect to the database like this: `docker exec -it loadbalancing-example-db-1 psql --host localhost`
+For example, to show all login names: `docker exec -it loadbalancing-example-db-1 psql -d zitadel --host localhost -c 'select * from projections.login_names3'`

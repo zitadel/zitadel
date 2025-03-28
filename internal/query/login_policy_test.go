@@ -39,8 +39,7 @@ var (
 		` projections.login_policies5.mfa_init_skip_lifetime,` +
 		` projections.login_policies5.second_factor_check_lifetime,` +
 		` projections.login_policies5.multi_factor_check_lifetime` +
-		` FROM projections.login_policies5` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.login_policies5`
 	loginPolicyCols = []string{
 		"aggregate_id",
 		"creation_date",
@@ -69,15 +68,13 @@ var (
 	}
 
 	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies5.second_factors` +
-		` FROM projections.login_policies5` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.login_policies5`
 	prepareLoginPolicy2FAsCols = []string{
 		"second_factors",
 	}
 
 	prepareLoginPolicyMFAsStmt = `SELECT projections.login_policies5.multi_factors` +
-		` FROM projections.login_policies5` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.login_policies5`
 	prepareLoginPolicyMFAsCols = []string{
 		"multi_factors",
 	}
@@ -331,7 +328,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

@@ -40,31 +40,31 @@ func (a *AddTarget) IsValid() error {
 	return nil
 }
 
-func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner string) (_ time.Time, err error) {
 	if resourceOwner == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-brml926e2d", "Errors.IDMissing")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-brml926e2d", "Errors.IDMissing")
 	}
 
 	if err := add.IsValid(); err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 
 	if add.AggregateID == "" {
 		add.AggregateID, err = c.idGenerator.Next()
 		if err != nil {
-			return nil, err
+			return time.Time{}, err
 		}
 	}
 	wm, err := c.getTargetWriteModelByID(ctx, add.AggregateID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	if wm.State.Exists() {
-		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-9axkz0jvzm", "Errors.Target.AlreadyExists")
+		return time.Time{}, zerrors.ThrowAlreadyExists(nil, "INSTANCE-9axkz0jvzm", "Errors.Target.AlreadyExists")
 	}
 	code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.targetEncryption) //nolint
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	add.SigningKey = code.PlainCode()
 	pushedEvents, err := c.eventstore.Push(ctx, target.NewAddedEvent(
@@ -78,12 +78,12 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		code.Crypted,
 	))
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	if err := AppendAndReduce(wm, pushedEvents...); err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&wm.WriteModel), nil
+	return wm.ChangeDate, nil
 }
 
 type ChangeTarget struct {
@@ -118,26 +118,26 @@ func (a *ChangeTarget) IsValid() error {
 	return nil
 }
 
-func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resourceOwner string) (time.Time, error) {
 	if resourceOwner == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-zqibgg0wwh", "Errors.IDMissing")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-zqibgg0wwh", "Errors.IDMissing")
 	}
 	if err := change.IsValid(); err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	existing, err := c.getTargetWriteModelByID(ctx, change.AggregateID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	if !existing.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-xj14f2cccn", "Errors.Target.NotFound")
+		return time.Time{}, zerrors.ThrowNotFound(nil, "COMMAND-xj14f2cccn", "Errors.Target.NotFound")
 	}
 
 	var changedSigningKey *crypto.CryptoValue
 	if change.ExpirationSigningKey {
 		code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.targetEncryption) //nolint
 		if err != nil {
-			return nil, err
+			return time.Time{}, err
 		}
 		changedSigningKey = code.Crypted
 		change.SigningKey = &code.Plain
@@ -154,30 +154,30 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 		changedSigningKey,
 	)
 	if changedEvent == nil {
-		return writeModelToObjectDetails(&existing.WriteModel), nil
+		return existing.WriteModel.ChangeDate, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	err = AppendAndReduce(existing, pushedEvents...)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&existing.WriteModel), nil
+	return existing.WriteModel.ChangeDate, nil
 }
 
-func (c *Commands) DeleteTarget(ctx context.Context, id, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeleteTarget(ctx context.Context, id, resourceOwner string) (time.Time, error) {
 	if id == "" || resourceOwner == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-obqos2l3no", "Errors.IDMissing")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-obqos2l3no", "Errors.IDMissing")
 	}
 
 	existing, err := c.getTargetWriteModelByID(ctx, id, resourceOwner)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	if !existing.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-k4s7ucu0ax", "Errors.Target.NotFound")
+		return existing.WriteModel.ChangeDate, nil
 	}
 
 	if err := c.pushAppendAndReduce(ctx,
@@ -187,9 +187,9 @@ func (c *Commands) DeleteTarget(ctx context.Context, id, resourceOwner string) (
 			existing.Name,
 		),
 	); err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&existing.WriteModel), nil
+	return existing.WriteModel.ChangeDate, nil
 }
 
 func (c *Commands) existsTargetsByIDs(ctx context.Context, ids []string, resourceOwner string) bool {

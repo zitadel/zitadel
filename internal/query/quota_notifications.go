@@ -9,7 +9,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -59,7 +58,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, instanceID strin
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	usedRel := uint16(math.Floor(float64(usedAbs*100) / float64(qu.Amount)))
-	query, scan := prepareQuotaNotificationsQuery(ctx, q.client)
+	query, scan := prepareQuotaNotificationsQuery()
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
@@ -149,7 +148,7 @@ func calculateThreshold(usedRel, notificationPercent uint16) uint16 {
 	return uint16(times+percent-1)*100 + notificationPercent
 }
 
-func prepareQuotaNotificationsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*QuotaNotifications, error)) {
+func prepareQuotaNotificationsQuery() (sq.SelectBuilder, func(*sql.Rows) (*QuotaNotifications, error)) {
 	return sq.Select(
 			QuotaNotificationColumnID.identifier(),
 			QuotaNotificationColumnCallURL.identifier(),
@@ -157,7 +156,7 @@ func prepareQuotaNotificationsQuery(ctx context.Context, db prepareDatabase) (sq
 			QuotaNotificationColumnRepeat.identifier(),
 			QuotaNotificationColumnNextDueThreshold.identifier(),
 		).
-			From(quotaNotificationsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(quotaNotificationsTable.identifier()).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*QuotaNotifications, error) {
 			cfgs := &QuotaNotifications{Configs: []*QuotaNotification{}}
 			for rows.Next() {

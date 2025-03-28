@@ -46,5 +46,5 @@ Currently, the defined Actions v2 will be executed additionally to the defined [
 
 ## Further reading
 
-- [Actions v2 reference](/apis/actions/v3/usage)
-- [Actions v2 example execution locally](/apis/actions/v3/testing-locally)
+- [Actions v2 reference](/apis/actions/v2/usage)
+- [Actions v2 example execution locally](/apis/actions/v2/testing-locally)

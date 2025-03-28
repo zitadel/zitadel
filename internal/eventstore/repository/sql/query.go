@@ -11,7 +11,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -64,11 +63,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	where, values := prepareConditions(criteria, q, useV1)
 	if where == "" || query == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
-	}
-	if q.Tx == nil {
-		if travel := prepareTimeTravel(ctx, criteria, q.AllowTimeTravel); travel != "" {
-			query += travel
-		}
 	}
 	query += where
 
@@ -158,15 +152,7 @@ func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (s
 	}
 }
 
-func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string {
-	if !allow {
-		return ""
-	}
-	took := call.Took(ctx)
-	return criteria.Timetravel(took)
-}
-
-func maxSequenceScanner(row scan, dest interface{}) (err error) {
+func maxSequenceScanner(row scan, dest any) (err error) {
 	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
 		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)

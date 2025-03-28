@@ -171,8 +171,7 @@ func (s *Storage) push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reduc
 			cmd.position.InPositionOrder,
 		)
 
-		stmt.WriteString(s.pushPositionStmt)
-		stmt.WriteString(`)`)
+		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()))")
 	}
 	stmt.WriteString(` RETURNING created_at, "position"`)
 

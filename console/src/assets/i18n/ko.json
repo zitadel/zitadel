@@ -185,6 +185,32 @@
           "DESCRIPTION": "유휴 갱신 토큰 수명은 갱신 토큰이 사용되지 않는 최대 기간을 의미합니다."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "ZITADEL 인스턴스의 토큰을 안전하게 서명하고 검증하기 위해 OIDC 웹 키를 관리하세요.",
+        "TABLE": {
+          "TITLE": "활성 및 예정된 웹 키",
+          "DESCRIPTION": "현재 활성화된 웹 키와 앞으로 활성화될 웹 키입니다. 새로운 키를 활성화하면 기존 키는 비활성화됩니다.",
+          "NOTE": "참고: JWKs OIDC 엔드포인트는 캐시 가능한 응답을 반환합니다 (기본값: 5분). 키를 너무 빨리 활성화하면 캐시 및 클라이언트에서 아직 사용할 수 없을 수 있습니다.",
+          "ACTIVATE": "다음 웹 키 활성화",
+          "ACTIVE": "현재 활성화됨",
+          "NEXT": "대기 중인 다음 키",
+          "FUTURE": "향후 사용 예정",
+          "WARNING": "웹 키가 5분 미만입니다."
+        },
+        "CREATE": {
+          "TITLE": "새 웹 키 생성",
+          "DESCRIPTION": "새 웹 키를 생성하면 목록에 추가됩니다. ZITADEL은 기본적으로 RSA2048 키와 SHA256 해시 알고리즘을 사용합니다.",
+          "KEY_TYPE": "키 유형",
+          "BITS": "비트",
+          "HASHER": "해시 알고리즘",
+          "CURVE": "곡선"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "이전 웹 키",
+          "DESCRIPTION": "더 이상 활성 상태가 아닌 이전 웹 키 목록입니다.",
+          "DEACTIVATED_ON": "비활성화된 날짜"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "메시지 텍스트",
         "DESCRIPTION": "알림 이메일 또는 SMS 메시지의 텍스트를 사용자 정의하세요. 언어를 비활성화하려면 인스턴스의 언어 설정에서 제한하세요.",
@@ -1356,6 +1382,7 @@
       "BRANDING": "브랜딩",
       "PRIVACYPOLICY": "외부 링크",
       "OIDC": "OIDC 토큰 수명 및 만료",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "시크릿 생성기",
       "SECURITY": "보안 설정",
       "EVENTS": "이벤트",

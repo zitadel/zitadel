@@ -15,7 +15,7 @@ import { ActionKeysType } from '../action-keys/action-keys.component';
 })
 export class HeaderComponent {
   @Input() public isDarkTheme: boolean = true;
-  @Input() public user?: User.AsObject;
+  @Input({ required: true }) public user!: User.AsObject;
   public showOrgContext: boolean = false;
 
   @Input() public org!: Org.AsObject;

@@ -159,14 +159,6 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "permission error",
-			args: args{
-				ctx: IamCTX,
-				req: &feature.GetSystemFeaturesRequest{},
-			},
-			wantErr: true,
-		},
-		{
 			name: "nothing set",
 			args: args{
 				ctx: SystemCTX,
@@ -349,14 +341,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 		want    *feature.GetInstanceFeaturesResponse
 		wantErr bool
 	}{
-		{
-			name: "permission error",
-			args: args{
-				ctx: OrgCTX,
-				req: &feature.GetInstanceFeaturesRequest{},
-			},
-			wantErr: true,
-		},
 		{
 			name: "defaults, no inheritance",
 			args: args{

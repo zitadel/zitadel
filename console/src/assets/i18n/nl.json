@@ -185,6 +185,32 @@
           "DESCRIPTION": "De levensduur van het inactieve vernieuwingstoken is de maximale tijd dat een vernieuwingstoken ongebruikt kan zijn."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Beheer je OIDC Web Keys om tokens veilig te ondertekenen en te valideren voor je ZITADEL-instantie.",
+        "TABLE": {
+          "TITLE": "Actieve en Toekomstige Websleutels",
+          "DESCRIPTION": "Je actieve en aankomende websleutels. Het activeren van een nieuwe sleutel deactiveert de huidige.",
+          "NOTE": "Opmerking: Het JWKs OIDC-eindpunt geeft een cachebare respons terug (standaard 5 minuten). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is in caches en bij clients.",
+          "ACTIVATE": "Volgende Websleutel activeren",
+          "ACTIVE": "Momenteel actief",
+          "NEXT": "Volgende in de wachtrij",
+          "FUTURE": "Toekomstig",
+          "WARNING": "De websleutel is minder dan 5 minuten oud"
+        },
+        "CREATE": {
+          "TITLE": "Nieuwe Websleutel aanmaken",
+          "DESCRIPTION": "Het aanmaken van een nieuwe websleutel voegt deze toe aan je lijst. ZITADEL gebruikt standaard RSA2048-sleutels met een SHA256-hasher.",
+          "KEY_TYPE": "Sleuteltype",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Curve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Vorige Websleutels",
+          "DESCRIPTION": "Dit zijn je vorige websleutels die niet langer actief zijn.",
+          "DEACTIVATED_ON": "Gedeactiveerd op"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Berichtteksten",
         "DESCRIPTION": "Pas de teksten van je notificatie-e-mail of SMS-berichten aan. Als je sommige talen wilt uitschakelen, beperk ze dan in de taalinstellingen van je instanties.",
@@ -1356,6 +1382,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacybeleid",
       "OIDC": "OIDC Token levensduur en vervaldatum",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Beveiligingsinstellingen",
       "EVENTS": "Evenementen",

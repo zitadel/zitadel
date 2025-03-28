@@ -185,6 +185,32 @@
           "DESCRIPTION": "Životnost nečinného refresh tokenu je maximální doba, po kterou může být refresh token nepoužitý."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Spravujte své OIDC webové klíče pro bezpečné podepisování a ověřování tokenů ve vaší instanci ZITADEL.",
+        "TABLE": {
+          "TITLE": "Aktivní a budoucí webové klíče",
+          "DESCRIPTION": "Vaše aktivní a nadcházející webové klíče. Aktivací nového klíče dojde k deaktivaci aktuálního.",
+          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a klientům.",
+          "ACTIVATE": "Aktivovat další webový klíč",
+          "ACTIVE": "Aktuálně aktivní",
+          "NEXT": "Další v řadě",
+          "FUTURE": "Budoucí",
+          "WARNING": "Webový klíč je starý méně než 5 minut"
+        },
+        "CREATE": {
+          "TITLE": "Vytvořit nový webový klíč",
+          "DESCRIPTION": "Vytvořením nového webového klíče jej přidáte do svého seznamu. ZITADEL používá klíče RSA2048 s hashováním SHA256 jako výchozí.",
+          "KEY_TYPE": "Typ klíče",
+          "BITS": "Bity",
+          "HASHER": "Hasher",
+          "CURVE": "Křivka"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Předchozí webové klíče",
+          "DESCRIPTION": "Toto jsou vaše předchozí webové klíče, které již nejsou aktivní.",
+          "DEACTIVATED_ON": "Deaktivováno dne"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Texty zpráv",
         "DESCRIPTION": "Přizpůsob si texty svých e-mailových nebo SMS notifikací. Pokud chceš některé z jazyků zakázat, omez je ve svém nastavení jazyků instance.",
@@ -1356,6 +1382,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Zásady ochrany osobních údajů",
       "OIDC": "Životnost a expirace OIDC tokenu",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Generátor tajemství",
       "SECURITY": "Bezpečnostní nastavení",
       "EVENTS": "Události",

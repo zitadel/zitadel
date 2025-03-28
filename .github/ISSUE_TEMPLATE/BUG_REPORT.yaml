@@ -40,7 +40,7 @@ body:
     label: Database
     description: What database are you using? (self-hosters only)
     options:
-    - CockroachDB
+    - CockroachDB (Zitadel v2)
     - PostgreSQL
     - Other (describe below!)
 - type: input

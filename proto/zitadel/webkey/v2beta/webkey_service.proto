@@ -1,0 +1,359 @@
+syntax = "proto3";
+
+package zitadel.webkey.v2beta;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/webkey/v2beta/key.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta;webkey";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Web key Service";
+    version: "2.0-beta";
+    description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This service is in beta state. It can AND will continue breaking until a stable version is released.\n\nThe public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n\nPlease make sure to enable the `web_key` feature flag on your instance to use this service.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  produces: "application/json";
+
+  consumes: "application/grpc";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// Service to manage web keys for OIDC token signing and validation.
+// The service provides methods to create, activate, delete and list web keys.
+// The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.
+//
+// Please make sure to enable the `web_key` feature flag on your instance to use this service.
+service WebKeyService {
+  // Create Web Key
+  //
+  // Generate a private and public key pair. The private key can be used to sign OIDC tokens after activation.
+  // The public key can be used to validate OIDC tokens.
+  // The newly created key will have the state `STATE_INITIAL` and is published to the public key endpoint.
+  // Note that the JWKs OIDC endpoint returns a cacheable response.
+  //
+  // If no key type is provided, a RSA key pair with 2048 bits and SHA256 hashing will be created.
+  //
+  // Required permission:
+  //   - `iam.web_key.write`
+  //
+  // Required feature flag:
+  //   - `web_key`
+  rpc CreateWebKey(CreateWebKeyRequest) returns (CreateWebKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/web_keys"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.web_key.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Web key created successfully.";
+        }
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `web_key` is not enabled.";
+        }
+      };
+    };
+  }
+
+  // Activate Web Key
+  //
+  // Switch the active signing web key. The previously active key will be deactivated.
+  // Note that the JWKs OIDC endpoint returns a cacheable response.
+  // Therefore it is not advised to activate a key that has been created within the cache duration (default is 5min),
+  // as the public key may not have been propagated to caches and clients yet.
+  //
+  // Required permission:
+  //   - `iam.web_key.write`
+  //
+  // Required feature flag:
+  //   - `web_key`
+  rpc ActivateWebKey(ActivateWebKeyRequest) returns (ActivateWebKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/web_keys/{id}/activate"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.web_key.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Web key activated successfully.";
+        }
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `web_key` is not enabled.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The web key to active does not exist.";
+        }
+      };
+    };
+  }
+
+  // Delete Web Key
+  //
+  // Delete a web key pair. Only inactive keys can be deleted. Once a key is deleted,
+  // any tokens signed by this key will be invalid.
+  // Note that the JWKs OIDC endpoint returns a cacheable response.
+  // In case the web key is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the change date in the response to verify if the web key was deleted during the request.
+  //
+  // Required permission:
+  //   - `iam.web_key.delete`
+  //
+  // Required feature flag:
+  //   - `web_key`
+  rpc DeleteWebKey(DeleteWebKeyRequest) returns (DeleteWebKeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/web_keys/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.web_key.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Web key deleted successfully.";
+        }
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `web_key` is not enabled or the web key is currently active.";
+        }
+      };
+    };
+  }
+
+  // List Web Keys
+  //
+  // List all web keys and their states.
+  //
+  // Required permission:
+  //   - `iam.web_key.read`
+  //
+  // Required feature flag:
+  //   - `web_key`
+  rpc ListWebKeys(ListWebKeysRequest) returns (ListWebKeysResponse) {
+    option (google.api.http) = {
+      get: "/v2beta/web_keys"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.web_key.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "List of all web keys.";
+        }
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `web_key` is not enabled.";
+        }
+      };
+    };
+  }
+}
+
+message CreateWebKeyRequest {
+  // The key type to create (RSA, ECDSA, ED25519).
+  // If no key type is provided, a RSA key pair with 2048 bits and SHA256 hashing will be created.
+  oneof key {
+    // Create a RSA key pair and specify the bit size and hashing algorithm.
+    // If no bits and hasher are provided, a RSA key pair with 2048 bits and SHA256 hashing will be created.
+    RSA rsa = 1;
+    // Create a ECDSA key pair and specify the curve.
+    // If no curve is provided, a ECDSA key pair with P-256 curve will be created.
+    ECDSA ecdsa = 2;
+    // Create a ED25519 key pair.
+    ED25519 ed25519 = 3;
+  }
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"rsa\":{\"bits\":\"RSA_BITS_2048\",\"hasher\":\"RSA_HASHER_SHA256\"}}";
+  };
+}
+
+message CreateWebKeyResponse {
+  // The unique identifier of the newly created key.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the key creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message ActivateWebKeyRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ActivateWebKeyResponse {
+  // The timestamp of the activation of the key.
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteWebKeyRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message DeleteWebKeyResponse {
+  // The timestamp of the deletion of the key.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might be empty.
+  google.protobuf.Timestamp deletion_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListWebKeysRequest {}
+
+message ListWebKeysResponse {
+  repeated WebKey web_keys = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"id\":\"69629012906488334\",\"creationDate\":\"2024-12-18T07:50:47.492Z\",\"changeDate\":\"2024-12-18T08:04:47.492Z\",\"state\":\"STATE_ACTIVE\",\"rsa\":{\"bits\":\"RSA_BITS_2048\",\"hasher\":\"RSA_HASHER_SHA256\"}},{\"id\":\"69629012909346200\",\"creationDate\":\"2025-01-18T12:05:47.492Z\",\"state\":\"STATE_INITIAL\",\"ecdsa\":{\"curve\":\"ECDSA_CURVE_P256\"}}]";
+    }
+  ];
+}

@@ -5,7 +5,6 @@
         [loading]="dataSource.loading$ | async"
         *ngIf="projectId"
         (refreshed)="refreshPage()"
-        [dataSize]="dataSource.totalResult"
         [selection]="selection"
         [timestamp]="dataSource.viewTimestamp"
         (refreshed)="getRoleOptions(projectId)"
