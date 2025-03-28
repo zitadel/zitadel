@@ -22,12 +22,18 @@ import { createFeatureServiceClient, createUserServiceClient, createSessionServi
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
-import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2/Feature_serviceServiceClientPb';
+// @ts-ignore
+import { createClientFor } from '@zitadel/client';
+import { Client, Transport } from '@connectrpc/connect';
+
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+
 // @ts-ignore
 import { createClientFor } from '@zitadel/client';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);
+const createActionServiceClient = createClientFor(ActionService);
 
 @Injectable({
   providedIn: 'root',
@@ -42,6 +48,7 @@ export class GrpcService {
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
+  public actionNew!: ReturnType<typeof createActionServiceClient>;
   public webKey!: ReturnType<typeof createWebKeyServiceClient>;
 
   constructor(
@@ -116,6 +123,7 @@ export class GrpcService {
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);
+        this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
 
         const authConfig: AuthConfig = {

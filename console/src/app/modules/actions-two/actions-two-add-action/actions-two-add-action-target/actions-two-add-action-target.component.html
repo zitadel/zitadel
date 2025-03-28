@@ -1,0 +1,33 @@
+<form *ngIf="targetForm" class="form-grid" [formGroup]="targetForm" (ngSubmit)="submit()">
+  <p class="target-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.TITLE' | translate }}</p>
+
+  <cnsl-form-field class="full-width">
+    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.DESCRIPTION' | translate }}</cnsl-label>
+    <input
+      cnslInput
+      type="text"
+      placeholder=""
+      #serviceInput
+      [formControl]="targetForm.controls.target"
+      [matAutocomplete]="targetauto"
+    />
+
+    <mat-autocomplete #targetauto="matAutocomplete" [displayWith]="displayTarget">
+      <mat-option *ngIf="(executionTargets$ | async) === null" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let target of executionTargets$ | async" [value]="target">
+        <span>{{ target.name }}</span>
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
+
+  <div class="actions">
+    <button mat-stroked-button (click)="back.emit()">
+      {{ 'ACTIONS.BACK' | translate }}
+    </button>
+    <button color="primary" mat-raised-button type="submit">
+      {{ 'ACTIONS.CONTINUE' | translate }}
+    </button>
+  </div>
+</form>
