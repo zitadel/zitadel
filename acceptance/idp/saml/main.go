@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"os/signal"
@@ -24,6 +25,7 @@ import (
 	xrv "github.com/mattermost/xml-roundtrip-validator"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/bind"
+	"github.com/zenazn/goji/web"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -156,18 +158,12 @@ func addService(idpServer *samlidp.Server, spURLStr string) {
 		panic(err)
 	}
 	defer metadataResp.Body.Close()
-	spMetadata, err := getSPMetadata(metadataResp.Body)
-	if err != nil {
-		panic(err)
-	}
 
-	err = idpServer.Store.Put("/services/sp", samlidp.Service{
-		Name:     spURLStr,
-		Metadata: *spMetadata,
-	})
-	if err != nil {
-		panic(err)
-	}
+	idpServer.HandlePutService(
+		web.C{URLParams: map[string]string{"id": spURLStr}},
+		httptest.NewRecorder(),
+		httptest.NewRequest(http.MethodPost, spURLStr, metadataResp.Body),
+	)
 }
 
 func getSPMetadata(r io.Reader) (spMetadata *saml.EntityDescriptor, err error) {
@@ -267,8 +263,8 @@ func CreateIDP(apiURL, pat, domain string, idpMetadata []byte) (string, error) {
 	createIDP := &createIDP{
 		Name:              "CREWJAM",
 		MetadataXml:       string(encoded),
-		Binding:           "SAML_BINDING_POST",
-		WithSignedRequest: true,
+		Binding:           "SAML_BINDING_REDIRECT",
+		WithSignedRequest: false,
 		ProviderOptions: providerOptions{
 			IsLinkingAllowed:  true,
 			IsCreationAllowed: true,

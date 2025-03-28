@@ -127,7 +127,7 @@ func CreateIDP(apiURL, pat, domain string, issuer, clientID, clientSecret string
 			IsCreationAllowed: true,
 			IsAutoCreation:    true,
 			IsAutoUpdate:      true,
-			AutoLinking:       "AUTO_LINKING_OPTION_UNSPECIFIED",
+			AutoLinking:       "AUTO_LINKING_OPTION_USERNAME",
 		},
 		IsIdTokenMapping: false,
 		UsePkce:          false,

@@ -1,7 +1,7 @@
 services:
   zitadel:
     user: "${ZITADEL_DEV_UID}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:dc64e35128108d70471c7a5b9ad1dfc2c7c4c654}"
+    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -12,7 +12,7 @@ services:
       db:
         condition: "service_healthy"
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "localhost:host-gateway"
 
   db:
     restart: "always"

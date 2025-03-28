@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { test as base } from "@playwright/test";
+import {expect, test as base} from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 import { loginname } from "./loginname";
@@ -35,5 +35,5 @@ test("saml username and password login", async ({ user, page }) => {
   await selectNewAccount(page)
   await loginname(page, user.getUsername());
   await password(page, user.getPassword());
-  // currently fails because of issuer problems
+  await expect(page.locator('html')).toContainText(user.getUsername());
 });
