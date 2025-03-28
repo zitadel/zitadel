@@ -39,7 +39,9 @@ $lgn-icon-button-line-height: 40px !default;
   padding: $lgn-button-padding;
   border-radius: $lgn-button-border-radius;
 
-  overflow: visible;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 
   &[disabled] {
