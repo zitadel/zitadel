@@ -10,7 +10,11 @@ import { catchError, map, startWith, switchMap, tap, timeout } from 'rxjs/operat
 import { MatDialog } from '@angular/material/dialog';
 import { ActionTwoAddTargetDialogComponent } from '../actions-two-add-target/actions-two-add-target-dialog.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { Target, TargetSchema } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import {
+  CreateTargetRequestSchema,
+  UpdateTargetRequestSchema,
+} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
 @Component({
   selector: 'cnsl-actions-two-targets',
@@ -101,7 +105,7 @@ export class ActionsTwoTargetsComponent implements OnInit {
 
     ref.afterClosed().subscribe((dialogResponse) => {
       if (target?.id && dialogResponse) {
-        const req: MessageInitShape<typeof TargetSchema> = dialogResponse;
+        const req: MessageInitShape<typeof UpdateTargetRequestSchema> = dialogResponse;
 
         this.actionService.updateTarget({ ...req, id: target.id });
         setTimeout(() => {
@@ -109,7 +113,7 @@ export class ActionsTwoTargetsComponent implements OnInit {
         }, 1000);
       }
       if (dialogResponse) {
-        const req: MessageInitShape<typeof TargetSchema> = dialogResponse;
+        const req: MessageInitShape<typeof CreateTargetRequestSchema> = dialogResponse;
 
         this.actionService.createTarget(req);
         setTimeout(() => {

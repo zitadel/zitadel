@@ -13,13 +13,11 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Target as ZitadelTarget } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
-import { ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
-
-type Target = Required<Pick<ZitadelTarget, 'config' | 'details'>> & ZitadelTarget;
+import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
 export type TargetInit = NonNullable<
-  NonNullable<MessageInitShape<typeof ExecutionSchema>['execution']>['targets']
+  NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['targets']>
 >[number]['type'];
 
 @Component({
@@ -76,7 +74,7 @@ export class ActionsTwoAddActionTargetComponent {
   }
 
   private targetHasDetailsAndConfig(target: Target): target is Target {
-    return !!target.details && !!target.config;
+    return !!target.id && !!target.id;
   }
 
   private submit() {
