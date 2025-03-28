@@ -45,8 +45,6 @@ export class ActionTwoAddTargetDialogComponent {
     public dialogRef: MatDialogRef<ActionTwoAddTargetDialogComponent, MessageInitShape<typeof TargetSchema>>,
     @Inject(MAT_DIALOG_DATA) public data: { target: Target },
   ) {
-    console.log(data.target);
-
     this.targetForm = this.buildTargetForm();
 
     if (data.target) {

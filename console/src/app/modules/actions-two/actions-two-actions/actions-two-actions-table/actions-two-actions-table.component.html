@@ -7,21 +7,29 @@
       <ng-container matColumnDef="condition">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.CONDITION' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row?.condition | json }}
+          <span *ngIf="row.condition?.conditionType?.value">{{
+            conditionParser(row?.condition?.conditionType?.value)
+          }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TYPE' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row?.condition | json }}
+          {{ 'ACTIONSTWO.EXECUTION.TYPES.' + row?.condition?.conditionType?.case | translate }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="target">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TARGET' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ row?.condition | json }}
+          <div class="target-key">
+            <cnsl-project-role-chip
+              *ngFor="let target of filteredTargetTypes(row.targets) | async"
+              [roleName]="target.name"
+              >{{ target.name }}</cnsl-project-role-chip
+            >
+          </div>
         </td>
       </ng-container>
 
@@ -30,7 +38,7 @@
           {{ 'ACTIONSTWO.EXECUTION.TABLE.CREATIONDATE' | translate }}
         </th>
         <td mat-cell *matCellDef="let row; dataSource: dataSource">
-          <span class="no-break">{{ row.details.created | timestampToDate | localizedDate: 'regular' }}</span>
+          <span class="no-break">{{ row.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
         </td>
       </ng-container>
 

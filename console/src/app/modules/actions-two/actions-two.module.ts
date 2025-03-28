@@ -16,6 +16,7 @@ import { ActionsTwoActionsTableComponent } from './actions-two-actions/actions-t
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/type-safe-cell-def.module';
+import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/typ
     RefreshTableModule,
     ActionKeysModule,
     TypeSafeCellDefModule,
+    ProjectRoleChipModule,
   ],
   exports: [ActionsTwoActionsComponent, ActionsTwoTargetsComponent, ActionsTwoTargetsTableComponent],
 })

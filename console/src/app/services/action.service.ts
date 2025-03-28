@@ -29,6 +29,10 @@ import {
 export class ActionService {
   constructor(private readonly grpcService: GrpcService) {}
 
+  public listTargets(req: MessageInitShape<typeof ListTargetsRequestSchema>): Promise<ListTargetsResponse> {
+    return this.grpcService.actionNew.listTargets(req);
+  }
+
   public createTarget(req: MessageInitShape<typeof CreateTargetRequestSchema>): Promise<CreateTargetResponse> {
     return this.grpcService.actionNew.createTarget(req);
   }
@@ -39,6 +43,10 @@ export class ActionService {
 
   public getTarget(req: MessageInitShape<typeof GetTargetRequestSchema>): Promise<GetTargetResponse> {
     return this.grpcService.actionNew.getTarget(req);
+  }
+
+  public updateTarget(req: MessageInitShape<typeof UpdateTargetRequestSchema>): Promise<UpdateTargetResponse> {
+    return this.grpcService.actionNew.updateTarget(req);
   }
 
   public listExecutionFunctions(
@@ -63,15 +71,7 @@ export class ActionService {
     return this.grpcService.actionNew.listExecutions(req);
   }
 
-  public listTargets(req: MessageInitShape<typeof ListTargetsRequestSchema>): Promise<ListTargetsResponse> {
-    return this.grpcService.actionNew.listTargets(req);
-  }
-
   public setExecution(req: MessageInitShape<typeof SetExecutionRequestSchema>): Promise<SetExecutionResponse> {
     return this.grpcService.actionNew.setExecution(req);
-  }
-
-  public updateTarget(req: MessageInitShape<typeof UpdateTargetRequestSchema>): Promise<UpdateTargetResponse> {
-    return this.grpcService.actionNew.updateTarget(req);
   }
 }

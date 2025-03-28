@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { Execution, ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -23,6 +24,7 @@ export class ActionsTwoActionsComponent implements OnInit {
   protected readonly refresh = new Subject<true>();
   private readonly actionsEnabled$: Observable<boolean>;
   protected readonly executions$: Observable<Execution[]>;
+  protected readonly targets$: Observable<Target[]>;
 
   constructor(
     private readonly actionService: ActionService,
@@ -35,6 +37,7 @@ export class ActionsTwoActionsComponent implements OnInit {
   ) {
     this.actionsEnabled$ = this.getActionsEnabled$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executions$ = this.getExecutions$(this.actionsEnabled$);
+    this.targets$ = this.getTargets$(this.actionsEnabled$);
   }
 
   ngOnInit(): void {
@@ -71,6 +74,24 @@ export class ActionsTwoActionsComponent implements OnInit {
     );
   }
 
+  private getTargets$(actionsEnabled$: Observable<boolean>) {
+    return this.refresh.pipe(
+      startWith(true),
+      switchMap(() => {
+        return this.actionService.listTargets({});
+      }),
+      tap(console.log),
+      map(({ result }) => result),
+      catchError(async (err) => {
+        const actionsEnabled = await firstValueFrom(actionsEnabled$);
+        if (actionsEnabled) {
+          this.toast.showError(err);
+        }
+        return [];
+      }),
+    );
+  }
+
   private getActionsEnabled$() {
     return defer(() => this.featureService.getInstanceFeatures()).pipe(
       map(({ actions }) => actions?.enabled ?? false),
@@ -90,21 +111,26 @@ export class ActionsTwoActionsComponent implements OnInit {
     });
 
     ref.afterClosed().subscribe((request?: MessageInitShape<typeof SetExecutionRequestSchema>) => {
-      console.log('request', request);
-      // if (request) {
-      //   this.actionService
-      //     .setExecution(request)
-      //     .then(() => {
-      //       setTimeout(() => {
-      //         this.refresh.next(true);
-      //       }, 1000);
-      //     })
-      //     .catch((error) => {
-      //       this.toast.showError(error);
-      //     });
-      // }
+      if (request) {
+        this.actionService
+          .setExecution(request)
+          .then(() => {
+            setTimeout(() => {
+              this.refresh.next(true);
+            }, 1000);
+          })
+          .catch((error) => {
+            console.error(error);
+            this.toast.showError(error);
+          });
+      }
     });
   }
 
-  public deleteExecution(execution: Execution) {}
+  public deleteExecution(execution: Execution) {
+    // this.actionService.({ id: execution. });
+    // setTimeout(() => {
+    //   this.refresh.next(true);
+    // }, 1000);
+  }
 }

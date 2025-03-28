@@ -5,6 +5,7 @@
   (refresh)="refresh.next(true)"
   (delete)="deleteExecution($event)"
   [executions]="executions$ | async"
+  [targets]="targets$ | async"
 >
   <button color="primary" mat-raised-button (click)="openDialog()">
     {{ 'ACTIONS.CREATE' | translate }}

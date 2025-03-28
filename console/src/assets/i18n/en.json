@@ -532,6 +532,12 @@
     "EXECUTION": {
       "TITLE": "Actions",
       "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and itegrate with other systems.",
+      "TYPES": {
+        "request": "Request",
+        "response": "Response",
+        "events": "Events",
+        "functions": "Functions"
+      },
       "CREATE": {
         "TITLE": "Create an Action",
         "TYPE": {
@@ -571,6 +577,14 @@
           "FUNCTIONNAME": {
             "TITLE": "Function Name",
             "DESCRIPTION": "Choose the function you want to execute"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Select Group",
+            "DESCRIPTION": "If you want to only execute on a group of events, select it here"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Select Event",
+            "DESCRIPTION": "If you want to only execute on a specific event, select it here"
           }
         },
         "TARGET": {
