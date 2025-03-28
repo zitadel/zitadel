@@ -44,10 +44,16 @@ Possible conditions for the Execution:
 Currently, the defined Actions v2 will be executed additionally to the defined [Actions](/concepts/features/actions).
 :::
 
+## Migration
+
+- [Migrate Actions v1 to Actions v2](/guides/integrate/actions/migrate-from-v1)
+
 ## Further reading
 
-- [Actions v2 reference](/apis/actions/v2/usage)
-- [Actions v2 example execution locally for request](/apis/actions/v2/testing-locally-request)
-- [Actions v2 example execution locally for response](/apis/actions/v2/testing-locally-response)
-- [Actions v2 example execution locally for function](/apis/actions/v2/testing-locally-function)
-- [Actions v2 example execution locally for event](/apis/actions/v2/testing-locally-event)
+- [Actions v2 reference](/guides/integrate/actions/usage)
+- [Actions v2 example execution locally for request](/guides/integrate/actions/testing-locally-request)
+- [Actions v2 example execution locally for request manipulation](/guides/integrate/actions/testing-locally-request-manipulation)
+- [Actions v2 example execution locally for response](/guides/integrate/actions/testing-locally-response)
+- [Actions v2 example execution locally for response manipulation](/guides/integrate/actions/testing-locally-response-manipulation)
+- [Actions v2 example execution locally for function](/guides/integrate/actions/testing-locally-function)
+- [Actions v2 example execution locally for event](/guides/integrate/actions/testing-locally-event)

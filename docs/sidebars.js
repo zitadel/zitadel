@@ -471,6 +471,48 @@ module.exports = {
           ],
         },
         "guides/integrate/external-audit-log",
+        {
+          type: "category",
+          label: "Actions",
+          link: {
+            type: "generated-index",
+            title: "Use Actions to integrate ZITADEL with your Favorite Services",
+            slug: "/guides/integrate/actions",
+            description:
+              "With the guides in this section you will learn how to use action to integrate ZITADEL with your services.",
+          },
+          collapsed: true,
+          items: [
+            {
+              type: "doc",
+              id: "guides/integrate/actions/usage",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-locally-request",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-locally-request-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-locally-response",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-locally-response-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-locally-function",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-locally-event",
+            },
+          ],
+        },
       ],
     },
     {
@@ -784,28 +826,7 @@ module.exports = {
                     "\n" +
                     "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running ZITADEL V3.",
               },
-              items: [
-                {
-                  type: "doc",
-                  id: "apis/actions/v2/usage",
-                },
-                {
-                  type: "doc",
-                  id: "apis/actions/v2/testing-locally-request",
-                },
-                {
-                  type: "doc",
-                  id: "apis/actions/v2/testing-locally-response",
-                },
-                {
-                  type: "doc",
-                  id: "apis/actions/v2/testing-locally-function",
-                },
-                {
-                  type: "doc",
-                  id: "apis/actions/v2/testing-locally-event",
-                },
-              ].concat(sidebar_api_actions_v2),
+              items: sidebar_api_actions_v2,
             },
           ],
         },
