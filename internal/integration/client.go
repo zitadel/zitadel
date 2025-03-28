@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -157,6 +158,7 @@ func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserRes
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -181,6 +183,7 @@ func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHuman
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -212,7 +215,24 @@ func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *
 		TotpSecret: gu.Ptr(secret),
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
+}
+
+// TriggerUserByID makes sure the user projection gets triggered after creation.
+func (i *Instance) TriggerUserByID(ctx context.Context, users ...string) {
+	var wg sync.WaitGroup
+	wg.Add(len(users))
+	for _, user := range users {
+		go func(user string) {
+			defer wg.Done()
+			_, err := i.Client.UserV2.GetUserByID(ctx, &user_v2.GetUserByIDRequest{
+				UserId: user,
+			})
+			logging.OnError(err).Warn("get user by ID for trigger failed")
+		}(user)
+	}
+	wg.Wait()
 }
 
 func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail string) *org.AddOrganizationResponse {
@@ -238,6 +258,13 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 		},
 	})
 	logging.OnError(err).Panic("create org")
+
+	users := make([]string, len(resp.GetCreatedAdmins()))
+	for i, admin := range resp.GetCreatedAdmins() {
+		users[i] = admin.GetUserId()
+	}
+	i.TriggerUserByID(ctx, users...)
+
 	return resp
 }
 
@@ -302,6 +329,7 @@ func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email, phon
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -313,6 +341,7 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 		AccessTokenType: user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
