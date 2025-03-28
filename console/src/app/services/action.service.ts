@@ -5,20 +5,23 @@ import {
   CreateTargetRequestSchema,
   CreateTargetResponse,
   DeleteTargetRequestSchema,
-  DeleteTargetResponse,
+  GetTargetRequestSchema,
   GetTargetResponse,
+  ListExecutionFunctionsRequestSchema,
   ListExecutionFunctionsResponse,
+  ListExecutionMethodsRequestSchema,
   ListExecutionMethodsResponse,
+  ListExecutionServicesRequestSchema,
   ListExecutionServicesResponse,
-  PatchTargetRequestSchema,
-  PatchTargetResponse,
-  SearchExecutionsRequestSchema,
-  SearchExecutionsResponse,
-  SearchTargetsRequestSchema,
-  SearchTargetsResponse,
+  ListExecutionsRequestSchema,
+  ListExecutionsResponse,
+  ListTargetsRequestSchema,
+  ListTargetsResponse,
   SetExecutionRequestSchema,
   SetExecutionResponse,
-} from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
+  UpdateTargetRequestSchema,
+  UpdateTargetResponse,
+} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
 @Injectable({
   providedIn: 'root',
@@ -26,43 +29,49 @@ import {
 export class ActionService {
   constructor(private readonly grpcService: GrpcService) {}
 
-  public searchTargets(req: MessageInitShape<typeof SearchTargetsRequestSchema>): Promise<SearchTargetsResponse> {
-    return this.grpcService.actionNew.searchTargets(req);
-  }
-
-  public getTarget(id: string): Promise<GetTargetResponse> {
-    return this.grpcService.actionNew.getTarget({ id });
-  }
-
   public createTarget(req: MessageInitShape<typeof CreateTargetRequestSchema>): Promise<CreateTargetResponse> {
     return this.grpcService.actionNew.createTarget(req);
   }
 
-  public deleteTarget(req: MessageInitShape<typeof DeleteTargetRequestSchema>): Promise<DeleteTargetResponse> {
+  public deleteTarget(req: MessageInitShape<typeof DeleteTargetRequestSchema>): Promise<CreateTargetResponse> {
     return this.grpcService.actionNew.deleteTarget(req);
   }
 
-  public patchTarget(req: MessageInitShape<typeof PatchTargetRequestSchema>): Promise<PatchTargetResponse> {
-    return this.grpcService.actionNew.patchTarget(req);
+  public getTarget(req: MessageInitShape<typeof GetTargetRequestSchema>): Promise<GetTargetResponse> {
+    return this.grpcService.actionNew.getTarget(req);
+  }
+
+  public listExecutionFunctions(
+    req: MessageInitShape<typeof ListExecutionFunctionsRequestSchema>,
+  ): Promise<ListExecutionFunctionsResponse> {
+    return this.grpcService.actionNew.listExecutionFunctions(req);
+  }
+
+  public listExecutionMethods(
+    req: MessageInitShape<typeof ListExecutionMethodsRequestSchema>,
+  ): Promise<ListExecutionMethodsResponse> {
+    return this.grpcService.actionNew.listExecutionMethods(req);
+  }
+
+  public listExecutionServices(
+    req: MessageInitShape<typeof ListExecutionServicesRequestSchema>,
+  ): Promise<ListExecutionServicesResponse> {
+    return this.grpcService.actionNew.listExecutionServices(req);
+  }
+
+  public listExecutions(req: MessageInitShape<typeof ListExecutionsRequestSchema>): Promise<ListExecutionsResponse> {
+    return this.grpcService.actionNew.listExecutions(req);
+  }
+
+  public listTargets(req: MessageInitShape<typeof ListTargetsRequestSchema>): Promise<ListTargetsResponse> {
+    return this.grpcService.actionNew.listTargets(req);
   }
 
   public setExecution(req: MessageInitShape<typeof SetExecutionRequestSchema>): Promise<SetExecutionResponse> {
     return this.grpcService.actionNew.setExecution(req);
   }
 
-  public searchExecutions(req: MessageInitShape<typeof SearchExecutionsRequestSchema>): Promise<SearchExecutionsResponse> {
-    return this.grpcService.actionNew.searchExecutions(req);
-  }
-
-  public listExecutionFunctions(): Promise<ListExecutionFunctionsResponse> {
-    return this.grpcService.actionNew.listExecutionFunctions({});
-  }
-
-  public listExecutionServices(): Promise<ListExecutionServicesResponse> {
-    return this.grpcService.actionNew.listExecutionServices({});
-  }
-
-  public listExecutionMethods(): Promise<ListExecutionMethodsResponse> {
-    return this.grpcService.actionNew.listExecutionMethods({});
+  public updateTarget(req: MessageInitShape<typeof UpdateTargetRequestSchema>): Promise<UpdateTargetResponse> {
+    return this.grpcService.actionNew.updateTarget(req);
   }
 }

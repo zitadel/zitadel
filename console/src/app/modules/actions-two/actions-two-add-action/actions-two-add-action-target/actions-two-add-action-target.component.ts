@@ -11,15 +11,15 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { GetTarget } from '@zitadel/proto/zitadel/resources/action/v3alpha/target_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs/operators';
+import { Target as ZitadelTarget } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 
-type Target = Required<Pick<GetTarget, 'config' | 'details'>> & GetTarget;
+type Target = Required<Pick<ZitadelTarget, 'config' | 'details'>> & ZitadelTarget;
+
 export type TargetInit = NonNullable<
-  NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['execution']>['targets']
+  NonNullable<MessageInitShape<typeof ExecutionSchema>['execution']>['targets']
 >[number]['type'];
 
 @Component({
@@ -66,9 +66,8 @@ export class ActionsTwoAddActionTargetComponent {
   }
 
   private listExecutionTargets() {
-    return defer(() => this.actionService.searchTargets({})).pipe(
+    return defer(() => this.actionService.listTargets({})).pipe(
       map(({ result }) => result.filter(this.targetHasDetailsAndConfig)),
-      tap((target) => console.log('hoi', target)),
       catchError((error) => {
         this.toast.showError(error);
         return of([]);
@@ -76,7 +75,7 @@ export class ActionsTwoAddActionTargetComponent {
     );
   }
 
-  private targetHasDetailsAndConfig(target: GetTarget): target is Target {
+  private targetHasDetailsAndConfig(target: Target): target is Target {
     return !!target.details && !!target.config;
   }
 
@@ -87,7 +86,7 @@ export class ActionsTwoAddActionTargetComponent {
     }
     this.target.emit({
       case: 'target',
-      value: target.details.id,
+      value: target.id,
     });
   }
 
@@ -95,6 +94,6 @@ export class ActionsTwoAddActionTargetComponent {
     if (!target) {
       return '';
     }
-    return target.config.name;
+    return target.name;
   }
 }

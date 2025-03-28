@@ -580,9 +580,9 @@
         }
       },
       "TABLE": {
-        "CONDITION": "Name",
-        "TYPE": "Endpoint",
-        "TARGET": "Creation Date",
+        "CONDITION": "Condition",
+        "TYPE": "Type",
+        "TARGET": "Target",
         "CREATIONDATE": "Creation Date"
       }
     },

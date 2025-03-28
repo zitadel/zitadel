@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { ReplaySubject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
-import { GetExecution } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
+import { Execution } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions-table',
@@ -15,14 +15,14 @@ export class ActionsTwoActionsTableComponent {
   public readonly refresh = new EventEmitter<void>();
 
   @Output()
-  public readonly delete = new EventEmitter<GetExecution>();
+  public readonly delete = new EventEmitter<Execution>();
 
   @Input({ required: true })
-  public set executions(executions: GetExecution[] | null) {
+  public set executions(executions: Execution[] | null) {
     this.executions$.next(executions);
   }
 
-  private readonly executions$ = new ReplaySubject<GetExecution[] | null>(1);
+  private readonly executions$ = new ReplaySubject<Execution[] | null>(1);
   protected readonly dataSource$ = this.executions$.pipe(
     filter(Boolean),
     map((keys) => new MatTableDataSource(keys)),

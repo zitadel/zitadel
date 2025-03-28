@@ -2,16 +2,16 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular
 import { ActionService } from 'src/app/services/action.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { defer, firstValueFrom, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
-import { catchError, filter, map, timeout } from 'rxjs/operators';
+import { catchError, filter, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
-import { Execution, GetExecution } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANIZATIONS } from '../../settings-list/settings';
 import { ActionTwoAddActionDialogComponent } from '../actions-two-add-action/actions-two-add-action-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
+import { Execution, ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -22,7 +22,7 @@ import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/acti
 export class ActionsTwoActionsComponent implements OnInit {
   protected readonly refresh = new Subject<true>();
   private readonly actionsEnabled$: Observable<boolean>;
-  protected readonly executions$: Observable<GetExecution[]>;
+  protected readonly executions$: Observable<Execution[]>;
 
   constructor(
     private readonly actionService: ActionService,
@@ -54,7 +54,12 @@ export class ActionsTwoActionsComponent implements OnInit {
   }
 
   private getExecutions$(actionsEnabled$: Observable<boolean>) {
-    return defer(() => this.actionService.searchExecutions({})).pipe(
+    return this.refresh.pipe(
+      startWith(true),
+      switchMap(() => {
+        return this.actionService.listExecutions({});
+      }),
+      tap(console.log),
       map(({ result }) => result),
       catchError(async (err) => {
         const actionsEnabled = await firstValueFrom(actionsEnabled$);
@@ -100,5 +105,5 @@ export class ActionsTwoActionsComponent implements OnInit {
     });
   }
 
-  public deleteExecution(execution: GetExecution) {}
+  public deleteExecution(execution: Execution) {}
 }

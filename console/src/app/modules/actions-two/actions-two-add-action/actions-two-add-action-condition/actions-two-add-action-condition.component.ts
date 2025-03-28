@@ -7,15 +7,15 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap } from 'rxjs';
+import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap, tap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import { Condition } from '@zitadel/proto/zitadel/resources/action/v3alpha/execution_pb';
 import { Message } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 
 export type ConditionType = NonNullable<Condition['conditionType']['case']>;
 export type ConditionTypeValue<T extends ConditionType> = Omit<
@@ -68,7 +68,20 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     this.executionMethods$ = this.listExecutionMethods().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionFunctions$ = this.listExecutionFunctions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
-    this.form$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((form) => this.submit(form));
+    this.form$
+      .pipe(
+        switchMap((form) =>
+          form.form.valueChanges.pipe(
+            //@ts-ignore
+            map(() => form), // Pass the form object along with the value changes
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef), // Ensure cleanup on component destruction
+      )
+      .subscribe((form) => {
+        // console.log('Form value changed:', form.form.getRawValue());
+        this.submit(form as any); // Call the submit method with the form
+      });
   }
 
   public buildForm() {
@@ -157,7 +170,7 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
   }
 
   private listExecutionServices() {
-    return defer(() => this.actionService.listExecutionServices()).pipe(
+    return defer(() => this.actionService.listExecutionServices({})).pipe(
       map(({ services }) => services),
       catchError((error) => {
         this.toast.showError(error);
@@ -167,7 +180,7 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
   }
 
   private listExecutionFunctions() {
-    return defer(() => this.actionService.listExecutionFunctions()).pipe(
+    return defer(() => this.actionService.listExecutionFunctions({})).pipe(
       map(({ functions }) => functions),
       catchError((error) => {
         this.toast.showError(error);
@@ -177,7 +190,7 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
   }
 
   private listExecutionMethods() {
-    return defer(() => this.actionService.listExecutionMethods()).pipe(
+    return defer(() => this.actionService.listExecutionMethods({})).pipe(
       map(({ methods }) => methods),
       catchError((error) => {
         this.toast.showError(error);

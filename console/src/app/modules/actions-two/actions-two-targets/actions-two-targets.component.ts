@@ -7,14 +7,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ORGANIZATIONS } from '../../settings-list/settings';
 import { catchError, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
-import { GetTarget } from '@zitadel/proto/zitadel/resources/action/v3alpha/target_pb';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionTwoAddTargetDialogComponent } from '../actions-two-add-target/actions-two-add-target-dialog.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import {
-  CreateTargetRequestSchema,
-  PatchTargetRequestSchema,
-} from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
+import { Target, TargetSchema } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 
 @Component({
   selector: 'cnsl-actions-two-targets',
@@ -24,7 +20,7 @@ import {
 })
 export class ActionsTwoTargetsComponent implements OnInit {
   private readonly actionsEnabled$: Observable<boolean>;
-  protected readonly targets$: Observable<GetTarget[]>;
+  protected readonly targets$: Observable<Target[]>;
   protected readonly refresh = new Subject<true>();
 
   constructor(
@@ -60,7 +56,7 @@ export class ActionsTwoTargetsComponent implements OnInit {
     return this.refresh.pipe(
       startWith(true),
       switchMap(() => {
-        return this.actionService.searchTargets({});
+        return this.actionService.listTargets({});
       }),
       map(({ result }) => result),
       catchError(async (err) => {
@@ -86,14 +82,14 @@ export class ActionsTwoTargetsComponent implements OnInit {
     );
   }
 
-  public async deleteTarget(target: GetTarget) {
-    this.actionService.deleteTarget({ id: target.details?.id });
+  public async deleteTarget(target: Target) {
+    this.actionService.deleteTarget({ id: target.id });
     setTimeout(() => {
       this.refresh.next(true);
     }, 1000);
   }
 
-  public openDialog(target?: GetTarget): void {
+  public openDialog(target?: Target): void {
     const ref = this.dialog.open(ActionTwoAddTargetDialogComponent, {
       width: '550px',
       data: target
@@ -104,16 +100,16 @@ export class ActionsTwoTargetsComponent implements OnInit {
     });
 
     ref.afterClosed().subscribe((dialogResponse) => {
-      if (target?.details?.id && dialogResponse) {
-        const req: MessageInitShape<typeof PatchTargetRequestSchema> = dialogResponse;
+      if (target?.id && dialogResponse) {
+        const req: MessageInitShape<typeof TargetSchema> = dialogResponse;
 
-        this.actionService.patchTarget({ ...req, id: target.details?.id });
+        this.actionService.updateTarget({ ...req, id: target.id });
         setTimeout(() => {
           this.refresh.next(true);
         }, 1000);
       }
       if (dialogResponse) {
-        const req: MessageInitShape<typeof CreateTargetRequestSchema> = dialogResponse;
+        const req: MessageInitShape<typeof TargetSchema> = dialogResponse;
 
         this.actionService.createTarget(req);
         setTimeout(() => {

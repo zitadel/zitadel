@@ -4,7 +4,6 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActionsTwoAddActionTypeComponent } from './actions-two-add-action-type/actions-two-add-action-type.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
 import {
   ActionsTwoAddActionConditionComponent,
   ConditionType,
@@ -14,6 +13,7 @@ import {
   TargetInit,
 } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
+import { ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 
 enum Page {
   Type,
@@ -21,7 +21,7 @@ enum Page {
   Target,
 }
 
-type ConditionInit = NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['condition']>['conditionType'];
+type ConditionInit = NonNullable<MessageInitShape<typeof ExecutionSchema>['condition']>['conditionType'];
 
 @Component({
   selector: 'cnsl-actions-two-add-action-dialog',
@@ -46,10 +46,25 @@ export class ActionTwoAddActionDialogComponent {
   public conditionSignal = signal<ConditionInit | undefined>(undefined);
   public targetSignal = signal<TargetInit | undefined>(undefined);
 
-  public request = computed<MessageInitShape<typeof SetExecutionRequestSchema>>(() => {
+  public request = computed<MessageInitShape<typeof ExecutionSchema>>(() => {
     return {
       condition: {
-        conditionType: this.conditionSignal(),
+        // conditionType: this.conditionSignal(),
+        // conditionType: {
+        //   case: 'function',
+        //   value: {
+        //     name: 'Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PreCreation',
+        //   },
+        // },
+        conditionType: {
+          case: 'request',
+          value: {
+            condition: {
+              case: 'service',
+              value: 'zitadel.saml.v2.SAMLService',
+            },
+          },
+        },
       },
       execution: {
         targets: [

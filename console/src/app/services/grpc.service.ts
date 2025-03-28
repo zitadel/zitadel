@@ -24,15 +24,16 @@ import { createAuthServiceClient, createManagementServiceClient } from '@zitadel
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 // @ts-ignore
 import { createClientFor } from '@zitadel/client';
-import { ZITADELActions } from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
 import { Client, Transport } from '@connectrpc/connect';
 
-const createActionServiceClient: (transport: Transport) => Client<typeof ZITADELActions> = createClientFor(ZITADELActions);
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+
 // @ts-ignore
 import { createClientFor } from '@zitadel/client';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);
+const createActionServiceClient = createClientFor(ActionService);
 
 @Injectable({
   providedIn: 'root',

@@ -1,20 +1,7 @@
-import { AfterViewInit, Component, Inject, signal, ViewChild } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogModule,
-  MatDialogRef,
-  MatDialogTitle,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import {
-  CreateTargetRequestSchema,
-  PatchTargetRequestSchema,
-  SetExecutionRequestSchema,
-} from '@zitadel/proto/zitadel/resources/action/v3alpha/action_service_pb';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -22,8 +9,8 @@ import { InputModule } from '../../input/input.module';
 import { requiredValidator } from '../../form-field/validators/validators';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { DurationSchema } from '@bufbuild/protobuf/wkt';
-import { GetTarget, Target } from '@zitadel/proto/zitadel/resources/action/v3alpha/target_pb';
 import { MatSelectModule } from '@angular/material/select';
+import { Target, TargetSchema } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 
 enum TargetType {
   RestWebhook = 'restWebhook',
@@ -55,11 +42,8 @@ export class ActionTwoAddTargetDialogComponent {
 
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<
-      ActionTwoAddTargetDialogComponent,
-      MessageInitShape<typeof CreateTargetRequestSchema> | MessageInitShape<typeof PatchTargetRequestSchema>
-    >,
-    @Inject(MAT_DIALOG_DATA) public data: { target: GetTarget },
+    public dialogRef: MatDialogRef<ActionTwoAddTargetDialogComponent, MessageInitShape<typeof TargetSchema>>,
+    @Inject(MAT_DIALOG_DATA) public data: { target: Target },
   ) {
     console.log(data.target);
 
@@ -67,12 +51,12 @@ export class ActionTwoAddTargetDialogComponent {
 
     if (data.target) {
       this.targetForm.patchValue({
-        name: data.target.config?.name,
-        endpoint: data.target.config?.endpoint,
-        timeout: Number(data.target.config?.timeout?.seconds),
+        name: data.target?.name,
+        endpoint: data.target.endpoint,
+        timeout: Number(data.target.timeout?.seconds),
         interrupt_on_error:
-          data.target.config?.targetType.case === 'restWebhook' || data.target.config?.targetType.case === 'restCall'
-            ? data.target.config?.targetType.value.interruptOnError
+          data.target.targetType.case === 'restWebhook' || data.target.targetType.case === 'restCall'
+            ? data.target.targetType.value.interruptOnError
             : false,
       });
     }
@@ -95,19 +79,17 @@ export class ActionTwoAddTargetDialogComponent {
         nanos: 0,
       };
 
-      let req: MessageInitShape<typeof PatchTargetRequestSchema> | MessageInitShape<typeof CreateTargetRequestSchema> = {
-        target: {
-          name: this.targetForm.get('name')?.value ?? '',
-          endpoint: this.targetForm.get('endpoint')?.value ?? '',
-          timeout: timeoutDuration,
-          targetType: {
-            case: this.targetType as 'restWebhook' | 'restCall',
-            value: {
-              interruptOnError:
-                this.targetType == 'restWebhook' || this.targetType == 'restCall'
-                  ? !!this.targetForm.get('interrupt_on_error')?.value
-                  : undefined,
-            },
+      let req: MessageInitShape<typeof TargetSchema> = {
+        name: this.targetForm.get('name')?.value ?? '',
+        endpoint: this.targetForm.get('endpoint')?.value ?? '',
+        timeout: timeoutDuration,
+        targetType: {
+          case: this.targetType as 'restWebhook' | 'restCall',
+          value: {
+            interruptOnError:
+              this.targetType == 'restWebhook' || this.targetType == 'restCall'
+                ? !!this.targetForm.get('interrupt_on_error')?.value
+                : undefined,
           },
         },
       };
