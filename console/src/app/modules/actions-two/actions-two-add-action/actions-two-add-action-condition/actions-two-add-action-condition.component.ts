@@ -19,6 +19,7 @@ import {
   switchMap,
   tap,
   Subject,
+  take,
 } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
@@ -56,12 +57,13 @@ export type ConditionTypeValue<T extends ConditionType> = Omit<
     MatProgressSpinnerModule,
   ],
 })
-export class ActionsTwoAddActionConditionComponent<T extends ConditionType = ConditionType> implements OnInit {
+export class ActionsTwoAddActionConditionComponent<T extends ConditionType = ConditionType> {
   @Input({ required: true }) public set conditionType(conditionType: T) {
     this.conditionType$.next(conditionType);
   }
-  @Output() public readonly conditionTypeValue = new EventEmitter<ConditionTypeValue<T>>();
-  @Input() public continue: Subject<void> = new Subject<void>();
+  @Output() public readonly back = new EventEmitter<void>();
+  @Output() public readonly continue = new EventEmitter<ConditionTypeValue<T>>();
+
   private readonly conditionType$ = new ReplaySubject<T>(1);
   protected readonly form$: ReturnType<typeof this.buildForm>;
 
@@ -79,19 +81,6 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     this.executionServices$ = this.listExecutionServices().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionMethods$ = this.listExecutionMethods().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.executionFunctions$ = this.listExecutionFunctions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-
-    this.form$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((form) => this.submit(form));
-  }
-
-  ngOnInit(): void {
-    this.continue
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        switchMap(() => this.form$),
-      )
-      .subscribe((form) => {
-        this.submit(form);
-      });
   }
 
   public buildForm() {
@@ -209,7 +198,13 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     );
   }
 
-  protected submit(form: ObservedValueOf<typeof this.form$>) {
+  protected submit() {
+    this.form$.pipe(take(1)).subscribe((form) => {
+      this.submitForm(form);
+    });
+  }
+
+  protected submitForm(form: ObservedValueOf<typeof this.form$>) {
     if (form.case === 'request' || form.case === 'response') {
       (this as unknown as ActionsTwoAddActionConditionComponent<'request' | 'response'>).submitRequestOrResponse(form);
     } else if (form.case === 'event') {
@@ -227,21 +222,21 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     console.log(all, service, method);
 
     if (all) {
-      this.conditionTypeValue.emit({
+      this.continue.emit({
         condition: {
           case: 'all',
           value: true,
         },
       });
     } else if (method) {
-      this.conditionTypeValue.emit({
+      this.continue.emit({
         condition: {
           case: 'method',
           value: method,
         },
       });
     } else if (service) {
-      this.conditionTypeValue.emit({
+      this.continue.emit({
         condition: {
           case: 'service',
           value: service,
@@ -256,21 +251,21 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
   ) {
     const { all, event, group } = form.getRawValue();
     if (all) {
-      this.conditionTypeValue.emit({
+      this.continue.emit({
         condition: {
           case: 'all',
           value: true,
         },
       });
     } else if (event) {
-      this.conditionTypeValue.emit({
+      this.continue.emit({
         condition: {
           case: 'event',
           value: event,
         },
       });
     } else if (group) {
-      this.conditionTypeValue.emit({
+      this.continue.emit({
         condition: {
           case: 'group',
           value: group,
@@ -284,7 +279,7 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     { form }: ObservedValueOf<ReturnType<typeof this.buildFunctionForm>>,
   ) {
     const { name } = form.getRawValue();
-    this.conditionTypeValue.emit({
+    this.continue.emit({
       name,
     });
   }

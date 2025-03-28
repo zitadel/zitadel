@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, catchError, defer, map, of, shareReplay } from 'rxjs';
+import { Observable, Subject, catchError, defer, map, of, shareReplay } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -42,7 +42,8 @@ export type TargetInit = NonNullable<
 export class ActionsTwoAddActionTargetComponent {
   protected readonly targetForm = this.buildActionTargetForm();
 
-  @Output() public readonly target = new EventEmitter<TargetInit>();
+  @Output() public readonly back = new EventEmitter<void>();
+  @Output() public readonly continue = new EventEmitter<TargetInit>();
 
   protected readonly executionTargets$: Observable<Target[]>;
 
@@ -50,11 +51,8 @@ export class ActionsTwoAddActionTargetComponent {
     private readonly fb: FormBuilder,
     private readonly actionService: ActionService,
     private readonly toast: ToastService,
-    destroyRef: DestroyRef,
   ) {
     this.executionTargets$ = this.listExecutionTargets().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-
-    this.targetForm.valueChanges.pipe(takeUntilDestroyed(destroyRef)).subscribe(() => this.submit());
   }
 
   public buildActionTargetForm() {
@@ -77,12 +75,12 @@ export class ActionsTwoAddActionTargetComponent {
     return !!target.id && !!target.id;
   }
 
-  private submit() {
+  protected submit() {
     const { target } = this.targetForm.getRawValue();
     if (!target) {
       return;
     }
-    this.target.emit({
+    this.continue.emit({
       case: 'target',
       value: target.id,
     });

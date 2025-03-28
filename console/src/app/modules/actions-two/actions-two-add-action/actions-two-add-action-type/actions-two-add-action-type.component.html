@@ -1,6 +1,6 @@
 <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.TYPE.DESCRIPTION' | translate }}</p>
 
-<form class="form-grid" [formGroup]="typeForm" (ngSubmit)="continue.emit()">
+<form class="form-grid" [formGroup]="typeForm" (ngSubmit)="submit()">
   <div class="executionType">
     <mat-radio-group class="execution-radio-group" aria-label="Select an option" formControlName="executionType">
       <mat-radio-button class="execution-radio-button" [value]="'request'">
@@ -38,18 +38,12 @@
     </mat-radio-group>
   </div>
 
-  <!-- <div>
-    <button
-      data-e2e="create-button"
-      color="primary"
-      [disabled]="
-        userForm.invalid || (authenticationFactor.factor === 'initialPassword' && authenticationFactor.form.invalid)
-      "
-      type="submit"
-      class="create-button"
-      mat-raised-button
-    >
-      {{ 'ACTIONS.CREATE' | translate }}
+  <div class="actions">
+    <button mat-stroked-button (click)="back.emit()">
+      {{ 'ACTIONS.CANCEL' | translate }}
     </button>
-  </div> -->
+    <button color="primary" mat-raised-button type="submit">
+      {{ 'ACTIONS.CONTINUE' | translate }}
+    </button>
+  </div>
 </form>

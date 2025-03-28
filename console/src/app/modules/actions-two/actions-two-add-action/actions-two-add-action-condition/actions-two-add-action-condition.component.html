@@ -1,4 +1,4 @@
-<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid">
+<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit()">
   <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
     <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
 
@@ -155,4 +155,13 @@
       }}</span>
     </cnsl-form-field>
   </ng-container>
+
+  <div class="actions">
+    <button mat-stroked-button (click)="back.emit()">
+      {{ 'ACTIONS.BACK' | translate }}
+    </button>
+    <button color="primary" mat-raised-button type="submit">
+      {{ 'ACTIONS.CONTINUE' | translate }}
+    </button>
+  </div>
 </form>

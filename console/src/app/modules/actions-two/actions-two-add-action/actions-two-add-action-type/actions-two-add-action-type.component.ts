@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
+import { Observable, Subject, map, of, startWith, switchMap, tap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ConditionType } from '../actions-two-add-action-condition/actions-two-add-action-condition.component';
 
@@ -25,8 +25,10 @@ import { ConditionType } from '../actions-two-add-action-condition/actions-two-a
 })
 export class ActionsTwoAddActionTypeComponent {
   protected readonly typeForm: ReturnType<typeof this.buildActionTypeForm> = this.buildActionTypeForm();
-  @Output() public readonly continue = new EventEmitter<void>();
   @Output() public readonly typeChanges$: Observable<ConditionType>;
+
+  @Output() public readonly back = new EventEmitter<void>();
+  @Output() public readonly continue = new EventEmitter<ConditionType>();
 
   constructor(private readonly fb: FormBuilder) {
     this.typeChanges$ = this.typeForm.get('executionType')!.valueChanges.pipe(
@@ -40,5 +42,9 @@ export class ActionsTwoAddActionTypeComponent {
         nonNullable: true,
       }),
     });
+  }
+
+  public submit() {
+    this.continue.emit(this.typeForm.get('executionType')!.value);
   }
 }

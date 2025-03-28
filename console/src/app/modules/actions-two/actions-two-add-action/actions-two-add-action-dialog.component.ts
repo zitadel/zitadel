@@ -32,8 +32,6 @@ enum Page {
   Target,
 }
 
-type ConditionInit = NonNullable<MessageInitShape<typeof ExecutionSchema>['condition']>['conditionType'];
-
 @Component({
   selector: 'cnsl-actions-two-add-action-dialog',
   templateUrl: './actions-two-add-action-dialog.component.html',
@@ -101,7 +99,7 @@ export class ActionTwoAddActionDialogComponent {
     }
   }
 
-  public previous() {
+  public back() {
     const currentPage = this.page();
     if (currentPage === Page.Target) {
       this.page.set(Page.Condition);

@@ -1,4 +1,4 @@
-<form *ngIf="targetForm" class="form-grid" [formGroup]="targetForm">
+<form *ngIf="targetForm" class="form-grid" [formGroup]="targetForm" (ngSubmit)="submit()">
   <p class="target-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.TITLE' | translate }}</p>
 
   <cnsl-form-field class="full-width">
@@ -21,4 +21,13 @@
       </mat-option>
     </mat-autocomplete>
   </cnsl-form-field>
+
+  <div class="actions">
+    <button mat-stroked-button (click)="back.emit()">
+      {{ 'ACTIONS.BACK' | translate }}
+    </button>
+    <button color="primary" mat-raised-button type="submit">
+      {{ 'ACTIONS.CONTINUE' | translate }}
+    </button>
+  </div>
 </form>
