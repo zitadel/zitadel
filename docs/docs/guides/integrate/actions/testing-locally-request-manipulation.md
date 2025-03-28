@@ -1,8 +1,8 @@
 ---
-title: Test Actions Locally
+title: Test Actions Request Locally
 ---
 
-In this guide, you will create a ZITADEL execution and target. After a user is created through the API, the target is called.
+In this guide, you will create a ZITADEL execution and target. Before a user is created through the API, the target is called.
 
 ## Prerequisites
 
@@ -13,19 +13,25 @@ Before you start, make sure you have everything set up correctly.
 
 ## Start example target
 
-To start a simple HTTP server locally, which receives the webhook call, the following code example can be used:
+To start a simple HTTP server locally, which receives the call and manipulated the request, the following code example can be used:
 
 ```go
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"io"
 	"net/http"
+
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-// webhook HandleFunc to read the request body and then print out the contents
-func webhook(w http.ResponseWriter, req *http.Request) {
+type contextRequest struct {
+	Request *user.AddHumanUserRequest `json:"request"`
+}
+
+// call HandleFunc to read the request body, manipulate the content and return the request
+func call(w http.ResponseWriter, req *http.Request) {
 	// read the body content
 	sentBody, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -33,20 +39,44 @@ func webhook(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
-	// print out the read content
-	fmt.Println(string(sentBody))
+
+	// read the request into the expected structure
+	request := new(infoRequest)
+	if err := json.Unmarshal(sentBody, request); err != nil {
+		http.Error(w, "error", http.StatusInternalServerError)
+	}
+    
+	// build the response from the received request
+	response := request.Request
+	// manipulate the request to send back as response
+	if response.Metadata == nil {
+		response.Metadata = make([]*user.SetMetadataEntry, 0)
+	}
+	response.Metadata = append(response.Metadata, &user.SetMetadataEntry{Key: "organization", Value: []byte("company")})
+
+	// marshal the request into json
+	data, err := json.Marshal(response)
+	if err != nil {
+		// if there was an error while marshalling the json
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+
+	// return the manipulated request
+	w.Write(data)
 }
 
 func main() {
 	// handle the HTTP call under "/webhook"
-	http.HandleFunc("/webhook", webhook)
+	http.HandleFunc("/call", call)
 
 	// start an HTTP server with the before defined function to handle the endpoint under "http://localhost:8090"
 	http.ListenAndServe(":8090", nil)
 }
+
 ```
 
-What happens here is only a target which prints out the received request, which could also be handled with a different logic.
+What happens here is that the target receives the request Zitadel receives, adds a metadata entry to the request and returns it.
 
 ### Check Signature
 
@@ -64,7 +94,7 @@ Where you can replace 'signingKey' with the key received in the next step 'Creat
 
 ## Create target
 
-As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
+As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
 
 [Create a target](/apis/resources/action_service_v2/action-service-create-target)
 
@@ -74,8 +104,8 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-  "name": "local webhook",
-  "restWebhook": {
+  "name": "local call",
+  "restCall": {
     "interruptOnError": true    
   },
   "endpoint": "http://localhost:8090/webhook",
@@ -87,7 +117,7 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To call the target just created before, with the intention to print the request used for user creation by the user V2 API, we define an execution with a method condition.
+To call the target just created before, with the intention to manipulate the request used for user creation by the user V2 API, we define an execution with a method condition.
 
 [Set an execution](/apis/resources/action_service_v2/action-service-set-execution)
 
@@ -112,7 +142,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now on every call on `/zitadel.user.v2.UserService/AddHumanUser` the local server prints out the received body of the request:
+Now on every call on `/zitadel.user.v2.UserService/AddHumanUser` the local server adds metadata to the request:
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
@@ -130,24 +160,24 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 }'
 ```
 
-Should print out something like, also described under [Sent information Request](./usage#sent-information-request):
+Resulting in a request like this:
+
 ```shell
-{
-  "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
-  "instanceID": "262851882718855632",
-  "orgID": "262851882718921168",
-  "projectID": "262851882719052240",
-  "userID": "262851882718986704",
-  "request": {
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H 'Authorization: Bearer <TOKEN>' \
+--data-raw '{
     "profile": {
-      "given_name": "Example_given",
-      "family_name": "Example_family"
+        "givenName": "Example_given",
+        "familyName": "Example_family"
     },
     "email": {
-      "email": "example@example.com"
+        "email": "example@example.com"
     }
-  }
-}
+    "metadata": [
+        {"key": "organization", "value": "Y29tcGFueQ=="}
+    ]
+}'
 ```
-
 

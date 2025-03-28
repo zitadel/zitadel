@@ -50,6 +50,79 @@ The information sent to the Endpoint is structured as JSON:
 }
 ```
 
+### Sent information Function
+
+Information sent and expected back are specific to the function.
+
+#### PreUserinfo
+
+The information sent to the Endpoint is structured as JSON:
+
+```json
+{
+  "function": "Name of the function",
+  "userinfo": "Currently available userinfo",
+  "user": "Information about the user",
+  "user_metadata": "List of metadata belonging to the user",
+  "org": "Information about the organization the user belongs to",
+  "user_grants": "List of grants belonging to a user"
+}
+```
+
+The expected structure of the JSON as response:
+
+```json
+{
+  "set_user_metadata": "List of metadata to be set on the user",
+  "append_claims": "List of claims to be appended to the token",
+  "append_log_claims": "List of logs to be appended to the log claim on the token"
+}
+```
+
+#### PreAccessToken
+
+The information sent to the Endpoint is structured as JSON:
+
+```json
+{
+  "function": "Name of the function",
+  "userinfo": "Currently available userinfo",
+  "user": "Information about the user",
+  "user_metadata": "List of metadata belonging to the user",
+  "org": "Information about the organization the user belongs to",
+  "user_grants": "List of grants belonging to a user"
+}
+```
+
+The expected structure of the JSON as response:
+
+```json
+{
+  "set_user_metadata": "List of metadata to be set on the user",
+  "append_claims": "List of claims to be appended to the token",
+  "append_log_claims": "List of logs to be appended to the log claim on the token"
+}
+```
+
+### Sent information Event
+
+The information sent to the Endpoint is structured as JSON:
+
+```json
+{
+  "aggregateID": "ID of the aggregate",
+  "aggregateType": "Type of the aggregate",
+  "resourceOwner": "Resourceowner the aggregate belongs to",
+  "instanceID": "ID of the instance the aggregate belongs to",
+  "version": "Version of the aggregate",
+  "sequence": "Sequence of the event",
+  "event_type": "Type of the event",
+  "created_at": "Time the event was created",
+  "userID": "ID of the creator of the event",
+  "event_payload": "Content of the event"
+}
+```
+
 ## Target
 
 The Target describes how ZITADEL interacts with the Endpoint.
@@ -169,13 +242,6 @@ The available conditions can be found under:
 - [All available Services](/apis/resources/action_service_v2/action-service-list-execution-services), for example `zitadel.user.v2.UserService`
 
 ### Condition for Functions
-
-Replace the current Actions with the following flows:
-
-- [Internal Authentication](/apis/actions/internal-authentication)
-- [External Authentication](/apis/actions/external-authentication)
-- [Complement Token](/apis/actions/complement-token)
-- [Customize SAML Response](/apis/actions/customize-samlresponse)
 
 The available conditions can be found under [all available Functions](/apis/resources/action_service_v2/action-service-list-execution-functions).
 
