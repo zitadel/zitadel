@@ -509,6 +509,7 @@
     "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
     "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
     "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
+    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací klienty",
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",

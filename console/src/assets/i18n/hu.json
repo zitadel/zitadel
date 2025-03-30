@@ -509,6 +509,7 @@
     "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
     "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
     "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
+    "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési kliensek kezelésére",
     "ORG_OWNER": "Engedélye van az egész szervezet fölött",
     "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
