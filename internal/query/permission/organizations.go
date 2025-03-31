@@ -23,26 +23,25 @@ type permittedOrgsBuilder struct {
 	systemPermissions []authz.SystemUserPermissions
 	permission        string
 	orgID             string
+	overrides         []sq.Eq
+}
 
-	// options
-	userIDCol string
+func (b *permittedOrgsBuilder) appendOverride(column string, value any) {
+	b.overrides = append(b.overrides, sq.Eq{column: value})
 }
 
 func (b *permittedOrgsBuilder) clauses() sq.Or {
-	clauses := sq.Or{
-		sq.Expr(
-			fmt.Sprintf(wherePermittedOrgsExpr, b.orgIDColumn),
-			b.instanceID,
-			b.userID,
-			database.NewJSONArray(b.systemPermissions),
-			b.permission,
-			b.orgID,
-		),
-	}
-	if b.userIDCol != "" {
-		clauses = append(clauses, sq.Eq{
-			b.userIDCol: b.userID,
-		})
+	clauses := make(sq.Or, 1, len(b.overrides)+1)
+	clauses[0] = sq.Expr(
+		fmt.Sprintf(wherePermittedOrgsExpr, b.orgIDColumn),
+		b.instanceID,
+		b.userID,
+		database.NewJSONArray(b.systemPermissions),
+		b.permission,
+		b.orgID,
+	)
+	for _, include := range b.overrides {
+		clauses = append(clauses, include)
 	}
 	return clauses
 }
@@ -54,7 +53,15 @@ type OrgsOption func(b *permittedOrgsBuilder)
 // For example an authenticated user can always see his own user account.
 func OwnedRowsOption(userIDColumn string) OrgsOption {
 	return func(b *permittedOrgsBuilder) {
-		b.userIDCol = userIDColumn
+		b.appendOverride(userIDColumn, b.userID)
+	}
+}
+
+// OverrideOption allows returning of rows where the value is matched.
+// Even if the user does not have an explicit permission for the organization.
+func OverrideOption(column string, value any) OrgsOption {
+	return func(b *permittedOrgsBuilder) {
+		b.appendOverride(column, value)
 	}
 }
 
@@ -82,7 +89,7 @@ func OrgsFilter(ctx context.Context, query sq.SelectBuilder, orgIDCol, filterOrg
 		"system_user_permissions", b.systemPermissions,
 		"permission", b.permission,
 		"org_id", b.orgID,
-		"user_id_colum", b.userIDCol,
+		"overrides", b.overrides,
 	).Debug("permitted orgs check used")
 
 	return query.Where(b.clauses())
