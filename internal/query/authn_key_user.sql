@@ -3,9 +3,10 @@ from projections.authn_keys2 k
 join projections.users13 u
 	on k.instance_id = u.instance_id
 	and k.identifier = u.id
-join projections.users13_machines m 
+join projections.users13_machines m
 	on u.instance_id = m.instance_id
 	and u.id = m.user_id
 where k.instance_id = $1
 	and k.id = $2
-	and u.id = $3;
+	and u.id = $3
+    and k.expiration > current_timestamp;
