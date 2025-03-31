@@ -1,17 +1,12 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
 import { Group, GroupState } from 'src/app/proto/generated/zitadel/group_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
@@ -47,14 +42,10 @@ export class UserGroupsComponent implements OnInit {
     ];
 
     constructor(
-        private router: Router,
         public translate: TranslateService,
-        private authService: GrpcAuthService,
         private groupService: ManagementService,
         private toast: ToastService,
         private dialog: MatDialog,
-        private route: ActivatedRoute,
-        private _liveAnnouncer: LiveAnnouncer,
       ) {
         
       }
