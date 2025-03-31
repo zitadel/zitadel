@@ -6,7 +6,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import {
   Observable,
   catchError,
@@ -97,14 +105,30 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     );
   }
 
+  private atLeastOneFieldValidator(fields: string[]): ValidatorFn {
+    return (formGroup: AbstractControl): ValidationErrors | null => {
+      const isValid = fields.some((field) => {
+        const control = formGroup.get(field);
+        return control && control.value;
+      });
+
+      return isValid ? null : { atLeastOneRequired: true }; // Return an error if none are set
+    };
+  }
+
   private buildRequestOrResponseForm<T extends 'request' | 'response'>(requestOrResponse: T) {
     const formFactory = () => ({
       case: requestOrResponse,
-      form: this.fb.group({
-        all: new FormControl<boolean>(false, { nonNullable: true }),
-        service: new FormControl<string>('', { nonNullable: true }),
-        method: new FormControl<string>('', { nonNullable: true }),
-      }),
+      form: this.fb.group(
+        {
+          all: new FormControl<boolean>(false, { nonNullable: true }),
+          service: new FormControl<string>('', { nonNullable: true }),
+          method: new FormControl<string>('', { nonNullable: true }),
+        },
+        {
+          validators: this.atLeastOneFieldValidator(['all', 'service', 'method']),
+        },
+      ),
     });
 
     return new Observable<ReturnType<typeof formFactory>>((obs) => {
@@ -219,7 +243,6 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     { form }: ObservedValueOf<ReturnType<typeof this.buildRequestOrResponseForm>>,
   ) {
     const { all, service, method } = form.getRawValue();
-    console.log(all, service, method);
 
     if (all) {
       this.continue.emit({

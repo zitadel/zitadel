@@ -15,7 +15,11 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
-import { ExecutionTargetType, ExecutionTargetTypeSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import {
+  Condition,
+  ExecutionTargetType,
+  ExecutionTargetTypeSchema,
+} from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 
 export type TargetInit = NonNullable<
   NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['targets']>
@@ -48,6 +52,7 @@ export class ActionsTwoAddActionTargetComponent {
   @Input() public hideBackButton = false;
 
   protected readonly executionTargets$: Observable<Target[]>;
+  // protected readonly executionConditions$: Observable<Condition[]>;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -55,6 +60,7 @@ export class ActionsTwoAddActionTargetComponent {
     private readonly toast: ToastService,
   ) {
     this.executionTargets$ = this.listExecutionTargets().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    // this.executionConditions$ = this.listExecutionConditions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
   }
 
   private buildActionTargetForm() {
@@ -66,6 +72,24 @@ export class ActionsTwoAddActionTargetComponent {
   private listExecutionTargets() {
     return defer(() => this.actionService.listTargets({})).pipe(
       map(({ result }) => result.filter(this.targetHasDetailsAndConfig)),
+      catchError((error) => {
+        this.toast.showError(error);
+        return of([]);
+      }),
+    );
+  }
+
+  private listExecutionConditions() {
+    return defer(() => this.actionService.listExecutions({})).pipe(
+      map(({ result }) => {
+        const conditions = result
+          .map((execution) => {
+            return execution.condition;
+          })
+          .filter((c) => !!c);
+
+        return conditions.filter(Boolean);
+      }),
       catchError((error) => {
         this.toast.showError(error);
         return of([]);

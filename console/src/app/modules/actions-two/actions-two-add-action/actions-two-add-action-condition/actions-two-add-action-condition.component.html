@@ -125,7 +125,7 @@
     <button mat-stroked-button (click)="back.emit()">
       {{ 'ACTIONS.BACK' | translate }}
     </button>
-    <button color="primary" mat-raised-button type="submit">
+    <button [disabled]="form.form.invalid" color="primary" mat-raised-button type="submit">
       {{ 'ACTIONS.CONTINUE' | translate }}
     </button>
   </div>

@@ -48,7 +48,7 @@
               actions
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               color="warn"
-              (click)="delete.emit(row)"
+              (click)="$event.stopPropagation(); delete.emit(row)"
               mat-icon-button
             >
               <i class="las la-trash"></i>
