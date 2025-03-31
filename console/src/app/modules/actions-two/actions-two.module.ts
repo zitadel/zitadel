@@ -18,6 +18,8 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/type-safe-cell-def.module';
 import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -38,8 +40,10 @@ import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/a
     TranslateModule,
     MatTableModule,
     MatTooltipModule,
+    MatSelectModule,
     RefreshTableModule,
     ActionKeysModule,
+    MatIconModule,
     TypeSafeCellDefModule,
     ProjectRoleChipModule,
     ActionConditionPipeModule,

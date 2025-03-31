@@ -12,6 +12,7 @@ import {
   ResponseExecution,
 } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { parseCondition } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.pipe';
 
 @Component({
   selector: 'cnsl-actions-two-actions-table',
@@ -54,5 +55,12 @@ export class ActionsTwoActionsTableComponent {
       filter(Boolean),
       map((alltargets) => alltargets!.filter((target) => targetIds.includes(target.id))),
     );
+  }
+
+  protected filteredIncludeConditions(targets: ExecutionTargetType[]): Condition[] {
+    return targets
+      .filter((t) => t.type.case === 'include')
+      .filter((t) => typeof t.type.value === 'object')
+      .map((t) => t.type.value as Condition);
   }
 }

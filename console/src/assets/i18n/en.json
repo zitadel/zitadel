@@ -579,12 +579,12 @@
             "DESCRIPTION": "Choose the function you want to execute"
           },
           "SELECT_GROUP": {
-            "TITLE": "Select Group",
-            "DESCRIPTION": "If you want to only execute on a group of events, select it here"
+            "TITLE": "Set Group",
+            "DESCRIPTION": "If you want to only execute on a group of events, set the group here"
           },
           "SELECT_EVENT": {
             "TITLE": "Select Event",
-            "DESCRIPTION": "If you want to only execute on a specific event, select it here"
+            "DESCRIPTION": "If you want to only execute on a specific event, specify it here"
           }
         },
         "TARGET": {

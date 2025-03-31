@@ -20,6 +20,10 @@ import {
   ExecutionTargetType,
   ExecutionTargetTypeSchema,
 } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { MatSelectModule } from '@angular/material/select';
+import { atLeastOneFieldValidator } from 'src/app/modules/form-field/validators/validators';
+import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
+import { parseCondition } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.pipe';
 
 export type TargetInit = NonNullable<
   NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['targets']>
@@ -39,20 +43,22 @@ export type TargetInit = NonNullable<
     InputModule,
     MatAutocompleteModule,
     FormsModule,
+    ActionConditionPipeModule,
     CommonModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
   ],
 })
 export class ActionsTwoAddActionTargetComponent {
   protected readonly targetForm = this.buildActionTargetForm();
 
   @Output() public readonly back = new EventEmitter<void>();
-  @Output() public readonly continue = new EventEmitter<Array<MessageInitShape<typeof ExecutionTargetTypeSchema>>>();
+  @Output() public readonly continue = new EventEmitter<MessageInitShape<typeof ExecutionTargetTypeSchema>[]>();
   @Input() public hideBackButton = false;
 
   protected readonly executionTargets$: Observable<Target[]>;
-  // protected readonly executionConditions$: Observable<Condition[]>;
+  protected readonly executionConditions$: Observable<Condition[]>;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -60,13 +66,19 @@ export class ActionsTwoAddActionTargetComponent {
     private readonly toast: ToastService,
   ) {
     this.executionTargets$ = this.listExecutionTargets().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    // this.executionConditions$ = this.listExecutionConditions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.executionConditions$ = this.listExecutionConditions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
   }
 
   private buildActionTargetForm() {
-    return this.fb.group({
-      target: new FormControl<Target | null>(null, { validators: [Validators.required] }),
-    });
+    return this.fb.group(
+      {
+        target: new FormControl<Target | null>(null, { validators: [] }),
+        executionConditions: new FormControl<Condition[]>([], { validators: [] }),
+      },
+      {
+        validators: atLeastOneFieldValidator(['target', 'executionConditions']),
+      },
+    );
   }
 
   private listExecutionTargets() {
@@ -79,17 +91,15 @@ export class ActionsTwoAddActionTargetComponent {
     );
   }
 
-  private listExecutionConditions() {
+  private listExecutionConditions(): Observable<Condition[]> {
     return defer(() => this.actionService.listExecutions({})).pipe(
-      map(({ result }) => {
-        const conditions = result
-          .map((execution) => {
-            return execution.condition;
-          })
-          .filter((c) => !!c);
-
-        return conditions.filter(Boolean);
-      }),
+      map(
+        ({ result }) =>
+          result
+            .map((execution) => execution.condition)
+            .filter((c) => !!c)
+            .filter(Boolean) as Condition[],
+      ),
       catchError((error) => {
         this.toast.showError(error);
         return of([]);
@@ -102,18 +112,33 @@ export class ActionsTwoAddActionTargetComponent {
   }
 
   protected submit() {
-    const { target } = this.targetForm.getRawValue();
-    if (!target) {
-      return;
-    }
-    this.continue.emit([
-      {
-        type: {
-          case: 'target',
-          value: target.id,
-        },
-      },
-    ]);
+    const { target, executionConditions } = this.targetForm.getRawValue();
+
+    let valueToEmit: MessageInitShape<typeof ExecutionTargetTypeSchema>[] = target
+      ? [
+          {
+            type: {
+              case: 'target',
+              value: target.id,
+            },
+          },
+        ]
+      : [];
+
+    console.log(executionConditions);
+
+    const includeConditions: MessageInitShape<typeof ExecutionTargetTypeSchema>[] = executionConditions
+      ? executionConditions.map((condition) => ({
+          type: {
+            case: 'include',
+            value: condition,
+          },
+        }))
+      : [];
+
+    valueToEmit = [...valueToEmit, ...includeConditions];
+
+    this.continue.emit(valueToEmit);
   }
 
   protected displayTarget(target?: Target) {
@@ -121,5 +146,12 @@ export class ActionsTwoAddActionTargetComponent {
       return '';
     }
     return target.name;
+  }
+
+  protected displayCondition(condition?: Condition) {
+    if (!condition) {
+      return '';
+    }
+    return parseCondition(condition);
   }
 }

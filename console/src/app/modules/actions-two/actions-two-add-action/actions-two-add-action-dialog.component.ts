@@ -66,7 +66,6 @@ export class ActionTwoAddActionDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { execution: Execution },
   ) {
     if (data.execution) {
-      console.log(data.execution.condition?.conditionType.case);
       this.typeSignal.set(data.execution.condition?.conditionType.case ?? 'request');
       this.conditionSignal.set((data.execution.condition?.conditionType as any)?.value ?? undefined);
       this.targetSignal.set(data.execution.targets ?? []);

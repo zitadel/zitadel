@@ -100,24 +100,18 @@
       </mat-checkbox>
     </div>
 
-    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_GROUP.TITLE' | translate }}</p>
 
     <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_GROUP.TITLE' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_GROUP.DESCRIPTION' | translate }}</cnsl-label>
       <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.group" />
-      <span class="name-hint cnsl-secondary-text" cnslHint>{{
-        'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_GROUP.DESCRIPTION' | translate
-      }}</span>
     </cnsl-form-field>
 
     <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.TITLE' | translate }}</p>
 
     <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.TITLE' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.DESCRIPTION' | translate }}</cnsl-label>
       <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.event" />
-      <span class="name-hint cnsl-secondary-text" cnslHint>{{
-        'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.DESCRIPTION' | translate
-      }}</span>
     </cnsl-form-field>
   </ng-container>
 

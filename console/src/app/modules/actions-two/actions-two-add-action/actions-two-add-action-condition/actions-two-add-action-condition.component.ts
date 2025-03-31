@@ -33,7 +33,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
+import { atLeastOneFieldValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Message } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
@@ -105,17 +105,6 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     );
   }
 
-  private atLeastOneFieldValidator(fields: string[]): ValidatorFn {
-    return (formGroup: AbstractControl): ValidationErrors | null => {
-      const isValid = fields.some((field) => {
-        const control = formGroup.get(field);
-        return control && control.value;
-      });
-
-      return isValid ? null : { atLeastOneRequired: true }; // Return an error if none are set
-    };
-  }
-
   private buildRequestOrResponseForm<T extends 'request' | 'response'>(requestOrResponse: T) {
     const formFactory = () => ({
       case: requestOrResponse,
@@ -126,7 +115,7 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
           method: new FormControl<string>('', { nonNullable: true }),
         },
         {
-          validators: this.atLeastOneFieldValidator(['all', 'service', 'method']),
+          validators: atLeastOneFieldValidator(['all', 'service', 'method']),
         },
       ),
     });
