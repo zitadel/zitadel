@@ -477,7 +477,10 @@ export async function GET(request: NextRequest) {
 
         redirectUrl.searchParams.set("url", url);
         redirectUrl.searchParams.set("RelayState", binding.value.relayState);
-        redirectUrl.searchParams.set("SAMLResponse", binding.value.samlResponse);
+        redirectUrl.searchParams.set(
+          "SAMLResponse",
+          binding.value.samlResponse,
+        );
 
         return NextResponse.redirect(redirectUrl.toString());
       } else {

@@ -22,7 +22,9 @@ export async function middleware(request: NextRequest) {
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const instanceHost = `${serviceUrl}`.replace("https://", "").replace("http://", "");
+  const instanceHost = `${serviceUrl}`
+    .replace("https://", "")
+    .replace("http://", "");
 
   const requestHeaders = new Headers(request.headers);
 
