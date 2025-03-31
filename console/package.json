@@ -30,7 +30,7 @@
     "@fortawesome/angular-fontawesome": "^0.13.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
-    "@ngx-translate/core": "^15.0.0",
+    "@ngx-translate/core": "^16.0.4",
     "@zitadel/client": "^1.0.7",
     "@zitadel/proto": "^1.0.4",
     "angular-oauth2-oidc": "^15.0.1",
