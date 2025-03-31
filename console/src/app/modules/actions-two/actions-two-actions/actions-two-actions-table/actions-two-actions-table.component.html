@@ -58,7 +58,12 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="['condition', 'type', 'target', 'creationDate', 'actions']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['condition', 'type', 'target', 'creationDate', 'actions']"></tr>
+      <tr
+        class="highlight pointer"
+        (click)="selected.emit(row)"
+        mat-row
+        *matRowDef="let row; columns: ['condition', 'type', 'target', 'creationDate', 'actions']"
+      ></tr>
     </table>
   </div>
 </cnsl-refresh-table>

@@ -5,4 +5,8 @@
 .actions {
   display: flex;
   justify-content: space-between;
+
+  .fill-space {
+    font: 1;
+  }
 }

@@ -36,6 +36,9 @@ export class ActionsTwoActionsTableComponent {
     this.targets$.next(targets);
   }
 
+  @Output()
+  public readonly selected = new EventEmitter<Execution>();
+
   private readonly executions$ = new ReplaySubject<Execution[] | null>(1);
   private readonly targets$ = new ReplaySubject<Target[] | null>(1);
 

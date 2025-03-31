@@ -4,6 +4,7 @@
 <cnsl-actions-two-actions-table
   (refresh)="refresh.next(true)"
   (delete)="deleteExecution($event)"
+  (selected)="openDialog($event)"
   [executions]="executions$ | async"
   [targets]="targets$ | async"
 >

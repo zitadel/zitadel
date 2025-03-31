@@ -29,6 +29,9 @@ export class ActionsTwoAddActionTypeComponent {
 
   @Output() public readonly back = new EventEmitter<void>();
   @Output() public readonly continue = new EventEmitter<ConditionType>();
+  @Input() public set initialValue(type: ConditionType) {
+    this.typeForm.get('executionType')!.setValue(type);
+  }
 
   constructor(private readonly fb: FormBuilder) {
     this.typeChanges$ = this.typeForm.get('executionType')!.valueChanges.pipe(

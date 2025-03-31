@@ -23,9 +23,10 @@
   </cnsl-form-field>
 
   <div class="actions">
-    <button mat-stroked-button (click)="back.emit()">
+    <button *ngIf="!hideBackButton" mat-stroked-button (click)="back.emit()">
       {{ 'ACTIONS.BACK' | translate }}
     </button>
+    <span class="fill-space"></span>
     <button color="primary" mat-raised-button type="submit">
       {{ 'ACTIONS.CONTINUE' | translate }}
     </button>

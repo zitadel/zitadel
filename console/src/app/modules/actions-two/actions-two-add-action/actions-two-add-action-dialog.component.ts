@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, computed, effect, signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, Inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActionsTwoAddActionTypeComponent } from './actions-two-add-action-type/actions-two-add-action-type.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
@@ -9,20 +9,9 @@ import {
   ConditionType,
   ConditionTypeValue,
 } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
-import {
-  ActionsTwoAddActionTargetComponent,
-  TargetInit,
-} from './actions-two-add-action-target/actions-two-add-action-target.component';
+import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
-import {
-  Condition,
-  EventExecution,
-  Execution,
-  ExecutionSchema,
-  FunctionExecution,
-  RequestExecution,
-  ResponseExecution,
-} from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Execution, ExecutionTargetTypeSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { Subject } from 'rxjs';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
@@ -53,11 +42,10 @@ export class ActionTwoAddActionDialogComponent {
 
   public typeSignal = signal<ConditionType>('request');
   public conditionSignal = signal<ConditionTypeValue<ConditionType> | undefined>(undefined); // TODO: fix this type
-  public targetSignal = signal<TargetInit | undefined>(undefined);
+  public targetSignal = signal<Array<MessageInitShape<typeof ExecutionTargetTypeSchema>> | undefined>(undefined);
 
   public continueSubject = new Subject<void>();
 
-  // TODO as the condition component is demounted when the page changes we need a workaround
   public request = computed<MessageInitShape<typeof SetExecutionRequestSchema>>(() => {
     const req = {
       condition: {
@@ -66,20 +54,26 @@ export class ActionTwoAddActionDialogComponent {
           value: this.conditionSignal() as any, // TODO: fix this type
         },
       },
-      execution: {
-        targets: [
-          {
-            type: this.targetSignal(),
-          },
-        ],
-      },
+      targets: this.targetSignal(),
     };
 
     console.log(req);
     return req;
   });
 
-  constructor(public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent>) {
+  constructor(
+    public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent, MessageInitShape<typeof SetExecutionRequestSchema>>,
+    @Inject(MAT_DIALOG_DATA) public data: { execution: Execution },
+  ) {
+    if (data.execution) {
+      console.log(data.execution.condition?.conditionType.case);
+      this.typeSignal.set(data.execution.condition?.conditionType.case ?? 'request');
+      this.conditionSignal.set((data.execution.condition?.conditionType as any)?.value ?? undefined);
+      this.targetSignal.set(data.execution.targets ?? []);
+
+      this.page.set(Page.Target); // Set the initial page based on the provided execution data
+    }
+
     effect(() => {
       const currentPage = this.page();
       if (currentPage === Page.Target) {

@@ -3,6 +3,7 @@
   <div class="framework-change-block" [ngSwitch]="page()">
     <cnsl-actions-two-add-action-type
       *ngSwitchCase="Page.Type"
+      [initialValue]="typeSignal()"
       (back)="back()"
       (continue)="typeSignal.set($event); continue()"
     ></cnsl-actions-two-add-action-type>
@@ -17,17 +18,8 @@
     <cnsl-actions-two-add-action-target
       *ngSwitchCase="Page.Target"
       (back)="back()"
+      [hideBackButton]="!!data.execution"
       (continue)="targetSignal.set($event); continue()"
     ></cnsl-actions-two-add-action-target>
   </div>
 </mat-dialog-content>
-<!-- <div>
-  <mat-dialog-actions class="actions">
-    <button mat-stroked-button (click)="previous()">
-      {{ page() === Page.Type ? ('ACTIONS.CANCEL' | translate) : ('ACTIONS.BACK' | translate) }}
-    </button>
-    <button color="primary" mat-raised-button (click)="continue()" cdkFocusInitial>
-      {{ page() === Page.Target ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.CONTINUE' | translate) }}
-    </button>
-  </mat-dialog-actions>
-</div> -->

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +15,7 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+import { ExecutionTargetType, ExecutionTargetTypeSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 
 export type TargetInit = NonNullable<
   NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['targets']>
@@ -43,7 +44,8 @@ export class ActionsTwoAddActionTargetComponent {
   protected readonly targetForm = this.buildActionTargetForm();
 
   @Output() public readonly back = new EventEmitter<void>();
-  @Output() public readonly continue = new EventEmitter<TargetInit>();
+  @Output() public readonly continue = new EventEmitter<Array<MessageInitShape<typeof ExecutionTargetTypeSchema>>>();
+  @Input() public hideBackButton = false;
 
   protected readonly executionTargets$: Observable<Target[]>;
 
@@ -55,7 +57,7 @@ export class ActionsTwoAddActionTargetComponent {
     this.executionTargets$ = this.listExecutionTargets().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
   }
 
-  public buildActionTargetForm() {
+  private buildActionTargetForm() {
     return this.fb.group({
       target: new FormControl<Target | null>(null, { validators: [Validators.required] }),
     });
@@ -80,10 +82,14 @@ export class ActionsTwoAddActionTargetComponent {
     if (!target) {
       return;
     }
-    this.continue.emit({
-      case: 'target',
-      value: target.id,
-    });
+    this.continue.emit([
+      {
+        type: {
+          case: 'target',
+          value: target.id,
+        },
+      },
+    ]);
   }
 
   protected displayTarget(target?: Target) {

@@ -106,9 +106,14 @@ export class ActionsTwoActionsComponent implements OnInit {
     );
   }
 
-  public openDialog(): void {
+  public openDialog(execution?: Execution): void {
     const ref = this.dialog.open<ActionTwoAddActionDialogComponent>(ActionTwoAddActionDialogComponent, {
       width: '400px',
+      data: execution
+        ? {
+            execution: execution,
+          }
+        : {},
     });
 
     ref.afterClosed().subscribe((request?: MessageInitShape<typeof SetExecutionRequestSchema>) => {

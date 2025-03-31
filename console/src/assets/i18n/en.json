@@ -536,7 +536,7 @@
         "request": "Request",
         "response": "Response",
         "events": "Events",
-        "functions": "Functions"
+        "function": "Function"
       },
       "CREATE": {
         "TITLE": "Create an Action",
