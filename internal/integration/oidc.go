@@ -393,7 +393,7 @@ func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (mac
 	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
 }
 
-func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
+func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context, keyLifetime time.Duration) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
 	name = gofakeit.Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
@@ -406,7 +406,7 @@ func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *man
 	keyResp, err := i.Client.Mgmt.AddMachineKey(ctx, &management.AddMachineKeyRequest{
 		UserId:         machine.GetUserId(),
 		Type:           authn.KeyType_KEY_TYPE_JSON,
-		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),
+		ExpirationDate: timestamppb.New(time.Now().Add(keyLifetime)),
 	})
 	if err != nil {
 		return nil, "", nil, err
