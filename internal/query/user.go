@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query/permission"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -607,8 +606,8 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 	return count, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheck domain.PermissionCheck) (*Users, error) {
-	users, err := q.searchUsers(ctx, queries, filterOrgIds, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
+	users, err := q.searchUsers(ctx, queries, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
@@ -618,7 +617,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, f
 	return users, nil
 }
 
-func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgID string, permissionCheckV2 bool) (users *Users, err error) {
+func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheckV2 bool) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -627,9 +626,10 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, f
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	})
 	if permissionCheckV2 {
-		query = permission.OrgsFilter(
-			ctx, query, UserResourceOwnerCol.identifier(), filterOrgID, domain.PermissionUserRead,
-			permission.OwnedRowsOption(UserIDCol.identifier()),
+		query = WherePermittedOrgs(
+			ctx, query, UserResourceOwnerCol, domain.PermissionUserRead,
+			SingleOrgOption(queries.Queries),
+			OwnedRowsOrgOption(UserIDCol),
 		)
 	}
 	stmt, args, err := query.ToSql()
