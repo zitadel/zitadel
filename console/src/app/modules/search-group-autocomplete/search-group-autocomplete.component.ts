@@ -19,7 +19,6 @@ import { ListGroupsResponse } from 'src/app/proto/generated/zitadel/management_p
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { GroupNameQuery, GroupQuery, Group } from 'src/app/proto/generated/zitadel/group_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 const USER_LIMIT = 25;
 
@@ -48,7 +47,6 @@ export class SearchGroupAutocompleteComponent implements OnInit, AfterContentChe
   private unsubscribed$: Subject<void> = new Subject();
   constructor(
     private groupService: ManagementService,
-    private toast: ToastService,
     private cdref: ChangeDetectorRef,
   ) {}
 

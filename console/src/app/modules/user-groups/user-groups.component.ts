@@ -15,6 +15,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
+import { GroupCreateDialogComponent } from '../add-group-dialog/group-create-dialog.component';
 
 @Component({
     selector: 'cnsl-user-groups',
@@ -35,6 +36,7 @@ export class UserGroupsComponent implements OnInit {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable < boolean > = this.loadingSubject.asObservable();
     public GroupState: any = GroupState;
+    public changePage: EventEmitter<void> = new EventEmitter();
     @Input() public displayedColumnsHuman: string[] = [
         'select',
         'name',
@@ -62,6 +64,12 @@ export class UserGroupsComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.changePage.emit();
+        this.getData();
+    }
+
+    private getData(): void {
+        this.loadingSubject.next(true);
         this.groupService.getGroupByUserID(this.userId).then((resp) => {
             if (resp.details?.totalResult) {
                 this.totalResult = resp.details?.totalResult;
@@ -101,6 +109,7 @@ export class UserGroupsComponent implements OnInit {
                 .removeGroupMember(group.id, this.userId)
                 .then(() => {
                     this.toast.showInfo('GROUP.TOAST.MEMBERREMOVED', true);
+                    this.getData();
                 })
                 .catch((error) => {
                     this.toast.showError(error);
@@ -110,9 +119,33 @@ export class UserGroupsComponent implements OnInit {
     }
 
     public refreshPage(): void {
-
+        this.getData();
     }
 
     public openAddGroup(): void {
+        const dialogRef = this.dialog.open(GroupCreateDialogComponent, {width: '400px'});
+        dialogRef.afterClosed().subscribe((resp) => {
+            if (resp) {
+                const groups: string[] = resp.groups;
+                if (groups && groups.length) {
+                    Promise.all(
+                        groups.map((group) => {
+                            return this.groupService.addGroupMember(group, this.userId);
+                        }),
+                    )
+                    .then(() => {
+                        setTimeout(() => {
+                            this.changePage.emit();
+                            this.getData();
+                        }, 1000);
+                        this.toast.showInfo('GROUP.TOAST.MEMBERSADDED', true);
+                    })
+                    .catch((error) => {
+                        this.changePage.emit();
+                        this.toast.showError(error);
+                    });
+                }
+            }
+        });
     }
 }

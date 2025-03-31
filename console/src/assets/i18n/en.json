@@ -961,6 +961,7 @@
       }
     },
     "GROUPS": {
+      "ADD": "Add User Group",
       "TITLE": "User Groups",
       "DELETE_TITLE": "Remove User Group",
       "DELETE_DESCRIPTION": "You are about to remove a group. Are you sure?"
@@ -1857,6 +1858,9 @@
       "ACTIVATE": "Activate User",
       "DELETE": "Delete User",
       "CLEAR": "Clear selection"
+    },
+    "GROUP": {
+      "DESCRIPTION": "Enter the names of the groups to be added."
     }
   },
   "PROJECT": {
