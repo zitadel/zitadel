@@ -131,7 +131,7 @@ export class ActionsTwoActionsComponent implements OnInit {
   public deleteExecution(execution: Execution) {
     const deleteReq: MessageInitShape<typeof SetExecutionRequestSchema> = {
       condition: execution.condition,
-      targets: [], //[{ type: { case: undefined, value: undefined } }],
+      targets: [],
     };
     this.actionService.setExecution(deleteReq);
     setTimeout(() => {

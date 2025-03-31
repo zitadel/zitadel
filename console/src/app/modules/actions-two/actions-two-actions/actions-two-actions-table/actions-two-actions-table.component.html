@@ -7,9 +7,7 @@
       <ng-container matColumnDef="condition">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.CONDITION' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          <span *ngIf="row.condition?.conditionType?.value">{{
-            conditionParser(row?.condition?.conditionType?.value)
-          }}</span>
+          <span *ngIf="row.condition?.conditionType?.value">{{ row?.condition | condition }}</span>
         </td>
       </ng-container>
 

@@ -52,15 +52,4 @@ export class ActionsTwoActionsTableComponent {
       map((alltargets) => alltargets!.filter((target) => targetIds.includes(target.id))),
     );
   }
-
-  // move this to directive
-  protected conditionParser(conditionType: Condition['conditionType']['value']): string {
-    return conditionType && 'condition' in conditionType
-      ? typeof conditionType.condition.value === 'string'
-        ? `${conditionType.condition.case}: ${conditionType.condition.value}`
-        : ''
-      : conditionType && 'name' in conditionType
-        ? `function: ${conditionType.name}` // only function condition has name
-        : '';
-  }
 }
