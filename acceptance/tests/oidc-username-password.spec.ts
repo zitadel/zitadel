@@ -3,9 +3,9 @@ import { test as base, expect } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 import { loginname } from "./loginname";
+import { startOIDC } from "./oidc";
 import { password } from "./password";
 import { PasswordUser } from "./user";
-import {startOIDC} from "./oidc";
 
 // Read from ".env" file.
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
@@ -30,8 +30,8 @@ const test = base.extend<{ user: PasswordUser }>({
 });
 
 test("oidc username and password login", async ({ user, page }) => {
-  await startOIDC(page)
+  await startOIDC(page);
   await loginname(page, user.getUsername());
   await password(page, user.getPassword());
-  await expect(page.locator('pre')).toContainText(user.getUsername());
+  await expect(page.locator("pre")).toContainText(user.getUsername());
 });
