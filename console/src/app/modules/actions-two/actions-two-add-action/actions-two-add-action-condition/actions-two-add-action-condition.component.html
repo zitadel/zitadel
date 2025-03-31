@@ -1,6 +1,6 @@
 <form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit()">
   <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
-    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.DESCRIPTION' | translate }}</p>
+    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.REQ_RESP_DESCRIPTION' | translate }}</p>
 
     <div class="emailVerified">
       <mat-checkbox [formControl]="form.form.controls.all">
@@ -87,8 +87,6 @@
   </ng-container>
 
   <ng-container *ngIf="form.case === 'event'">
-    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.DESCRIPTION' | translate }}</p>
-
     <div class="emailVerified">
       <mat-checkbox [formControl]="form.form.controls.all">
         <div class="execution-condition-text">

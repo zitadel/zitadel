@@ -495,6 +495,113 @@
     "DOWNLOAD": "Unduh",
     "APPLY": "Menerapkan"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Tindakan",
+      "DESCRIPTION": "Tindakan memungkinkan Anda menjalankan kode khusus sebagai respons terhadap permintaan API, peristiwa, atau fungsi tertentu. Gunakan ini untuk memperluas Zitadel, mengotomatiskan alur kerja, dan berintegrasi dengan sistem lain.",
+      "TYPES": {
+        "request": "Permintaan",
+        "response": "Respons",
+        "events": "Peristiwa",
+        "function": "Fungsi"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Buat Tindakan",
+        "UPDATE_TITLE": "Perbarui Tindakan",
+        "TYPE": {
+          "DESCRIPTION": "Pilih kapan Anda ingin Tindakan ini dijalankan",
+          "REQUEST": {
+            "TITLE": "Permintaan",
+            "DESCRIPTION": "Permintaan yang terjadi di dalam Zitadel. Ini bisa berupa sesuatu seperti panggilan permintaan login."
+          },
+          "RESPONSE": {
+            "TITLE": "Respons",
+            "DESCRIPTION": "Respons dari permintaan di dalam Zitadel. Pikirkan respons yang Anda dapatkan kembali dari pengambilan pengguna."
+          },
+          "EVENTS": {
+            "TITLE": "Peristiwa",
+            "DESCRIPTION": "Peristiwa yang terjadi di dalam Zitadel. Ini bisa berupa apa saja seperti pengguna membuat akun, login berhasil, dll."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Fungsi",
+            "DESCRIPTION": "Fungsi yang dapat Anda panggil di dalam Zitadel. Ini bisa berupa apa saja mulai dari mengirim email hingga membuat pengguna."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Pilih apakah tindakan ini berlaku untuk semua permintaan, layanan tertentu (mis. manajemen pengguna), atau permintaan tunggal (mis. buat pengguna).",
+          "ALL": {
+            "TITLE": "Semua",
+            "DESCRIPTION": "Pilih ini jika Anda ingin menjalankan tindakan Anda pada setiap permintaan"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Pilih Layanan",
+            "DESCRIPTION": "Pilih Layanan Zitadel untuk tindakan Anda."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Pilih Metode",
+            "DESCRIPTION": "Jika Anda hanya ingin menjalankan pada permintaan tertentu, pilih di sini",
+            "NOTE": "Jika Anda tidak memilih metode, tindakan Anda akan berjalan pada setiap permintaan di layanan yang Anda pilih."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nama Fungsi",
+            "DESCRIPTION": "Pilih fungsi yang ingin Anda jalankan"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Tetapkan Grup",
+            "DESCRIPTION": "Jika Anda hanya ingin menjalankan pada grup peristiwa, tetapkan grup di sini"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Pilih Peristiwa",
+            "DESCRIPTION": "Jika Anda hanya ingin menjalankan pada peristiwa tertentu, tentukan di sini"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Anda dapat memilih untuk menjalankan target, atau menjalankannya dengan kondisi yang sama dengan target lain.",
+          "TARGET": {
+            "DESCRIPTION": "Target yang ingin Anda jalankan untuk tindakan ini"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Kondisi Eksekusi"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Kondisi",
+        "TYPE": "Jenis",
+        "TARGET": "Target",
+        "CREATIONDATE": "Tanggal Pembuatan"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Target",
+      "DESCRIPTION": "Target adalah tujuan kode yang ingin Anda jalankan dari tindakan. Buat target di sini dan tambahkan ke tindakan Anda.",
+      "CREATE": {
+        "TITLE": "Buat Target Anda",
+        "DESCRIPTION": "Buat target Anda sendiri di luar Zitadel",
+        "NAME": "Nama",
+        "NAME_DESCRIPTION": "Beri target Anda nama yang jelas dan deskriptif agar mudah diidentifikasi nanti",
+        "TYPE": "Jenis",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Panggilan REST",
+          "restAsync": "REST Asinkron"
+        },
+        "ENDPOINT": "Titik Akhir",
+        "ENDPOINT_DESCRIPTION": "Masukkan titik akhir tempat kode Anda dihosting. Pastikan dapat diakses oleh kami!",
+        "TIMEOUT": "Batas Waktu",
+        "TIMEOUT_DESCRIPTION": "Tetapkan waktu maksimum target Anda untuk merespons. Jika membutuhkan waktu lebih lama, kami akan menghentikan permintaan.",
+        "INTERRUPT_ON_ERROR": "Interupsi jika Terjadi Kesalahan",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Hentikan semua eksekusi saat target mengembalikan kesalahan",
+        "AWAIT_RESPONSE": "Tunggu Respons",
+        "AWAIT_RESPONSE_DESCRIPTION": "Kami akan menunggu respons sebelum melakukan hal lain. Berguna jika Anda berniat menggunakan beberapa target untuk satu tindakan"
+      },
+      "TABLE": {
+        "NAME": "Nama",
+        "ENDPOINT": "Titik Akhir",
+        "CREATIONDATE": "Tanggal Pembuatan"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Memiliki kendali atas seluruh instansi, termasuk semua organisasi",
     "IAM_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh instansi, termasuk semua organisasi",

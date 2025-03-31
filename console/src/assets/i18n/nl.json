@@ -528,6 +528,113 @@
     "DOWNLOAD": "Download",
     "APPLY": "Toepassen"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Acties",
+      "DESCRIPTION": "Met acties kunt u aangepaste code uitvoeren als reactie op API-verzoeken, gebeurtenissen of specifieke functies. Gebruik ze om Zitadel uit te breiden, workflows te automatiseren en te integreren met andere systemen.",
+      "TYPES": {
+        "request": "Verzoek",
+        "response": "Reactie",
+        "events": "Gebeurtenissen",
+        "function": "Functie"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Een actie maken",
+        "UPDATE_TITLE": "Een actie bijwerken",
+        "TYPE": {
+          "DESCRIPTION": "Selecteer wanneer u deze actie wilt uitvoeren",
+          "REQUEST": {
+            "TITLE": "Verzoek",
+            "DESCRIPTION": "Verzoeken die binnen Zitadel plaatsvinden. Dit kan zoiets zijn als een inlogverzoek-oproep."
+          },
+          "RESPONSE": {
+            "TITLE": "Reactie",
+            "DESCRIPTION": "Een reactie op een verzoek binnen Zitadel. Denk aan de reactie die u terugkrijgt van het ophalen van een gebruiker."
+          },
+          "EVENTS": {
+            "TITLE": "Gebeurtenissen",
+            "DESCRIPTION": "Gebeurtenissen die binnen Zitadel plaatsvinden. Dit kan van alles zijn, zoals een gebruiker die een account aanmaakt, een succesvolle login enz."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Functies",
+            "DESCRIPTION": "Functies die u binnen Zitadel kunt aanroepen. Dit kan van alles zijn, van het verzenden van een e-mail tot het maken van een gebruiker."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Kies of deze actie van toepassing is op alle verzoeken, een specifieke service (bijv. gebruikersbeheer) of een enkel verzoek (bijv. gebruiker maken).",
+          "ALL": {
+            "TITLE": "Alle",
+            "DESCRIPTION": "Selecteer dit als u uw actie bij elk verzoek wilt uitvoeren"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Service selecteren",
+            "DESCRIPTION": "Kies een Zitadel-service voor uw actie."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Methode selecteren",
+            "DESCRIPTION": "Als u alleen bij een specifiek verzoek wilt uitvoeren, selecteert u dit hier",
+            "NOTE": "Als u geen methode selecteert, wordt uw actie bij elk verzoek in uw geselecteerde service uitgevoerd."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Functienaam",
+            "DESCRIPTION": "Kies de functie die u wilt uitvoeren"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Groep instellen",
+            "DESCRIPTION": "Als u alleen bij een groep gebeurtenissen wilt uitvoeren, stelt u de groep hier in"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Gebeurtenis selecteren",
+            "DESCRIPTION": "Als u alleen bij een specifieke gebeurtenis wilt uitvoeren, specificeert u deze hier"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "U kunt ervoor kiezen om een doel uit te voeren of om het onder dezelfde voorwaarden als andere doelen uit te voeren.",
+          "TARGET": {
+            "DESCRIPTION": "Het doel dat u voor deze actie wilt uitvoeren"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Uitvoeringsvoorwaarden"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Voorwaarde",
+        "TYPE": "Type",
+        "TARGET": "Doel",
+        "CREATIONDATE": "Aanmaakdatum"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Doelen",
+      "DESCRIPTION": "Een doel is de bestemming van de code die u vanuit een actie wilt uitvoeren. Maak hier een doel en voeg het toe aan uw acties.",
+      "CREATE": {
+        "TITLE": "Uw doel maken",
+        "DESCRIPTION": "Maak uw eigen doel buiten Zitadel",
+        "NAME": "Naam",
+        "NAME_DESCRIPTION": "Geef uw doel een duidelijke, beschrijvende naam om het later gemakkelijk te kunnen identificeren",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Aanroep",
+          "restAsync": "REST Asynchroon"
+        },
+        "ENDPOINT": "Eindpunt",
+        "ENDPOINT_DESCRIPTION": "Voer het eindpunt in waar uw code wordt gehost. Zorg ervoor dat het voor ons toegankelijk is!",
+        "TIMEOUT": "Time-out",
+        "TIMEOUT_DESCRIPTION": "Stel de maximale tijd in die uw doel heeft om te reageren. Als het langer duurt, stoppen we het verzoek.",
+        "INTERRUPT_ON_ERROR": "Onderbreken bij fout",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop alle uitvoeringen als de doelen een fout retourneren",
+        "AWAIT_RESPONSE": "Wachten op reactie",
+        "AWAIT_RESPONSE_DESCRIPTION": "We wachten op een reactie voordat we iets anders doen. Handig als u van plan bent om meerdere doelen voor één actie te gebruiken"
+      },
+      "TABLE": {
+        "NAME": "Naam",
+        "ENDPOINT": "Eindpunt",
+        "CREATIONDATE": "Aanmaakdatum"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
     "IAM_OWNER_VIEWER": "Heeft toestemming om de hele instantie te bekijken, inclusief alle organisaties",

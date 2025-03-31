@@ -528,6 +528,113 @@
     "DOWNLOAD": "Baixar",
     "APPLY": "Aplicar"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Ações",
+      "DESCRIPTION": "As ações permitem que você execute código personalizado em resposta a solicitações de API, eventos ou funções específicas. Use-as para estender o Zitadel, automatizar fluxos de trabalho e integrar-se a outros sistemas.",
+      "TYPES": {
+        "request": "Solicitação",
+        "response": "Resposta",
+        "events": "Eventos",
+        "function": "Função"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Criar uma Ação",
+        "UPDATE_TITLE": "Atualizar uma Ação",
+        "TYPE": {
+          "DESCRIPTION": "Selecione quando você deseja que esta Ação seja executada",
+          "REQUEST": {
+            "TITLE": "Solicitação",
+            "DESCRIPTION": "Solicitações que ocorrem dentro do Zitadel. Isso pode ser algo como uma chamada de solicitação de login."
+          },
+          "RESPONSE": {
+            "TITLE": "Resposta",
+            "DESCRIPTION": "Uma resposta de uma solicitação dentro do Zitadel. Pense na resposta que você recebe ao buscar um usuário."
+          },
+          "EVENTS": {
+            "TITLE": "Eventos",
+            "DESCRIPTION": "Eventos que acontecem dentro do Zitadel. Isso pode ser qualquer coisa, como um usuário criando uma conta, um login bem-sucedido, etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funções",
+            "DESCRIPTION": "Funções que você pode chamar dentro do Zitadel. Isso pode ser qualquer coisa, desde enviar um e-mail até criar um usuário."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Escolha se esta ação se aplica a todas as solicitações, um serviço específico (por exemplo, gerenciamento de usuários) ou uma única solicitação (por exemplo, criar usuário).",
+          "ALL": {
+            "TITLE": "Todas",
+            "DESCRIPTION": "Selecione isso se você quiser executar sua ação em cada solicitação"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Selecionar Serviço",
+            "DESCRIPTION": "Escolha um Serviço Zitadel para sua ação."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Selecionar Método",
+            "DESCRIPTION": "Se você quiser executar apenas em uma solicitação específica, selecione-a aqui",
+            "NOTE": "Se você não selecionar um método, sua ação será executada em todas as solicitações em seu serviço selecionado."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nome da Função",
+            "DESCRIPTION": "Escolha a função que você deseja executar"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Definir Grupo",
+            "DESCRIPTION": "Se você quiser executar apenas em um grupo de eventos, defina o grupo aqui"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Selecionar Evento",
+            "DESCRIPTION": "Se você quiser executar apenas em um evento específico, especifique-o aqui"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Você pode escolher executar um destino ou executá-lo nas mesmas condições que outros destinos.",
+          "TARGET": {
+            "DESCRIPTION": "O destino que você deseja executar para esta ação"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Condições de Execução"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condição",
+        "TYPE": "Tipo",
+        "TARGET": "Destino",
+        "CREATIONDATE": "Data de Criação"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Destinos",
+      "DESCRIPTION": "Um destino é o destino do código que você deseja executar a partir de uma ação. Crie um destino aqui e adicione-o às suas ações.",
+      "CREATE": {
+        "TITLE": "Criar seu Destino",
+        "DESCRIPTION": "Crie seu próprio destino fora do Zitadel",
+        "NAME": "Nome",
+        "NAME_DESCRIPTION": "Dê ao seu destino um nome claro e descritivo para torná-lo fácil de identificar mais tarde",
+        "TYPE": "Tipo",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Chamada REST",
+          "restAsync": "REST Assíncrono"
+        },
+        "ENDPOINT": "Ponto de Extremidade",
+        "ENDPOINT_DESCRIPTION": "Insira o ponto de extremidade onde seu código está hospedado. Certifique-se de que ele esteja acessível para nós!",
+        "TIMEOUT": "Tempo Limite",
+        "TIMEOUT_DESCRIPTION": "Defina o tempo máximo que seu destino tem para responder. Se demorar mais, interromperemos a solicitação.",
+        "INTERRUPT_ON_ERROR": "Interromper em Caso de Erro",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Pare todas as execuções quando os destinos retornarem um erro",
+        "AWAIT_RESPONSE": "Aguardar Resposta",
+        "AWAIT_RESPONSE_DESCRIPTION": "Aguardaremos uma resposta antes de fazermos qualquer outra coisa. Útil se você pretende usar vários destinos para uma única ação"
+      },
+      "TABLE": {
+        "NAME": "Nome",
+        "ENDPOINT": "Ponto de Extremidade",
+        "CREATIONDATE": "Data de Criação"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Tem controle sobre toda a instância, incluindo todas as organizações",
     "IAM_OWNER_VIEWER": "Tem permissão para revisar toda a instância, incluindo todas as organizações",

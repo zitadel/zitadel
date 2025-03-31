@@ -561,7 +561,7 @@
           }
         },
         "CONDITION": {
-          "DESCRIPTION": "Choose whether this action applies to all request, a specific service (ec. user management), or a single request (e.g. create user).",
+          "REQ_RESP_DESCRIPTION": "Choose whether this action applies to all request, a specific service (ec. user management), or a single request (e.g. create user).",
           "ALL": {
             "TITLE": "All",
             "DESCRIPTION": "Select this if you want to run your action on every request"
