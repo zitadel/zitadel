@@ -1,4 +1,4 @@
-package permission
+package query
 
 import (
 	"context"
@@ -17,7 +17,7 @@ const (
 )
 
 type permittedOrgsBuilder struct {
-	orgIDColumn       string
+	orgIDColumn       Column
 	instanceID        string
 	userID            string
 	systemPermissions []authz.SystemUserPermissions
@@ -33,7 +33,7 @@ func (b *permittedOrgsBuilder) appendOverride(column string, value any) {
 func (b *permittedOrgsBuilder) clauses() sq.Or {
 	clauses := make(sq.Or, 1, len(b.overrides)+1)
 	clauses[0] = sq.Expr(
-		fmt.Sprintf(wherePermittedOrgsExpr, b.orgIDColumn),
+		fmt.Sprintf(wherePermittedOrgsExpr, b.orgIDColumn.identifier()),
 		b.instanceID,
 		b.userID,
 		database.NewJSONArray(b.systemPermissions),
@@ -46,29 +46,37 @@ func (b *permittedOrgsBuilder) clauses() sq.Or {
 	return clauses
 }
 
-type OrgsOption func(b *permittedOrgsBuilder)
+type PermittedOrgsOption func(b *permittedOrgsBuilder)
 
-// OwnedRowsOption allows rows to be returned of which the current user is the owner.
+// OwnedRowsOrgOption allows rows to be returned of which the current user is the owner.
 // Even if the user does not have an explicit permission for the organization.
 // For example an authenticated user can always see his own user account.
-func OwnedRowsOption(userIDColumn string) OrgsOption {
+func OwnedRowsOrgOption(userIDColumn Column) PermittedOrgsOption {
 	return func(b *permittedOrgsBuilder) {
-		b.appendOverride(userIDColumn, b.userID)
+		b.appendOverride(userIDColumn.identifier(), b.userID)
 	}
 }
 
-// OverrideOption allows returning of rows where the value is matched.
+// OverrideOrgOption allows returning of rows where the value is matched.
 // Even if the user does not have an explicit permission for the organization.
-func OverrideOption(column string, value any) OrgsOption {
+func OverrideOrgOption(column Column, value any) PermittedOrgsOption {
 	return func(b *permittedOrgsBuilder) {
-		b.appendOverride(column, value)
+		b.appendOverride(column.identifier(), value)
 	}
 }
 
-// OrgsFilter sets a `WHERE` clause to query, which filters returned rows against organizations the
+// SingleOrgOption may be used to optimize the permitted orgs function by limiting the
+// returned organizations, to the one used in the requested filters.
+func SingleOrgOption(queries []SearchQuery) PermittedOrgsOption {
+	return func(b *permittedOrgsBuilder) {
+		b.orgID = findTextEqualsQuery(b.orgIDColumn, queries)
+	}
+}
+
+// WherePermittedOrgs sets a `WHERE` clause to query, which filters returned rows against organizations the
 // current authenticated user has the requested permission to.
 // filterOrgID may be used to optimize the permitted orgs function by limiting the returned organizations,
-func OrgsFilter(ctx context.Context, query sq.SelectBuilder, orgIDCol, filterOrgID, permission string, options ...OrgsOption) sq.SelectBuilder {
+func WherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, orgIDCol Column, permission string, options ...PermittedOrgsOption) sq.SelectBuilder {
 	ctxData := authz.GetCtxData(ctx)
 
 	b := &permittedOrgsBuilder{
@@ -77,7 +85,6 @@ func OrgsFilter(ctx context.Context, query sq.SelectBuilder, orgIDCol, filterOrg
 		userID:            ctxData.UserID,
 		systemPermissions: ctxData.SystemUserPermissions,
 		permission:        permission,
-		orgID:             filterOrgID,
 	}
 	for _, opt := range options {
 		opt(b)
