@@ -13,6 +13,7 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { Execution, ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { Value } from 'google-protobuf/google/protobuf/struct_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -128,9 +129,13 @@ export class ActionsTwoActionsComponent implements OnInit {
   }
 
   public deleteExecution(execution: Execution) {
-    // this.actionService.({ id: execution. });
-    // setTimeout(() => {
-    //   this.refresh.next(true);
-    // }, 1000);
+    const deleteReq: MessageInitShape<typeof SetExecutionRequestSchema> = {
+      condition: execution.condition,
+      targets: [], //[{ type: { case: undefined, value: undefined } }],
+    };
+    this.actionService.setExecution(deleteReq);
+    setTimeout(() => {
+      this.refresh.next(true);
+    }, 1000);
   }
 }
