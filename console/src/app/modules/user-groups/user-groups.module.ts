@@ -17,7 +17,6 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 import { InputModule } from '../../modules/input/input.module';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
-import { AvatarModule } from '../avatar/avatar.module';
 import { FilterUserGrantsModule } from '../filter-user-grants/filter-user-grants.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
@@ -32,7 +31,6 @@ import { UserGroupsComponent } from './user-groups.component';
   imports: [
     CommonModule,
     FormsModule,
-    AvatarModule,
     MatButtonModule,
     HasRoleModule,
     MatTableModule,
