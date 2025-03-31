@@ -1,22 +1,22 @@
 <form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit()">
   <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
-    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
+    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.DESCRIPTION' | translate }}</p>
 
     <div class="emailVerified">
       <mat-checkbox [formControl]="form.form.controls.all">
         <div class="execution-condition-text">
-          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.TITLE' | translate }}</span>
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{
-            'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.DESCRIPTION' | translate
+            'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL.DESCRIPTION' | translate
           }}</span>
         </div>
       </mat-checkbox>
     </div>
 
-    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
 
     <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_SERVICE.DESCRIPTION' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_SERVICE.DESCRIPTION' | translate }}</cnsl-label>
       <input
         cnslInput
         type="text"
@@ -36,10 +36,10 @@
       </mat-autocomplete>
     </cnsl-form-field>
 
-    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.TITLE' | translate }}</p>
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_METHOD.TITLE' | translate }}</p>
 
     <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
       <input
         cnslInput
         type="text"
@@ -62,7 +62,7 @@
 
   <ng-container *ngIf="form.case === 'function'">
     <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
       <input
         cnslInput
         type="text"
@@ -81,36 +81,36 @@
       </mat-autocomplete>
 
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
-        'ACTIONSTWO.EXECUTION.CREATE.CONDITION.FUNCTIONNAME.DESCRIPTION' | translate
+        'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.FUNCTIONNAME.DESCRIPTION' | translate
       }}</span>
     </cnsl-form-field>
   </ng-container>
 
   <ng-container *ngIf="form.case === 'event'">
-    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.DESCRIPTION' | translate }}</p>
+    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.DESCRIPTION' | translate }}</p>
 
     <div class="emailVerified">
       <mat-checkbox [formControl]="form.form.controls.all">
         <div class="execution-condition-text">
-          <span>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.TITLE' | translate }}</span>
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL.TITLE' | translate }}</span>
           <span class="description cnsl-secondary-text">{{
-            'ACTIONSTWO.EXECUTION.CREATE.CONDITION.ALL.DESCRIPTION' | translate
+            'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL.DESCRIPTION' | translate
           }}</span>
         </div>
       </mat-checkbox>
     </div>
 
-    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_GROUP.TITLE' | translate }}</p>
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_GROUP.TITLE' | translate }}</p>
 
     <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_GROUP.DESCRIPTION' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_GROUP.DESCRIPTION' | translate }}</cnsl-label>
       <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.group" />
     </cnsl-form-field>
 
-    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.TITLE' | translate }}</p>
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_EVENT.TITLE' | translate }}</p>
 
     <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.CONDITION.SELECT_EVENT.DESCRIPTION' | translate }}</cnsl-label>
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_EVENT.DESCRIPTION' | translate }}</cnsl-label>
       <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.event" />
     </cnsl-form-field>
   </ng-container>

@@ -538,8 +538,9 @@
         "events": "Events",
         "function": "Function"
       },
-      "CREATE": {
-        "TITLE": "Create an Action",
+      "DIALOG": {
+        "CREATE_TITLE": "Create an Action",
+        "UPDATE_TITLE": "Update an Action",
         "TYPE": {
           "DESCRIPTION": "Select when you want this Action to run",
           "REQUEST": {
@@ -588,9 +589,13 @@
           }
         },
         "TARGET": {
-          "TITLE": "Choose your Target",
-          "DESCRIPTION": "The target you want to execute for this action",
-          "ADD_ANOTHER": "Add another target"
+          "DESCRIPTION": "You can choose to execute a target, or to run it on the same conditions as other targets.",
+          "TARGET": {
+            "DESCRIPTION": "The target you want to execute for this action"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Execution Conditions"
+          }
         }
       },
       "TABLE": {

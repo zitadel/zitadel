@@ -1,4 +1,6 @@
-<h2 mat-dialog-title>{{ 'ACTIONSTWO.EXECUTION.CREATE.TITLE' | translate }}</h2>
+<h2 *ngIf="!data.execution" mat-dialog-title>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CREATE_TITLE' | translate }}</h2>
+<h2 *ngIf="data.execution" mat-dialog-title>{{ 'ACTIONSTWO.EXECUTION.DIALOG.UPDATE_TITLE' | translate }}</h2>
+
 <mat-dialog-content>
   <div class="framework-change-block" [ngSwitch]="page()">
     <cnsl-actions-two-add-action-type

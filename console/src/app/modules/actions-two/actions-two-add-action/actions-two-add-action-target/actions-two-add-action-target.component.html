@@ -1,8 +1,8 @@
 <form *ngIf="targetForm" class="form-grid" [formGroup]="targetForm" (ngSubmit)="submit()">
-  <p class="target-description">{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.TITLE' | translate }}</p>
+  <p class="target-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.DESCRIPTION' | translate }}</p>
 
   <cnsl-form-field class="full-width">
-    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.DESCRIPTION' | translate }}</cnsl-label>
+    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.TARGET.DESCRIPTION' | translate }}</cnsl-label>
     <mat-select formControlName="target">
       <mat-option *ngIf="(executionTargets$ | async) === null" class="is-loading">
         <mat-spinner diameter="30"></mat-spinner>
@@ -14,7 +14,7 @@
   </cnsl-form-field>
 
   <cnsl-form-field class="full-width">
-    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.CREATE.TARGET.DESCRIPTION' | translate }}</cnsl-label>
+    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.CONDITIONS.DESCRIPTION' | translate }}</cnsl-label>
 
     <mat-select [multiple]="true" formControlName="executionConditions">
       <mat-option *ngIf="(executionConditions$ | async) === null" class="is-loading">
