@@ -54,10 +54,21 @@ func TestOrgsFilter(t *testing.T) {
 			wantArgs:  []any{instanceID, instanceID, userID, database.NewJSONArray(permissions), permission, orgID},
 		},
 		{
-			name:      "owned rows option",
-			options:   []OrgsOption{OwnedRowsOption("user_id")},
+			name: "owned rows option",
+			options: []OrgsOption{
+				OwnedRowsOption("user_id"),
+			},
 			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)) OR user_id = ?)",
 			wantArgs:  []any{instanceID, instanceID, userID, database.NewJSONArray(permissions), permission, orgID, userID},
+		},
+		{
+			name: "override rows option",
+			options: []OrgsOption{
+				OwnedRowsOption("user_id"),
+				OverrideOption("foo", "bar"),
+			},
+			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)) OR user_id = ? OR foo = ?)",
+			wantArgs:  []any{instanceID, instanceID, userID, database.NewJSONArray(permissions), permission, orgID, userID, "bar"},
 		},
 	}
 	for _, tt := range tests {
