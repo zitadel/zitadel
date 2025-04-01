@@ -25,7 +25,7 @@ import { firstValueFrom, Observable, ReplaySubject, shareReplay, switchMap } fro
 import { filter, map, startWith } from 'rxjs/operators';
 import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-feature-toggle/login-v2-feature-toggle.component';
 
-// TODO: to add a new feature, add the key here and in the FEATURE_KEYS array
+// to add a new feature, add the key here and in the FEATURE_KEYS array
 const FEATURE_KEYS = [
   'actions',
   'consoleUseV2UserApi',
@@ -34,7 +34,6 @@ const FEATURE_KEYS = [
   'enableBackChannelLogout',
   // 'improvedPerformance',
   'loginDefaultOrg',
-  // 'loginV2',
   'oidcLegacyIntrospection',
   'oidcSingleV1SessionTermination',
   'oidcTokenExchange',
@@ -77,7 +76,6 @@ export type ToggleStateKeys = keyof ToggleStates;
 })
 export class FeaturesComponent {
   private readonly refresh$ = new ReplaySubject<true>(1);
-  protected readonly instanceFeatures$: Observable<GetInstanceFeaturesResponse>;
   protected readonly toggleStates$: Observable<ToggleStates>;
   protected readonly Source = Source;
   protected readonly FEATURE_KEYS = FEATURE_KEYS;
@@ -96,11 +94,10 @@ export class FeaturesComponent {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.instanceFeatures$ = this.getInstanceFeatures().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.toggleStates$ = this.getToggleStates(this.instanceFeatures$);
+    this.toggleStates$ = this.getToggleStates().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
   }
 
-  private getInstanceFeatures() {
+  private getToggleStates() {
     return this.refresh$.pipe(
       startWith(true),
       switchMap(async () => {
@@ -112,11 +109,8 @@ export class FeaturesComponent {
         }
       }),
       filter(Boolean),
+      map((res) => this.createToggleStates(res)),
     );
-  }
-
-  private getToggleStates(instanceFeatures$: Observable<GetInstanceFeaturesResponse>) {
-    return instanceFeatures$.pipe(map((res) => this.createToggleStates(res)));
   }
 
   private createToggleStates(featureData: GetInstanceFeaturesResponse): ToggleStates {
@@ -130,6 +124,7 @@ export class FeaturesComponent {
         return acc;
       },
       {
+        // to add special feature flags they have to be mapped here
         loginV2: {
           source: featureData.loginV2?.source ?? Source.SYSTEM,
           enabled: !!featureData.loginV2?.required,
@@ -147,6 +142,7 @@ export class FeaturesComponent {
       return acc;
     }, {});
 
+    // to save special flags they have to be handled here
     req.loginV2 = {
       required: toggleStates.loginV2.enabled,
       baseUri: toggleStates.loginV2.baseUri,
@@ -178,6 +174,4 @@ export class FeaturesComponent {
       this.toast.showError(error);
     }
   }
-
-  protected structuredClone = structuredClone;
 }
