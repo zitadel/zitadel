@@ -1,5 +1,5 @@
 ---
-title: Test Actions Request Locally
+title: Test Actions Request Manipulation
 ---
 
 In this guide, you will create a ZITADEL execution and target. Before a user is created through the API, the target is called.
@@ -67,7 +67,7 @@ func call(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	// handle the HTTP call under "/webhook"
+	// handle the HTTP call under "/call"
 	http.HandleFunc("/call", call)
 
 	// start an HTTP server with the before defined function to handle the endpoint under "http://localhost:8090"
@@ -77,20 +77,6 @@ func main() {
 ```
 
 What happens here is that the target receives the request Zitadel receives, adds a metadata entry to the request and returns it.
-
-### Check Signature
-
-To additionally check the signature header you can add the following to the example:
-```go
-	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
-		// if the signed content is not equal the sent content return an error
-		http.Error(w, "error", http.StatusInternalServerError)
-		return
-	}
-```
-
-Where you can replace 'signingKey' with the key received in the next step 'Create target'.
 
 ## Create target
 
@@ -108,7 +94,7 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
   "restCall": {
     "interruptOnError": true    
   },
-  "endpoint": "http://localhost:8090/webhook",
+  "endpoint": "http://localhost:8090/call",
   "timeout": "10s"
 }'
 ```

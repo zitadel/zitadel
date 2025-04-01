@@ -1,5 +1,5 @@
 ---
-title: Test Actions Function Locally
+title: Test Actions Function
 ---
 
 In this guide, you will create a ZITADEL execution and target. To add claims to a token, the target is called.
@@ -41,7 +41,7 @@ type AppendClaim struct {
 	Value any    `json:"value"`
 }
 
-// webhook HandleFunc to read the request body and then print out the contents
+// call HandleFunc to read the request body and then print out the contents
 func call(w http.ResponseWriter, req *http.Request) {
 	// read the body content
 	sentBody, err := io.ReadAll(req.Body)
@@ -73,7 +73,7 @@ func call(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	// handle the HTTP call under "/webhook"
+	// handle the HTTP call under "/call"
 	http.HandleFunc("/call", call)
 
 	// start an HTTP server with the before defined function to handle the endpoint under "http://localhost:8090"
@@ -83,23 +83,9 @@ func main() {
 
 What happens here is that the user get the metadata with the key "key" and value "value" added, the token gets a claim "urn:zitadel:iam:claim" with value "value" and the log claim "urn:zitadel:iam:action:preuserinfo:log" with values "log1", "log2" and "log3".
 
-### Check Signature
-
-To additionally check the signature header you can add the following to the example:
-```go
-	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
-		// if the signed content is not equal the sent content return an error
-		http.Error(w, "error", http.StatusInternalServerError)
-		return
-	}
-```
-
-Where you can replace 'signingKey' with the key received in the next step 'Create target'.
-
 ## Create target
 
-As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
+As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
 
 [Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target)
 
@@ -122,7 +108,7 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To call the target just created before, with the intention to print the response from a user creation by the user V2 API, we define an execution with a method condition.
+To call the target just created before, with the intention to complement the userinfo resulting in a token, we define an execution with a function condition.
 
 [Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
 

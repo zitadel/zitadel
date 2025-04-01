@@ -1,8 +1,9 @@
 ---
-title: Test Actions Response ManipulationLocally
+title: Test Actions Response Manipulation
 ---
 
-In this guide, you will create a ZITADEL execution and target. After an intent is retrieved through the API, the target is called.
+In this guide, you will create a ZITADEL execution and target. After an intent is retrieved through the API, the target
+is called.
 
 ## Prerequisites
 
@@ -27,7 +28,7 @@ import (
 )
 
 type response struct {
-	Request *user.RetrieveIdentityProviderIntentRequest `json:"request"`
+	Request  *user.RetrieveIdentityProviderIntentRequest  `json:"request"`
 	Response *user.RetrieveIdentityProviderIntentResponse `json:"response"`
 }
 
@@ -78,23 +79,10 @@ func main() {
 
 What happens here is the response is received as a request, manipulated and then returned.
 
-### Check Signature
-
-To additionally check the signature header you can add the following to the example:
-```go
-	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
-		// if the signed content is not equal the sent content return an error
-		http.Error(w, "error", http.StatusInternalServerError)
-		return
-	}
-```
-
-Where you can replace 'signingKey' with the key received in the next step 'Create target'.
-
 ## Create target
 
-As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
+As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the
+target can be created as follows:
 
 [Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target)
 
@@ -117,7 +105,8 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To call the target just created before, with the intention to manipulate the retrieve of an intent by the user V2 API, we define an execution with a method condition.
+To call the target just created before, with the intention to manipulate the retrieve of an intent by the user V2 API,
+we define an execution with a method condition.
 
 [Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
 
@@ -142,15 +131,109 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now on every call on `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent` the local server would return something like:
+Now on every call on `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent` the local server would return
+something like:
 
-```json
-TODO
+```json    
+{
+  "details": {
+    "sequence": "599",
+    "changeDate": "2023-06-15T06:44:26.039444Z",
+    "resourceOwner": "163840776835432705"
+  },
+  "idpInformation": {
+    "oauth": {
+      "accessToken": "ya29...",
+      "idToken": "ey..."
+    },
+    "idpId": "218528353504723201",
+    "userId": "218528353504723202",
+    "username": "test-user@localhost",
+    "rawInformation": {
+      "User": {
+        "email": "test-user@localhost",
+        "email_verified": true,
+        "family_name": "User",
+        "given_name": "Test",
+        "hd": "mouse.com",
+        "locale": "de",
+        "name": "Minnie Mouse",
+        "picture": "https://lh3.googleusercontent.com/a/AAcKTtf973Q7NH8KzKTMEZELPU9lx45WpQ9FRBuxFdPb=s96-c",
+        "sub": "111392805975715856637"
+      }
+    }
+  },
+  "addHumanUser": {
+    "idpLinks": [
+      {"idpId": "218528353504723201", "userId": "218528353504723202", "userName": "test-user@localhost"}
+    ],
+    "username": "test-user@localhost",
+    "profile": {
+      "givenName": "Test",
+      "familyName": "User",
+      "displayName": "Test User",
+      "preferredLanguage": "de"
+    },
+    "email": {
+      "email": "test-user@zitadel.ch",
+      "isVerified": true
+    },
+    "metadata": []
+  }
+}
 ```
 
 Resulting in a response like this:
+
 ```json
-TODO
+{
+  "details": {
+    "sequence": "599",
+    "changeDate": "2023-06-15T06:44:26.039444Z",
+    "resourceOwner": "163840776835432705"
+  },
+  "idpInformation": {
+    "oauth": {
+      "accessToken": "ya29...",
+      "idToken": "ey..."
+    },
+    "idpId": "218528353504723201",
+    "userId": "218528353504723202",
+    "username": "test-user@localhost",
+    "rawInformation": {
+      "User": {
+        "email": "test-user@localhost",
+        "email_verified": true,
+        "family_name": "User",
+        "given_name": "Test",
+        "hd": "mouse.com",
+        "locale": "de",
+        "name": "Minnie Mouse",
+        "picture": "https://lh3.googleusercontent.com/a/AAcKTtf973Q7NH8KzKTMEZELPU9lx45WpQ9FRBuxFdPb=s96-c",
+        "sub": "111392805975715856637"
+      }
+    }
+  },
+  "addHumanUser": {
+    "idpLinks": [
+      {"idpId": "218528353504723201", "userId": "218528353504723202", "userName": "test-user@localhost"}
+    ],
+    "username": "test-user@localhost",
+    "profile": {
+      "givenName": "Test",
+      "familyName": "User",
+      "displayName": "Test User",
+      "preferredLanguage": "de"
+    },
+    "email": {
+      "email": "test-user@zitadel.ch",
+      "isVerified": true
+    },
+    "metadata": [
+      {"key": "organization", "value": "Y29tcGFueQ=="}
+    ]
+  }
+}
 ```
 
 

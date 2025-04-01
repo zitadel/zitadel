@@ -1,5 +1,5 @@
 ---
-title: Test Actions Event Locally
+title: Test Actions Event
 ---
 
 In this guide, you will create a ZITADEL execution and target. As a result of the event creation, the target is called.
@@ -46,21 +46,7 @@ func main() {
 }
 ```
 
-What happens here is that the user get the metadata with the key "key" and value "value" added, the token gets a claim "urn:zitadel:iam:claim" with value "value" and the log claim "urn:zitadel:iam:action:preuserinfo:log" with values "log1", "log2" and "log3".
-
-### Check Signature
-
-To additionally check the signature header you can add the following to the example:
-```go
-	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
-		// if the signed content is not equal the sent content return an error
-		http.Error(w, "error", http.StatusInternalServerError)
-		return
-	}
-```
-
-Where you can replace 'signingKey' with the key received in the next step 'Create target'.
+What happens here is only a target which prints out the received event, which could also be handled with a different logic.
 
 ## Create target
 
@@ -87,7 +73,7 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To call the target just created before, with the intention to print the response from a user creation by the user V2 API, we define an execution with a method condition.
+To call the target just created before, with the intention to print the event from a user creation, we define an execution with an event condition.
 
 [Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
 

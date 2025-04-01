@@ -489,27 +489,31 @@ module.exports = {
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-locally-request",
+              id: "guides/integrate/actions/testing-request",
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-locally-request-manipulation",
+              id: "guides/integrate/actions/testing-request-manipulation",
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-locally-response",
+              id: "guides/integrate/actions/testing-request-signature",
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-locally-response-manipulation",
+              id: "guides/integrate/actions/testing-response",
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-locally-function",
+              id: "guides/integrate/actions/testing-response-manipulation",
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-locally-event",
+              id: "guides/integrate/actions/testing-function",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-event",
             },
           ],
         },
