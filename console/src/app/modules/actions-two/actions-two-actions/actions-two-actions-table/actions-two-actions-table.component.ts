@@ -1,18 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
-import {
-  Condition,
-  EventExecution,
-  Execution,
-  ExecutionTargetType,
-  FunctionExecution,
-  RequestExecution,
-  ResponseExecution,
-} from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Condition, Execution, ExecutionTargetType } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
-import { parseCondition } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.pipe';
 
 @Component({
   selector: 'cnsl-actions-two-actions-table',
@@ -49,7 +40,10 @@ export class ActionsTwoActionsTableComponent {
   );
 
   protected filteredTargetTypes(targets: ExecutionTargetType[]): Observable<Target[]> {
-    const targetIds = targets.filter((t) => t.type.case === 'target').map((t) => t.type.value as string);
+    const targetIds = targets
+      .map((t) => t.type)
+      .filter((t): t is Extract<ExecutionTargetType['type'], { case: 'target' }> => t.case === 'target')
+      .map((t) => t.value);
 
     return this.targets$.pipe(
       filter(Boolean),
@@ -59,8 +53,8 @@ export class ActionsTwoActionsTableComponent {
 
   protected filteredIncludeConditions(targets: ExecutionTargetType[]): Condition[] {
     return targets
-      .filter((t) => t.type.case === 'include')
-      .filter((t) => typeof t.type.value === 'object')
-      .map((t) => t.type.value as Condition);
+      .map((t) => t.type)
+      .filter((t): t is Extract<ExecutionTargetType['type'], { case: 'include' }> => t.case === 'include')
+      .map(({ value }) => value);
   }
 }

@@ -3,15 +3,14 @@
     <ng-content></ng-content>
   </div>
   <div class="table-wrapper">
-    <table *ngIf="dataSource$ | async as dataSource" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+    <table *ngIf="dataSource$ | async as dataSource" mat-table class="table" aria-label="Elements"
+           [dataSource]="dataSource">
       <ng-container matColumnDef="condition">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.CONDITION' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          <span class="" *ngIf="row.condition?.conditionType?.value">{{ row?.condition | condition }}</span>
-          <span *ngFor="let condition of filteredIncludeConditions(row.targets)">
-            <mat-icon class="icon">refresh</mat-icon>
-            {{ condition | condition }}</span
-          >
+          <span *ngIf="row.condition?.conditionType?.value">
+            {{ row?.condition | condition }}
+          </span>
         </td>
       </ng-container>
 
@@ -29,8 +28,12 @@
             <cnsl-project-role-chip
               *ngFor="let target of filteredTargetTypes(row.targets) | async"
               [roleName]="target.name"
-              >{{ target.name }}</cnsl-project-role-chip
-            >
+            >{{ target.name }}
+            </cnsl-project-role-chip>
+            <cnsl-project-role-chip *ngFor="let condition of filteredIncludeConditions(row.targets)" [roleName]="condition | condition">
+              <mat-icon class="icon">refresh</mat-icon>
+              {{ condition | condition }}
+            </cnsl-project-role-chip>
           </div>
         </td>
       </ng-container>
@@ -39,7 +42,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'ACTIONSTWO.EXECUTION.TABLE.CREATIONDATE' | translate }}
         </th>
-        <td mat-cell *matCellDef="let row; dataSource: dataSource">
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
           <span class="no-break">{{ row.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
         </td>
       </ng-container>
