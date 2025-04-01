@@ -63,9 +63,9 @@ export class ActionTwoAddActionDialogComponent {
 
   constructor(
     public dialogRef: MatDialogRef<ActionTwoAddActionDialogComponent, MessageInitShape<typeof SetExecutionRequestSchema>>,
-    @Inject(MAT_DIALOG_DATA) public data: { execution: Execution },
+    @Inject(MAT_DIALOG_DATA) protected readonly data: { execution?: Execution },
   ) {
-    if (data.execution) {
+    if (data?.execution) {
       this.typeSignal.set(data.execution.condition?.conditionType.case ?? 'request');
       this.conditionSignal.set((data.execution.condition?.conditionType as any)?.value ?? undefined);
       this.targetSignal.set(data.execution.targets ?? []);

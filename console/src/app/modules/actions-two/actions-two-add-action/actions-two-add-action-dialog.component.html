@@ -22,6 +22,7 @@
       (back)="back()"
       [hideBackButton]="!!data.execution"
       (continue)="targetSignal.set($event); continue()"
+      [selectedCondition]="data.execution?.condition"
     ></cnsl-actions-two-add-action-target>
   </div>
 </mat-dialog-content>

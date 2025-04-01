@@ -10,13 +10,13 @@ import { requiredValidator } from '../../form-field/validators/validators';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { DurationSchema } from '@bufbuild/protobuf/wkt';
 import { MatSelectModule } from '@angular/material/select';
-import { Target, TargetSchema } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import {
+  CreateTargetRequestSchema,
+  UpdateTargetRequestSchema,
+} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
-enum TargetType {
-  RestWebhook = 'restWebhook',
-  RestCall = 'restCall',
-  RestAsync = 'restAsync',
-}
+type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
 
 @Component({
   selector: 'cnsl-actions-two-add-target-dialog',
@@ -35,68 +35,81 @@ enum TargetType {
   ],
 })
 export class ActionTwoAddTargetDialogComponent {
-  public TargetType = TargetType;
-  public targetTypeValues = Object.values(TargetType); // Get enum values
-
+  protected readonly targetTypes = ['restCall', 'restWebhook', 'restAsync'] as const;
   protected readonly targetForm: ReturnType<typeof this.buildTargetForm>;
 
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<ActionTwoAddTargetDialogComponent, MessageInitShape<typeof TargetSchema>>,
-    @Inject(MAT_DIALOG_DATA) public data: { target: Target },
+    public dialogRef: MatDialogRef<
+      ActionTwoAddTargetDialogComponent,
+      MessageInitShape<typeof CreateTargetRequestSchema | typeof UpdateTargetRequestSchema>
+    >,
+    @Inject(MAT_DIALOG_DATA) private readonly data: { target?: Target },
   ) {
     this.targetForm = this.buildTargetForm();
 
-    if (data.target) {
-      this.targetForm.patchValue({
-        name: data.target?.name,
-        endpoint: data.target.endpoint,
-        timeout: Number(data.target.timeout?.seconds),
-        interrupt_on_error:
-          data.target.targetType.case === 'restWebhook' || data.target.targetType.case === 'restCall'
-            ? data.target.targetType.value.interruptOnError
-            : false,
-      });
+    if (!data?.target) {
+      return;
     }
+
+    this.targetForm.patchValue({
+      name: data.target.name,
+      endpoint: data.target.endpoint,
+      timeout: Number(data.target.timeout?.seconds),
+      type: this.data.target?.targetType?.case ?? 'restWebhook',
+      interruptOnError:
+        data.target.targetType.case === 'restWebhook' || data.target.targetType.case === 'restCall'
+          ? data.target.targetType.value.interruptOnError
+          : false,
+    });
   }
 
   public buildTargetForm() {
     return this.fb.group({
-      name: new FormControl<string>('', [requiredValidator]),
-      type: new FormControl<TargetType>(TargetType.RestWebhook, [requiredValidator]),
-      endpoint: new FormControl<string>('', [requiredValidator]),
-      timeout: new FormControl<number>(10, [requiredValidator]),
-      interrupt_on_error: new FormControl<boolean>(true),
+      name: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
+      type: new FormControl<TargetTypes>('restWebhook', {
+        nonNullable: true,
+        validators: [requiredValidator],
+      }),
+      endpoint: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
+      timeout: new FormControl<number>(10, { nonNullable: true, validators: [requiredValidator] }),
+      interruptOnError: new FormControl<boolean>(true, { nonNullable: true }),
     });
   }
 
   public closeWithResult() {
-    if (this.targetForm.valid) {
-      const timeoutDuration: MessageInitShape<typeof DurationSchema> = {
-        seconds: BigInt(this.targetForm.get('timeout')?.value ?? 10),
-        nanos: 0,
-      };
-
-      let req: MessageInitShape<typeof TargetSchema> = {
-        name: this.targetForm.get('name')?.value ?? '',
-        endpoint: this.targetForm.get('endpoint')?.value ?? '',
-        timeout: timeoutDuration,
-        targetType: {
-          case: this.targetType as 'restWebhook' | 'restCall',
-          value: {
-            interruptOnError:
-              this.targetType == 'restWebhook' || this.targetType == 'restCall'
-                ? !!this.targetForm.get('interrupt_on_error')?.value
-                : undefined,
-          },
-        },
-      };
-
-      this.dialogRef.close(req);
+    if (this.targetForm.invalid) {
+      return;
     }
-  }
 
-  public get targetType(): TargetType {
-    return this.targetForm.get('type')?.value as TargetType;
+    const { type, name, endpoint, timeout, interruptOnError } = this.targetForm.getRawValue();
+
+    const timeoutDuration: MessageInitShape<typeof DurationSchema> = {
+      seconds: BigInt(timeout),
+      nanos: 0,
+    };
+
+    const targetType: Extract<MessageInitShape<typeof CreateTargetRequestSchema>['targetType'], { case: TargetTypes }> =
+      type === 'restWebhook'
+        ? { case: type, value: { interruptOnError } }
+        : type === 'restCall'
+          ? { case: type, value: { interruptOnError } }
+          : { case: 'restAsync', value: {} };
+
+    const baseReq = {
+      name,
+      endpoint,
+      timeout: timeoutDuration,
+      targetType,
+    };
+
+    this.dialogRef.close(
+      this.data.target
+        ? {
+            ...baseReq,
+            id: this.data.target.id,
+          }
+        : baseReq,
+    );
   }
 }

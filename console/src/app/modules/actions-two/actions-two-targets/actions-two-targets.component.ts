@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
-import { defer, firstValueFrom, merge, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
+import { defer, firstValueFrom, Observable, of, ReplaySubject, shareReplay, Subject, TimeoutError } from 'rxjs';
 import { ActionService } from 'src/app/services/action.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ORGANIZATIONS } from '../../settings-list/settings';
-import { catchError, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
+import { catchError, filter, map, startWith, switchMap, timeout } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionTwoAddTargetDialogComponent } from '../actions-two-add-target/actions-two-add-target-dialog.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
@@ -25,7 +25,7 @@ import {
 export class ActionsTwoTargetsComponent implements OnInit {
   private readonly actionsEnabled$: Observable<boolean>;
   protected readonly targets$: Observable<Target[]>;
-  protected readonly refresh = new Subject<true>();
+  protected readonly refresh$ = new ReplaySubject<true>(1);
 
   constructor(
     private readonly actionService: ActionService,
@@ -57,7 +57,7 @@ export class ActionsTwoTargetsComponent implements OnInit {
   }
 
   private getTargets$(actionsEnabled$: Observable<boolean>) {
-    return this.refresh.pipe(
+    return this.refresh$.pipe(
       startWith(true),
       switchMap(() => {
         return this.actionService.listTargets({});
@@ -87,39 +87,35 @@ export class ActionsTwoTargetsComponent implements OnInit {
   }
 
   public async deleteTarget(target: Target) {
-    this.actionService.deleteTarget({ id: target.id });
-    setTimeout(() => {
-      this.refresh.next(true);
-    }, 1000);
+    await this.actionService.deleteTarget({ id: target.id });
+    await new Promise((res) => setTimeout(res, 1000));
+    this.refresh$.next(true);
   }
 
   public openDialog(target?: Target): void {
-    const ref = this.dialog.open(ActionTwoAddTargetDialogComponent, {
+    const ref = this.dialog.open<
+      ActionTwoAddTargetDialogComponent,
+      { target?: Target },
+      MessageInitShape<typeof UpdateTargetRequestSchema | typeof CreateTargetRequestSchema>
+    >(ActionTwoAddTargetDialogComponent, {
       width: '550px',
-      data: target
-        ? {
-            target: target,
-          }
-        : {},
+      data: {
+        target: target,
+      },
     });
 
-    ref.afterClosed().subscribe((dialogResponse) => {
-      if (target?.id && dialogResponse) {
-        const req: MessageInitShape<typeof UpdateTargetRequestSchema> = dialogResponse;
+    ref
+      .afterClosed()
+      .pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef))
+      .subscribe(async (dialogResponse) => {
+        if ('id' in dialogResponse) {
+          await this.actionService.updateTarget(dialogResponse);
+        } else {
+          await this.actionService.createTarget(dialogResponse);
+        }
 
-        this.actionService.updateTarget({ ...req, id: target.id });
-        setTimeout(() => {
-          this.refresh.next(true);
-        }, 1000);
-      }
-      if (dialogResponse) {
-        const req: MessageInitShape<typeof CreateTargetRequestSchema> = dialogResponse;
-
-        this.actionService.createTarget(req);
-        setTimeout(() => {
-          this.refresh.next(true);
-        }, 1000);
-      }
-    });
+        await new Promise((res) => setTimeout(res, 1000));
+        this.refresh$.next(true);
+      });
   }
 }

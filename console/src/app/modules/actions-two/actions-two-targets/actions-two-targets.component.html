@@ -2,7 +2,7 @@
 <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.TARGET.DESCRIPTION' | translate }}</p>
 
 <cnsl-actions-two-targets-table
-  (refresh)="refresh.next(true)"
+  (refresh)="refresh$.next(true)"
   (delete)="deleteTarget($event)"
   (selected)="openDialog($event)"
   [targets]="targets$ | async"

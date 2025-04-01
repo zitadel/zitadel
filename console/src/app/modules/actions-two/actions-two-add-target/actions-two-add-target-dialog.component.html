@@ -5,7 +5,7 @@
   <form *ngIf="targetForm" class="form-grid" [formGroup]="targetForm" (ngSubmit)="closeWithResult()">
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.NAME' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput formControlName="name" />
+      <input cnslInput type="text" placeholder="" formControlName="name" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
         'ACTIONSTWO.TARGET.CREATE.NAME_DESCRIPTION' | translate
       }}</span>
@@ -13,7 +13,7 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.ENDPOINT' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput formControlName="endpoint" />
+      <input cnslInput type="text" placeholder="" formControlName="endpoint" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
         'ACTIONSTWO.TARGET.CREATE.ENDPOINT_DESCRIPTION' | translate
       }}</span>
@@ -21,8 +21,8 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TYPE' | translate }}</cnsl-label>
-      <mat-select formControlName="type" name="type">
-        <mat-option *ngFor="let type of targetTypeValues" [value]="type">
+      <mat-select [formControl]="targetForm.controls.type" name="type">
+        <mat-option *ngFor="let type of targetTypes" [value]="type">
           {{ 'ACTIONSTWO.TARGET.CREATE.TYPES.' + type | translate }}
         </mat-option>
       </mat-select>
@@ -30,16 +30,16 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TIMEOUT' | translate }}</cnsl-label>
-      <input cnslInput type="number" placeholder="10" #nameInput formControlName="timeout" />
+      <input cnslInput type="number" placeholder="10" [formControl]="targetForm.controls.timeout" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
         'ACTIONSTWO.TARGET.CREATE.TIMEOUT_DESCRIPTION' | translate
       }}</span>
     </cnsl-form-field>
 
     <mat-checkbox
-      *ngIf="targetType == TargetType.RestWebhook || targetType == TargetType.RestCall"
+      *ngIf="targetForm.controls.type.value === 'restWebhook' || targetForm.controls.type.value === 'restCall'"
       class="target-checkbox"
-      formControlName="interrupt_on_error"
+      [formControl]="targetForm.controls.interruptOnError"
     >
       <div class="target-condition-text">
         <span>{{ 'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR' | translate }}</span>
