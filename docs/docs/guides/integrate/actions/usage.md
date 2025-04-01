@@ -30,7 +30,9 @@ The information sent to the Endpoint is structured as JSON:
   "orgID": "ID of the organization related to the calling context",
   "projectID": "ID of the project related to the used application",
   "userID": "ID of the calling user",
-  "request": "full request of the call"
+  "request": {
+    "attribute": "Attribute value of full request of the call"
+  }
 }
 ```
 
@@ -45,8 +47,12 @@ The information sent to the Endpoint is structured as JSON:
   "orgID": "ID of the organization related to the calling context",
   "projectID": "ID of the project related to the used application",
   "userID": "ID of the calling user",
-  "request": "full request of the call",
-  "response": "full response of the call"
+  "request": {
+    "attribute": "Attribute value of full request of the call"
+  },
+  "response": {
+    "attribute": "Attribute value of full response of the call"
+  }
 }
 ```
 
@@ -57,15 +63,71 @@ Information sent and expected back are specific to the function.
 #### PreUserinfo
 
 The information sent to the Endpoint is structured as JSON:
-
 ```json
 {
   "function": "Name of the function",
-  "userinfo": "Currently available userinfo",
-  "user": "Information about the user",
-  "user_metadata": "List of metadata belonging to the user",
-  "org": "Information about the organization the user belongs to",
-  "user_grants": "List of grants belonging to a user"
+  "userinfo": {
+    "given_name": "",
+    "family_name": "",
+    "middle_name": "",
+    "nickname": "",
+    "profile": "",
+    "picture": "",
+    ...
+    "preferred_username": "",
+    "email": "",
+    "email_verified": true,
+    "phone_number": "",
+    "phone_number_verified": true
+  },
+  "user": {
+    "id": "",
+    "creation_date": "",
+    ...
+    "human": {
+      "first_name": "",
+      "last_name": "",
+      ...
+      "email": "",
+      "is_email_verified": true,
+      "phone": "",
+      "is_phone_verified": true
+    }
+  },
+  "user_metadata": [
+    {
+      "creation_date": "",
+      "change_date": "",
+      "resource_owner": "",
+      "sequence": "",
+      "key": "",
+      "value": ""
+    }
+  ],
+  "org": {
+    "id": "ID of the organization the user belongs to",
+    "name": "Name of the organization the user belongs to",
+    "primary_domain": "Primary domain of the organization the user belongs to"
+  },
+  "user_grants": [
+    {
+      "id": "",
+      "projectGrantId": "The ID of the project grant",
+      "state": 1,
+      "creationDate": "",
+      "changeDate": "",
+      "sequence": 1,
+      "userId": "",
+      "roles": [
+        "role"
+      ],
+      "userResourceOwner": "The ID of the organization the user belongs to",
+      "userGrantResourceOwner": "The ID of the organization the user got authorization granted",
+      "userGrantResourceOwnerName": "The name of the organization the user got authorization granted",
+      "projectId": "",
+      "projectName": ""
+    }
+  ]
 }
 ```
 
@@ -73,9 +135,21 @@ The expected structure of the JSON as response:
 
 ```json
 {
-  "set_user_metadata": "List of metadata to be set on the user",
-  "append_claims": "List of claims to be appended to the token",
-  "append_log_claims": "List of logs to be appended to the log claim on the token"
+  "set_user_metadata": [
+    {
+      "key": "key of metadata to be set on the user",
+      "value": "base64 value of metadata to be set on the user"
+    }
+  ],
+  "append_claims": [
+    {
+      "key": "key of claim to be set on the user",
+      "value": "value of claim to be set on the user"
+    }
+  ],
+  "append_log_claims": [
+    "Log to be appended to the log claim on the token"
+  ]
 }
 ```
 
@@ -86,11 +160,68 @@ The information sent to the Endpoint is structured as JSON:
 ```json
 {
   "function": "Name of the function",
-  "userinfo": "Currently available userinfo",
-  "user": "Information about the user",
-  "user_metadata": "List of metadata belonging to the user",
-  "org": "Information about the organization the user belongs to",
-  "user_grants": "List of grants belonging to a user"
+  "userinfo": {
+    "given_name": "",
+    "family_name": "",
+    "middle_name": "",
+    "nickname": "",
+    "profile": "",
+    "picture": "",
+    ...
+    "preferred_username": "",
+    "email": "",
+    "email_verified": true/false,
+    "phone_number": "",
+    "phone_number_verified": true/false
+  },
+  "user": {
+    "id": "",
+    "creation_date": "",
+    ...
+    "human": {
+      "first_name": "",
+      "last_name": "",
+      ...
+      "email": "",
+      "is_email_verified": true,
+      "phone": "",
+      "is_phone_verified": true
+    }
+  },
+  "user_metadata": [
+    {
+      "creation_date": "",
+      "change_date": "",
+      "resource_owner": "",
+      "sequence": "",
+      "key": "",
+      "value": ""
+    }
+  ],
+  "org": {
+    "id": "ID of the organization the user belongs to",
+    "name": "Name of the organization the user belongs to",
+    "primary_domain": "Primary domain of the organization the user belongs to"
+  },
+  "user_grants": [
+    {
+      "id": "",
+      "projectGrantId": "The ID of the project grant",
+      "state": 1,
+      "creationDate": "",
+      "changeDate": "",
+      "sequence": 1,
+      "userId": "",
+      "roles": [
+        "role"
+      ],
+      "userResourceOwner": "The ID of the organization the user belongs to",
+      "userGrantResourceOwner": "The ID of the organization the user got authorization granted",
+      "userGrantResourceOwnerName": "The name of the organization the user got authorization granted",
+      "projectId": "",
+      "projectName": ""
+    }
+  ]
 }
 ```
 
@@ -98,9 +229,21 @@ The expected structure of the JSON as response:
 
 ```json
 {
-  "set_user_metadata": "List of metadata to be set on the user",
-  "append_claims": "List of claims to be appended to the token",
-  "append_log_claims": "List of logs to be appended to the log claim on the token"
+  "set_user_metadata": [
+    {
+      "key": "key of metadata to be set on the user",
+      "value": "base64 value of metadata to be set on the user"
+    }
+  ],
+  "append_claims": [
+    {
+      "key": "key of claim to be set on the user",
+      "value": "value of claim to be set on the user"
+    }
+  ],
+  "append_log_claims": [
+    "Log to be appended to the log claim on the token"
+  ]
 }
 ```
 
@@ -119,7 +262,7 @@ The information sent to the Endpoint is structured as JSON:
   "event_type": "Type of the event",
   "created_at": "Time the event was created",
   "userID": "ID of the creator of the event",
-  "event_payload": "Content of the event"
+  "event_payload": "Base64 encoded content of the event"
 }
 ```
 
