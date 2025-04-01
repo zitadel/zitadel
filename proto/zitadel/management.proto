@@ -913,7 +913,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 UpdateUser
+    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
