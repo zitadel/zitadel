@@ -47,7 +47,7 @@
     "@types/node": "^20.17.17",
     "@vitejs/plugin-react": "^4.3.3",
     "@zitadel/prettier-config": "workspace:*",
-    "axios": "^1.7.7",
+    "axios": "^1.8.2",
     "dotenv": "^16.4.5",
     "eslint": "8.57.1",
     "@zitadel/eslint-config": "workspace:*",

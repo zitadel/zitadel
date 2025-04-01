@@ -1,12 +1,8 @@
 import { faker } from "@faker-js/faker";
-import {expect, test as base} from "@playwright/test";
+import { test as base } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
-import { loginname } from "./loginname";
-import { password } from "./password";
 import { PasswordUser } from "./user";
-import {startSAML} from "./saml";
-import {selectNewAccount} from "./select-account";
 
 // Read from ".env" file.
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
