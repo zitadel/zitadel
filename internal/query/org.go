@@ -93,6 +93,16 @@ func orgsCheckPermission(ctx context.Context, orgs *Orgs, permissionCheck domain
 	)
 }
 
+func orgsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	return WherePermittedOrgs(
+		ctx,
+		query,
+		enabled,
+		OrgColumnID,
+		domain_pkg.PermissionOrgRead,
+	)
+}
+
 type OrgSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -299,7 +309,7 @@ func (q *Queries) searchOrgs(ctx context.Context, queries *OrgSearchQueries, per
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareOrgsQuery()
-	query = WherePermittedOrgs(ctx, query, permissionCheckV2, OrgColumnID, domain_pkg.PermissionOrgRead)
+	query = orgsPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.And{
 			sq.Eq{
