@@ -432,7 +432,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ImportHumanUser
+    // Deprecated: please use user service v2 CreateUser
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -445,7 +445,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Create User (Human)";
-            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: use ImportHumanUser"
+            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             deprecated: true;
             parameters: {
@@ -459,7 +459,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 AddHumanUser
+    // Deprecated: please use user service v2 CreateUser
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -471,8 +471,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Create/Import User (Human)";
-            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [AddHumanUser](apis/resources/user_service_v2/user-service-add-human-user.api.mdx)"
+            summary: "Deprecated: Create/Import User (Human)";
+            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             tags: "User Human"
             deprecated: true;
@@ -498,8 +498,9 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Create User (Machine)";
-            description: "Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows."
+            summary: "Deprecated: Create User (Machine)";
+            deprecated: true;
+            description: "Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -683,7 +684,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 UpdateHumanUser
+    // Deprecated: please use user service v2 UpdateUser
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -695,8 +696,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Change user name";
-            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward.\n\nDeprecated: please use user service v2 UpdateHumanUser"
+            summary: "Deprecated: Change user name";
+            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward.\n\nDeprecated: please use user service v2 [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -903,7 +904,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 UpdateHumanUser
+    // Deprecated: please use user service v2 UpdateUser
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
@@ -916,7 +917,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Profile (Human)";
-            description: "Update the profile information from a user. The profile includes basic information like first_name and last_name.\n\nDeprecated: please use user service v2 UpdateHumanUser"
+            description: "Update the profile information from a user. The profile includes basic information like first_name and last_name.\n\nDeprecated: please use user service v2 [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1640,8 +1641,9 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Update Machine User";
-            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities."
+            summary: "Deprecated: Update Machine User";
+            deprecated: true;
+            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.\n\nDeprecated: please use user service v2 [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
