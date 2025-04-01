@@ -1284,8 +1284,8 @@ service UserService {
   // The same conditions apply as in the [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) endpoint.
   // The UpdateUser endpoint doesn't support changing the users metadata or idp links.
   // Use the following endpoints to manage sub-resources:
-  // - [AddUserMetadata](apis/resources/user_service_v2/user-service-add-user-metadata.api.mdx)
-  // - [RemoveUserMetadata](apis/resources/user_service_v2/user-service-remove-user-metadata.api.mdx)
+  // - [AddUserMetadataEntry](apis/resources/user_service_v2/user-service-add-user-metadata-entry.api.mdx)
+  // - [RemoveUserMetadataEntry](apis/resources/user_service_v2/user-service-remove-user-metadata-entry.api.mdx)
   // - [SetUserMetadata](apis/resources/user_service_v2/user-service-set-user-metadata.api.mdx)
   // - [AddUserIDPLink](apis/resources/user_service_v2/user-service-add-user-idp-link.api.mdx)
   // - [RemoveUserIDPLink](apis/resources/user_service_v2/user-service-remove-user-idp-link.api.mdx)
