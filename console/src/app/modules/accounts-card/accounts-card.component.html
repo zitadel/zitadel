@@ -1,7 +1,6 @@
-<div class="accounts-card">
+<div class="accounts-card" *ngIf="user$ | async as user">
   <cnsl-avatar
     (click)="editUserProfile()"
-    *ngIf="user"
     class="avatar"
     [ngClass]="{ 'iam-user': iamuser }"
     [forColor]="user.preferredLoginName"
@@ -16,8 +15,8 @@
 
   <button (click)="editUserProfile()" mat-stroked-button>{{ 'USER.EDITACCOUNT' | translate }}</button>
   <div class="l-accounts">
-    <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
-    <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
+    <mat-progress-bar *ngIf="(sessions$ | async) === null" color="primary" mode="indeterminate"></mat-progress-bar>
+    <a class="row" *ngFor="let session of sessions$ | async" (click)="selectAccount(session.loginName)">
       <cnsl-avatar
         *ngIf="session && session.displayName"
         class="small-avatar"
@@ -31,7 +30,7 @@
       <div class="col">
         <span class="user-title">{{ session.displayName ? session.displayName : session.userName }} </span>
         <span class="loginname">{{ session.loginName }}</span>
-        <span class="state inactive" *ngIf="session.authState === UserState.USER_STATE_INACTIVE">{{
+        <span class="state inactive" *ngIf="$any(session.authState) === UserState.USER_STATE_INACTIVE">{{
           'USER.STATE.' + session.authState | translate
         }}</span>
       </div>
