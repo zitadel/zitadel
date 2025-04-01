@@ -110,7 +110,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserService {
 
-  // Deprecated: Use CreateUser instead.
+  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
   //
   // Create a new human user
   //
@@ -133,7 +133,8 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      description: "Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
+      summary: "Deprecated: Add Human User";
+      description: "Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -408,7 +409,7 @@ service UserService {
     };
   }
 
-  // Deprecated: Use UpdateUser instead.
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
   //
   // Update User
   //
@@ -427,7 +428,8 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      description: "Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
+      summary: "Deprecated: Update Human User";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {

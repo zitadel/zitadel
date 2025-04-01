@@ -432,7 +432,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 CreateUser
+    // Deprecated: please use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -444,10 +444,10 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            deprecated: true;
             summary: "Deprecated: Create User (Human)";
             description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
-            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -459,7 +459,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 CreateUser
+    // Deprecated: please use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -471,11 +471,11 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            deprecated: true;
             summary: "Deprecated: Create/Import User (Human)";
             description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             tags: "User Human"
-            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -487,6 +487,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
             post: "/users/machine"
@@ -498,8 +499,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Create User (Machine)";
             deprecated: true;
+            summary: "Deprecated: Create User (Machine)";
             description: "Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             tags: "User Machine";
@@ -684,7 +685,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 UpdateUser
+    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -697,7 +698,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Change user name";
-            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward.\n\nDeprecated: please use user service v2 [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
+            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward.\n\nDeprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -717,6 +718,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use [user service v2 AddUserMetadataEntry](apis/resources/user_service_v2/user-service-add-user-metadata-entry.api.mdx)
     rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/{key}"
@@ -730,8 +732,9 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Set User Metadata";
-            description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
+            deprecated: true;
+            summary: "Deprecated: Set User Metadata";
+            description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.\n\nDeprecated: use [user service v2 AddUserMetadataEntry](apis/resources/user_service_v2/user-service-add-user-metadata-entry.api.mdx)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -743,6 +746,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use [user service v2 SetUserMetadataEntries](apis/resources/user_service_v2/user-service-set-user-metadata-entries.api.mdx)
     rpc BulkSetUserMetadata(BulkSetUserMetadataRequest) returns (BulkSetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_bulk"
@@ -756,12 +760,13 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Bulk Set User Metadata";
+            deprecated: true;
+            summary: "Deprecated: Bulk Set User Metadata";
             description: "Add or update multiple metadata values for a user. Make sure the values are base64 encoded."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.\n\nDeprecated: use [user service v2 SetUserMetadataEntries](apis/resources/user_service_v2/user-service-set-user-metadata-entries.api.mdx)";
                     type: STRING,
                     required: false;
                 };
@@ -820,6 +825,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use [user service v2 RemoveUserMetadataEntry](apis/resources/user_service_v2/user-service-remove-user-metadata-entry.api.mdx)
     rpc RemoveUserMetadata(RemoveUserMetadataRequest) returns (RemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/{key}"
@@ -832,12 +838,13 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Delete User Metadata By Key";
+            deprecated: true;
+            summary: "Deprecated: Delete User Metadata By Key";
             description: "Remove a metadata object from a user with a specific key."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.\n\nDeprecated: use [user service v2 RemoveUserMetadataEntry](apis/resources/user_service_v2/user-service-remove-user-metadata-entry.api.mdx)";
                     type: STRING,
                     required: false;
                 };
@@ -845,6 +852,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use [user service v2 RemoveUserMetadataEntry](apis/resources/user_service_v2/user-service-remove-user-metadata-entry.api.mdx) or [user service v2 SetUserMetadataEntries](apis/resources/user_service_v2/user-service-set-user-metadata-entries.api.mdx)
     rpc BulkRemoveUserMetadata(BulkRemoveUserMetadataRequest) returns (BulkRemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/_bulk"
@@ -858,12 +866,13 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Bulk Delete Metadata";
+            summary: "Deprecated: Bulk Delete Metadata";
+            deprecated: true;
             description: "Remove a list of metadata objects from a user with a list of keys."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.\n\nDeprecated: use [user service v2 RemoveUserMetadataEntry](apis/resources/user_service_v2/user-service-remove-user-metadata-entry.api.mdx) or [user service v2 SetUserMetadataEntries](apis/resources/user_service_v2/user-service-set-user-metadata-entries.api.mdx)";
                     type: STRING,
                     required: false;
                 };
@@ -2005,7 +2014,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemoveLinkedIDP
+    // Deprecated: please use user service v2 RemoveIDPLink
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -2017,9 +2026,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
-            summary: "Remove Social Login";
+            summary: "Deprecated: Remove Social Login";
             deprecated: true;
-            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use user service v2 RemoveLinkedIDP"
+            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idplink.api.mdx)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
