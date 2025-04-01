@@ -71,6 +71,7 @@ export class AuthUserDetailComponent implements OnInit {
       i18nKey: 'USER.SETTINGS.METADATA',
       requiredRoles: { [PolicyComponentServiceType.MGMT]: ['user.read'] },
     },
+    { id: 'groups', i18nKey: 'USER.SETTINGS.GROUPS' }
   ];
   protected readonly user$: Observable<UserQuery>;
   protected readonly metadata$: Observable<MetadataQuery>;
