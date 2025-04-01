@@ -5,7 +5,7 @@
   (toggleChange)="toggleState$.next($event); !$event.enabled && toggleChanged.emit($event)"
 >
   <cnsl-form-field *ngIf="toggleState.enabled">
-    <cnsl-label>{{ 'BASE URI' | translate }}</cnsl-label>
+    <cnsl-label>{{ 'SETTING.FEATURES.LOGINV2_BASEURI' | translate }}</cnsl-label>
     <input cnslInput [formControl]="baseUri" />
     <button
       matTooltip="{{ 'ACTIONS.SAVE' | translate }}"

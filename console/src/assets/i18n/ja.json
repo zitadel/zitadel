@@ -1542,7 +1542,10 @@
       },
       "RESET": "すべて継承に設定",
       "CONSOLEUSEV2USERAPI": "コンソールでユーザー作成のためにV2 APIを使用してください。",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。"
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。",
+      "LOGINV2": "ログイン V2",
+      "LOGINV2_DESCRIPTION": "これを有効にすると、セキュリティ、パフォーマンス、およびカスタマイズ性が向上した、TypeScript ベースの新しいログイン UI が有効になります。",
+      "LOGINV2_BASEURI": "ベースURI"
     },
     "DIALOG": {
       "RESET": {

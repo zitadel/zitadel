@@ -1541,7 +1541,10 @@
       },
       "RESET": "Ustaw wszystko na dziedziczone",
       "CONSOLEUSEV2USERAPI": "Użyj API V2 w konsoli do tworzenia użytkowników",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego.",
+      "LOGINV2": "Logowanie V2",
+      "LOGINV2_DESCRIPTION": "Włączenie tej opcji aktywuje nowy interfejs logowania oparty na TypeScript z ulepszonym bezpieczeństwem, wydajnością i możliwością dostosowania.",
+      "LOGINV2_BASEURI": "Podstawowy URI"
     },
     "DIALOG": {
       "RESET": {
