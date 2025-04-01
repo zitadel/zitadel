@@ -1303,7 +1303,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "authenticated"
+        permission: "user.write"
       }
     };
 
@@ -2598,6 +2598,12 @@ message HumanMFAInitSkippedResponse {
 message CreateUserRequest{
   message Human {
     message Profile {
+      enum Gender {
+        GENDER_UNSPECIFIED = 0;
+        GENDER_FEMALE = 1;
+        GENDER_MALE = 2;
+        GENDER_DIVERSE = 3;
+      }
       string given_name = 1  [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
@@ -2653,9 +2659,24 @@ message CreateUserRequest{
           example: "\"mini@mouse.com\"";
         }
       ];
+      message SendVerificationCode {
+        // Optionally set a url_template, which will be used in the verification mail sent by ZITADEL to guide the user to your verification page.
+        // If no template is set, the default ZITADEL url will be used.
+        //
+        // The following placeholders can be used: UserID, OrgID, Code
+        optional string url_template = 1 [
+          (validate.rules).string = {min_len: 1, max_len: 200},
+          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"";
+          }
+        ];
+      }
+      message ReturnEmailVerificationCode {}
       // if no verification is specified, an email is sent with the default url
       oneof verification {
-        SendEmailVerificationCode send_code = 2;
+        SendVerificationCode send_code = 2;
         ReturnEmailVerificationCode return_code = 3;
         bool is_verified = 4;
       }
@@ -2668,9 +2689,11 @@ message CreateUserRequest{
           example: "\"+41791234567\"";
         }
       ];
+      message SendVerificationCode {}
+      message ReturnVerificationCode {}
       oneof verification {
-        SendPhoneVerificationCode send_code = 2;
-        ReturnPhoneVerificationCode return_code = 3;
+        SendVerificationCode send_code = 2;
+        ReturnVerificationCode return_code = 3;
         bool is_verified = 4 [(validate.rules).bool.const = true];
       }
     }
@@ -2880,7 +2903,7 @@ message UpdateUserRequest{
           example: "\"en\"";
         }
       ];
-      optional Gender gender = 6 [
+      optional CreateUserRequest.Human.Profile.Gender gender = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
           example: "\"GENDER_FEMALE\"";
         }
@@ -2888,8 +2911,8 @@ message UpdateUserRequest{
     }
     message Password {
       oneof password_type {
-        Password password = 1;
-        HashedPassword hashed_password = 2;
+        CreateUserRequest.Human.Password password = 1;
+        CreateUserRequest.Human.HashedPassword hashed_password = 2;
       }
     }
     optional Profile profile = 1;
