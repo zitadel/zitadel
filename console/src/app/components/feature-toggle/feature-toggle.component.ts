@@ -1,14 +1,14 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, NgIf, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
-import { ToggleState, ToggleStateKeys } from '../features/features.component';
+import { ToggleStateKeys, ToggleStates } from '../features/features.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
+import { ReplaySubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -17,25 +17,29 @@ import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
   styleUrls: ['./feature-toggle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
-    FormsModule,
-    TranslateModule,
-    MatButtonModule,
-    InfoSectionModule,
-    MatTooltipModule,
-    CopyToClipboardModule,
     MatButtonToggleModule,
+    UpperCasePipe,
+    TranslateModule,
+    FormsModule,
+    MatTooltipModule,
+    InfoSectionModule,
+    AsyncPipe,
+    NgIf,
   ],
 })
-export class FeatureToggleComponent {
-  @Input({ required: true }) toggleStateKey!: ToggleStateKeys;
-  @Input({ required: true }) toggleState!: ToggleState;
-  @Output() toggleChange = new EventEmitter<ToggleState>();
-
-  protected Source = Source;
-
-  protected get isInherited(): boolean {
-    const { source } = this.toggleState;
-    return source == Source.SYSTEM || source == Source.UNSPECIFIED;
+export class FeatureToggleComponent<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]> {
+  @Input({ required: true }) toggleStateKey!: TKey;
+  @Input({ required: true })
+  set toggleState(toggleState: TValue) {
+    // we copy the toggleState so we can mutate it
+    this.toggleState$.next(structuredClone(toggleState));
   }
+
+  @Output() readonly toggleChange = new EventEmitter<TValue>();
+
+  protected readonly Source = Source;
+  protected readonly toggleState$ = new ReplaySubject<TValue>(1);
+  protected readonly isInherited$ = this.toggleState$.pipe(
+    map(({ source }) => source == Source.SYSTEM || source == Source.UNSPECIFIED),
+  );
 }

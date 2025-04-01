@@ -1,4 +1,4 @@
-<div class="feature-row">
+<div class="feature-row" *ngIf="toggleState$ | async as toggleState">
   <span>{{ 'SETTING.FEATURES.' + (toggleStateKey | uppercase) | translate }}</span>
   <div class="row">
     <mat-button-toggle-group
@@ -13,7 +13,7 @@
           <span>{{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
 
           <div
-            *ngIf="!toggleState.enabled && isInherited"
+            *ngIf="!toggleState.enabled && (isInherited$ | async)"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.DISABLED' | translate }}"
           ></div>
@@ -23,7 +23,7 @@
         <div class="toggle-row">
           <span>{{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
           <div
-            *ngIf="toggleState.enabled && isInherited"
+            *ngIf="toggleState.enabled && (isInherited$ | async)"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
           ></div>

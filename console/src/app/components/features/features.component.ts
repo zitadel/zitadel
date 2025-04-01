@@ -21,8 +21,9 @@ import {
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
 import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { Observable, ReplaySubject, switchMap } from 'rxjs';
+import { firstValueFrom, Observable, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
+import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-feature-toggle/login-v2-feature-toggle.component';
 
 // TODO: to add a new feature, add the key here and in the FEATURE_KEYS array
 const FEATURE_KEYS = [
@@ -44,11 +45,13 @@ const FEATURE_KEYS = [
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };
-export type ToggleStateKeys = (typeof FEATURE_KEYS)[number];
-
 export type ToggleStates = {
-  [key in ToggleStateKeys]: ToggleState;
+  [key in (typeof FEATURE_KEYS)[number]]: ToggleState;
+} & {
+  loginV2: ToggleState & { baseUri: string };
 };
+
+export type ToggleStateKeys = keyof ToggleStates;
 
 @Component({
   imports: [
@@ -65,6 +68,7 @@ export type ToggleStates = {
     MatTooltipModule,
     HasRoleModule,
     FeatureToggleComponent,
+    LoginV2FeatureToggleComponent,
   ],
   standalone: true,
   selector: 'cnsl-features',
@@ -73,6 +77,7 @@ export type ToggleStates = {
 })
 export class FeaturesComponent {
   private readonly refresh$ = new ReplaySubject<true>(1);
+  protected readonly instanceFeatures$: Observable<GetInstanceFeaturesResponse>;
   protected readonly toggleStates$: Observable<ToggleStates>;
   protected readonly Source = Source;
   protected readonly FEATURE_KEYS = FEATURE_KEYS;
@@ -91,24 +96,11 @@ export class FeaturesComponent {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.toggleStates$ = this.getToggleStates();
+    this.instanceFeatures$ = this.getInstanceFeatures().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.toggleStates$ = this.getToggleStates(this.instanceFeatures$);
   }
 
-  public async validateAndSave(toggleStates: ToggleStates) {
-    const req = FEATURE_KEYS.reduce<MessageInitShape<typeof SetInstanceFeaturesRequestSchema>>((acc, key) => {
-      acc[key] = toggleStates[key].enabled;
-      return acc;
-    }, {});
-
-    try {
-      await this.featureService.setInstanceFeatures(req);
-      this.toast.showInfo('POLICY.TOAST.SET', true);
-    } catch (error) {
-      this.toast.showError(error);
-    }
-  }
-
-  private getToggleStates() {
+  private getInstanceFeatures() {
     return this.refresh$.pipe(
       startWith(true),
       switchMap(async () => {
@@ -120,30 +112,72 @@ export class FeaturesComponent {
         }
       }),
       filter(Boolean),
-      map((res) => this.createToggleStates(res)),
     );
   }
 
+  private getToggleStates(instanceFeatures$: Observable<GetInstanceFeaturesResponse>) {
+    return instanceFeatures$.pipe(map((res) => this.createToggleStates(res)));
+  }
+
   private createToggleStates(featureData: GetInstanceFeaturesResponse): ToggleStates {
-    return FEATURE_KEYS.reduce((acc, key) => {
-      const feature = featureData[key];
-      acc[key] = {
-        source: feature?.source ?? Source.SYSTEM,
-        enabled: !!feature?.enabled,
-      };
+    return FEATURE_KEYS.reduce(
+      (acc, key) => {
+        const feature = featureData[key];
+        acc[key] = {
+          source: feature?.source ?? Source.SYSTEM,
+          enabled: !!feature?.enabled,
+        };
+        return acc;
+      },
+      {
+        loginV2: {
+          source: featureData.loginV2?.source ?? Source.SYSTEM,
+          enabled: !!featureData.loginV2?.required,
+          baseUri: featureData.loginV2?.baseUri ?? '',
+        },
+      } as ToggleStates,
+    );
+  }
+
+  public async saveFeatures<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]>(key: TKey, value: TValue) {
+    const toggleStates = { ...(await firstValueFrom(this.toggleStates$)), [key]: value };
+
+    const req = FEATURE_KEYS.reduce<MessageInitShape<typeof SetInstanceFeaturesRequestSchema>>((acc, key) => {
+      acc[key] = toggleStates[key].enabled;
       return acc;
-    }, {} as ToggleStates);
+    }, {});
+
+    req.loginV2 = {
+      required: toggleStates.loginV2.enabled,
+      baseUri: toggleStates.loginV2.baseUri,
+    };
+
+    try {
+      await this.featureService.setInstanceFeatures(req);
+
+      // needed because of eventual consistency
+      await new Promise((res) => setTimeout(res, 1000));
+      this.refresh$.next(true);
+
+      this.toast.showInfo('POLICY.TOAST.SET', true);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   public async resetFeatures() {
     try {
       await this.featureService.resetInstanceFeatures();
-      this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
 
+      // needed because of eventual consistency
       await new Promise((res) => setTimeout(res, 1000));
       this.refresh$.next(true);
+
+      this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
     } catch (error) {
       this.toast.showError(error);
     }
   }
+
+  protected structuredClone = structuredClone;
 }

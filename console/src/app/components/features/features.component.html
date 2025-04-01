@@ -24,8 +24,12 @@
         *ngFor="let key of FEATURE_KEYS"
         [toggleStateKey]="key"
         [toggleState]="toggleStates[key]"
-        (toggleChange)="validateAndSave(toggleStates)"
+        (toggleChange)="saveFeatures(key, $event)"
       ></cnsl-feature-toggle>
+      <cnsl-login-v2-feature-toggle
+        [toggleState]="toggleStates.loginV2"
+        (toggleChanged)="saveFeatures('loginV2', $event)"
+      />
     </div>
   </cnsl-card>
 </div>
