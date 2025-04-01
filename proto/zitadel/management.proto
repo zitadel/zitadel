@@ -2014,7 +2014,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemoveIDPLink
+    // Deprecated: please use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp_link.api.mdx)
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -2028,7 +2028,7 @@ service ManagementService {
             tags: "Users"
             summary: "Deprecated: Remove Social Login";
             deprecated: true;
-            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idplink.api.mdx)"
+            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp_link.api.mdx)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
