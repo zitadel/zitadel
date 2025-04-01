@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 )
 
 const (
@@ -75,10 +76,13 @@ func SingleOrgOption(queries []SearchQuery) PermittedOrgsOption {
 
 // WherePermittedOrgs sets a `WHERE` clause to query, which filters returned rows against organizations the
 // current authenticated user has the requested permission to.
-// filterOrgID may be used to optimize the permitted orgs function by limiting the returned organizations,
-func WherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, orgIDCol Column, permission string, options ...PermittedOrgsOption) sq.SelectBuilder {
-	ctxData := authz.GetCtxData(ctx)
+// filterOrgID may be used to optimize the permitted orgs function by limiting the returned organizations.
+func WherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, enabled bool, orgIDCol Column, permission string, options ...PermittedOrgsOption) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
 
+	ctxData := authz.GetCtxData(ctx)
 	b := &permittedOrgsBuilder{
 		orgIDColumn:       orgIDCol,
 		instanceID:        authz.GetInstance(ctx).InstanceID(),
@@ -100,4 +104,10 @@ func WherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, orgIDCol Co
 	).Debug("permitted orgs check used")
 
 	return query.Where(b.clauses())
+}
+
+// PermissionV2 checks are enabled when the feature flag is set and the permission check function is not nil.
+// When the permission check function is nil, it indicates a v1 API and no resource based permission check is needed.
+func PermissionV2(ctx context.Context, cf domain_pkg.PermissionCheck) bool {
+	return authz.GetFeatures(ctx).PermissionCheckV2 && cf != nil
 }

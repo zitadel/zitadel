@@ -607,7 +607,8 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 }
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
-	users, err := q.searchUsers(ctx, queries, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	users, err := q.searchUsers(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
@@ -622,17 +623,14 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery()
-	query = queries.toQuery(query).Where(sq.Eq{
+	query = WherePermittedOrgs(
+		ctx, query, permissionCheckV2, UserResourceOwnerCol, domain.PermissionUserRead,
+		SingleOrgOption(queries.Queries),
+		OwnedRowsOrgOption(UserIDCol),
+	)
+	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	})
-	if permissionCheckV2 {
-		query = WherePermittedOrgs(
-			ctx, query, UserResourceOwnerCol, domain.PermissionUserRead,
-			SingleOrgOption(queries.Queries),
-			OwnedRowsOrgOption(UserIDCol),
-		)
-	}
-	stmt, args, err := query.ToSql()
+	}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}

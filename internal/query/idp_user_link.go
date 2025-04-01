@@ -107,11 +107,12 @@ func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissio
 }
 
 func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, permissionCheck domain.PermissionCheck) (idps *IDPUserLinks, err error) {
-	links, err := q.idpUserLinks(ctx, queries, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	links, err := q.idpUserLinks(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && len(links.Links) > 0 && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil && len(links.Links) > 0 && !permissionCheckV2 {
 		// when userID for query is provided, only one check has to be done
 		if queries.hasUserID() {
 			if err := userCheckPermission(ctx, links.Links[0].ResourceOwner, links.Links[0].UserID, permissionCheck); err != nil {
@@ -129,18 +130,15 @@ func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareIDPUserLinksQuery()
+	query = WherePermittedOrgs(ctx, query, permissionCheckV2, IDPUserLinkResourceOwnerCol, domain.PermissionUserRead,
+		SingleOrgOption(queries.Queries),
+		// OwnedRowsOption(IDPUserLinkUserIDCol),
+	)
 	eq := sq.Eq{
 		IDPUserLinkInstanceIDCol.identifier():   authz.GetInstance(ctx).InstanceID(),
 		IDPUserLinkOwnerRemovedCol.identifier(): false,
 	}
-	query = queries.toQuery(query).Where(eq)
-	if permissionCheckV2 {
-		query = WherePermittedOrgs(ctx, query, IDPUserLinkResourceOwnerCol, domain.PermissionUserRead,
-			SingleOrgOption(queries.Queries),
-			// OwnedRowsOption(IDPUserLinkUserIDCol),
-		)
-	}
-	stmt, args, err := query.ToSql()
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
 	}
