@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 	"slices"
 	"time"
@@ -211,6 +212,9 @@ type UserAuthMethodRequirements struct {
 	ForceMFALocalOnly bool
 }
 
+//go:embed user_auth_method_types_required.sql
+var listUserAuthMethodTypesStmt string
+
 func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID string) (requirements *UserAuthMethodRequirements, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
@@ -221,20 +225,33 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodTypesRequiredQuery()
-	eq := sq.Eq{
-		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	stmt, args, err := query.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-E5ut4", "Errors.Query.InvalidRequest")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		requirements, err = scan(row)
-		return err
-	}, stmt, args...)
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			var userType sql.NullInt32
+			var forceMFA sql.NullBool
+			var forceMFALocalOnly sql.NullBool
+			err := row.Scan(
+				&userType,
+				&forceMFA,
+				&forceMFALocalOnly,
+			)
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return zerrors.ThrowNotFound(err, "QUERY-SF3h2", "Errors.Internal")
+				}
+				return zerrors.ThrowInternal(err, "QUERY-Sf3rt", "Errors.Internal")
+			}
+			requirements = &UserAuthMethodRequirements{
+				UserType:          domain.UserType(userType.Int32),
+				ForceMFA:          forceMFA.Bool,
+				ForceMFALocalOnly: forceMFALocalOnly.Bool,
+			}
+			return nil
+		},
+		listUserAuthMethodTypesStmt,
+		userID,
+		authz.GetInstance(ctx).InstanceID(),
+	)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
 	}
@@ -460,45 +477,6 @@ func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool,
 		}
 }
 
-func prepareUserAuthMethodTypesRequiredQuery() (sq.SelectBuilder, func(*sql.Row) (*UserAuthMethodRequirements, error)) {
-	loginPolicyQuery, err := prepareAuthMethodsForceMFAQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	return sq.Select(
-			UserTypeCol.identifier(),
-			forceMFAForce.identifier(),
-			forceMFAForceLocalOnly.identifier()).
-			From(userTable.identifier()).
-			LeftJoin("(" + loginPolicyQuery + ") AS " + forceMFATable.alias + " ON " +
-				"(" + forceMFAOrgID.identifier() + " = " + UserInstanceIDCol.identifier() + " OR " + forceMFAOrgID.identifier() + " = " + UserResourceOwnerCol.identifier() + ") AND " +
-				forceMFAInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
-			OrderBy(forceMFAIsDefault.identifier()).
-			Limit(1).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*UserAuthMethodRequirements, error) {
-			var userType sql.NullInt32
-			var forceMFA sql.NullBool
-			var forceMFALocalOnly sql.NullBool
-			err := row.Scan(
-				&userType,
-				&forceMFA,
-				&forceMFALocalOnly,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-SF3h2", "Errors.Internal")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-Sf3rt", "Errors.Internal")
-			}
-			return &UserAuthMethodRequirements{
-				UserType:          domain.UserType(userType.Int32),
-				ForceMFA:          forceMFA.Bool,
-				ForceMFALocalOnly: forceMFALocalOnly.Bool,
-			}, nil
-		}
-}
-
 func prepareAuthMethodsIDPsQuery() (string, error) {
 	idpsQuery, _, err := sq.Select(
 		userIDPsCountUserID.identifier(),
@@ -534,17 +512,4 @@ func prepareAuthMethodQuery(activeOnly bool, includeWithoutDomain bool, queryDom
 	}
 
 	return q.ToSql()
-}
-
-func prepareAuthMethodsForceMFAQuery() (string, error) {
-	loginPolicyQuery, _, err := sq.Select(
-		forceMFAForce.identifier(),
-		forceMFAForceLocalOnly.identifier(),
-		forceMFAInstanceID.identifier(),
-		forceMFAOrgID.identifier(),
-		forceMFAIsDefault.identifier(),
-	).
-		From(forceMFATable.identifier()).
-		ToSql()
-	return loginPolicyQuery, err
 }
