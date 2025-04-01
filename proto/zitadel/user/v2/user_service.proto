@@ -1242,11 +1242,14 @@ service UserService {
 
   // Create a new user
   //
-  // Create a new user with either the type human or machine. The user receives an email verification email if all of the following conditions apply:
+  // Create a new user with either the type human or machine.
+  //
+  // The user receives an email verification email if all of the following conditions apply:
   // - The type is human.
   // - An SMTP provider is correctly configured and active.
   // - The email address is not marked as verified in the request.
   // - The email verification code is not requested to be returned in the response.
+  //
   // The user receives a phone verification SMS if all of the following conditions apply:
   // - The type is human.
   // - A Twilio provider is correctly configured and active.
@@ -1286,7 +1289,7 @@ service UserService {
   // Use the following endpoints to manage sub-resources:
   // - [AddUserMetadataEntry](apis/resources/user_service_v2/user-service-add-user-metadata-entry.api.mdx)
   // - [RemoveUserMetadataEntry](apis/resources/user_service_v2/user-service-remove-user-metadata-entry.api.mdx)
-  // - [SetUserMetadata](apis/resources/user_service_v2/user-service-set-user-metadata.api.mdx)
+  // - [SetUserMetadataEntries](apis/resources/user_service_v2/user-service-set-user-metadata-entries.api.mdx)
   // - [AddUserIDPLink](apis/resources/user_service_v2/user-service-add-user-idp-link.api.mdx)
   // - [RemoveUserIDPLink](apis/resources/user_service_v2/user-service-remove-user-idp-link.api.mdx)
   // - [SetUserIDPLinks](apis/resources/user_service_v2/user-service-set-user-idp-links.api.mdx)
@@ -1356,7 +1359,7 @@ service UserService {
     };
   }
 
-  rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
+  rpc SetUserMetadataEntries(SetUserMetadataEntriesRequest) returns (SetUserMetadataEntriesResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/metadata"
       body: "metadata"
@@ -1443,11 +1446,6 @@ service UserService {
     };
   }
 }
-
-
-
-// TODO: Add a method to manage a list of metadata entries for a user
-// TODO: Add a method to manage a list of idp links for a user of type human
 
 message AddHumanUserRequest{
   reserved 3;
@@ -2724,8 +2722,7 @@ message CreateUserRequest{
           description: "Username of the user in the identity provider"
           min_length: 1;
           max_length: 200;
-          // TODO: Use an Azure style username as an example
-          example: "\"163840776835432345\"";
+          example: "\"somebody@gmail.com\"";
         }
       ];
     }
@@ -2793,7 +2790,6 @@ message CreateUserRequest{
       (validate.rules).bytes = {min_len: 1, max_len: 500000},
       (google.api.field_behavior) = REQUIRED,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        // TODO: Is there something we can improve? Maybe just use a string instead of bytes?
         description: "The value has to be base64 encoded.";
         example: "\"VGhpcyBpcyBteSB0ZXN0IHZhbHVl\"";
         min_length: 1,
@@ -2895,7 +2891,6 @@ message UpdateUserRequest{
       }
     }
     optional Profile profile = 1;
-    // TODO: Does this pattern work? If we share a message on the command side, we define it as a Create sub-message.
     optional CreateUserRequest.Human.Email email = 2;
     optional CreateUserRequest.Human.Phone phone = 3;
     optional Password password = 4;
@@ -2986,12 +2981,12 @@ message RemoveUserMetadataEntryResponse {
   zitadel.object.v2.Details details = 1;
 }
 
-message SetUserMetadataRequest {
+message SetUserMetadataEntriesRequest {
   string user_id = 1;
   repeated CreateUserRequest.MetadataEntry metadata = 2;
 }
 
-message SetUserMetadataResponse {
+message SetUserMetadataEntriesResponse {
   zitadel.object.v2.Details details = 1;
 }
 
