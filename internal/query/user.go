@@ -132,6 +132,18 @@ func usersCheckPermission(ctx context.Context, users *Users, permissionCheck dom
 	)
 }
 
+func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *UserSearchQueries) sq.SelectBuilder {
+	return WherePermittedOrgs(
+		ctx,
+		query,
+		enabled,
+		UserResourceOwnerCol,
+		domain.PermissionUserRead,
+		SingleOrgOption(queries.Queries),
+		OwnedRowsOrgOption(UserIDCol),
+	)
+}
+
 type UserSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -623,11 +635,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery()
-	query = WherePermittedOrgs(
-		ctx, query, permissionCheckV2, UserResourceOwnerCol, domain.PermissionUserRead,
-		SingleOrgOption(queries.Queries),
-		OwnedRowsOrgOption(UserIDCol),
-	)
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()

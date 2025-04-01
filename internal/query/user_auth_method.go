@@ -104,6 +104,17 @@ func authMethodsCheckPermission(ctx context.Context, methods *AuthMethods, permi
 	)
 }
 
+func userAuthMethodPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	return WherePermittedOrgs(
+		ctx,
+		query,
+		enabled,
+		UserAuthMethodColumnResourceOwner,
+		domain.PermissionUserRead,
+		OwnedRowsOrgOption(UserIDCol),
+	)
+}
+
 type AuthMethod struct {
 	UserID        string
 	CreationDate  time.Time
@@ -160,10 +171,7 @@ func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUserAuthMethodsQuery()
-	query = WherePermittedOrgs(
-		ctx, query, permissionCheckV2, UserAuthMethodColumnResourceOwner, domain.PermissionUserRead,
-		OwnedRowsOrgOption(UserAuthMethodColumnUserID),
-	)
+	query = userAuthMethodPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")

@@ -106,6 +106,18 @@ func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissio
 	)
 }
 
+func idpLinksPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *IDPUserLinksSearchQuery) sq.SelectBuilder {
+	return WherePermittedOrgs(
+		ctx,
+		query,
+		enabled,
+		IDPUserLinkResourceOwnerCol,
+		domain.PermissionUserRead,
+		SingleOrgOption(queries.Queries),
+		OwnedRowsOrgOption(IDPUserLinkUserIDCol),
+	)
+}
+
 func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, permissionCheck domain.PermissionCheck) (idps *IDPUserLinks, err error) {
 	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
 	links, err := q.idpUserLinks(ctx, queries, permissionCheckV2)
@@ -130,10 +142,7 @@ func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareIDPUserLinksQuery()
-	query = WherePermittedOrgs(ctx, query, permissionCheckV2, IDPUserLinkResourceOwnerCol, domain.PermissionUserRead,
-		SingleOrgOption(queries.Queries),
-		// OwnedRowsOption(IDPUserLinkUserIDCol),
-	)
+	query = idpLinksPermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	eq := sq.Eq{
 		IDPUserLinkInstanceIDCol.identifier():   authz.GetInstance(ctx).InstanceID(),
 		IDPUserLinkOwnerRemovedCol.identifier(): false,
