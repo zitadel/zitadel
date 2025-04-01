@@ -51,9 +51,10 @@ Currently, the defined Actions v2 will be executed additionally to the defined [
 ## Further reading
 
 - [Actions v2 reference](/guides/integrate/actions/usage)
-- [Actions v2 example execution locally for request](/guides/integrate/actions/testing-locally-request)
-- [Actions v2 example execution locally for request manipulation](/guides/integrate/actions/testing-locally-request-manipulation)
-- [Actions v2 example execution locally for response](/guides/integrate/actions/testing-locally-response)
-- [Actions v2 example execution locally for response manipulation](/guides/integrate/actions/testing-locally-response-manipulation)
-- [Actions v2 example execution locally for function](/guides/integrate/actions/testing-locally-function)
-- [Actions v2 example execution locally for event](/guides/integrate/actions/testing-locally-event)
+- [Actions v2 example execution for request](/guides/integrate/actions/testing-request)
+- [Actions v2 example execution for request manipulation](/guides/integrate/actions/testing-request-manipulation)
+- [Actions v2 example execution for request signature check](/guides/integrate/actions/testing-request-signature)
+- [Actions v2 example execution for response](/guides/integrate/actions/testing-response)
+- [Actions v2 example execution for response manipulation](/guides/integrate/actions/testing-response-manipulation)
+- [Actions v2 example execution for function](/guides/integrate/actions/testing-function)
+- [Actions v2 example execution for event](/guides/integrate/actions/testing-event)

@@ -1,8 +1,8 @@
 ---
-title: Test Actions Request Locally
+title: Test Actions Response
 ---
 
-In this guide, you will create a ZITADEL execution and target. Before a user is created through the API, the target is called.
+In this guide, you will create a ZITADEL execution and target. After a user is created through the API, the target is called.
 
 ## Prerequisites
 
@@ -46,27 +46,13 @@ func main() {
 }
 ```
 
-What happens here is only a target which prints out the received request, which could also be handled with a different logic.
-
-### Check Signature
-
-To additionally check the signature header you can add the following to the example:
-```go
-	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
-		// if the signed content is not equal the sent content return an error
-		http.Error(w, "error", http.StatusInternalServerError)
-		return
-	}
-```
-
-Where you can replace 'signingKey' with the key received in the next step 'Create target'.
+What happens here is only a target which prints out the received response, which could also be handled with a different logic.
 
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
 
-[Create a target](/apis/resources/action_service_v2/action-service-create-target)
+[Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target)
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
@@ -87,9 +73,9 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To call the target just created before, with the intention to print the request used for user creation by the user V2 API, we define an execution with a method condition.
+To call the target just created before, with the intention to print the response from a user creation by the user V2 API, we define an execution with a method condition.
 
-[Set an execution](/apis/resources/action_service_v2/action-service-set-execution)
+[Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
@@ -98,7 +84,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
     "condition": {
-        "request": {
+        "response": {
             "method": "/zitadel.user.v2.UserService/AddHumanUser"
         }
     },
@@ -112,7 +98,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now on every call on `/zitadel.user.v2.UserService/AddHumanUser` the local server prints out the received body of the request:
+Now on every call on `/zitadel.user.v2.UserService/AddHumanUser` the local server prints out the response body of the request:
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
@@ -120,7 +106,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
+    "userId": {
         "givenName": "Example_given",
         "familyName": "Example_family"
     },
@@ -130,8 +116,8 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 }'
 ```
 
-Should print out something like, also described under [Sent information Request](./usage#sent-information-request):
-```shell
+Should print out something like, also described under [Sent information Response](./usage#sent-information-response):
+```json
 {
   "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
   "instanceID": "262851882718855632",
@@ -145,6 +131,14 @@ Should print out something like, also described under [Sent information Request]
     },
     "email": {
       "email": "example@example.com"
+    }
+  },
+  "response": {
+    "user_id": "312918757460672920",
+    "details": {
+        "sequence": "2",
+        "change_date": "2025-03-26T17:28:33.856436Z",
+        "resource_owner": "312909075211944344",
     }
   }
 }
