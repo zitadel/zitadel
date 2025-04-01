@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CopyToClipboardModule } from '../../directives/copy-to-clipboard/copy-to-clipboard.module';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
-import { FeatureState, ToggleStateKeys } from '../features/features.component';
+import { ToggleState, ToggleStateKeys } from '../features/features.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
@@ -28,14 +28,14 @@ import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
   ],
 })
 export class FeatureToggleComponent {
-  @Input({ required: true }) featureKey!: ToggleStateKeys;
-  @Input({ required: true }) featureState!: FeatureState;
-  @Output() toggleChange = new EventEmitter<FeatureState>();
+  @Input({ required: true }) toggleStateKey!: ToggleStateKeys;
+  @Input({ required: true }) toggleState!: ToggleState;
+  @Output() toggleChange = new EventEmitter<ToggleState>();
 
   protected Source = Source;
 
   protected get isInherited(): boolean {
-    const { source } = this.featureState;
+    const { source } = this.toggleState;
     return source == Source.SYSTEM || source == Source.UNSPECIFIED;
   }
 }

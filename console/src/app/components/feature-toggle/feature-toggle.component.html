@@ -1,11 +1,11 @@
 <div class="feature-row">
-  <span>{{ 'SETTING.FEATURES.' + (featureKey | uppercase) | translate }}</span>
+  <span>{{ 'SETTING.FEATURES.' + (toggleStateKey | uppercase) | translate }}</span>
   <div class="row">
     <mat-button-toggle-group
       class="theme-toggle"
       class="buttongroup"
-      [(ngModel)]="featureState.enabled"
-      (change)="toggleChange.emit(featureState)"
+      [(ngModel)]="toggleState.enabled"
+      (change)="toggleChange.emit(toggleState)"
       name="displayview"
     >
       <mat-button-toggle [value]="false">
@@ -13,7 +13,7 @@
           <span>{{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
 
           <div
-            *ngIf="!featureState.enabled && isInherited"
+            *ngIf="!toggleState.enabled && isInherited"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.DISABLED' | translate }}"
           ></div>
@@ -23,7 +23,7 @@
         <div class="toggle-row">
           <span>{{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
           <div
-            *ngIf="featureState.enabled && isInherited"
+            *ngIf="toggleState.enabled && isInherited"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
           ></div>
@@ -34,7 +34,7 @@
   <ng-content></ng-content>
   <cnsl-info-section
     class="feature-info"
-    *ngIf="'SETTING.FEATURES.' + (featureKey | uppercase) + '_DESCRIPTION' | translate as i18nDescription"
+    *ngIf="'SETTING.FEATURES.' + (toggleStateKey | uppercase) + '_DESCRIPTION' | translate as i18nDescription"
     >{{ i18nDescription }}</cnsl-info-section
   >
 </div>

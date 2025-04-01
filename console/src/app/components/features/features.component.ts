@@ -43,11 +43,11 @@ const FEATURE_KEYS = [
   // 'webKey',
 ] as const;
 
-export type FeatureState = { source: Source; enabled: boolean };
+export type ToggleState = { source: Source; enabled: boolean };
 export type ToggleStateKeys = (typeof FEATURE_KEYS)[number];
 
 export type ToggleStates = {
-  [key in ToggleStateKeys]: FeatureState;
+  [key in ToggleStateKeys]: ToggleState;
 };
 
 @Component({
@@ -75,11 +75,12 @@ export class FeaturesComponent {
   private readonly refresh$ = new ReplaySubject<true>(1);
   protected readonly toggleStates$: Observable<ToggleStates>;
   protected readonly Source = Source;
+  protected readonly FEATURE_KEYS = FEATURE_KEYS;
 
   constructor(
-    private featureService: NewFeatureService,
-    private breadcrumbService: BreadcrumbService,
-    private toast: ToastService,
+    private readonly featureService: NewFeatureService,
+    private readonly breadcrumbService: BreadcrumbService,
+    private readonly toast: ToastService,
   ) {
     const breadcrumbs = [
       new Breadcrumb({
@@ -134,7 +135,7 @@ export class FeaturesComponent {
     }, {} as ToggleStates);
   }
 
-  public async resetSettings() {
+  public async resetFeatures() {
     try {
       await this.featureService.resetInstanceFeatures();
       this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
@@ -144,9 +145,5 @@ export class FeaturesComponent {
     } catch (error) {
       this.toast.showError(error);
     }
-  }
-
-  public get toggleStateKeys() {
-    return FEATURE_KEYS;
   }
 }
