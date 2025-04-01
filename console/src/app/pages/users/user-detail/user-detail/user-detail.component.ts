@@ -170,7 +170,7 @@ export class UserDetailComponent implements OnInit {
         if (user.value.type.case === 'human') {
           return of([GENERAL, SECURITY, IDP, GRANTS, MEMBERSHIPS, METADATA, GROUPS]);
         } else if (user.value.type.case === 'machine') {
-          return of([GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA]);
+          return of([GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA, GROUPS]);
         }
         return EMPTY;
       }),
