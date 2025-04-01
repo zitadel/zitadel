@@ -13,11 +13,13 @@
       [disabled]="baseUri.invalid"
       color="primary"
       type="submit"
-      (click)="toggleChanged.emit({
-        source: toggleState.source,
-        enabled: toggleState.enabled,
-        baseUri: baseUri.value
-      })"
+      (click)="
+        toggleChanged.emit({
+          source: toggleState.source,
+          enabled: toggleState.enabled,
+          baseUri: baseUri.value,
+        })
+      "
     >
       <i class="las la-save"></i>
     </button>
