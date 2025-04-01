@@ -55,6 +55,11 @@ const routes: Routes = [
     loadChildren: () => import('src/app/pages/users/users.module'),
   },
   {
+    path: 'groups',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('src/app/pages/groups/groups.module'),
+  },
+  {
     path: 'instance',
     loadChildren: () => import('./pages/instance/instance.module'),
     canActivate: [authGuard, roleGuard],
@@ -111,6 +116,38 @@ const routes: Routes = [
         path: 'user/:userid',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module'),
         canActivate: [roleGuard],
+        data: {
+          roles: ['user.grant.write'],
+        },
+      },
+      {
+        path: 'groups',
+        loadChildren: () => import('src/app/pages/groups/group-grant-create/group-grant-create.module'),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['user.grant.write'],
+        },
+      },
+      {
+        path: 'groups/project/:projectid',
+        loadChildren: () => import('src/app/pages/groups/group-grant-create/group-grant-create.module'),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['user.grant.write'],
+        },
+      },
+      {
+        path: 'groups/group/:groupid',
+        loadChildren: () => import('src/app/pages/groups/group-grant-create/group-grant-create.module'),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['user.grant.write'],
+        },
+      },
+      {
+        path: 'groups/project/:projectid/grant/:grantid',
+        loadChildren: () => import('src/app/pages/groups/group-grant-create/group-grant-create.module'),
+        canActivate: [RoleGuard],
         data: {
           roles: ['user.grant.write'],
         },

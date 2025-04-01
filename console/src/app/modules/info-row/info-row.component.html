@@ -327,3 +327,38 @@
     </p>
   </div>
 </div>
+
+<div class="info-row" *ngIf="group">
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.PAGES.STATE' | translate }}</p>
+    <p
+      *ngIf="group && group.state !== undefined"
+      class="state"
+      [ngClass]="{
+        active: group.state === GroupState.GROUP_STATE_ACTIVE,
+        inactive: group.state === GroupState.GROUP_STATE_INACTIVE,
+      }"
+    >
+      {{ 'USER.DATA.STATE' + group.state | translate }}
+    </p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.ID' | translate }}</p>
+    <p *ngIf="group && group.id" class="info-row-desc">{{ group.id }}</p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.DETAILS.DATECREATED' | translate }}</p>
+    <p *ngIf="group && group.details && group.details.creationDate" class="info-row-desc">
+      {{ group.details.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+    </p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.DETAILS.DATECHANGED' | translate }}</p>
+    <p *ngIf="group && group.details && group.details.changeDate" class="info-row-desc">
+      {{ group.details.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+    </p>
+  </div>
+</div>

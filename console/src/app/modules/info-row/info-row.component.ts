@@ -6,6 +6,7 @@ import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { GrantedProject, Project, ProjectGrantState, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { Group, GroupState } from 'src/app/proto/generated/zitadel/group_pb';
 import { User as UserV1 } from '@zitadel/proto/zitadel/user_pb';
 import { User as UserV2 } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { LoginPolicy as LoginPolicyV2 } from '@zitadel/proto/zitadel/policy_pb';
@@ -17,6 +18,7 @@ import { LoginPolicy as LoginPolicyV2 } from '@zitadel/proto/zitadel/policy_pb';
 })
 export class InfoRowComponent {
   @Input() public user?: User.AsObject | UserV2 | UserV1;
+  @Input() public group!: Group.AsObject;
   @Input() public org!: Org.AsObject;
   @Input() public instance!: InstanceDetail.AsObject;
   @Input() public app!: App.AsObject;
@@ -26,6 +28,7 @@ export class InfoRowComponent {
   @Input() public loginPolicy?: LoginPolicy.AsObject | LoginPolicyV2;
 
   public UserState: any = UserState;
+  public GroupState: any = GroupState;
   public State: any = State;
   public OrgState: any = OrgState;
   public AppState: any = AppState;
@@ -35,7 +38,7 @@ export class InfoRowComponent {
 
   public copied: string = '';
 
-  constructor() {}
+  constructor() { }
 
   public get loginMethods(): Set<string> {
     if (!this.user) {
