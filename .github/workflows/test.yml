@@ -2,9 +2,9 @@ name: Quality
 
 on:
   pull_request:
-  schedule:
+  # schedule:
     # Every morning at 6:00 AM CET
-    - cron: '0 4 * * *'
+    # - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       target-env:
