@@ -18,21 +18,14 @@
     </button>
   </ng-template>
 
-  <cnsl-card *ngIf="toggleStates && featureData">
+  <cnsl-card *ngIf="toggleStates$ | async as toggleStates">
     <div class="features">
       <cnsl-feature-toggle
         *ngFor="let key of toggleStateKeys"
-        [featureData]="featureData"
-        [toggleStates]="toggleStates"
-        [toggleStateKey]="key"
-        (toggleChange)="validateAndSave()"
+        [featureKey]="key"
+        [featureState]="toggleStates[key]"
+        (toggleChange)="validateAndSave(toggleStates)"
       ></cnsl-feature-toggle>
     </div>
   </cnsl-card>
 </div>
-
-<ng-template #sourceLabel let-source="source" let-last="last">
-  <span class="state" *ngIf="source === Source.SOURCE_SYSTEM">
-    {{ 'SETTING.FEATURES.SOURCE.' + source | translate }}
-  </span>
-</ng-template>

@@ -19,16 +19,13 @@ import {
   GetInstanceFeaturesResponse,
   SetInstanceFeaturesRequestSchema,
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
-import { FeatureFlag, Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
+import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
-
-export enum ToggleState {
-  ENABLED = 'ENABLED',
-  DISABLED = 'DISABLED',
-}
+import { Observable, ReplaySubject, switchMap } from 'rxjs';
+import { filter, map, startWith } from 'rxjs/operators';
 
 // TODO: to add a new feature, add the key here and in the FEATURE_KEYS array
-const FEATURE_KEYS: ToggleStateKeys[] = [
+const FEATURE_KEYS = [
   'actions',
   'consoleUseV2UserApi',
   'debugOidcParentError',
@@ -44,10 +41,10 @@ const FEATURE_KEYS: ToggleStateKeys[] = [
   'permissionCheckV2',
   'userSchema',
   // 'webKey',
-];
+] as const;
 
-type FeatureState = { source: Source; state: ToggleState };
-export type ToggleStateKeys = Exclude<keyof GetInstanceFeaturesResponse, 'details' | '$typeName' | '$unknown'>;
+export type FeatureState = { source: Source; enabled: boolean };
+export type ToggleStateKeys = (typeof FEATURE_KEYS)[number];
 
 export type ToggleStates = {
   [key in ToggleStateKeys]: FeatureState;
@@ -75,11 +72,9 @@ export type ToggleStates = {
   styleUrls: ['./features.component.scss'],
 })
 export class FeaturesComponent {
-  protected featureData: GetInstanceFeaturesResponse | undefined;
-
-  protected toggleStates: ToggleStates | undefined;
-  protected Source: any = Source;
-  protected ToggleState: any = ToggleState;
+  private readonly refresh$ = new ReplaySubject<true>(1);
+  protected readonly toggleStates$: Observable<ToggleStates>;
+  protected readonly Source = Source;
 
   constructor(
     private featureService: NewFeatureService,
@@ -95,74 +90,63 @@ export class FeaturesComponent {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.getFeatures();
+    this.toggleStates$ = this.getToggleStates();
   }
 
-  public validateAndSave() {
-    const req: MessageInitShape<typeof SetInstanceFeaturesRequestSchema> = {
-      actions: this.toggleStates?.actions?.state === ToggleState.ENABLED,
-      consoleUseV2UserApi: this.toggleStates?.consoleUseV2UserApi?.state === ToggleState.ENABLED,
-      debugOidcParentError: this.toggleStates?.debugOidcParentError?.state === ToggleState.ENABLED,
-      disableUserTokenEvent: this.toggleStates?.disableUserTokenEvent?.state === ToggleState.ENABLED,
-      enableBackChannelLogout: this.toggleStates?.enableBackChannelLogout?.state === ToggleState.ENABLED,
-      loginDefaultOrg: this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED,
-      oidcLegacyIntrospection: this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED,
-      oidcSingleV1SessionTermination: this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
-      oidcTokenExchange: this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED,
-      oidcTriggerIntrospectionProjections:
-        this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
-      permissionCheckV2: this.toggleStates?.permissionCheckV2?.state === ToggleState.ENABLED,
-      userSchema: this.toggleStates?.userSchema?.state === ToggleState.ENABLED,
-      // webKey: this.toggleStates?.webKey?.state === ToggleState.ENABLED,
-    };
+  public async validateAndSave(toggleStates: ToggleStates) {
+    const req = FEATURE_KEYS.reduce<MessageInitShape<typeof SetInstanceFeaturesRequestSchema>>((acc, key) => {
+      acc[key] = toggleStates[key].enabled;
+      return acc;
+    }, {});
 
-    this.featureService
-      .setInstanceFeatures(req)
-      .then(() => {
-        this.toast.showInfo('POLICY.TOAST.SET', true);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    try {
+      await this.featureService.setInstanceFeatures(req);
+      this.toast.showInfo('POLICY.TOAST.SET', true);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  private getFeatures() {
-    this.featureService.getInstanceFeatures().then((instanceFeaturesResponse) => {
-      this.featureData = instanceFeaturesResponse;
-      this.toggleStates = this.createToggleStates(this.featureData);
-    });
+  private getToggleStates() {
+    return this.refresh$.pipe(
+      startWith(true),
+      switchMap(async () => {
+        try {
+          return await this.featureService.getInstanceFeatures();
+        } catch (error) {
+          this.toast.showError(error);
+          return undefined;
+        }
+      }),
+      filter(Boolean),
+      map((res) => this.createToggleStates(res)),
+    );
   }
 
   private createToggleStates(featureData: GetInstanceFeaturesResponse): ToggleStates {
-    const toggleStates: Partial<ToggleStates> = {};
-
-    FEATURE_KEYS.forEach((key) => {
-      // TODO: Fix this type cast as not all keys are present as FeatureFlag
-      const feature = featureData[key] as unknown as FeatureFlag;
-      toggleStates[key] = {
-        source: feature?.source || Source.SYSTEM,
-        state: !!feature?.enabled ? ToggleState.ENABLED : ToggleState.DISABLED,
+    return FEATURE_KEYS.reduce((acc, key) => {
+      const feature = featureData[key];
+      acc[key] = {
+        source: feature?.source ?? Source.SYSTEM,
+        enabled: !!feature?.enabled,
       };
-    });
-
-    return toggleStates as ToggleStates;
+      return acc;
+    }, {} as ToggleStates);
   }
 
-  public resetSettings(): void {
-    this.featureService
-      .resetInstanceFeatures()
-      .then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-        setTimeout(() => {
-          this.getFeatures();
-        }, 1000);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public async resetSettings() {
+    try {
+      await this.featureService.resetInstanceFeatures();
+      this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+
+      await new Promise((res) => setTimeout(res, 1000));
+      this.refresh$.next(true);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   public get toggleStateKeys() {
-    return Object.keys(this.toggleStates ?? {});
+    return FEATURE_KEYS;
   }
 }
