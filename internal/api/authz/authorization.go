@@ -134,7 +134,12 @@ type SystemUserPermissions struct {
 	Permissions []string   `json:"permissions"`
 }
 
+// systemMembershipsToUserPermissions converts system memberships based on roles,
+// to SystemUserPermissions, using the passed role mapping.
 func systemMembershipsToUserPermissions(memberships Memberships, roleMap []RoleMapping) []SystemUserPermissions {
+	if memberships == nil {
+		return nil
+	}
 	systemUserPermissions := make([]SystemUserPermissions, len(memberships))
 	for i, systemPerm := range memberships {
 		permissions := make([]string, 0, len(systemPerm.Roles))
@@ -142,10 +147,12 @@ func systemMembershipsToUserPermissions(memberships Memberships, roleMap []RoleM
 			permissions = append(permissions, getPermissionsFromRole(roleMap, role)...)
 		}
 		slices.Sort(permissions)
+		permissions = slices.Compact(permissions) // remove duplicates
 
 		systemUserPermissions[i].MemberType = systemPerm.MemberType
 		systemUserPermissions[i].AggregateID = systemPerm.AggregateID
-		systemUserPermissions[i].Permissions = slices.Compact(permissions)
+		systemUserPermissions[i].ObjectID = systemPerm.ObjectID
+		systemUserPermissions[i].Permissions = permissions
 	}
 	return systemUserPermissions
 }

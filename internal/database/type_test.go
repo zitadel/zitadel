@@ -512,7 +512,7 @@ func TestJSONArray_Scan(t *testing.T) {
 func TestJSONArray_Value(t *testing.T) {
 	tests := []struct {
 		name string
-		a    JSONArray[string]
+		a    []string
 		want driver.Value
 	}{
 		{
@@ -522,18 +522,18 @@ func TestJSONArray_Value(t *testing.T) {
 		},
 		{
 			name: "empty",
-			a:    JSONArray[string]{},
+			a:    []string{},
 			want: []byte("[]"),
 		},
 		{
 			name: "ok",
-			a:    JSONArray[string]{"a", "b"},
+			a:    []string{"a", "b"},
 			want: []byte("[\"a\",\"b\"]"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.a.Value()
+			got, err := NewJSONArray(tt.a).Value()
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 		})
