@@ -25,7 +25,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
   schemes: HTTPS;
@@ -113,6 +113,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // reserving the proto field number. Such removal is not considered a breaking change.
 // Setting a removed field will effectively result in a no-op.
 service FeatureService {
+  // Set System Features
+  //
+  // Configure and set features that apply to the complete system. Only fields present in the request are set or unset.
+  //
+  // Required permissions:
+  //  - system.feature.write
   rpc SetSystemFeatures (SetSystemFeaturesRequest) returns (SetSystemFeaturesResponse) {
     option (google.api.http) = {
       put: "/v2/features/system"
@@ -126,8 +132,6 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set system level features";
-      description: "Configure and set features that apply to the complete system. Only fields present in the request are set or unset."
       responses: {
         key: "200"
         value: {
@@ -137,6 +141,12 @@ service FeatureService {
     };
   }
 
+  // Reset System Features
+  //
+  // Deletes ALL configured features for the system, reverting the behaviors to system defaults.
+  //
+  // Required permissions:
+  //  - system.feature.delete
   rpc ResetSystemFeatures (ResetSystemFeaturesRequest) returns (ResetSystemFeaturesResponse) {
     option (google.api.http) = {
       delete: "/v2/features/system"
@@ -149,8 +159,6 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Reset system level features";
-      description: "Deletes ALL configured features for the system, reverting the behaviors to system defaults."
       responses: {
         key: "200"
         value: {
@@ -160,6 +168,12 @@ service FeatureService {
     };
   }
 
+  // Get System Features
+  //
+  // Returns all configured features for the system. Unset fields mean the feature is the current system default.
+  //
+  // Required permissions:
+  //  - none
   rpc GetSystemFeatures (GetSystemFeaturesRequest) returns (GetSystemFeaturesResponse) {
     option (google.api.http) = {
       get: "/v2/features/system"
@@ -167,13 +181,11 @@ service FeatureService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.feature.read"
+        permission: "authenticated"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get system level features";
-      description: "Returns all configured features for the system. Unset fields mean the feature is the current system default."
       responses: {
         key: "200"
         value: {
@@ -183,6 +195,12 @@ service FeatureService {
     };
   }
 
+  // Set Instance Features
+  //
+  // Configure and set features that apply to a complete instance. Only fields present in the request are set or unset.
+  //
+  // Required permissions:
+  //  - iam.feature.write
   rpc SetInstanceFeatures (SetInstanceFeaturesRequest) returns (SetInstanceFeaturesResponse) {
     option (google.api.http) = {
       put: "/v2/features/instance"
@@ -196,8 +214,6 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set instance level features";
-      description: "Configure and set features that apply to a complete instance. Only fields present in the request are set or unset."
       responses: {
         key: "200"
         value: {
@@ -207,6 +223,12 @@ service FeatureService {
     };
   }
 
+  // Reset Instance Features
+  //
+  // Deletes ALL configured features for an instance, reverting the behaviors to system defaults.
+  //
+  // Required permissions:
+  //  - iam.feature.delete
   rpc ResetInstanceFeatures (ResetInstanceFeaturesRequest) returns (ResetInstanceFeaturesResponse) {
     option (google.api.http) = {
       delete: "/v2/features/instance"
@@ -219,8 +241,6 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Reset instance level features";
-      description: "Deletes ALL configured features for an instance, reverting the behaviors to system defaults."
       responses: {
         key: "200"
         value: {
@@ -230,6 +250,12 @@ service FeatureService {
     };
   }
 
+  // Get Instance Features
+  //
+  // Returns all configured features for an instance. Unset fields mean the feature is the current system default.
+  //
+  // Required permissions:
+  //  - none
   rpc GetInstanceFeatures (GetInstanceFeaturesRequest) returns (GetInstanceFeaturesResponse) {
     option (google.api.http) = {
       get: "/v2/features/instance"
@@ -237,13 +263,11 @@ service FeatureService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "iam.feature.read"
+        permission: "authenticated"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get instance level features";
-      description: "Returns all configured features for an instance. Unset fields mean the feature is the current system default."
       responses: {
         key: "200"
         value: {
@@ -253,6 +277,12 @@ service FeatureService {
     };
   }
 
+  // Set Organization Features
+  //
+  // Configure and set features that apply to a complete instance. Only fields present in the request are set or unset.
+  //
+  // Required permissions:
+  //  - org.feature.write
   rpc SetOrganizationFeatures (SetOrganizationFeaturesRequest) returns (SetOrganizationFeaturesResponse) {
     option (google.api.http) = {
       put: "/v2/features/organization/{organization_id}"
@@ -266,8 +296,6 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set organization level features";
-      description: "Configure and set features that apply to a complete instance. Only fields present in the request are set or unset."
       responses: {
         key: "200"
         value: {
@@ -277,6 +305,12 @@ service FeatureService {
     };
   }
 
+  // Reset Organization Features
+  //
+  // Deletes ALL configured features for an organization, reverting the behaviors to instance defaults.
+  //
+  // Required permissions:
+  //  - org.feature.delete
   rpc ResetOrganizationFeatures (ResetOrganizationFeaturesRequest) returns (ResetOrganizationFeaturesResponse) {
     option (google.api.http) = {
       delete: "/v2/features/organization/{organization_id}"
@@ -284,13 +318,11 @@ service FeatureService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.feature.write"
+        permission: "org.feature.delete"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Reset organization level features";
-      description: "Deletes ALL configured features for an organization, reverting the behaviors to instance defaults."
       responses: {
         key: "200"
         value: {
@@ -300,6 +332,13 @@ service FeatureService {
     };
   }
 
+  // Get Organization Features
+  //
+  // Returns all configured features for an organization. Unset fields mean the feature is the current instance default.
+  //
+  // Required permissions:
+  //  - org.feature.read
+  //  - no permission required for the organization the user belongs to
   rpc GetOrganizationFeatures(GetOrganizationFeaturesRequest) returns (GetOrganizationFeaturesResponse) {
     option (google.api.http) = {
       get: "/v2/features/organization/{organization_id}"
@@ -307,13 +346,11 @@ service FeatureService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.feature.read"
+        permission: "authenticated"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get organization level features";
-      description: "Returns all configured features for an organization. Unset fields mean the feature is the current instance default."
       responses: {
         key: "200"
         value: {
@@ -323,6 +360,12 @@ service FeatureService {
     };
   }
 
+  // Set User Features
+  //
+  // Configure and set features that apply to an user. Only fields present in the request are set or unset.
+  //
+  // Required permissions:
+  //  - user.feature.write
   rpc SetUserFeatures(SetUserFeatureRequest) returns (SetUserFeaturesResponse) {
     option (google.api.http) = {
       put: "/v2/features/user/{user_id}"
@@ -336,8 +379,6 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set user level features";
-      description: "Configure and set features that apply to an user. Only fields present in the request are set or unset."
       responses: {
         key: "200"
         value: {
@@ -347,6 +388,12 @@ service FeatureService {
     };
   }
 
+  // Reset User Features
+  //
+  // Deletes ALL configured features for a user, reverting the behaviors to organization defaults.
+  //
+  // Required permissions:
+  //  - user.feature.delete
   rpc ResetUserFeatures(ResetUserFeaturesRequest) returns (ResetUserFeaturesResponse) {
     option (google.api.http) = {
       delete: "/v2/features/user/{user_id}"
@@ -354,13 +401,11 @@ service FeatureService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.feature.write"
+        permission: "user.feature.delete"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Reset user level features";
-      description: "Deletes ALL configured features for a user, reverting the behaviors to organization defaults."
       responses: {
         key: "200"
         value: {
@@ -370,6 +415,13 @@ service FeatureService {
     };
   }
 
+  // Get User Features
+  //
+  // Returns all configured features for a user. Unset fields mean the feature is the current organization default.
+  //
+  // Required permissions:
+  //  - user.feature.read
+  //  - no permission required for the own user
   rpc GetUserFeatures(GetUserFeaturesRequest) returns (GetUserFeaturesResponse) {
     option (google.api.http) = {
       get: "/v2/features/user/{user_id}"
@@ -377,13 +429,11 @@ service FeatureService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.feature.read"
+        permission: "authenticated"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get organization level features";
-      description: "Returns all configured features for an organization. Unset fields mean the feature is the current instance default."
       responses: {
         key: "200"
         value: {
