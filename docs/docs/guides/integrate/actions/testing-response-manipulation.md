@@ -49,6 +49,7 @@ func call(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
+	defer req.Body.Close()
 
 	// read the response into the expected structure
 	request := new(response)

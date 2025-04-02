@@ -42,6 +42,7 @@ func webhook(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
+	defer req.Body.Close()
 	// print out the read content
 	fmt.Println(string(sentBody))
 }
