@@ -24,7 +24,8 @@ services:
     image: 'ghcr.io/zitadel/zitadel:latest'
     command: 'init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml'
     depends_on:
-      - db
+      db:
+        condition: 'service_healthy'
     volumes:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
@@ -45,16 +46,17 @@ services:
       --config /example-zitadel-config.yaml
       --config /example-zitadel-secrets.yaml
       --steps /example-zitadel-init-steps.yaml
-      --masterkey $${ZITADEL_MASTERKEY} &&
-      echo ZITADEL_SERVICE_USER_TOKEN=$$(cat /.env-file/pat) > /.env-file/.env &&
-      chown -R 1001:$${GID} /.env-file &&
+      --masterkey ${ZITADEL_MASTERKEY} &&
+      echo ZITADEL_SERVICE_USER_TOKEN=$(cat /.env-file/pat) > /.env-file/.env &&
+      chown -R 1001:${GID} /.env-file &&
       chmod -R 770 /.env-file
       "
     environment:
       - GID
-      - ZITADEL_MASTERKEY
     depends_on:
-      - zitadel-init
+      zitadel-init:
+        condition: 'service_completed_successfully'
+        restart: false
     volumes:
       - './.env-file:/.env-file:rw'
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
@@ -70,11 +72,11 @@ services:
     command: >
       start --config /example-zitadel-config.yaml
       --config /example-zitadel-secrets.yaml
-      --masterkey $${ZITADEL_MASTERKEY}
-    environment:
-      - ZITADEL_MASTERKEY
+      --masterkey ${ZITADEL_MASTERKEY}
     depends_on:
-      - zitadel-setup
+      zitadel-setup:
+        condition: 'service_completed_successfully'
+        restart: true
     volumes:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
@@ -99,14 +101,16 @@ services:
     image: 'badouralix/curl-jq:alpine'
     entrypoint: '/bin/sh -c'
     command: >
-      "curl --fail-with-body -X PUT -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $$(cat ./.env-file/pat)\" --insecure http://zitadel:8080/v2/features/instance -d '{\"loginV2\": {\"required\": true}}' &&
-      LOGIN_USER=$$(curl --fail-with-body  -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $$(cat ./.env-file/pat)\" --insecure http://zitadel:8080/auth/v1/users/me | jq -r '.user.id') &&
-      curl --fail-with-body -X PUT  -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $$(cat ./.env-file/pat)\" --insecure http://zitadel:8080/admin/v1/members/$${LOGIN_USER} -d '{\"roles\": [\"IAM_OWNER\", \"IAM_LOGIN_CLIENT\"]}'
+      "curl --fail-with-body -X PUT -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/v2/features/instance -d '{\"loginV2\": {\"required\": true}}' &&
+      LOGIN_USER=$(curl --fail-with-body  -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/auth/v1/users/me | jq -r '.user.id') &&
+      curl --fail-with-body -X PUT  -H \"Host: 127.0.0.1.sslip.io\" -H \"Authorization: Bearer $(cat ./.env-file/pat)\" --insecure http://zitadel:8080/admin/v1/members/$${LOGIN_USER} -d '{\"roles\": [\"IAM_OWNER\", \"IAM_LOGIN_CLIENT\"]}'
       "
     volumes:
       - './.env-file:/.env-file:ro'
     depends_on:
-      - zitadel
+      zitadel:
+        condition: 'service_healthy'
+        restart: false
 
   login:
     restart: 'unless-stopped'
@@ -121,7 +125,9 @@ services:
     volumes:
       - './.env-file:/.env-file:ro'
     depends_on:
-      - use-new-login
+      zitadel:
+        condition: 'service_healthy'
+        restart: false
 
   traefik:
     restart: 'unless-stopped'
@@ -134,8 +140,10 @@ services:
     volumes:
       - "./example-traefik.yaml:/etc/traefik/traefik.yaml"
     depends_on:
-      - zitadel
-      - login
+      zitadel:
+        condition: 'service_healthy'
+      login:
+        condition: 'service_started'
 
 networks:
   storage:

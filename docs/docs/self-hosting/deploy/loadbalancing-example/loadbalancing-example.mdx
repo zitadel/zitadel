@@ -9,17 +9,12 @@ import ExampleZITADELConfigSource from '!!raw-loader!./example-zitadel-config.ya
 import ExampleZITADELSecretsSource from '!!raw-loader!./example-zitadel-secrets.yaml'
 import ExampleZITADELInitStepsSource from '!!raw-loader!./example-zitadel-init-steps.yaml'
 
-The stack consists of three long-running containers and a couple of short-lived containers:
-With this example configuration, you run a [Docker Compose](https://docs.docker.com/compose/) Zitadel and the default login at the same domain behind a Traefik reverse proxy using [Docker Compose](https://docs.docker.com/compose/).
-Traefik accepts incoming requests via HTTPS.
-It forwards calls to `/ui/v2/login` using plaintext HTTP to a login container.
-All other paths are forwarded to the Zitadel container using HTTP/2.
-The Traefik container and the login container call the Zitadel container via the internal Docker network using the Docker DNS name `zitadel` and HTTP/2.
+With this example configuration, you run Zitadel and the default login at the same domain using [Docker Compose](https://docs.docker.com/compose/).
 
-The stack consists of three long-running containers and a couple of short-lived containers:
+The stack consists of three long-running containers:
 - A [Traefik](https://doc.traefik.io/traefik/) reverse proxy container with upstream HTTP/2 enabled, issuing a self-signed TLS certificate.
 - A Login container that is accessible via Traefik at `/ui/v2/login`
-- A Zitadel container that is accessible via Traefik at all other paths than `/ui/v2/login`.
+- A Zitadel container that is accessable via Traefik at all other paths than `/ui/v2/login`.
 - The Traefik container and the login container call the Zitadel container via the internal Docker network at `h2c://zitadel:8080`
 - An insecure [PostgreSQL](https://www.postgresql.org/docs/current/index.html).
 
