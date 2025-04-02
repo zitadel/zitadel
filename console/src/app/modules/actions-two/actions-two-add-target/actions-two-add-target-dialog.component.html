@@ -7,16 +7,16 @@
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.NAME' | translate }}</cnsl-label>
       <input cnslInput type="text" placeholder="" formControlName="name" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
-          'ACTIONSTWO.TARGET.CREATE.NAME_DESCRIPTION' | translate
-        }}</span>
+        'ACTIONSTWO.TARGET.CREATE.NAME_DESCRIPTION' | translate
+      }}</span>
     </cnsl-form-field>
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.ENDPOINT' | translate }}</cnsl-label>
       <input cnslInput type="text" placeholder="" formControlName="endpoint" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
-          'ACTIONSTWO.TARGET.CREATE.ENDPOINT_DESCRIPTION' | translate
-        }}</span>
+        'ACTIONSTWO.TARGET.CREATE.ENDPOINT_DESCRIPTION' | translate
+      }}</span>
     </cnsl-form-field>
 
     <cnsl-form-field class="full-width">
@@ -32,8 +32,8 @@
       <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TIMEOUT' | translate }}</cnsl-label>
       <input cnslInput type="number" placeholder="10" [formControl]="targetForm.controls.timeout" />
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
-          'ACTIONSTWO.TARGET.CREATE.TIMEOUT_DESCRIPTION' | translate
-        }}</span>
+        'ACTIONSTWO.TARGET.CREATE.TIMEOUT_DESCRIPTION' | translate
+      }}</span>
     </cnsl-form-field>
 
     <mat-checkbox
@@ -44,10 +44,10 @@
       <div class="target-condition-text">
         <span>{{ 'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR' | translate }}</span>
         <span class="description cnsl-secondary-text">{{
-            'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR_DESCRIPTION' | translate
-          }}</span>
+          'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR_DESCRIPTION' | translate
+        }}</span>
         <span [style.color]="'var(--warn)'" class="description cnsl-secondary-text"
-        >{{ 'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR_WARNING' | translate }}
+          >{{ 'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR_WARNING' | translate }}
         </span>
       </div>
     </mat-checkbox>
@@ -58,8 +58,7 @@
     <button mat-stroked-button mat-dialog-close>
       {{ 'ACTIONS.CANCEL' | translate }}
     </button>
-    <button color="primary" [disabled]="targetForm.invalid" mat-raised-button (click)="closeWithResult()"
-            cdkFocusInitial>
+    <button color="primary" [disabled]="targetForm.invalid" mat-raised-button (click)="closeWithResult()" cdkFocusInitial>
       {{ 'ACTIONS.CREATE' | translate }}
     </button>
   </mat-dialog-actions>
