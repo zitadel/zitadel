@@ -73,7 +73,7 @@ export class ActionTwoAddTargetDialogComponent {
       }),
       endpoint: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
       timeout: new FormControl<number>(10, { nonNullable: true, validators: [requiredValidator] }),
-      interruptOnError: new FormControl<boolean>(true, { nonNullable: true }),
+      interruptOnError: new FormControl<boolean>(false, { nonNullable: true }),
     });
   }
 
