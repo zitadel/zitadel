@@ -1,4 +1,4 @@
-<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit()">
+<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit(form)">
   <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
     <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.REQ_RESP_DESCRIPTION' | translate }}</p>
 

@@ -26,7 +26,6 @@ import {
   ReplaySubject,
   ObservedValueOf,
   switchMap,
-  take,
   combineLatestWith,
   OperatorFunction,
 } from 'rxjs';
@@ -38,7 +37,7 @@ import { atLeastOneFieldValidator, requiredValidator } from 'src/app/modules/for
 import { Message } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
-import { filter, startWith, tap, withLatestFrom } from 'rxjs/operators';
+import { startWith } from 'rxjs/operators';
 
 export type ConditionType = NonNullable<Condition['conditionType']['case']>;
 export type ConditionTypeValue<T extends ConditionType> = Omit<
@@ -259,17 +258,11 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     return (obs) =>
       obs.pipe(
         combineLatestWith(filterValue$),
-        map(([values, filterValue]) => values.map((v) => v.toLowerCase()).filter((v) => v.includes(filterValue))),
+        map(([values, filterValue]) => values.filter((v) => v.toLowerCase().includes(filterValue))),
       );
   }
 
-  protected submit() {
-    this.form$.pipe(take(1)).subscribe((form) => {
-      this.submitForm(form);
-    });
-  }
-
-  protected submitForm(form: ObservedValueOf<typeof this.form$>) {
+  protected submit(form: ObservedValueOf<typeof this.form$>) {
     if (form.case === 'request' || form.case === 'response') {
       (this as unknown as ActionsTwoAddActionConditionComponent<'request' | 'response'>).submitRequestOrResponse(form);
     } else if (form.case === 'event') {
