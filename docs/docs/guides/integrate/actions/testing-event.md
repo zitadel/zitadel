@@ -2,7 +2,9 @@
 title: Test Actions Event
 ---
 
-In this guide, you will create a ZITADEL execution and target. As a result of the event creation, the target is called.
+This guide shows you how to leverage the ZITADEL actions feature to react to events in your ZITADEL instance.
+You can use the actions feature to create a target that will be called when a specific event occurs.
+This is useful for integrating with other systems or for triggering workflows based on events in ZITADEL.
 
 ## Prerequisites
 
@@ -11,9 +13,16 @@ Before you start, make sure you have everything set up correctly.
 - You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
+:::info
+Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+:::
+
 ## Start example target
 
-To start a simple HTTP server locally, which receives the webhook call, the following code example can be used:
+To test the actions feature, you need to create a target that will be called when an event occurs.
+You will need to implement a listener that can receive HTTP requests and process the events.
+For this example, we will use a simple Go HTTP server that will print the received events to standard output.
 
 ```go
 package main
@@ -33,6 +42,7 @@ func webhook(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
+	defer req.Body.Close()
 	// print out the read content
 	fmt.Println(string(sentBody))
 }
@@ -46,13 +56,12 @@ func main() {
 }
 ```
 
-What happens here is only a target which prints out the received event, which could also be handled with a different logic.
-
 ## Create target
 
-As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
+As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the
+target can be created as follows:
 
-[Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target)
+See [Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
@@ -73,7 +82,8 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To call the target just created before, with the intention to print the event from a user creation, we define an execution with an event condition.
+To configure ZITADEL to call the target when an event occurs, you need to set an execution and define the event
+condition.
 
 [Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
 
@@ -98,7 +108,8 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now on every call on `/zitadel.user.v2.UserService/AddHumanUser` the local server prints out the event:
+Now that you have set up the target and execution, you can test it by creating a user through the Console UI or
+by calling the ZITADEL API to create a human user.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
@@ -107,41 +118,48 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
     "userId": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
+        "givenName": "Test",
+        "familyName": "User"
     },
     "email": {
-        "email": "example@example.com"
+        "email": "example@test.com"
     }
 }'
 ```
 
-Should print out something like, also described under [Sent information Event](./usage#sent-information-event):
+Your server should now print out something like the following. Check out
+the [Sent information Event](./usage#sent-information-event) payload description.
+
 ```json
 {
-  "aggregateID" : "313014806065971608",
-  "aggregateType" : "user",
-  "resourceOwner" : "312909075211944344",
-  "instanceID" : "312909075211878808",
-  "version" : "v2",
-  "sequence" : 1,
-  "event_type" : "user.human.added",
-  "created_at" : "2025-03-27T10:22:43.262665+01:00",
-  "userID" : "312909075212468632",
-  "event_payload" : "eyJ1c2VyTmFtZSI6ImV4YW1wbGVAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJ0ZXN0IiwibGFzdE5hbWUiOiJ0ZXN0IiwiZGlzcGxheU5hbWUiOiJ0ZXN0IHRlc3QiLCJwcmVmZXJyZWRMYW5ndWFnZSI6InVuZCIsImVtYWlsIjoiZXhhbXBsZUB0ZXN0LmNvbSJ9"
+  "aggregateID": "313014806065971608",
+  "aggregateType": "user",
+  "resourceOwner": "312909075211944344",
+  "instanceID": "312909075211878808",
+  "version": "v2",
+  "sequence": 1,
+  "event_type": "user.human.added",
+  "created_at": "2025-03-27T10:22:43.262665+01:00",
+  "userID": "312909075212468632",
+  "event_payload": "eyJ1c2VyTmFtZSI6ImV4YW1wbGVAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwiZGlzcGxheU5hbWUiOiJUZXN0IFVzZXIiLCJwcmVmZXJyZWRMYW5ndWFnZSI6InVuZCIsImVtYWlsIjoiZXhhbXBsZUB0ZXN0LmNvbSJ9"
 }
 ```
 
 The event_payload is base64 encoded and has the following content:
+
 ```json
 {
   "userName": "example@test.com",
-  "firstName": "test",
-  "lastName": "test",
-  "displayName": "test test",
+  "firstName": "Test",
+  "lastName": "User",
+  "displayName": "Test User",
   "preferredLanguage": "und",
   "email": "example@test.com"
 }
 ```
 
+## Conclusion
 
+You have successfully set up a target and execution to react to events in your ZITADEL instance.
+This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on events in ZITADEL.
+Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).
