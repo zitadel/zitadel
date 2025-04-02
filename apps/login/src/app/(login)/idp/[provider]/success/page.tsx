@@ -4,7 +4,7 @@ import { linkingFailed } from "@/components/idps/pages/linking-failed";
 import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
-import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
+import { idpTypeToIdentityProviderType } from "@/lib/idp";
 import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   addHuman,
@@ -19,10 +19,7 @@ import {
 import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { AddHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -58,6 +55,7 @@ export default async function Page(props: {
   });
 
   const { idpInformation, userId } = intent;
+  let { addHumanUser } = intent;
 
   // sign in user. If user should be linked continue
   if (userId && !link) {
@@ -124,7 +122,7 @@ export default async function Page(props: {
   // search for potential user via username, then link
   if (options?.isLinkingAllowed) {
     let foundUser;
-    const email = PROVIDER_MAPPING[providerType](idpInformation).email?.email;
+    const email = addHumanUser?.email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
       foundUser = await listUsers({ serviceUrl, email }).then((response) => {
@@ -180,16 +178,14 @@ export default async function Page(props: {
 
   if (options?.isCreationAllowed && options.isAutoCreation) {
     let orgToRegisterOn: string | undefined = organization;
-
-    let userData: AddHumanUserRequest =
-      PROVIDER_MAPPING[providerType](idpInformation);
+    let newUser;
 
     if (
       !orgToRegisterOn &&
-      userData.username && // username or email?
-      ORG_SUFFIX_REGEX.test(userData.username)
+      addHumanUser?.username && // username or email?
+      ORG_SUFFIX_REGEX.test(addHumanUser.username)
     ) {
-      const matched = ORG_SUFFIX_REGEX.exec(userData.username);
+      const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
@@ -209,21 +205,21 @@ export default async function Page(props: {
       }
     }
 
-    if (orgToRegisterOn) {
+    if (addHumanUser && orgToRegisterOn) {
       const organizationSchema = create(OrganizationSchema, {
         org: { case: "orgId", value: orgToRegisterOn },
       });
 
-      userData = create(AddHumanUserRequestSchema, {
-        ...userData,
+      const addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
+        ...addHumanUser,
         organization: organizationSchema,
       });
-    }
 
-    const newUser = await addHuman({
-      serviceUrl,
-      request: userData,
-    });
+      newUser = await addHuman({
+        serviceUrl,
+        request: addHumanUserWithOrganization,
+      });
+    }
 
     if (newUser) {
       return (

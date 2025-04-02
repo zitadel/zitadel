@@ -915,27 +915,6 @@ export async function startIdentityProviderFlow({
   });
 }
 
-export async function retrieveIdentityProviderInformation({
-  serviceUrl,
-  idpIntentId,
-  idpIntentToken,
-}: {
-  serviceUrl: string;
-
-  idpIntentId: string;
-  idpIntentToken: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
-
-  return userService.retrieveIdentityProviderIntent({
-    idpIntentId,
-    idpIntentToken,
-  });
-}
-
 export async function getAuthRequest({
   serviceUrl,
   authRequestId,
