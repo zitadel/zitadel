@@ -131,14 +131,13 @@ export class ActionsTwoActionsComponent implements OnInit {
     });
   }
 
-  public deleteExecution(execution: Execution) {
+  public async deleteExecution(execution: Execution) {
     const deleteReq: MessageInitShape<typeof SetExecutionRequestSchema> = {
       condition: execution.condition,
       targets: [],
     };
-    this.actionService.setExecution(deleteReq);
-    setTimeout(() => {
-      this.refresh.next(true);
-    }, 1000);
+    await this.actionService.setExecution(deleteReq);
+    await new Promise((res) => setTimeout(res, 1000));
+    this.refresh.next(true);
   }
 }

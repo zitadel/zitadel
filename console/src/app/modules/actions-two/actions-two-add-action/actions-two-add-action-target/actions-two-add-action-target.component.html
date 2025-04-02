@@ -13,18 +13,18 @@
     </mat-select>
   </cnsl-form-field>
 
-  <cnsl-form-field class="full-width">
-    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.CONDITIONS.DESCRIPTION' | translate }}</cnsl-label>
+<!--  <cnsl-form-field class="full-width">-->
+<!--    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.CONDITIONS.DESCRIPTION' | translate }}</cnsl-label>-->
 
-    <mat-select [multiple]="true" formControlName="executionConditions">
-      <mat-option *ngIf="(executionConditions$ | async) === null" class="is-loading">
-        <mat-spinner diameter="30"></mat-spinner>
-      </mat-option>
-      <mat-option *ngFor="let condition of executionConditions$ | async" [value]="condition">
-        <span>{{ condition | condition }}</span>
-      </mat-option>
-    </mat-select>
-  </cnsl-form-field>
+<!--    <mat-select [multiple]="true" formControlName="executionConditions">-->
+<!--      <mat-option *ngIf="(executionConditions$ | async) === null" class="is-loading">-->
+<!--        <mat-spinner diameter="30"></mat-spinner>-->
+<!--      </mat-option>-->
+<!--      <mat-option *ngFor="let condition of executionConditions$ | async" [value]="condition">-->
+<!--        <span>{{ condition | condition }}</span>-->
+<!--      </mat-option>-->
+<!--    </mat-select>-->
+<!--  </cnsl-form-field>-->
 
   <div class="actions">
     <button *ngIf="!hideBackButton" mat-stroked-button (click)="back.emit()">

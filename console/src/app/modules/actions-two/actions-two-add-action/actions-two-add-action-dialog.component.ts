@@ -47,7 +47,7 @@ export class ActionTwoAddActionDialogComponent {
   public continueSubject = new Subject<void>();
 
   public request = computed<MessageInitShape<typeof SetExecutionRequestSchema>>(() => {
-    const req = {
+    return {
       condition: {
         conditionType: {
           case: this.typeSignal(),
@@ -56,9 +56,6 @@ export class ActionTwoAddActionDialogComponent {
       },
       targets: this.targetSignal(),
     };
-
-    console.log(req);
-    return req;
   });
 
   constructor(
