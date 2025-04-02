@@ -79,7 +79,7 @@ The application is now available at `http://localhost:3000`
 ### Adding applications and IDPs
 
 ```sh
-# OPTIONAL Run SAML SP 
+# OPTIONAL Run SAML SP
 pnpm run-samlsp
 
 # OPTIONAL Run OIDC RP
@@ -91,7 +91,6 @@ pnpm run-samlidp
 # OPTIONAL Run OIDC OP
 pnpm run-oidcop
 ```
-
 
 ### Testing
 
