@@ -2,7 +2,9 @@
 title: Test Actions Function
 ---
 
-In this guide, you will create a ZITADEL execution and target. To add claims to a token, the target is called.
+This guide shows you how to leverage the ZITADEL actions feature to enhance different functions in your ZITADEL instance.
+You can use the actions feature to create a target that will be called when a specific functionality is used.
+This is useful for integrating with other systems which need specific claims in tokens or for executing external code during OIDC or SAML flows.
 
 ## Prerequisites
 
@@ -11,9 +13,16 @@ Before you start, make sure you have everything set up correctly.
 - You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
+:::info
+Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+:::
+
 ## Start example target
 
-To start a simple HTTP server locally, which receives the call and sends back a response, the following code example can be used:
+To test the actions feature, you need to create a target that will be called when a function is used.
+You will need to implement a listener that can receive HTTP requests and process the data.
+For this example, we will use a simple Go HTTP server that will print the received data to standard output.
 
 ```go
 package main
@@ -50,6 +59,7 @@ func call(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
+	defer req.Body.Close()
 	// print out the read content
 	fmt.Println(string(sentBody))
     
@@ -81,13 +91,11 @@ func main() {
 }
 ```
 
-What happens here is that the user get the metadata with the key "key" and value "value" added, the token gets a claim "urn:zitadel:iam:claim" with value "value" and the log claim "urn:zitadel:iam:action:preuserinfo:log" with values "log1", "log2" and "log3".
-
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
 
-[Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target)
+See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
@@ -108,9 +116,10 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To call the target just created before, with the intention to complement the userinfo resulting in a token, we define an execution with a function condition.
+To configure ZITADEL to call the target when a function is executed, you need to set an execution and define the function
+condition.
 
-[Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
+See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
@@ -133,7 +142,8 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now on every OIDC flow this action will get executed.
+Now that you have set up the target and execution, you can test it by logging into Console UI or
+by using any OIDC flow.
 
 Should print out something like, also described under [Sent information Function](./usage#sent-information-function):
 ```json
@@ -178,4 +188,8 @@ Should print out something like, also described under [Sent information Function
 }
 ```
 
+## Conclusion
 
+You have successfully set up a target and execution to react to functions in your ZITADEL instance.
+This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on functionality in ZITADEL.
+Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).
