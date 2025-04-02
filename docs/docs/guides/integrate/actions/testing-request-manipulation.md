@@ -2,7 +2,9 @@
 title: Test Actions Request Manipulation
 ---
 
-In this guide, you will create a ZITADEL execution and target. Before a user is created through the API, the target is called.
+This guide shows you how to leverage the ZITADEL actions feature to manipulate API requests in your ZITADEL instance.
+You can use the actions feature to create a target that will be called when a specific API request occurs.
+This is useful for adding information to managed resources in ZITADEL.
 
 ## Prerequisites
 
@@ -11,9 +13,16 @@ Before you start, make sure you have everything set up correctly.
 - You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
+:::info
+Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+:::
+
 ## Start example target
 
-To start a simple HTTP server locally, which receives the call and manipulated the request, the following code example can be used:
+To test the actions feature, you need to create a target that will be called when an API endpoint is called.
+You will need to implement a listener that can receive HTTP requests, process the request and returns the manipulated request.
+For this example, we will use a simple Go HTTP server that will return the request with added metadata.
 
 ```go
 package main
@@ -39,6 +48,7 @@ func call(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
+	defer req.Body.Close()
 
 	// read the request into the expected structure
 	request := new(infoRequest)
@@ -76,13 +86,11 @@ func main() {
 
 ```
 
-What happens here is that the target receives the request Zitadel receives, adds a metadata entry to the request and returns it.
-
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
 
-[Create a target](/apis/resources/action_service_v2/action-service-create-target)
+See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
@@ -105,7 +113,7 @@ Save the returned ID to set in the execution.
 
 To call the target just created before, with the intention to manipulate the request used for user creation by the user V2 API, we define an execution with a method condition.
 
-[Set an execution](/apis/resources/action_service_v2/action-service-set-execution)
+See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
@@ -128,7 +136,8 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now on every call on `/zitadel.user.v2.UserService/AddHumanUser` the local server adds metadata to the request:
+Now that you have set up the target and execution, you can test it by creating a user through the Console UI or
+by calling the ZITADEL API to create a human user.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
@@ -146,7 +155,8 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 }'
 ```
 
-Resulting in a request like this:
+Your server should now manipulate the request to something like the following. Check out
+the [Sent information Request](./usage#sent-information-request) payload description.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
@@ -167,3 +177,8 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 }'
 ```
 
+## Conclusion
+
+You have successfully set up a target and execution to manipulate API requests in your ZITADEL instance.
+This feature can now be used to add information to managed resources in ZITADEL.
+Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

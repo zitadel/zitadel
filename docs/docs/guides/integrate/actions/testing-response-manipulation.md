@@ -2,8 +2,9 @@
 title: Test Actions Response Manipulation
 ---
 
-In this guide, you will create a ZITADEL execution and target. After an intent is retrieved through the API, the target
-is called.
+This guide shows you how to leverage the ZITADEL actions feature to manipulate API responses in your ZITADEL instance.
+You can use the actions feature to create a target that will be called when a specific API response occurs.
+This is useful for triggering workflows based on API responses in ZITADEL.
 
 ## Prerequisites
 
@@ -12,9 +13,16 @@ Before you start, make sure you have everything set up correctly.
 - You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
+:::info
+Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+:::
+
 ## Start example target
 
-To start a simple HTTP server locally, which receives the call, the following code example can be used:
+To test the actions feature, you need to create a target that will be called when an API endpoint is called.
+You will need to implement a listener that can receive HTTP requests, process the request and returns the manipulated request.
+For this example, we will use a simple Go HTTP server that will return the request with added metadata.
 
 ```go
 package main
@@ -77,14 +85,12 @@ func main() {
 }
 ```
 
-What happens here is the response is received as a request, manipulated and then returned.
-
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the
 target can be created as follows:
 
-[Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target)
+See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
@@ -106,9 +112,9 @@ Save the returned ID to set in the execution.
 ## Set execution
 
 To call the target just created before, with the intention to manipulate the retrieve of an intent by the user V2 API,
-we define an execution with a method condition.
+we define an execution with a response condition.
 
-[Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
+See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
@@ -131,8 +137,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now on every call on `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent` the local server would return
-something like:
+Now that you have set up the target and execution, you can test it by using a login-flow in the typescript login with an external IDP.
 
 ```json    
 {
@@ -183,7 +188,8 @@ something like:
 }
 ```
 
-Resulting in a response like this:
+Your server should now manipulate the response to something like the following. Check out
+the [Sent information Response](./usage#sent-information-response) payload description.
 
 ```json
 {
@@ -236,4 +242,8 @@ Resulting in a response like this:
 }
 ```
 
+## Conclusion
 
+You have successfully set up a target and execution to manipulate API responses in your ZITADEL instance.
+This feature can now be used to add information to managed resources in ZITADEL.
+Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

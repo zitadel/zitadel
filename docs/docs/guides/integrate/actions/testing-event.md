@@ -61,7 +61,7 @@ func main() {
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the
 target can be created as follows:
 
-See [Create a target](/apis/resources/action_service_v2/zitadel-actions-create-target) for more detailed information.
+See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
@@ -85,7 +85,7 @@ Save the returned ID to set in the execution.
 To configure ZITADEL to call the target when an event occurs, you need to set an execution and define the event
 condition.
 
-[Set an execution](/apis/resources/action_service_v2/zitadel-actions-set-execution)
+See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
