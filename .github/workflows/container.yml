@@ -75,7 +75,7 @@ jobs:
       - 
         name: Debug
         id: build-debug
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         timeout-minutes: 3
         with:
           context: .
@@ -90,7 +90,7 @@ jobs:
       - 
         name: Scratch
         id: build-scratch
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         timeout-minutes: 3
         with:
           context: .
