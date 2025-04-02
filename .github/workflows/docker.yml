@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - publish-image
   workflow_dispatch:
 
 permissions:
