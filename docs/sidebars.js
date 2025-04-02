@@ -761,7 +761,7 @@ module.exports = {
                     "\n"+
                     "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n"+
                     "\n"+
-                    "Please make sure to enable the `web_key` feature flag on your instance to use this service.",
+                    "Please make sure to enable the `web_key` feature flag on your instance to use this service and that you're running ZITADEL V3.",
               },
               items: sidebar_api_webkey_service_v2
             },
@@ -782,7 +782,7 @@ module.exports = {
                     "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
                     "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n"+
                     "\n" +
-                    "Please make sure to enable the `actions` feature flag on your instance to use this service.",
+                    "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running ZITADEL V3.",
               },
               items: [
                 {
