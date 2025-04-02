@@ -26,6 +26,10 @@
     "release": "turbo run build --filter=login^... && changeset publish",
     "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup",
     "run-sink": "docker compose -f ./acceptance/docker-compose.yaml up -d sink",
+    "run-samlsp": "docker compose -f ./acceptance/saml/docker-compose.yaml up -d",
+    "run-samlidp": "docker compose -f ./acceptance/idp/saml/docker-compose.yaml up -d",
+    "run-oidcrp": "docker compose -f ./acceptance/oidc/docker-compose.yaml up -d",
+    "run-oidcop": "docker compose -f ./acceptance/idp/oidc/docker-compose.yaml up -d",
     "stop": "docker compose -f ./acceptance/docker-compose.yaml stop"
   },
   "pnpm": {
