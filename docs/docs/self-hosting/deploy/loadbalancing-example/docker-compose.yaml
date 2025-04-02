@@ -112,7 +112,7 @@ services:
     restart: 'unless-stopped'
     networks:
       - 'backend'
-    image: 'ghcr.io/zitadel/zitadel-login:sha-365a85e'
+    image: 'ghcr.io/zitadel/login:main'
     environment:
       - ZITADEL_API_URL=http://zitadel:8080
       - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
