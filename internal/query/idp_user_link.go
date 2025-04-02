@@ -107,14 +107,14 @@ func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissio
 }
 
 func idpLinksPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *IDPUserLinksSearchQuery) sq.SelectBuilder {
-	return WherePermittedOrgs(
+	return PermissionClause(
 		ctx,
 		query,
 		enabled,
 		IDPUserLinkResourceOwnerCol,
 		domain.PermissionUserRead,
-		SingleOrgOption(queries.Queries),
-		OwnedRowsOrgOption(IDPUserLinkUserIDCol),
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(IDPUserLinkUserIDCol),
 	)
 }
 

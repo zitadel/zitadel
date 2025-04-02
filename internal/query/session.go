@@ -114,17 +114,17 @@ func sessionCheckPermission(ctx context.Context, resourceOwner string, creator s
 }
 
 func sessionsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
-	return WherePermittedOrgs(
+	return PermissionClause(
 		ctx,
 		query,
 		enabled,
 		SessionColumnResourceOwner,
 		domain.PermissionSessionRead,
 		// Allow if user is creator
-		OwnedRowsOrgOption(SessionColumnCreator),
+		OwnedRowsPermissionOption(SessionColumnCreator),
 		// Allow if session belongs to the user
-		OwnedRowsOrgOption(SessionColumnUserID),
-		OverrideOrgOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
+		OwnedRowsPermissionOption(SessionColumnUserID),
+		OverridePermissionOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
 	)
 }
 

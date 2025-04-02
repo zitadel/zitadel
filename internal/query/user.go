@@ -133,14 +133,14 @@ func usersCheckPermission(ctx context.Context, users *Users, permissionCheck dom
 }
 
 func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *UserSearchQueries) sq.SelectBuilder {
-	return WherePermittedOrgs(
+	return PermissionClause(
 		ctx,
 		query,
 		enabled,
 		UserResourceOwnerCol,
 		domain.PermissionUserRead,
-		SingleOrgOption(queries.Queries),
-		OwnedRowsOrgOption(UserIDCol),
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(UserIDCol),
 	)
 }
 
