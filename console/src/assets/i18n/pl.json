@@ -624,6 +624,7 @@
         "TIMEOUT_DESCRIPTION": "Ustaw maksymalny czas, w jakim cel musi odpowiedzieć. Jeśli zajmie to więcej czasu, zatrzymamy żądanie.",
         "INTERRUPT_ON_ERROR": "Przerwij w przypadku błędu",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Zatrzymaj wszystkie wykonania, gdy cele zwrócą błąd",
+        "INTERRUPT_ON_ERROR_WARNING": "Uwaga: „Przerwij w przypadku błędu” zatrzymuje operacje w przypadku błędu, co grozi zablokowaniem. Przetestuj przy wyłączonej opcji, aby uniknąć blokowania logowania/tworzenia.",
         "AWAIT_RESPONSE": "Oczekuj na odpowiedź",
         "AWAIT_RESPONSE_DESCRIPTION": "Przed wykonaniem jakichkolwiek innych czynności poczekamy na odpowiedź. Przydatne, jeśli zamierzasz użyć wielu celów dla jednej akcji"
       },

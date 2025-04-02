@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "设置您的目标必须响应的最大时间。如果花费的时间更长，我们将停止请求。",
         "INTERRUPT_ON_ERROR": "错误时中断",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "当目标返回错误时，停止所有执行",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：“出错时中断”会在失败时停止操作，存在被锁定的风险。请在禁用该选项的情况下进行测试，以避免阻止登录/创建。",
         "AWAIT_RESPONSE": "等待响应",
         "AWAIT_RESPONSE_DESCRIPTION": "我们将在执行任何其他操作之前等待响应。如果您打算为单个操作使用多个目标，这将非常有用"
       },

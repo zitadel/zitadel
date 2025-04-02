@@ -624,6 +624,7 @@
         "TIMEOUT_DESCRIPTION": "Imposta il tempo massimo che il tuo obiettivo ha per rispondere. Se impiega più tempo, interromperemo la richiesta.",
         "INTERRUPT_ON_ERROR": "Interrompi in caso di errore",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Interrompi tutte le esecuzioni quando gli obiettivi restituiscono un errore",
+        "INTERRUPT_ON_ERROR_WARNING": "Attenzione: “Interrompi in caso di errore” arresta le operazioni in caso di fallimento, rischiando il blocco. Testare con l’opzione disattivata per evitare il blocco dell’accesso/creazione.",
         "AWAIT_RESPONSE": "Attendi risposta",
         "AWAIT_RESPONSE_DESCRIPTION": "Aspetteremo una risposta prima di fare altro. Utile se intendi utilizzare più obiettivi per una singola azione"
       },

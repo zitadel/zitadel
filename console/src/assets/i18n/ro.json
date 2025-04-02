@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Setați timpul maxim pe care ținta dvs. îl are pentru a răspunde. Dacă durează mai mult, vom opri cererea.",
         "INTERRUPT_ON_ERROR": "Întrerupe la Eroare",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Opriți toate execuțiile când țintele returnează o eroare",
+        "INTERRUPT_ON_ERROR_WARNING": "Atenție: „Întrerupe la eroare” oprește operațiunile în caz de eșec, riscând blocarea accesului. Testați cu această opțiune dezactivată pentru a evita blocarea autentificării/creării.",
         "AWAIT_RESPONSE": "Așteaptă Răspuns",
         "AWAIT_RESPONSE_DESCRIPTION": "Vom aștepta un răspuns înainte de a face altceva. Util dacă intenționați să utilizați mai multe ținte pentru o singură acțiune"
       },

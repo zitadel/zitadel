@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Nastavte maximální dobu, po kterou musí váš cíl odpovědět. Pokud to trvá déle, požadavek zastavíme.",
         "INTERRUPT_ON_ERROR": "Přerušit při chybě",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Zastavte všechna spuštění, když cíle vrátí chybu",
+        "INTERRUPT_ON_ERROR_WARNING": "Pozor: „Přerušit při chybě“ zastaví operace při selhání, což může vést k zablokování. Otestujte s vypnutou možností, abyste předešli zablokování přihlášení/vytváření.",
         "AWAIT_RESPONSE": "Čekat na odpověď",
         "AWAIT_RESPONSE_DESCRIPTION": "Před provedením čehokoli jiného počkáme na odpověď. Užitečné, pokud hodláte použít více cílů pro jednu akci"
       },

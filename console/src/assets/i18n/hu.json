@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Állítsa be a maximális időt, amíg a céljának válaszolnia kell. Ha tovább tart, leállítjuk a kérést.",
         "INTERRUPT_ON_ERROR": "Hiba esetén megszakítás",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Állítsa le az összes végrehajtást, ha a célok hibát adnak vissza",
+        "INTERRUPT_ON_ERROR_WARNING": "Figyelem: Az „Hiba esetén megszakítás” funkció leállítja a műveleteket hiba esetén, ami kizáráshoz vezethet. Tesztelje kikapcsolt állapotban a bejelentkezés/létrehozás blokkolásának elkerülése érdekében.",
         "AWAIT_RESPONSE": "Válaszra várás",
         "AWAIT_RESPONSE_DESCRIPTION": "Megvárjuk a választ, mielőtt bármi mást tennénk. Hasznos, ha több célt szeretne használni egyetlen művelethez"
       },

@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "타겟이 응답해야 하는 최대 시간을 설정하십시오. 시간이 더 오래 걸리면 요청을 중지합니다.",
         "INTERRUPT_ON_ERROR": "오류 시 중단",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "타겟이 오류를 반환하면 모든 실행을 중지하십시오.",
+        "INTERRUPT_ON_ERROR_WARNING": "주의: “오류 시 중단” 기능은 실패 시 작업을 중단하며, 잠금 위험이 있습니다. 로그인/생성 차단을 방지하려면 비활성화된 상태로 테스트하세요.",
         "AWAIT_RESPONSE": "응답 대기",
         "AWAIT_RESPONSE_DESCRIPTION": "다른 작업을 수행하기 전에 응답을 기다립니다. 단일 작업에 여러 타겟을 사용하려는 경우 유용합니다."
       },

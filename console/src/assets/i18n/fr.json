@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Définissez le temps maximal dont votre cible dispose pour répondre. Si cela prend plus de temps, nous arrêterons la requête.",
         "INTERRUPT_ON_ERROR": "Interrompre en cas d'erreur",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Arrêtez toutes les exécutions lorsque les cibles renvoient une erreur",
+        "INTERRUPT_ON_ERROR_WARNING": "Attention : “Interrompre en cas d'erreur” arrête les opérations en cas d’échec, ce qui peut entraîner un verrouillage. Testez avec cette option désactivée pour éviter de bloquer la connexion ou la création.",
         "AWAIT_RESPONSE": "Attendre une réponse",
         "AWAIT_RESPONSE_DESCRIPTION": "Nous attendrons une réponse avant de faire autre chose. Utile si vous avez l'intention d'utiliser plusieurs cibles pour une seule action"
       },

@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Establece el tiempo máximo que tiene tu objetivo para responder. Si tarda más, detendremos la solicitud.",
         "INTERRUPT_ON_ERROR": "Interrumpir en error",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Detén todas las ejecuciones cuando los objetivos devuelvan un error",
+        "INTERRUPT_ON_ERROR_WARNING": "Precaución: “Interrumpir en error” detiene las operaciones si fallan, lo que puede provocar un bloqueo. Pruebe con esta opción desactivada para evitar bloquear el inicio de sesión o la creación.",
         "AWAIT_RESPONSE": "Esperar respuesta",
         "AWAIT_RESPONSE_DESCRIPTION": "Esperaremos una respuesta antes de hacer cualquier otra cosa. Útil si tienes la intención de usar múltiples objetivos para una sola acción"
       },

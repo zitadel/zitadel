@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Legen Sie die maximale Zeit fest, die Ihr Ziel zum Antworten hat. Wenn es länger dauert, stoppen wir die Anfrage.",
         "INTERRUPT_ON_ERROR": "Bei Fehler unterbrechen",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Stoppen Sie alle Ausführungen, wenn die Ziele einen Fehler zurückgeben",
+        "INTERRUPT_ON_ERROR_WARNING": "Achtung: „Bei Fehler unterbrechen“ stoppt Vorgänge bei einem Fehler und kann zur Sperrung führen. Testen Sie mit deaktivierter Option, um Login/Erstellung nicht zu blockieren.",
         "AWAIT_RESPONSE": "Auf Antwort warten",
         "AWAIT_RESPONSE_DESCRIPTION": "Wir warten auf eine Antwort, bevor wir etwas anderes tun. Nützlich, wenn Sie mehrere Ziele für eine einzelne Aktion verwenden möchten"
       },

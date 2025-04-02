@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Defina o tempo máximo que seu destino tem para responder. Se demorar mais, interromperemos a solicitação.",
         "INTERRUPT_ON_ERROR": "Interromper em Caso de Erro",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Pare todas as execuções quando os destinos retornarem um erro",
+        "INTERRUPT_ON_ERROR_WARNING": "Atenção: “Interromper em caso de erro” interrompe as operações em caso de falha, com risco de bloqueio. Teste com esta opção desativada para evitar bloquear o login/criação.",
         "AWAIT_RESPONSE": "Aguardar Resposta",
         "AWAIT_RESPONSE_DESCRIPTION": "Aguardaremos uma resposta antes de fazermos qualquer outra coisa. Útil se você pretende usar vários destinos para uma única ação"
       },

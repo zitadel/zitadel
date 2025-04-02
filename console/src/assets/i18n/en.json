@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Set the maximum time your target has to respond. If it takes longer, we will stop the request.",
         "INTERRUPT_ON_ERROR": "Interrupt on Error",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop all executions when the targets returns with an error",
+        "INTERRUPT_ON_ERROR_WARNING": "Caution: “Interrupt on Error” halts operations on failure, risking lockout. Test with it disabled to prevent blocking login/creation.",
         "AWAIT_RESPONSE": "Await Response",
         "AWAIT_RESPONSE_DESCRIPTION": "We'll Wait for a response before we do anything else. Useful if you intend to use multiple targets for a single action"
       },

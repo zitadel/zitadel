@@ -592,6 +592,7 @@
         "TIMEOUT_DESCRIPTION": "Tetapkan waktu maksimum target Anda untuk merespons. Jika membutuhkan waktu lebih lama, kami akan menghentikan permintaan.",
         "INTERRUPT_ON_ERROR": "Interupsi jika Terjadi Kesalahan",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Hentikan semua eksekusi saat target mengembalikan kesalahan",
+        "INTERRUPT_ON_ERROR_WARNING": "Perhatian: \"Interupsi jika Terjadi Kesalahan\" akan menghentikan operasi jika terjadi kegagalan, berisiko mengunci akses. Uji dengan opsi ini dinonaktifkan untuk mencegah pemblokiran login/pembuatan.",
         "AWAIT_RESPONSE": "Tunggu Respons",
         "AWAIT_RESPONSE_DESCRIPTION": "Kami akan menunggu respons sebelum melakukan hal lain. Berguna jika Anda berniat menggunakan beberapa target untuk satu tindakan"
       },

@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Stel de maximale tijd in die uw doel heeft om te reageren. Als het langer duurt, stoppen we het verzoek.",
         "INTERRUPT_ON_ERROR": "Onderbreken bij fout",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop alle uitvoeringen als de doelen een fout retourneren",
+        "INTERRUPT_ON_ERROR_WARNING": "Let op: “Onderbreken bij fout” stopt operaties bij een mislukking, met kans op blokkering. Test met deze optie uitgeschakeld om inloggen/aanmaken niet te blokkeren.",
         "AWAIT_RESPONSE": "Wachten op reactie",
         "AWAIT_RESPONSE_DESCRIPTION": "We wachten op een reactie voordat we iets anders doen. Handig als u van plan bent om meerdere doelen voor één actie te gebruiken"
       },

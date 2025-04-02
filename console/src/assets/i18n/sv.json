@@ -625,6 +625,7 @@
         "TIMEOUT_DESCRIPTION": "Ange den maximala tid ditt mål har att svara. Om det tar längre tid stoppar vi förfrågan.",
         "INTERRUPT_ON_ERROR": "Avbryt vid fel",
         "INTERRUPT_ON_ERROR_DESCRIPTION": "Stoppa alla körningar när målen returnerar ett fel",
+        "INTERRUPT_ON_ERROR_WARNING": "Varning: ”Avbryt vid fel” stoppar åtgärder vid fel och kan leda till att du blir utelåst. Testa med funktionen avstängd för att undvika att blockera inloggning/skapa.",
         "AWAIT_RESPONSE": "Vänta på svar",
         "AWAIT_RESPONSE_DESCRIPTION": "Vi väntar på ett svar innan vi gör något annat. Användbart om du avser att använda flera mål för en enda åtgärd"
       },
