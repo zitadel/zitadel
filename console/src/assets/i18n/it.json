@@ -527,6 +527,114 @@
     "DOWNLOAD": "Scarica",
     "APPLY": "Applicare"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Azioni",
+      "DESCRIPTION": "Le azioni consentono di eseguire codice personalizzato in risposta a richieste API, eventi o funzioni specifiche. Usale per estendere Zitadel, automatizzare i flussi di lavoro e integrarti con altri sistemi.",
+      "TYPES": {
+        "request": "Richiesta",
+        "response": "Risposta",
+        "events": "Eventi",
+        "function": "Funzione"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Crea un'azione",
+        "UPDATE_TITLE": "Aggiorna un'azione",
+        "TYPE": {
+          "DESCRIPTION": "Seleziona quando vuoi che venga eseguita questa azione",
+          "REQUEST": {
+            "TITLE": "Richiesta",
+            "DESCRIPTION": "Richieste che si verificano all'interno di Zitadel. Potrebbe trattarsi di una chiamata di richiesta di accesso."
+          },
+          "RESPONSE": {
+            "TITLE": "Risposta",
+            "DESCRIPTION": "Una risposta a una richiesta all'interno di Zitadel. Pensa alla risposta che ricevi quando recuperi un utente."
+          },
+          "EVENTS": {
+            "TITLE": "Eventi",
+            "DESCRIPTION": "Eventi che si verificano all'interno di Zitadel. Potrebbe trattarsi di qualsiasi cosa, come un utente che crea un account, un accesso riuscito, ecc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funzioni",
+            "DESCRIPTION": "Funzioni che puoi chiamare all'interno di Zitadel. Potrebbe trattarsi di qualsiasi cosa, dall'invio di un'e-mail alla creazione di un utente."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Scegli se questa azione si applica a tutte le richieste, a un servizio specifico (ad es. gestione utenti) o a una singola richiesta (ad es. crea utente).",
+          "ALL": {
+            "TITLE": "Tutte",
+            "DESCRIPTION": "Seleziona questa opzione se vuoi eseguire la tua azione su ogni richiesta"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Seleziona servizio",
+            "DESCRIPTION": "Scegli un servizio Zitadel per la tua azione."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Seleziona metodo",
+            "DESCRIPTION": "Se vuoi eseguire solo su una richiesta specifica, selezionala qui",
+            "NOTE": "Se non selezioni un metodo, la tua azione verrà eseguita su ogni richiesta nel servizio selezionato."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nome funzione",
+            "DESCRIPTION": "Scegli la funzione che vuoi eseguire"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Imposta gruppo",
+            "DESCRIPTION": "Se vuoi eseguire solo su un gruppo di eventi, imposta il gruppo qui"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Seleziona evento",
+            "DESCRIPTION": "Se vuoi eseguire solo su un evento specifico, specificalo qui"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Puoi scegliere di eseguire un obiettivo o di eseguirlo alle stesse condizioni di altri obiettivi.",
+          "TARGET": {
+            "DESCRIPTION": "L'obiettivo che vuoi eseguire per questa azione"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Condizioni di esecuzione"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condizione",
+        "TYPE": "Tipo",
+        "TARGET": "Obiettivo",
+        "CREATIONDATE": "Data di creazione"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Obiettivi",
+      "DESCRIPTION": "Un obiettivo è la destinazione del codice che vuoi eseguire da un'azione. Crea un obiettivo qui e aggiungilo alle tue azioni.",
+      "CREATE": {
+        "TITLE": "Crea il tuo obiettivo",
+        "DESCRIPTION": "Crea il tuo obiettivo al di fuori di Zitadel",
+        "NAME": "Nome",
+        "NAME_DESCRIPTION": "Dai al tuo obiettivo un nome chiaro e descrittivo per renderlo facile da identificare in seguito",
+        "TYPE": "Tipo",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Chiamata REST",
+          "restAsync": "REST Asincrono"
+        },
+        "ENDPOINT": "Endpoint",
+        "ENDPOINT_DESCRIPTION": "Inserisci l'endpoint in cui è ospitato il tuo codice. Assicurati che sia accessibile per noi!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Imposta il tempo massimo che il tuo obiettivo ha per rispondere. Se impiega più tempo, interromperemo la richiesta.",
+        "INTERRUPT_ON_ERROR": "Interrompi in caso di errore",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Interrompi tutte le esecuzioni quando gli obiettivi restituiscono un errore",
+        "INTERRUPT_ON_ERROR_WARNING": "Attenzione: “Interrompi in caso di errore” arresta le operazioni in caso di fallimento, rischiando il blocco. Testare con l’opzione disattivata per evitare il blocco dell’accesso/creazione.",
+        "AWAIT_RESPONSE": "Attendi risposta",
+        "AWAIT_RESPONSE_DESCRIPTION": "Aspetteremo una risposta prima di fare altro. Utile se intendi utilizzare più obiettivi per una singola azione"
+      },
+      "TABLE": {
+        "NAME": "Nome",
+        "ENDPOINT": "Endpoint",
+        "CREATIONDATE": "Data di creazione"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
     "IAM_OWNER_VIEWER": "Ha l'autorizzazione per esaminare l'intera istanza, comprese tutte le organizzazioni",

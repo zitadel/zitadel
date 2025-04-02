@@ -527,6 +527,114 @@
     "DOWNLOAD": "Pobierz",
     "APPLY": "Stosować"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Akcje",
+      "DESCRIPTION": "Akcje umożliwiają uruchamianie niestandardowego kodu w odpowiedzi na żądania API, zdarzenia lub określone funkcje. Użyj ich, aby rozszerzyć Zitadel, zautomatyzować przepływy pracy i zintegrować się z innymi systemami.",
+      "TYPES": {
+        "request": "Żądanie",
+        "response": "Odpowiedź",
+        "events": "Zdarzenia",
+        "function": "Funkcja"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Utwórz akcję",
+        "UPDATE_TITLE": "Aktualizuj akcję",
+        "TYPE": {
+          "DESCRIPTION": "Wybierz, kiedy chcesz uruchomić tę akcję",
+          "REQUEST": {
+            "TITLE": "Żądanie",
+            "DESCRIPTION": "Żądania występujące w Zitadel. Może to być coś takiego jak wywołanie żądania logowania."
+          },
+          "RESPONSE": {
+            "TITLE": "Odpowiedź",
+            "DESCRIPTION": "Odpowiedź na żądanie w Zitadel. Pomyśl o odpowiedzi, którą otrzymujesz po pobraniu użytkownika."
+          },
+          "EVENTS": {
+            "TITLE": "Zdarzenia",
+            "DESCRIPTION": "Zdarzenia, które mają miejsce w Zitadel. Mogą to być dowolne zdarzenia, takie jak utworzenie konta użytkownika, udane logowanie itp."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funkcje",
+            "DESCRIPTION": "Funkcje, które można wywołać w Zitadel. Mogą to być dowolne funkcje, od wysłania wiadomości e-mail po utworzenie użytkownika."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Wybierz, czy ta akcja ma zastosowanie do wszystkich żądań, określonej usługi (np. zarządzanie użytkownikami) czy pojedynczego żądania (np. utwórz użytkownika).",
+          "ALL": {
+            "TITLE": "Wszystkie",
+            "DESCRIPTION": "Wybierz tę opcję, jeśli chcesz uruchomić akcję dla każdego żądania"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Wybierz usługę",
+            "DESCRIPTION": "Wybierz usługę Zitadel dla swojej akcji."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Wybierz metodę",
+            "DESCRIPTION": "Jeśli chcesz uruchomić tylko dla określonego żądania, wybierz je tutaj",
+            "NOTE": "Jeśli nie wybierzesz metody, akcja zostanie uruchomiona dla każdego żądania w wybranej usłudze."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nazwa funkcji",
+            "DESCRIPTION": "Wybierz funkcję, którą chcesz uruchomić"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Ustaw grupę",
+            "DESCRIPTION": "Jeśli chcesz uruchomić tylko dla grupy zdarzeń, ustaw grupę tutaj"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Wybierz zdarzenie",
+            "DESCRIPTION": "Jeśli chcesz uruchomić tylko dla określonego zdarzenia, określ je tutaj"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Możesz wybrać uruchomienie celu lub uruchomienie go na tych samych warunkach co inne cele.",
+          "TARGET": {
+            "DESCRIPTION": "Cel, który chcesz uruchomić dla tej akcji"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Warunki wykonania"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Warunek",
+        "TYPE": "Typ",
+        "TARGET": "Cel",
+        "CREATIONDATE": "Data utworzenia"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Cele",
+      "DESCRIPTION": "Celem jest miejsce docelowe kodu, który chcesz uruchomić z akcji. Utwórz cel tutaj i dodaj go do swoich akcji.",
+      "CREATE": {
+        "TITLE": "Utwórz swój cel",
+        "DESCRIPTION": "Utwórz własny cel poza Zitadel",
+        "NAME": "Nazwa",
+        "NAME_DESCRIPTION": "Nadaj swojemu celowi jasną, opisową nazwę, aby ułatwić jego późniejszą identyfikację",
+        "TYPE": "Typ",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Wywołanie REST",
+          "restAsync": "REST Asynchroniczny"
+        },
+        "ENDPOINT": "Punkt końcowy",
+        "ENDPOINT_DESCRIPTION": "Wprowadź punkt końcowy, w którym hostowany jest Twój kod. Upewnij się, że jest dla nas dostępny!",
+        "TIMEOUT": "Limit czasu",
+        "TIMEOUT_DESCRIPTION": "Ustaw maksymalny czas, w jakim cel musi odpowiedzieć. Jeśli zajmie to więcej czasu, zatrzymamy żądanie.",
+        "INTERRUPT_ON_ERROR": "Przerwij w przypadku błędu",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Zatrzymaj wszystkie wykonania, gdy cele zwrócą błąd",
+        "INTERRUPT_ON_ERROR_WARNING": "Uwaga: „Przerwij w przypadku błędu” zatrzymuje operacje w przypadku błędu, co grozi zablokowaniem. Przetestuj przy wyłączonej opcji, aby uniknąć blokowania logowania/tworzenia.",
+        "AWAIT_RESPONSE": "Oczekuj na odpowiedź",
+        "AWAIT_RESPONSE_DESCRIPTION": "Przed wykonaniem jakichkolwiek innych czynności poczekamy na odpowiedź. Przydatne, jeśli zamierzasz użyć wielu celów dla jednej akcji"
+      },
+      "TABLE": {
+        "NAME": "Nazwa",
+        "ENDPOINT": "Punkt końcowy",
+        "CREATIONDATE": "Data utworzenia"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Ma kontrolę nad całą instancją, włącznie z wszystkimi organizacjami",
     "IAM_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej instancji, włącznie z wszystkimi organizacjami",

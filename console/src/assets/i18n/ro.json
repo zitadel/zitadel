@@ -528,6 +528,114 @@
     "DOWNLOAD": "Descărcați",
     "APPLY": "Aplicați"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Acțiuni",
+      "DESCRIPTION": "Acțiunile vă permit să rulați cod personalizat ca răspuns la cereri API, evenimente sau funcții specifice. Folosiți-le pentru a extinde Zitadel, a automatiza fluxurile de lucru și a vă integra cu alte sisteme.",
+      "TYPES": {
+        "request": "Cerere",
+        "response": "Răspuns",
+        "events": "Evenimente",
+        "function": "Funcție"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Creează o Acțiune",
+        "UPDATE_TITLE": "Actualizează o Acțiune",
+        "TYPE": {
+          "DESCRIPTION": "Selectați când doriți să rulați această Acțiune",
+          "REQUEST": {
+            "TITLE": "Cerere",
+            "DESCRIPTION": "Cereri care apar în Zitadel. Acesta ar putea fi ceva de genul unui apel de cerere de autentificare."
+          },
+          "RESPONSE": {
+            "TITLE": "Răspuns",
+            "DESCRIPTION": "Un răspuns la o cerere în Zitadel. Gândiți-vă la răspunsul pe care îl primiți la preluarea unui utilizator."
+          },
+          "EVENTS": {
+            "TITLE": "Evenimente",
+            "DESCRIPTION": "Evenimente care se întâmplă în Zitadel. Acesta ar putea fi orice, cum ar fi un utilizator care își creează un cont, o autentificare reușită etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funcții",
+            "DESCRIPTION": "Funcții pe care le puteți apela în Zitadel. Acesta ar putea fi orice, de la trimiterea unui e-mail la crearea unui utilizator."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Alegeți dacă această acțiune se aplică tuturor cererilor, unui serviciu specific (de exemplu, gestionarea utilizatorilor) sau unei singure cereri (de exemplu, crearea unui utilizator).",
+          "ALL": {
+            "TITLE": "Toate",
+            "DESCRIPTION": "Selectați aceasta dacă doriți să rulați acțiunea la fiecare cerere"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Selectați Serviciul",
+            "DESCRIPTION": "Alegeți un Serviciu Zitadel pentru acțiunea dvs."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Selectați Metoda",
+            "DESCRIPTION": "Dacă doriți să rulați numai la o cerere specifică, selectați-o aici",
+            "NOTE": "Dacă nu selectați o metodă, acțiunea dvs. va rula la fiecare cerere din serviciul selectat."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Numele Funcției",
+            "DESCRIPTION": "Alegeți funcția pe care doriți să o rulați"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Setează Grupul",
+            "DESCRIPTION": "Dacă doriți să rulați numai pe un grup de evenimente, setați grupul aici"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Selectați Evenimentul",
+            "DESCRIPTION": "Dacă doriți să rulați numai la un eveniment specific, specificați-l aici"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Puteți alege să rulați o țintă sau să o rulați în aceleași condiții ca și alte ținte.",
+          "TARGET": {
+            "DESCRIPTION": "Ținta pe care doriți să o rulați pentru această acțiune"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Condiții de Execuție"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condiție",
+        "TYPE": "Tip",
+        "TARGET": "Țintă",
+        "CREATIONDATE": "Data Creării"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Ținte",
+      "DESCRIPTION": "O țintă este destinația codului pe care doriți să-l rulați dintr-o acțiune. Creați o țintă aici și adăugați-o la acțiunile dvs.",
+      "CREATE": {
+        "TITLE": "Creează-ți Ținta",
+        "DESCRIPTION": "Creați-vă propria țintă în afara Zitadel",
+        "NAME": "Nume",
+        "NAME_DESCRIPTION": "Dați țintei dvs. un nume clar, descriptiv, pentru a o identifica ușor mai târziu",
+        "TYPE": "Tip",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Apel REST",
+          "restAsync": "REST Asincron"
+        },
+        "ENDPOINT": "Punct Final",
+        "ENDPOINT_DESCRIPTION": "Introduceți punctul final unde este găzduit codul dvs. Asigurați-vă că este accesibil pentru noi!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Setați timpul maxim pe care ținta dvs. îl are pentru a răspunde. Dacă durează mai mult, vom opri cererea.",
+        "INTERRUPT_ON_ERROR": "Întrerupe la Eroare",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Opriți toate execuțiile când țintele returnează o eroare",
+        "INTERRUPT_ON_ERROR_WARNING": "Atenție: „Întrerupe la eroare” oprește operațiunile în caz de eșec, riscând blocarea accesului. Testați cu această opțiune dezactivată pentru a evita blocarea autentificării/creării.",
+        "AWAIT_RESPONSE": "Așteaptă Răspuns",
+        "AWAIT_RESPONSE_DESCRIPTION": "Vom aștepta un răspuns înainte de a face altceva. Util dacă intenționați să utilizați mai multe ținte pentru o singură acțiune"
+      },
+      "TABLE": {
+        "NAME": "Nume",
+        "ENDPOINT": "Punct Final",
+        "CREATIONDATE": "Data Creării"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Are control asupra întregii instanțe, inclusiv asupra tuturor organizațiilor",
     "IAM_OWNER_VIEWER": "Are permisiunea de a revizui întreaga instanță, inclusiv toate organizațiile",

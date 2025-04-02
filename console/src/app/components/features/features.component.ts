@@ -40,7 +40,7 @@ const FEATURE_KEYS = [
   'oidcTriggerIntrospectionProjections',
   'permissionCheckV2',
   'userSchema',
-  // 'webKey',
+  'webKey',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };

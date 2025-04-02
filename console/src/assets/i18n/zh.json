@@ -528,6 +528,114 @@
     "DOWNLOAD": "下载",
     "APPLY": "申请"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "操作",
+      "DESCRIPTION": "操作允许您运行自定义代码以响应 API 请求、事件或特定函数。使用它们来扩展 Zitadel、自动化工作流程并与其他系统集成。",
+      "TYPES": {
+        "request": "请求",
+        "response": "响应",
+        "events": "事件",
+        "function": "函数"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "创建操作",
+        "UPDATE_TITLE": "更新操作",
+        "TYPE": {
+          "DESCRIPTION": "选择您希望此操作运行的时间",
+          "REQUEST": {
+            "TITLE": "请求",
+            "DESCRIPTION": "Zitadel 中发生的请求。这可能是登录请求调用之类的操作。"
+          },
+          "RESPONSE": {
+            "TITLE": "响应",
+            "DESCRIPTION": "来自 Zitadel 中请求的响应。考虑一下从获取用户返回的响应。"
+          },
+          "EVENTS": {
+            "TITLE": "事件",
+            "DESCRIPTION": "Zitadel 中发生的事件。这可能是用户创建帐户、成功登录等任何操作。"
+          },
+          "FUNCTIONS": {
+            "TITLE": "函数",
+            "DESCRIPTION": "您可以在 Zitadel 中调用的函数。这可能是从发送电子邮件到创建用户的任何操作。"
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "选择此操作是适用于所有请求、特定服务（例如用户管理）还是单个请求（例如创建用户）。",
+          "ALL": {
+            "TITLE": "全部",
+            "DESCRIPTION": "如果您希望在每个请求上运行您的操作，请选择此项"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "选择服务",
+            "DESCRIPTION": "为您的操作选择一个 Zitadel 服务。"
+          },
+          "SELECT_METHOD": {
+            "TITLE": "选择方法",
+            "DESCRIPTION": "如果您只想在特定请求上执行，请在此处选择它",
+            "NOTE": "如果您不选择方法，您的操作将在您选择的服务中的每个请求上运行。"
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "函数名称",
+            "DESCRIPTION": "选择您要执行的函数"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "设置组",
+            "DESCRIPTION": "如果您只想在事件组上执行，请在此处设置组"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "选择事件",
+            "DESCRIPTION": "如果您只想在特定事件上执行，请在此处指定它"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "您可以选择执行目标，或在与其他目标相同的条件下运行它。",
+          "TARGET": {
+            "DESCRIPTION": "您要为此操作执行的目标"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "执行条件"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "条件",
+        "TYPE": "类型",
+        "TARGET": "目标",
+        "CREATIONDATE": "创建日期"
+      }
+    },
+    "TARGET": {
+      "TITLE": "目标",
+      "DESCRIPTION": "目标是您要从操作中执行的代码的目标。在此处创建一个目标并将其添加到您的操作中。",
+      "CREATE": {
+        "TITLE": "创建您的目标",
+        "DESCRIPTION": "在 Zitadel 外部创建您自己的目标",
+        "NAME": "名称",
+        "NAME_DESCRIPTION": "为您的目标提供清晰、描述性的名称，以便稍后轻松识别",
+        "TYPE": "类型",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST 调用",
+          "restAsync": "REST 异步"
+        },
+        "ENDPOINT": "端点",
+        "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
+        "TIMEOUT": "超时",
+        "TIMEOUT_DESCRIPTION": "设置您的目标必须响应的最大时间。如果花费的时间更长，我们将停止请求。",
+        "INTERRUPT_ON_ERROR": "错误时中断",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "当目标返回错误时，停止所有执行",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：“出错时中断”会在失败时停止操作，存在被锁定的风险。请在禁用该选项的情况下进行测试，以避免阻止登录/创建。",
+        "AWAIT_RESPONSE": "等待响应",
+        "AWAIT_RESPONSE_DESCRIPTION": "我们将在执行任何其他操作之前等待响应。如果您打算为单个操作使用多个目标，这将非常有用"
+      },
+      "TABLE": {
+        "NAME": "名称",
+        "ENDPOINT": "端点",
+        "CREATIONDATE": "创建日期"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",
     "IAM_OWNER_VIEWER": "有权审查整个实例，包括所有组织",

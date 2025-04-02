@@ -528,6 +528,114 @@
     "DOWNLOAD": "Ladda ner",
     "APPLY": "Tillämpa"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Åtgärder",
+      "DESCRIPTION": "Åtgärder låter dig köra anpassad kod som svar på API-förfrågningar, händelser eller specifika funktioner. Använd dem för att utöka Zitadel, automatisera arbetsflöden och integrera med andra system.",
+      "TYPES": {
+        "request": "Förfrågan",
+        "response": "Svar",
+        "events": "Händelser",
+        "function": "Funktion"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Skapa en åtgärd",
+        "UPDATE_TITLE": "Uppdatera en åtgärd",
+        "TYPE": {
+          "DESCRIPTION": "Välj när du vill att denna åtgärd ska köras",
+          "REQUEST": {
+            "TITLE": "Förfrågan",
+            "DESCRIPTION": "Förfrågningar som sker inom Zitadel. Detta kan vara något som ett inloggningsförfrågningsanrop."
+          },
+          "RESPONSE": {
+            "TITLE": "Svar",
+            "DESCRIPTION": "Ett svar från en förfrågan inom Zitadel. Tänk på svaret du får tillbaka från att hämta en användare."
+          },
+          "EVENTS": {
+            "TITLE": "Händelser",
+            "DESCRIPTION": "Händelser som händer inom Zitadel. Detta kan vara vad som helst som en användare som skapar ett konto, en lyckad inloggning etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funktioner",
+            "DESCRIPTION": "Funktioner som du kan anropa inom Zitadel. Detta kan vara allt från att skicka ett e-postmeddelande till att skapa en användare."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Välj om denna åtgärd gäller för alla förfrågningar, en specifik tjänst (t.ex. användarhantering) eller en enskild förfrågan (t.ex. skapa användare).",
+          "ALL": {
+            "TITLE": "Alla",
+            "DESCRIPTION": "Välj detta om du vill köra din åtgärd på varje förfrågan"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Välj tjänst",
+            "DESCRIPTION": "Välj en Zitadel-tjänst för din åtgärd."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Välj metod",
+            "DESCRIPTION": "Om du bara vill köra på en specifik förfrågan, välj den här",
+            "NOTE": "Om du inte väljer en metod körs din åtgärd på varje förfrågan i din valda tjänst."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Funktionsnamn",
+            "DESCRIPTION": "Välj den funktion du vill köra"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Ange grupp",
+            "DESCRIPTION": "Om du bara vill köra på en grupp händelser, ange gruppen här"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Välj händelse",
+            "DESCRIPTION": "Om du bara vill köra på en specifik händelse, ange den här"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Du kan välja att köra ett mål eller att köra det under samma villkor som andra mål.",
+          "TARGET": {
+            "DESCRIPTION": "Målet du vill köra för denna åtgärd"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Körningsvillkor"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Villkor",
+        "TYPE": "Typ",
+        "TARGET": "Mål",
+        "CREATIONDATE": "Skapat datum"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Mål",
+      "DESCRIPTION": "Ett mål är destinationen för koden du vill köra från en åtgärd. Skapa ett mål här och lägg till det i dina åtgärder.",
+      "CREATE": {
+        "TITLE": "Skapa ditt mål",
+        "DESCRIPTION": "Skapa ditt eget mål utanför Zitadel",
+        "NAME": "Namn",
+        "NAME_DESCRIPTION": "Ge ditt mål ett tydligt, beskrivande namn för att göra det enkelt att identifiera senare",
+        "TYPE": "Typ",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Anrop",
+          "restAsync": "REST Asynkron"
+        },
+        "ENDPOINT": "Slutpunkt",
+        "ENDPOINT_DESCRIPTION": "Ange slutpunkten där din kod finns. Se till att den är tillgänglig för oss!",
+        "TIMEOUT": "Tidsgräns",
+        "TIMEOUT_DESCRIPTION": "Ange den maximala tid ditt mål har att svara. Om det tar längre tid stoppar vi förfrågan.",
+        "INTERRUPT_ON_ERROR": "Avbryt vid fel",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stoppa alla körningar när målen returnerar ett fel",
+        "INTERRUPT_ON_ERROR_WARNING": "Varning: ”Avbryt vid fel” stoppar åtgärder vid fel och kan leda till att du blir utelåst. Testa med funktionen avstängd för att undvika att blockera inloggning/skapa.",
+        "AWAIT_RESPONSE": "Vänta på svar",
+        "AWAIT_RESPONSE_DESCRIPTION": "Vi väntar på ett svar innan vi gör något annat. Användbart om du avser att använda flera mål för en enda åtgärd"
+      },
+      "TABLE": {
+        "NAME": "Namn",
+        "ENDPOINT": "Slutpunkt",
+        "CREATIONDATE": "Skapat datum"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",
     "IAM_OWNER_VIEWER": "Har behörighet att granska hela instansen, inklusive alla organisationer",
