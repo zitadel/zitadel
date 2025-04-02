@@ -1,0 +1,27 @@
+<cnsl-feature-toggle
+  *ngIf="toggleState$ | async as toggleState"
+  toggleStateKey="loginV2"
+  [toggleState]="toggleState"
+  (toggleChange)="toggleState$.next($event); !$event.enabled && toggleChanged.emit($event)"
+>
+  <cnsl-form-field *ngIf="toggleState.enabled">
+    <cnsl-label>{{ 'SETTING.FEATURES.LOGINV2_BASEURI' | translate }}</cnsl-label>
+    <input cnslInput [formControl]="baseUri" />
+    <button
+      matTooltip="{{ 'ACTIONS.SAVE' | translate }}"
+      mat-icon-button
+      [disabled]="baseUri.invalid"
+      color="primary"
+      type="submit"
+      (click)="
+        toggleChanged.emit({
+          source: toggleState.source,
+          enabled: toggleState.enabled,
+          baseUri: baseUri.value,
+        })
+      "
+    >
+      <i class="las la-save"></i>
+    </button>
+  </cnsl-form-field>
+</cnsl-feature-toggle>
