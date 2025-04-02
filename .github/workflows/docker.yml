@@ -64,7 +64,9 @@ jobs:
             ${{ secrets.DOCKER_IMAGE }}
           tags: |
             type=edge
-            type=ref
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
             type=sha
 
       - name: Install dependencies
