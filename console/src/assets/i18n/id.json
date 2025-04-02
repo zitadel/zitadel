@@ -1516,7 +1516,10 @@
       },
       "RESET": "Tetapkan semua untuk diwarisi",
       "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol untuk pembuatan pengguna",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
+      "LOGINV2_BASEURI": "URI dasar"
     },
     "DIALOG": {
       "RESET": {

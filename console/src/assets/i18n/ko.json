@@ -1649,7 +1649,10 @@
       },
       "RESET": "모두 상속으로 설정",
       "CONSOLEUSEV2USERAPI": "콘솔에서 사용자 생성을 위해 V2 API를 사용하세요",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "이 플래그가 활성화되면 콘솔은 V2 사용자 API를 사용하여 새 사용자를 생성합니다. V2 API를 사용하면 새로 생성된 사용자는 초기 상태 없이 시작합니다."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "이 플래그가 활성화되면 콘솔은 V2 사용자 API를 사용하여 새 사용자를 생성합니다. V2 API를 사용하면 새로 생성된 사용자는 초기 상태 없이 시작합니다.",
+      "LOGINV2": "로그인 V2",
+      "LOGINV2_DESCRIPTION": "이 옵션을 활성화하면 보안, 성능 및 사용자 정의 기능이 향상된 새로운 TypeScript 기반 로그인 UI가 활성화됩니다.",
+      "LOGINV2_BASEURI": "기본 URI"
     },
     "DIALOG": {
       "RESET": {

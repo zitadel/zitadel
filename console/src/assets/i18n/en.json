@@ -1652,7 +1652,10 @@
       },
       "RESET": "Set all to inherit",
       "CONSOLEUSEV2USERAPI": "Use V2 Api in Console for User creation",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
+      "LOGINV2_BASEURI": "Base URI"
     },
     "DIALOG": {
       "RESET": {
