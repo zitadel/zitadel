@@ -9,10 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [amd64,arm64]
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -88,7 +84,6 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/${{ matrix.arch }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,push-by-digest=true,name-canonical=true
@@ -102,7 +97,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.arch }}
+          name: digests
           path: /tmp/digests
           if-no-files-found: error
           retention-days: 1
