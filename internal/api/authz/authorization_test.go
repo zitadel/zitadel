@@ -3,6 +3,8 @@ package authz
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -273,6 +275,130 @@ func Test_GetPermissionCtxIDs(t *testing.T) {
 			if !equalStringArray(result, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}
+		})
+	}
+}
+
+func Test_systemMembershipsToUserPermissions(t *testing.T) {
+	roleMap := []RoleMapping{
+		{
+			Role:        "FOO_BAR",
+			Permissions: []string{"foo.bar.read", "foo.bar.write"},
+		},
+		{
+			Role:        "BAR_FOO",
+			Permissions: []string{"bar.foo.read", "bar.foo.write", "foo.bar.read"},
+		},
+	}
+
+	type args struct {
+		memberships Memberships
+		roleMap     []RoleMapping
+	}
+	tests := []struct {
+		name string
+		args args
+		want []SystemUserPermissions
+	}{
+		{
+			name: "nil memberships",
+			args: args{
+				memberships: nil,
+				roleMap:     roleMap,
+			},
+			want: nil,
+		},
+		{
+			name: "empty memberships",
+			args: args{
+				memberships: Memberships{},
+				roleMap:     roleMap,
+			},
+			want: []SystemUserPermissions{},
+		},
+		{
+			name: "single membership",
+			args: args{
+				memberships: Memberships{
+					{
+						MemberType:  MemberTypeSystem,
+						AggregateID: "1",
+						ObjectID:    "2",
+						Roles:       []string{"FOO_BAR"},
+					},
+				},
+				roleMap: roleMap,
+			},
+			want: []SystemUserPermissions{
+				{
+					MemberType:  MemberTypeSystem,
+					AggregateID: "1",
+					ObjectID:    "2",
+					Permissions: []string{"foo.bar.read", "foo.bar.write"},
+				},
+			},
+		},
+		{
+			name: "multiple memberships",
+			args: args{
+				memberships: Memberships{
+					{
+						MemberType:  MemberTypeSystem,
+						AggregateID: "1",
+						ObjectID:    "2",
+						Roles:       []string{"FOO_BAR"},
+					},
+					{
+						MemberType:  MemberTypeIAM,
+						AggregateID: "1",
+						ObjectID:    "2",
+						Roles:       []string{"BAR_FOO"},
+					},
+				},
+				roleMap: roleMap,
+			},
+			want: []SystemUserPermissions{
+				{
+					MemberType:  MemberTypeSystem,
+					AggregateID: "1",
+					ObjectID:    "2",
+					Permissions: []string{"foo.bar.read", "foo.bar.write"},
+				},
+				{
+					MemberType:  MemberTypeIAM,
+					AggregateID: "1",
+					ObjectID:    "2",
+					Permissions: []string{"bar.foo.read", "bar.foo.write", "foo.bar.read"},
+				},
+			},
+		},
+		{
+			name: "multiple roles",
+			args: args{
+				memberships: Memberships{
+					{
+						MemberType:  MemberTypeSystem,
+						AggregateID: "1",
+						ObjectID:    "2",
+						Roles:       []string{"FOO_BAR", "BAR_FOO"},
+					},
+				},
+				roleMap: roleMap,
+			},
+			want: []SystemUserPermissions{
+				{
+					MemberType:  MemberTypeSystem,
+					AggregateID: "1",
+					ObjectID:    "2",
+					Permissions: []string{"bar.foo.read", "bar.foo.write", "foo.bar.read", "foo.bar.write"},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := systemMembershipsToUserPermissions(tt.args.memberships, tt.args.roleMap)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
