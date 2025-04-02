@@ -62,6 +62,8 @@ export class InstanceComponent {
   protected readonly defaultSettingsList: SidenavSetting[] = [
     ORGANIZATIONS,
     FEATURESETTINGS,
+    ACTIONS,
+    ACTIONS_TARGETS,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
@@ -73,7 +75,6 @@ export class InstanceComponent {
     COMPLEXITY,
     AGE,
     LOCKOUT,
-
     DOMAIN,
     // appearance
     BRANDING,
@@ -90,8 +91,6 @@ export class InstanceComponent {
     WEBKEYS,
     SECRETS,
     SECURITY,
-    ACTIONS,
-    ACTIONS_TARGETS,
   ];
 
   protected readonly settingsList$: Observable<SidenavSetting[]>;
