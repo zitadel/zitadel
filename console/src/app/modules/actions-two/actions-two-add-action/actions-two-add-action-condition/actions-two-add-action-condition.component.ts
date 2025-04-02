@@ -10,6 +10,7 @@ import {
   AbstractControl,
   FormBuilder,
   FormControl,
+  FormGroup,
   FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
@@ -25,9 +26,9 @@ import {
   ReplaySubject,
   ObservedValueOf,
   switchMap,
-  tap,
-  Subject,
   take,
+  combineLatestWith,
+  OperatorFunction,
 } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
@@ -37,6 +38,7 @@ import { atLeastOneFieldValidator, requiredValidator } from 'src/app/modules/for
 import { Message } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { filter, startWith, tap, withLatestFrom } from 'rxjs/operators';
 
 export type ConditionType = NonNullable<Condition['conditionType']['case']>;
 export type ConditionTypeValue<T extends ConditionType> = Omit<
@@ -86,9 +88,9 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     private readonly destroyRef: DestroyRef,
   ) {
     this.form$ = this.buildForm().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.executionServices$ = this.listExecutionServices().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.executionMethods$ = this.listExecutionMethods().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.executionFunctions$ = this.listExecutionFunctions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.executionServices$ = this.listExecutionServices(this.form$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.executionMethods$ = this.listExecutionMethods(this.form$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.executionFunctions$ = this.listExecutionFunctions(this.form$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
   }
 
   public buildForm() {
@@ -181,9 +183,15 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     }
   }
 
-  private listExecutionServices() {
+  private listExecutionServices(form$: typeof this.form$) {
     return defer(() => this.actionService.listExecutionServices({})).pipe(
       map(({ services }) => services),
+      this.formFilter(form$, (form) => {
+        if ('service' in form.form.controls) {
+          return form.form.controls.service;
+        }
+        return undefined;
+      }),
       catchError((error) => {
         this.toast.showError(error);
         return of([]);
@@ -191,9 +199,15 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     );
   }
 
-  private listExecutionFunctions() {
+  private listExecutionFunctions(form$: typeof this.form$) {
     return defer(() => this.actionService.listExecutionFunctions({})).pipe(
       map(({ functions }) => functions),
+      this.formFilter(form$, (form) => {
+        if (form.case !== 'function') {
+          return undefined;
+        }
+        return form.form.controls.name;
+      }),
       catchError((error) => {
         this.toast.showError(error);
         return of([]);
@@ -201,14 +215,52 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     );
   }
 
-  private listExecutionMethods() {
+  private listExecutionMethods(form$: typeof this.form$) {
     return defer(() => this.actionService.listExecutionMethods({})).pipe(
       map(({ methods }) => methods),
+      this.formFilter(form$, (form) => {
+        if ('method' in form.form.controls) {
+          return form.form.controls.method;
+        }
+        return undefined;
+      }),
+      // we also filter by service name
+      this.formFilter(form$, (form) => {
+        if ('service' in form.form.controls) {
+          return form.form.controls.service;
+        }
+        return undefined;
+      }),
       catchError((error) => {
         this.toast.showError(error);
         return of([]);
       }),
     );
+  }
+
+  private formFilter(
+    form$: typeof this.form$,
+    getter: (form: ObservedValueOf<typeof this.form$>) => FormControl<string> | undefined,
+  ): OperatorFunction<string[], string[]> {
+    const filterValue$ = form$.pipe(
+      map(getter),
+      switchMap((control) => {
+        if (!control) {
+          return of('');
+        }
+
+        return control.valueChanges.pipe(
+          startWith(control.value),
+          map((value) => value.toLowerCase()),
+        );
+      }),
+    );
+
+    return (obs) =>
+      obs.pipe(
+        combineLatestWith(filterValue$),
+        map(([values, filterValue]) => values.map((v) => v.toLowerCase()).filter((v) => v.includes(filterValue))),
+      );
   }
 
   protected submit() {
