@@ -47,7 +47,7 @@ func (es *Eventstore) FillFields(ctx context.Context, events ...eventstore.FillF
 // Search implements the [eventstore.Search] method
 func (es *Eventstore) Search(ctx context.Context, conditions ...map[eventstore.FieldType]any) (result []*eventstore.SearchResult, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	var builder strings.Builder
 	args := buildSearchStatement(ctx, &builder, conditions...)

@@ -1,29 +1,29 @@
-<div class="feature-row" *ngIf="$any(toggleStates)[toggleStateKey]">
-  <span>{{ 'SETTING.FEATURES.' + toggleStateKey.toUpperCase() | translate }}</span>
+<div class="feature-row" *ngIf="toggleState$ | async as toggleState">
+  <span>{{ 'SETTING.FEATURES.' + (toggleStateKey | uppercase) | translate }}</span>
   <div class="row">
     <mat-button-toggle-group
       class="theme-toggle"
       class="buttongroup"
-      [(ngModel)]="$any(toggleStates)[toggleStateKey].state"
-      (change)="onToggleChange()"
+      [(ngModel)]="toggleState.enabled"
+      (change)="toggleChange.emit(toggleState)"
       name="displayview"
     >
-      <mat-button-toggle [value]="ToggleState.DISABLED">
+      <mat-button-toggle [value]="false">
         <div class="toggle-row">
           <span>{{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
 
           <div
-            *ngIf="!enabled && isInherited"
+            *ngIf="!toggleState.enabled && (isInherited$ | async)"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.DISABLED' | translate }}"
           ></div>
         </div>
       </mat-button-toggle>
-      <mat-button-toggle [value]="ToggleState.ENABLED">
+      <mat-button-toggle [value]="true">
         <div class="toggle-row">
           <span>{{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
           <div
-            *ngIf="enabled && isInherited"
+            *ngIf="toggleState.enabled && (isInherited$ | async)"
             class="current-dot"
             matTooltip="{{ 'SETTING.FEATURES.INHERITEDINDICATOR_DESCRIPTION.ENABLED' | translate }}"
           ></div>
@@ -34,7 +34,7 @@
   <ng-content></ng-content>
   <cnsl-info-section
     class="feature-info"
-    *ngIf="'SETTING.FEATURES.' + toggleStateKey.toUpperCase() + '_DESCRIPTION' | translate as i18nDescription"
+    *ngIf="'SETTING.FEATURES.' + (toggleStateKey | uppercase) + '_DESCRIPTION' | translate as i18nDescription"
     >{{ i18nDescription }}</cnsl-info-section
   >
 </div>

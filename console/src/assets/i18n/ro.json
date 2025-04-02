@@ -1540,7 +1540,10 @@
       },
       "RESET": "Setați totul pentru a moșteni",
       "CONSOLEUSEV2USERAPI": "Utilizați API-ul V2 în Consola pentru crearea utilizatorului",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
+      "LOGINV2": "Autentificare V2",
+      "LOGINV2_DESCRIPTION": "Activarea acestei opțiuni pornește noua interfață de autentificare bazată pe TypeScript, cu securitate, performanță și personalizare îmbunătățite.",
+      "LOGINV2_BASEURI": "URI de bază"
     },
     "DIALOG": {
       "RESET": {

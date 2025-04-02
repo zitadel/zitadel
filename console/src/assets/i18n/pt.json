@@ -1543,7 +1543,10 @@
       },
       "RESET": "Definir tudo para herdar",
       "CONSOLEUSEV2USERAPI": "Use a API V2 no console para criação de usuários",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Ativar esta opção ativa a nova interface de login baseada em TypeScript, com melhorias na segurança, desempenho e personalização.",
+      "LOGINV2_BASEURI": "URI base"
     },
     "DIALOG": {
       "RESET": {
