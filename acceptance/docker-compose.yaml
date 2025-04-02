@@ -1,7 +1,7 @@
 services:
   zitadel:
     user: "${ZITADEL_DEV_UID}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v2.67.2}"
+    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -11,6 +11,8 @@ services:
     depends_on:
       db:
         condition: "service_healthy"
+    extra_hosts:
+      - "localhost:host-gateway"
 
   db:
     restart: "always"
@@ -57,7 +59,7 @@ services:
         condition: "service_completed_successfully"
 
   sink:
-    image: golang:1.19-alpine
+    image: golang:1.24-alpine
     container_name: sink
     command: go run /sink/main.go -port '3333' -email '/email' -sms '/sms' -notification '/notification'
     ports:

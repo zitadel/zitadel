@@ -29,7 +29,7 @@ export async function passwordScreen(page: Page, password: string) {
 
 export async function passwordScreenExpect(page: Page, password: string) {
   await expect(page.getByTestId(passwordField)).toHaveValue(password);
-  await expect(page.getByTestId("error").locator("div")).toContainText("Could not verify password");
+  await expect(page.getByTestId("error").locator("div")).toContainText("Failed to authenticate.");
 }
 
 export async function changePasswordScreenExpect(

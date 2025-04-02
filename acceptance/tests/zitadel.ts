@@ -53,7 +53,7 @@ async function deleteCall(url: string) {
   try {
     const response = await axios.delete(url, {
       headers: {
-        Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
       },
     });
 
@@ -87,7 +87,7 @@ async function listCall(url: string, data: any): Promise<any> {
     const response = await axios.post(url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
       },
     });
 
@@ -123,7 +123,7 @@ async function pushCall(url: string, data: any) {
     const response = await axios.post(url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
       },
     });
 
