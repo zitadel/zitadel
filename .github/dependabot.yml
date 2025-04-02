@@ -1,7 +1,17 @@
 version: 2
 updates:
 - package-ecosystem: npm
-  directory: "/console"
+  groups:
+    console:
+      applies-to: version-updates
+      patterns:
+        - "*"
+      update-types:
+        - "minor"
+        - "patch"
+  directories:
+    - "/console"
+    - "/e2e"
   schedule:
     interval: weekly
     time: "02:00"
@@ -13,6 +23,14 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: gomod
+  groups:
+    go:
+      applies-to: version-updates
+      patterns:
+        - "*"
+      update-types:
+        - "minor"
+        - "patch"
   directory: "/"
   schedule:
     interval: weekly
@@ -25,6 +43,14 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "docker"
+  groups:
+    docker:
+      applies-to: version-updates
+      patterns:
+        - "*"
+      update-types:
+        - "minor"
+        - "patch"
   directory: "/build"
   schedule:
     interval: "weekly"
@@ -34,6 +60,11 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "github-actions"
+  groups:
+    actions:
+      applies-to: version-updates
+      patterns:
+        - "*"
   directory: "/"
   schedule:
     interval: weekly
