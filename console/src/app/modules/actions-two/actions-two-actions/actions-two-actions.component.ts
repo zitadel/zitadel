@@ -63,7 +63,6 @@ export class ActionsTwoActionsComponent implements OnInit {
       switchMap(() => {
         return this.actionService.listExecutions({});
       }),
-      tap(console.log),
       map(({ result }) => result),
       catchError(async (err) => {
         const actionsEnabled = await firstValueFrom(actionsEnabled$);
@@ -81,7 +80,6 @@ export class ActionsTwoActionsComponent implements OnInit {
       switchMap(() => {
         return this.actionService.listTargets({});
       }),
-      tap(console.log),
       map(({ result }) => result),
       catchError(async (err) => {
         const actionsEnabled = await firstValueFrom(actionsEnabled$);

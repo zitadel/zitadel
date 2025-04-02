@@ -1,18 +1,7 @@
-import {
-  AfterViewInit,
-  Component,
-  ContentChild,
-  effect,
-  Input,
-  OnChanges,
-  OnInit,
-  signal,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, effect, Input, OnInit, signal } from '@angular/core';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
-import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'cnsl-settings-list',
@@ -24,7 +13,7 @@ export class SettingsListComponent implements OnInit {
   @Input() public set selectedId(selectedId: string) {
     this.selectedId$.set(selectedId);
   }
-  @Input() public settingsList: SidenavSetting[] = [];
+  @Input({ required: true }) public settingsList: SidenavSetting[] = [];
 
   protected setting = signal<SidenavSetting | null>(null);
   private selectedId$ = signal<string | undefined>(undefined);
