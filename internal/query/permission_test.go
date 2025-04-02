@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
-func TestWherePermittedOrgs(t *testing.T) {
+func TestPermissionClause(t *testing.T) {
 	var permissions = []authz.SystemUserPermissions{
 		{
 			MemberType:  authz.MemberTypeOrganization,
@@ -38,7 +38,7 @@ func TestWherePermittedOrgs(t *testing.T) {
 		enabled    bool
 		orgIDCol   Column
 		permission string
-		options    []PermittedOrgsOption
+		options    []PermissionOption
 	}
 	tests := []struct {
 		name      string
@@ -78,8 +78,8 @@ func TestWherePermittedOrgs(t *testing.T) {
 				enabled:    true,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
-				options: []PermittedOrgsOption{
-					OwnedRowsOrgOption(UserIDCol),
+				options: []PermissionOption{
+					OwnedRowsPermissionOption(UserIDCol),
 				},
 			},
 			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)) OR projections.users14.id = ?)",
@@ -93,9 +93,9 @@ func TestWherePermittedOrgs(t *testing.T) {
 				enabled:    true,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
-				options: []PermittedOrgsOption{
-					OwnedRowsOrgOption(UserIDCol),
-					OverrideOrgOption(UserStateCol, "bar"),
+				options: []PermissionOption{
+					OwnedRowsPermissionOption(UserIDCol),
+					OverridePermissionOption(UserStateCol, "bar"),
 				},
 			},
 			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)) OR projections.users14.id = ? OR projections.users14.state = ?)",
@@ -109,8 +109,8 @@ func TestWherePermittedOrgs(t *testing.T) {
 				enabled:    true,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
-				options: []PermittedOrgsOption{
-					SingleOrgOption([]SearchQuery{
+				options: []PermissionOption{
+					SingleOrgPermissionOption([]SearchQuery{
 						mustSearchQuery(NewUserDisplayNameSearchQuery("zitadel", TextContains)),
 						mustSearchQuery(NewUserResourceOwnerSearchQuery("orgID", TextEquals)),
 					}),
@@ -122,7 +122,7 @@ func TestWherePermittedOrgs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			query := WherePermittedOrgs(tt.args.ctx, tt.args.query, tt.args.enabled, tt.args.orgIDCol, tt.args.permission, tt.args.options...)
+			query := PermissionClause(tt.args.ctx, tt.args.query, tt.args.enabled, tt.args.orgIDCol, tt.args.permission, tt.args.options...)
 			gotQuery, gotArgs, err := query.ToSql()
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantQuery, gotQuery)

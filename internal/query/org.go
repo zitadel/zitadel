@@ -94,7 +94,7 @@ func orgsCheckPermission(ctx context.Context, orgs *Orgs, permissionCheck domain
 }
 
 func orgsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
-	return WherePermittedOrgs(
+	return PermissionClause(
 		ctx,
 		query,
 		enabled,

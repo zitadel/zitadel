@@ -105,13 +105,13 @@ func authMethodsCheckPermission(ctx context.Context, methods *AuthMethods, permi
 }
 
 func userAuthMethodPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
-	return WherePermittedOrgs(
+	return PermissionClause(
 		ctx,
 		query,
 		enabled,
 		UserAuthMethodColumnResourceOwner,
 		domain.PermissionUserRead,
-		OwnedRowsOrgOption(UserIDCol),
+		OwnedRowsPermissionOption(UserIDCol),
 	)
 }
 
