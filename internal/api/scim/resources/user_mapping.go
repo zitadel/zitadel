@@ -319,6 +319,8 @@ func (h *UsersHandler) mapWriteModelToScimUser(ctx context.Context, user *comman
 			{
 				Value:   string(user.Email),
 				Primary: true,
+				// This is a hack for Microsoft Entra ID, which (usually) patches emails using the `emails[type eq "work"]` filter.
+				Type: "work",
 			},
 		}
 	}
