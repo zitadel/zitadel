@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/repository/permission"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -29,93 +27,6 @@ var (
 func TestMain(m *testing.M) {
 	i18n.SupportLanguages(SupportedLanguages...)
 	os.Exit(m.Run())
-}
-
-func TestCommands_pushChunked(t *testing.T) {
-	aggregate := permission.NewAggregate("instanceID")
-	cmds := make([]eventstore.Command, 100)
-	for i := 0; i < 100; i++ {
-		cmds[i] = permission.NewAddedEvent(context.Background(), aggregate, "role", fmt.Sprintf("permission%d", i))
-	}
-	type args struct {
-		size uint16
-	}
-	tests := []struct {
-		name       string
-		args       args
-		eventstore func(*testing.T) *eventstore.Eventstore
-		wantEvents int
-		wantErr    error
-	}{
-		{
-			name: "push error",
-			args: args{
-				size: 100,
-			},
-			eventstore: expectEventstore(
-				expectPushFailed(io.ErrClosedPipe, cmds...),
-			),
-			wantEvents: 0,
-			wantErr:    io.ErrClosedPipe,
-		},
-		{
-			name: "single chunk",
-			args: args{
-				size: 100,
-			},
-			eventstore: expectEventstore(
-				expectPush(cmds...),
-			),
-			wantEvents: len(cmds),
-		},
-		{
-			name: "aligned chunks",
-			args: args{
-				size: 50,
-			},
-			eventstore: expectEventstore(
-				expectPush(cmds[0:50]...),
-				expectPush(cmds[50:100]...),
-			),
-			wantEvents: len(cmds),
-		},
-		{
-			name: "odd chunks",
-			args: args{
-				size: 30,
-			},
-			eventstore: expectEventstore(
-				expectPush(cmds[0:30]...),
-				expectPush(cmds[30:60]...),
-				expectPush(cmds[60:90]...),
-				expectPush(cmds[90:100]...),
-			),
-			wantEvents: len(cmds),
-		},
-		{
-			name: "partial error",
-			args: args{
-				size: 30,
-			},
-			eventstore: expectEventstore(
-				expectPush(cmds[0:30]...),
-				expectPush(cmds[30:60]...),
-				expectPushFailed(io.ErrClosedPipe, cmds[60:90]...),
-			),
-			wantEvents: len(cmds[0:60]),
-			wantErr:    io.ErrClosedPipe,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				eventstore: tt.eventstore(t),
-			}
-			gotEvents, err := c.pushChunked(context.Background(), tt.args.size, cmds...)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Len(t, gotEvents, tt.wantEvents)
-		})
-	}
 }
 
 func TestCommands_asyncPush(t *testing.T) {

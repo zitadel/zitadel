@@ -36,7 +36,6 @@ load-test/.keys
 # dumps
 .backups
 
-cockroach-data/*
 .local/*
 .build/
 
@@ -71,7 +70,6 @@ zitadel-*-*
 
 # local
 build/local/*.env
-migrations/cockroach/migrate_cloud.go
 .notifications
 /.artifacts/*
 !/.artifacts/zitadel

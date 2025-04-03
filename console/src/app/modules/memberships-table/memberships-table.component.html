@@ -1,7 +1,6 @@
 <cnsl-refresh-table
   *ngIf="dataSource"
   (refreshed)="changePage()"
-  [dataSize]="dataSource.totalResult"
   [timestamp]="dataSource.viewTimestamp"
   [hideRefresh]="true"
   [selection]="selection"

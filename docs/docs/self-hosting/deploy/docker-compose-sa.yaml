@@ -32,7 +32,7 @@ services:
 
   db:
     restart: 'always'
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres
