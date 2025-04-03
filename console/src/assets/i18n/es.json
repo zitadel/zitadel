@@ -643,6 +643,7 @@
     "IAM_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios",
     "IAM_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de todas las organizaciones",
     "IAM_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de todas las organizaciones",
+    "IAM_LOGIN_CLIENT": "Tiene permiso para gestionar los clientes de inicio de sesión",
     "ORG_OWNER": "Tiene permisos sobre toda la organización",
     "ORG_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios de la organización",
     "ORG_OWNER_VIEWER": "TIene permiso para revisar toda la organización",

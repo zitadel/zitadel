@@ -643,6 +643,7 @@
     "IAM_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs",
     "IAM_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de toutes les organisations",
     "IAM_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de toutes les organisations",
+    "IAM_LOGIN_CLIENT": "A la permission de gérer les clients de connexion",
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",

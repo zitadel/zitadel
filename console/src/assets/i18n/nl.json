@@ -643,6 +643,7 @@
     "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
     "IAM_ADMIN_IMPERSONATOR": "Heeft toestemming om zich voor te doen als beheerder en eindgebruikers van alle organisaties",
     "IAM_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van alle organisaties na te bootsen",
+    "IAM_LOGIN_CLIENT": "Heeft toestemming om aanmeldklanten te beheren",
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
