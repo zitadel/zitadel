@@ -1,0 +1,16 @@
+{
+  "name": "ci",
+  "sdk": "go",
+  "dependencies": [
+    {
+      "name": "console",
+      "source": "ci/console"
+    },
+    {
+      "name": "core",
+      "source": "ci/core"
+    }
+  ],
+  "source": "ci",
+  "engineVersion": "v0.11.8"
+}
