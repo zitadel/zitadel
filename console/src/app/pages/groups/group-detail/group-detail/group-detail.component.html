@@ -58,14 +58,14 @@
           [dataSource]="dataSource"
           [factoryLoadFunc]="changePageFactory"
           [refreshTrigger]="changePage"
-          [canWrite]="['project.member.write$'] | hasRole | async"
-          [canDelete]="['project.member.delete$'] | hasRole | async"
+          [canWrite]="['group.member.write$'] | hasRole | async"
+          [canDelete]="['group.member.delete$'] | hasRole | async"
           (deleteMember)="removeGroupMember($event)"
         >
           <ng-template
             cnslHasRole
             writeactions
-            [hasRole]="['project.member.write']"
+            [hasRole]="['group.member.write']"
           >
             <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
               <mat-icon class="icon">add</mat-icon>
