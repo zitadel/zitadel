@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package zitadel.project.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/project/v2beta;project";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+import "zitadel/filter/v2beta/filter.proto";
+
+message Project {
+  // The unique identifier of the project.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the project creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the project (e.g. creation, activation, deactivation).
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // The name of the Project.
+  string name = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Describes the current state of the project.
+  ProjectState state = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the project";
+    }
+  ];
+  // Describes if the roles of the user should be added to the token.
+  bool project_role_assertion = 6;
+  // ZITADEL checks if the user has at least one on this project.
+  bool project_role_check = 7;
+  // ZITADEL checks if the org of the user has permission for this project.
+  bool has_project_check = 8;
+  // Defines from where the private labeling should be triggered.
+  PrivateLabelingSetting private_labeling_setting = 9;
+}
+
+enum ProjectState {
+  PROJECT_STATE_UNSPECIFIED = 0;
+  PROJECT_STATE_ACTIVE = 1;
+  PROJECT_STATE_INACTIVE = 2;
+}
+
+enum PrivateLabelingSetting {
+  PRIVATE_LABELING_SETTING_UNSPECIFIED = 0;
+  PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY = 1;
+  PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY = 2;
+}
+
+enum ProjectFieldName {
+  PROJECT_FIELD_NAME_UNSPECIFIED = 0;
+  PROJECT_FIELD_NAME_ID = 1;
+  PROJECT_FIELD_NAME_CREATED_DATE = 2;
+  PROJECT_FIELD_NAME_CHANGED_DATE = 3;
+  PROJECT_FIELD_NAME_NAME = 4;
+  PROJECT_FIELD_NAME_PROJECT_TYPE = 5;
+  PROJECT_FIELD_NAME_URL = 6;
+  PROJECT_FIELD_NAME_TIMEOUT = 7;
+  PROJECT_FIELD_NAME_INTERRUPT_ON_ERROR = 8;
+}
+
+message ProjectSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    ProjectNameFilter project_name_filter = 1;
+    InProjectIDsFilter in_project_ids_filter = 2;
+  }
+}
+
+message ProjectNameFilter {
+  // Defines the name of the project to query for.
+  string project_name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
+
+message InProjectIDsFilter {
+  // Defines the ids to query for.
+  repeated string project_ids = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the ids of the projects to include"
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
