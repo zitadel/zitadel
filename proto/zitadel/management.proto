@@ -731,7 +731,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            deprecated: true;
             summary: "Set User Metadata";
             description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
             parameters: {
@@ -758,7 +757,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            deprecated: true;
             summary: "Bulk Set User Metadata";
             description: "Add or update multiple metadata values for a user. Make sure the values are base64 encoded."
             parameters: {
@@ -835,7 +833,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            deprecated: true;
             summary: "Delete User Metadata By Key";
             description: "Remove a metadata object from a user with a specific key."
             parameters: {
@@ -863,7 +860,6 @@ service ManagementService {
             tags: "Users";
             tags: "User Metadata";
             summary: "Bulk Delete Metadata";
-            deprecated: true;
             description: "Remove a list of metadata objects from a user with a list of keys."
             parameters: {
                 headers: {
@@ -1635,6 +1631,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/machine"
@@ -1646,9 +1643,9 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Update Machine User";
+            summary: "Deprecated: Update Machine User";
             deprecated: true;
-            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities."
+            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.\n\nDeprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1974,7 +1971,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Get a Personal-Access-Token (PAT) by ID";
+            summary: "Deprecated: Remove a Personal-Access-Token (PAT) by ID";
             description: "Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore.\n\nDeprecated: please use [user service v2 RemovePersonalAccessToken](apis/resources/user_service_v2/user-service-remove-personal-access-token.api.mdx)"
             tags: "Users";
             tags: "User Machine";
