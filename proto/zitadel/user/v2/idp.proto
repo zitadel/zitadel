@@ -155,7 +155,7 @@ message IDPLink {
   string user_name = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "external username from of the identity provider"
+      description: "external username from the identity provider"
       min_length: 1;
       max_length: 200;
       example: "\"user@external.com\"";
