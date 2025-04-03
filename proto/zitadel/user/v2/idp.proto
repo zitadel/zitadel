@@ -137,16 +137,16 @@ message IDPLink {
   string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the identity provider"
+      description: "internal ID of the Zitadel identity provider configuration"
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   string user_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the user of the identity provider"
+      description: "external user ID from the identity provider"
       min_length: 1;
       max_length: 200;
       example: "\"6516849804890468048461403518\"";
@@ -155,7 +155,7 @@ message IDPLink {
   string user_name = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "username of the user of the identity provider"
+      description: "external username from of the identity provider"
       min_length: 1;
       max_length: 200;
       example: "\"user@external.com\"";
