@@ -3098,7 +3098,7 @@ message AddPersonalAccessTokenRequest {
   // The timestamp when the token will expire.
   // For example "2519-04-01T08:45:00.000000Z"
   google.protobuf.Timestamp expiration_date = 3 [
-    (validate.rules).message.required = true
+    (validate.rules).timestamp.required = true
   ];
 }
 
