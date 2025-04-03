@@ -73,7 +73,7 @@ export class InfoRowComponent {
     if (!this.user) {
       return undefined;
     }
-    return '$typeName' in this.user ? undefined : this.user.details?.creationDate;
+    return '$typeName' in this.user ? this.user.details?.creationDate : undefined;
   }
 
   private getEmail(user: User.AsObject | UserV2 | UserV1) {
