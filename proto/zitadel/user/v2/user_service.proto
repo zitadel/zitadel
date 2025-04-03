@@ -2,6 +2,14 @@ syntax = "proto3";
 
 package zitadel.user.v2;
 
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
 import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v2/auth.proto";
@@ -11,12 +19,6 @@ import "zitadel/user/v2/idp.proto";
 import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
 import "zitadel/user/v2/query.proto";
-import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
-import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
@@ -1339,13 +1341,13 @@ service UserService {
   //
   // ## Updating human users
   //
-  //
   // By default, the user will receive a verification email and/or SMS if the email address or phone number is changed.
   // Read more about your options for controlling this behaviour in the email and phone field documentations.
   //
-  // You can update a users password using a hashed_password.
-  // This allows restoring old passwords for lockout cases where a password reset is not feasible.
-  // Please [check the required format and supported algorithms](/docs/concepts/architecture/secrets).
+  // By default, the user is required to change the password if you update it.
+  // You can disable this behaviour using the skip_password_change field.
+  // You can also trigger a password change without updating the password.
+  // Read more about your options and common use cases in the password field documentation.
   //
   // The UpdateUser endpoint doesn't support changing a human users identity provider links.
   // Use the following endpoints to manage identity provider links:
@@ -1370,6 +1372,166 @@ service UserService {
     option (google.api.http) = {
       patch: "/v2/users/{user_id}"
       body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // AddSecret
+  //
+  // AddSecret generates a new client ID and client secret for the user.
+  // If the user already has a secret, it is overwritten.
+  // Currently, only users of type machine can have a secret.
+  rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/secret"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // RemoveSecret
+  //
+  // RemoveSecret removes the current client ID and client secret from a machine user.
+  // If no secret is set, the response is successful.
+  rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/secret"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // AddKey
+  //
+  // Keys can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
+  // Make sure you store them safely.
+  // Currently, only users of type machine can have keys.
+  rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/keys"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // RemoveKey
+  //
+  // Remove a machine users key by the given user ID and key ID.
+  rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/keys/{key_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // AddPersonalAccessToken
+  //
+  // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
+  // Make sure you store them safely.
+  // Currently, only users of type machine can have personal access tokens.
+  rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/pats"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // RemovePersonalAccessToken
+  //
+  // Removes a machine users personal access token by the given user ID and token ID.
+  rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/pats/{token_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -2700,8 +2862,8 @@ message CreateUserRequest{
 }
 
 message CreateUserResponse {
-  string user_id = 1;
-  zitadel.object.v2.Details details = 2;
+  zitadel.object.v2.Details details = 1;
+  string user_id = 2;
   optional string email_code = 3;
   optional string phone_code = 4;
 }
@@ -2867,4 +3029,99 @@ message UpdateUserResponse {
   zitadel.object.v2.Details details = 1;
   optional string email_code = 2;
   optional string phone_code = 3;
+}
+
+message AddSecretRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message AddSecretResponse {
+  zitadel.object.v2.Details details = 1;
+  string client_id = 2;
+  string client_secret = 3;
+}
+
+message RemoveSecretRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message RemoveSecretResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message AddKeyRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message AddKeyResponse {
+  zitadel.object.v2.Details details = 1;
+  string key_id = 2;
+  bytes key_content = 3;
+}
+
+
+message RemoveKeyRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // The keys resource ID.
+  // For example "163840776835432345"
+  string key_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+}
+
+message RemoveKeyResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+
+message AddPersonalAccessTokenRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // Providing your own token allows you for example to configure your integrations before the token is created.
+  // This is useful for easily repeatable setups of testing environments.
+  optional string token = 2 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // The timestamp when the token will expire.
+  // For example "2519-04-01T08:45:00.000000Z"
+  google.protobuf.Timestamp expiration_date = 3 [
+    (validate.rules).message.required = true
+  ];
+}
+
+message AddPersonalAccessTokenResponse {
+  zitadel.object.v2.Details details = 1;
+  // The personal access token that can be used to authenticate against the API
+  // For example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjM4NDA3NzY4MzU0MzI0NTMiLCJleHBfdGltZSI6MTY4MjQwNzE5N30.8f7a3e7b8d8f8e8f8e8f8e8f8e8f8e8f"
+  string token = 2;
+}
+
+message RemovePersonalAccessTokenRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // The tokens resource ID.
+  // For example "163840776835432345"
+  string token_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+}
+
+message RemovePersonalAccessTokenResponse {
+  zitadel.object.v2.Details details = 1;
 }
