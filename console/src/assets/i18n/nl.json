@@ -185,6 +185,32 @@
           "DESCRIPTION": "De levensduur van het inactieve vernieuwingstoken is de maximale tijd dat een vernieuwingstoken ongebruikt kan zijn."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Beheer je OIDC Web Keys om tokens veilig te ondertekenen en te valideren voor je ZITADEL-instantie.",
+        "TABLE": {
+          "TITLE": "Actieve en Toekomstige Websleutels",
+          "DESCRIPTION": "Je actieve en aankomende websleutels. Het activeren van een nieuwe sleutel deactiveert de huidige.",
+          "NOTE": "Opmerking: Het JWKs OIDC-eindpunt geeft een cachebare respons terug (standaard 5 minuten). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is in caches en bij clients.",
+          "ACTIVATE": "Volgende Websleutel activeren",
+          "ACTIVE": "Momenteel actief",
+          "NEXT": "Volgende in de wachtrij",
+          "FUTURE": "Toekomstig",
+          "WARNING": "De websleutel is minder dan 5 minuten oud"
+        },
+        "CREATE": {
+          "TITLE": "Nieuwe Websleutel aanmaken",
+          "DESCRIPTION": "Het aanmaken van een nieuwe websleutel voegt deze toe aan je lijst. ZITADEL gebruikt standaard RSA2048-sleutels met een SHA256-hasher.",
+          "KEY_TYPE": "Sleuteltype",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Curve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Vorige Websleutels",
+          "DESCRIPTION": "Dit zijn je vorige websleutels die niet langer actief zijn.",
+          "DEACTIVATED_ON": "Gedeactiveerd op"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Berichtteksten",
         "DESCRIPTION": "Pas de teksten van je notificatie-e-mail of SMS-berichten aan. Als je sommige talen wilt uitschakelen, beperk ze dan in de taalinstellingen van je instanties.",
@@ -502,6 +528,114 @@
     "DOWNLOAD": "Download",
     "APPLY": "Toepassen"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Acties",
+      "DESCRIPTION": "Met acties kunt u aangepaste code uitvoeren als reactie op API-verzoeken, gebeurtenissen of specifieke functies. Gebruik ze om Zitadel uit te breiden, workflows te automatiseren en te integreren met andere systemen.",
+      "TYPES": {
+        "request": "Verzoek",
+        "response": "Reactie",
+        "events": "Gebeurtenissen",
+        "function": "Functie"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Een actie maken",
+        "UPDATE_TITLE": "Een actie bijwerken",
+        "TYPE": {
+          "DESCRIPTION": "Selecteer wanneer u deze actie wilt uitvoeren",
+          "REQUEST": {
+            "TITLE": "Verzoek",
+            "DESCRIPTION": "Verzoeken die binnen Zitadel plaatsvinden. Dit kan zoiets zijn als een inlogverzoek-oproep."
+          },
+          "RESPONSE": {
+            "TITLE": "Reactie",
+            "DESCRIPTION": "Een reactie op een verzoek binnen Zitadel. Denk aan de reactie die u terugkrijgt van het ophalen van een gebruiker."
+          },
+          "EVENTS": {
+            "TITLE": "Gebeurtenissen",
+            "DESCRIPTION": "Gebeurtenissen die binnen Zitadel plaatsvinden. Dit kan van alles zijn, zoals een gebruiker die een account aanmaakt, een succesvolle login enz."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Functies",
+            "DESCRIPTION": "Functies die u binnen Zitadel kunt aanroepen. Dit kan van alles zijn, van het verzenden van een e-mail tot het maken van een gebruiker."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Kies of deze actie van toepassing is op alle verzoeken, een specifieke service (bijv. gebruikersbeheer) of een enkel verzoek (bijv. gebruiker maken).",
+          "ALL": {
+            "TITLE": "Alle",
+            "DESCRIPTION": "Selecteer dit als u uw actie bij elk verzoek wilt uitvoeren"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Service selecteren",
+            "DESCRIPTION": "Kies een Zitadel-service voor uw actie."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Methode selecteren",
+            "DESCRIPTION": "Als u alleen bij een specifiek verzoek wilt uitvoeren, selecteert u dit hier",
+            "NOTE": "Als u geen methode selecteert, wordt uw actie bij elk verzoek in uw geselecteerde service uitgevoerd."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Functienaam",
+            "DESCRIPTION": "Kies de functie die u wilt uitvoeren"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Groep instellen",
+            "DESCRIPTION": "Als u alleen bij een groep gebeurtenissen wilt uitvoeren, stelt u de groep hier in"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Gebeurtenis selecteren",
+            "DESCRIPTION": "Als u alleen bij een specifieke gebeurtenis wilt uitvoeren, specificeert u deze hier"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "U kunt ervoor kiezen om een doel uit te voeren of om het onder dezelfde voorwaarden als andere doelen uit te voeren.",
+          "TARGET": {
+            "DESCRIPTION": "Het doel dat u voor deze actie wilt uitvoeren"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Uitvoeringsvoorwaarden"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Voorwaarde",
+        "TYPE": "Type",
+        "TARGET": "Doel",
+        "CREATIONDATE": "Aanmaakdatum"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Doelen",
+      "DESCRIPTION": "Een doel is de bestemming van de code die u vanuit een actie wilt uitvoeren. Maak hier een doel en voeg het toe aan uw acties.",
+      "CREATE": {
+        "TITLE": "Uw doel maken",
+        "DESCRIPTION": "Maak uw eigen doel buiten Zitadel",
+        "NAME": "Naam",
+        "NAME_DESCRIPTION": "Geef uw doel een duidelijke, beschrijvende naam om het later gemakkelijk te kunnen identificeren",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Aanroep",
+          "restAsync": "REST Asynchroon"
+        },
+        "ENDPOINT": "Eindpunt",
+        "ENDPOINT_DESCRIPTION": "Voer het eindpunt in waar uw code wordt gehost. Zorg ervoor dat het voor ons toegankelijk is!",
+        "TIMEOUT": "Time-out",
+        "TIMEOUT_DESCRIPTION": "Stel de maximale tijd in die uw doel heeft om te reageren. Als het langer duurt, stoppen we het verzoek.",
+        "INTERRUPT_ON_ERROR": "Onderbreken bij fout",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop alle uitvoeringen als de doelen een fout retourneren",
+        "INTERRUPT_ON_ERROR_WARNING": "Let op: “Onderbreken bij fout” stopt operaties bij een mislukking, met kans op blokkering. Test met deze optie uitgeschakeld om inloggen/aanmaken niet te blokkeren.",
+        "AWAIT_RESPONSE": "Wachten op reactie",
+        "AWAIT_RESPONSE_DESCRIPTION": "We wachten op een reactie voordat we iets anders doen. Handig als u van plan bent om meerdere doelen voor één actie te gebruiken"
+      },
+      "TABLE": {
+        "NAME": "Naam",
+        "ENDPOINT": "Eindpunt",
+        "CREATIONDATE": "Aanmaakdatum"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
     "IAM_OWNER_VIEWER": "Heeft toestemming om de hele instantie te bekijken, inclusief alle organisaties",
@@ -789,7 +923,10 @@
       "PHONESECTION": "Telefoonnummers",
       "PASSWORDSECTION": "Initieel wachtwoord",
       "ADDRESSANDPHONESECTION": "Telefoonnummer",
-      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren."
+      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren.",
+      "SETUPAUTHENTICATIONLATER": "Authenticatie later instellen voor deze gebruiker.",
+      "INVITATION": "Stuur een uitnodigingsmail voor het instellen van authenticatie en e-mailverificatie.",
+      "INITIALPASSWORD": "Stel een initieel wachtwoord in voor de gebruiker."
     },
     "CODEDIALOG": {
       "TITLE": "Verifieer telefoonnummer",
@@ -1353,6 +1490,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacybeleid",
       "OIDC": "OIDC Token levensduur en vervaldatum",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Beveiligingsinstellingen",
       "EVENTS": "Evenementen",
@@ -1396,7 +1534,10 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "hu": "Magyar"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1487,6 +1628,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
+      "DISABLEUSERTOKENEVENT": "Gebruikerstokengebeurtenis uitschakelen",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
+      "PERMISSIONCHECKV2": "Permissiecontrole V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
+      "WEBKEY": "Websleutel",
+      "WEBKEY_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1499,7 +1650,10 @@
       },
       "RESET": "Alles instellen op overgenomen",
       "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de console voor het aanmaken van gebruikers",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
+      "LOGINV2": "Inloggen V2",
+      "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
+      "LOGINV2_BASEURI": "Basis-URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1636,7 +1790,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -2603,7 +2759,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

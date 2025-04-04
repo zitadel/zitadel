@@ -18,6 +18,7 @@ import localeNl from '@angular/common/locales/nl';
 import localeSv from '@angular/common/locales/sv';
 import localeHu from '@angular/common/locales/hu';
 import localeKo from '@angular/common/locales/ko';
+import localeRo from '@angular/common/locales/ro';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -32,9 +33,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import * as i18nIsoCountries from 'i18n-iso-countries';
 import { from, Observable } from 'rxjs';
-import { AuthGuard } from 'src/app/guards/auth.guard';
-import { RoleGuard } from 'src/app/guards/role.guard';
-import { UserGuard } from 'src/app/guards/user.guard';
 import { InfoOverlayModule } from 'src/app/modules/info-overlay/info-overlay.module';
 import { AssetService } from 'src/app/services/asset.service';
 import { AppRoutingModule } from './app-routing.module';
@@ -112,6 +110,8 @@ registerLocaleData(localeHu);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/hu.json'));
 registerLocaleData(localeKo);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ko.json'));
+registerLocaleData(localeRo);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ro.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -170,9 +170,6 @@ const authConfig: AuthConfig = {
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [
-    AuthGuard,
-    RoleGuard,
-    UserGuard,
     ThemeService,
     EnvironmentService,
     ExhaustedService,

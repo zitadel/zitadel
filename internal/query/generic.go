@@ -44,7 +44,7 @@ func genericRowsQueryWithState[R Stateful](
 	scan func(rows *sql.Rows) (R, error),
 ) (resp R, err error) {
 	var rnil R
-	resp, err = genericRowsQuery[R](ctx, client, query, scan)
+	resp, err = genericRowsQuery(ctx, client, query, scan)
 	if err != nil {
 		return rnil, err
 	}
@@ -60,7 +60,7 @@ func latestState(ctx context.Context, client *database.DB, projections ...table)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLatestState(ctx, client)
+	query, scan := prepareLatestState()
 	or := make(sq.Or, len(projections))
 	for i, projection := range projections {
 		or[i] = sq.Eq{CurrentStateColProjectionName.identifier(): projection.name}

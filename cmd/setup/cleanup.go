@@ -35,7 +35,7 @@ func Cleanup(config *Config) {
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	es := eventstore.NewEventstore(config.Eventstore)
 
 	step, err := migration.LastStuckStep(ctx, es)
