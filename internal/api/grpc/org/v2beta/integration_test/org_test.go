@@ -80,6 +80,18 @@ func TestServer_AddOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no admin, custom org ID",
+			ctx:  CTX,
+			req: &org.AddOrganizationRequest{
+				Name:  gofakeit.AppName(),
+				OrgId: gu.Ptr("custom-org-ID"),
+			},
+			want: &org.AddOrganizationResponse{
+				OrganizationId: "custom-org-ID",
+				CreatedAdmins:  []*org.AddOrganizationResponse_CreatedAdmin{},
+			},
+		},
+		{
 			name: "admin with init",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{

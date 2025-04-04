@@ -1524,6 +1524,45 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 		},
 		{
+			name: "no human added, custom org ID",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectPush(
+						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"Org",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate, "org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+					),
+				),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: "custom-org-ID",
+				},
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "custom-org-ID",
+					},
+					CreatedAdmins: []*CreatedOrgAdmin{},
+				},
+			},
+		},
+		{
 			name: "existing human added",
 			fields: fields{
 				eventstore: expectEventstore(
