@@ -106,9 +106,9 @@ services:
     command:
       - -c
       - >
-        curl --fail-with-body -X PUT -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/v2/features/instance -d '{"loginV2": {"required": true}}' &&
+        curl -X PUT -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/v2/features/instance -d '{"loginV2": {"required": true}}' &&
         LOGIN_USER=$(curl --fail-with-body  -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/auth/v1/users/me | jq -r '.user.id') &&
-        curl --fail-with-body -X PUT  -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/admin/v1/members/$${LOGIN_USER} -d '{"roles": ["IAM_OWNER", "IAM_LOGIN_CLIENT"]}'
+        curl -X PUT  -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/admin/v1/members/$${LOGIN_USER} -d '{"roles": ["IAM_OWNER", "IAM_LOGIN_CLIENT"]}'
     volumes:
       - './.env-file:/.env-file:ro'
     depends_on:
