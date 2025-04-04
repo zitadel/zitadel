@@ -160,6 +160,14 @@ message AddOrganizationRequest{
     }
   ];
   repeated Admin admins = 2;
+  // optionally set your own id unique for the organization.
+  optional string org_id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
 }
 
 message AddOrganizationResponse{
