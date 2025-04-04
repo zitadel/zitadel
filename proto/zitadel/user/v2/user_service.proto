@@ -1396,6 +1396,14 @@ service UserService {
   // AddSecret generates a new client ID and client secret for the user.
   // If the user already has a secret, it is overwritten.
   // Currently, only users of type machine can have a secret.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
   rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/secret"
@@ -1423,6 +1431,14 @@ service UserService {
   //
   // RemoveSecret removes the current client ID and client secret from a machine user.
   // If no secret is set, the response is successful.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
   rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/secret"
@@ -1450,6 +1466,14 @@ service UserService {
   // Keys can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
   // Make sure you store them safely.
   // Currently, only users of type machine can have keys.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
   rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/keys"
@@ -1476,6 +1500,14 @@ service UserService {
   // RemoveKey
   //
   // Remove a machine users key by the given user ID and key ID.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
   rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/keys/{key_id}"
@@ -1503,6 +1535,14 @@ service UserService {
   // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
   // Make sure you store them safely.
   // Currently, only users of type machine can have personal access tokens.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
   rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/pats"
@@ -1529,6 +1569,14 @@ service UserService {
   // RemovePersonalAccessToken
   //
   // Removes a machine users personal access token by the given user ID and token ID.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
   rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/pats/{token_id}"
