@@ -199,7 +199,6 @@ ENV PATH="/go/bin:/usr/local/go/bin:${PATH}"
 WORKDIR /go/src/github.com/zitadel/zitadel
 
 # default vars
-ENV DB_FLAVOR=postgres
 ENV POSTGRES_USER=zitadel
 ENV POSTGRES_DB=zitadel
 ENV POSTGRES_PASSWORD=postgres
@@ -231,12 +230,6 @@ COPY --from=test-core-unit /go/src/github.com/zitadel/zitadel/profile.cov /cover
 # integration test core
 # #######################################
 FROM test-core-base AS test-core-integration
-ENV DB_FLAVOR=cockroach
-
-# install cockroach
-COPY --from=cockroachdb/cockroach:latest /cockroach/cockroach /usr/local/bin/
-ENV COCKROACH_BINARY=/cockroach/cockroach
-
 ENV ZITADEL_MASTERKEY=MasterkeyNeedsToHave32Characters
 
 COPY build/core-integration-test.sh /usr/local/bin/run-tests.sh

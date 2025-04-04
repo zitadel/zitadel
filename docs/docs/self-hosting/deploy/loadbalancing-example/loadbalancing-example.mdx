@@ -13,8 +13,9 @@ The stack consists of four long-running containers and a couple of short-lived c
 - A [Traefik](https://doc.traefik.io/traefik/) reverse proxy container with upstream HTTP/2 enabled, issuing a self-signed TLS certificate.
 - A Login container that is accessible via Traefik at `/ui/v2/login`
 - A Zitadel container that is accessible via Traefik at all other paths than `/ui/v2/login`.
-- The Traefik container and the login container call the Zitadel container via the internal Docker network at `h2c://zitadel:8080`
 - An insecure [PostgreSQL](https://www.postgresql.org/docs/current/index.html).
+
+The Traefik container and the login container call the Zitadel container via the internal Docker network at `h2c://zitadel:8080`
 
 The setup is tested against Docker version 28.0.4 and Docker Compose version v2.34.0
 

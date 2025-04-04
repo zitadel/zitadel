@@ -19,7 +19,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
-			database.DecodeHook,
+			database.DecodeHook(false),
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)

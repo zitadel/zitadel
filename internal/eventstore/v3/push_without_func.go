@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
@@ -15,25 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-type transaction struct {
-	database.Tx
-}
-
-var _ crdb.Tx = (*transaction)(nil)
-
-func (t *transaction) Exec(ctx context.Context, query string, args ...interface{}) error {
-	_, err := t.Tx.ExecContext(ctx, query, args...)
-	return err
-}
-
-func (t *transaction) Commit(ctx context.Context) error {
-	return t.Tx.Commit()
-}
-
-func (t *transaction) Rollback(ctx context.Context) error {
-	return t.Tx.Rollback()
-}
 
 // checks whether the error is caused because setup step 39 was not executed
 func isSetupNotExecutedError(err error) bool {
@@ -64,7 +44,6 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 		err = closeTx(err)
 	}()
 
-	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
 	)
