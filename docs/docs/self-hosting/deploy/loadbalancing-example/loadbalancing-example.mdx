@@ -63,13 +63,11 @@ tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-masterkey
 export ZITADEL_MASTERKEY="$(cat ./zitadel-masterkey)"
 
 # Run the database and application containers
-docker compose up --detach
+docker compose up --detach --wait
 ```
 
-Open your favorite internet browser at https://127.0.0.1.sslip.io/ui/console/.
+Open your favorite internet browser at https://127.0.0.1.sslip.io/ui/console?login_hint=zitadel-admin@zitadel.127.0.0.1.sslip.io.
 Your browser warns you about the insecure self-signed TLS certificate. As 127.0.0.1.sslip.io resolves to your localhost, you can safely proceed.
-This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
-- **username**: *zitadel-admin@<span></span>zitadel.127.0.0.1.sslip.io*
-- **password**: *Password1!*
+Use the password *Password1!* to log in.
 
 Read more about [the login process](/guides/integrate/login/oidc/login-users).
