@@ -2,6 +2,14 @@ syntax = "proto3";
 
 package zitadel.user.v2;
 
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
 import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v2/auth.proto";
@@ -11,12 +19,6 @@ import "zitadel/user/v2/idp.proto";
 import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
 import "zitadel/user/v2/query.proto";
-import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
-import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
@@ -110,6 +112,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserService {
 
+  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
+  //
   // Create a new human user
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
@@ -130,6 +134,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: Add Human User";
+      description: "Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -202,6 +209,8 @@ service UserService {
     };
   }
 
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Change the user email
   //
   // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
@@ -218,6 +227,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: SetEmail";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -227,6 +239,8 @@ service UserService {
     };
   }
 
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Resend code to verify user email
   //
   // Resend code to verify user email.
@@ -243,6 +257,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: ResendEmailCode";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -252,6 +269,8 @@ service UserService {
     };
   }
 
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Send code to verify user email
   //
   // Send code to verify user email.
@@ -268,6 +287,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: SendEmailCode";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -302,6 +324,8 @@ service UserService {
     };
   }
 
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Set the user phone
   //
   // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
@@ -318,6 +342,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: SetPhone";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -354,6 +381,8 @@ service UserService {
     };
   }
 
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Resend code to verify user phone
   //
   // Resend code to verify user phone.
@@ -370,6 +399,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: ResendPhoneCode";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -404,6 +436,8 @@ service UserService {
     };
   }
 
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Update User
   //
   // Update all information from a user..
@@ -420,6 +454,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: Update Human User";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -1036,6 +1073,8 @@ service UserService {
     };
   }
 
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Request a code to reset a password
   //
   // Request a code to reset a password..
@@ -1052,6 +1091,9 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      summary: "Deprecated: PasswordReset";
+      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -1232,6 +1274,330 @@ service UserService {
     };
   }
 
+  // CreateUser
+  //
+  // CreateUser creates a new human or machine user in the specified organization.
+  //
+  // ## Uniqueness
+  //
+  // The username must be unique within the given organization.
+  // Providing it in the request is optional.
+  // For human users, it defaults to the given email address, which is a required input.
+  // For machine users, it defaults to the optionally given or generated user ID.
+  //
+  // ## Creating human users
+  //
+  // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
+  // To make this work, make sure you have valid active SMTP and Twilio configurations.
+  // Read more about your options for controlling this behaviour in the email and phone field documentations.
+  //
+  // ## Creating machine users
+  //
+  // Beware that the given access token type can't be changed using the user service v2, yet.
+  // Please use the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) or contains invalid data for the creation of the user. Check error details for the missing or invalid fields.
+  //   - user_already_exists: The user already exists. The username must be unique.
+  //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
+  //   - permission_denied: You do not have the required permissions to access the requested resource.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      // The /new path segment does not follow Zitadels API design.
+      // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
+      post: "/v2/users/new"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We can check in the middleware if the request is allowed on the given organization.
+        permission: "user.write"
+        org_field: "organization"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // UpdateUser
+  //
+  // UpdateUser allows to partially update an existing user.
+  // If the username is updated, it must be unique within the users organization.
+  //
+  // ## Updating human users
+  //
+  // By default, the user will receive a verification email and/or SMS if the email address or phone number is changed.
+  // Read more about your options for controlling this behaviour in the email and phone field documentations.
+  //
+  // By default, the user is required to change the password if you update it.
+  // You can disable this behaviour using the skip_password_change field.
+  // You can also trigger a password change without updating the password.
+  // Read more about your options and common use cases in the password field documentation.
+  //
+  // The UpdateUser endpoint doesn't support changing a human users identity provider links.
+  // Use the following endpoints to manage identity provider links:
+  // - [AddIDPLink](apis/resources/user_service_v2/user-service-add-idp-link.api.mdx)
+  // - [RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
+  //
+  // ## Updating machine users
+  //
+  // The UpdateUser endpoint doesn't support changing a machine users access token type.
+  // Use the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx) instead.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) or contains invalid data for the creation of the user. Check error details for the missing or invalid fields.
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/v2/users/{user_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // AddSecret
+  //
+  // AddSecret generates a new client ID and client secret for the user.
+  // If the user already has a secret, it is overwritten.
+  // Currently, only users of type machine can have a secret.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/secret"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // RemoveSecret
+  //
+  // RemoveSecret removes the current client ID and client secret from a machine user.
+  // If no secret is set, the response is successful.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/secret"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // AddKey
+  //
+  // Keys can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
+  // Make sure you store them safely.
+  // Currently, only users of type machine can have keys.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/keys"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // RemoveKey
+  //
+  // Remove a machine users key by the given user ID and key ID.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/keys/{key_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // AddPersonalAccessToken
+  //
+  // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
+  // Make sure you store them safely.
+  // Currently, only users of type machine can have personal access tokens.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/pats"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // RemovePersonalAccessToken
+  //
+  // Removes a machine users personal access token by the given user ID and token ID.
+  //
+  // Required permission:
+  //   - user.write on the users instance or the users organization
+  //
+  // Error Codes:
+  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
+  //   - permission_denied: You do not have the required permissions to update the user.
+  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/pats/{token_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        // We need to query the database to find the org and check if the request is allowed.
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
 }
 
 message AddHumanUserRequest{
@@ -2377,5 +2743,433 @@ message HumanMFAInitSkippedRequest {
 }
 
 message HumanMFAInitSkippedResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message CreateUserRequest{
+  message Human {
+    message Profile {
+      // given_name is the first name of the user.
+      // It can be used to personalize notifications.
+      // For example "Minnie" in "Minnie Mouse".
+      string given_name = 1  [
+        (validate.rules).string = {min_len: 1, max_len: 200}
+      ];
+      // family_name is the last name of the user.
+      // It can be used to personalize notifications.
+      // For example "Mouse" in "Minnie Mouse".
+      string family_name = 2  [
+        (validate.rules).string = {min_len: 1, max_len: 200}
+      ];
+      // nick_name can be used to personalize notifications.
+      // For example "Mini" for "Minnie Mouse".
+      optional string nick_name = 3 [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // display_name is the name of the user that is primarily displayed in the UI.
+      // For example "Minnie Mouse"
+      optional string display_name = 4 [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // preferred_language is the language that is primarily used by the user.
+      // It is used where no higher prioritized preferred language can be used.
+      // Notification messages use the users preferred language if available.
+      // Instance and organization settings can define a default language for users without a specific preferred language.
+      // Browser settings can overwrite a users preferred_language.
+      // For example "en-US" for "English (United States)" or "de-DE" for "German (Germany)".
+      optional string preferred_language = 5 [
+        (validate.rules).string = {max_len: 10}
+      ];
+      // gender can be used to personalize notifications.
+      // For example "GENDER_FEMALE"
+      optional Gender gender = 6;
+    }
+    message Email {
+      // set the email address of the user.
+      // For example "mini@mouse.com"
+      string email = 1 [
+        (validate.rules).string = {min_len: 2, max_len: 200, email: true}
+      ];
+      // if no verification is specified, an email is sent with the default url
+      oneof verification {
+        // Use send_code if Zitadel should send a verification email to the user.
+        SendEmailVerificationCode send_code = 2;
+        // Use return_code if you want to send the verification email to the user yourself.
+        ReturnEmailVerificationCode return_code = 3;
+        // If the user should not receive a verification email at all, set is_verified to true.
+        // If is_verified is true and the email address is empty, the current email address is marked as verified.
+        // This is useful...
+        // - ...in migration scenarios, where the user has their email already verified, for example in another Zitadel instance.
+        // - ...if no valid and active SMTP provider configuration is available for the Zitadel instance, for example in development or test instances.
+        bool is_verified = 4 [
+          (validate.rules).bool.const = true
+        ];
+      }
+    }
+    message Phone {
+      // set the phone number of the user.
+      // For example "+14151231234"
+      string phone = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200}
+      ];
+      // if no verification is specified, an SMS is sent with the verification code
+      oneof verification {
+        // Use send_code if Zitadel should send a verification SMS to the user.
+        // This is the default behavior.
+        SendPhoneVerificationCode send_code = 2;
+        // Use return_code if you want to send the verification SMS to the user yourself.
+        ReturnPhoneVerificationCode return_code = 3;
+        // If the user should not receive a verification SMS at all, set is_verified to true.
+        // If is_verified is true and the phone number is empty, the current phone number is marked as verified if it is set.
+        // This is useful...
+        // - ...in migration scenarios, where the user has their phone already verified, for example in another Zitadel instance.
+        // - ...if no valid Twilio configuration is available for the Zitadel instance, for example in development or test instances.
+        bool is_verified = 4 [
+          (validate.rules).bool.const = true
+        ];
+      }
+    }
+    message Password {
+      oneof password {
+        option (validate.required) = true;
+        // set an initial password for the user
+        string plain_password = 4 [
+          (validate.rules).string = {min_len: 1, max_len: 200}
+        ];
+        // import a hashed password from another system
+        // This allows migrating your users from your own system to Zitadel without necessarily requiring the user to reset the password.
+        // Please [check the required format and supported algorithms](/docs/concepts/architecture/secrets).
+        string hashed_password = 5 [
+          (validate.rules).string = {min_len: 1, max_len: 200}
+        ];
+      }
+      // By default, the user is required to set a new password.
+      // This can be avoided by setting skip_password_change to true.
+      optional bool skip_password_change = 6 [
+        (validate.rules).bool = {const: true}
+      ];
+    }
+    Profile profile = 1 [
+      (validate.rules).message.required = true
+    ];
+    Email email = 2 [
+      (validate.rules).message.required = true
+    ];
+    optional Phone phone = 3;
+    Password password = 4 [
+      (validate.rules).message.required = true
+    ];
+    // Create the user with a list of links to identity providers.
+    // This can be useful in migration-scenarios.
+    // For example, if a user already has an account in an external identity provider or another Zitadel instance, an IDP link allows the user to authenticate as usual.
+    // Sessions, second factors, hardware keys registered externally are still available for authentication.
+    repeated IDPLink idp_links = 7;
+    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
+    // Currently no other options are supported, and if anything different is used the validation will fail.
+    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
+    optional string totp_secret = 8 [
+      (validate.rules).string = {max_len: 200}
+    ];
+  }
+  message Machine {
+    // name is a human readable field that helps identifying the user.
+    // For example "Acceptance Test User"
+    string name = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 200}
+    ];
+    // description is a field that helps noting down the purpose of the user.
+    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
+    optional string description = 2 [
+      (validate.rules).string = {max_len: 500}
+    ];
+  }
+
+  reserved 4 to 9;
+  // Specify in which organization the user should be created.
+  zitadel.object.v2.Organization organization = 1 [
+    (validate.rules).message.required = true
+  ];
+  // optionally set your own unique id for the user.
+  // This is useful in migration scenarios, for example if the user already has an ID in another Zitadel system.
+  // For example "163840776835432345"
+  optional string user_id = 2 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // optionally set a username that is unique within the organization.
+  // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
+  // For example "minnie-mouse"
+  optional string username = 3 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // The type of the user.
+  oneof user_type {
+    option (validate.required) = true;
+    Human human = 10;
+    Machine machine = 11;
+  }
+}
+
+message CreateUserResponse {
+  zitadel.object.v2.Details details = 1;
+  string user_id = 2;
+  optional string email_code = 3;
+  optional string phone_code = 4;
+}
+
+message UpdateUserRequest{
+  message Human {
+    message Profile {
+      // given_name is the first name of the user.
+      // It can be used to personalize notifications.
+      // For example "Minnie" in "Minnie Mouse".
+      optional string given_name = 1  [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // family_name is the last name of the user.
+      // It can be used to personalize notifications.
+      // For example "Mouse" in "Minnie Mouse".
+      optional string family_name = 2  [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // nick_name can be used to personalize notifications.
+      // For example "Mini" for "Minnie Mouse".
+      optional string nick_name = 3 [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // display_name is the name of the user that is primarily displayed in the UI.
+      // For example "Minnie Mouse"
+      optional string display_name = 4 [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // preferred_language is the language that is primarily used by the user.
+      // It is used where no higher prioritized preferred language can be used.
+      // Notification messages use the users preferred language if available.
+      // Instance and organization settings can define a default language for users without a specific preferred language.
+      // Browser settings can overwrite a users preferred_language.
+      // For example "en-US" for "English (United States)" or "de-DE" for "German (Germany)".
+      optional string preferred_language = 5 [
+        (validate.rules).string = {max_len: 10}
+      ];
+      // gender can be used to personalize notifications.
+      // For example "GENDER_FEMALE"
+      optional Gender gender = 6;
+    }
+    message Email {
+      // optionally change the email address of the user.
+      // Leave it empty to resend a verification email to the current email address.
+      // For example "mini@mouse.com"
+      optional string email = 1 [
+        (validate.rules).string = {max_len: 200, email: true}
+      ];
+      oneof verification {
+        option (validate.required) = true;
+        // Use send_code if Zitadel should send a verification email to the user.
+        SendEmailVerificationCode send_code = 2;
+        // Use return_code if you want to send the verification email to the user yourself.
+        ReturnEmailVerificationCode return_code = 3;
+        // If the user should not receive a verification email at all, set is_verified to true.
+        // If is_verified is true and the email address is empty, the current email address is marked as verified.
+        // This is useful...
+        // - ...in migration scenarios, where the user has their email already verified, for example in another Zitadel instance.
+        // - ...if no valid and active SMTP provider configuration is available for the Zitadel instance, for example in development or test instances.
+        bool is_verified = 4[
+          (validate.rules).bool.const = true
+        ];
+      }
+    }
+    message Phone {
+      // optionally change the phone number of the user.
+      // Leave it empty to resend a verification SMS to the current phone number, if it is set.
+      // For example "+14151231234"
+      optional string phone = 1 [
+        (validate.rules).string = {max_len: 200}
+      ];
+      oneof verification {
+        option (validate.required) = true;
+        // Use send_code if Zitadel should send a verification SMS to the user.
+        // This is the default behavior.
+        SendPhoneVerificationCode send_code = 2;
+        // Use return_code if you want to send the verification SMS to the user yourself.
+        ReturnPhoneVerificationCode return_code = 3;
+        // If the user should not receive a verification SMS at all, set is_verified to true.
+        // If is_verified is true and the phone number is empty, the current phone number is marked as verified if it is set.
+        // This is useful...
+        // - ...in migration scenarios, where the user has their phone already verified, for example in another Zitadel instance.
+        // - ...if no valid Twilio configuration is available for the Zitadel instance, for example in development or test instances.
+        bool is_verified = 4 [
+          (validate.rules).bool.const = true
+        ];
+      }
+    }
+    message Password {
+      // optionally change the users password
+      // The user is required to set a new own password unless skip_password_change is set to true.
+      oneof password {
+        option (validate.required) = true;
+        // change the users password if it is forgotten
+        string plain_password = 1 [
+          (validate.rules).string = {min_len: 1, max_len: 200}
+        ];
+        // import a hashed password from another system
+        // This allows migrating your users from your own system to Zitadel without necessarily requiring the user to reset the password.
+        // Setting a previously hashed password also allows to securely handle lockout scenarios.
+        // Please [check the required format and supported algorithms](/docs/concepts/architecture/secrets).
+        string hashed_password = 2 [
+          (validate.rules).string = {min_len: 1, max_len: 200}
+        ];
+        // To trigger a password change without setting a new password, set use_current_password to true and omit skip_password_change.
+        bool use_current_password = 3 [
+          (validate.rules).bool = {const: true}
+        ];
+      }
+      // By default, the user is required to set a new password.
+      // This can be avoided by setting skip_password_change to true.
+      optional bool skip_password_change = 4 [
+        (validate.rules).bool = {const: true}
+      ];
+    }
+    // change the users profile information
+    optional Profile profile = 1;
+    // change the users email address or trigger a verification email
+    optional Email email = 2;
+    // change the users phone number or trigger a verification SMS
+    optional Phone phone = 3;
+    // change the users password or require the user to set a new password without resetting it
+    optional Password password = 4;
+    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
+    // Currently no other options are supported, and if anything different is used the validation will fail.
+    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
+    optional string totp_secret = 5 [
+      (validate.rules).string = {max_len: 200}
+    ];
+  }
+  message Machine {
+    // name is a human readable field that helps identifying the user.
+    // For example "Acceptance Test User"
+    optional string name = 1 [
+      (validate.rules).string = {max_len: 200}
+    ];
+    // description is a field that helps noting down the purpose of the user.
+    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
+    optional string description = 2 [
+      (validate.rules).string = {max_len: 500}
+    ];
+  }
+  reserved 3 to 9;
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // optionally set a username that is unique within the organization.
+  // For example "minnie-mouse"
+  optional string username = 2 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // optionally change type specific properties of the user.
+  oneof user_type {
+    Human human = 10;
+    Machine machine = 11;
+  }
+}
+
+message UpdateUserResponse {
+  zitadel.object.v2.Details details = 1;
+  optional string email_code = 2;
+  optional string phone_code = 3;
+}
+
+message AddSecretRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message AddSecretResponse {
+  zitadel.object.v2.Details details = 1;
+  string client_id = 2;
+  string client_secret = 3;
+}
+
+message RemoveSecretRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message RemoveSecretResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message AddKeyRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message AddKeyResponse {
+  zitadel.object.v2.Details details = 1;
+  string key_id = 2;
+  bytes key_content = 3;
+}
+
+
+message RemoveKeyRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // The keys resource ID.
+  // For example "163840776835432345"
+  string key_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+}
+
+message RemoveKeyResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+
+message AddPersonalAccessTokenRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // Providing your own token allows you for example to configure your integrations before the token is created.
+  // This is useful for easily repeatable setups of testing environments.
+  optional string token = 2 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // The timestamp when the token will expire.
+  // For example "2519-04-01T08:45:00.000000Z"
+  google.protobuf.Timestamp expiration_date = 3 [
+    (validate.rules).timestamp.required = true
+  ];
+}
+
+message AddPersonalAccessTokenResponse {
+  zitadel.object.v2.Details details = 1;
+  // The personal access token that can be used to authenticate against the API
+  // For example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjM4NDA3NzY4MzU0MzI0NTMiLCJleHBfdGltZSI6MTY4MjQwNzE5N30.8f7a3e7b8d8f8e8f8e8f8e8f8e8f8e8f"
+  string token = 2;
+}
+
+message RemovePersonalAccessTokenRequest {
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // The tokens resource ID.
+  // For example "163840776835432345"
+  string token_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+}
+
+message RemovePersonalAccessTokenResponse {
   zitadel.object.v2.Details details = 1;
 }
