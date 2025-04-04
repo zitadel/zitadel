@@ -45,16 +45,6 @@ func testSetLimit(limit uint64) func(builder *SearchQueryBuilder) *SearchQueryBu
 	}
 }
 
-func testOr(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQuery) *SearchQuery {
-	return func(query *SearchQuery) *SearchQuery {
-		subQuery := query.Or()
-		for _, queryFunc := range queryFuncs {
-			queryFunc(subQuery)
-		}
-		return subQuery
-	}
-}
-
 func testSetAggregateTypes(types ...AggregateType) func(*SearchQuery) *SearchQuery {
 	return func(query *SearchQuery) *SearchQuery {
 		query = query.AggregateTypes(types...)

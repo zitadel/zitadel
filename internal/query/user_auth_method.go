@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -159,7 +158,7 @@ func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodsQuery(ctx, q.client)
+	query, scan := prepareUserAuthMethodsQuery()
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
@@ -186,7 +185,7 @@ func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, ac
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodTypesQuery(ctx, q.client, activeOnly, includeWithoutDomain, queryDomain)
+	query, scan := prepareUserAuthMethodTypesQuery(activeOnly, includeWithoutDomain, queryDomain)
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -366,7 +365,7 @@ func (q *UserAuthMethodSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectB
 	return query
 }
 
-func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
+func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
 	return sq.Select(
 			UserAuthMethodColumnTokenID.identifier(),
 			UserAuthMethodColumnCreationDate.identifier(),
@@ -378,7 +377,7 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			UserAuthMethodColumnState.identifier(),
 			UserAuthMethodColumnMethodType.identifier(),
 			countColumn.identifier()).
-			From(userAuthMethodTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(userAuthMethodTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthMethods, error) {
 			userAuthMethods := make([]*AuthMethod, 0)
@@ -416,7 +415,7 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 		}
 }
 
-func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, activeOnly bool, includeWithoutDomain bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
 	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery(activeOnly, includeWithoutDomain, queryDomain)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -437,7 +436,7 @@ func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, ac
 				authMethodsArgs...).
 			LeftJoin("(" + idpsQuery + ") AS " + userIDPsCountTable.alias + " ON " +
 				userIDPsCountUserID.identifier() + " = " + UserIDCol.identifier() + " AND " +
-				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier() + db.Timetravel(call.Took(ctx))).
+				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthMethodTypes, error) {
 			userAuthMethodTypes := make([]domain.UserAuthMethodType, 0)

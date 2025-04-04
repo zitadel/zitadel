@@ -12,20 +12,17 @@ import (
 )
 
 var (
-	//go:embed sql/cockroach/*
-	//go:embed sql/postgres/*
+	//go:embed sql/*.sql
 	stmts embed.FS
 
 	createUserStmt           string
 	grantStmt                string
-	settingsStmt             string
 	databaseStmt             string
 	createEventstoreStmt     string
 	createProjectionsStmt    string
 	createSystemStmt         string
 	createEncryptionKeysStmt string
 	createEventsStmt         string
-	createSystemSequenceStmt string
 	createUniqueConstraints  string
 
 	roleAlreadyExistsCode = "42710"
@@ -39,7 +36,7 @@ func New() *cobra.Command {
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
 Prerequisites:
-- database (PostgreSql or cockroachdb)
+- PostgreSql database
 
 The user provided by flags needs privileges to
 - create the database if it does not exist
@@ -53,7 +50,7 @@ The user provided by flags needs privileges to
 		},
 	}
 
-	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant(), newSettings())
+	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
 	return cmd
 }
 
@@ -62,7 +59,6 @@ func InitAll(ctx context.Context, config *Config) {
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
 		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
-		VerifySettings(config.Database.DatabaseName(), config.Database.Username()),
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 
@@ -73,7 +69,7 @@ func InitAll(ctx context.Context, config *Config) {
 func initialise(ctx context.Context, config database.Config, steps ...func(context.Context, *database.DB) error) error {
 	logging.Info("initialization started")
 
-	err := ReadStmts(config.Type())
+	err := ReadStmts()
 	if err != nil {
 		return err
 	}
@@ -97,58 +93,48 @@ func Init(ctx context.Context, db *database.DB, steps ...func(context.Context, *
 	return nil
 }
 
-func ReadStmts(typ string) (err error) {
-	createUserStmt, err = readStmt(typ, "01_user")
+func ReadStmts() (err error) {
+	createUserStmt, err = readStmt("01_user")
 	if err != nil {
 		return err
 	}
 
-	databaseStmt, err = readStmt(typ, "02_database")
+	databaseStmt, err = readStmt("02_database")
 	if err != nil {
 		return err
 	}
 
-	grantStmt, err = readStmt(typ, "03_grant_user")
+	grantStmt, err = readStmt("03_grant_user")
 	if err != nil {
 		return err
 	}
 
-	createEventstoreStmt, err = readStmt(typ, "04_eventstore")
+	createEventstoreStmt, err = readStmt("04_eventstore")
 	if err != nil {
 		return err
 	}
 
-	createProjectionsStmt, err = readStmt(typ, "05_projections")
+	createProjectionsStmt, err = readStmt("05_projections")
 	if err != nil {
 		return err
 	}
 
-	createSystemStmt, err = readStmt(typ, "06_system")
+	createSystemStmt, err = readStmt("06_system")
 	if err != nil {
 		return err
 	}
 
-	createEncryptionKeysStmt, err = readStmt(typ, "07_encryption_keys_table")
+	createEncryptionKeysStmt, err = readStmt("07_encryption_keys_table")
 	if err != nil {
 		return err
 	}
 
-	createEventsStmt, err = readStmt(typ, "08_events_table")
+	createEventsStmt, err = readStmt("08_events_table")
 	if err != nil {
 		return err
 	}
 
-	createSystemSequenceStmt, err = readStmt(typ, "09_system_sequence")
-	if err != nil {
-		return err
-	}
-
-	createUniqueConstraints, err = readStmt(typ, "10_unique_constraints_table")
-	if err != nil {
-		return err
-	}
-
-	settingsStmt, err = readStmt(typ, "11_settings")
+	createUniqueConstraints, err = readStmt("10_unique_constraints_table")
 	if err != nil {
 		return err
 	}
@@ -156,7 +142,7 @@ func ReadStmts(typ string) (err error) {
 	return nil
 }
 
-func readStmt(typ, step string) (string, error) {
-	stmt, err := stmts.ReadFile("sql/" + typ + "/" + step + ".sql")
+func readStmt(step string) (string, error) {
+	stmt, err := stmts.ReadFile("sql/" + step + ".sql")
 	return string(stmt), err
 }
