@@ -479,7 +479,7 @@ module.exports = {
             title: "Use Actions to integrate ZITADEL with your Favorite Services",
             slug: "/guides/integrate/actions",
             description:
-              "With the guides in this section you will learn how to use action to integrate ZITADEL with your services.",
+              "With the guides in this section you will learn how to use action to integrate Zitadel with your services.",
           },
           collapsed: true,
           items: [
