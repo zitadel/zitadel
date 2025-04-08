@@ -2,36 +2,46 @@ package setup
 
 import (
 	"context"
-	"embed"
-	"fmt"
-
-	"github.com/zitadel/logging"
+	"database/sql"
+	_ "embed"
+	"errors"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-type InitPermittedOrgsFunction52 struct {
+var (
+	//go:embed 52/alter.sql
+	renameTableIfNotExisting string
+	//go:embed 52/check.sql
+	checkIfTableIsExisting string
+)
+
+type IDPTemplate6LDAP2 struct {
 	dbClient *database.DB
 }
 
-//go:embed 52/*.sql
-var permittedOrgsFunction52 embed.FS
-
-func (mig *InitPermittedOrgsFunction52) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(permittedOrgsFunction52, "52")
-	if err != nil {
+func (mig *IDPTemplate6LDAP2) Execute(ctx context.Context, _ eventstore.Event) error {
+	var count int
+	err := mig.dbClient.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			if err := row.Scan(&count); err != nil {
+				return err
+			}
+			return row.Err()
+		},
+		checkIfTableIsExisting,
+	)
+	if err == nil {
+		return nil
+	}
+	if !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
-	for _, stmt := range statements {
-		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
-		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
-			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
-		}
-	}
-	return nil
+	_, err = mig.dbClient.ExecContext(ctx, renameTableIfNotExisting)
+	return err
 }
 
-func (*InitPermittedOrgsFunction52) String() string {
-	return "52_init_permitted_orgs_function"
+func (mig *IDPTemplate6LDAP2) String() string {
+	return "52_idp_templates6_ldap2"
 }

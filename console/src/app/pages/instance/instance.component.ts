@@ -1,7 +1,7 @@
 import { Component, DestroyRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { BehaviorSubject, defer, from, Observable, of, TimeoutError } from 'rxjs';
+import { BehaviorSubject, defer, from, Observable, of, shareReplay, TimeoutError } from 'rxjs';
 import { catchError, finalize, map, timeout } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
@@ -35,7 +35,9 @@ import {
   EVENTS,
   ORGANIZATIONS,
   FEATURESETTINGS,
-} from '../../modules/settings-list/settings';
+  ACTIONS,
+  ACTIONS_TARGETS,
+} from 'src/app/modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { EnvironmentService } from 'src/app/services/environment.service';
@@ -60,6 +62,8 @@ export class InstanceComponent {
   protected readonly defaultSettingsList: SidenavSetting[] = [
     ORGANIZATIONS,
     FEATURESETTINGS,
+    ACTIONS,
+    ACTIONS_TARGETS,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
@@ -90,7 +94,7 @@ export class InstanceComponent {
     SECURITY,
   ];
 
-  protected readonly settingsList: Observable<SidenavSetting[]>;
+  protected readonly settingsList$: Observable<SidenavSetting[]>;
   protected readonly customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
 
   constructor(
@@ -126,39 +130,43 @@ export class InstanceComponent {
         this.toast.showError(error);
       });
 
-    activatedRoute.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params: Params) => {
-      const { id } = params;
+    activatedRoute.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const id = params.get('id');
       if (id) {
         this.id = id;
       }
     });
 
-    this.settingsList = this.getSettingsList();
+    this.settingsList$ = this.getSettingsList();
   }
 
-  public getSettingsList(): Observable<SidenavSetting[]> {
-    const webKeysEnabled$ = defer(() => this.featureService.getInstanceFeatures()).pipe(
-      map(({ webKey }) => webKey?.enabled ?? false),
+  private getSettingsList(): Observable<SidenavSetting[]> {
+    const features$ = this.getFeatures().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+
+    const actionsEnabled$ = features$.pipe(map((features) => features?.actions?.enabled));
+
+    return this.authService
+      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.admin || [])
+      .pipe(
+        withLatestFromSynchronousFix(actionsEnabled$),
+        map(([settings, actionsEnabled]) =>
+          settings
+            .filter((setting) => actionsEnabled || setting.id !== ACTIONS.id)
+            .filter((setting) => actionsEnabled || setting.id !== ACTIONS_TARGETS.id),
+        ),
+      );
+  }
+
+  private getFeatures() {
+    return defer(() => this.featureService.getInstanceFeatures()).pipe(
       timeout(1000),
       catchError((error) => {
         if (!(error instanceof TimeoutError)) {
           this.toast.showError(error);
         }
-        return of(false);
+        return of(undefined);
       }),
     );
-
-    return this.authService
-      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.admin || [])
-      .pipe(
-        withLatestFromSynchronousFix(webKeysEnabled$),
-        map(([settings, webKeysEnabled]) => {
-          if (webKeysEnabled) {
-            return settings;
-          }
-          return settings.filter((setting) => setting.id !== WEBKEYS.id);
-        }),
-      );
   }
 
   public loadMembers(): void {
