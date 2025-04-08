@@ -85,7 +85,7 @@ Save the returned ID to set in the execution.
 
 ## Set execution
 
-To configure ZITADEL to call the target when an API endpoint is called, you need to set an execution and define the response
+To configure Zitadel to call the target when an API endpoint is called, you need to set an execution and define the response
 condition.
 
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
