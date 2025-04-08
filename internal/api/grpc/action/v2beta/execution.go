@@ -14,22 +14,10 @@ import (
 )
 
 func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionRequest) (*action.SetExecutionResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	reqTargets := req.GetTargets()
 	targets := make([]*execution.Target, len(reqTargets))
 	for i, target := range reqTargets {
-		switch t := target.GetType().(type) {
-		case *action.ExecutionTargetType_Include:
-			include, err := conditionToInclude(t.Include)
-			if err != nil {
-				return nil, err
-			}
-			targets[i] = &execution.Target{Type: domain.ExecutionTargetTypeInclude, Target: include}
-		case *action.ExecutionTargetType_Target:
-			targets[i] = &execution.Target{Type: domain.ExecutionTargetTypeTarget, Target: t.Target}
-		}
+		targets[i] = &execution.Target{Type: domain.ExecutionTargetTypeTarget, Target: target}
 	}
 	set := &command.SetExecution{
 		Targets: targets,
@@ -92,27 +80,18 @@ func conditionToInclude(cond *action.Condition) (string, error) {
 }
 
 func (s *Server) ListExecutionFunctions(ctx context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	return &action.ListExecutionFunctionsResponse{
 		Functions: s.ListActionFunctions(),
 	}, nil
 }
 
 func (s *Server) ListExecutionMethods(ctx context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	return &action.ListExecutionMethodsResponse{
 		Methods: s.ListGRPCMethods(),
 	}, nil
 }
 
 func (s *Server) ListExecutionServices(ctx context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	return &action.ListExecutionServicesResponse{
 		Services: s.ListGRPCServices(),
 	}, nil

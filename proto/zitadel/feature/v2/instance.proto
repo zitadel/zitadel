@@ -43,12 +43,6 @@ message SetInstanceFeaturesRequest{
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
     }
   ];
-  optional bool actions = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Actions allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
-    }
-  ];
 
   repeated ImprovedPerformance improved_performance = 7 [
     (validate.rules).repeated.unique = true,

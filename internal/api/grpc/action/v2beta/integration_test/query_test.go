@@ -20,7 +20,6 @@ import (
 
 func TestServer_GetTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
@@ -213,7 +212,6 @@ func TestServer_GetTarget(t *testing.T) {
 
 func TestServer_ListTargets(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
@@ -446,7 +444,6 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 
 func TestServer_ListExecutions(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 
@@ -475,7 +472,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
 					cond := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
-					resp := instance.SetExecution(ctx, t, cond, executionTargetsSingleTarget(targetResp.GetId()))
+					resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
 
 					// Set expected response with used values for SetExecution
 					response.Result[0].CreationDate = resp.GetSetDate()
@@ -544,13 +541,12 @@ func TestServer_ListExecutions(t *testing.T) {
 							},
 						},
 					}
-					targets := executionTargetsSingleTarget(target.GetId())
-					resp := instance.SetExecution(ctx, t, cond, targets)
+					resp := instance.SetExecution(ctx, t, cond, []string{target.GetId()})
 
 					response.Result[0].CreationDate = resp.GetSetDate()
 					response.Result[0].ChangeDate = resp.GetSetDate()
 					response.Result[0].Condition = cond
-					response.Result[0].Targets = targets
+					response.Result[0].Targets = executionTargetsSingleTarget(target.GetId())
 				},
 				req: &action.ListExecutionsRequest{
 					Filters: []*action.ExecutionSearchFilter{{}},
@@ -566,59 +562,6 @@ func TestServer_ListExecutions(t *testing.T) {
 						Condition: &action.Condition{},
 						Targets:   executionTargetsSingleTarget(""),
 					},
-				},
-			},
-		}, {
-			name: "list request single include",
-			args: args{
-				ctx: isolatedIAMOwnerCTX,
-				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
-					cond := &action.Condition{
-						ConditionType: &action.Condition_Request{
-							Request: &action.RequestExecution{
-								Condition: &action.RequestExecution_Method{
-									Method: "/zitadel.management.v1.ManagementService/GetAction",
-								},
-							},
-						},
-					}
-					instance.SetExecution(ctx, t, cond, executionTargetsSingleTarget(targetResp.GetId()))
-					request.Filters[0].GetIncludeFilter().Include = cond
-
-					includeCond := &action.Condition{
-						ConditionType: &action.Condition_Request{
-							Request: &action.RequestExecution{
-								Condition: &action.RequestExecution_Method{
-									Method: "/zitadel.management.v1.ManagementService/ListActions",
-								},
-							},
-						},
-					}
-					includeTargets := executionTargetsSingleInclude(cond)
-					resp2 := instance.SetExecution(ctx, t, includeCond, includeTargets)
-
-					response.Result[0] = &action.Execution{
-						Condition:    includeCond,
-						CreationDate: resp2.GetSetDate(),
-						ChangeDate:   resp2.GetSetDate(),
-						Targets:      includeTargets,
-					}
-				},
-				req: &action.ListExecutionsRequest{
-					Filters: []*action.ExecutionSearchFilter{{
-						Filter: &action.ExecutionSearchFilter_IncludeFilter{
-							IncludeFilter: &action.IncludeFilter{},
-						},
-					}},
-				},
-			},
-			want: &action.ListExecutionsResponse{
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
-					AppliedLimit: 100,
-				},
-				Result: []*action.Execution{
-					{},
 				},
 			},
 		},
@@ -659,33 +602,30 @@ func TestServer_ListExecutions(t *testing.T) {
 					}
 
 					cond1 := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
-					targets1 := executionTargetsSingleTarget(targetResp.GetId())
-					resp1 := instance.SetExecution(ctx, t, cond1, targets1)
+					resp1 := instance.SetExecution(ctx, t, cond1, []string{targetResp.GetId()})
 					response.Result[2] = &action.Execution{
 						CreationDate: resp1.GetSetDate(),
 						ChangeDate:   resp1.GetSetDate(),
 						Condition:    cond1,
-						Targets:      targets1,
+						Targets:      executionTargetsSingleTarget(targetResp.GetId()),
 					}
 
 					cond2 := request.Filters[0].GetInConditionsFilter().GetConditions()[1]
-					targets2 := executionTargetsSingleTarget(targetResp.GetId())
-					resp2 := instance.SetExecution(ctx, t, cond2, targets2)
+					resp2 := instance.SetExecution(ctx, t, cond2, []string{targetResp.GetId()})
 					response.Result[1] = &action.Execution{
 						CreationDate: resp2.GetSetDate(),
 						ChangeDate:   resp2.GetSetDate(),
 						Condition:    cond2,
-						Targets:      targets2,
+						Targets:      executionTargetsSingleTarget(targetResp.GetId()),
 					}
 
 					cond3 := request.Filters[0].GetInConditionsFilter().GetConditions()[2]
-					targets3 := executionTargetsSingleTarget(targetResp.GetId())
-					resp3 := instance.SetExecution(ctx, t, cond3, targets3)
+					resp3 := instance.SetExecution(ctx, t, cond3, []string{targetResp.GetId()})
 					response.Result[0] = &action.Execution{
 						CreationDate: resp3.GetSetDate(),
 						ChangeDate:   resp3.GetSetDate(),
 						Condition:    cond3,
-						Targets:      targets3,
+						Targets:      executionTargetsSingleTarget(targetResp.GetId()),
 					}
 				},
 				req: &action.ListExecutionsRequest{
@@ -709,15 +649,14 @@ func TestServer_ListExecutions(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
-					targets := executionTargetsSingleTarget(targetResp.GetId())
 					conditions := request.Filters[0].GetInConditionsFilter().GetConditions()
 					for i, cond := range conditions {
-						resp := instance.SetExecution(ctx, t, cond, targets)
+						resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
 						response.Result[(len(conditions)-1)-i] = &action.Execution{
 							CreationDate: resp.GetSetDate(),
 							ChangeDate:   resp.GetSetDate(),
 							Condition:    cond,
-							Targets:      targets,
+							Targets:      executionTargetsSingleTarget(targetResp.GetId()),
 						}
 					}
 				},
