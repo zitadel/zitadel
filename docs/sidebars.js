@@ -513,7 +513,15 @@ module.exports = {
             },
             {
               type: "doc",
+              id: "guides/integrate/actions/testing-function-manipulation",
+            },
+            {
+              type: "doc",
               id: "guides/integrate/actions/testing-event",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/migrate-from-v1",
             },
           ],
         },
