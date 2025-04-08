@@ -17,6 +17,9 @@ Some use-cases:
 
 - Handle successful authentication through the response of `/zitadel.session.v2.SessionService/CreateSession` and `/zitadel.session.v2.SessionService/SetSession`, [Action Response Example](./testing-response)
 - Handle failed authentication through the response of `/zitadel.session.v2.SessionService/CreateSession` and `/zitadel.session.v2.SessionService/SetSession`, [Action Response Example](./testing-response)
+- Handle session with password checked through the creation of event `session.password.checked`, [Action Event Example](./testing-event)
+- Handle successful authentication through the creation of event `user.human.password.check.succeeded`, [Action Event Example](./testing-event)
+- Handle failed authentication through the creation of event `user.human.password.check.failed`, [Action Event Example](./testing-event)
 
 ### Pre Creation
 
@@ -46,7 +49,9 @@ A user has authenticated externally. ZITADEL retrieved and mapped the external i
 
 Some use-cases:
 
-- Handle the information mapping from the external authentication to internal structure through the response on `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`,  [Action Response Example](./testing-response)
+- Handle the information mapping from the external authentication to internal structure through the response on `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`, [Action Response Example](./testing-response)
+  - information about the link to the external IDP available in the response under [`idpInformation`](/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent)
+  - information if a new user has to be created available in the response under [`addHumanUser`](/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent), including metadata and link to external IDP
 
 ### Pre Creation
 

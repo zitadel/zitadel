@@ -1,5 +1,5 @@
 ---
-title: Test Actions Function
+title: Test Actions Function Manipulation
 ---
 
 This guide shows you how to leverage the ZITADEL actions feature to enhance different functions in your ZITADEL instance.
@@ -26,7 +26,7 @@ The available conditions can be found under [all available Functions](/apis/reso
 
 To test the actions feature, you need to create a target that will be called when a function is used.
 You will need to implement a listener that can receive HTTP requests and process the data.
-For this example, we will use a simple Go HTTP server that will print the received data to standard output.
+For this example, we will use a simple Go HTTP server that will send back static data.
 
 :::info
 The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).
@@ -36,28 +36,50 @@ The signature of the received request can be checked, [please refer to the examp
 package main
 
 import (
-	"fmt"
-	"io"
+	"encoding/json"
 	"net/http"
 )
 
-// webhook HandleFunc to read the request body and then print out the contents
-func webhook(w http.ResponseWriter, req *http.Request) {
-	// read the body content
-	sentBody, err := io.ReadAll(req.Body)
+type Response struct {
+	SetUserMetadata []*Metadata    `json:"set_user_metadata,omitempty"`
+	AppendClaims    []*AppendClaim `json:"append_claims,omitempty"`
+	AppendLogClaims []string       `json:"append_log_claims,omitempty"`
+}
+
+type Metadata struct {
+	Key   string `json:"key"`
+	Value []byte `json:"value"`
+}
+
+type AppendClaim struct {
+	Key   string `json:"key"`
+	Value any    `json:"value"`
+}
+
+// call HandleFunc to respond with static data
+func call(w http.ResponseWriter, req *http.Request) {
+	// create the response with the correct structure
+	resp := &Response{
+		SetUserMetadata: []*Metadata{
+			{Key: "key", Value: []byte("value")},
+		},
+		AppendClaims: []*AppendClaim{
+			{Key: "claim", Value: "value"},
+		},
+		AppendLogClaims: []string{"log1", "log2", "log3"},
+	}
+	data, err := json.Marshal(resp)
 	if err != nil {
-		// if there was an error while reading the body return an error
+		// if there was an error while marshalling the json
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
 	}
-	defer req.Body.Close()
-	// print out the read content
-	fmt.Println(string(sentBody))
+	w.Write(data)
 }
 
 func main() {
-	// handle the HTTP call under "/webhook"
-	http.HandleFunc("/webhook", webhook)
+	// handle the HTTP call under "/call"
+	http.HandleFunc("/call", call)
 
 	// start an HTTP server with the before defined function to handle the endpoint under "http://localhost:8090"
 	http.ListenAndServe(":8090", nil)
@@ -67,7 +89,7 @@ func main() {
 
 ## Create target
 
-As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
+As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
@@ -78,10 +100,10 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
   "name": "local call",
-  "restWebhook": {
+  "restCall": {
     "interruptOnError": true    
   },
-  "endpoint": "http://localhost:8090/webhook",
+  "endpoint": "http://localhost:8090/call",
   "timeout": "10s"
 }'
 ```
@@ -119,53 +141,15 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 Now that you have set up the target and execution, you can test it by logging into Console UI or
 by using any OIDC flow.
 
-Your server should now print out something like the following. Check out the [Sent information Function](./usage#sent-information-function) payload description.
-```json
-{
-  "function" : "function/preuserinfo",
-  "userinfo" : {
-    "sub" : "312909075212468632"
-  },
-  "user" : {
-    "id" : "312909075212468632",
-    "creation_date" : "2025-03-26T15:52:23.917636Z",
-    "change_date" : "2025-03-26T15:52:23.917636Z",
-    "resource_owner" : "312909075211944344",
-    "sequence" : 2,
-    "state" : 1,
-    "username" : "user@example.com",
-    "preferred_login_name" : "zitadel@zitadel.localhost",
-    "human" : {
-      "first_name" : "Example firstname",
-      "last_name" : "Example lastname",
-      "display_name" : "Example displayname",
-      "preferred_language" : "en",
-      "email" : "user@example.com",
-      "is_email_verified" : true,
-      "password_changed" : "0001-01-01T00:00:00Z",
-      "mfa_init_skipped" : "0001-01-01T00:00:00Z"
-    }
-  },
-  "user_metadata" : [ {
-    "creation_date" : "2025-03-27T09:10:25.879677Z",
-    "change_date" : "2025-03-27T09:10:25.879677Z",
-    "resource_owner" : "312909075211944344",
-    "sequence" : 18,
-    "key" : "key",
-    "value" : "dmFsdWU="
-  } ],
-  "org" : {
-    "id" : "312909075211944344",
-    "name" : "ZITADEL",
-    "primary_domain" : "example.com"
-  }
-}
-```
+As a result 3 things happen:
+- the user get the metadata with the key "key" and value "value" added
+- the token has a claim "urn:zitadel:iam:claim" added with value "value"
+- the token has the log claim "urn:zitadel:iam:action:preuserinfo:log" added with values "log1", "log2" and "log3".
 
 For any further information related to [the OIDC Flow, refer to our documentation.](/guides/integrate/login/oidc/login-users)
 
 ## Conclusion
 
 You have successfully set up a target and execution to react to functions in your ZITADEL instance.
-This feature can now be used to customize the functionality in ZITADEL, in particular the content of the OIDC tokens and SAML responses.
+This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on functionality in ZITADEL.
 Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

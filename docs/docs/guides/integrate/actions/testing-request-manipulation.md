@@ -24,6 +24,10 @@ To test the actions feature, you need to create a target that will be called whe
 You will need to implement a listener that can receive HTTP requests, process the request and returns the manipulated request.
 For this example, we will use a simple Go HTTP server that will return the request with added metadata.
 
+:::info
+The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).
+:::
+
 ```go
 package main
 
@@ -39,7 +43,7 @@ type contextRequest struct {
 	Request *user.AddHumanUserRequest `json:"request"`
 }
 
-// call HandleFunc to read the request body, manipulate the content and return the request
+// call HandleFunc to read the request body, manipulate the content and return the manipulated request
 func call(w http.ResponseWriter, req *http.Request) {
 	// read the body content
 	sentBody, err := io.ReadAll(req.Body)
@@ -180,5 +184,5 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 ## Conclusion
 
 You have successfully set up a target and execution to manipulate API requests in your ZITADEL instance.
-This feature can now be used to add information to managed resources in ZITADEL.
+This feature can now be used to add or manipulate information to managed resources in ZITADEL.
 Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

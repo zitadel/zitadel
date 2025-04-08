@@ -57,4 +57,5 @@ Currently, the defined Actions v2 will be executed additionally to the defined [
 - [Actions v2 example execution for response](/guides/integrate/actions/testing-response)
 - [Actions v2 example execution for response manipulation](/guides/integrate/actions/testing-response-manipulation)
 - [Actions v2 example execution for function](/guides/integrate/actions/testing-function)
+- [Actions v2 example execution for function manipulation](/guides/integrate/actions/testing-function-manipulation)
 - [Actions v2 example execution for event](/guides/integrate/actions/testing-event)
