@@ -836,7 +836,7 @@ module.exports = {
                     "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
                     "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n"+
                     "\n" +
-                    "Please make sure to enable the `actions` feature flag on your instance to use this service  and that you're running ZITADEL V3.",
+                    "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
               },
               items: sidebar_api_actions_v2,
             },
