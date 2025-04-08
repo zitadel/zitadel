@@ -32,7 +32,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@ngx-translate/core": "^15.0.0",
     "@zitadel/client": "^1.0.7",
-    "@zitadel/proto": "1.0.5-sha-4118a9d",
+    "@zitadel/proto": "1.0.5-sha-47a2ab5",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.2",
     "buffer": "^6.0.3",
@@ -65,7 +65,6 @@
     "@angular/compiler-cli": "^16.2.5",
     "@angular/language-service": "^18.2.4",
     "@bufbuild/buf": "^1.41.0",
-    "@netlify/framework-info": "^9.8.13",
     "@types/file-saver": "^2.0.7",
     "@types/google-protobuf": "^3.15.3",
     "@types/jasmine": "~5.1.4",
@@ -87,6 +86,7 @@
     "karma-jasmine-html-reporter": "^2.1.0",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
-    "typescript": "5.1"
+    "typescript": "5.1",
+    "@netlify/framework-info": "^9.8.13"
   }
 }

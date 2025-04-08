@@ -427,6 +427,34 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 	return user, err
 }
 
+// Deprecated: use either GetUserByID or GetUserByLoginName
+func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (user *User, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		triggerUserProjections(ctx)
+	}
+
+	query, scan := prepareUserQuery()
+	for _, q := range queries {
+		query = q.toQuery(query)
+	}
+	eq := sq.Eq{
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	stmt, args, err := query.Where(eq).ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		user, err = scan(row)
+		return err
+	}, stmt, args...)
+	return user, err
+}
+
 func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (profile *Profile, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

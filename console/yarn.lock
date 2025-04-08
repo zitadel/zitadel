@@ -3471,10 +3471,10 @@
   dependencies:
     "@bufbuild/protobuf" "^2.2.2"
 
-"@zitadel/proto@1.0.5-sha-4118a9d":
-  version "1.0.5-sha-4118a9d"
-  resolved "https://registry.yarnpkg.com/@zitadel/proto/-/proto-1.0.5-sha-4118a9d.tgz#e09025f31b2992b061d5416a0d1e12ef370118cc"
-  integrity sha512-7ZFwISL7TqdCkfEUx7/H6UJDqX8ZP2jqG1ulbELvEQ2smrK365Zs7AkJGeB/xbVdhQW9BOhWy2R+Jni7sfxd2w==
+"@zitadel/proto@1.0.5-sha-47a2ab5":
+  version "1.0.5-sha-47a2ab5"
+  resolved "https://registry.yarnpkg.com/@zitadel/proto/-/proto-1.0.5-sha-47a2ab5.tgz#c0ef7d9e7d0c41d12206e5762a255b3336763732"
+  integrity sha512-ZqPGJEs9Rl5ialU3OY48pU8QcR3yy79SBDMFluFNc256VJI73t7EI/aAxlJn6BcyQ7/CTASg3QfdVDKLMNEU5g==
   dependencies:
     "@bufbuild/protobuf" "^2.2.2"
 
