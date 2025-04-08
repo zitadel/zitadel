@@ -75,7 +75,6 @@ export class InstanceComponent {
     COMPLEXITY,
     AGE,
     LOCKOUT,
-
     DOMAIN,
     // appearance
     BRANDING,
@@ -116,7 +115,6 @@ export class InstanceComponent {
       name: 'Instance',
       routerLink: ['/instance'],
     });
-
     breadcrumbService.setBreadcrumb([instanceBread]);
 
     this.adminService
