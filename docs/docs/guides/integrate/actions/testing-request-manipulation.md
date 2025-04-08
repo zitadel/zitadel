@@ -55,7 +55,7 @@ func call(w http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 
 	// read the request into the expected structure
-	request := new(infoRequest)
+	request := new(contextRequest)
 	if err := json.Unmarshal(sentBody, request); err != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 	}
