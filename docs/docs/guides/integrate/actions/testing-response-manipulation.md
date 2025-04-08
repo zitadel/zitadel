@@ -4,7 +4,7 @@ title: Test Actions Response Manipulation
 
 This guide shows you how to leverage the ZITADEL actions feature to manipulate API responses in your ZITADEL instance.
 You can use the actions feature to create a target that will be called when a specific API response occurs.
-This is useful for triggering workflows based on API responses in ZITADEL.
+This is useful for triggering workflows based on API responses in ZITADEL. You can even use this to provide data necessary data to the new login UI as shown in this example.
 
 ## Prerequisites
 
@@ -23,6 +23,10 @@ In case you are using a different setup, you need to adjust the target URL accor
 To test the actions feature, you need to create a target that will be called when an API endpoint is called.
 You will need to implement a listener that can receive HTTP requests, process the request and returns the manipulated request.
 For this example, we will use a simple Go HTTP server that will return the request with added metadata.
+
+:::info
+The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).
+:::
 
 ```go
 package main
@@ -246,5 +250,5 @@ the [Sent information Response](./usage#sent-information-response) payload descr
 ## Conclusion
 
 You have successfully set up a target and execution to manipulate API responses in your ZITADEL instance.
-This feature can now be used to add information to managed resources in ZITADEL.
+This feature can now be used to add necessary information for clients including the new login UI.
 Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

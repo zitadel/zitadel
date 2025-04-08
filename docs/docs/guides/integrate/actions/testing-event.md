@@ -24,6 +24,10 @@ To test the actions feature, you need to create a target that will be called whe
 You will need to implement a listener that can receive HTTP requests and process the events.
 For this example, we will use a simple Go HTTP server that will print the received events to standard output.
 
+:::info
+The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).
+:::
+
 ```go
 package main
 

@@ -247,6 +247,82 @@ The expected structure of the JSON as response:
 }
 ```
 
+#### PreSAMLResponse
+
+The information sent to the Endpoint is structured as JSON:
+```json
+{
+  "function": "Name of the function",
+  "userinfo": {
+    "given_name": "",
+    "family_name": "",
+    "middle_name": "",
+    "nickname": "",
+    "profile": "",
+    "picture": "",
+    ...
+    "preferred_username": "",
+    "email": "",
+    "email_verified": true,
+    "phone_number": "",
+    "phone_number_verified": true
+  },
+  "user": {
+    "id": "",
+    "creation_date": "",
+    ...
+    "human": {
+      "first_name": "",
+      "last_name": "",
+      ...
+      "email": "",
+      "is_email_verified": true,
+      "phone": "",
+      "is_phone_verified": true
+    }
+  },
+  "user_grants": [
+    {
+      "id": "",
+      "projectGrantId": "The ID of the project grant",
+      "state": 1,
+      "creationDate": "",
+      "changeDate": "",
+      "sequence": 1,
+      "userId": "",
+      "roles": [
+        "role"
+      ],
+      "userResourceOwner": "The ID of the organization the user belongs to",
+      "userGrantResourceOwner": "The ID of the organization the user got authorization granted",
+      "userGrantResourceOwnerName": "The name of the organization the user got authorization granted",
+      "projectId": "",
+      "projectName": ""
+    }
+  ]
+}
+```
+
+The expected structure of the JSON as response:
+
+```json
+{
+  "set_user_metadata": [
+    {
+      "key": "key of metadata to be set on the user",
+      "value": "base64 value of metadata to be set on the user"
+    }
+  ],
+  "append_attribute": [
+    {
+      "name": "name of the attribute to be added to the response",
+      "name_format": "name format of the attribute to be added to the response",
+      "value": "value of the attribute to be added to the response"
+    }
+  ]
+}
+```
+
 ### Sent information Event
 
 The information sent to the Endpoint is structured as JSON:
@@ -286,6 +362,8 @@ To ensure the integrity of request content, each call includes a 'ZITADEL-Signat
 
 Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v2/action-service-create-target),
 and can also be newly generated when a Target is [patched](/apis/resources/action_service_v2/action-service-patch-target).
+
+For an example on how to check the signature, [refer to the example](/guides/integrate/actions/testing-request-signature).
 
 ## Execution
 
