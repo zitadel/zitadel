@@ -119,7 +119,7 @@ export class UserTableComponent implements OnInit {
 
     this.dataSize = toSignal(
       this.users$.pipe(
-        map((users) => Number(users.details?.totalResult ?? 0)),
+        map((users) => Number(users.details?.totalResult ?? users.result.length)),
         distinctUntilChanged(),
       ),
       { initialValue: 0 },
