@@ -670,8 +670,8 @@ message ListTargetsResponse {
 message SetExecutionRequest {
   // Condition defining when the execution should be used.
   Condition condition = 1;
-  // Ordered list of targets/includes called during the execution.
-  repeated ExecutionTargetType targets = 2;
+  // Ordered list of targets called during the execution.
+  repeated string targets = 2;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"condition\":{\"request\":{\"method\":\"zitadel.session.v2.SessionService/ListSessions\"}},\"targets\":[{\"target\":\"69629026806489455\"}]}";
   };

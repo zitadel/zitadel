@@ -108,9 +108,6 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyUserSchema:
 		v := value.(bool)
 		features.UserSchema = &v
-	case feature.KeyActions:
-		v := value.(bool)
-		features.Actions = &v
 	case feature.KeyImprovedPerformance:
 		v := value.([]feature.ImprovedPerformanceType)
 		features.ImprovedPerformance = v
