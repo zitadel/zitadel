@@ -86,7 +86,7 @@ func TestPermissionClause(t *testing.T) {
 			wantArgs:  []any{"instanceID", "instanceID", "userID", database.NewJSONArray(permissions), "permission1", "", "userID"},
 		},
 		{
-			name: "override rows option",
+			name: "connection rows option",
 			args: args{
 				ctx:        ctx,
 				query:      sq.Select("foo", "bar").From("users").Where(sq.Eq{"instance_id": "instanceID"}),
@@ -95,7 +95,7 @@ func TestPermissionClause(t *testing.T) {
 				permission: "permission1",
 				options: []PermissionOption{
 					OwnedRowsPermissionOption(UserIDCol),
-					OverridePermissionOption(UserStateCol, "bar"),
+					ConnectionPermissionOption(UserStateCol, "bar"),
 				},
 			},
 			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)) OR projections.users14.id = ? OR projections.users14.state = ?)",

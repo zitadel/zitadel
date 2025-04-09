@@ -27,7 +27,7 @@ type permissionClauseBuilder struct {
 	overrides         []sq.Eq
 }
 
-func (b *permissionClauseBuilder) appendOverride(column string, value any) {
+func (b *permissionClauseBuilder) appendConnection(column string, value any) {
 	b.overrides = append(b.overrides, sq.Eq{column: value})
 }
 
@@ -54,15 +54,15 @@ type PermissionOption func(b *permissionClauseBuilder)
 // For example an authenticated user can always see his own user account.
 func OwnedRowsPermissionOption(userIDColumn Column) PermissionOption {
 	return func(b *permissionClauseBuilder) {
-		b.appendOverride(userIDColumn.identifier(), b.userID)
+		b.appendConnection(userIDColumn.identifier(), b.userID)
 	}
 }
 
-// OverridePermissionOption allows returning of rows where the value is matched.
+// ConnectionPermissionOption allows returning of rows where the value is matched.
 // Even if the user does not have an explicit permission for the organization.
-func OverridePermissionOption(column Column, value any) PermissionOption {
+func ConnectionPermissionOption(column Column, value any) PermissionOption {
 	return func(b *permissionClauseBuilder) {
-		b.appendOverride(column.identifier(), value)
+		b.appendConnection(column.identifier(), value)
 	}
 }
 

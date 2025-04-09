@@ -124,7 +124,7 @@ func sessionsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enab
 		OwnedRowsPermissionOption(SessionColumnCreator),
 		// Allow if session belongs to the user
 		OwnedRowsPermissionOption(SessionColumnUserID),
-		OverridePermissionOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
+		ConnectionPermissionOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
 	)
 }
 
