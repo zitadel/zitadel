@@ -633,6 +633,10 @@ func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, a
 // renderExternalNotFoundOption renders a page, where the user is able to edit the IDP data,
 // create a new externalUser of link to existing on (based on the IDP template)
 func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idpLink *domain.UserIDPLink, err error) {
+	if authReq == nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	if orgIAMPolicy == nil {
 		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)

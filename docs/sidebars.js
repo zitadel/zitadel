@@ -471,6 +471,60 @@ module.exports = {
           ],
         },
         "guides/integrate/external-audit-log",
+        {
+          type: "category",
+          label: "Actions",
+          link: {
+            type: "generated-index",
+            title: "Use Actions to integrate ZITADEL with your Favorite Services",
+            slug: "/guides/integrate/actions",
+            description:
+              "With the guides in this section you will learn how to use action to integrate Zitadel with your services.",
+          },
+          collapsed: true,
+          items: [
+            {
+              type: "doc",
+              id: "guides/integrate/actions/usage",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request-signature",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-response",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-response-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-function",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-function-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-event",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/migrate-from-v1",
+            },
+          ],
+        },
       ],
     },
     {
@@ -782,18 +836,9 @@ module.exports = {
                     "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
                     "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n"+
                     "\n" +
-                    "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running ZITADEL V3.",
+                    "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
               },
-              items: [
-                {
-                  type: "doc",
-                  id: "apis/actions/v2/usage",
-                },
-                {
-                  type: "doc",
-                  id: "apis/actions/v2/testing-locally",
-                },
-              ].concat(sidebar_api_actions_v2),
+              items: sidebar_api_actions_v2,
             },
           ],
         },
