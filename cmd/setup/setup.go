@@ -113,7 +113,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	stop := make(chan os.Signal, 1)
 	// catch interrupt from terminal or SIGTERM from kubernetes
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 	var signalReceived os.Signal
 
 	go func() {
@@ -360,7 +360,7 @@ func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventsto
 		)
 	}
 	logging.WithFields(logFields...).WithError(err)
-	return fmt.Errorf("migration failed: %w", err)
+	return fmt.Errorf("%s: %w", errorMsg, err)
 }
 
 // readStmt reads a single file from the embedded FS,
