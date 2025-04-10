@@ -5,8 +5,13 @@ import (
 	"embed"
 	_ "embed"
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"path"
+	"syscall"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spf13/cobra"
@@ -101,9 +106,41 @@ func bindForMirror(cmd *cobra.Command) error {
 
 func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) {
 	logging.Info("setup started")
+	var setupErr error
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	stop := make(chan os.Signal, 1)
+	// catch interrupt from terminal or SIGTERM from kubernetes
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	var signalReceived os.Signal
+
+	go func() {
+		select {
+		case sig := <-stop:
+			logging.Infof("received interrupt signal, shutting down: %s", sig)
+			signalReceived = sig
+			cancel()
+		case <-ctx.Done():
+			return
+		}
+	}()
+
+	defer func() {
+		if setupErr != nil || signalReceived != nil {
+			// if we're in the middle of long-running setup, run cleanup before exiting
+			// so if/when we're restarted we can pick up where we left off rather than
+			// booting into a broken state that requires manual intervention
+			// kubernetes will typically kill the pod after 30 seconds if the container does not exit
+			cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cleanupCancel()
+
+			Cleanup(cleanupCtx, config)
+		}
+	}()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
-
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
@@ -223,7 +260,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s52IDPTemplate6LDAP2,
 		steps.s53InitPermittedOrgsFunction,
 	} {
-		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
+		err := executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if err != nil {
+			setupErr = err
+			return
+		}
 	}
 
 	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
@@ -257,7 +298,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}
 
 	for _, repeatableStep := range repeatableSteps {
-		mustExecuteMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
+		err := executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
+		if err != nil {
+			setupErr = err
+			return
+		}
 	}
 
 	// These steps are executed after the repeatable steps because they add fields projections
@@ -273,7 +318,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
 	} {
-		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
+		err := executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if err != nil {
+			setupErr = err
+			return
+		}
 	}
 
 	// projection initialization must be done last, since the steps above might add required columns to the projections
@@ -285,10 +334,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}
 }
 
-func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) {
+func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) error {
 	err := migration.Migrate(ctx, eventstoreClient, step)
 	if err == nil {
-		return
+		return nil
 	}
 	logFields := []any{
 		"name", step.String(),
@@ -303,7 +352,8 @@ func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Even
 			"hint", pgErr.Hint,
 		)
 	}
-	logging.WithFields(logFields...).WithError(err).Fatal(errorMsg)
+	logging.WithFields(logFields...).WithError(err)
+	return fmt.Errorf("migration failed: %w", err)
 }
 
 // readStmt reads a single file from the embedded FS,
