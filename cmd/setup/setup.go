@@ -128,7 +128,13 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}()
 
 	defer func() {
-		if (setupErr != nil && errors.Is(setupErr, context.Canceled)) || signalReceived != nil {
+		if signalReceived != nil {
+			if setupErr != nil && !errors.Is(setupErr, context.Canceled) {
+				// if somehow the setup step failed for some other reason than the context being cancelled
+				// by the signal, skip cleanup as this might be a fatal error we should not retry
+				logging.WithFields("error", setupErr).Fatal("setup failed, skipping cleanup")
+				return
+			}
 			// if we're in the middle of long-running setup, run cleanup before exiting
 			// so if/when we're restarted we can pick up where we left off rather than
 			// booting into a broken state that requires manual intervention
