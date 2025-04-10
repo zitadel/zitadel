@@ -1517,13 +1517,6 @@ service UserService {
   //
   // CreateUser creates a new human or machine user in the specified organization.
   //
-  // ## Uniqueness
-  //
-  // The username must be unique within the given organization.
-  // Providing it in the request is optional.
-  // For human users, it defaults to the given email address, which is a required input.
-  // For machine users, it defaults to the optionally given or generated user ID.
-  //
   // ## Creating human users
   //
   // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
@@ -3145,7 +3138,8 @@ message CreateUserRequest{
   optional string user_id = 2 [
     (validate.rules).string = {max_len: 200}
   ];
-  // optionally set a username that is unique within the organization.
+
+  // optionally set a username that is unique within the instance.
   // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
   // For example "minnie-mouse"
   optional string username = 3 [
@@ -3311,7 +3305,7 @@ message UpdateUserRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200}
   ];
-  // optionally set a username that is unique within the organization.
+  // optionally set a username that is unique within the instance.
   // For example "minnie-mouse"
   optional string username = 2 [
     (validate.rules).string = {max_len: 200}
