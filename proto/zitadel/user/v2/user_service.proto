@@ -1571,7 +1571,6 @@ service UserService {
   // UpdateUser
   //
   // UpdateUser allows to partially update an existing user.
-  // If the username is updated, it must be unique within the users organization.
   //
   // ## Updating human users
   //
