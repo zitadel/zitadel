@@ -1517,17 +1517,6 @@ service UserService {
   //
   // CreateUser creates a new human or machine user in the specified organization.
   //
-  // ## Creating human users
-  //
-  // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
-  // To make this work, make sure you have valid active SMTP and Twilio configurations.
-  // Read more about your options for controlling this behaviour in the email and phone field documentations.
-  //
-  // ## Creating machine users
-  //
-  // Beware that the given access token type can't be changed using the user service v2, yet.
-  // Please use the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
-  //
   // Required permission:
   //   - user.write
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
@@ -1571,26 +1560,6 @@ service UserService {
   // UpdateUser
   //
   // UpdateUser allows to partially update an existing user.
-  //
-  // ## Updating human users
-  //
-  // By default, the user will receive a verification email and/or SMS if the email address or phone number is changed.
-  // Read more about your options for controlling this behaviour in the email and phone field documentations.
-  //
-  // By default, the user is required to change the password if you update it.
-  // You can disable this behaviour using the skip_password_change field.
-  // You can also trigger a password change without updating the password.
-  // Read more about your options and common use cases in the password field documentation.
-  //
-  // The UpdateUser endpoint doesn't support changing a human users identity provider links.
-  // Use the following endpoints to manage identity provider links:
-  // - [AddIDPLink](apis/resources/user_service_v2/user-service-add-idp-link.api.mdx)
-  // - [RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
-  //
-  // ## Updating machine users
-  //
-  // The UpdateUser endpoint doesn't support changing a machine users access token type.
-  // Use the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx) instead.
   //
   // Required permission:
   //   - user.write
@@ -3105,6 +3074,9 @@ message CreateUserRequest{
     // This can be useful in migration-scenarios.
     // For example, if a user already has an account in an external identity provider or another Zitadel instance, an IDP link allows the user to authenticate as usual.
     // Sessions, second factors, hardware keys registered externally are still available for authentication.
+    // Use the following endpoints to manage identity provider links:
+    // - [AddIDPLink](apis/resources/user_service_v2/user-service-add-idp-link.api.mdx)
+    // - [RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
     repeated IDPLink idp_links = 7;
     // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
     // Currently no other options are supported, and if anything different is used the validation will fail.
@@ -3147,7 +3119,16 @@ message CreateUserRequest{
   // The type of the user.
   oneof user_type {
     option (validate.required) = true;
+    // Users of type human are users that are meant to be used by a person.
+    // They can log in interactively using a login UI.
+    // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
+    // To make sure these messages are sent, configure and activate valid SMTP and Twilio configurations.
+    // Read more about your options for controlling this behaviour in the email and phone field documentations.
     Human human = 10;
+    // Users of type machine are users that are meant to be used by a machine.
+    // In order to authenticate, [add a secret](apis/resources/user_service_v2/user-service-add-secret.api.mdx), [a key](apis/resources/user_service_v2/user-service-add-key.api.mdx) or [a personal access token](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) to the user.
+    // Tokens generated for new users of type machine will be of an opaque Bearer type.
+    // You can change the users token type to JWT using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
     Machine machine = 11;
   }
 }
