@@ -113,7 +113,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	stop := make(chan os.Signal, 1)
 	// catch interrupt from terminal or SIGTERM from kubernetes
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	var signalReceived os.Signal
 
 	go func() {
@@ -128,7 +128,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}()
 
 	defer func() {
-		if setupErr != nil || signalReceived != nil {
+		if (setupErr != nil && errors.Is(setupErr, context.Canceled)) || signalReceived != nil {
 			// if we're in the middle of long-running setup, run cleanup before exiting
 			// so if/when we're restarted we can pick up where we left off rather than
 			// booting into a broken state that requires manual intervention
@@ -327,10 +327,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	// projection initialization must be done last, since the steps above might add required columns to the projections
 	if !config.ForMirror && config.InitProjections.Enabled {
-		initProjections(
-			ctx,
-			eventstoreClient,
-		)
+		err := initProjections(ctx, eventstoreClient)
+		if err != nil {
+			setupErr = err
+			return
+		}
 	}
 }
 
@@ -558,26 +559,36 @@ func startCommandsQueries(
 func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
-) {
+) error {
 	logging.Info("init-projections is currently in beta")
 
 	for _, p := range projection.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err)
+			return err
+		}
 	}
 
 	for _, p := range admin_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err)
+			return err
+		}
 	}
 
 	for _, p := range auth_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err)
+			return err
+		}
 	}
 
 	for _, p := range notify_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err)
+			return err
+		}
 	}
+
+	return nil
 }
