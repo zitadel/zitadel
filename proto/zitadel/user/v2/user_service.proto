@@ -1315,9 +1315,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We can check in the middleware if the request is allowed on the given organization.
-        permission: "user.write"
-        org_field: "organization"
+        permission: "authenticated"
       }
       http_response: {
         success_code: 201
@@ -1376,7 +1374,6 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We need to query the database to find the org and check if the request is allowed.
         permission: "authenticated"
       }
     };
@@ -1412,7 +1409,6 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We need to query the database to find the org and check if the request is allowed.
         permission: "authenticated"
       }
     };
@@ -1446,7 +1442,6 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We need to query the database to find the org and check if the request is allowed.
         permission: "authenticated"
       }
     };
@@ -1482,7 +1477,6 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We need to query the database to find the org and check if the request is allowed.
         permission: "authenticated"
       }
     };
@@ -1515,7 +1509,6 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We need to query the database to find the org and check if the request is allowed.
         permission: "authenticated"
       }
     };
@@ -1551,7 +1544,6 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We need to query the database to find the org and check if the request is allowed.
         permission: "authenticated"
       }
     };
@@ -1584,7 +1576,6 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        // We need to query the database to find the org and check if the request is allowed.
         permission: "authenticated"
       }
     };
@@ -1955,7 +1946,6 @@ message DeactivateUserRequest {
 message DeactivateUserResponse {
   zitadel.object.v2.Details details = 1;
 }
-
 
 message ReactivateUserRequest {
   string user_id = 1 [
