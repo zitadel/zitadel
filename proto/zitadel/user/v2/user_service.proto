@@ -87,9 +87,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
   }
   responses: {
-    key: "403";
+    key: "400";
     value: {
-      description: "Returned when the user does not have permission to access the resource.";
+      description: "The request is malformed.";
       schema: {
         json_schema: {
           ref: "#/definitions/rpcStatus";
@@ -98,9 +98,20 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
   }
   responses: {
-    key: "404";
+    key: "401";
     value: {
-      description: "Returned when the resource does not exist.";
+      description: "Returned when the user is not authenticated.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
       schema: {
         json_schema: {
           ref: "#/definitions/rpcStatus";
@@ -170,6 +181,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -236,6 +253,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -266,6 +289,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -296,6 +325,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -321,6 +356,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -351,6 +392,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -378,6 +425,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -408,6 +461,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -433,6 +492,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -463,6 +528,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -488,6 +559,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -513,6 +590,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -538,6 +621,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -563,6 +652,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -587,6 +682,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -611,6 +712,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -635,6 +742,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -659,6 +772,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -707,6 +826,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -731,6 +856,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -755,6 +886,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -780,6 +917,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -804,6 +947,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -828,6 +977,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -851,6 +1006,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -875,6 +1036,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -898,6 +1065,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -922,6 +1095,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -945,6 +1124,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -995,6 +1180,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "Intent ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1020,6 +1211,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1070,6 +1267,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1100,6 +1303,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1125,6 +1334,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1195,6 +1410,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1220,6 +1441,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1246,6 +1473,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1271,6 +1504,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1297,14 +1536,7 @@ service UserService {
   // Please use the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) or contains invalid data for the creation of the user. Check error details for the missing or invalid fields.
-  //   - user_already_exists: The user already exists. The username must be unique.
-  //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
-  //   - permission_denied: You do not have the required permissions to access the requested resource.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
       // The /new path segment does not follow Zitadels API design.
@@ -1324,9 +1556,20 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
-        key: "200"
+        key: "201"
         value: {
           description: "OK";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
         }
       };
     };
@@ -1358,14 +1601,7 @@ service UserService {
   // Use the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx) instead.
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) or contains invalid data for the creation of the user. Check error details for the missing or invalid fields.
-  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
-  //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
-  //   - permission_denied: You do not have the required permissions to update the user.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
     option (google.api.http) = {
       patch: "/v2/users/{user_id}"
@@ -1385,6 +1621,28 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
     };
   }
 
@@ -1392,15 +1650,10 @@ service UserService {
   //
   // AddSecret generates a new client ID and client secret for the user.
   // If the user already has a secret, it is overwritten.
-  // Currently, only users of type machine can have a secret.
+  // Only users of type machine can have a secret.
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
-  //   - permission_denied: You do not have the required permissions to update the user.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/secret"
@@ -1417,7 +1670,18 @@ service UserService {
       responses: {
         key: "200"
         value: {
-          description: "OK";
+          description: "The secret was successfully generated.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
         }
       };
     };
@@ -1426,15 +1690,9 @@ service UserService {
   // RemoveSecret
   //
   // RemoveSecret removes the current client ID and client secret from a machine user.
-  // If no secret is set, the response is successful.
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
-  //   - permission_denied: You do not have the required permissions to update the user.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/secret"
@@ -1450,7 +1708,7 @@ service UserService {
       responses: {
         key: "200"
         value: {
-          description: "OK";
+          description: "The secret was either successfully removed or it didn't exist in the first place.";
         }
       };
     };
@@ -1459,16 +1717,11 @@ service UserService {
   // AddKey
   //
   // Keys can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
-  // Make sure you store them safely.
-  // Currently, only users of type machine can have keys.
+  // Make sure you store the returned key safely, as you won't be able to read it from the Zitadel API anymore.
+  // Only users of type machine can have keys.
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
-  //   - permission_denied: You do not have the required permissions to update the user.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/keys"
@@ -1485,7 +1738,18 @@ service UserService {
       responses: {
         key: "200"
         value: {
-          description: "OK";
+          description: "The key was successfully created.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
         }
       };
     };
@@ -1493,15 +1757,10 @@ service UserService {
 
   // RemoveKey
   //
-  // Remove a machine users key by the given user ID and key ID.
+  // Remove a machine users key by the given key ID and an optionally given user ID.
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
-  //   - permission_denied: You do not have the required permissions to update the user.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/keys/{key_id}"
@@ -1517,7 +1776,7 @@ service UserService {
       responses: {
         key: "200"
         value: {
-          description: "OK";
+          description: "The key was either successfully removed or it not found in the first place.";
         }
       };
     };
@@ -1526,16 +1785,11 @@ service UserService {
   // AddPersonalAccessToken
   //
   // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
-  // Make sure you store them safely.
-  // Currently, only users of type machine can have personal access tokens.
+  // Make sure you store the returned PAT safely, as you won't be able to read it from the Zitadel API anymore.
+  // Only users of type machine can have personal access tokens.
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
-  //   - permission_denied: You do not have the required permissions to update the user.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/pats"
@@ -1552,7 +1806,18 @@ service UserService {
       responses: {
         key: "200"
         value: {
-          description: "OK";
+          description: "The personal access token was successfully created.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
         }
       };
     };
@@ -1560,15 +1825,10 @@ service UserService {
 
   // RemovePersonalAccessToken
   //
-  // Removes a machine users personal access token by the given user ID and token ID.
+  // Removes a machine users personal access token by the given token ID and an optionally given user ID.
   //
   // Required permission:
-  //   - user.write on the users instance or the users organization
-  //
-  // Error Codes:
-  //   - user_does_not_exists: The user doesn't exists. The user was not found in any organization by the given ID.
-  //   - permission_denied: You do not have the required permissions to update the user.
-  //   - unauthenticated: You are not authenticated. Please provide a valid access token.
+  //   - user.write
   rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/pats/{token_id}"
@@ -1584,7 +1844,7 @@ service UserService {
       responses: {
         key: "200"
         value: {
-          description: "OK";
+          description: "The personal access token was either successfully removed or it was not found in the first place.";
         }
       };
     };
