@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -481,4 +482,12 @@ func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInit
 	return &user.HumanMFAInitSkippedResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
+}
+
+func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
+	return nil, zerrors.ThrowUnimplemented(nil, "", "not implemented")
+}
+
+func (s *Server) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
+	return nil, zerrors.ThrowUnimplemented(nil, "", "not implemented")
 }
