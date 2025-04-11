@@ -471,8 +471,6 @@ service UserService {
   // Resend code to verify user phone
   //
   // Deprecated: [Update the users phone verification](apis/resources/user_service_v2/user-service-update-user.api.mdx) and leave the phone number empty to resend a code.
-  //
-  // Resend code to verify user phone.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -487,8 +485,6 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      summary: "Deprecated: ResendPhoneCode";
-      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
