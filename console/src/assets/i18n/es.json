@@ -185,6 +185,32 @@
           "DESCRIPTION": "La duración de vida del token de actualización en espera es el tiempo máximo que un token de actualización puede estar sin usar."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Administra tus claves web OIDC para firmar y validar tokens de manera segura en tu instancia de ZITADEL.",
+        "TABLE": {
+          "TITLE": "Claves Web Activas y Futuras",
+          "DESCRIPTION": "Tus claves web activas y próximas. Activar una nueva clave desactivará la actual.",
+          "NOTE": "Nota: El endpoint JWKs OIDC devuelve una respuesta almacenable en caché (por defecto 5 min). Evita activar una clave demasiado pronto, ya que puede que aún no esté disponible en cachés y clientes.",
+          "ACTIVATE": "Activar la siguiente Clave Web",
+          "ACTIVE": "Actualmente activa",
+          "NEXT": "Siguiente en la cola",
+          "FUTURE": "Futuro",
+          "WARNING": "La clave web tiene menos de 5 minutos"
+        },
+        "CREATE": {
+          "TITLE": "Crear nueva Clave Web",
+          "DESCRIPTION": "Crear una nueva clave web la añadirá a tu lista. ZITADEL usa por defecto claves RSA2048 con un algoritmo de hash SHA256.",
+          "KEY_TYPE": "Tipo de Clave",
+          "BITS": "Bits",
+          "HASHER": "Algoritmo de Hash",
+          "CURVE": "Curva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Claves Web Anteriores",
+          "DESCRIPTION": "Estas son tus claves web anteriores que ya no están activas.",
+          "DEACTIVATED_ON": "Desactivada el"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Textos de Mensajes",
         "DESCRIPTION": "Personaliza los textos de tus mensajes de correo electrónico de notificación o mensajes SMS. Si deseas desactivar algunos de los idiomas, restríngelos en la configuración de idiomas de tus instancias.",
@@ -501,6 +527,114 @@
     },
     "DOWNLOAD": "Descargar",
     "APPLY": "Aplicar"
+  },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Acciones",
+      "DESCRIPTION": "Las acciones te permiten ejecutar código personalizado en respuesta a solicitudes de API, eventos o funciones específicas. Úsalas para extender Zitadel, automatizar flujos de trabajo e integrarte con otros sistemas.",
+      "TYPES": {
+        "request": "Solicitud",
+        "response": "Respuesta",
+        "events": "Eventos",
+        "function": "Función"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Crear una acción",
+        "UPDATE_TITLE": "Actualizar una acción",
+        "TYPE": {
+          "DESCRIPTION": "Selecciona cuándo quieres que se ejecute esta acción",
+          "REQUEST": {
+            "TITLE": "Solicitud",
+            "DESCRIPTION": "Solicitudes que ocurren dentro de Zitadel. Esto podría ser algo como una llamada de solicitud de inicio de sesión."
+          },
+          "RESPONSE": {
+            "TITLE": "Respuesta",
+            "DESCRIPTION": "Una respuesta de una solicitud dentro de Zitadel. Piensa en la respuesta que recibes al obtener un usuario."
+          },
+          "EVENTS": {
+            "TITLE": "Eventos",
+            "DESCRIPTION": "Eventos que ocurren dentro de Zitadel. Esto podría ser cualquier cosa como un usuario creando una cuenta, un inicio de sesión exitoso, etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funciones",
+            "DESCRIPTION": "Funciones que puedes llamar dentro de Zitadel. Esto podría ser cualquier cosa, desde enviar un correo electrónico hasta crear un usuario."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Elige si esta acción se aplica a todas las solicitudes, a un servicio específico (p. ej., administración de usuarios) o a una sola solicitud (p. ej., crear usuario).",
+          "ALL": {
+            "TITLE": "Todas",
+            "DESCRIPTION": "Selecciona esto si quieres ejecutar tu acción en cada solicitud"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Seleccionar servicio",
+            "DESCRIPTION": "Elige un servicio de Zitadel para tu acción."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Seleccionar método",
+            "DESCRIPTION": "Si quieres ejecutar solo en una solicitud específica, selecciónala aquí",
+            "NOTE": "Si no seleccionas un método, tu acción se ejecutará en cada solicitud de tu servicio seleccionado."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nombre de la función",
+            "DESCRIPTION": "Elige la función que quieres ejecutar"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Establecer grupo",
+            "DESCRIPTION": "Si quieres ejecutar solo en un grupo de eventos, establece el grupo aquí"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Seleccionar evento",
+            "DESCRIPTION": "Si quieres ejecutar solo en un evento específico, especifícalo aquí"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Puedes elegir ejecutar un objetivo o ejecutarlo en las mismas condiciones que otros objetivos.",
+          "TARGET": {
+            "DESCRIPTION": "El objetivo que quieres ejecutar para esta acción"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Condiciones de ejecución"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condición",
+        "TYPE": "Tipo",
+        "TARGET": "Objetivo",
+        "CREATIONDATE": "Fecha de creación"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Objetivos",
+      "DESCRIPTION": "Un objetivo es el destino del código que quieres ejecutar desde una acción. Crea un objetivo aquí y agrégalo a tus acciones.",
+      "CREATE": {
+        "TITLE": "Crear tu objetivo",
+        "DESCRIPTION": "Crea tu propio objetivo fuera de Zitadel",
+        "NAME": "Nombre",
+        "NAME_DESCRIPTION": "Dale a tu objetivo un nombre claro y descriptivo para que sea fácil de identificar más tarde",
+        "TYPE": "Tipo",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Llamada REST",
+          "restAsync": "REST Asíncrono"
+        },
+        "ENDPOINT": "Punto de conexión",
+        "ENDPOINT_DESCRIPTION": "Introduce el punto de conexión donde se aloja tu código. ¡Asegúrate de que sea accesible para nosotros!",
+        "TIMEOUT": "Tiempo de espera",
+        "TIMEOUT_DESCRIPTION": "Establece el tiempo máximo que tiene tu objetivo para responder. Si tarda más, detendremos la solicitud.",
+        "INTERRUPT_ON_ERROR": "Interrumpir en error",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Detén todas las ejecuciones cuando los objetivos devuelvan un error",
+        "INTERRUPT_ON_ERROR_WARNING": "Precaución: “Interrumpir en error” detiene las operaciones si fallan, lo que puede provocar un bloqueo. Pruebe con esta opción desactivada para evitar bloquear el inicio de sesión o la creación.",
+        "AWAIT_RESPONSE": "Esperar respuesta",
+        "AWAIT_RESPONSE_DESCRIPTION": "Esperaremos una respuesta antes de hacer cualquier otra cosa. Útil si tienes la intención de usar múltiples objetivos para una sola acción"
+      },
+      "TABLE": {
+        "NAME": "Nombre",
+        "ENDPOINT": "Punto de conexión",
+        "CREATIONDATE": "Fecha de creación"
+      }
+    }
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tiene control sobre toda la instancia, incluyendo todas las organizaciones",
@@ -1358,6 +1492,7 @@
       "BRANDING": "Imagen de marca",
       "PRIVACYPOLICY": "Política de privacidad",
       "OIDC": "OIDC Token lifetime and expiration",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Apariencia del secreto",
       "SECURITY": "Ajustes de seguridad",
       "EVENTS": "Eventos",
@@ -1517,7 +1652,10 @@
       },
       "RESET": "Establecer todo a heredado",
       "CONSOLEUSEV2USERAPI": "Utilice la API V2 en la consola para la creación de usuarios",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial.",
+      "LOGINV2": "Inicio de sesión V2",
+      "LOGINV2_DESCRIPTION": "Al habilitar esto, se activa la nueva interfaz de inicio de sesión basada en TypeScript con mejoras en seguridad, rendimiento y personalización.",
+      "LOGINV2_BASEURI": "URI base"
     },
     "DIALOG": {
       "RESET": {

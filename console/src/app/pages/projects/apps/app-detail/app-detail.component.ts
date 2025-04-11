@@ -73,7 +73,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public canWrite: boolean = false;
   public errorMessage: string = '';
   public removable: boolean = true;
-  public addOnBlur: boolean = true;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -168,21 +167,20 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public isZitadel: boolean = false;
   public docs!: GetOIDCInformationResponse.AsObject;
 
-  public OIDCAppType: any = OIDCAppType;
-  public OIDCAuthMethodType: any = OIDCAuthMethodType;
-  public APIAuthMethodType: any = APIAuthMethodType;
-  public OIDCTokenType: any = OIDCTokenType;
-  public OIDCGrantType: any = OIDCGrantType;
+  public OIDCAppType = OIDCAppType;
+  public OIDCAuthMethodType = OIDCAuthMethodType;
+  public APIAuthMethodType = APIAuthMethodType;
+  public OIDCTokenType = OIDCTokenType;
+  public OIDCGrantType = OIDCGrantType;
 
-  public ChangeType: any = ChangeType;
+  public ChangeType = ChangeType;
 
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
-  public copiedKey: any = '';
-  public InfoSectionType: any = InfoSectionType;
+  public InfoSectionType = InfoSectionType;
   public copied: string = '';
 
   public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
-  public currentSetting: string | undefined = this.settingsList[0].id;
+  public currentSetting = this.settingsList[0];
 
   public isNew = signal<boolean>(false);
 
@@ -305,7 +303,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     if (projectId && appId) {
       this.projectId = projectId;
       this.appId = appId;
-      this.getData(projectId, appId);
+      this.getData(projectId, appId).then();
     }
   }
 
@@ -395,7 +393,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 if (this.initialAuthMethod === 'BASIC') {
                   this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
-                  this.currentSetting = 'urls';
+                  this.currentSetting = this.settingsList[0];
                 } else {
                   this.settingsList = [
                     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
@@ -742,13 +740,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
             if (this.currentAuthMethod === 'BASIC') {
               this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
-              this.currentSetting = 'urls';
+              this.currentSetting = this.settingsList[0];
             } else {
               this.settingsList = [
                 { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                 { id: 'urls', i18nKey: 'APP.URLS' },
               ];
-              this.currentSetting = 'configuration';
+              this.currentSetting = this.settingsList[0];
             }
           }
           this.toast.showInfo('APP.TOAST.APIUPDATED', true);
