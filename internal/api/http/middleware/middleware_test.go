@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"os"
 	"testing"
 
 	"golang.org/x/text/language"
@@ -14,5 +15,5 @@ var (
 
 func TestMain(m *testing.M) {
 	i18n.SupportLanguages(SupportedLanguages...)
-	m.Run()
+	os.Exit(m.Run())
 }

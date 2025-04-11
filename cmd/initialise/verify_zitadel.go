@@ -21,7 +21,7 @@ func newZitadel() *cobra.Command {
 		Long: `initialize ZITADEL internals.
 
 Prerequisites:
-- cockroachDB or postgreSQL with user and database
+- postgreSQL with user and database
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
@@ -32,7 +32,7 @@ Prerequisites:
 }
 
 func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config) error {
-	err := ReadStmts(config.Type())
+	err := ReadStmts()
 	if err != nil {
 		return err
 	}
@@ -65,11 +65,6 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 
 	logging.WithFields().Info("verify events tables")
 	if err := createEvents(ctx, conn); err != nil {
-		return err
-	}
-
-	logging.WithFields().Info("verify system sequence")
-	if err := exec(ctx, conn, createSystemSequenceStmt, nil); err != nil {
 		return err
 	}
 

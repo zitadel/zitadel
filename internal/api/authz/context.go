@@ -22,6 +22,7 @@ const (
 	dataKey               key = 2
 	allPermissionsKey     key = 3
 	instanceKey           key = 4
+	systemUserRolesKey    key = 5
 )
 
 type CtxData struct {
@@ -50,7 +51,8 @@ type Memberships []*Membership
 type Membership struct {
 	MemberType  MemberType
 	AggregateID string
-	//ObjectID differs from aggregate id if object is sub of an aggregate
+	InstanceID  string
+	// ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
 	Roles []string

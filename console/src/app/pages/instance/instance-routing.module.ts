@@ -14,6 +14,12 @@ const routes: Routes = [
     data: {
       roles: ['iam.read'],
     },
+    children: [
+      {
+        path: 'actions',
+        loadChildren: () => import('src/app/modules/actions-two/actions-two.module'),
+      },
+    ],
   },
   {
     path: 'members',
