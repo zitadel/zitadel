@@ -432,7 +432,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)
+    // Create User (Human)
+    //
+    // Deprecated: use [ImportHumanUser](apis/mgmt/management-service-import-human-user.api.mdx) instead.
+    //
+    // Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -445,8 +449,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Create User (Human)";
-            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             parameters: {
                 headers: {
@@ -459,7 +461,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)
+    // Create/Import User (Human)
+    //
+    // Deprecated: use [UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
+    //
+    // Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -472,8 +478,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Create/Import User (Human)";
-            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             tags: "User Human"
             parameters: {
@@ -487,7 +491,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)
+    // Create User (Machine)
+    //
+    // Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a user of type machine instead.
+    //
+    // Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
             post: "/users/machine"
@@ -500,8 +508,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Create User (Machine)";
-            description: "Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.\n\nDeprecated: please use user service v2 [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -685,7 +691,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Change user name
+    //
+    // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+    //
+    // Change the username of the user. Be aware that the user has to log in with the newly added username afterward
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -697,8 +707,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Change user name";
-            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward.\n\nDeprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -905,7 +913,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Update User Profile (Human)
+    //
+    // Deprecated: use [user service v2 UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
+    //
+    // Update the profile information from a user. The profile includes basic information like first_name and last_name.
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
@@ -917,11 +929,9 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Update User Profile (Human)";
-            description: "Update the profile information from a user. The profile includes basic information like first_name and last_name.\n\nDeprecated: please use user service v2 [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
+            deprecated: true;
             tags: "Users";
             tags: "User Human";
-            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -972,7 +982,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Update User Email (Human)
+    //
+    // Deprecated: use [user service v2 SetEmail](apis/resources/user_service_v2/user-service-set-email.api.mdx) instead.
+    //
+    // Change the email address of a user. If the state is set to not verified, the user will get a verification email.
     rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/email"
@@ -984,8 +998,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Update User Email (Human)";
-            description: "Change the email address of a user. If the state is set to not verified, the user will get a verification email.\n\nDeprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1041,7 +1053,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Resend User Email Verification
+    //
+    // Deprecated: use [user service v2 ResendEmailCode](apis/resources/user_service_v2/user-service-resend-email-code.api.mdx) instead.
+    //
+    // Resend the email verification notification to the given email address of the user.
     rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/email/_resend_verification"
@@ -1053,8 +1069,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Resend User Email Verification";
-            description: "Resend the email verification notification to the given email address of the user.\n\nDeprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1108,7 +1122,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Update User Phone (Human)
+    //
+    // Deprecated: use [user service v2 SetPhone](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+    //
+    // Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/phone"
@@ -1120,8 +1138,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Update User Phone (Human)";
-            description: "Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).\n\nDeprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1142,7 +1158,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 RemovePhone](apis/resources/user_service_v2/user-service-remove-phone.api.mdx)
+    // Remove User Phone (Human)
+    //
+    // Deprecated: use user service v2 [user service v2 SetPhone](apis/resources/user_service_v2/user-service-set-phone.api.mdx) instead.
+    //
+    // Remove the configured phone number of a user.
     rpc RemoveHumanPhone(RemoveHumanPhoneRequest) returns (RemoveHumanPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/phone"
@@ -1153,8 +1173,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Remove User Phone (Human)";
-            description: "Remove the configured phone number of a user.\n\nDeprecated: please use [user service v2 RemovePhone](apis/resources/user_service_v2/user-service-remove-phone.api.mdx)"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1175,7 +1193,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ResendPhoneCode
+    // Resend User Phone Verification
+    //
+    // Deprecated: use user service v2 [user service v2 ResendPhoneCode](apis/resources/user_service_v2/user-service-resend-phone-code.api.mdx) instead.
+    //
+    // Resend the notification for the verification of the phone number, to the number stored on the user.
     rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/phone/_resend_verification"
@@ -1187,8 +1209,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Resend User Phone Verification";
-            description: "Resend the notification for the verification of the phone number, to the number stored on the user.\n\nDeprecated: please use user service v2 ResendPhoneCode"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1240,7 +1260,9 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Set Human Initial Password
+    //
+    // Deprecated: use [user service v2 SetPassword](apis/resources/user_service_v2/user-service-set-password.api.mdx) instead.
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_initialize"
@@ -1254,7 +1276,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Human";
-            summary: "Set Human Initial Password\n\nDeprecated: please use user service v2 SetPassword";
             deprecated: true;
             parameters: {
                 headers: {
@@ -1267,7 +1288,9 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Set User Password
+    //
+    // Deprecated: use [user service v2 SetPassword](apis/resources/user_service_v2/user-service-set-password.api.mdx) instead.
     rpc SetHumanPassword(SetHumanPasswordRequest) returns (SetHumanPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password"
@@ -1279,8 +1302,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Set User Password";
-            description: "Set a new password for a user. Per default, the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login.\n\nDeprecated: please use user service v2 SetPassword"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1301,7 +1322,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 PasswordReset
+    // Send Reset Password Notification
+    //
+    // Deprecated: use [user service v2 PasswordReset](apis/resources/user_service_v2/user-service-password-reset.api.mdx) instead.
+    //
+    // The user will receive an email with a link to change the password.
     rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_reset"
@@ -1313,8 +1338,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Send Reset Password Notification";
-            description: "The user will receive an email with a link to change the password.\n\nDeprecated: please use user service v2 PasswordReset"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1631,7 +1654,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)
+    // Update Machine User
+    //
+    // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type machine instead.
+    //
+    // Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/machine"
@@ -1643,9 +1670,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deprecated: Update Machine User";
             deprecated: true;
-            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.\n\nDeprecated: please use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1665,7 +1690,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 AddSecret](apis/resources/user_service_v2/user-service-add-secret.api.mdx)
+    // Create Secret for Machine User
+    //
+    // Deprecated: use [user service v2 AddSecret](apis/resources/user_service_v2/user-service-add-secret.api.mdx) instead.
+    //
+    // Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant).
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/secret"
@@ -1678,8 +1707,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Create Secret for Machine User";
-            description: "Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant).\n\nplease use [user service v2 AddSecret](apis/resources/user_service_v2/user-service-add-secret.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1699,7 +1726,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 RemoveSecret](apis/resources/user_service_v2/user-service-remove-secret.api.mdx)
+    // Delete Secret of Machine User
+    //
+    // Deprecated: use [user service v2 RemoveSecret](apis/resources/user_service_v2/user-service-remove-secret.api.mdx) instead.
+    //
+    // Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward.
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/secret"
@@ -1711,8 +1742,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Delete Secret of Machine User";
-            description: "Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward.\n\nDeprecated: please use [user service v2 RemoveSecret](apis/resources/user_service_v2/user-service-remove-secret.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1795,7 +1824,14 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 AddKey](apis/resources/user_service_v2/user-service-add-key.api.mdx)
+    // Create Key for machine user
+    //
+    // Deprecated: use [user service v2 AddKey](apis/resources/user_service_v2/user-service-add-key.api.mdx) instead.
+    //
+    // If a public key is not supplied, a new key is generated and will be returned in the response.
+    // Make sure to store the returned key.
+    // If an RSA public key is supplied, the private key is omitted from the response.
+    // Machine keys are used to authenticate with jwt profile.
     rpc AddMachineKey(AddMachineKeyRequest) returns (AddMachineKeyResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys"
@@ -1808,8 +1844,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Create Key for machine user";
-            description: "If a public key is not supplied, a new key is generated and will be returned in the response. Make sure to store the returned key. If an RSA public key is supplied, the private key is omitted from the response. Machine keys are used to authenticate with jwt profile.\n\nDeprecated: please use [user service v2 AddKey](apis/resources/user_service_v2/user-service-add-key.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1829,7 +1863,12 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 RemoveKey](apis/resources/user_service_v2/user-service-remove-key.api.mdx)
+    // Delete Key for machine user
+    //
+    // Deprecated: use [user service v2 RemoveKey](apis/resources/user_service_v2/user-service-remove-key.api.mdx) instead.
+    //
+    // Delete a specific key from a user.
+    // The user will not be able to authenticate with that key afterward.
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/keys/{key_id}"
@@ -1841,8 +1880,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Delete Key for machine user";
-            description: "Delete a specific key from a user. The user will not be able to authenticate with that key afterward.\n\nDeprecated: please use [user service v2 RemoveKey](apis/resources/user_service_v2/user-service-remove-key.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1925,7 +1962,13 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 AddPersonalAccessToken](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx)
+    // Create a Personal-Access-Token (PAT)
+    //
+    // Deprecated: use [user service v2 AddPersonalAccessToken](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) instead.
+    //
+    // Generates a new PAT for the user. Currently only available for machine users.
+    // The token will be returned in the response, make sure to store it.
+    // PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/pats"
@@ -1938,8 +1981,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Create a Personal-Access-Token (PAT)";
-            description: "Generates a new PAT for the user. Currently only available for machine users. The token will be returned in the response, make sure to store it. PATs are ready-to-use tokens and can be sent directly in the authentication header.Deprecated: please use [user service v2 AddPersonalAccessToken](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1959,7 +2000,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 RemovePersonalAccessToken](apis/resources/user_service_v2/user-service-remove-personal-access-token.api.mdx)
+    // Remove a Personal-Access-Token (PAT) by ID
+    //
+    // Deprecated: use [user service v2 RemovePersonalAccessToken](apis/resources/user_service_v2/user-service-remove-personal-access-token.api.mdx) instead.
+    //
+    // Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore.
     rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/pats/{token_id}"
@@ -1971,8 +2016,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             deprecated: true;
-            summary: "Deprecated: Remove a Personal-Access-Token (PAT) by ID";
-            description: "Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore.\n\nDeprecated: please use [user service v2 RemovePersonalAccessToken](apis/resources/user_service_v2/user-service-remove-personal-access-token.api.mdx)"
             tags: "Users";
             tags: "User Machine";
             responses: {

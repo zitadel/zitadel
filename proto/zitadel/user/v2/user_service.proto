@@ -123,9 +123,53 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserService {
 
-  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
+  // CreateUser
   //
+  // CreateUser creates a new human or machine user in the specified organization.
+  //
+  // Required permission:
+  //   - user.write
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      // The /new path segment does not follow Zitadels API design.
+      // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
+      post: "/v2/users/new"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "201"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
   // Create a new human user
+  //
+  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a new user of type human instead.
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -146,8 +190,6 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      summary: "Deprecated: Add Human User";
-      description: "Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -226,9 +268,9 @@ service UserService {
     };
   }
 
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-  //
   // Change the user email
+  //
+  // Deprecated: [Update the users email field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
   //
   // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
@@ -245,8 +287,6 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      summary: "Deprecated: SetEmail";
-      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -262,9 +302,9 @@ service UserService {
     };
   }
 
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-  //
   // Resend code to verify user email
+  //
+  // Deprecated: [Update the users email verification](apis/resources/user_service_v2/user-service-update-user.api.mdx) and leave the email address empty to resend a verification code for the current email address.
   //
   // Resend code to verify user email.
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
@@ -281,8 +321,6 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      summary: "Deprecated: ResendEmailCode";
-      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -298,9 +336,9 @@ service UserService {
     };
   }
 
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-  //
   // Send code to verify user email
+  //
+  // Deprecated: [Update the users email verification](apis/resources/user_service_v2/user-service-update-user.api.mdx) and leave the email address empty to resend a verification code for the current email address.
   //
   // Send code to verify user email.
   rpc SendEmailCode (SendEmailCodeRequest) returns (SendEmailCodeResponse) {
@@ -317,8 +355,6 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      summary: "Deprecated: SendEmailCode";
-      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -365,9 +401,9 @@ service UserService {
     };
   }
 
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-  //
   // Set the user phone
+  //
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
   //
   // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
@@ -384,8 +420,6 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      summary: "Deprecated: SetPhone";
-      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -434,9 +468,9 @@ service UserService {
     };
   }
 
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-  //
   // Resend code to verify user phone
+  //
+  // Deprecated: [Update the users phone verification](apis/resources/user_service_v2/user-service-update-user.api.mdx) and leave the phone number empty to resend a code.
   //
   // Resend code to verify user phone.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
@@ -501,9 +535,61 @@ service UserService {
     };
   }
 
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+
+  // UpdateUser
   //
+  // UpdateUser allows to partially update an existing user.
+  // Specify the side effects if you change the users email, phone or password.
+  //
+  // Required permission:
+  //   - user.write
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/v2/users/{user_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
   // Update User
+  //
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type human instead.
   //
   // Update all information from a user..
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
@@ -520,8 +606,6 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       deprecated: true;
-      summary: "Deprecated: Update Human User";
-      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -1276,8 +1360,6 @@ service UserService {
     };
   }
 
-  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-  //
   // Request a code to reset a password
   //
   // Request a code to reset a password..
@@ -1294,9 +1376,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
-      summary: "Deprecated: PasswordReset";
-      description: "Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx)"
       responses: {
         key: "200"
         value: {
@@ -1314,6 +1393,8 @@ service UserService {
 
   // Change password
   //
+  // Deprecated: [Update the users password](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Change the password of a user with either a verification code or the current password..
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
@@ -1328,6 +1409,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1510,100 +1592,6 @@ service UserService {
           description: "User ID does not exist.";
         }
       }
-    };
-  }
-
-  // CreateUser
-  //
-  // CreateUser creates a new human or machine user in the specified organization.
-  //
-  // Required permission:
-  //   - user.write
-  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
-    option (google.api.http) = {
-      // The /new path segment does not follow Zitadels API design.
-      // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
-      post: "/v2/users/new"
-      body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-      http_response: {
-        success_code: 201
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "201"
-        value: {
-          description: "OK";
-        }
-      };
-      responses: {
-        key: "409"
-        value: {
-          description: "The user already exists.";
-          schema: {
-            json_schema: {
-              ref: "#/definitions/rpcStatus";
-            };
-          };
-        }
-      };
-    };
-  }
-
-  // UpdateUser
-  //
-  // UpdateUser allows to partially update an existing user.
-  //
-  // Required permission:
-  //   - user.write
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
-    option (google.api.http) = {
-      patch: "/v2/users/{user_id}"
-      body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200"
-        value: {
-          description: "OK";
-        }
-      };
-      responses: {
-        key: "404";
-        value: {
-          description: "User ID does not exist.";
-          schema: {
-            json_schema: {
-              ref: "#/definitions/rpcStatus";
-            };
-          };
-        }
-      }
-      responses: {
-        key: "409"
-        value: {
-          description: "The user already exists.";
-          schema: {
-            json_schema: {
-              ref: "#/definitions/rpcStatus";
-            };
-          };
-        }
-      };
     };
   }
 
@@ -1869,6 +1857,111 @@ message AddHumanUserResponse {
   optional string phone_code = 4;
 }
 
+
+message CreateUserRequest{
+  message Human {
+    SetHumanProfile profile = 1 [
+      (validate.rules).message.required = true,
+      (google.api.field_behavior) = REQUIRED
+    ];
+    // change the users email address and/or trigger a verification email
+    SetHumanEmail email = 2 [
+      (validate.rules).message.required = true,
+      (google.api.field_behavior) = REQUIRED
+    ];
+    // change the users phone number and/or trigger a verification SMS
+    optional SetHumanPhone phone = 3;
+    // set the users password and or require the user to set a new password without resetting it
+    oneof password_type {
+      option (validate.required) = true;
+      Password password = 4;
+      HashedPassword hashed_password = 5;
+    }
+    // Create the user with a list of links to identity providers.
+    // This can be useful in migration-scenarios.
+    // For example, if a user already has an account in an external identity provider or another Zitadel instance, an IDP link allows the user to authenticate as usual.
+    // Sessions, second factors, hardware keys registered externally are still available for authentication.
+    // Use the following endpoints to manage identity provider links:
+    // - [AddIDPLink](apis/resources/user_service_v2/user-service-add-idp-link.api.mdx)
+    // - [RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
+    repeated IDPLink idp_links = 7;
+    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
+    // Currently no other options are supported, and if anything different is used the validation will fail.
+    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
+    optional string totp_secret = 8 [
+      (validate.rules).string = {max_len: 200}
+    ];
+  }
+  message Machine {
+    // name is a human readable field that helps identifying the user.
+    // For example "Acceptance Test User"
+    string name = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 200}
+    ];
+    // description is a field that helps noting down the purpose of the user.
+    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
+    optional string description = 2 [
+      (validate.rules).string = {max_len: 500}
+    ];
+  }
+
+  reserved 4 to 9;
+  // Specify in which organization the user should be created.
+  zitadel.object.v2.Organization organization = 1 [
+    (validate.rules).message.required = true
+  ];
+  // optionally set your own unique id for the user.
+  // This is useful in migration scenarios, for example if the user already has an ID in another Zitadel system.
+  // For example "163840776835432345"
+  optional string user_id = 2 [
+    (validate.rules).string = {max_len: 200}
+  ];
+
+  // optionally set a username that is unique within the instance.
+  // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
+  // For example "minnie-mouse"
+  optional string username = 3 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // The type of the user.
+  oneof user_type {
+    option (validate.required) = true;
+    // Users of type human are users that are meant to be used by a person.
+    // They can log in interactively using a login UI.
+    // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
+    // To make sure these messages are sent, configure and activate valid SMTP and Twilio configurations.
+    // Read more about your options for controlling this behaviour in the email and phone field documentations.
+    Human human = 10;
+    // Users of type machine are users that are meant to be used by a machine.
+    // In order to authenticate, [add a secret](apis/resources/user_service_v2/user-service-add-secret.api.mdx), [a key](apis/resources/user_service_v2/user-service-add-key.api.mdx) or [a personal access token](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) to the user.
+    // Tokens generated for new users of type machine will be of an opaque Bearer type.
+    // You can change the users token type to JWT by using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
+    Machine machine = 11;
+  }
+}
+
+message CreateUserResponse {
+  // The unique identifier of the newly created user.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the user creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The
+  optional string email_code = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"XTA6BC\"";
+    }
+  ];
+  optional string phone_code = 4;
+}
+
 message GetUserByIDRequest {
   reserved 2;
   reserved "organization";
@@ -2121,6 +2214,98 @@ message DeleteUserRequest {
 
 message DeleteUserResponse {
   zitadel.object.v2.Details details = 1;
+}
+
+
+message UpdateUserRequest{
+  message Human {
+    message Profile {
+      // given_name is the first name of the user.
+      // It can be used to personalize notifications.
+      // For example "Minnie" in "Minnie Mouse".
+      optional string given_name = 1  [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // family_name is the last name of the user.
+      // It can be used to personalize notifications.
+      // For example "Mouse" in "Minnie Mouse".
+      optional string family_name = 2  [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // nick_name can be used to personalize notifications.
+      // For example "Mini" for "Minnie Mouse".
+      optional string nick_name = 3 [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // display_name is the name of the user that is primarily displayed in the UI.
+      // For example "Minnie Mouse"
+      optional string display_name = 4 [
+        (validate.rules).string = {max_len: 200}
+      ];
+      // preferred_language is the language that is primarily used by the user.
+      // It is used where no higher prioritized preferred language can be used.
+      // Notification messages use the users preferred language if available.
+      // Instance and organization settings can define a default language for users without a specific preferred language.
+      // Browser settings can overwrite a users preferred_language.
+      // For example "en-US" for "English (United States)" or "de-DE" for "German (Germany)".
+      optional string preferred_language = 5 [
+        (validate.rules).string = {max_len: 10}
+      ];
+      // gender can be used to personalize notifications.
+      // For example "GENDER_FEMALE"
+      optional Gender gender = 6;
+    }
+    // change the users profile information
+    optional Profile profile = 1;
+    // change the users email address and/or trigger a verification email
+    optional SetHumanEmail email = 2;
+    // change the users phone number and/or trigger a verification SMS
+    optional SetHumanPhone phone = 3;
+    // change the users password.
+    optional SetPassword password = 4;
+    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
+    // Currently no other options are supported, and if anything different is used the validation will fail.
+    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
+    optional string totp_secret = 5 [
+      (validate.rules).string = {max_len: 200}
+    ];
+  }
+  message Machine {
+    // name is a human readable field that helps identifying the user.
+    // For example "Acceptance Test User"
+    optional string name = 1 [
+      (validate.rules).string = {max_len: 200}
+    ];
+    // description is a field that helps noting down the purpose of the user.
+    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
+    optional string description = 2 [
+      (validate.rules).string = {max_len: 500}
+    ];
+  }
+  reserved 3 to 9;
+  // The users resource ID.
+  // For example "163840776835432345"
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200}
+  ];
+  // optionally set a username that is unique within the instance.
+  // For example "minnie-mouse"
+  optional string username = 2 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // optionally change type specific properties of the user.
+  oneof user_type {
+    Human human = 10;
+    Machine machine = 11;
+  }
+}
+
+message UpdateUserResponse {
+  zitadel.object.v2.Details details = 1;
+  // in case the email verification was set to return_code, the code will be returned
+  optional string email_code = 2;
+  // in case the phone verification was set to return_code, the code will be returned
+  optional string phone_code = 3;
 }
 
 message UpdateHumanUserRequest{
@@ -2955,352 +3140,6 @@ message HumanMFAInitSkippedRequest {
 
 message HumanMFAInitSkippedResponse {
   zitadel.object.v2.Details details = 1;
-}
-
-message CreateUserRequest{
-  message Human {
-    message Profile {
-      // given_name is the first name of the user.
-      // It can be used to personalize notifications.
-      // For example "Minnie" in "Minnie Mouse".
-      string given_name = 1  [
-        (validate.rules).string = {min_len: 1, max_len: 200}
-      ];
-      // family_name is the last name of the user.
-      // It can be used to personalize notifications.
-      // For example "Mouse" in "Minnie Mouse".
-      string family_name = 2  [
-        (validate.rules).string = {min_len: 1, max_len: 200}
-      ];
-      // nick_name can be used to personalize notifications.
-      // For example "Mini" for "Minnie Mouse".
-      optional string nick_name = 3 [
-        (validate.rules).string = {max_len: 200}
-      ];
-      // display_name is the name of the user that is primarily displayed in the UI.
-      // For example "Minnie Mouse"
-      optional string display_name = 4 [
-        (validate.rules).string = {max_len: 200}
-      ];
-      // preferred_language is the language that is primarily used by the user.
-      // It is used where no higher prioritized preferred language can be used.
-      // Notification messages use the users preferred language if available.
-      // Instance and organization settings can define a default language for users without a specific preferred language.
-      // Browser settings can overwrite a users preferred_language.
-      // For example "en-US" for "English (United States)" or "de-DE" for "German (Germany)".
-      optional string preferred_language = 5 [
-        (validate.rules).string = {max_len: 10}
-      ];
-      // gender can be used to personalize notifications.
-      // For example "GENDER_FEMALE"
-      optional Gender gender = 6;
-    }
-    message Email {
-      // set the email address of the user.
-      // For example "mini@mouse.com"
-      string email = 1 [
-        (validate.rules).string = {min_len: 2, max_len: 200, email: true}
-      ];
-      // if no verification is specified, an email is sent with the default url
-      oneof verification {
-        // Use send_code if Zitadel should send a verification email to the user.
-        SendEmailVerificationCode send_code = 2;
-        // Use return_code if you want to send the verification email to the user yourself.
-        ReturnEmailVerificationCode return_code = 3;
-        // If the user should not receive a verification email at all, set is_verified to true.
-        // If is_verified is true and the email address is empty, the current email address is marked as verified.
-        // This is useful...
-        // - ...in migration scenarios, where the user has their email already verified, for example in another Zitadel instance.
-        // - ...if no valid and active SMTP provider configuration is available for the Zitadel instance, for example in development or test instances.
-        bool is_verified = 4 [
-          (validate.rules).bool.const = true
-        ];
-      }
-    }
-    message Phone {
-      // set the phone number of the user.
-      // For example "+14151231234"
-      string phone = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200}
-      ];
-      // if no verification is specified, an SMS is sent with the verification code
-      oneof verification {
-        // Use send_code if Zitadel should send a verification SMS to the user.
-        // This is the default behavior.
-        SendPhoneVerificationCode send_code = 2;
-        // Use return_code if you want to send the verification SMS to the user yourself.
-        ReturnPhoneVerificationCode return_code = 3;
-        // If the user should not receive a verification SMS at all, set is_verified to true.
-        // If is_verified is true and the phone number is empty, the current phone number is marked as verified if it is set.
-        // This is useful...
-        // - ...in migration scenarios, where the user has their phone already verified, for example in another Zitadel instance.
-        // - ...if no valid Twilio configuration is available for the Zitadel instance, for example in development or test instances.
-        bool is_verified = 4 [
-          (validate.rules).bool.const = true
-        ];
-      }
-    }
-    message Password {
-      oneof password {
-        option (validate.required) = true;
-        // set an initial password for the user
-        string plain_password = 4 [
-          (validate.rules).string = {min_len: 1, max_len: 200}
-        ];
-        // import a hashed password from another system
-        // This allows migrating your users from your own system to Zitadel without necessarily requiring the user to reset the password.
-        // Please [check the required format and supported algorithms](/docs/concepts/architecture/secrets).
-        string hashed_password = 5 [
-          (validate.rules).string = {min_len: 1, max_len: 200}
-        ];
-      }
-      // By default, the user is required to set a new password.
-      // This can be avoided by setting skip_password_change to true.
-      optional bool skip_password_change = 6 [
-        (validate.rules).bool = {const: true}
-      ];
-    }
-    Profile profile = 1 [
-      (validate.rules).message.required = true
-    ];
-    Email email = 2 [
-      (validate.rules).message.required = true
-    ];
-    optional Phone phone = 3;
-    Password password = 4 [
-      (validate.rules).message.required = true
-    ];
-    // Create the user with a list of links to identity providers.
-    // This can be useful in migration-scenarios.
-    // For example, if a user already has an account in an external identity provider or another Zitadel instance, an IDP link allows the user to authenticate as usual.
-    // Sessions, second factors, hardware keys registered externally are still available for authentication.
-    // Use the following endpoints to manage identity provider links:
-    // - [AddIDPLink](apis/resources/user_service_v2/user-service-add-idp-link.api.mdx)
-    // - [RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
-    repeated IDPLink idp_links = 7;
-    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
-    // Currently no other options are supported, and if anything different is used the validation will fail.
-    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
-    optional string totp_secret = 8 [
-      (validate.rules).string = {max_len: 200}
-    ];
-  }
-  message Machine {
-    // name is a human readable field that helps identifying the user.
-    // For example "Acceptance Test User"
-    string name = 1 [
-      (validate.rules).string = {min_len: 1, max_len: 200}
-    ];
-    // description is a field that helps noting down the purpose of the user.
-    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
-    optional string description = 2 [
-      (validate.rules).string = {max_len: 500}
-    ];
-  }
-
-  reserved 4 to 9;
-  // Specify in which organization the user should be created.
-  zitadel.object.v2.Organization organization = 1 [
-    (validate.rules).message.required = true
-  ];
-  // optionally set your own unique id for the user.
-  // This is useful in migration scenarios, for example if the user already has an ID in another Zitadel system.
-  // For example "163840776835432345"
-  optional string user_id = 2 [
-    (validate.rules).string = {max_len: 200}
-  ];
-
-  // optionally set a username that is unique within the instance.
-  // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
-  // For example "minnie-mouse"
-  optional string username = 3 [
-    (validate.rules).string = {max_len: 200}
-  ];
-  // The type of the user.
-  oneof user_type {
-    option (validate.required) = true;
-    // Users of type human are users that are meant to be used by a person.
-    // They can log in interactively using a login UI.
-    // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
-    // To make sure these messages are sent, configure and activate valid SMTP and Twilio configurations.
-    // Read more about your options for controlling this behaviour in the email and phone field documentations.
-    Human human = 10;
-    // Users of type machine are users that are meant to be used by a machine.
-    // In order to authenticate, [add a secret](apis/resources/user_service_v2/user-service-add-secret.api.mdx), [a key](apis/resources/user_service_v2/user-service-add-key.api.mdx) or [a personal access token](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) to the user.
-    // Tokens generated for new users of type machine will be of an opaque Bearer type.
-    // You can change the users token type to JWT using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
-    Machine machine = 11;
-  }
-}
-
-message CreateUserResponse {
-  zitadel.object.v2.Details details = 1;
-  string user_id = 2;
-  optional string email_code = 3;
-  optional string phone_code = 4;
-}
-
-message UpdateUserRequest{
-  message Human {
-    message Profile {
-      // given_name is the first name of the user.
-      // It can be used to personalize notifications.
-      // For example "Minnie" in "Minnie Mouse".
-      optional string given_name = 1  [
-        (validate.rules).string = {max_len: 200}
-      ];
-      // family_name is the last name of the user.
-      // It can be used to personalize notifications.
-      // For example "Mouse" in "Minnie Mouse".
-      optional string family_name = 2  [
-        (validate.rules).string = {max_len: 200}
-      ];
-      // nick_name can be used to personalize notifications.
-      // For example "Mini" for "Minnie Mouse".
-      optional string nick_name = 3 [
-        (validate.rules).string = {max_len: 200}
-      ];
-      // display_name is the name of the user that is primarily displayed in the UI.
-      // For example "Minnie Mouse"
-      optional string display_name = 4 [
-        (validate.rules).string = {max_len: 200}
-      ];
-      // preferred_language is the language that is primarily used by the user.
-      // It is used where no higher prioritized preferred language can be used.
-      // Notification messages use the users preferred language if available.
-      // Instance and organization settings can define a default language for users without a specific preferred language.
-      // Browser settings can overwrite a users preferred_language.
-      // For example "en-US" for "English (United States)" or "de-DE" for "German (Germany)".
-      optional string preferred_language = 5 [
-        (validate.rules).string = {max_len: 10}
-      ];
-      // gender can be used to personalize notifications.
-      // For example "GENDER_FEMALE"
-      optional Gender gender = 6;
-    }
-    message Email {
-      // optionally change the email address of the user.
-      // Leave it empty to resend a verification email to the current email address.
-      // For example "mini@mouse.com"
-      optional string email = 1 [
-        (validate.rules).string = {max_len: 200, email: true}
-      ];
-      oneof verification {
-        option (validate.required) = true;
-        // Use send_code if Zitadel should send a verification email to the user.
-        SendEmailVerificationCode send_code = 2;
-        // Use return_code if you want to send the verification email to the user yourself.
-        ReturnEmailVerificationCode return_code = 3;
-        // If the user should not receive a verification email at all, set is_verified to true.
-        // If is_verified is true and the email address is empty, the current email address is marked as verified.
-        // This is useful...
-        // - ...in migration scenarios, where the user has their email already verified, for example in another Zitadel instance.
-        // - ...if no valid and active SMTP provider configuration is available for the Zitadel instance, for example in development or test instances.
-        bool is_verified = 4[
-          (validate.rules).bool.const = true
-        ];
-      }
-    }
-    message Phone {
-      // optionally change the phone number of the user.
-      // Leave it empty to resend a verification SMS to the current phone number, if it is set.
-      // For example "+14151231234"
-      optional string phone = 1 [
-        (validate.rules).string = {max_len: 200}
-      ];
-      oneof verification {
-        option (validate.required) = true;
-        // Use send_code if Zitadel should send a verification SMS to the user.
-        // This is the default behavior.
-        SendPhoneVerificationCode send_code = 2;
-        // Use return_code if you want to send the verification SMS to the user yourself.
-        ReturnPhoneVerificationCode return_code = 3;
-        // If the user should not receive a verification SMS at all, set is_verified to true.
-        // If is_verified is true and the phone number is empty, the current phone number is marked as verified if it is set.
-        // This is useful...
-        // - ...in migration scenarios, where the user has their phone already verified, for example in another Zitadel instance.
-        // - ...if no valid Twilio configuration is available for the Zitadel instance, for example in development or test instances.
-        bool is_verified = 4 [
-          (validate.rules).bool.const = true
-        ];
-      }
-    }
-    message Password {
-      // optionally change the users password
-      // The user is required to set a new own password unless skip_password_change is set to true.
-      oneof password {
-        option (validate.required) = true;
-        // change the users password if it is forgotten
-        string plain_password = 1 [
-          (validate.rules).string = {min_len: 1, max_len: 200}
-        ];
-        // import a hashed password from another system
-        // This allows migrating your users from your own system to Zitadel without necessarily requiring the user to reset the password.
-        // Setting a previously hashed password also allows to securely handle lockout scenarios.
-        // Please [check the required format and supported algorithms](/docs/concepts/architecture/secrets).
-        string hashed_password = 2 [
-          (validate.rules).string = {min_len: 1, max_len: 200}
-        ];
-        // To trigger a password change without setting a new password, set use_current_password to true and omit skip_password_change.
-        bool use_current_password = 3 [
-          (validate.rules).bool = {const: true}
-        ];
-      }
-      // By default, the user is required to set a new password.
-      // This can be avoided by setting skip_password_change to true.
-      optional bool skip_password_change = 4 [
-        (validate.rules).bool = {const: true}
-      ];
-    }
-    // change the users profile information
-    optional Profile profile = 1;
-    // change the users email address or trigger a verification email
-    optional Email email = 2;
-    // change the users phone number or trigger a verification SMS
-    optional Phone phone = 3;
-    // change the users password or require the user to set a new password without resetting it
-    optional Password password = 4;
-    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
-    // Currently no other options are supported, and if anything different is used the validation will fail.
-    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
-    optional string totp_secret = 5 [
-      (validate.rules).string = {max_len: 200}
-    ];
-  }
-  message Machine {
-    // name is a human readable field that helps identifying the user.
-    // For example "Acceptance Test User"
-    optional string name = 1 [
-      (validate.rules).string = {max_len: 200}
-    ];
-    // description is a field that helps noting down the purpose of the user.
-    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
-    optional string description = 2 [
-      (validate.rules).string = {max_len: 500}
-    ];
-  }
-  reserved 3 to 9;
-  // The users resource ID.
-  // For example "163840776835432345"
-  string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200}
-  ];
-  // optionally set a username that is unique within the instance.
-  // For example "minnie-mouse"
-  optional string username = 2 [
-    (validate.rules).string = {max_len: 200}
-  ];
-  // optionally change type specific properties of the user.
-  oneof user_type {
-    Human human = 10;
-    Machine machine = 11;
-  }
-}
-
-message UpdateUserResponse {
-  zitadel.object.v2.Details details = 1;
-  optional string email_code = 2;
-  optional string phone_code = 3;
 }
 
 message AddSecretRequest {

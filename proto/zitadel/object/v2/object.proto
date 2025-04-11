@@ -18,7 +18,6 @@ message Organisation {
 
 message Organization {
   oneof org {
-    option (validate.required) = true;
     string org_id = 1;
     string org_domain = 2;
   }
