@@ -3,41 +3,21 @@
 package setup_test
 
 import (
-	"context"
-	"os"
+	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/permission"
 )
-
-const ConnString = "host=localhost port=5432 user=zitadel dbname=zitadel sslmode=disable"
-
-var (
-	CTX    context.Context
-	dbPool *pgxpool.Pool
-)
-
-func TestMain(m *testing.M) {
-	var cancel context.CancelFunc
-	CTX, cancel = context.WithTimeout(context.Background(), time.Second*10)
-
-	var err error
-	dbPool, err = pgxpool.New(context.Background(), ConnString)
-	if err != nil {
-		panic(err)
-	}
-	exit := m.Run()
-	cancel()
-	dbPool.Close()
-	os.Exit(exit)
-}
 
 func TestGetSystemPermissions(t *testing.T) {
 	const query = "SELECT * FROM eventstore.get_system_permissions($1, $2);"
@@ -540,4 +520,182 @@ func TestCheckSystemUserPerms(t *testing.T) {
 			assert.JSONEq(t, tt.want, got)
 		})
 	}
+}
+
+func TestPermittedOrgs(t *testing.T) {
+	t.Parallel()
+
+	tx, err := dbPool.Begin(CTX)
+	require.NoError(t, err)
+	defer tx.Rollback(CTX)
+
+	// Insert a couple of deterministic field rows to test the function.
+	// Data will not persist, because the transaction is rolled back.
+	createRolePermission(t, tx, "IAM_OWNER", []string{"org.write", "org.read"})
+	createRolePermission(t, tx, "ORG_OWNER", []string{"org.write", "org.read"})
+	createMember(t, tx, instance.AggregateType, "instance_user")
+	createMember(t, tx, org.AggregateType, "org_user")
+
+	const query = "SELECT instance_permitted, org_ids FROM eventstore.permitted_orgs($1,$2,$3,$4,$5);"
+	type args struct {
+		reqInstanceID   string
+		authUserID      string
+		systemUserPerms []authz.SystemUserPermissions
+		perm            string
+		filterOrg       string
+	}
+	type result struct {
+		InstancePermitted bool
+		OrgIDs            pgtype.FlatArray[string]
+	}
+	tests := []struct {
+		name string
+		args args
+		want result
+	}{
+		{
+			name: "system user, instance",
+			args: args{
+				reqInstanceID: instanceID,
+				systemUserPerms: []authz.SystemUserPermissions{{
+					MemberType:  authz.MemberTypeSystem,
+					Permissions: []string{"org.write", "org.read"},
+				}},
+				perm: "org.read",
+			},
+			want: result{
+				InstancePermitted: true,
+				OrgIDs:            pgtype.FlatArray[string]{},
+			},
+		},
+		{
+			name: "system user, orgs",
+			args: args{
+				reqInstanceID: instanceID,
+				systemUserPerms: []authz.SystemUserPermissions{{
+					MemberType:  authz.MemberTypeOrganization,
+					AggregateID: orgID,
+					Permissions: []string{"org.read", "org.write", "org.policy.read", "project.read", "project.write"},
+				}},
+				perm: "org.read",
+			},
+			want: result{
+				InstancePermitted: false,
+				OrgIDs: pgtype.FlatArray[string]{
+					orgID,
+				},
+			},
+		},
+		{
+			name: "instance member",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "instance_user",
+				perm:          "org.read",
+			},
+			want: result{
+				InstancePermitted: true,
+			},
+		},
+		{
+			name: "org member",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "org_user",
+				perm:          "org.read",
+			},
+			want: result{
+				InstancePermitted: false,
+				OrgIDs: pgtype.FlatArray[string]{
+					orgID,
+				},
+			},
+		},
+		{
+			name: "org member, filter",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "org_user",
+				perm:          "org.read",
+				filterOrg:     orgID,
+			},
+			want: result{
+				InstancePermitted: false,
+				OrgIDs: pgtype.FlatArray[string]{
+					orgID,
+				},
+			},
+		},
+		{
+			name: "org member, filter wrong org",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "org_user",
+				perm:          "org.read",
+				filterOrg:     "foobar",
+			},
+			want: result{
+				InstancePermitted: false,
+				OrgIDs:            pgtype.FlatArray[string]{},
+			},
+		},
+		{
+			name: "no permission",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "foobar",
+				perm:          "org.read",
+				filterOrg:     orgID,
+			},
+			want: result{
+				InstancePermitted: false,
+				OrgIDs:            pgtype.FlatArray[string]{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rows, err := tx.Query(CTX, query, tt.args.reqInstanceID, tt.args.authUserID, database.NewJSONArray(tt.args.systemUserPerms), tt.args.perm, tt.args.filterOrg)
+			require.NoError(t, err)
+			got, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByPos[result])
+			require.NoError(t, err)
+			assert.Equal(t, tt.want.InstancePermitted, got.InstancePermitted)
+			assert.ElementsMatch(t, tt.want.OrgIDs, got.OrgIDs)
+		})
+	}
+}
+
+const (
+	instanceID = "instanceID"
+	orgID      = "orgID"
+)
+
+func createRolePermission(t *testing.T, tx pgx.Tx, role string, permissions []string) {
+	for _, perm := range permissions {
+		createTestField(t, tx, instanceID, permission.AggregateType, instanceID, "role_permission", role, "permission", perm)
+	}
+}
+
+func createMember(t *testing.T, tx pgx.Tx, aggregateType eventstore.AggregateType, userID string) {
+	var err error
+	switch aggregateType {
+	case instance.AggregateType:
+		createTestField(t, tx, instanceID, aggregateType, instanceID, "instance_member_role", userID, "instance_role", "IAM_OWNER")
+	case org.AggregateType:
+		createTestField(t, tx, orgID, aggregateType, orgID, "org_member_role", userID, "org_role", "ORG_OWNER")
+	default:
+		panic("unknown aggregate type " + aggregateType)
+	}
+	require.NoError(t, err)
+}
+
+func createTestField(t *testing.T, tx pgx.Tx, resourceOwner string, aggregateType eventstore.AggregateType, aggregateID, objectType, objectID, fieldName string, value any) {
+	const query = `INSERT INTO eventstore.fields(
+		instance_id, resource_owner, aggregate_type, aggregate_id, object_type, object_id, field_name, value, value_must_be_unique, should_index, object_revision)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, false, true, 1);`
+	encValue, err := json.Marshal(value)
+	require.NoError(t, err)
+	_, err = tx.Exec(CTX, query, instanceID, resourceOwner, aggregateType, aggregateID, objectType, objectID, fieldName, encValue)
+	require.NoError(t, err)
+
 }
