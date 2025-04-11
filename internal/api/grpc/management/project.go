@@ -175,25 +175,26 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 }
 
 func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest) (*mgmt_pb.AddProjectResponse, error) {
-	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), authz.GetCtxData(ctx).OrgID)
+	add := ProjectCreateToCommand(req, "", authz.GetCtxData(ctx).OrgID)
+	project, err := s.command.AddProject(ctx, add)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectResponse{
-		Id:      project.AggregateID,
-		Details: object_grpc.AddToDetailsPb(project.Sequence, project.ChangeDate, project.ResourceOwner),
+		Id:      add.AggregateID,
+		Details: object_grpc.AddToDetailsPb(project.Sequence, project.EventDate, project.ResourceOwner),
 	}, nil
 }
 
 func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRequest) (*mgmt_pb.UpdateProjectResponse, error) {
-	project, err := s.command.ChangeProject(ctx, ProjectUpdateToDomain(req), authz.GetCtxData(ctx).OrgID)
+	project, err := s.command.ChangeProject(ctx, ProjectUpdateToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			project.Sequence,
-			project.ChangeDate,
+			project.EventDate,
 			project.ResourceOwner,
 		),
 	}, nil

@@ -147,7 +147,7 @@ func TestServer_TokenExchange(t *testing.T) {
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userResp := instance.CreateHumanUser(ctx)
 
-	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx)
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)
@@ -371,7 +371,7 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 	setTokenExchangeFeature(t, instance, true)
 	setImpersonationPolicy(t, instance, true)
 
-	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx)
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)
@@ -591,7 +591,7 @@ func TestImpersonation_API_Call(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx)
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)
