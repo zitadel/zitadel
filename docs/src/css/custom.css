@@ -613,3 +613,12 @@ p strong {
   top: 0;
   left: 0;
 }
+
+/*
+  The overview list components are enriched by swizzled DocCardList and DocSidebarItems wrappers.
+  Deprecated list item titles have the class zitadel-lifecycle-deprecated.
+  We strike them through, because this is well-known practice and reduces mental overhead for finding the right method to solve a task.
+ */
+.zitadel-lifecycle-deprecated {
+  text-decoration: line-through;
+}
