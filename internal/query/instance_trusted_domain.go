@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -48,7 +47,7 @@ func (q *Queries) SearchInstanceTrustedDomains(ctx context.Context, queries *Ins
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareInstanceTrustedDomainsQuery(ctx, q.client)
+	query, scan := prepareInstanceTrustedDomainsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			InstanceTrustedDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -72,7 +71,7 @@ func (q *Queries) queryInstanceTrustedDomains(ctx context.Context, stmt string, 
 	return domains, err
 }
 
-func prepareInstanceTrustedDomainsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*InstanceTrustedDomains, error)) {
+func prepareInstanceTrustedDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*InstanceTrustedDomains, error)) {
 	return sq.Select(
 			InstanceTrustedDomainCreationDateCol.identifier(),
 			InstanceTrustedDomainChangeDateCol.identifier(),
@@ -80,7 +79,7 @@ func prepareInstanceTrustedDomainsQuery(ctx context.Context, db prepareDatabase)
 			InstanceTrustedDomainDomainCol.identifier(),
 			InstanceTrustedDomainInstanceIDCol.identifier(),
 			countColumn.identifier(),
-		).From(instanceTrustedDomainsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(instanceTrustedDomainsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*InstanceTrustedDomains, error) {
 			domains := make([]*InstanceTrustedDomain, 0)

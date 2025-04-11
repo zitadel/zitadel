@@ -73,6 +73,7 @@ func requireEventually(
 	assertCounts func(assert.TestingT, *eventCounts),
 	msg string,
 ) (counts *eventCounts) {
+	t.Helper()
 	countTimeout := 30 * time.Second
 	assertTimeout := countTimeout + time.Second
 	countCtx, cancel := context.WithTimeout(ctx, time.Minute)

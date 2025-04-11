@@ -42,7 +42,7 @@ func CallTargets(
 	info ContextInfo,
 ) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	for _, target := range targets {
 		// call the type of target
@@ -72,7 +72,7 @@ func CallTarget(
 	info ContextInfoRequest,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets

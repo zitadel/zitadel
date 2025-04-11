@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -165,10 +166,8 @@ func TestUser_idpLinksCheckPermission(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				for _, perm := range tt.permissions {
-					if resourceID == perm {
-						return nil
-					}
+				if slices.Contains(tt.permissions, resourceID) {
+					return nil
 				}
 				return errors.New("failed")
 			}
@@ -188,8 +187,7 @@ var (
 		` projections.idp_user_links3.resource_owner,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_user_links3` +
-		` LEFT JOIN projections.idp_templates6 ON projections.idp_user_links3.idp_id = projections.idp_templates6.id AND projections.idp_user_links3.instance_id = projections.idp_templates6.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.idp_templates6 ON projections.idp_user_links3.idp_id = projections.idp_templates6.id AND projections.idp_user_links3.instance_id = projections.idp_templates6.instance_id`)
 	idpUserLinksCols = []string{
 		"idp_id",
 		"user_id",
@@ -307,7 +305,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
