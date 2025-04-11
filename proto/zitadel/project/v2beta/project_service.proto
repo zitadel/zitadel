@@ -583,7 +583,7 @@ service ProjectService {
   //   - `project.grant.write`
   rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/grants/{grant_id}/_deactivate"
+      post: "/v2beta/projects/grants/{id}/_deactivate"
       body: "*"
     };
 
@@ -611,7 +611,7 @@ service ProjectService {
   //   - `project.grant.write`
   rpc ActivateProjectGrant(ActivateProjectGrantRequest) returns (ActivateProjectGrantResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/grants/{grant_id}/_activate"
+      post: "/v2beta/projects/grants/{id}/_activate"
       body: "*"
     };
 
@@ -668,8 +668,17 @@ service ProjectService {
 }
 
 message CreateProjectRequest {
+  // The unique identifier of the organization the project belongs to.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
   // The unique identifier of the project.
-  optional string id = 1 [
+  optional string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
@@ -678,7 +687,7 @@ message CreateProjectRequest {
     }
   ];
   // Name of the project.
-  string name = 2 [
+  string name = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -688,17 +697,17 @@ message CreateProjectRequest {
     }
   ];
   // Enable this setting to have role information included in the user info endpoint. It is also dependent on your application settings to include it in tokens and other types.
-  bool project_role_assertion = 3;
+  bool project_role_assertion = 4;
   // When enabled ZITADEL will check if a user has a role of this project assigned when login into an application of this project.
-  bool project_role_check = 4;
+  bool project_role_check = 5;
   // When enabled ZITADEL will check if the organization of the user, that is trying to log in, has a grant to this project.
-  bool has_project_check = 5;
+  bool has_project_check = 6;
   // Define which private labeling/branding should trigger when getting to a login of this project.
-  PrivateLabelingSetting private_labeling_setting = 6 [
+  PrivateLabelingSetting private_labeling_setting = 7 [
     (validate.rules).enum = {defined_only: true}
   ];
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"name\":\"MyProject\",\"projectRoleAssertion\":true,\"projectRoleCheck\":true,\"hasProjectCheck\":true,\"privateLabelingSetting\":\"PRIVATE_LABELING_SETTING_UNSPECIFIED\"}";
+    example: "{\"organizationId\":\"69629026806489455\",\"name\":\"MyProject\",\"projectRoleAssertion\":true,\"projectRoleCheck\":true,\"hasProjectCheck\":true,\"privateLabelingSetting\":\"PRIVATE_LABELING_SETTING_UNSPECIFIED\"}";
   };
 }
 
@@ -1079,7 +1088,7 @@ message CreateProjectGrantResponse {
 }
 
 message UpdateProjectGrantRequest {
-  // The unique identifier of the project.
+  // The unique identifier of the project grant.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
