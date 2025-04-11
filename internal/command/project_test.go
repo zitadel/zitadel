@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -18,16 +19,15 @@ import (
 
 func TestCommandSide_AddProject(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		project       *domain.Project
-		resourceOwner string
+		ctx     context.Context
+		project *AddProject
 	}
 	type res struct {
-		want *domain.Project
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -39,14 +39,13 @@ func TestCommandSide_AddProject(t *testing.T) {
 		{
 			name: "invalid project, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
-				project:       &domain.Project{},
-				resourceOwner: "org1",
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				project: &AddProject{
+					ObjectRoot: models.ObjectRoot{ResourceOwner: "org1"},
+				},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -55,20 +54,18 @@ func TestCommandSide_AddProject(t *testing.T) {
 		{
 			name: "project, resourceowner empty",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
-				project: &domain.Project{
+				project: &AddProject{
+					ObjectRoot:             models.ObjectRoot{ResourceOwner: ""},
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
 					ProjectRoleCheck:       true,
 					HasProjectCheck:        true,
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
-				resourceOwner: "",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -77,8 +74,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 		{
 			name: "project, error already exists",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internl"),
 						project.NewProjectAddedEvent(
@@ -93,14 +89,14 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
-				project: &domain.Project{
+				project: &AddProject{
+					ObjectRoot:             models.ObjectRoot{ResourceOwner: "org1"},
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
 					ProjectRoleCheck:       true,
 					HasProjectCheck:        true,
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -109,8 +105,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 		{
 			name: "project, already exists",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -124,14 +119,14 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
-				project: &domain.Project{
+				project: &AddProject{
+					ObjectRoot:             models.ObjectRoot{ResourceOwner: "org1"},
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
 					ProjectRoleCheck:       true,
 					HasProjectCheck:        true,
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -140,8 +135,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 		{
 			name: "project, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						project.NewProjectAddedEvent(
@@ -156,26 +150,18 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
-				project: &domain.Project{
+				project: &AddProject{
+					ObjectRoot:             models.ObjectRoot{ResourceOwner: "org1"},
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
 					ProjectRoleCheck:       true,
 					HasProjectCheck:        true,
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.Project{
-					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "org1",
-						AggregateID:   "project1",
-					},
-					Name:                   "project",
-					ProjectRoleAssertion:   true,
-					ProjectRoleCheck:       true,
-					HasProjectCheck:        true,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -183,11 +169,11 @@ func TestCommandSide_AddProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			c.setMilestonesCompletedForTest("instanceID")
-			got, err := c.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner)
+			got, err := c.AddProject(tt.args.ctx, tt.args.project)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -195,7 +181,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assert.NotEmpty(t, got.ID)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -203,15 +190,15 @@ func TestCommandSide_AddProject(t *testing.T) {
 
 func TestCommandSide_ChangeProject(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
-		project       *domain.Project
+		project       *ChangeProject
 		resourceOwner string
 	}
 	type res struct {
-		want *domain.Project
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -223,16 +210,15 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 		{
 			name: "invalid project, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
-				project: &domain.Project{
+				project: &ChangeProject{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
+					Name: gu.Ptr(""),
 				},
 				resourceOwner: "org1",
 			},
@@ -243,14 +229,12 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 		{
 			name: "invalid project empty aggregateid, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
-				project: &domain.Project{
-					Name: "project",
+				project: &ChangeProject{
+					Name: gu.Ptr("project"),
 				},
 				resourceOwner: "org1",
 			},
@@ -261,18 +245,17 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 		{
 			name: "project not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				project: &domain.Project{
+				project: &ChangeProject{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name: "project change",
+					Name: gu.Ptr("project change"),
 				},
 				resourceOwner: "org1",
 			},
@@ -283,8 +266,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 		{
 			name: "project removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -303,11 +285,11 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				project: &domain.Project{
+				project: &ChangeProject{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name: "project change",
+					Name: gu.Ptr("project change"),
 				},
 				resourceOwner: "org1",
 			},
@@ -316,10 +298,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 			},
 		},
 		{
-			name: "no changes, precondition error",
+			name: "no changes, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -332,27 +313,28 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				project: &domain.Project{
+				project: &ChangeProject{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name:                   "project",
-					ProjectRoleAssertion:   true,
-					ProjectRoleCheck:       true,
-					HasProjectCheck:        true,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+					Name:                   gu.Ptr("project"),
+					ProjectRoleAssertion:   gu.Ptr(true),
+					ProjectRoleCheck:       gu.Ptr(true),
+					HasProjectCheck:        gu.Ptr(true),
+					PrivateLabelingSetting: gu.Ptr(domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
 				},
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
 			name: "project change with name and unique constraints, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -377,37 +359,28 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				project: &domain.Project{
+				project: &ChangeProject{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name:                   "project-new",
-					ProjectRoleAssertion:   false,
-					ProjectRoleCheck:       false,
-					HasProjectCheck:        false,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
+					Name:                   gu.Ptr("project-new"),
+					ProjectRoleAssertion:   gu.Ptr(false),
+					ProjectRoleCheck:       gu.Ptr(false),
+					HasProjectCheck:        gu.Ptr(false),
+					PrivateLabelingSetting: gu.Ptr(domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy),
 				},
 				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.Project{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "project1",
-						ResourceOwner: "org1",
-					},
-					Name:                   "project-new",
-					ProjectRoleAssertion:   false,
-					ProjectRoleCheck:       false,
-					HasProjectCheck:        false,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
 		{
 			name: "project change without name and unique constraints, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -432,29 +405,21 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				project: &domain.Project{
+				project: &ChangeProject{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
-					Name:                   "project",
-					ProjectRoleAssertion:   false,
-					ProjectRoleCheck:       false,
-					HasProjectCheck:        false,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
+					Name:                   gu.Ptr("project"),
+					ProjectRoleAssertion:   gu.Ptr(false),
+					ProjectRoleCheck:       gu.Ptr(false),
+					HasProjectCheck:        gu.Ptr(false),
+					PrivateLabelingSetting: gu.Ptr(domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy),
 				},
 				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.Project{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "project1",
-						ResourceOwner: "org1",
-					},
-					Name:                   "project",
-					ProjectRoleAssertion:   false,
-					ProjectRoleCheck:       false,
-					HasProjectCheck:        false,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -462,9 +427,9 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ChangeProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner)
+			got, err := r.ChangeProject(tt.args.ctx, tt.args.project)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -472,7 +437,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -480,7 +445,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 
 func TestCommandSide_DeactivateProject(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -500,9 +465,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 		{
 			name: "invalid project id, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -514,26 +477,9 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid resourceowner, invalid error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				projectID:     "project1",
-				resourceOwner: "",
-			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "project not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -549,8 +495,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 		{
 			name: "project removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -579,8 +524,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 		{
 			name: "project already inactive, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -605,10 +549,38 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 			},
 		},
 		{
+			name: "project deactivate,no resourceOwner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+					expectPush(
+						project.NewProjectDeactivatedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
 			name: "project deactivate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -638,7 +610,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.DeactivateProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -656,7 +628,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 
 func TestCommandSide_ReactivateProject(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -676,9 +648,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 		{
 			name: "invalid project id, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -690,26 +660,9 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid resourceowner, invalid error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				projectID:     "project1",
-				resourceOwner: "",
-			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "project not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -725,8 +678,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 		{
 			name: "project removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -755,8 +707,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 		{
 			name: "project not inactive, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -775,12 +726,43 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 			res: res{
 				err: zerrors.IsPreconditionFailed,
 			},
+		}, {
+			name: "project reactivate, no resourceOwner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+						eventFromEventPusher(
+							project.NewProjectDeactivatedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate),
+						),
+					),
+					expectPush(
+						project.NewProjectReactivatedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
 		},
 		{
 			name: "project reactivate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -814,7 +796,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ReactivateProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -832,7 +814,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 
 func TestCommandSide_RemoveProject(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -852,9 +834,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "invalid project id, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -868,9 +848,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "invalid resourceowner, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -884,8 +862,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "project not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -901,8 +878,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "project removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -931,8 +907,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "project remove, without entityConstraints, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -965,8 +940,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "project remove, with entityConstraints, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -1018,8 +992,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "project remove, with multiple entityConstraints, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -1106,7 +1079,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.RemoveProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1122,6 +1095,295 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 	}
 }
 
+func TestCommandSide_DeleteProject(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		projectID     string
+		resourceOwner string
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "invalid project id, invalid error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "project not existing, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: nil,
+			},
+		},
+		{
+			name: "project removed, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+						eventFromEventPusher(
+							project.NewProjectRemovedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project",
+								nil),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: nil,
+			},
+		}, {
+			name: "project remove, no resourceOwner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+					// no saml application events
+					expectFilter(),
+					expectPush(
+						project.NewProjectRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project",
+							nil),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "",
+			},
+			res: res{
+				err: nil,
+			},
+		},
+		{
+			name: "project remove, without entityConstraints, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+					// no saml application events
+					expectFilter(),
+					expectPush(
+						project.NewProjectRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project",
+							nil),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: nil,
+			},
+		},
+		{
+			name: "project remove, with entityConstraints, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						)),
+						eventFromEventPusher(
+							project.NewSAMLConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"https://test.com/saml/metadata",
+								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+								"http://localhost:8080/saml/metadata",
+								domain.LoginVersionUnspecified,
+								"",
+							),
+						),
+					),
+					expectPush(
+						project.NewProjectRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project",
+							[]*eventstore.UniqueConstraint{
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata"),
+							},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: nil,
+			},
+		},
+		{
+			name: "project remove, with multiple entityConstraints, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						)),
+						eventFromEventPusher(
+							project.NewSAMLConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"https://test1.com/saml/metadata",
+								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+								"",
+								domain.LoginVersionUnspecified,
+								"",
+							),
+						),
+						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app2",
+							"app",
+						)),
+						eventFromEventPusher(
+							project.NewSAMLConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app2",
+								"https://test2.com/saml/metadata",
+								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+								"",
+								domain.LoginVersionUnspecified,
+								"",
+							),
+						),
+						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app3",
+							"app",
+						)),
+						eventFromEventPusher(
+							project.NewSAMLConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app3",
+								"https://test3.com/saml/metadata",
+								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+								"",
+								domain.LoginVersionUnspecified,
+								"",
+							),
+						),
+					),
+					expectPush(
+						project.NewProjectRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project",
+							[]*eventstore.UniqueConstraint{
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test1.com/saml/metadata"),
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata"),
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test3.com/saml/metadata"),
+							},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			_, err := r.DeleteProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldName, newName string, roleAssertion, roleCheck, hasProjectCheck bool, privateLabelingSetting domain.PrivateLabelingSetting) *project.ProjectChangeEvent {
 	changes := []project.ProjectChanges{
 		project.ChangeProjectRoleAssertion(roleAssertion),
@@ -1132,12 +1394,11 @@ func newProjectChangedEvent(ctx context.Context, projectID, resourceOwner, oldNa
 	if newName != "" {
 		changes = append(changes, project.ChangeName(newName))
 	}
-	event, _ := project.NewProjectChangeEvent(ctx,
+	return project.NewProjectChangeEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,
 		oldName,
 		changes,
 	)
-	return event
 }
 
 func TestAddProject(t *testing.T) {

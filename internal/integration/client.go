@@ -33,6 +33,7 @@ import (
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
@@ -70,6 +71,7 @@ type Client struct {
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
 	SCIM           *scim.Client
+	Projectv2Beta  project_v2beta.ProjectServiceClient
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
@@ -103,6 +105,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
 		SCIM:           scim.NewScimClient(target),
+		Projectv2Beta:  project_v2beta.NewProjectServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -428,6 +431,45 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 	})
 	logging.OnError(err).Panic("set user password")
 	return resp.GetDetails()
+}
+
+func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name string, projectRoleCheck, hasProjectCheck bool) *project_v2beta.CreateProjectResponse {
+	if orgID == "" {
+		orgID = i.DefaultOrg.GetId()
+	}
+
+	resp, err := i.Client.Projectv2Beta.CreateProject(ctx, &project_v2beta.CreateProjectRequest{
+		OrganizationId:   orgID,
+		Name:             name,
+		HasProjectCheck:  hasProjectCheck,
+		ProjectRoleCheck: projectRoleCheck,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeleteProjectResponse {
+	resp, err := i.Client.Projectv2Beta.DeleteProject(ctx, &project_v2beta.DeleteProjectRequest{
+		Id: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeactivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeactivateProjectResponse {
+	resp, err := i.Client.Projectv2Beta.DeactivateProject(ctx, &project_v2beta.DeactivateProjectRequest{
+		Id: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) ActivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.ActivateProjectResponse {
+	resp, err := i.Client.Projectv2Beta.ActivateProject(ctx, &project_v2beta.ActivateProjectRequest{
+		Id: projectID,
+	})
+	require.NoError(t, err)
+	return resp
 }
 
 func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id string) {

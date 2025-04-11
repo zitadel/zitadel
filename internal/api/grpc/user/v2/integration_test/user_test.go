@@ -1753,12 +1753,12 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	projectResp := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+
 	type args struct {
 		ctx     context.Context
 		req     *user.DeleteUserRequest
-		prepare func(request *user.DeleteUserRequest) error
+		prepare func(request *user.DeleteUserRequest)
 	}
 	tests := []struct {
 		name    string
@@ -1773,7 +1773,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				&user.DeleteUserRequest{
 					UserId: "notexisting",
 				},
-				func(request *user.DeleteUserRequest) error { return nil },
+				nil,
 			},
 			wantErr: true,
 		},
@@ -1782,10 +1782,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1800,10 +1799,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) {
 					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1818,13 +1816,12 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateOrgMembership(t, CTX, request.UserId)
-					return err
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1837,8 +1834,9 @@ func TestServer_DeleteUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.prepare(tt.args.req)
-			require.NoError(t, err)
+			if tt.args.prepare != nil {
+				tt.args.prepare(tt.args.req)
+			}
 
 			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {

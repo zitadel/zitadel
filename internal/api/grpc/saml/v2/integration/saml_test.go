@@ -640,10 +640,9 @@ func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding stri
 }
 
 func createSAMLApplication(ctx context.Context, t *testing.T, idpMetadata *saml.EntityDescriptor, binding string, projectRoleCheck, hasProjectCheck bool) (string, string, *samlsp.Middleware) {
-	project, err := Instance.CreateProjectWithPermissionCheck(ctx, projectRoleCheck, hasProjectCheck)
-	require.NoError(t, err)
+	project := Instance.CreateProject(ctx, t, "", gofakeit.AppName(), projectRoleCheck, hasProjectCheck)
 	rootURL, sp := createSAMLSP(t, idpMetadata, binding)
-	_, err = Instance.CreateSAMLClient(ctx, project.GetId(), sp)
+	_, err := Instance.CreateSAMLClient(ctx, project.GetId(), sp)
 	require.NoError(t, err)
 	return project.GetId(), rootURL, sp
 }
