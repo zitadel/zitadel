@@ -115,6 +115,7 @@ func TestGetUser(t *testing.T) {
 					{
 						Value:   "bjensen@example.com",
 						Primary: true,
+						Type:    "work",
 					},
 				},
 				PhoneNumbers: []*resources.ScimPhoneNumber{

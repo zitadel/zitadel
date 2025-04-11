@@ -30,6 +30,7 @@ const (
 	KeyAddresses                Key = KeyPrefix + "addresses"
 	KeyEntitlements             Key = KeyPrefix + "entitlements"
 	KeyRoles                    Key = KeyPrefix + "roles"
+	KeyEmails                   Key = KeyPrefix + "emails"
 )
 
 var (
@@ -47,6 +48,7 @@ var (
 		KeyAddresses,
 		KeyEntitlements,
 		KeyRoles,
+		KeyEmails,
 	}
 
 	AttributePathToMetadataKeys = map[string][]Key{
@@ -64,6 +66,7 @@ var (
 		"addresses":            {KeyAddresses},
 		"entitlements":         {KeyEntitlements},
 		"roles":                {KeyRoles},
+		"emails":               {KeyEmails},
 	}
 )
 

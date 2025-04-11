@@ -140,6 +140,7 @@ func TestUpdateUser(t *testing.T) {
 					{
 						Value:   "babs@example.com",
 						Primary: true,
+						Type:    "home",
 					},
 				},
 				Addresses: []*resources.ScimAddress{
