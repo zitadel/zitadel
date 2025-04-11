@@ -22,8 +22,7 @@ var (
 		` projections.password_age_policies2.max_age_days,` +
 		` projections.password_age_policies2.is_default,` +
 		` projections.password_age_policies2.state` +
-		` FROM projections.password_age_policies2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.password_age_policies2`
 	preparePasswordAgePolicyCols = []string{
 		"id",
 		"sequence",
@@ -118,7 +117,7 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
