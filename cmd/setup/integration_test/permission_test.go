@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/permission"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 func TestGetSystemPermissions(t *testing.T) {
@@ -522,6 +523,12 @@ func TestCheckSystemUserPerms(t *testing.T) {
 	}
 }
 
+const (
+	instanceID = "instanceID"
+	orgID      = "orgID"
+	projectID  = "projectID"
+)
+
 func TestPermittedOrgs(t *testing.T) {
 	t.Parallel()
 
@@ -565,7 +572,6 @@ func TestPermittedOrgs(t *testing.T) {
 			},
 			want: result{
 				InstancePermitted: true,
-				OrgIDs:            pgtype.FlatArray[string]{},
 			},
 		},
 		{
@@ -580,10 +586,7 @@ func TestPermittedOrgs(t *testing.T) {
 				perm: "org.read",
 			},
 			want: result{
-				InstancePermitted: false,
-				OrgIDs: pgtype.FlatArray[string]{
-					orgID,
-				},
+				OrgIDs: pgtype.FlatArray[string]{orgID},
 			},
 		},
 		{
@@ -605,10 +608,7 @@ func TestPermittedOrgs(t *testing.T) {
 				perm:          "org.read",
 			},
 			want: result{
-				InstancePermitted: false,
-				OrgIDs: pgtype.FlatArray[string]{
-					orgID,
-				},
+				OrgIDs: pgtype.FlatArray[string]{orgID},
 			},
 		},
 		{
@@ -620,10 +620,7 @@ func TestPermittedOrgs(t *testing.T) {
 				filterOrg:     orgID,
 			},
 			want: result{
-				InstancePermitted: false,
-				OrgIDs: pgtype.FlatArray[string]{
-					orgID,
-				},
+				OrgIDs: pgtype.FlatArray[string]{orgID},
 			},
 		},
 		{
@@ -634,10 +631,7 @@ func TestPermittedOrgs(t *testing.T) {
 				perm:          "org.read",
 				filterOrg:     "foobar",
 			},
-			want: result{
-				InstancePermitted: false,
-				OrgIDs:            pgtype.FlatArray[string]{},
-			},
+			want: result{},
 		},
 		{
 			name: "no permission",
@@ -647,10 +641,7 @@ func TestPermittedOrgs(t *testing.T) {
 				perm:          "org.read",
 				filterOrg:     orgID,
 			},
-			want: result{
-				InstancePermitted: false,
-				OrgIDs:            pgtype.FlatArray[string]{},
-			},
+			want: result{},
 		},
 	}
 	for _, tt := range tests {
@@ -665,10 +656,209 @@ func TestPermittedOrgs(t *testing.T) {
 	}
 }
 
-const (
-	instanceID = "instanceID"
-	orgID      = "orgID"
-)
+func TestPermittedProjects(t *testing.T) {
+	t.Parallel()
+
+	tx, err := dbPool.Begin(CTX)
+	require.NoError(t, err)
+	defer tx.Rollback(CTX)
+
+	// Insert a couple of deterministic field rows to test the function.
+	// Data will not persist, because the transaction is rolled back.
+	createRolePermission(t, tx, "IAM_OWNER", []string{"project.write", "project.read"})
+	createRolePermission(t, tx, "ORG_OWNER", []string{"project.write", "project.read"})
+	createRolePermission(t, tx, "PROJECT_OWNER", []string{"project.write", "project.read"})
+	createMember(t, tx, instance.AggregateType, "instance_user")
+	createMember(t, tx, org.AggregateType, "org_user")
+	createMember(t, tx, project.AggregateType, "project_user")
+
+	const query = "SELECT instance_permitted, org_ids, project_ids FROM eventstore.permitted_projects($1,$2,$3,$4,$5,$6);"
+	type args struct {
+		reqInstanceID   string
+		authUserID      string
+		systemUserPerms []authz.SystemUserPermissions
+		perm            string
+		filterOrg       string
+		filterProject   string
+	}
+	type result struct {
+		InstancePermitted bool
+		OrgIDs            pgtype.FlatArray[string]
+		ProjectIDs        pgtype.FlatArray[string]
+	}
+	tests := []struct {
+		name string
+		args args
+		want result
+	}{
+		{
+			name: "system user, instance",
+			args: args{
+				reqInstanceID: instanceID,
+				systemUserPerms: []authz.SystemUserPermissions{{
+					MemberType:  authz.MemberTypeSystem,
+					Permissions: []string{"project.write", "project.read"},
+				}},
+				perm: "project.read",
+			},
+			want: result{
+				InstancePermitted: true,
+			},
+		},
+		{
+			name: "system user, orgs",
+			args: args{
+				reqInstanceID: instanceID,
+				systemUserPerms: []authz.SystemUserPermissions{{
+					MemberType:  authz.MemberTypeOrganization,
+					AggregateID: orgID,
+					Permissions: []string{"project.read", "project.write"},
+				}},
+				perm: "project.read",
+			},
+			want: result{
+				OrgIDs: pgtype.FlatArray[string]{orgID},
+			},
+		},
+		{
+			name: "system user, projects",
+			args: args{
+				reqInstanceID: instanceID,
+				systemUserPerms: []authz.SystemUserPermissions{{
+					MemberType:  authz.MemberTypeProject,
+					AggregateID: projectID,
+					Permissions: []string{"project.read", "project.write"},
+				}},
+				perm: "project.read",
+			},
+			want: result{
+				ProjectIDs: pgtype.FlatArray[string]{projectID},
+			},
+		},
+		{
+			name: "system user, org and project",
+			args: args{
+				reqInstanceID: instanceID,
+				systemUserPerms: []authz.SystemUserPermissions{
+					{
+						MemberType:  authz.MemberTypeOrganization,
+						AggregateID: orgID,
+						Permissions: []string{"project.read", "project.write"},
+					},
+					{
+						MemberType:  authz.MemberTypeProject,
+						AggregateID: projectID,
+						Permissions: []string{"project.read", "project.write"},
+					},
+				},
+				perm: "project.read",
+			},
+			want: result{
+				OrgIDs:     pgtype.FlatArray[string]{orgID},
+				ProjectIDs: pgtype.FlatArray[string]{projectID},
+			},
+		},
+		{
+			name: "instance member",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "instance_user",
+				perm:          "project.read",
+			},
+			want: result{
+				InstancePermitted: true,
+			},
+		},
+		{
+			name: "org member",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "org_user",
+				perm:          "project.read",
+			},
+			want: result{
+				InstancePermitted: false,
+				OrgIDs:            pgtype.FlatArray[string]{orgID},
+			},
+		},
+		{
+			name: "org member, filter",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "org_user",
+				perm:          "project.read",
+				filterOrg:     orgID,
+			},
+			want: result{
+				InstancePermitted: false,
+				OrgIDs:            pgtype.FlatArray[string]{orgID},
+			},
+		},
+		{
+			name: "org member, filter wrong org",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "org_user",
+				perm:          "project.read",
+				filterOrg:     "foobar",
+			},
+			want: result{},
+		},
+		{
+			name: "project member",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "project_user",
+				perm:          "project.read",
+			},
+			want: result{
+				ProjectIDs: pgtype.FlatArray[string]{projectID},
+			},
+		},
+		{
+			name: "project member, filter",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "project_user",
+				perm:          "project.read",
+				filterProject: projectID,
+			},
+			want: result{
+				ProjectIDs: pgtype.FlatArray[string]{projectID},
+			},
+		},
+		{
+			name: "project member, filter wrong project",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "project_user",
+				perm:          "project.read",
+				filterProject: "foobar",
+			},
+			want: result{},
+		},
+		{
+			name: "no permission",
+			args: args{
+				reqInstanceID: instanceID,
+				authUserID:    "foobar",
+				perm:          "project.read",
+				filterOrg:     orgID,
+			},
+			want: result{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rows, err := tx.Query(CTX, query, tt.args.reqInstanceID, tt.args.authUserID, database.NewJSONArray(tt.args.systemUserPerms), tt.args.perm, tt.args.filterOrg, tt.args.filterProject)
+			require.NoError(t, err)
+			got, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByPos[result])
+			require.NoError(t, err)
+			assert.Equal(t, tt.want.InstancePermitted, got.InstancePermitted)
+			assert.ElementsMatch(t, tt.want.OrgIDs, got.OrgIDs)
+		})
+	}
+}
 
 func createRolePermission(t *testing.T, tx pgx.Tx, role string, permissions []string) {
 	for _, perm := range permissions {
@@ -683,6 +873,8 @@ func createMember(t *testing.T, tx pgx.Tx, aggregateType eventstore.AggregateTyp
 		createTestField(t, tx, instanceID, aggregateType, instanceID, "instance_member_role", userID, "instance_role", "IAM_OWNER")
 	case org.AggregateType:
 		createTestField(t, tx, orgID, aggregateType, orgID, "org_member_role", userID, "org_role", "ORG_OWNER")
+	case project.AggregateType:
+		createTestField(t, tx, orgID, aggregateType, orgID, "project_member_role", userID, "project_role", "PROJECT_OWNER")
 	default:
 		panic("unknown aggregate type " + aggregateType)
 	}
