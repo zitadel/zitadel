@@ -65,6 +65,13 @@ type CreatedOrgAdmin struct {
 	MachineKey *MachineKey
 }
 
+func (o *OrgSetup) Validate() (err error) {
+	if o.OrgID != "" && strings.TrimSpace(o.OrgID) == "" {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-4ABd3", "Errors.Invalid.Argument")
+	}
+	return nil
+}
+
 func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, userIDs ...string) (_ *CreatedOrg, err error) {
 	cmds := c.newOrgSetupCommands(ctx, orgID, o)
 	for _, admin := range o.Admins {
@@ -234,6 +241,10 @@ func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrg
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
+	if err := o.Validate(); err != nil {
+		return nil, err
+	}
+
 	if o.OrgID == "" {
 		var err error
 		o.OrgID, err = c.idGenerator.Next()

@@ -1345,6 +1345,22 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 		},
 		{
+			name: "org id empty, error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: " ",
+				},
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "ORG-4ABd3", "Errors.Invalid.Argument"),
+			},
+		},
+		{
 			name: "userID not existing, error",
 			fields: fields{
 				eventstore: expectEventstore(
