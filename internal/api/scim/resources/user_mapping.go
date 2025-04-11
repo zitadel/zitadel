@@ -319,8 +319,6 @@ func (h *UsersHandler) mapWriteModelToScimUser(ctx context.Context, user *comman
 			{
 				Value:   string(user.Email),
 				Primary: true,
-				// This is a hack for Microsoft Entra ID, which (usually) patches emails using the `emails[type eq "work"]` filter.
-				Type: "work",
 			},
 		}
 	}
@@ -382,6 +380,10 @@ func (h *UsersHandler) mapAndValidateMetadata(ctx context.Context, user *ScimUse
 	}
 
 	if err := extractJsonMetadata(ctx, md, metadata.KeyRoles, &user.Roles); err != nil {
+		logging.OnError(err).Warn("Could not deserialize scim roles metadata")
+	}
+
+	if err := extractJsonMetadata(ctx, md, metadata.KeyEmails, &user.Emails); err != nil {
 		logging.OnError(err).Warn("Could not deserialize scim roles metadata")
 	}
 }

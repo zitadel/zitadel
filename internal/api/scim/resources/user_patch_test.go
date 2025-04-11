@@ -713,6 +713,7 @@ func TestOperationCollection_Apply(t *testing.T) {
 					{
 						Value:   "jeanie.rebecca.pendleton@example.com",
 						Primary: true,
+						Type:    "work",
 					},
 				},
 			},
