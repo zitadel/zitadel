@@ -14,21 +14,23 @@ type SearchQuery struct {
 
 	SubQueries            [][]*Filter
 	Tx                    *sql.Tx
-	AllowTimeTravel       bool
+	LockRows              bool
+	LockOption            eventstore.LockOption
 	AwaitOpenTransactions bool
 	Limit                 uint64
 	Offset                uint32
 	Desc                  bool
 
-	InstanceID        *Filter
-	InstanceIDs       *Filter
-	ExcludedInstances *Filter
-	Creator           *Filter
-	Owner             *Filter
-	Position          *Filter
-	Sequence          *Filter
-	CreatedAfter      *Filter
-	CreatedBefore     *Filter
+	InstanceID          *Filter
+	InstanceIDs         *Filter
+	ExcludedInstances   *Filter
+	Creator             *Filter
+	Owner               *Filter
+	Position            *Filter
+	Sequence            *Filter
+	CreatedAfter        *Filter
+	CreatedBefore       *Filter
+	ExcludeAggregateIDs []*Filter
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -48,11 +50,11 @@ const (
 	OperationGreater
 	// OperationLess compares if the given values is less than the stored one
 	OperationLess
-	//OperationIn checks if a stored value matches one of the passed value list
+	// OperationIn checks if a stored value matches one of the passed value list
 	OperationIn
-	//OperationJSONContains checks if a stored value matches the given json
+	// OperationJSONContains checks if a stored value matches the given json
 	OperationJSONContains
-	//OperationNotIn checks if a stored value does not match one of the passed value list
+	// OperationNotIn checks if a stored value does not match one of the passed value list
 	OperationNotIn
 
 	operationCount
@@ -62,25 +64,25 @@ const (
 type Field int32
 
 const (
-	//FieldAggregateType represents the aggregate type field
+	// FieldAggregateType represents the aggregate type field
 	FieldAggregateType Field = iota + 1
-	//FieldAggregateID represents the aggregate id field
+	// FieldAggregateID represents the aggregate id field
 	FieldAggregateID
-	//FieldSequence represents the sequence field
+	// FieldSequence represents the sequence field
 	FieldSequence
-	//FieldResourceOwner represents the resource owner field
+	// FieldResourceOwner represents the resource owner field
 	FieldResourceOwner
-	//FieldInstanceID represents the instance id field
+	// FieldInstanceID represents the instance id field
 	FieldInstanceID
-	//FieldEditorService represents the editor service field
+	// FieldEditorService represents the editor service field
 	FieldEditorService
-	//FieldEditorUser represents the editor user field
+	// FieldEditorUser represents the editor user field
 	FieldEditorUser
-	//FieldEventType represents the event type field
+	// FieldEventType represents the event type field
 	FieldEventType
-	//FieldEventData represents the event data field
+	// FieldEventData represents the event data field
 	FieldEventData
-	//FieldCreationDate represents the creation date field
+	// FieldCreationDate represents the creation date field
 	FieldCreationDate
 	// FieldPosition represents the field of the global sequence
 	FieldPosition
@@ -126,10 +128,10 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		Offset:                builder.GetOffset(),
 		Desc:                  builder.GetDesc(),
 		Tx:                    builder.GetTx(),
-		AllowTimeTravel:       builder.GetAllowTimeTravel(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 	}
+	query.LockRows, query.LockOption = builder.GetLockRows()
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
 		instanceIDFilter,
@@ -166,6 +168,21 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 				return nil, err
 			}
 			query.SubQueries[i] = append(query.SubQueries[i], filter)
+		}
+	}
+	if excludeAggregateIDs := builder.GetExcludeAggregateIDs(); excludeAggregateIDs != nil {
+		for _, f := range []func(query *eventstore.ExclusionQuery) *Filter{
+			excludeAggregateTypeFilter,
+			excludeEventTypeFilter,
+		} {
+			filter := f(excludeAggregateIDs)
+			if filter == nil {
+				continue
+			}
+			if err := filter.Validate(); err != nil {
+				return nil, err
+			}
+			query.ExcludeAggregateIDs = append(query.ExcludeAggregateIDs, filter)
 		}
 	}
 
@@ -282,4 +299,24 @@ func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
 		return NewFilter(FieldPosition, pos, OperationGreater)
 	}
 	return nil
+}
+
+func excludeEventTypeFilter(query *eventstore.ExclusionQuery) *Filter {
+	if len(query.GetEventTypes()) < 1 {
+		return nil
+	}
+	if len(query.GetEventTypes()) == 1 {
+		return NewFilter(FieldEventType, query.GetEventTypes()[0], OperationEquals)
+	}
+	return NewFilter(FieldEventType, database.TextArray[eventstore.EventType](query.GetEventTypes()), OperationIn)
+}
+
+func excludeAggregateTypeFilter(query *eventstore.ExclusionQuery) *Filter {
+	if len(query.GetAggregateTypes()) < 1 {
+		return nil
+	}
+	if len(query.GetAggregateTypes()) == 1 {
+		return NewFilter(FieldAggregateType, query.GetAggregateTypes()[0], OperationEquals)
+	}
+	return NewFilter(FieldAggregateType, database.TextArray[eventstore.AggregateType](query.GetAggregateTypes()), OperationIn)
 }

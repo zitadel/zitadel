@@ -26,8 +26,6 @@ import (
 )
 
 func TestServer_Limits_Block(t *testing.T) {
-	t.Parallel()
-
 	isoInstance := integration.NewInstance(CTX)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	tests := []*test{
@@ -140,13 +138,13 @@ func TestServer_Limits_Block(t *testing.T) {
 		InstanceId: isoInstance.ID(),
 		Block:      gu.Ptr(true),
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	// The following call ensures that an undefined bool is not deserialized to false
 	_, err = integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId:        isoInstance.ID(),
 		AuditLogRetention: durationpb.New(time.Hour),
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	for _, tt := range tests {
 		var isFirst bool
 		t.Run(tt.name+" with blocking", func(t *testing.T) {

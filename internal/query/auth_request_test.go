@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
@@ -23,7 +24,6 @@ import (
 func TestQueries_AuthRequestByID(t *testing.T) {
 	expQuery := regexp.QuoteMeta(fmt.Sprintf(
 		authRequestByIDQuery,
-		asOfSystemTime,
 	))
 
 	cols := []string{
@@ -45,11 +45,12 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 		checkLoginClient  bool
 	}
 	tests := []struct {
-		name    string
-		args    args
-		expect  sqlExpectation
-		want    *AuthRequest
-		wantErr error
+		name            string
+		args            args
+		expect          sqlExpectation
+		permissionCheck domain.PermissionCheck
+		want            *AuthRequest
+		wantErr         error
 	}{
 		{
 			name: "success, all values",
@@ -138,7 +139,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-Ou8ue", "Errors.Internal"),
 		},
 		{
-			name: "wrong login client",
+			name: "wrong login client / not permitted",
 			args: args{
 				shouldTriggerBulk: false,
 				id:                "123",
@@ -157,7 +158,47 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				nil,
 				nil,
 			}, "123", "instanceID"),
-			wantErr: zerrors.ThrowPermissionDeniedf(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient"),
+			permissionCheck: func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				return zerrors.ThrowPermissionDenied(nil, "id", "not permitted")
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "id", "not permitted"),
+		},
+		{
+			name: "other login client / permitted",
+			args: args{
+				shouldTriggerBulk: false,
+				id:                "123",
+				checkLoginClient:  true,
+			},
+			expect: mockQuery(expQuery, cols, []driver.Value{
+				"id",
+				testNow,
+				"otherLoginClient",
+				"clientID",
+				database.TextArray[string]{"a", "b", "c"},
+				"example.com",
+				database.NumberArray[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
+				database.TextArray[string]{"en", "fi"},
+				nil,
+				nil,
+				nil,
+			}, "123", "instanceID"),
+			permissionCheck: func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				return nil
+			},
+			want: &AuthRequest{
+				ID:           "id",
+				CreationDate: testNow,
+				LoginClient:  "otherLoginClient",
+				ClientID:     "clientID",
+				Scope:        []string{"a", "b", "c"},
+				RedirectURI:  "example.com",
+				Prompt:       []domain.Prompt{domain.PromptLogin, domain.PromptConsent},
+				UiLocales:    []string{"en", "fi"},
+				LoginHint:    nil,
+				MaxAge:       nil,
+				HintUserID:   nil,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -165,9 +206,9 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			execMock(t, tt.expect, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
+					checkPermission: tt.permissionCheck,
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 

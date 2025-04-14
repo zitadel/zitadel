@@ -30,7 +30,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
   schemes: HTTPS;
@@ -719,7 +719,7 @@ service ZITADELUsers {
 
   // Start a TOTP registration
   //
-  // Start the registration of a new time-based one-time-password (TOTP) generator for a user.
+  // Start the registration of a new time-based one-time password (TOTP) generator for a user.
   // As a response a secret is returned, which is used to initialize a TOTP app or device.
   rpc StartTOTPRegistration (StartTOTPRegistrationRequest) returns (StartTOTPRegistrationResponse) {
     option (google.api.http) = {
@@ -743,7 +743,7 @@ service ZITADELUsers {
 
   // Verify a TOTP registration
   //
-  // Verify the time-based one-time-password (TOTP) registration with the generated code.
+  // Verify the time-based one-time password (TOTP) registration with the generated code.
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/totp/{totp_id}/_verify"
@@ -767,7 +767,7 @@ service ZITADELUsers {
 
   // Remove a TOTP authenticator
   //
-  // Remove an existing time-based one-time-password (TOTP) authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing time-based one-time password (TOTP) authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveTOTPAuthenticator (RemoveTOTPAuthenticatorRequest) returns (RemoveTOTPAuthenticatorResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/totp/{totp_id}"
@@ -790,7 +790,7 @@ service ZITADELUsers {
 
   // Add a OTP SMS authenticator
   //
-  // Add a new one-time-password (OTP) SMS authenticator to a user.
+  // Add a new one-time password (OTP) SMS authenticator to a user.
   // If the phone is not passed as verified, a verification code will be generated,
   // which can be either returned or will be sent to the user by SMS.
   rpc AddOTPSMSAuthenticator (AddOTPSMSAuthenticatorRequest) returns (AddOTPSMSAuthenticatorResponse) {
@@ -841,7 +841,7 @@ service ZITADELUsers {
 
   // Remove a OTP SMS authenticator
   //
-  // Remove an existing one-time-password (OTP) SMS authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing one-time password (OTP) SMS authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPSMSAuthenticator (RemoveOTPSMSAuthenticatorRequest) returns (RemoveOTPSMSAuthenticatorResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/otp_sms/{otp_sms_id}"
@@ -864,7 +864,7 @@ service ZITADELUsers {
 
   // Add a OTP Email authenticator
   //
-  // Add a new one-time-password (OTP) Email authenticator to a user.
+  // Add a new one-time password (OTP) Email authenticator to a user.
   // If the email is not passed as verified, a verification code will be generated,
   // which can be either returned or will be sent to the user by email.
   rpc AddOTPEmailAuthenticator (AddOTPEmailAuthenticatorRequest) returns (AddOTPEmailAuthenticatorResponse) {
@@ -915,7 +915,7 @@ service ZITADELUsers {
 
   // Remove a OTP Email authenticator
   //
-  // Remove an existing one-time-password (OTP) Email authenticator from a user, so it cannot be used for authentication anymore.
+  // Remove an existing one-time password (OTP) Email authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPEmailAuthenticator (RemoveOTPEmailAuthenticatorRequest) returns (RemoveOTPEmailAuthenticatorResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/otp_email/{otp_email_id}"

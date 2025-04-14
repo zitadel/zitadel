@@ -20,6 +20,10 @@ type InstanceFeatures struct {
 	DebugOIDCParentError            FeatureSource[bool]
 	OIDCSingleV1SessionTermination  FeatureSource[bool]
 	DisableUserTokenEvent           FeatureSource[bool]
+	EnableBackChannelLogout         FeatureSource[bool]
+	LoginV2                         FeatureSource[*feature.LoginV2]
+	PermissionCheckV2               FeatureSource[bool]
+	ConsoleUseV2UserApi             FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

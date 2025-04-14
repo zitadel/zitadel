@@ -70,6 +70,7 @@ The following hash algorithms are supported:
 - bcrypt (Default)
 - md5: implementation of md5Crypt with salt and password shuffling [^2]
 - md5plain: md5 digest of a password without salt [^2]
+- md5salted: md5 digest of a salted password [^2]
 - scrypt
 - pbkdf2
 
@@ -92,7 +93,7 @@ Some secrets cannot be hashed because they need to be used in their raw form. Th
 
 - Federation
   - Client Secrets of Identity Providers (IdPs)
-- Multi Factor Authentication
+- Multi-factor Authentication
   - TOTP Seed Values
 - Validation Secrets
   - Verifying contact information like eMail, Phonenumbers

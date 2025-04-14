@@ -263,6 +263,9 @@ RegistrationUser:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   GenderLabel: Пол
   Female: Женски
   Male: Машки
@@ -304,6 +307,9 @@ ExternalRegistrationUserOverview:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
   TosLinkText: правилата за користење
@@ -379,6 +385,9 @@ ExternalNotFound:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
 
 DeviceAuth:
   Title: Овластување преку уред
@@ -500,6 +509,10 @@ Errors:
       CreationNotAllowed: Креирањето на нов корисник не е дозволено на овој провајдер
       LinkingNotAllowed: Поврзувањето на корисник не е дозволено на овој провајдер
       NoOptionAllowed: NНиту создавање, ниту поврзување е дозволено за овој провајдер. Ве молиме контактирајте го вашиот администратор.
+      LoginFailedSwitchLocal: |
+        Најавата во надворешен провајдер на идентитет не успеа. Враќање на локална најава.
+
+        Детали за грешката: {{.Details}}
     GrantRequired: Не е можно најавување. Корисникот мора да има барем едно овластување за апликацијата. Ве молиме контактирајте го вашиот администратор.
     ProjectRequired: Не е можно најавување. Организацијата на корисникот мора да биде доделена на проектот. Ве молиме контактирајте го вашиот администратор.
   IdentityProvider:

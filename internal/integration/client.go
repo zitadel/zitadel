@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -17,6 +18,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/integration/scim"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -30,10 +33,9 @@ import (
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
-	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
@@ -41,6 +43,7 @@ import (
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	webkey_v2beta "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
 type Client struct {
@@ -58,13 +61,15 @@ type Client struct {
 	OIDCv2         oidc_pb.OIDCServiceClient
 	OrgV2beta      org_v2beta.OrganizationServiceClient
 	OrgV2          org.OrganizationServiceClient
-	ActionV3Alpha  action.ZITADELActionsClient
+	ActionV2beta   action.ActionServiceClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
-	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
+	WebKeyV2Beta   webkey_v2beta.WebKeyServiceClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
+	SAMLv2         saml_pb.SAMLServiceClient
+	SCIM           *scim.Client
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
@@ -89,13 +94,15 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
 		OrgV2:          org.NewOrganizationServiceClient(cc),
-		ActionV3Alpha:  action.NewZITADELActionsClient(cc),
+		ActionV2beta:   action.NewActionServiceClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
-		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
+		WebKeyV2Beta:   webkey_v2beta.NewWebKeyServiceClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
+		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
+		SCIM:           scim.NewScimClient(target),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -151,6 +158,7 @@ func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserRes
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -175,6 +183,7 @@ func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHuman
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -206,7 +215,24 @@ func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *
 		TotpSecret: gu.Ptr(secret),
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
+}
+
+// TriggerUserByID makes sure the user projection gets triggered after creation.
+func (i *Instance) TriggerUserByID(ctx context.Context, users ...string) {
+	var wg sync.WaitGroup
+	wg.Add(len(users))
+	for _, user := range users {
+		go func(user string) {
+			defer wg.Done()
+			_, err := i.Client.UserV2.GetUserByID(ctx, &user_v2.GetUserByIDRequest{
+				UserId: user,
+			})
+			logging.OnError(err).Warn("get user by ID for trigger failed")
+		}(user)
+	}
+	wg.Wait()
 }
 
 func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail string) *org.AddOrganizationResponse {
@@ -232,6 +258,13 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 		},
 	})
 	logging.OnError(err).Panic("create org")
+
+	users := make([]string, len(resp.GetCreatedAdmins()))
+	for i, admin := range resp.GetCreatedAdmins() {
+		users[i] = admin.GetUserId()
+	}
+	i.TriggerUserByID(ctx, users...)
+
 	return resp
 }
 
@@ -268,7 +301,7 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
-func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email string) *user_v2.AddHumanUserResponse {
+func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email, phone string) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
@@ -289,13 +322,14 @@ func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email strin
 			},
 		},
 		Phone: &user_v2.SetHumanPhone{
-			Phone: "+41791234567",
+			Phone: phone,
 			Verification: &user_v2.SetHumanPhone_IsVerified{
 				IsVerified: true,
 			},
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -307,6 +341,7 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 		AccessTokenType: user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -324,7 +359,7 @@ func (i *Instance) CreateUserIDPlink(ctx context.Context, userID, externalID, id
 	)
 }
 
-func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) {
+func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) string {
 	reg, err := i.Client.UserV2.CreatePasskeyRegistrationLink(ctx, &user_v2.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user_v2.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
@@ -347,9 +382,10 @@ func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) {
 		PasskeyName:         "nice name",
 	})
 	logging.OnError(err).Panic("create user passkey")
+	return pkr.GetPasskeyId()
 }
 
-func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) {
+func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) string {
 	pkr, err := i.Client.UserV2.RegisterU2F(ctx, &user_v2.RegisterU2FRequest{
 		UserId: userID,
 		Domain: i.Domain,
@@ -365,6 +401,21 @@ func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) {
 		TokenName:           "nice name",
 	})
 	logging.OnError(err).Panic("create user u2f")
+	return pkr.GetU2FId()
+}
+
+func (i *Instance) RegisterUserOTPSMS(ctx context.Context, userID string) {
+	_, err := i.Client.UserV2.AddOTPSMS(ctx, &user_v2.AddOTPSMSRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create user sms")
+}
+
+func (i *Instance) RegisterUserOTPEmail(ctx context.Context, userID string) {
+	_, err := i.Client.UserV2.AddOTPEmail(ctx, &user_v2.AddOTPEmailRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create user email")
 }
 
 func (i *Instance) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *object.Details {
@@ -379,7 +430,18 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 	return resp.GetDetails()
 }
 
+func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id string) {
+	_, err := i.Client.Admin.AddIDPToLoginPolicy(ctx, &admin.AddIDPToLoginPolicyRequest{
+		IdpId: id,
+	})
+	logging.OnError(err).Panic("add provider to default login policy")
+}
+
 func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *admin.AddGenericOAuthProviderResponse {
+	return i.AddGenericOAuthProviderWithOptions(ctx, name, true, true, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
+}
+
+func (i *Instance) AddGenericOAuthProviderWithOptions(ctx context.Context, name string, isLinkingAllowed, isCreationAllowed, isAutoCreation bool, autoLinking idp.AutoLinkingOption) *admin.AddGenericOAuthProviderResponse {
 	resp, err := i.Client.Admin.AddGenericOAuthProvider(ctx, &admin.AddGenericOAuthProviderRequest{
 		Name:                  name,
 		ClientId:              "clientID",
@@ -390,11 +452,11 @@ func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *ad
 		Scopes:                []string{"openid", "profile", "email"},
 		IdAttribute:           "id",
 		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  true,
-			IsCreationAllowed: true,
-			IsAutoCreation:    true,
+			IsLinkingAllowed:  isLinkingAllowed,
+			IsCreationAllowed: isCreationAllowed,
+			IsAutoCreation:    isAutoCreation,
 			IsAutoUpdate:      true,
-			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			AutoLinking:       autoLinking,
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
@@ -436,6 +498,26 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 			return err
 		})
 	*/
+	return resp
+}
+
+func (i *Instance) AddGenericOIDCProvider(ctx context.Context, name string) *admin.AddGenericOIDCProviderResponse {
+	resp, err := i.Client.Admin.AddGenericOIDCProvider(ctx, &admin.AddGenericOIDCProviderRequest{
+		Name:         name,
+		Issuer:       "https://example.com",
+		ClientId:     "clientID",
+		ClientSecret: "clientSecret",
+		Scopes:       []string{"openid", "profile", "email"},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+		},
+		IsIdTokenMapping: false,
+	})
+	logging.OnError(err).Panic("create generic oidc idp")
 	return resp
 }
 
@@ -493,100 +575,45 @@ func (i *Instance) AddSAMLPostProvider(ctx context.Context) string {
 	return resp.GetId()
 }
 
-/*
-func (s *Instance) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
-	resp, err := i.Client.UserV2.StartIdentityProviderIntent(ctx, &user.StartIdentityProviderIntentRequest{
+func (i *Instance) AddLDAPProvider(ctx context.Context) string {
+	resp, err := i.Client.Admin.AddLDAPProvider(ctx, &admin.AddLDAPProviderRequest{
+		Name:              "ldap-idp-post",
+		Servers:           []string{"https://localhost:8000"},
+		StartTls:          false,
+		BaseDn:            "baseDn",
+		BindDn:            "admin",
+		BindPassword:      "admin",
+		UserBase:          "dn",
+		UserObjectClasses: []string{"user"},
+		UserFilters:       []string{"(objectclass=*)"},
+		Timeout:           durationpb.New(10 * time.Second),
+		Attributes: &idp.LDAPAttributes{
+			IdAttribute: "id",
+		},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	logging.OnError(err).Panic("create ldap idp")
+	return resp.GetId()
+}
+
+func (i *Instance) CreateIntent(ctx context.Context, idpID string) *user_v2.StartIdentityProviderIntentResponse {
+	resp, err := i.Client.UserV2.StartIdentityProviderIntent(ctx, &user_v2.StartIdentityProviderIntentRequest{
 		IdpId: idpID,
-		Content: &user.StartIdentityProviderIntentRequest_Urls{
-			Urls: &user.RedirectURLs{
+		Content: &user_v2.StartIdentityProviderIntentRequest_Urls{
+			Urls: &user_v2.RedirectURLs{
 				SuccessUrl: "https://example.com/success",
 				FailureUrl: "https://example.com/failure",
 			},
-			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 		},
 	})
 	logging.OnError(err).Fatal("create generic OAuth idp")
 	return resp
 }
-
-func (i *Instance) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Instance.InstanceID())
-	require.NoError(t, err)
-	return writeModel.AggregateID
-}
-
-func (i *Instance) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	intentID := s.CreateIntent(t, ctx, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
-	require.NoError(t, err)
-	idpUser := openid.NewUser(
-		&oidc.UserInfo{
-			Subject: idpUserID,
-			UserInfoProfile: oidc.UserInfoProfile{
-				PreferredUsername: "username",
-			},
-		},
-	)
-	idpSession := &openid.Session{
-		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
-			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-			},
-			IDToken: "idToken",
-		},
-	}
-	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
-}
-
-func (s *Instance) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	intentID := s.CreateIntent(t, ctx, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
-	require.NoError(t, err)
-	username := "username"
-	lang := language.Make("en")
-	idpUser := ldap.NewUser(
-		idpUserID,
-		"",
-		"",
-		"",
-		"",
-		username,
-		"",
-		false,
-		"",
-		false,
-		lang,
-		"",
-		"",
-	)
-	attributes := map[string][]string{"id": {idpUserID}, "username": {username}, "language": {lang.String()}}
-	token, err := s.Commands.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, userID, attributes)
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
-}
-
-func (s *Instance) CreateSuccessfulSAMLIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	intentID := s.CreateIntent(t, ctx, idpID)
-	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
-	require.NoError(t, err)
-
-	idpUser := &saml.UserMapper{
-		ID:         idpUserID,
-		Attributes: map[string][]string{"attribute1": {"value1"}},
-	}
-	assertion := &crewjam_saml.Assertion{ID: "id"}
-
-	token, err := s.Server.Commands.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, userID, assertion)
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
-}
-*/
 
 func (i *Instance) CreateVerifiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
 	return i.CreateVerifiedWebAuthNSessionWithLifetime(t, ctx, userID, 0)
@@ -645,12 +672,31 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
+func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *mgmt.AddProjectGrantResponse {
+	resp, err := i.Client.Mgmt.AddProjectGrant(ctx, &mgmt.AddProjectGrantRequest{
+		GrantedOrgId: grantedOrgID,
+		ProjectId:    projectID,
+	})
+	logging.OnError(err).Panic("create project grant")
+	return resp
+}
+
 func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) string {
 	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 	})
 	require.NoError(t, err)
+	return resp.GetUserGrantId()
+}
+
+func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, projectID, projectGrantID, userID string) string {
+	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		ProjectGrantId: projectGrantID,
+	})
+	logging.OnError(err).Panic("create project grant user grant")
 	return resp.GetUserGrantId()
 }
 
@@ -675,47 +721,52 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 	if name == "" {
 		name = gofakeit.Name()
 	}
-	reqTarget := &action.Target{
+	req := &action.CreateTargetRequest{
 		Name:     name,
 		Endpoint: endpoint,
-		Timeout:  durationpb.New(10 * time.Second),
+		Timeout:  durationpb.New(5 * time.Second),
 	}
 	switch ty {
 	case domain.TargetTypeWebhook:
-		reqTarget.TargetType = &action.Target_RestWebhook{
-			RestWebhook: &action.SetRESTWebhook{
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.RESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeCall:
-		reqTarget.TargetType = &action.Target_RestCall{
-			RestCall: &action.SetRESTCall{
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.RESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeAsync:
-		reqTarget.TargetType = &action.Target_RestAsync{
-			RestAsync: &action.SetRESTAsync{},
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.RESTAsync{},
 		}
 	}
-	target, err := i.Client.ActionV3Alpha.CreateTarget(ctx, &action.CreateTargetRequest{Target: reqTarget})
+	target, err := i.Client.ActionV2beta.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
+func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
+	_, err := i.Client.ActionV2beta.DeleteTarget(ctx, &action.DeleteTargetRequest{
+		Id: id,
+	})
+	require.NoError(t, err)
+}
+
 func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
-	_, err := i.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
+	_, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
 }
 
 func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
-	target, err := i.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
+	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
-		Execution: &action.Execution{
-			Targets: targets,
-		},
+		Targets:   targets,
 	})
 	require.NoError(t, err)
 	return target

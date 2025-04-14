@@ -544,12 +544,23 @@ Errors:
     AlreadyExists: Auth Request already exists
     NotExisting: Auth Request does not exist
     WrongLoginClient: Auth Request created by other login client
+    AlreadyHandled: Auth Request has already been handled
   OIDCSession:
     RefreshTokenInvalid: Refresh Token is invalid
     Token:
       Invalid: Token is invalid
       Expired: Token is expired
     InvalidClient: Token was not issued for this client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest already exists
+    NotExisting: SAMLRequest does not exist
+    WrongLoginClient: SAMLRequest created by other login client
+    AlreadyHandled: SAMLRequest has already been handled
+  SAMLSession:
+    InvalidClient: SAMLResponse was not issued for this client
+  DeviceAuth:
+    NotFound: Device Authorization Request does not exist
+    AlreadyHandled: Device Authorization Request has already been handled
   Feature:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
@@ -624,6 +635,8 @@ AggregateTypes:
   system: System
   session: Session
   web_key: Web Key
+  saml_request: SAML Request
+  saml_session: SAML Session
 
 EventTypes:
   execution:
@@ -938,8 +951,8 @@ EventTypes:
           added: Second factor added to Login Policy
           removed: Second factor removed from Login Policy
         multifactor:
-          added: Multi factor added to Login Policy
-          removed: Multi factor removed from Login Policy
+          added: Multi-factor added to Login Policy
+          removed: Multi-factor removed from Login Policy
       password:
         complexity:
           added: Password complexity policy added

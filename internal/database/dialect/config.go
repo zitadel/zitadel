@@ -3,7 +3,6 @@ package dialect
 import (
 	"database/sql"
 	"sync"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -22,40 +21,23 @@ var (
 
 type Matcher interface {
 	MatchName(string) bool
-	Decode([]interface{}) (Connector, error)
+	Decode([]any) (Connector, error)
+	Type() DatabaseType
 }
 
-const (
-	QueryAppName             = "zitadel_queries"
-	EventstorePusherAppName  = "zitadel_es_pusher"
-	ProjectionSpoolerAppName = "zitadel_projection_spooler"
-	defaultAppName           = "zitadel"
-)
-
-// DBPurpose is what the resulting connection pool is used for.
-type DBPurpose int
+type DatabaseType uint8
 
 const (
-	DBPurposeQuery DBPurpose = iota
-	DBPurposeEventPusher
-	DBPurposeProjectionSpooler
+	DatabaseTypePostgres DatabaseType = iota
+	DatabaseTypeCockroach
 )
 
-func (p DBPurpose) AppName() string {
-	switch p {
-	case DBPurposeQuery:
-		return QueryAppName
-	case DBPurposeEventPusher:
-		return EventstorePusherAppName
-	case DBPurposeProjectionSpooler:
-		return ProjectionSpoolerAppName
-	default:
-		return defaultAppName
-	}
-}
+const (
+	DefaultAppName = "zitadel"
+)
 
 type Connector interface {
-	Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose DBPurpose) (*sql.DB, *pgxpool.Pool, error)
+	Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error)
 	Password() string
 	Database
 }
@@ -63,8 +45,7 @@ type Connector interface {
 type Database interface {
 	DatabaseName() string
 	Username() string
-	Type() string
-	Timetravel(time.Duration) string
+	Type() DatabaseType
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {

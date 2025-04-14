@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -11,13 +12,17 @@ import (
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/queue"
 )
 
-var projections []*handler.Handler
+var (
+	projections []*handler.Handler
+)
 
 func Register(
 	ctx context.Context,
-	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig projection.CustomConfig,
+	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig, backChannelLogoutHandlerCustomConfig projection.CustomConfig,
+	notificationWorkerConfig handlers.WorkerConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -25,16 +30,34 @@ func Register(
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
-	otpEmailTmpl string,
-	fileSystemPath string,
-	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
+	otpEmailTmpl, fileSystemPath string,
+	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
+	tokenLifetime time.Duration,
+	queue *queue.Queue,
 ) {
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.ShouldStart()
+	}
+
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
-	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl))
+	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
+	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
+		ctx,
+		projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig),
+		commands,
+		q,
+		es,
+		keysEncryptionAlg,
+		c,
+		tokenLifetime,
+	))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
+	}
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.AddWorkers(handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
 	}
 }
 

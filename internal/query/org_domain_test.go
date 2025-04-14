@@ -21,8 +21,7 @@ var (
 		` projections.org_domains2.is_primary,` +
 		` projections.org_domains2.validation_type,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.org_domains2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.org_domains2`
 	prepareOrgDomainsCols = []string{
 		"id",
 		"creation_date",
@@ -177,7 +176,7 @@ func Test_OrgDomainPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

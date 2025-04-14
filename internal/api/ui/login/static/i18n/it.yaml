@@ -263,6 +263,9 @@ RegistrationUser:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -304,6 +307,9 @@ ExternalRegistrationUserOverview:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -379,6 +385,9 @@ ExternalNotFound:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo
@@ -500,6 +509,10 @@ Errors:
       CreationNotAllowed: La creazione di un nuovo utente non è consentita su questo provider.
       LinkingNotAllowed: Il collegamento di un utente non è consentito su questo provider.
       NoOptionAllowed: Né la creazione né il collegamento sono consentiti per questo provider. Contattare l'amministratore.
+      LoginFailedSwitchLocal: |
+        Accesso al provider di identità esterno non riuscito. Ritorno all'accesso locale.
+
+        Dettagli dell'errore: {{.Details}}
     GrantRequired: Accesso non possibile. L'utente deve avere almeno una sovvenzione sull'applicazione. Contatta il tuo amministratore.
     ProjectRequired: Accesso non possibile. L'organizzazione dell'utente deve essere concessa al progetto. Contatta il tuo amministratore.
   IdentityProvider:

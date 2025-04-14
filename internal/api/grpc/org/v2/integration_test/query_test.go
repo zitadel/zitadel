@@ -15,6 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
@@ -25,9 +26,17 @@ type orgAttr struct {
 	Details *object.Details
 }
 
-func TestServer_ListOrganizations(t *testing.T) {
-	t.Parallel()
+func createOrganization(ctx context.Context, name string) orgAttr {
+	orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
+	orgResp.Details.CreationDate = orgResp.Details.ChangeDate
+	return orgAttr{
+		ID:      orgResp.GetOrganizationId(),
+		Name:    name,
+		Details: orgResp.GetDetails(),
+	}
+}
 
+func TestServer_ListOrganizations(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *org.ListOrganizationsRequest
@@ -64,6 +73,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						State:         org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -83,15 +93,10 @@ func TestServer_ListOrganizations(t *testing.T) {
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					count := 3
 					orgs := make([]orgAttr, count)
-					prefix := fmt.Sprintf("ListOrgs%d", time.Now().UnixNano())
+					prefix := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
 					for i := 0; i < count; i++ {
 						name := prefix + strconv.Itoa(i)
-						orgResp := Instance.CreateOrganization(ctx, name, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-						orgs[i] = orgAttr{
-							ID:      orgResp.GetOrganizationId(),
-							Name:    name,
-							Details: orgResp.GetDetails(),
-						}
+						orgs[i] = createOrganization(ctx, name)
 					}
 					request.Queries = []*org.SearchQuery{
 						OrganizationNamePrefixQuery(prefix),
@@ -141,6 +146,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -173,6 +179,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -205,11 +212,47 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.CreationDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
 						Id:            Instance.DefaultOrg.Id,
 						PrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
+					},
+				},
+			},
+		},
+		{
+			name: "list org by domain (non primary), ok",
+			args: args{
+				CTX,
+				&org.ListOrganizationsRequest{},
+				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
+					orgs := make([]orgAttr, 1)
+					name := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
+					orgs[0] = createOrganization(ctx, name)
+					domain := gofakeit.DomainName()
+					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgs[0].ID), &management.AddOrgDomainRequest{
+						Domain: domain,
+					})
+					if err != nil {
+						return nil, err
+					}
+					request.Queries = []*org.SearchQuery{
+						OrganizationDomainQuery(domain),
+					}
+					return orgs, nil
+				},
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*org.Organization{
+					{
+						State: org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
 					},
 				},
 			},
@@ -223,18 +266,19 @@ func TestServer_ListOrganizations(t *testing.T) {
 				},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					name := gofakeit.Name()
-					orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
-					deactivateOrgResp := Instance.DeactivateOrganization(ctx, orgResp.GetOrganizationId())
+					orgResp := createOrganization(ctx, name)
+					deactivateOrgResp := Instance.DeactivateOrganization(ctx, orgResp.ID)
 					request.Queries = []*org.SearchQuery{
-						OrganizationIdQuery(orgResp.GetOrganizationId()),
+						OrganizationIdQuery(orgResp.ID),
 						OrganizationStateQuery(org.OrganizationState_ORGANIZATION_STATE_INACTIVE),
 					}
 					return []orgAttr{{
-						ID:   orgResp.GetOrganizationId(),
+						ID:   orgResp.ID,
 						Name: name,
 						Details: &object.Details{
 							ResourceOwner: deactivateOrgResp.GetDetails().GetResourceOwner(),
 							Sequence:      deactivateOrgResp.GetDetails().GetSequence(),
+							CreationDate:  orgResp.Details.GetCreationDate(),
 							ChangeDate:    deactivateOrgResp.GetDetails().GetChangeDate(),
 						},
 					}}, nil
@@ -278,6 +322,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.ChangeDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -375,6 +420,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Name:  Instance.DefaultOrg.Name,
 						Details: &object.Details{
 							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							CreationDate:  Instance.DefaultOrg.Details.ChangeDate,
 							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
 							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 						},
@@ -399,38 +445,32 @@ func TestServer_ListOrganizations(t *testing.T) {
 				}
 			}
 
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.ListOrganizations(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.ListOrganizations(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, listErr)
-				if listErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
 
 				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
 				tt.want.Details.TotalResult = got.Details.TotalResult
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
+				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					for i := range tt.want.Result {
+						// domain from result, as it is generated though the create
+						tt.want.Result[i].PrimaryDomain = got.Result[i].PrimaryDomain
+						// sequence from result, as it can be with different sequence from create
+						tt.want.Result[i].Details.Sequence = got.Result[i].Details.Sequence
+					}
 
-				for i := range tt.want.Result {
-					// domain from result, as it is generated though the create
-					tt.want.Result[i].PrimaryDomain = got.Result[i].PrimaryDomain
-					// sequence from result, as it can be with different sequence from create
-					tt.want.Result[i].Details.Sequence = got.Result[i].Details.Sequence
-				}
-
-				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+					for i := range tt.want.Result {
+						assert.Contains(ttt, got.Result, tt.want.Result[i])
+					}
 				}
 				integration.AssertListDetails(t, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user result")
+			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}
 }

@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+package zitadel.saml.v2;
+
+import "zitadel/object/v2/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/saml/v2/authorization.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/saml/v2;saml";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "SAML Service";
+    version: "2.0";
+    description: "Get SAML Auth Request details and create callback URLs.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+service SAMLService {
+  rpc GetSAMLRequest (GetSAMLRequestRequest) returns (GetSAMLRequestResponse) {
+    option (google.api.http) = {
+      get: "/v2/saml/saml_requests/{saml_request_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get SAML Request details";
+      description: "Get SAML Request details by ID. Returns details that are parsed from the application's SAML Request."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc CreateResponse (CreateResponseRequest) returns (CreateResponseResponse) {
+    option (google.api.http) = {
+      post: "/v2/saml/saml_requests/{saml_request_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Finalize a SAML Request and get the response.";
+      description: "Finalize a SAML Request and get the response definition for success or failure. The response must be handled as per the SAML definition to inform the application about the success or failure. On success, the response contains details for the application to obtain the SAMLResponse. This method can only be called once for an SAML request."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+}
+
+message GetSAMLRequestRequest {
+  // ID of the SAML Request, as obtained from the redirect URL.
+  string saml_request_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message GetSAMLRequestResponse {
+  SAMLRequest saml_request = 1;
+}
+
+message CreateResponseRequest {
+  // ID of the SAML Request.
+  string saml_request_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432705\"";
+    }
+  ];
+
+  oneof response_kind {
+    option (validate.required) = true;
+    Session session = 2;
+    // Set this field when the authorization flow failed. It creates a response depending on the SP, with the error details set.
+    AuthorizationError error = 3;
+  }
+}
+
+message Session {
+  // ID of the session, used to login the user. Connects the session to the SAML Request.
+  string session_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+
+  // Token to verify the session is valid.
+  string session_token = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+    }
+  ];
+}
+
+message CreateResponseResponse {
+  zitadel.object.v2.Details details = 1;
+  // URL including the Assertion Consumer Service where the user should be redirected or has to call per POST, depending on the binding. Contains details for the application to obtain the response on success, or error details on failure. Note that this field must be treated as credentials, as the contained SAMLResponse or code can be used on behalve of the user.
+  string url = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://client.example.org/cb\""
+    }
+  ];
+  // Binding is defined through the request, what the IDP is able to use and what bindings are available for the SP.
+  oneof binding {
+    // Set if the binding is Redirect-Binding, where the user can directly be redirected to the application, using a \"302 FOUND\" status to the URL.
+    RedirectResponse redirect = 3;
+    // Set if the binding is POST-Binding, where the application expects to be called per HTTP POST with the SAMLResponse and RelayState in the form body.
+    PostResponse post = 4;
+  }
+}
+
+message RedirectResponse{}
+message PostResponse{
+  string relay_state = 1;
+  string saml_response = 2;
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -19,8 +20,10 @@ import (
 
 func TestCommands_AddTarget(t *testing.T) {
 	type fields struct {
-		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		idGenerator                 id.Generator
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx           context.Context
@@ -28,9 +31,8 @@ func TestCommands_AddTarget(t *testing.T) {
 		resourceOwner string
 	}
 	type res struct {
-		id      string
-		details *domain.ObjectDetails
-		err     func(error) bool
+		id  string
+		err func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -132,10 +134,18 @@ func TestCommands_AddTarget(t *testing.T) {
 							"https://example.com",
 							time.Second,
 							false,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
 						),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
 			},
 			args{
 				ctx: context.Background(),
@@ -186,7 +196,9 @@ func TestCommands_AddTarget(t *testing.T) {
 						targetAddEvent("id1", "instance"),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
 			},
 			args{
 				ctx: context.Background(),
@@ -200,10 +212,6 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 			res{
 				id: "id1",
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
 			},
 		},
 		{
@@ -219,7 +227,9 @@ func TestCommands_AddTarget(t *testing.T) {
 						}(),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
 			},
 			args{
 				ctx: context.Background(),
@@ -234,20 +244,18 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 			res{
 				id: "id1",
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore:                  tt.fields.eventstore(t),
+				idGenerator:                 tt.fields.idGenerator,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			details, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
+			_, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -256,7 +264,6 @@ func TestCommands_AddTarget(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, tt.args.add.AggregateID)
-				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -264,7 +271,9 @@ func TestCommands_AddTarget(t *testing.T) {
 
 func TestCommands_ChangeTarget(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx           context.Context
@@ -272,8 +281,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		resourceOwner string
 	}
 	type res struct {
-		details *domain.ObjectDetails
-		err     func(error) bool
+		err func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -415,12 +423,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				},
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
-			},
+			res{},
 		},
 		{
 			"unique constraint failed, error",
@@ -485,12 +488,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				},
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
-			},
+			res{},
 		},
 		{
 			"push full ok",
@@ -510,10 +508,18 @@ func TestCommands_ChangeTarget(t *testing.T) {
 								target.ChangeTargetType(domain.TargetTypeCall),
 								target.ChangeTimeout(10 * time.Second),
 								target.ChangeInterruptOnError(true),
+								target.ChangeSigningKey(&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								}),
 							},
 						),
 					),
 				),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
 			},
 			args{
 				ctx: context.Background(),
@@ -521,36 +527,31 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					Name:             gu.Ptr("name2"),
-					Endpoint:         gu.Ptr("https://example2.com"),
-					TargetType:       gu.Ptr(domain.TargetTypeCall),
-					Timeout:          gu.Ptr(10 * time.Second),
-					InterruptOnError: gu.Ptr(true),
+					Name:                 gu.Ptr("name2"),
+					Endpoint:             gu.Ptr("https://example2.com"),
+					TargetType:           gu.Ptr(domain.TargetTypeCall),
+					Timeout:              gu.Ptr(10 * time.Second),
+					InterruptOnError:     gu.Ptr(true),
+					ExpirationSigningKey: true,
 				},
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
-			},
+			res{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:                  tt.fields.eventstore(t),
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			details, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
+			_, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -566,8 +567,7 @@ func TestCommands_DeleteTarget(t *testing.T) {
 		resourceOwner string
 	}
 	type res struct {
-		details *domain.ObjectDetails
-		err     func(error) bool
+		err func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -601,9 +601,7 @@ func TestCommands_DeleteTarget(t *testing.T) {
 				id:            "id1",
 				resourceOwner: "instance",
 			},
-			res{
-				err: zerrors.IsNotFound,
-			},
+			res{},
 		},
 		{
 			"remove ok",
@@ -627,12 +625,31 @@ func TestCommands_DeleteTarget(t *testing.T) {
 				id:            "id1",
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
+			res{},
+		},
+		{
+			"already removed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							targetAddEvent("id1", "instance"),
+						),
+						eventFromEventPusher(
+							target.NewRemovedEvent(context.Background(),
+								target.NewAggregate("id1", "instance"),
+								"name",
+							),
+						),
+					),
+				),
 			},
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "instance",
+			},
+			res{},
 		},
 	}
 	for _, tt := range tests {
@@ -640,15 +657,12 @@ func TestCommands_DeleteTarget(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			details, err := c.DeleteTarget(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
+			_, err := c.DeleteTarget(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
+import { Timestamp as ConnectTimestamp } from '@bufbuild/protobuf/wkt';
 
 export interface PageEvent {
   length: number;
@@ -14,7 +15,7 @@ export interface PageEvent {
   styleUrls: ['./paginator.component.scss'],
 })
 export class PaginatorComponent {
-  @Input() public timestamp: Timestamp.AsObject | undefined = undefined;
+  @Input() public timestamp: Timestamp.AsObject | ConnectTimestamp | undefined = undefined;
   @Input() public length: number = 0;
   @Input() public pageSize: number = 10;
   @Input() public pageIndex: number = 0;
@@ -50,6 +51,15 @@ export class PaginatorComponent {
     return temp <= this.length / this.pageSize;
   }
 
+  get startIndex(): number {
+    return this.pageIndex * this.pageSize;
+  }
+
+  get endIndex(): number {
+    const max = this.startIndex + this.pageSize;
+    return this.length < max ? this.length : max;
+  }
+
   public emitChange(): void {
     this.page.emit({
       length: this.length,
@@ -57,5 +67,11 @@ export class PaginatorComponent {
       pageIndex: this.pageIndex,
       pageSizeOptions: this.pageSizeOptions,
     });
+  }
+
+  public updatePageSize(newSize: number): void {
+    this.pageSize = newSize;
+    this.pageIndex = 0;
+    this.emitChange();
   }
 }

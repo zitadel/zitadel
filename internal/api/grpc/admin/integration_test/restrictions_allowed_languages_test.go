@@ -24,8 +24,6 @@ import (
 )
 
 func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
-	t.Parallel()
-
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
 
@@ -51,7 +49,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 			require.Equal(ttt, language.Make(defaultLang.Language), language.English)
 		})
 		tt.Run("the discovery endpoint returns all supported languages", func(ttt *testing.T) {
-			awaitDiscoveryEndpoint(ttt, instance.Domain, supportedLanguagesStr, nil)
+			awaitDiscoveryEndpoint(ttt, ctx, instance.Domain, supportedLanguagesStr, nil)
 		})
 	})
 	t.Run("restricting the default language fails", func(tt *testing.T) {
@@ -92,10 +90,10 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		require.Condition(tt, contains(supported.GetLanguages(), supportedLanguagesStr))
 	})
 	t.Run("the disallowed language is not listed in the discovery endpoint", func(tt *testing.T) {
-		awaitDiscoveryEndpoint(tt, instance.Domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		awaitDiscoveryEndpoint(tt, ctx, instance.Domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
 	})
 	t.Run("the login ui is rendered in the default language", func(tt *testing.T) {
-		awaitLoginUILanguage(tt, instance.Domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
+		awaitLoginUILanguage(tt, ctx, instance.Domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
 	})
 	t.Run("preferred languages are not restricted by the supported languages", func(tt *testing.T) {
 		tt.Run("change user profile", func(ttt *testing.T) {
@@ -153,10 +151,10 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 
 	t.Run("allowing the language makes it usable again", func(tt *testing.T) {
 		tt.Run("the previously disallowed language is listed in the discovery endpoint again", func(ttt *testing.T) {
-			awaitDiscoveryEndpoint(ttt, instance.Domain, []string{disallowedLanguage.String()}, nil)
+			awaitDiscoveryEndpoint(ttt, ctx, instance.Domain, []string{disallowedLanguage.String()}, nil)
 		})
 		tt.Run("the login ui is rendered in the previously disallowed language", func(ttt *testing.T) {
-			awaitLoginUILanguage(ttt, instance.Domain, disallowedLanguage, disallowedLanguage, "Contraseña")
+			awaitLoginUILanguage(ttt, ctx, instance.Domain, disallowedLanguage, disallowedLanguage, "Contraseña")
 		})
 	})
 }
@@ -164,36 +162,36 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 func setAndAwaitAllowedLanguages(ctx context.Context, cc *integration.Client, t *testing.T, selectLanguages []string) {
 	_, err := cc.Admin.SetRestrictions(ctx, &admin.SetRestrictionsRequest{AllowedLanguages: &admin.SelectLanguages{List: selectLanguages}})
 	require.NoError(t, err)
-	awaitCtx, awaitCancel := context.WithTimeout(ctx, 10*time.Second)
-	defer awaitCancel()
-	await(t, awaitCtx, func(tt *assert.CollectT) {
-		restrictions, getErr := cc.Admin.GetRestrictions(awaitCtx, &admin.GetRestrictionsRequest{})
-		expectLanguages := selectLanguages
-		if len(selectLanguages) == 0 {
-			expectLanguages = nil
-		}
-		assert.NoError(tt, getErr)
-		assert.Equal(tt, expectLanguages, restrictions.GetAllowedLanguages())
-	})
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t,
+		func(tt *assert.CollectT) {
+			restrictions, getErr := cc.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
+			expectLanguages := selectLanguages
+			if len(selectLanguages) == 0 {
+				expectLanguages = nil
+			}
+			assert.NoError(tt, getErr)
+			assert.Equal(tt, expectLanguages, restrictions.GetAllowedLanguages())
+		}, retryDuration, tick, "awaiting successful GetAllowedLanguages failed",
+	)
 }
 
 func setAndAwaitDefaultLanguage(ctx context.Context, cc *integration.Client, t *testing.T, lang language.Tag) {
 	_, err := cc.Admin.SetDefaultLanguage(ctx, &admin.SetDefaultLanguageRequest{Language: lang.String()})
 	require.NoError(t, err)
-	awaitCtx, awaitCancel := context.WithTimeout(ctx, 10*time.Second)
-	defer awaitCancel()
-	await(t, awaitCtx, func(tt *assert.CollectT) {
-		defaultLang, getErr := cc.Admin.GetDefaultLanguage(awaitCtx, &admin.GetDefaultLanguageRequest{})
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		defaultLang, getErr := cc.Admin.GetDefaultLanguage(ctx, &admin.GetDefaultLanguageRequest{})
 		assert.NoError(tt, getErr)
 		assert.Equal(tt, lang.String(), defaultLang.GetLanguage())
-	})
+	}, retryDuration, tick, "awaiting successful GetDefaultLanguage failed",
+	)
 }
 
-func awaitDiscoveryEndpoint(t *testing.T, domain string, containsUILocales, notContainsUILocales []string) {
-	awaitCtx, awaitCancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer awaitCancel()
-	await(t, awaitCtx, func(tt *assert.CollectT) {
-		req, err := http.NewRequestWithContext(awaitCtx, http.MethodGet, "http://"+domain+":8080/.well-known/openid-configuration", nil)
+func awaitDiscoveryEndpoint(t *testing.T, ctx context.Context, domain string, containsUILocales, notContainsUILocales []string) {
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+domain+":8080/.well-known/openid-configuration", nil)
 		require.NoError(tt, err)
 		resp, err := http.DefaultClient.Do(req)
 		require.NoError(tt, err)
@@ -213,14 +211,14 @@ func awaitDiscoveryEndpoint(t *testing.T, domain string, containsUILocales, notC
 		if notContainsUILocales != nil {
 			assert.Condition(tt, not(contains(doc.UILocalesSupported, notContainsUILocales)))
 		}
-	})
+	}, retryDuration, tick, "awaiting successful call to Discovery endpoint failed",
+	)
 }
 
-func awaitLoginUILanguage(t *testing.T, domain string, acceptLanguage language.Tag, expectLang language.Tag, containsText string) {
-	awaitCtx, awaitCancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer awaitCancel()
-	await(t, awaitCtx, func(tt *assert.CollectT) {
-		req, err := http.NewRequestWithContext(awaitCtx, http.MethodGet, "http://"+domain+":8080/ui/login/register", nil)
+func awaitLoginUILanguage(t *testing.T, ctx context.Context, domain string, acceptLanguage language.Tag, expectLang language.Tag, containsText string) {
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+domain+":8080/ui/login/register", nil)
 		req.Header.Set("Accept-Language", acceptLanguage.String())
 		require.NoError(tt, err)
 		resp, err := http.DefaultClient.Do(req)
@@ -232,7 +230,8 @@ func awaitLoginUILanguage(t *testing.T, domain string, acceptLanguage language.T
 		}()
 		require.NoError(tt, err)
 		assert.Containsf(tt, string(body), containsText, "login ui language is in "+expectLang.String())
-	})
+	}, retryDuration, tick, "awaiting successful LoginUI in specific language failed",
+	)
 }
 
 // We would love to use assert.Contains here, but it doesn't work with slices of strings

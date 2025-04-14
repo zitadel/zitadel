@@ -263,6 +263,9 @@ RegistrationUser:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -304,6 +307,9 @@ ExternalRegistrationUserOverview:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -379,6 +385,9 @@ ExternalNotFound:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   
 Footer:
   PoweredBy: Powered By
@@ -482,6 +491,10 @@ Errors:
       CreationNotAllowed: La creación de un nuevo usuario no está permitida para este proveedor
       LinkingNotAllowed: La vinculación de un usuario no está permitida para este proveedor
       NoOptionAllowed: Ni la creación ni la vinculación están permitidas en este proveedor. Póngase en contacto con su administrador.
+      LoginFailedSwitchLocal: |
+        Error al iniciar sesión en el proveedor de identidad externo. Volviendo al inicio de sesión local.
+        
+        Detalles del error: {{.Details}}
     GrantRequired: El inicio de sesión no es posible. Se requiere que el usuario tenga al menos una concesión sobre la aplicación. Por favor contacta con tu administrador.
     ProjectRequired: El inicio de sesión no es posible. La organización del usuario debe tener el acceso concedido para el proyecto. Por favor contacta con tu administrador.
   IdentityProvider:

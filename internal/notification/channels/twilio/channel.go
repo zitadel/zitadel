@@ -1,7 +1,10 @@
 package twilio
 
 import (
-	newTwilio "github.com/twilio/twilio-go"
+	"errors"
+
+	"github.com/twilio/twilio-go"
+	twilioClient "github.com/twilio/twilio-go/client"
 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
 	verify "github.com/twilio/twilio-go/rest/verify/v2"
 	"github.com/zitadel/logging"
@@ -11,8 +14,12 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+const (
+	aggregateTypeNotification = "notification"
+)
+
 func InitChannel(config Config) channels.NotificationChannel {
-	client := newTwilio.NewRestClientWithParams(newTwilio.ClientParams{Username: config.SID, Password: config.Token})
+	client := twilio.NewRestClientWithParams(twilio.ClientParams{Username: config.SID, Password: config.Token})
 	logging.Debug("successfully initialized twilio sms channel")
 
 	return channels.HandleMessageFunc(func(message channels.Message) error {
@@ -26,6 +33,22 @@ func InitChannel(config Config) channels.NotificationChannel {
 			params.SetChannel("sms")
 
 			resp, err := client.VerifyV2.CreateVerification(config.VerifyServiceSID, params)
+
+			// In case of any client error (4xx), we should not retry sending the verification code
+			// as it would be a waste of resources and could potentially result in a rate limit.
+			var twilioErr *twilioClient.TwilioRestError
+			if errors.As(err, &twilioErr) && twilioErr.Status >= 400 && twilioErr.Status < 500 {
+				logging.WithFields(
+					"error", twilioErr.Message,
+					"status", twilioErr.Status,
+					"code", twilioErr.Code,
+					"instanceID", twilioMsg.InstanceID,
+					"jobID", twilioMsg.JobID,
+					"userID", twilioMsg.UserID,
+				).Warn("twilio create verification error")
+				return channels.NewCancelError(twilioErr)
+			}
+
 			if err != nil {
 				return zerrors.ThrowInternal(err, "TWILI-0s9f2", "could not send verification")
 			}

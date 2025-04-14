@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -17,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -114,14 +116,15 @@ type InstanceSetup struct {
 		MaxOTPAttempts           uint64
 		ShouldShowLockoutFailure bool
 	}
-	EmailTemplate     []byte
-	MessageTexts      []*domain.CustomMessageText
-	SMTPConfiguration *SMTPConfiguration
-	OIDCSettings      *OIDCSettings
-	Quotas            *SetQuotas
-	Features          *InstanceFeatures
-	Limits            *SetLimits
-	Restrictions      *SetRestrictions
+	EmailTemplate          []byte
+	MessageTexts           []*domain.CustomMessageText
+	SMTPConfiguration      *SMTPConfiguration
+	OIDCSettings           *OIDCSettings
+	Quotas                 *SetQuotas
+	Features               *InstanceFeatures
+	Limits                 *SetLimits
+	Restrictions           *SetRestrictions
+	RolePermissionMappings []authz.RoleMapping
 }
 
 type SMTPConfiguration struct {
@@ -155,6 +158,7 @@ type SecretGenerators struct {
 	OTPSMS                   *crypto.GeneratorConfig
 	OTPEmail                 *crypto.GeneratorConfig
 	InviteCode               *crypto.GeneratorConfig
+	SigningKey               *crypto.GeneratorConfig
 }
 
 type ZitadelConfig struct {
@@ -229,21 +233,25 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", "", nil, nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	_, err = c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
+
+	// RolePermissions need to be pushed in separate transaction.
+	// https://github.com/zitadel/zitadel/issues/9293
+	details, err := c.SynchronizeRolePermission(ctx, setup.zitadel.instanceID, setup.RolePermissionMappings)
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+	details.ResourceOwner = setup.zitadel.orgID
 
 	var token string
 	if pat != nil {
 		token = pat.Token
 	}
 
-	return setup.zitadel.instanceID, token, machineKey, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: setup.zitadel.orgID,
-	}, nil
+	return setup.zitadel.instanceID, token, machineKey, details, nil
 }
 
 func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string) context.Context {
@@ -292,7 +300,7 @@ func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (vali
 	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
 	setupLimits(c, &validations, limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID), setup.Limits)
 	setupRestrictions(c, &validations, restrictions.NewAggregate(setup.zitadel.restrictionsID, setup.zitadel.instanceID, setup.zitadel.instanceID), setup.Restrictions)
-
+	setupInstanceCreatedMilestone(&validations, setup.zitadel.instanceID)
 	return validations, pat, machineKey, nil
 }
 
@@ -843,9 +851,6 @@ func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLangu
 			if err := domain.LanguageIsAllowed(false, restrictionsWM.allowedLanguages, defaultLanguage); err != nil {
 				return nil, err
 			}
-			if err != nil {
-				return nil, err
-			}
 			return []eventstore.Command{instance.NewDefaultLanguageSetEvent(ctx, &a.Aggregate, defaultLanguage)}, nil
 		}, nil
 	}
@@ -890,7 +895,8 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 	if err != nil {
 		return nil, err
 	}
-
+	err = c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, id)
+	logging.OnError(err).Error("milestone invalidate")
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreatedAt(),
@@ -908,10 +914,16 @@ func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Vali
 			if !writeModel.State.Exists() {
 				return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
 			}
-			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx,
-					&a.Aggregate,
-					writeModel.Name,
-					writeModel.Domains)},
+			milestoneAggregate := milestone.NewInstanceAggregate(a.ID)
+			return []eventstore.Command{
+					instance.NewInstanceRemovedEvent(ctx,
+						&a.Aggregate,
+						writeModel.Name,
+						writeModel.Domains),
+					milestone.NewReachedEvent(ctx,
+						milestoneAggregate,
+						milestone.InstanceDeleted),
+				},
 				nil
 		}, nil
 	}

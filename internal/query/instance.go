@@ -16,7 +16,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -143,11 +142,15 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
+func (q *Queries) ActiveInstances() []string {
+	return q.caches.activeInstances.Keys()
+}
+
 func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	filter, query, scan := prepareInstancesQuery(ctx, q.client)
+	filter, query, scan := prepareInstancesQuery()
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
@@ -174,7 +177,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareInstanceDomainQuery(ctx, q.client)
+	stmt, scan := prepareInstanceDomainQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -198,10 +201,13 @@ var (
 )
 
 func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
+	var instance *authzInstance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("unable to get instance by host: instanceHost %s, publicHost %s: %w", instanceHost, publicHost, err)
+		} else {
+			q.caches.activeInstances.Add(instance.ID, true)
 		}
 		span.EndWithError(err)
 	}()
@@ -225,6 +231,12 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			return
+		}
+		q.caches.activeInstances.Add(id, true)
+	}()
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
 	if ok {
@@ -248,7 +260,7 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLang
 }
 
-func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
 	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
@@ -278,7 +290,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				InstanceDomainSequenceCol.identifier(),
 			).FromSelect(builder, InstancesFilterTableAlias).
 				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
-				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn) + db.Timetravel(call.Took(ctx))).
+				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
 				PlaceholderFormat(sq.Dollar)
 		},
 		func(rows *sql.Rows) (*Instances, error) {
@@ -353,7 +365,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -373,7 +385,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			InstanceDomainSequenceCol.identifier(),
 		).
 			From(instanceTable.identifier()).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -522,9 +534,9 @@ func (i *authzInstance) Keys(index instanceIndex) []string {
 		return []string{i.ID}
 	case instanceIndexByHost:
 		return i.ExternalDomains
-	default:
-		return nil
+	case instanceIndexUnspecified:
 	}
+	return nil
 }
 
 func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
@@ -587,9 +599,10 @@ func (c *Caches) registerInstanceInvalidation() {
 	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
 	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
 
-	// limits uses own aggregate ID, invalidate using resource owner.
+	// These projections have their own aggregate ID, invalidate using resource owner.
 	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
+	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
 
 	// System feature update should invalidate all instances, so Truncate the cache.
 	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {

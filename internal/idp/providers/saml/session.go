@@ -3,6 +3,7 @@ package saml
 import (
 	"bytes"
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -59,6 +60,11 @@ func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	return idp.Form(resp.content.String())
 }
 
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
+}
+
 // FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.RequestID == "" || s.Request == nil {
@@ -67,6 +73,10 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 
 	s.Assertion, err = s.ServiceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
 	if err != nil {
+		invalidRespErr := new(saml.InvalidResponseError)
+		if errors.As(err, &invalidRespErr) {
+			return nil, zerrors.ThrowInvalidArgument(invalidRespErr.PrivateErr, "SAML-ajl3irfs", "Errors.Intent.ResponseInvalid")
+		}
 		return nil, zerrors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 

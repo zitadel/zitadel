@@ -13,8 +13,6 @@
         <img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/zitadel/zitadel/build.yml?event=pull_request"></a>
     <a href="https://zitadel.com/docs/support/software-release-cycles-support" alt="Release">
         <img src="https://badgen.net/github/release/zitadel/zitadel/stable" /></a>
-    <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
-        <img alt="Dynamic YAML Badge" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fzitadel%2Fzitadel%2Fmain%2Frelease-channels.yaml&query=%24.stable&label=stable"></a>
     <a href="https://goreportcard.com/report/github.com/zitadel/zitadel" alt="Go Report Card">
         <img src="https://goreportcard.com/badge/github.com/zitadel/zitadel" /></a>
     <a href="https://codecov.io/gh/zitadel/zitadel" alt="Code Coverage">
@@ -29,10 +27,6 @@
     <a href="https://openid.net/certification/#OPs" alt="OpenID Connect Certified">
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
-
-|Community Meeting|
-|------------------|
-|ZITADEL holds bi-weekly community calls. To join the community calls or to watch previous meeting notes and recordings, please visit the [meeting schedule](https://github.com/zitadel/zitadel/blob/main/MEETING_SCHEDULE.md).|
 
 Are you searching for a user management tool that is quickly set up like Auth0 and open source like Keycloak?
 
@@ -51,6 +45,7 @@ We provide you with a wide range of out-of-the-box features to accelerate your p
 :white_check_mark: LDAP  
 :white_check_mark: Passkeys / FIDO2  
 :white_check_mark: OTP  
+:white_check_mark: SCIM 2.0 Server
 and an unlimited audit trail is there for you, ready to use.
 
 With ZITADEL, you are assured of a robust and customizable turnkey solution for all your authentication and authorization needs.
@@ -89,6 +84,10 @@ Available data regions are:
 ZITADEL Cloud comes with a free tier, providing you with all the same features as the open-source version.
 Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
+## Adopters
+
+We are grateful to the organizations and individuals who are using ZITADEL. If you are using ZITADEL, please consider adding your name to our [Adopters list](./ADOPTERS.md) by submitting a pull request.
+
 ### Example applications
 
 Clone one of our [example applications](https://zitadel.com/docs/sdk-examples/introduction) or deploy them directly to Vercel.
@@ -108,7 +107,7 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to react on events with custom code and extended ZITADEL for you needs
 - [Branding](https://zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
 - [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
-- [CockroachDB](https://www.cockroachlabs.com/) or a [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
+- [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
 
 ## Features
 
@@ -126,6 +125,7 @@ Authentication
 - [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) if you need to go beyond OIDC or SAML 
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 - [Token exchange and impersonation](https://zitadel.com/docs/guides/integrate/token-exchange)
+- [Beta: Hosted Login V2](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta) our new login version 2.0
 
 Multi-Tenancy
 
@@ -139,10 +139,11 @@ Integration
 - [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction) for every functionality and resource
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to call any API, send webhooks, adjust workflows, or customize tokens
 - [Role Based Access Control (RBAC)](https://zitadel.com/docs/guides/integrate/retrieve-user-roles)
+- [SCIM 2.0 Server](https://zitadel.com/docs/apis/scim2)
 - [Examples and SDKs](https://zitadel.com/docs/sdk-examples/introduction)
 - [Audit Log and SOC/SIEM](https://zitadel.com/docs/guides/integrate/external-audit-log)
 - [User registration and onboarding](https://zitadel.com/docs/guides/integrate/onboarding)
-- [Hosted and custom login user interface](https://zitadel.com/docs/guides/integrate/login-ui)
+- [Hosted and custom login user interface](https://zitadel.com/docs/guides/integrate/login/login-users)
 
 Self-Service
 - [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
@@ -150,7 +151,7 @@ Self-Service
 - [Administration UI (Console)](https://zitadel.com/docs/guides/manage/console/overview)
 
 Deployment
-- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version latest stable)
+- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14)
 - [Zero Downtime Updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)
 - [High scalability](https://zitadel.com/docs/self-hosting/manage/production)
 
@@ -167,7 +168,7 @@ Join our [Discord Chat](https://zitadel.com/chat) to get help.
   <img src="https://contrib.rocks/image?repo=zitadel/zitadel" />
 </a>
 
-Made with [contrib.rocks](https://contrib.rocks).
+Made with [contrib.rocks](https://contrib.rocks/preview?repo=zitadel/zitadel).
 
 ## Showcase
 
@@ -188,6 +189,11 @@ Use our login widget to allow easy and secure access to your applications and en
 Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 
 [![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
+
+### Login V2
+
+Check out our new Login V2 version in our [typescript repository](https://github.com/zitadel/typescript) or in our [documentation](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
+[![New Login Showcase](https://github.com/user-attachments/assets/cb5c5212-128b-4dc9-b11d-cabfd3f73e26)]
 
 ## Security
 

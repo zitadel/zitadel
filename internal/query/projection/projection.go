@@ -69,6 +69,7 @@ var (
 	DeviceAuthProjection                *handler.Handler
 	SessionProjection                   *handler.Handler
 	AuthRequestProjection               *handler.Handler
+	SamlRequestProjection               *handler.Handler
 	MilestoneProjection                 *handler.Handler
 	QuotaProjection                     *quotaProjection
 	LimitsProjection                    *handler.Handler
@@ -83,6 +84,9 @@ var (
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
+	InstanceDomainFields    *handler.FieldHandler
+	MembershipFields        *handler.FieldHandler
+	PermissionFields        *handler.FieldHandler
 )
 
 type projection interface {
@@ -94,18 +98,19 @@ type projection interface {
 
 var (
 	projections []projection
+	fields      []*handler.FieldHandler
 )
 
 func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) error {
 	projectionConfig = handler.Config{
-		Client:                sqlClient,
-		Eventstore:            es,
-		BulkLimit:             uint16(config.BulkLimit),
-		RequeueEvery:          config.RequeueEvery,
-		HandleActiveInstances: config.HandleActiveInstances,
-		MaxFailureCount:       config.MaxFailureCount,
-		RetryFailedAfter:      config.RetryFailedAfter,
-		TransactionDuration:   config.TransactionDuration,
+		Client:              sqlClient,
+		Eventstore:          es,
+		BulkLimit:           uint16(config.BulkLimit),
+		RequeueEvery:        config.RequeueEvery,
+		MaxFailureCount:     config.MaxFailureCount,
+		RetryFailedAfter:    config.RetryFailedAfter,
+		TransactionDuration: config.TransactionDuration,
+		ActiveInstancer:     config.ActiveInstancer,
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
@@ -156,7 +161,8 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
 	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
-	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]), systemUsers)
+	SamlRequestProjection = newSamlRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["saml_requests"]))
+	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]))
 	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	LimitsProjection = newLimitsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["limits"]))
 	RestrictionsProjection = newRestrictionsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["restrictions"]))
@@ -170,8 +176,13 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 
 	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
+	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsInstanceDomain]))
+	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
+	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
+	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
 	newProjectionsList()
+	newFieldsList()
 	return nil
 }
 
@@ -204,6 +215,16 @@ func ProjectInstance(ctx context.Context) error {
 	return nil
 }
 
+func ProjectInstanceFields(ctx context.Context) error {
+	for _, fieldProjection := range fields {
+		err := fieldProjection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
@@ -221,14 +242,21 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	if customConfig.RetryFailedAfter != nil {
 		config.RetryFailedAfter = *customConfig.RetryFailedAfter
 	}
-	if customConfig.HandleActiveInstances != nil {
-		config.HandleActiveInstances = *customConfig.HandleActiveInstances
-	}
 	if customConfig.TransactionDuration != nil {
 		config.TransactionDuration = *customConfig.TransactionDuration
 	}
 
 	return config
+}
+
+func newFieldsList() {
+	fields = []*handler.FieldHandler{
+		ProjectGrantFields,
+		OrgDomainVerifiedFields,
+		InstanceDomainFields,
+		MembershipFields,
+		PermissionFields,
+	}
 }
 
 // we know this is ugly, but we need to have a singleton slice of all projections
@@ -287,6 +315,7 @@ func newProjectionsList() {
 		DeviceAuthProjection,
 		SessionProjection,
 		AuthRequestProjection,
+		SamlRequestProjection,
 		MilestoneProjection,
 		QuotaProjection.handler,
 		LimitsProjection,

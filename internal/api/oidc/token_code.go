@@ -41,6 +41,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 			plainCode,
 			codeExchangeComplianceChecker(client, r.Data),
 			slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
+			client.client.BackChannelLogoutURI,
 		)
 	} else {
 		session, err = s.codeExchangeV1(ctx, client, r.Data, r.Data.Code)
@@ -75,6 +76,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		authReq.UserID,
 		authReq.UserOrgID,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		authReq.Audience,
 		authReq.AuthMethods(),
@@ -86,6 +88,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 		authReq.SessionID,
+		authReq.oidc().ResponseType,
 	)
 	if err != nil {
 		return nil, err

@@ -201,6 +201,16 @@
         pointer-events: none;
       }
     }
+
+    .saml-login-version {
+      margin-top: 2rem;
+
+      form {
+        display: flex;
+        grid-gap: 1rem;
+        align-items: center;
+      }
+    }
   }
 }
 

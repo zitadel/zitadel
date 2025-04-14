@@ -30,13 +30,9 @@ func (l *Login) handleLDAP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderLDAPLogin(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	temp := l.renderer.Templates[tmplLDAPLogin]
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "Login.Title", "Login.Description", errID, errMessage)
+	data := l.getUserData(r, authReq, translator, "Login.Title", "Login.Description", err)
 	l.renderer.RenderTemplate(w, r, translator, temp, data, nil)
 }
 
@@ -70,7 +66,7 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 		l.renderLDAPLogin(w, r, authReq, err)
 		return
 	}
-	session := &ldap.Session{Provider: provider, User: data.Username, Password: data.Password}
+	session := ldap.NewSession(provider, data.Username, data.Password)
 
 	user, err := session.FetchUser(r.Context())
 	if err != nil {

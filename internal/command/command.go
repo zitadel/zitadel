@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -18,6 +20,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -53,6 +56,7 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
+	targetEncryption                crypto.EncryptionAlgorithm
 	userPasswordHasher              *crypto.Hasher
 	secretHasher                    *crypto.Hasher
 	machineKeySize                  int
@@ -88,10 +92,18 @@ type Commands struct {
 	EventGroupExisting     func(group string) bool
 
 	GenerateDomain func(instanceName, domain string) (string, error)
+
+	caches *Caches
+	// Store instance IDs where all milestones are reached (except InstanceDeleted).
+	// These instance's milestones never need to be invalidated,
+	// so the query and cache overhead can completely eliminated.
+	milestonesCompleted sync.Map
 }
 
 func StartCommands(
+	ctx context.Context,
 	es *eventstore.Eventstore,
+	cacheConnectors connector.Connectors,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
@@ -99,7 +111,7 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
@@ -123,6 +135,10 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
 	}
+	caches, err := startCaches(ctx, cacheConnectors)
+	if err != nil {
+		return nil, fmt.Errorf("caches: %w", err)
+	}
 	repo = &Commands{
 		eventstore:                      es,
 		static:                          staticStore,
@@ -140,6 +156,7 @@ func StartCommands(
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
 		userEncryption:                  userEncryption,
+		targetEncryption:                targetEncryption,
 		userPasswordHasher:              userPasswordHasher,
 		secretHasher:                    secretHasher,
 		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),
@@ -162,13 +179,18 @@ func StartCommands(
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
 		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
-		// always true for now until we can check with an eventlist
-		EventExisting: func(event string) bool { return true },
-		// always true for now until we can check with an eventlist
-		EventGroupExisting:     func(group string) bool { return true },
+		EventExisting: func(value string) bool {
+			return slices.Contains(es.EventTypes(), value)
+		},
+		EventGroupExisting: func(group string) bool {
+			return slices.ContainsFunc(es.EventTypes(), func(value string) bool {
+				return strings.HasPrefix(value, group)
+			},
+			)
+		},
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
-		ActionFunctionExisting: domain.FunctionExists(),
+		ActionFunctionExisting: domain.ActionFunctionExists(),
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
 				CryptoMFA: otpEncryption,
@@ -176,6 +198,7 @@ func StartCommands(
 			},
 		},
 		GenerateDomain: domain.NewGeneratedInstanceDomain,
+		caches:         caches,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

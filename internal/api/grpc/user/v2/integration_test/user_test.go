@@ -10,27 +10,34 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/sink"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	user_v1 "github.com/zitadel/zitadel/pkg/grpc/user"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 var (
-	CTX       context.Context
-	IamCTX    context.Context
-	UserCTX   context.Context
-	SystemCTX context.Context
-	Instance  *integration.Instance
-	Client    user.UserServiceClient
+	CTX                            context.Context
+	IamCTX                         context.Context
+	UserCTX                        context.Context
+	SystemCTX                      context.Context
+	SystemUserWithNoPermissionsCTX context.Context
+	Instance                       *integration.Instance
+	Client                         user.UserServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -40,7 +47,8 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		SystemUserWithNoPermissionsCTX = integration.WithSystemUserWithNoPermissionsAuthorization(ctx)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
@@ -655,16 +663,20 @@ func TestServer_AddHumanUser(t *testing.T) {
 			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
+			} else {
+				assert.Empty(t, got.GetEmailCode())
 			}
 			if tt.want.GetPhoneCode() != "" {
 				assert.NotEmpty(t, got.GetPhoneCode())
+			} else {
+				assert.Empty(t, got.GetPhoneCode())
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
@@ -672,8 +684,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_AddHumanUser_Permission(t *testing.T) {
-	newOrgOwnerEmail := fmt.Sprintf("%d@permission.com", time.Now().UnixNano())
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -854,9 +866,9 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			integration.AssertDetails(t, tt.want, got)
@@ -900,7 +912,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Username: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1206,14 +1218,19 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
+			} else {
+				assert.Empty(t, got.GetEmailCode())
 			}
 			if tt.want.GetPhoneCode() != "" {
 				assert.NotEmpty(t, got.GetPhoneCode())
+			} else {
+				assert.Empty(t, got.GetPhoneCode())
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
@@ -1221,8 +1238,8 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 }
 
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
-	newOrgOwnerEmail := fmt.Sprintf("%d@permission.update.com", time.Now().UnixNano())
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -1240,7 +1257,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				SystemCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("system", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1256,7 +1273,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				IamCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("instance", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1272,7 +1289,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				CTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("org", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			wantErr: true,
@@ -1283,7 +1300,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				UserCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("user", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			wantErr: true,
@@ -1291,7 +1308,6 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -1403,9 +1419,9 @@ func TestServer_LockUser(t *testing.T) {
 			got, err := Client.LockUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1511,9 +1527,9 @@ func TestServer_UnLockUser(t *testing.T) {
 			got, err := Client.UnlockUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1619,9 +1635,10 @@ func TestServer_DeactivateUser(t *testing.T) {
 			got, err := Client.DeactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1727,9 +1744,9 @@ func TestServer_ReactivateUser(t *testing.T) {
 			got, err := Client.ReactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1826,9 +1843,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1837,7 +1854,7 @@ func TestServer_DeleteUser(t *testing.T) {
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	notDefaultOrgIdpResp := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	samlIdpID := Instance.AddSAMLProvider(IamCTX)
 	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
@@ -2070,15 +2087,14 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			got, err := Client.StartIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			if tt.want.url != "" {
 				authUrl, err := url.Parse(got.GetAuthUrl())
-				assert.NoError(t, err)
-
-				assert.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+				require.NoError(t, err)
+				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
 				for _, existing := range tt.want.parametersExisting {
 					assert.True(t, authUrl.Query().Has(existing))
@@ -2097,15 +2113,31 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	}
 }
 
-/*
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
-	intentID := Instance.CreateIntent(t, CTX, idpID)
-	successfulID, token, changeDate, sequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID, "", "id")
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID, "user", "id")
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Instance.CreateSuccessfulSAMLIntent(t, CTX, idpID, "", "id")
+	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
+	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, gofakeit.AppName()).GetId()
+	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
+	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
+	authURL, err := url.Parse(Instance.CreateIntent(CTX, oauthIdpID).GetAuthUrl())
+	require.NoError(t, err)
+	intentID := authURL.Query().Get("state")
+
+	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "")
+	require.NoError(t, err)
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "user")
+	require.NoError(t, err)
+	oidcSuccessful, oidcToken, oidcChangeDate, oidcSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "")
+	require.NoError(t, err)
+	oidcSuccessfulWithUserID, oidcWithUserIDToken, oidcWithUserIDChangeDate, oidcWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "user")
+	require.NoError(t, err)
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "")
+	require.NoError(t, err)
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "user")
+	require.NoError(t, err)
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "")
+	require.NoError(t, err)
+	samlSuccessfulWithUserID, samlWithUserToken, samlWithUserChangeDate, samlWithUserSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "user")
+	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -2139,7 +2171,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "retrieve successful intent",
+			name: "retrieve successful oauth intent",
 			args: args{
 				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
@@ -2160,17 +2192,30 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    oauthIdpID,
 					UserId:   "id",
-					UserName: "username",
+					UserName: "",
 					RawInformation: func() *structpb.Struct {
 						s, err := structpb.NewStruct(map[string]interface{}{
-							"sub":                "id",
-							"preferred_username": "username",
+							"RawInfo": map[string]interface{}{
+								"id":                 "id",
+								"preferred_username": "username",
+							},
 						})
 						require.NoError(t, err)
 						return s
 					}(),
+				},
+				AddHumanUser: &user.AddHumanUserRequest{
+					Profile: &user.SetHumanProfile{
+						PreferredLanguage: gu.Ptr("und"),
+					},
+					IdpLinks: []*user.IDPLink{
+						{IdpId: oauthIdpID, UserId: "id"},
+					},
+					Email: &user.SetHumanEmail{
+						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+					},
 				},
 			},
 			wantErr: false,
@@ -2198,7 +2243,97 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    oauthIdpID,
+					UserId:   "id",
+					UserName: "",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"RawInfo": map[string]interface{}{
+								"id":                 "id",
+								"preferred_username": "username",
+							},
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful oidc intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    oidcSuccessful,
+					IdpIntentToken: oidcToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(oidcChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      oidcSequence,
+				},
+				UserId: "",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    oidcIdpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				AddHumanUser: &user.AddHumanUserRequest{
+					Username: gu.Ptr("username"),
+					Profile: &user.SetHumanProfile{
+						PreferredLanguage: gu.Ptr("und"),
+					},
+					IdpLinks: []*user.IDPLink{
+						{IdpId: oidcIdpID, UserId: "id", UserName: "username"},
+					},
+					Email: &user.SetHumanEmail{
+						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful oidc intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    oidcSuccessfulWithUserID,
+					IdpIntentToken: oidcWithUserIDToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(oidcWithUserIDChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      oidcWithUserIDSequence,
+				},
+				UserId: "user",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    oidcIdpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2242,7 +2377,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    ldapIdpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2254,6 +2389,18 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						require.NoError(t, err)
 						return s
 					}(),
+				},
+				AddHumanUser: &user.AddHumanUserRequest{
+					Username: gu.Ptr("username"),
+					Profile: &user.SetHumanProfile{
+						PreferredLanguage: gu.Ptr("en"),
+					},
+					IdpLinks: []*user.IDPLink{
+						{IdpId: ldapIdpID, UserId: "id", UserName: "username"},
+					},
+					Email: &user.SetHumanEmail{
+						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+					},
 				},
 			},
 			wantErr: false,
@@ -2288,7 +2435,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    ldapIdpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2325,7 +2472,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    samlIdpID,
 					UserId:   "id",
 					UserName: "",
 					RawInformation: func() *structpb.Struct {
@@ -2339,6 +2486,56 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						return s
 					}(),
 				},
+				AddHumanUser: &user.AddHumanUserRequest{
+					Profile: &user.SetHumanProfile{
+						PreferredLanguage: gu.Ptr("und"),
+					},
+					IdpLinks: []*user.IDPLink{
+						{IdpId: samlIdpID, UserId: "id"},
+					},
+					Email: &user.SetHumanEmail{
+						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful saml intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    samlSuccessfulWithUserID,
+					IdpIntentToken: samlWithUserToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(samlWithUserChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      samlWithUserSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Saml{
+						Saml: &user.IDPSAMLAccessInformation{
+							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+						},
+					},
+					IdpId:    samlIdpID,
+					UserId:   "id",
+					UserName: "",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id": "id",
+							"attributes": map[string]interface{}{
+								"attribute1": []interface{}{"value1"},
+							},
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				UserId: "user",
 			},
 			wantErr: false,
 		},
@@ -2348,15 +2545,42 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			got, err := Client.RetrieveIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
-			grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
+			assert.EqualExportedValues(t, tt.want, got)
 		})
 	}
 }
-*/
+
+func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
+
+	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})
+	require.NoError(t, err)
+	require.NotEmpty(t, pkr.GetKey())
+	return ctx, userID, pkr
+}
+
+func ctxFromNewUserWithVerifiedPasswordlessLegacy(t *testing.T) (context.Context, string) {
+	ctx, userID, pkr := ctxFromNewUserWithRegisteredPasswordlessLegacy(t)
+
+	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponseData(pkr.GetKey().GetPublicKey())
+	require.NoError(t, err)
+
+	_, err = Instance.Client.Auth.VerifyMyPasswordless(ctx, &auth.VerifyMyPasswordlessRequest{
+		Verification: &user_v1.WebAuthNVerification{
+			TokenName:           "Mickey",
+			PublicKeyCredential: attestationResponse,
+		},
+	})
+	require.NoError(t, err)
+	return ctx, userID
+}
 
 func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
@@ -2383,7 +2607,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 	})
 	require.NoError(t, err)
-	idpLink, err := Instance.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
+	_, err = Instance.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
 		IdpId:    provider.GetId(),
 		UserId:   "external-id",
 		UserName: "displayName",
@@ -2393,6 +2617,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	_, err = Instance.Client.Mgmt.RemoveIDPFromLoginPolicy(CTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
 		IdpId: provider.GetId(),
 	})
+	require.NoError(t, err)
+
+	_, userLegacyID := ctxFromNewUserWithVerifiedPasswordlessLegacy(t)
 	require.NoError(t, err)
 
 	type args struct {
@@ -2436,6 +2663,81 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 			},
 		},
 		{
+			name: "with auth (passkey) with domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+					DomainQuery: &user.DomainQuery{
+						Domain: Instance.Domain,
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with wrong domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with legacy",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userLegacyID,
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with legacy included",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userLegacyID,
+					DomainQuery: &user.DomainQuery{
+						Domain:               "notexistent",
+						IncludeWithoutDomain: true,
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+				},
+			},
+		},
+		{
 			name: "multiple auth",
 			args: args{
 				CTX,
@@ -2453,28 +2755,300 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "multiple auth with domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+					DomainQuery: &user.DomainQuery{
+						Domain: Instance.Domain,
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+		{
+			name: "multiple auth with wrong domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var got *user.ListAuthenticationMethodTypesResponse
-			var err error
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
+				require.NoError(ttt, err)
+				if !assert.Equal(ttt, tt.want.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult()) {
+					return
+				}
+				assert.Equal(ttt, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
+				integration.AssertListDetails(ttt, tt.want, got)
+			}, retryDuration, tick, "timeout waiting for expected auth methods result")
+		})
+	}
+}
 
-			for {
-				got, err = Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
-				if err == nil && !got.GetDetails().GetTimestamp().AsTime().Before(idpLink.GetDetails().GetChangeDate().AsTime()) {
-					break
+func TestServer_ListAuthenticationFactors(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *user.ListAuthenticationFactorsRequest
+		want    *user.ListAuthenticationFactorsResponse
+		dep     func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse)
+		wantErr bool
+		ctx     context.Context
+	}{
+		{
+			name: "no auth",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: nil,
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
+				args.UserId = userIDWithoutAuth
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with u2f",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				U2FId := Instance.RegisterUserU2F(CTX, userWithU2F)
+
+				args.UserId = userWithU2F
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FId,
+						Name: "nice name",
+					},
 				}
-				select {
-				case <-CTX.Done():
-					t.Fatal(CTX.Err(), err)
-				case <-time.After(time.Second):
-					t.Log("retrying ListAuthenticationMethodTypes")
-					continue
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with totp, u2f",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_Otp{
+							Otp: &user.AuthFactorOTP{},
+						},
+					},
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+
+				args.UserId = userWithTOTP
+				want.Result[1].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FIdWithTOTP,
+						Name: "nice name",
+					},
 				}
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with totp, u2f filtered",
+			args: &user.ListAuthenticationFactorsRequest{
+				AuthFactors: []user.AuthFactors{user.AuthFactors_U2F},
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+
+				args.UserId = userWithTOTP
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FIdWithTOTP,
+						Name: "nice name",
+					},
+				}
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with sms",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_OtpSms{
+							OtpSms: &user.AuthFactorOTPSMS{},
+						},
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), gofakeit.Email(), gofakeit.Phone()).GetUserId()
+				Instance.RegisterUserOTPSMS(CTX, userWithSMS)
+
+				args.UserId = userWithSMS
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with email",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_OtpEmail{
+							OtpEmail: &user.AuthFactorOTPEmail{},
+						},
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), gofakeit.Email(), gofakeit.Phone()).GetUserId()
+				Instance.RegisterUserOTPEmail(CTX, userWithEmail)
+
+				args.UserId = userWithEmail
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with not ready u2f",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				_, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+					UserId: userWithNotReadyU2F,
+					Domain: Instance.Domain,
+				})
+				logging.OnError(err).Panic("Could not register u2f")
+
+				args.UserId = userWithNotReadyU2F
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with not ready u2f state filtered",
+			args: &user.ListAuthenticationFactorsRequest{
+				States: []user.AuthFactorState{user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY},
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				U2FNotReady, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+					UserId: userWithNotReadyU2F,
+					Domain: Instance.Domain,
+				})
+				logging.OnError(err).Panic("Could not register u2f")
+
+				args.UserId = userWithNotReadyU2F
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FNotReady.GetU2FId(),
+						Name: "",
+					},
+				}
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with no userId",
+			args: &user.ListAuthenticationFactorsRequest{
+				UserId: "",
+			},
+			ctx:     CTX,
+			wantErr: true,
+		},
+		{
+			name: "with no permission",
+			args: &user.ListAuthenticationFactorsRequest{},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "totp").GetUserId()
+
+				args.UserId = userWithTOTP
+			},
+			ctx:     UserCTX,
+			wantErr: true,
+		},
+		{
+			name: "with unknown user",
+			args: &user.ListAuthenticationFactorsRequest{
+				UserId: "unknown",
+			},
+			want: &user.ListAuthenticationFactorsResponse{},
+			ctx:  CTX,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.dep != nil {
+				tt.dep(tt.args, tt.want)
 			}
-			require.NoError(t, err)
-			assert.Equal(t, tt.want.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult())
-			require.Equal(t, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.ListAuthenticationFactors(tt.ctx, tt.args)
+				if tt.wantErr {
+					require.Error(ttt, err)
+					return
+				}
+				require.NoError(ttt, err)
+
+				assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
+			}, retryDuration, tick, "timeout waiting for expected auth methods result")
 		})
 	}
 }
@@ -2596,9 +3170,10 @@ func TestServer_CreateInviteCode(t *testing.T) {
 			got, err := Client.CreateInviteCode(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 			if tt.want.GetInviteCode() != "" {
 				assert.NotEmpty(t, got.GetInviteCode())
@@ -2689,9 +3264,10 @@ func TestServer_ResendInviteCode(t *testing.T) {
 			got, err := Client.ResendInviteCode(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -2778,10 +3354,82 @@ func TestServer_VerifyInviteCode(t *testing.T) {
 			got, err := Client.VerifyInviteCode(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_HumanMFAInitSkipped(t *testing.T) {
+	type args struct {
+		ctx     context.Context
+		req     *user.HumanMFAInitSkippedRequest
+		prepare func(request *user.HumanMFAInitSkippedRequest) error
+	}
+	tests := []struct {
+		name       string
+		args       args
+		want       *user.HumanMFAInitSkippedResponse
+		checkState func(t *testing.T, userID string, resp *user.HumanMFAInitSkippedResponse)
+		wantErr    bool
+	}{
+		{
+			name: "user not existing",
+			args: args{
+				CTX,
+				&user.HumanMFAInitSkippedRequest{
+					UserId: "notexisting",
+				},
+				func(request *user.HumanMFAInitSkippedRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "ok",
+			args: args{
+				CTX,
+				&user.HumanMFAInitSkippedRequest{},
+				func(request *user.HumanMFAInitSkippedRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			want: &user.HumanMFAInitSkippedResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+			checkState: func(t *testing.T, userID string, resp *user.HumanMFAInitSkippedResponse) {
+				state, err := Client.GetUserByID(CTX, &user.GetUserByIDRequest{
+					UserId: userID,
+				})
+				require.NoError(t, err)
+				integration.EqualProto(t,
+					state.GetUser().GetHuman().GetMfaInitSkipped(),
+					resp.GetDetails().GetChangeDate(),
+				)
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.prepare(tt.args.req)
+			require.NoError(t, err)
+
+			got, err := Client.HumanMFAInitSkipped(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			integration.AssertDetails(t, tt.want, got)
+			if tt.checkState != nil {
+				tt.checkState(t, tt.args.req.GetUserId(), got)
+			}
 		})
 	}
 }

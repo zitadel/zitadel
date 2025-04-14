@@ -2,16 +2,15 @@ go_bin := "$$(go env GOPATH)/bin"
 gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
-now := $(shell date --rfc-3339=seconds | sed 's/ /T/')
+now := $(shell date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/')
 VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
 GOCOVERDIR = tmp/coverage
-INTEGRATION_DB_FLAVOR ?= postgres
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
-export GOCOVERDIR INTEGRATION_DB_FLAVOR ZITADEL_MASTERKEY
+export GOCOVERDIR ZITADEL_MASTERKEY
 
 .PHONY: compile
 compile: core_build console_build compile_pipeline
@@ -63,12 +62,12 @@ endif
 
 .PHONY: core_grpc_dependencies
 core_grpc_dependencies:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2 						# https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go?tab=versions
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4 							# https://pkg.go.dev/google.golang.org/grpc/cmd/protoc-gen-go-grpc?tab=versions
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.20.0	# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway?tab=versions
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.20.0 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
-	go install github.com/envoyproxy/protoc-gen-validate@v1.0.4								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
-	go install github.com/bufbuild/buf/cmd/buf@v1.34.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1 						# https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go?tab=versions
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1 						# https://pkg.go.dev/google.golang.org/grpc/cmd/protoc-gen-go-grpc?tab=versions
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0	# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway?tab=versions
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
+	go install github.com/envoyproxy/protoc-gen-validate@v1.1.0								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
+	go install github.com/bufbuild/buf/cmd/buf@v1.45.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
@@ -113,7 +112,7 @@ core_unit_test:
 
 .PHONY: core_integration_db_up
 core_integration_db_up:
-	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait $${INTEGRATION_DB_FLAVOR}
+	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait cache
 
 .PHONY: core_integration_db_down
 core_integration_db_down:
@@ -123,13 +122,13 @@ core_integration_db_down:
 core_integration_setup:
 	go build -cover -race -tags integration -o zitadel.test main.go
 	mkdir -p $${GOCOVERDIR}
-	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/steps.yaml
+	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
+	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml --steps internal/integration/config/steps.yaml
 
 .PHONY: core_integration_server_start
 core_integration_server_start: core_integration_setup
 	GORACE="log_path=tmp/race.log" \
-	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml \
+	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml \
 	  > tmp/zitadel.log 2>&1 \
 	  & printf $$! > tmp/zitadel.pid
 

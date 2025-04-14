@@ -6,14 +6,18 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/pkg/actions"
 )
 
 type ContextInfo interface {
@@ -28,6 +32,7 @@ type Target interface {
 	GetEndpoint() string
 	GetTargetType() domain.TargetType
 	GetTimeout() time.Duration
+	GetSigningKey() string
 }
 
 // CallTargets call a list of targets in order with handling of error and responses
@@ -37,7 +42,7 @@ func CallTargets(
 	info ContextInfo,
 ) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	for _, target := range targets {
 		// call the type of target
@@ -67,18 +72,18 @@ func CallTarget(
 	info ContextInfoRequest,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case domain.TargetTypeWebhook:
-		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
 	// get request, return response and error
 	case domain.TargetTypeCall:
-		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
 	case domain.TargetTypeAsync:
 		go func(target Target, info ContextInfoRequest) {
-			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody()); err != nil {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
 		}(target, info)
@@ -89,13 +94,13 @@ func CallTarget(
 }
 
 // webhook call a webhook, ignore the response but return the errror
-func webhook(ctx context.Context, url string, timeout time.Duration, body []byte) error {
-	_, err := Call(ctx, url, timeout, body)
+func webhook(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string) error {
+	_, err := Call(ctx, url, timeout, body, signingKey)
 	return err
 }
 
 // Call function to do a post HTTP request to a desired url with timeout
-func Call(ctx context.Context, url string, timeout time.Duration, body []byte) (_ []byte, err error) {
+func Call(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string) (_ []byte, err error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
@@ -108,6 +113,9 @@ func Call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	if signingKey != "" {
+		req.Header.Set(actions.SigningHeader, actions.ComputeSignatureHeader(time.Now(), body, signingKey))
+	}
 
 	client := http.DefaultClient
 	resp, err := client.Do(req)
@@ -147,4 +155,60 @@ func HandleResponse(resp *http.Response) ([]byte, error) {
 type ErrorBody struct {
 	ForwardedStatusCode   int    `json:"forwardedStatusCode,omitempty"`
 	ForwardedErrorMessage string `json:"forwardedErrorMessage,omitempty"`
+}
+
+type ExecutionTargetsQueries interface {
+	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
+	TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
+}
+
+func QueryExecutionTargetsForRequestAndResponse(
+	ctx context.Context,
+	queries ExecutionTargetsQueries,
+	fullMethod string,
+) ([]Target, []Target) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	targets, err := queries.TargetsByExecutionIDs(ctx,
+		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
+		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
+	)
+	requestTargets := make([]Target, 0, len(targets))
+	responseTargets := make([]Target, 0, len(targets))
+	if err != nil {
+		logging.WithFields("fullMethod", fullMethod).WithError(err).Info("unable to query targets")
+		return requestTargets, responseTargets
+	}
+
+	for _, target := range targets {
+		if strings.HasPrefix(target.GetExecutionID(), execution.IDAll(domain.ExecutionTypeRequest)) {
+			requestTargets = append(requestTargets, target)
+		} else if strings.HasPrefix(target.GetExecutionID(), execution.IDAll(domain.ExecutionTypeResponse)) {
+			responseTargets = append(responseTargets, target)
+		}
+	}
+
+	return requestTargets, responseTargets
+}
+
+func idsForFullMethod(fullMethod string, executionType domain.ExecutionType) []string {
+	return []string{execution.ID(executionType, fullMethod), execution.ID(executionType, serviceFromFullMethod(fullMethod)), execution.IDAll(executionType)}
+}
+
+func serviceFromFullMethod(s string) string {
+	parts := strings.Split(s, "/")
+	return parts[1]
+}
+
+func QueryExecutionTargetsForFunction(ctx context.Context, query ExecutionTargetsQueries, function string) ([]Target, error) {
+	queriedActionsV2, err := query.TargetsByExecutionID(ctx, []string{function})
+	if err != nil {
+		return nil, err
+	}
+	executionTargets := make([]Target, len(queriedActionsV2))
+	for i, action := range queriedActionsV2 {
+		executionTargets[i] = action
+	}
+	return executionTargets, nil
 }

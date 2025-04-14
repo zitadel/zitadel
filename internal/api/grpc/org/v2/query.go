@@ -57,7 +57,7 @@ func orgQueriesToQuery(ctx context.Context, queries []*org.SearchQuery) (_ []que
 func orgQueryToQuery(ctx context.Context, orgQuery *org.SearchQuery) (query.SearchQuery, error) {
 	switch q := orgQuery.Query.(type) {
 	case *org.SearchQuery_DomainQuery:
-		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+		return query.NewOrgVerifiedDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org.SearchQuery_NameQuery:
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	case *org.SearchQuery_StateQuery:
@@ -129,6 +129,7 @@ func organizationToPb(organization *query.Org) *org.Organization {
 			Sequence:      organization.Sequence,
 			EventDate:     organization.ChangeDate,
 			ResourceOwner: organization.ResourceOwner,
+			CreationDate:  organization.CreationDate,
 		}),
 		State: orgStateToPb(organization.State),
 	}

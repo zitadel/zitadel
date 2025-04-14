@@ -10,6 +10,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
@@ -20,8 +21,6 @@ import (
 )
 
 func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	regOrgUrl, err := url.Parse("http://" + instance.Domain + ":8080/ui/login/register/org")
 	require.NoError(t, err)
@@ -70,28 +69,34 @@ func awaitPubOrgRegDisallowed(t *testing.T, ctx context.Context, cc *integration
 // awaitGetSSRGetResponse cuts the CSRF token from the response body if it exists
 func awaitGetSSRGetResponse(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, expectCode int) string {
 	var csrfToken []byte
-	await(t, ctx, func(tt *assert.CollectT) {
-		resp, err := client.Get(parsedURL.String())
-		require.NoError(tt, err)
-		body, err := io.ReadAll(resp.Body)
-		require.NoError(tt, err)
-		searchField := `<input type="hidden" name="gorilla.csrf.Token" value="`
-		_, after, hasCsrfToken := bytes.Cut(body, []byte(searchField))
-		if hasCsrfToken {
-			csrfToken, _, _ = bytes.Cut(after, []byte(`">`))
-		}
-		assert.Equal(tt, resp.StatusCode, expectCode)
-	})
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t,
+		func(tt *assert.CollectT) {
+			resp, err := client.Get(parsedURL.String())
+			require.NoError(tt, err)
+			body, err := io.ReadAll(resp.Body)
+			require.NoError(tt, err)
+			searchField := `<input type="hidden" name="gorilla.csrf.Token" value="`
+			_, after, hasCsrfToken := bytes.Cut(body, []byte(searchField))
+			if hasCsrfToken {
+				csrfToken, _, _ = bytes.Cut(after, []byte(`">`))
+			}
+			assert.Equal(tt, resp.StatusCode, expectCode)
+		}, retryDuration, tick, "awaiting successful get SSR get response failed",
+	)
 	return string(csrfToken)
 }
 
 // awaitPostFormResponse needs a valid CSRF token to make it to the actual endpoint implementation and get the expected status code
 func awaitPostFormResponse(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, expectCode int, csrfToken string) {
-	await(t, ctx, func(tt *assert.CollectT) {
-		resp, err := client.PostForm(parsedURL.String(), url.Values{
-			"gorilla.csrf.Token": {csrfToken},
-		})
-		require.NoError(tt, err)
-		assert.Equal(tt, resp.StatusCode, expectCode)
-	})
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t,
+		func(tt *assert.CollectT) {
+			resp, err := client.PostForm(parsedURL.String(), url.Values{
+				"gorilla.csrf.Token": {csrfToken},
+			})
+			require.NoError(tt, err)
+			assert.Equal(tt, resp.StatusCode, expectCode)
+		}, retryDuration, tick, "awaiting successful Post Form failed",
+	)
 }

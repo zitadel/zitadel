@@ -1,56 +1,66 @@
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Location } from '@angular/common';
-import { Component, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnInit, signal } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { from, Observable, Subscription, take } from 'rxjs';
+import { defer, EMPTY, mergeWith, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
-import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
+import {
+  MetadataDialogComponent,
+  MetadataDialogData,
+} from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
-import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
-import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
-import { LanguagesService } from '../../../../services/languages.service';
+import { EditDialogComponent, EditDialogData, EditDialogResult, EditDialogType } from './edit-dialog/edit-dialog.component';
+import { LanguagesService } from 'src/app/services/languages.service';
+import { Gender, HumanProfile, HumanUser, User, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { catchError, filter, map, startWith } from 'rxjs/operators';
+import { pairwiseStartWith } from 'src/app/utils/pairwiseStartWith';
+import { NewAuthService } from 'src/app/services/new-auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
+import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
+import { UserService } from 'src/app/services/user.service';
+import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
+import { query } from '@angular/animations';
+
+type UserQuery = { state: 'success'; value: User } | { state: 'error'; error: any } | { state: 'loading'; value?: User };
+
+type MetadataQuery =
+  | { state: 'success'; value: Metadata[] }
+  | { state: 'loading'; value: Metadata[] }
+  | { state: 'error'; error: any };
+
+type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: HumanUser } };
 
 @Component({
   selector: 'cnsl-auth-user-detail',
   templateUrl: './auth-user-detail.component.html',
   styleUrls: ['./auth-user-detail.component.scss'],
 })
-export class AuthUserDetailComponent implements OnDestroy {
-  public user?: User.AsObject;
-  public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
+export class AuthUserDetailComponent implements OnInit {
+  protected readonly genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
 
-  private subscription: Subscription = new Subscription();
-
-  public loading: boolean = false;
-  public loadingMetadata: boolean = false;
-
-  public ChangeType: any = ChangeType;
+  protected readonly ChangeType = ChangeType;
   public userLoginMustBeDomain: boolean = false;
-  public UserState: any = UserState;
+  protected readonly UserState = UserState;
 
-  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
-  public refreshChanges$: EventEmitter<void> = new EventEmitter();
+  protected USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
+  protected readonly refreshChanges$: EventEmitter<void> = new EventEmitter();
+  protected readonly refreshMetadata$ = new Subject<true>();
 
-  public metadata: Metadata.AsObject[] = [];
-
-  public settingsList: SidenavSetting[] = [
+  protected readonly settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
     { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' },
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
@@ -62,170 +72,197 @@ export class AuthUserDetailComponent implements OnDestroy {
       requiredRoles: { [PolicyComponentServiceType.MGMT]: ['user.read'] },
     },
   ];
-  public currentSetting: string | undefined = this.settingsList[0].id;
-  public loginPolicy?: LoginPolicy.AsObject;
-  private savedLanguage?: string;
+  protected readonly user$: Observable<UserQuery>;
+  protected readonly metadata$: Observable<MetadataQuery>;
+  private readonly savedLanguage$: Observable<string>;
+  protected readonly currentSetting$ = signal<SidenavSetting>(this.settingsList[0]);
+  protected readonly loginPolicy$: Observable<LoginPolicy>;
+  protected readonly userName$: Observable<string>;
 
   constructor(
-    public translate: TranslateService,
+    private translate: TranslateService,
     private toast: ToastService,
-    public userService: GrpcAuthService,
+    protected grpcAuthService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
-    private mgmt: ManagementService,
     private breadcrumbService: BreadcrumbService,
-    private mediaMatcher: MediaMatcher,
-    private _location: Location,
-    activatedRoute: ActivatedRoute,
     public langSvc: LanguagesService,
+    private readonly route: ActivatedRoute,
+    private readonly newAuthService: NewAuthService,
+    private readonly newMgmtService: NewMgmtService,
+    private readonly userService: UserService,
+    private readonly destroyRef: DestroyRef,
+    private readonly router: Router,
   ) {
-    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
-      const { id } = params;
-      if (id) {
-        this.cleanupTranslation();
-        this.currentSetting = id;
-      }
-    });
+    this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.userName$ = this.getUserName(this.user$);
+    this.savedLanguage$ = this.getSavedLanguage$(this.user$);
+    this.metadata$ = this.getMetadata$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
-    const mediaq: string = '(max-width: 500px)';
-    const small = this.mediaMatcher.matchMedia(mediaq).matches;
-    if (small) {
-      this.changeSelection(small);
-    }
-    this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
-      this.changeSelection(small.matches);
-    };
-
-    this.loading = true;
-    this.refreshUser();
-
-    this.userService.getMyLoginPolicy().then((policy) => {
-      if (policy.policy) {
-        this.loginPolicy = policy.policy;
-      }
-    });
+    this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
+      catchError(() => EMPTY),
+      map(({ policy }) => policy),
+      filter(Boolean),
+    );
   }
 
-  private changeSelection(small: boolean): void {
-    this.cleanupTranslation();
-    if (small) {
-      this.currentSetting = undefined;
-    } else {
-      this.currentSetting = this.currentSetting === undefined ? this.settingsList[0].id : this.currentSetting;
-    }
-  }
-
-  public navigateBack(): void {
-    this._location.back();
-  }
-
-  refreshUser(): void {
-    this.refreshChanges$.emit();
-    this.userService
-      .getMyUser()
-      .then((resp) => {
-        if (resp.user) {
-          this.user = resp.user;
-
-          this.loadMetadata();
-
-          this.breadcrumbService.setBreadcrumb([
-            new Breadcrumb({
-              type: BreadcrumbType.AUTHUSER,
-              name: this.user.human?.profile?.displayName,
-              routerLink: ['/users', 'me'],
-            }),
-          ]);
+  getUserName(user$: Observable<UserQuery>) {
+    return user$.pipe(
+      map((query) => {
+        const user = this.user(query);
+        if (!user) {
+          return '';
         }
-        this.savedLanguage = resp.user?.human?.profile?.preferredLanguage;
-        this.loading = false;
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-        this.loading = false;
-      });
+        if (user.type.case === 'human') {
+          return user.type.value.profile?.displayName ?? '';
+        }
+        if (user.type.case === 'machine') {
+          return user.type.value.name;
+        }
+        return '';
+      }),
+    );
   }
 
-  public ngOnDestroy(): void {
-    this.cleanupTranslation();
-    this.subscription.unsubscribe();
+  getSavedLanguage$(user$: Observable<UserQuery>) {
+    return user$.pipe(
+      switchMap((query) => {
+        if (query.state !== 'success' || query.value.type.case !== 'human') {
+          return EMPTY;
+        }
+        return query.value.type.value.profile?.preferredLanguage ?? EMPTY;
+      }),
+      startWith(this.translate.defaultLang),
+    );
   }
 
-  public settingChanged(): void {
-    this.cleanupTranslation();
-  }
+  ngOnInit(): void {
+    this.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
+      if ((query.state === 'loading' || query.state === 'success') && query.value?.type.case === 'human') {
+        this.breadcrumbService.setBreadcrumb([
+          new Breadcrumb({
+            type: BreadcrumbType.AUTHUSER,
+            name: query.value.type.value.profile?.displayName,
+            routerLink: ['/users', 'me'],
+          }),
+        ]);
+      }
+    });
 
-  private cleanupTranslation(): void {
-    if (this?.savedLanguage) {
-      this.translate.use(this?.savedLanguage);
-    } else {
-      this.translate.use(this.translate.defaultLang);
+    this.user$.pipe(mergeWith(this.metadata$), takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
+      if (query.state == 'error') {
+        this.toast.showError(query.error);
+      }
+    });
+
+    this.savedLanguage$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((savedLanguage) => this.translate.use(savedLanguage));
+
+    const param = this.route.snapshot.queryParamMap.get('id');
+    if (!param) {
+      return;
     }
+    const setting = this.settingsList.find(({ id }) => id === param);
+    if (!setting) {
+      return;
+    }
+    this.currentSetting$.set(setting);
   }
 
-  public changeUsername(): void {
-    const dialogRef = this.dialog.open(EditDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.CHANGE',
-        cancelKey: 'ACTIONS.CANCEL',
-        labelKey: 'ACTIONS.NEWVALUE',
-        titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
-        descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
-        value: this.user?.userName,
-      },
+  private getUser$(): Observable<UserQuery> {
+    return this.refreshChanges$.pipe(
+      startWith(true),
+      switchMap(() => this.getMyUser()),
+      pairwiseStartWith(undefined),
+      map(([prev, curr]) => {
+        if (prev?.state === 'success' && curr.state === 'loading') {
+          return { state: 'loading', value: prev.value } as const;
+        }
+        return curr;
+      }),
+    );
+  }
+
+  private getMyUser(): Observable<UserQuery> {
+    return this.userService.user$.pipe(
+      map((user) => ({ state: 'success' as const, value: user })),
+      catchError((error) => of({ state: 'error', error } as const)),
+      startWith({ state: 'loading' } as const),
+    );
+  }
+
+  getMetadata$(): Observable<MetadataQuery> {
+    return this.refreshMetadata$.pipe(
+      startWith(true),
+      switchMap(() => this.getMetadata()),
+      pairwiseStartWith(undefined),
+      map(([prev, curr]) => {
+        if (prev?.state === 'success' && curr.state === 'loading') {
+          return { state: 'loading', value: prev.value } as const;
+        }
+        return curr;
+      }),
+    );
+  }
+
+  private getMetadata(): Observable<MetadataQuery> {
+    return defer(() => this.newAuthService.listMyMetadata()).pipe(
+      map((metadata) => ({ state: 'success', value: metadata.result }) as const),
+      startWith({ state: 'loading', value: [] as Metadata[] } as const),
+      catchError((error) => of({ state: 'error', error } as const)),
+    );
+  }
+
+  public changeUsername(user: User): void {
+    const data = {
+      confirmKey: 'ACTIONS.CHANGE' as const,
+      cancelKey: 'ACTIONS.CANCEL' as const,
+      labelKey: 'ACTIONS.NEWVALUE' as const,
+      titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE' as const,
+      descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC' as const,
+      value: user.username,
+    };
+    const dialogRef = this.dialog.open<EditDialogComponent, typeof data, EditDialogResult>(EditDialogComponent, {
+      data,
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp: { value: string }) => {
-      if (resp && resp.value && resp.value !== this.user?.userName) {
-        this.userService
-          .updateMyUserName(resp.value)
-          .then(() => {
-            this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
-            this.refreshUser();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    });
-  }
-
-  public saveProfile(profileData: Profile.AsObject): void {
-    if (this.user?.human) {
-      this.user.human.profile = profileData;
-
-      this.userService
-        .updateMyProfile(
-          this.user.human.profile?.firstName,
-          this.user.human.profile?.lastName,
-          this.user.human.profile?.nickName,
-          this.user.human.profile?.displayName,
-          this.user.human.profile?.preferredLanguage,
-          this.user.human.profile?.gender,
-        )
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.SAVED', true);
-          this.savedLanguage = this.user?.human?.profile?.preferredLanguage;
+    dialogRef
+      .afterClosed()
+      .pipe(
+        map((value) => value?.value),
+        filter(Boolean),
+        filter((value) => user.username != value),
+        switchMap((username) => this.userService.updateUser({ userId: user.userId, username })),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
           this.refreshChanges$.emit();
-        })
-        .catch((error) => {
+        },
+        error: (error) => {
           this.toast.showError(error);
-        });
-    }
+        },
+      });
   }
 
-  public saveEmail(email: string): void {
+  public saveProfile(user: User, profile: HumanProfile): void {
     this.userService
-      .setMyEmail(email)
+      .updateUser({
+        userId: user.userId,
+        profile: {
+          givenName: profile.givenName,
+          familyName: profile.familyName,
+          nickName: profile.nickName,
+          displayName: profile.displayName,
+          preferredLanguage: profile.preferredLanguage,
+          gender: profile.gender,
+        },
+      })
       .then(() => {
-        this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-        if (this.user?.human) {
-          const mailToSet = new Email();
-          mailToSet.setEmail(email);
-          this.user.human.email = mailToSet.toObject();
-          this.refreshUser();
-        }
+        this.toast.showInfo('USER.TOAST.SAVED', true);
+        this.refreshChanges$.emit();
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -233,11 +270,11 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public enteredPhoneCode(code: string): void {
-    this.userService
+    this.newAuthService
       .verifyMyPhone(code)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-        this.refreshUser();
+        this.refreshChanges$.emit();
         this.promptSetupforSMSOTP();
       })
       .catch((error) => {
@@ -256,39 +293,26 @@ export class AuthUserDetailComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.userService.addMyAuthFactorOTPSMS().then(() => {
-          this.translate
-            .get('USER.MFA.OTPSMSSUCCESS')
-            .pipe(take(1))
-            .subscribe((msg) => {
-              this.toast.showInfo(msg);
-            });
-        });
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.newAuthService.addMyAuthFactorOTPSMS()),
+        switchMap(() => this.translate.get('USER.MFA.OTPSMSSUCCESS').pipe(take(1))),
+      )
+      .subscribe({
+        next: (msg) => this.toast.showInfo(msg),
+        error: (err) => this.toast.showError(err),
+      });
   }
 
   public changedLanguage(language: string): void {
     this.translate.use(language);
   }
 
-  public resendPhoneVerification(): void {
-    this.userService
-      .resendMyPhoneVerification()
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public resendEmailVerification(): void {
-    this.userService
-      .resendMyEmailVerification()
+  public resendEmailVerification(user: User): void {
+    this.newMgmtService
+      .resendHumanEmailVerification(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
         this.refreshChanges$.emit();
@@ -298,161 +322,187 @@ export class AuthUserDetailComponent implements OnDestroy {
       });
   }
 
-  public deletePhone(): void {
-    this.userService
-      .removeMyPhone()
+  public resendPhoneVerification(user: User): void {
+    this.newMgmtService
+      .resendHumanPhoneVerification(user.userId)
       .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        if (this.user?.human?.phone) {
-          const phone = new Phone();
-          this.user.human.phone = phone.toObject();
-          this.refreshUser();
-        }
+        this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
+        this.refreshChanges$.emit();
       })
       .catch((error) => {
         this.toast.showError(error);
       });
   }
 
-  public savePhone(phone: string): void {
-    if (this.user?.human) {
-      // Format phone before save (add +)
-      const formattedPhone = formatPhone(phone);
-      if (formattedPhone) {
-        phone = formattedPhone.phone;
-      }
-
-      this.userService
-        .setMyPhone(phone)
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          if (this.user?.human) {
-            const phoneToSet = new Phone();
-            phoneToSet.setPhone(phone);
-            this.user.human.phone = phoneToSet.toObject();
-            this.refreshUser();
-          }
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
+  public deletePhone(user: User): void {
+    this.userService
+      .removePhone(user.userId)
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
+        this.refreshChanges$.emit();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
-  public openEditDialog(type: EditDialogType): void {
+  public openEditDialog(user: UserWithHumanType, type: EditDialogType): void {
     switch (type) {
       case EditDialogType.PHONE:
-        const dialogRefPhone = this.dialog.open(EditDialogComponent, {
-          data: {
-            confirmKey: 'ACTIONS.SAVE',
-            cancelKey: 'ACTIONS.CANCEL',
-            labelKey: 'USER.LOGINMETHODS.PHONE.EDITVALUE',
-            titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
-            descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
-            value: this.user?.human?.phone?.phone,
-            type: type,
-            validator: Validators.compose([phoneValidator, requiredValidator]),
-          },
-          width: '400px',
-        });
-
-        dialogRefPhone.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
-          if (resp && resp.value) {
-            this.savePhone(resp.value);
-          }
-        });
-        break;
+        this.openEditPhoneDialog(user);
+        return;
       case EditDialogType.EMAIL:
-        const dialogRefEmail = this.dialog.open(EditDialogComponent, {
-          data: {
-            confirmKey: 'ACTIONS.SAVE',
-            cancelKey: 'ACTIONS.CANCEL',
-            labelKey: 'ACTIONS.NEWVALUE',
-            titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
-            descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
-            value: this.user?.human?.email?.email,
-            type: type,
-          },
-          width: '400px',
-        });
-
-        dialogRefEmail.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
-          if (resp && resp.value) {
-            this.saveEmail(resp.value);
-          }
-        });
-        break;
+        this.openEditEmailDialog(user);
+        return;
     }
   }
 
-  public deleteAccount(): void {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'USER.DIALOG.DELETE_BTN',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'USER.DIALOG.DELETE_TITLE',
-        descriptionKey: 'USER.DIALOG.DELETE_AUTH_DESCRIPTION',
-      },
+  private openEditEmailDialog(user: UserWithHumanType) {
+    const data: EditDialogData = {
+      confirmKey: 'ACTIONS.SAVE',
+      cancelKey: 'ACTIONS.CANCEL',
+      labelKey: 'ACTIONS.NEWVALUE',
+      titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
+      descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
+      value: user.type.value?.email?.email,
+      type: EditDialogType.EMAIL,
+    } as const;
+
+    const dialogRefEmail = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
+      data,
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.userService
-          .RemoveMyUser()
-          .then(() => {
-            this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
-            this.auth.signout();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
+    dialogRefEmail
+      .afterClosed()
+      .pipe(
+        filter((resp): resp is Required<EditDialogResult> => !!resp?.value),
+        switchMap(({ value, isVerified }) =>
+          this.userService.setEmail({
+            userId: user.userId,
+            email: value,
+            verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
+          }),
+        ),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+          this.refreshChanges$.emit();
+        },
+        error: (error) => this.toast.showError(error),
+      });
+  }
+
+  private openEditPhoneDialog(user: UserWithHumanType) {
+    const data = {
+      confirmKey: 'ACTIONS.SAVE',
+      cancelKey: 'ACTIONS.CANCEL',
+      labelKey: 'ACTIONS.NEWVALUE',
+      titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
+      descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
+      value: user.type.value.phone?.phone,
+      type: EditDialogType.PHONE,
+      validator: Validators.compose([phoneValidator, requiredValidator]),
+    };
+    const dialogRefPhone = this.dialog.open<EditDialogComponent, typeof data, { value: string; isVerified: boolean }>(
+      EditDialogComponent,
+      { data, width: '400px' },
+    );
+
+    dialogRefPhone
+      .afterClosed()
+      .pipe(
+        map((resp) => formatPhone(resp?.value)),
+        filter(Boolean),
+        switchMap(({ phone }) => this.userService.setPhone({ userId: user.userId, phone })),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+          this.refreshChanges$.emit();
+        },
+        error: (error) => {
+          this.toast.showError(error);
+        },
+      });
+  }
+
+  public deleteUser(user: User): void {
+    const data = {
+      confirmKey: 'USER.DIALOG.DELETE_BTN',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'USER.DIALOG.DELETE_TITLE',
+      descriptionKey: 'USER.DIALOG.DELETE_AUTH_DESCRIPTION',
+    };
+
+    const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
+      width: '400px',
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.userService.deleteUser(user.userId)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
+          this.auth.signout();
+        },
+        error: (error) => this.toast.showError(error),
+      });
+  }
+
+  public editMetadata(user: User, metadata: Metadata[]): void {
+    const setFcn = (key: string, value: string) =>
+      this.newMgmtService.setUserMetadata({
+        key,
+        value: Buffer.from(value),
+        id: user.userId,
+      });
+    const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
+
+    const dialogRef = this.dialog.open<MetadataDialogComponent, MetadataDialogData>(MetadataDialogComponent, {
+      data: {
+        metadata: [...metadata],
+        setFcn: setFcn,
+        removeFcn: removeFcn,
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.refreshMetadata$.next(true);
+      });
+  }
+
+  protected readonly query = query;
+
+  protected user(user: UserQuery): User | undefined {
+    if (user.state === 'success' || user.state === 'loading') {
+      return user.value;
+    }
+    return;
+  }
+
+  public async goToSetting(setting: string) {
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { id: setting },
+      queryParamsHandling: 'merge',
+      skipLocationChange: true,
     });
   }
 
-  public loadMetadata(): void {
-    if (this.user) {
-      this.userService.isAllowed(['user.read']).subscribe((allowed) => {
-        if (allowed) {
-          this.loadingMetadata = true;
-          this.mgmt
-            .listUserMetadata(this.user?.id ?? '')
-            .then((resp) => {
-              this.loadingMetadata = false;
-              this.metadata = resp.resultList.map((md) => {
-                return {
-                  key: md.key,
-                  value: Buffer.from(md.value as string, 'base64').toString('utf8'),
-                };
-              });
-            })
-            .catch((error) => {
-              this.loadingMetadata = false;
-              this.toast.showError(error);
-            });
-        }
-      });
+  public humanUser(userQuery: UserQuery): UserWithHumanType | undefined {
+    const user = this.user(userQuery);
+    if (user?.type.case === 'human') {
+      return { ...user, type: user.type };
     }
-  }
-
-  public editMetadata(): void {
-    if (this.user && this.user.id) {
-      const setFcn = (key: string, value: string): Promise<any> =>
-        this.mgmt.setUserMetadata(key, Buffer.from(value).toString('base64'), this.user?.id ?? '');
-      const removeFcn = (key: string): Promise<any> => this.mgmt.removeUserMetadata(key, this.user?.id ?? '');
-
-      const dialogRef = this.dialog.open(MetadataDialogComponent, {
-        data: {
-          metadata: this.metadata,
-          setFcn: setFcn,
-          removeFcn: removeFcn,
-        },
-      });
-
-      dialogRef.afterClosed().subscribe(() => {
-        this.loadMetadata();
-      });
-    }
+    return;
   }
 }

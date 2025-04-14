@@ -18,40 +18,41 @@ var (
 		", members.change_date" +
 		", members.sequence" +
 		", members.resource_owner" +
+		", members.user_resource_owner" +
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names3.login_name" +
-		", projections.users13_humans.email" +
-		", projections.users13_humans.first_name" +
-		", projections.users13_humans.last_name" +
-		", projections.users13_humans.display_name" +
-		", projections.users13_machines.name" +
-		", projections.users13_humans.avatar_key" +
-		", projections.users13.type" +
+		", projections.users14_humans.email" +
+		", projections.users14_humans.first_name" +
+		", projections.users14_humans.last_name" +
+		", projections.users14_humans.display_name" +
+		", projections.users14_machines.name" +
+		", projections.users14_humans.avatar_key" +
+		", projections.users14.type" +
 		", COUNT(*) OVER () " +
 		"FROM projections.project_grant_members4 AS members " +
-		"LEFT JOIN projections.users13_humans " +
-		"ON members.user_id = projections.users13_humans.user_id " +
-		"AND members.instance_id = projections.users13_humans.instance_id " +
-		"LEFT JOIN projections.users13_machines " +
-		"ON members.user_id = projections.users13_machines.user_id " +
-		"AND members.instance_id = projections.users13_machines.instance_id " +
-		"LEFT JOIN projections.users13 " +
-		"ON members.user_id = projections.users13.id " +
-		"AND members.instance_id = projections.users13.instance_id " +
+		"LEFT JOIN projections.users14_humans " +
+		"ON members.user_id = projections.users14_humans.user_id " +
+		"AND members.instance_id = projections.users14_humans.instance_id " +
+		"LEFT JOIN projections.users14_machines " +
+		"ON members.user_id = projections.users14_machines.user_id " +
+		"AND members.instance_id = projections.users14_machines.instance_id " +
+		"LEFT JOIN projections.users14 " +
+		"ON members.user_id = projections.users14.id " +
+		"AND members.instance_id = projections.users14.instance_id " +
 		"LEFT JOIN projections.login_names3 " +
 		"ON members.user_id = projections.login_names3.user_id " +
 		"AND members.instance_id = projections.login_names3.instance_id " +
 		"LEFT JOIN projections.project_grants4 " +
 		"ON members.grant_id = projections.project_grants4.grant_id " +
 		"AND members.instance_id = projections.project_grants4.instance_id " +
-		`AS OF SYSTEM TIME '-1 ms' ` +
 		"WHERE projections.login_names3.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",
 		"change_date",
 		"sequence",
 		"resource_owner",
+		"user_resource_owner",
 		"user_id",
 		"roles",
 		"login_name",
@@ -104,6 +105,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id",
 							database.TextArray[string]{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
@@ -128,6 +130,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
@@ -154,6 +157,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id",
 							database.TextArray[string]{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
@@ -178,6 +182,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
@@ -204,6 +209,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id-1",
 							database.TextArray[string]{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
@@ -220,6 +226,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id-2",
 							database.TextArray[string]{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
@@ -244,6 +251,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id-1",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
@@ -259,6 +267,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id-2",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
@@ -292,7 +301,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

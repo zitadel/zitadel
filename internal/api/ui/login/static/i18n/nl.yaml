@@ -263,6 +263,9 @@ RegistrationUser:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -304,6 +307,9 @@ ExternalRegistrationUserOverview:
   Nederlands: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -379,6 +385,9 @@ ExternalNotFound:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:
@@ -499,6 +508,10 @@ Errors:
       CreationNotAllowed: Creatie van een nieuwe gebruiker is niet toegestaan op deze Provider
       LinkingNotAllowed: Koppeling van een gebruiker is niet toegestaan op deze Provider
       NoOptionAllowed: Noch aanmaak noch koppeling is toegestaan voor deze provider. Neem contact op met uw beheerder.
+      LoginFailedSwitchLocal: |
+        Aanmelding bij externe identiteitsprovider is mislukt. Terug naar lokale aanmelding.
+
+        Foutdetails: {{.Details}}
     GrantRequired: Inloggen niet mogelijk. De gebruiker moet minimaal één grant hebben op de applicatie. Neem contact op met uw beheerder.
     ProjectRequired: Inloggen niet mogelijk. De organisatie van de gebruiker moet toegekend zijn aan het project. Neem contact op met uw beheerder.
   IdentityProvider:

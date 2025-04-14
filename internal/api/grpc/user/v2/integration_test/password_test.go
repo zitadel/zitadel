@@ -12,8 +12,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_RequestPasswordReset(t *testing.T) {
@@ -92,9 +92,10 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 			got, err := Client.PasswordReset(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 			if tt.want.GetVerificationCode() != "" {
 				assert.NotEmpty(t, got.GetVerificationCode())

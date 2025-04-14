@@ -63,6 +63,14 @@ message Member {
             description: "type of the user (human / machine)"
         }
     ];
+
+      // The organization the user belong to.  
+     string user_resource_owner = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+
 }
 
 message SearchQuery {
@@ -134,4 +142,12 @@ message UserIDQuery {
             example: "\"69629023906488334\"";
         }
     ];
+}
+
+enum MemberFieldColumnName {
+    MEMBER_FIELD_NAME_UNSPECIFIED = 0;
+    MEMBER_FIELD_NAME_USER_ID=1;
+    MEMBER_FIELD_NAME_CREATION_DATE = 2;
+    MEMBER_FIELD_NAME_CHANGE_DATE=3;
+    MEMBER_FIELD_NAME_USER_RESOURCE_OWNER=4;
 }

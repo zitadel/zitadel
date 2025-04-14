@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -45,6 +46,15 @@ func InitPasswordLink(origin, userID, code, orgID, authRequestID string) string 
 	v.Set(queryOrgID, orgID)
 	v.Set(QueryAuthRequestID, authRequestID)
 	return externalLink(origin) + EndpointInitPassword + "?" + v.Encode()
+}
+
+func InitPasswordLinkTemplate(origin, userID, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointInitPassword,
+		queryInitPWUserID, userID,
+		queryInitPWCode, "{{.Code}}",
+		queryOrgID, orgID,
+		QueryAuthRequestID, authRequestID)
 }
 
 func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {
@@ -102,10 +112,6 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID
 	}
@@ -113,7 +119,7 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	translator := l.getTranslator(r.Context(), authReq)
 
 	data := initPasswordData{
-		baseData:    l.getBaseData(r, authReq, translator, "InitPassword.Title", "InitPassword.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitPassword.Title", "InitPassword.Description", err),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -145,7 +151,7 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 
 func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "InitPasswordDone.Title", "InitPasswordDone.Description", "", "")
+	data := l.getUserData(r, authReq, translator, "InitPasswordDone.Title", "InitPasswordDone.Description", nil)
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)
 	}

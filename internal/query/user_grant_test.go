@@ -23,14 +23,14 @@ var (
 			", projections.user_grants5.roles" +
 			", projections.user_grants5.state" +
 			", projections.user_grants5.user_id" +
-			", projections.users13.username" +
-			", projections.users13.type" +
-			", projections.users13.resource_owner" +
-			", projections.users13_humans.first_name" +
-			", projections.users13_humans.last_name" +
-			", projections.users13_humans.email" +
-			", projections.users13_humans.display_name" +
-			", projections.users13_humans.avatar_key" +
+			", projections.users14.username" +
+			", projections.users14.type" +
+			", projections.users14.resource_owner" +
+			", projections.users14_humans.first_name" +
+			", projections.users14_humans.last_name" +
+			", projections.users14_humans.email" +
+			", projections.users14_humans.display_name" +
+			", projections.users14_humans.avatar_key" +
 			", projections.login_names3.login_name" +
 			", projections.user_grants5.resource_owner" +
 			", projections.orgs1.name" +
@@ -41,13 +41,12 @@ var (
 			", granted_orgs.name" +
 			", granted_orgs.primary_domain" +
 			" FROM projections.user_grants5" +
-			" LEFT JOIN projections.users13 ON projections.user_grants5.user_id = projections.users13.id AND projections.user_grants5.instance_id = projections.users13.instance_id" +
-			" LEFT JOIN projections.users13_humans ON projections.user_grants5.user_id = projections.users13_humans.user_id AND projections.user_grants5.instance_id = projections.users13_humans.instance_id" +
+			" LEFT JOIN projections.users14 ON projections.user_grants5.user_id = projections.users14.id AND projections.user_grants5.instance_id = projections.users14.instance_id" +
+			" LEFT JOIN projections.users14_humans ON projections.user_grants5.user_id = projections.users14_humans.user_id AND projections.user_grants5.instance_id = projections.users14_humans.instance_id" +
 			" LEFT JOIN projections.orgs1 ON projections.user_grants5.resource_owner = projections.orgs1.id AND projections.user_grants5.instance_id = projections.orgs1.instance_id" +
 			" LEFT JOIN projections.projects4 ON projections.user_grants5.project_id = projections.projects4.id AND projections.user_grants5.instance_id = projections.projects4.instance_id" +
-			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users13.resource_owner = granted_orgs.id AND projections.users13.instance_id = granted_orgs.instance_id" +
+			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users14.resource_owner = granted_orgs.id AND projections.users14.instance_id = granted_orgs.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
-			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names3.is_primary = $1")
 	userGrantCols = []string{
 		"id",
@@ -85,14 +84,14 @@ var (
 			", projections.user_grants5.roles" +
 			", projections.user_grants5.state" +
 			", projections.user_grants5.user_id" +
-			", projections.users13.username" +
-			", projections.users13.type" +
-			", projections.users13.resource_owner" +
-			", projections.users13_humans.first_name" +
-			", projections.users13_humans.last_name" +
-			", projections.users13_humans.email" +
-			", projections.users13_humans.display_name" +
-			", projections.users13_humans.avatar_key" +
+			", projections.users14.username" +
+			", projections.users14.type" +
+			", projections.users14.resource_owner" +
+			", projections.users14_humans.first_name" +
+			", projections.users14_humans.last_name" +
+			", projections.users14_humans.email" +
+			", projections.users14_humans.display_name" +
+			", projections.users14_humans.avatar_key" +
 			", projections.login_names3.login_name" +
 			", projections.user_grants5.resource_owner" +
 			", projections.orgs1.name" +
@@ -104,13 +103,12 @@ var (
 			", granted_orgs.primary_domain" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.user_grants5" +
-			" LEFT JOIN projections.users13 ON projections.user_grants5.user_id = projections.users13.id AND projections.user_grants5.instance_id = projections.users13.instance_id" +
-			" LEFT JOIN projections.users13_humans ON projections.user_grants5.user_id = projections.users13_humans.user_id AND projections.user_grants5.instance_id = projections.users13_humans.instance_id" +
+			" LEFT JOIN projections.users14 ON projections.user_grants5.user_id = projections.users14.id AND projections.user_grants5.instance_id = projections.users14.instance_id" +
+			" LEFT JOIN projections.users14_humans ON projections.user_grants5.user_id = projections.users14_humans.user_id AND projections.user_grants5.instance_id = projections.users14_humans.instance_id" +
 			" LEFT JOIN projections.orgs1 ON projections.user_grants5.resource_owner = projections.orgs1.id AND projections.user_grants5.instance_id = projections.orgs1.instance_id" +
 			" LEFT JOIN projections.projects4 ON projections.user_grants5.project_id = projections.projects4.id AND projections.user_grants5.instance_id = projections.projects4.instance_id" +
-			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users13.resource_owner = granted_orgs.id AND projections.users13.instance_id = granted_orgs.instance_id" +
+			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users14.resource_owner = granted_orgs.id AND projections.users14.instance_id = granted_orgs.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
-			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names3.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
@@ -1008,7 +1006,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

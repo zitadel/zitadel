@@ -32,6 +32,9 @@ func (f *fieldProjection) Reducers() []AggregateReducer {
 
 var _ Projection = (*fieldProjection)(nil)
 
+// NewFieldHandler returns a projection handler which backfills the `eventstore.fields` table with historic events which
+// might have existed before they had and Field Operations defined.
+// The events are filtered by the mapped aggregate types and each event type for that aggregate.
 func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.AggregateType][]eventstore.EventType) *FieldHandler {
 	return &FieldHandler{
 		Handler: Handler{
@@ -41,7 +44,6 @@ func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.Aggr
 			bulkLimit:              config.BulkLimit,
 			eventTypes:             eventTypes,
 			requeueEvery:           config.RequeueEvery,
-			handleActiveInstances:  config.HandleActiveInstances,
 			now:                    time.Now,
 			maxFailureCount:        config.MaxFailureCount,
 			retryFailedAfter:       config.RetryFailedAfter,
@@ -52,6 +54,7 @@ func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.Aggr
 	}
 }
 
+// Trigger executes the backfill job of events for the instance currently in the context.
 func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err error) {
 	config := new(triggerConfig)
 	for _, opt := range opts {

@@ -259,6 +259,9 @@ RegistrationUser:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -299,6 +302,9 @@ ExternalRegistrationUserOverview:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -368,6 +374,9 @@ ExternalNotFound:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
@@ -487,6 +496,10 @@ Errors:
       CreationNotAllowed: Създаването на нов потребител не е разрешено на този доставчик
       LinkingNotAllowed: Свързването на потребител не е разрешено на този доставчик
       NoOptionAllowed: Нито създаване, нито свързване е разрешено за този доставчик. Моля, свържете се с администратора.
+      LoginFailedSwitchLocal: |
+        Вход в външен доставчик на идентификация е неуспешен. Връщане към локален вход.
+
+        Подробности за грешката: {{.Details}}
     GrantRequired: 'Влизането не е възможно. '
     ProjectRequired: 'Влизането не е възможно. '
   IdentityProvider:

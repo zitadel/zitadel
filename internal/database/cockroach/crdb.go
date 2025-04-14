@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
@@ -17,7 +18,7 @@ import (
 
 func init() {
 	config := new(Config)
-	dialect.Register(config, config, true)
+	dialect.Register(config, config, false)
 }
 
 const (
@@ -51,7 +52,7 @@ func (c *Config) MatchName(name string) bool {
 	return false
 }
 
-func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+func (_ *Config) Decode(configs []any) (dialect.Connector, error) {
 	connector := new(Config)
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
@@ -71,15 +72,44 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	return connector, nil
 }
 
-func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, *pgxpool.Pool, error) {
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
+func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
+	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
+
+	config, err := pgxpool.ParseConfig(c.String(useAdmin))
 	if err != nil {
 		return nil, nil, err
 	}
 
-	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
-	if err != nil {
-		return nil, nil, err
+	if len(connConfig.AfterConnect) > 0 {
+		config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			for _, f := range connConfig.AfterConnect {
+				if err := f(ctx, conn); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}
+
+	if len(connConfig.BeforeAcquire) > 0 {
+		config.BeforeAcquire = func(ctx context.Context, conn *pgx.Conn) bool {
+			for _, f := range connConfig.BeforeAcquire {
+				if err := f(ctx, conn); err != nil {
+					return false
+				}
+			}
+			return true
+		}
+	}
+	if len(connConfig.AfterRelease) > 0 {
+		config.AfterRelease = func(conn *pgx.Conn) bool {
+			for _, f := range connConfig.AfterRelease {
+				if err := f(conn); err != nil {
+					return false
+				}
+			}
+			return true
+		}
 	}
 
 	if connConfig.MaxOpenConns != 0 {
@@ -113,12 +143,8 @@ func (c *Config) Password() string {
 	return c.User.Password
 }
 
-func (c *Config) Type() string {
-	return "cockroach"
-}
-
-func (c *Config) Timetravel(d time.Duration) string {
-	return ""
+func (c *Config) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypeCockroach
 }
 
 type User struct {
@@ -163,7 +189,7 @@ func (c *Config) checkSSL(user User) {
 	}
 }
 
-func (c Config) String(useAdmin bool, appName string) string {
+func (c Config) String(useAdmin bool) string {
 	user := c.User
 	if useAdmin {
 		user = c.Admin.User
@@ -174,7 +200,7 @@ func (c Config) String(useAdmin bool, appName string) string {
 		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + user.Username,
 		"dbname=" + c.Database,
-		"application_name=" + appName,
+		"application_name=" + dialect.DefaultAppName,
 		"sslmode=" + user.SSL.Mode,
 	}
 	if c.Options != "" {

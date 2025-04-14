@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func TestCRDB_Filter(t *testing.T) {
+func TestEventstore_Filter(t *testing.T) {
 	type args struct {
 		searchQuery *eventstore.SearchQueryBuilder
 	}
@@ -66,6 +66,39 @@ func TestCRDB_Filter(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "exclude aggregate type and event type",
+			args: args{
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AddQuery().
+					AggregateTypes(eventstore.AggregateType(t.Name())).
+					Builder().
+					ExcludeAggregateIDs().
+					EventTypes("test.updated").
+					AggregateTypes(eventstore.AggregateType(t.Name())).
+					Builder(),
+			},
+			fields: fields{
+				existingEvents: []eventstore.Command{
+					generateCommand(eventstore.AggregateType(t.Name()), "306"),
+					generateCommand(
+						eventstore.AggregateType(t.Name()),
+						"306",
+						func(te *testEvent) {
+							te.EventType = "test.updated"
+						},
+					),
+					generateCommand(
+						eventstore.AggregateType(t.Name()),
+						"308",
+					),
+				},
+			},
+			res: res{
+				eventCount: 1,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		for querierName, querier := range queriers {
@@ -87,18 +120,18 @@ func TestCRDB_Filter(t *testing.T) {
 
 				events, err := db.Filter(context.Background(), tt.args.searchQuery)
 				if (err != nil) != tt.wantErr {
-					t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("eventstore.query() error = %v, wantErr %v", err, tt.wantErr)
 				}
 
 				if len(events) != tt.res.eventCount {
-					t.Errorf("CRDB.query() expected event count: %d got %d", tt.res.eventCount, len(events))
+					t.Errorf("eventstore.query() expected event count: %d got %d", tt.res.eventCount, len(events))
 				}
 			})
 		}
 	}
 }
 
-func TestCRDB_LatestSequence(t *testing.T) {
+func TestEventstore_LatestSequence(t *testing.T) {
 	type args struct {
 		searchQuery *eventstore.SearchQueryBuilder
 	}
@@ -171,10 +204,10 @@ func TestCRDB_LatestSequence(t *testing.T) {
 
 				sequence, err := db.LatestSequence(context.Background(), tt.args.searchQuery)
 				if (err != nil) != tt.wantErr {
-					t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("eventstore.query() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				if tt.res.sequence > sequence {
-					t.Errorf("CRDB.query() expected sequence: %v got %v", tt.res.sequence, sequence)
+					t.Errorf("eventstore.query() expected sequence: %v got %v", tt.res.sequence, sequence)
 				}
 			})
 		}

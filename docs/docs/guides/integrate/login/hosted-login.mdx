@@ -1,0 +1,233 @@
+---
+title: Login users into your application with a hosted login UI
+sidebar_label: Hosted Login UI
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import PreventLockout from './_prevent-lockout.mdx';
+
+ZITADEL provides a hosted single-sign-on page to securely sign-in users to your applications.
+ZITADEL's hosted login page serves as a centralized authentication interface provided for applications that integrate ZITADEL.
+As a developer, understanding the hosted login page is essential for seamlessly integrating authentication into your application.
+
+## Centralized authentication endpoint
+
+ZITADEL's hosted login page acts as a centralized authentication endpoint where users are redirected to authenticate themselves.
+When users attempt to access a protected resource within your application, you can redirect them to the hosted login page to authenticate using their login methods and credentials or through Single-sign-on (SSO).
+After successful authentication, the user will be redirected back to the originating application.
+
+## Security and compliance
+
+ZITADEL's hosted login page prioritizes security and compliance with industry standards and regulations.
+It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/guides/integrate/login/oidc), and [SAML](/docs/guides/integrate/login/).
+
+We make sure to harden the login UI and minimize the attack surface.
+One of the measures we apply is setting the necessary security heads thus minimizing the risk of common vulnerabilities in login pages, such as XSS vulnerabilities.
+Put your current login to the test and compare the results with our hosted login page.
+Tools like [Mozilla's Observatory](https://observatory.mozilla.org/) can give you a good first impression about the security posture.
+
+## Developer-friendly integration
+
+Integrating the hosted login page into your application is straightforward, thanks to ZITADEL's developer-friendly documentation, SDKs, and APIs. Developers can easily implement authentication flows, handle authentication callbacks, and customize the user experience to seamlessly integrate authentication with their application's workflow.
+
+Overall, ZITADEL's hosted login page simplifies the authentication process for developers by providing a secure, customizable, and developer-friendly authentication interface. By leveraging this centralized authentication endpoint, developers can enhance their application's security, user experience, and compliance with industry standards and regulations.
+
+## Key features of the hosted login
+
+### Flexible usernames
+
+Different login name formats can be used on ZITADEL's hosted login page to select a user.
+Login methods can be a user's username, containing the username and an [organization domain](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain), their email addresses, or their phone numbers.
+By default, all of these login methods are allowed and can be adjusted by [Managers](/docs/concepts/structure/managers) to meet their requirements.
+
+### Support for multiple authentication methods
+
+The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
+The second factor (2FA) and multi-factor authentication methods (MFA) available in ZITADEL include OTP via an authenticator app, TOTP via SMS, OTP via email, and U2F.
+
+Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
+
+### Enterprise single-sign-on
+
+![Screenshot of ZITADEL console showing different identity provider templates](/img/guides/integrate/login/login-external-idp-templates.png)
+
+With the hosted login page from ZITADEL developers will get the best support for multi-tenancy single-sign-on with third-party identity providers.
+ZITADEL acts as an [identity broker](/docs/concepts/features/identity-brokering) between your applications and different external identity providers, reducing the implementation effort for developers.
+External Identity providers can be configured for the whole instance or for each organization that represents a group of users such as a B2B customer or organizational unit.
+
+ZITADEL offers various [identity provider templates](/docs/guides/integrate/identity-providers/introduction) to integrate providers such as [Okta](/docs/guides/integrate/identity-providers/okta-oidc), [Entra ID](/docs/guides/integrate/identity-providers/azure-ad-oidc) or on-premise [LDAP](/docs/guides/integrate/identity-providers/ldap).
+
+### Multi-tenancy authentication
+
+ZITADEL simplifies multi-tenancy authentication by securely managing authentication for multiple tenants, called [Organizations](/docs/concepts/structure/organizations), within a single [instance](/docs/concepts/structure/instance).
+
+Key features include:
+
+1. **Secure Tenant Isolation**: Ensures robust security measures to prevent unauthorized access between tenants, maintaining data privacy and compliance. [Managers](/docs/concepts/structure/managers) for an organization have only access to data and configuration within their Organization.
+2. **Custom Authentication Configurations**: Allows tailored [authentication settings](/docs/guides/manage/console/default-settings#login-behavior-and-access), [branding](/docs/guides/manage/customize/branding), and policies for each tenant.
+3. **Centralized Management**: Provides [centralized administration](/docs/guides/manage/console/managers) for efficient management across all tenants.
+4. **Scalability and Flexibility**: Scales seamlessly to accommodate growing organizations of all sizes.
+5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/docs/guides/integrate/identity-providers/azure-ad-oidc).
+
+### Customization options
+
+While the hosted login page provides a default authentication interface out-of-the-box, ZITADEL offers [customization options](/docs/guides/manage/customize/branding) to tailor the login page to match your application's branding and user experience requirements.
+Developers can customize elements such as logos, colors, and messaging to ensure a seamless integration with their application's user interface.
+
+:::info Customization and Branding
+The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
+
+By default, the displayed branding is defined [based on the user's domain](/docs/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
+:::
+
+### Fast account switching
+
+The hosted login page remembers users who have previously authenticated.
+In case a user has used multiple accounts, for example, a private account and a work account, to authenticate, then all accounts will be shown on the Account Picker.
+Users can still login with a different user that is not on the list.
+This allows users to quickly switch between users and provide a better user experience.
+
+:::info
+This behavior can be changed with the authorization request. Please refer to our [guide](/guides/integrate/login/oidc/login-users).
+:::
+
+### Self-service for users
+
+ZITADEL's hosted login page offers [many self-service flows](/docs/concepts/features/selfservice) that allow users to set up authentication methods or recover their login information.
+Developers use the self-service functionalities to reduce manual tasks and improve user experience.
+Key features include:
+
+### Password reset
+
+Unauthenticated users can request a password reset after providing the loginname during the login flow.
+
+- User selects reset password
+- An email will be sent to the verified email address
+- User opens a link and has to provide a new password
+
+#### Prompt users to set up multifactor authentication
+
+Users are automatically prompted to provide a second factor, when
+
+- Instance or organization [login policy](/concepts/structure/policies#login-policy) is set
+- Requested by the client
+- A multi-factor is set up for the user
+
+When a multi-factor is required, but not set up, then the user is requested to set up an additional factor.
+
+:::info Disabling multifactor prompt
+You can disable the prompt, in case multifactor authentication is not enforced by setting the [**Multifactor Init Lifetime**](/docs/guides/manage/console/default-settings#login-lifetimes) to 0.
+:::
+
+#### Enroll passkeys
+
+Users can select a button to initiate passwordless login or use a fall-back method (ie. login with username/password), if available.
+
+The passwordless with [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
+With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
+This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
+The user experience depends mainly on the operating system and browser.
+
+## Hosted Login Version 2 (Beta)
+
+We have worked on a new, self-hostable implementation of our hosted login built with Next.js and leveraging our [Session API](/docs/guides/integrate/login/login-users#zitadels-session-api).
+This solution empowers you to easily fork and customize the login experience to perfectly match your brand and needs.
+
+In this initial release, the new login is available for self-hosting only. We'll be progressively replacing the built-in login with this improved version, built with [TypeScript](https://github.com/zitadel/typescript).
+
+### Current State
+
+:::info
+The documentation describes the state of the feature in ZITADEL V3.
+:::
+
+Our primary goal for the TypeScript login system is to replace the existing login functionality within Zitadel Core, which is shipped with Zitadel automatically. This will allow us to leverage the benefits of the new system, including its modular architecture and enhanced security features.
+
+To achieve this, we are actively working on implementing the core features currently available in Zitadel Core, such as:
+
+- **Authentication Methods:**
+  - Username and Password
+  - Passkeys
+  - Multi-Factor Authentication (MFA)
+  - External Identity Providers (OIDC, SAML, etc.)
+- **OpenID Connect (OIDC) Compliance:** Adherence to the OIDC standard for seamless integration with various identity providers.
+- **Customization**:
+  - Branding options to match your organization's identity.
+  - Flexible configuration settings to tailor the login experience.
+
+The full feature list can be found [here](https://github.com/zitadel/typescript?tab=readme-ov-file#features-list).
+
+As we continue to develop the TypeScript login system, we will provide regular updates on its progress and new capabilities.
+
+### Limitations
+
+For the first implementation we have excluded the following features:
+
+- Generic JWT IDP
+- LDAP IDP
+- Device Authorization Grants
+- Force MFA on external authenticated users
+- Passkey/U2F Setup
+  - As passkey and u2f is bound to a domain, it is important to notice, that setting up the authentication possibility in the ZITADEL management console (Self-service), will not work if the login runs on a different domain
+- Custom Login Texts
+
+### Beta Testing
+
+The TypeScript login system is currently in beta testing. Your feedback is invaluable in helping us refine and improve this new solution.
+At your convenience please open any issues faced on our Typescript Login GitHub repository to report bugs or suggest enhancements while more general feedback can be shared directly to fabienne@zitadel.com.
+Your contributions will play a crucial role in shaping the future of our login system. Thank you for your support!
+
+#### Step-by-step Guide
+
+**Trying out the new login:** To preview the new login without changing your current setup, the easiest way is to visit `https://<YOUR_ZITADEL_INSTANCE_DOMAIN>/ui/v2/login` on your Zitadel Cloud instance domain. You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
+
+**Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/typescript repo and use the "Deploy" button to run your code on Vercel.
+
+<Tabs queryString="deployment">
+    <TabItem value="zitadel_cloud" label="Activate Zitadel Cloud V2 Login" default="true">
+
+        Zitadel Cloud provides the V2 login at the fixed path `/ui/v2/login`.
+        <PreventLockout/>
+
+        To activate it to authenticate on your Zitadel Cloud apps, you can follow one of these steps:
+
+        1. Enable the new login on your application configuration. Leave the field **Custom base URL for the new Login UI** empty to use the default. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
+        ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
+        2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
+
+    </TabItem>
+    <TabItem value="vercel_custom" label="Vercel Custom Login Deployment">
+
+        The simplest way to deploy the new login for yourself is by using the [“Deploy” button in our repository](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) to deploy the login directly to your Vercel.
+
+        1. [Create a service user](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat) with a PAT in your instance
+        2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (YOUR_DOMAIN/ui/console/instance?id=organizations)
+        Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/managers)
+        3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) at the bottom of the readme in our [repository](https://github.com/zitadel/typescript)
+        4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
+           - PAT
+           - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
+        5. Add the domain where your login UI is hosted to the [trusted domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
+        6. Use the new login in your application.
+            <PreventLockout/>
+            You have three different options on how to achieve this:
+            1. Enable the new login on your application configuration and add the URL of your login UI. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
+            ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
+            2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
+            3. Change the issuer in the code of your application to the new domain of your login
+        7. Enforce users to have their email verified. By setting `EMAIL_VERIFICATION` to `true` in your environment variables, your users will be enforced to verify their email address before they can log in.
+
+    </TabItem>
+</Tabs>
+
+### Important Notes
+
+As this feature is currently in Beta, please be aware of some potential workarounds and important considerations before implementation.
+
+- **Create Users:** The new typescript login is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
+- **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: $YOUR-DOMAIN/idps/callback
+- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
+  <br />
+  *Note: If you run the login on a subdomain of your current instance, this problem
+  can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*

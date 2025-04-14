@@ -31,6 +31,9 @@ type addOIDCApp struct {
 	ClockSkew                   time.Duration
 	AdditionalOrigins           []string
 	SkipSuccessPageForNativeApp bool
+	BackChannelLogoutURI        string
+	LoginVersion                domain.LoginVersion
+	LoginBaseURI                string
 
 	ClientID          string
 	ClientSecret      string
@@ -108,6 +111,9 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 					app.ClockSkew,
 					trimStringSliceWhiteSpaces(app.AdditionalOrigins),
 					app.SkipSuccessPageForNativeApp,
+					app.BackChannelLogoutURI,
+					app.LoginVersion,
+					app.LoginBaseURI,
 				),
 			}, nil
 		}, nil
@@ -126,11 +132,9 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
-	_, err = c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3m9s2", "Errors.Project.NotFound")
+	if err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+		return nil, err
 	}
-
 	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
 }
 
@@ -138,11 +142,9 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
-	_, err = c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3m9ss", "Errors.Project.NotFound")
+	if err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+		return nil, err
 	}
-
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}
@@ -199,13 +201,21 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		oidcApp.ClockSkew,
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
 		oidcApp.SkipNativeAppSuccessPage,
+		strings.TrimSpace(oidcApp.BackChannelLogoutURI),
+		oidcApp.LoginVersion,
+		strings.TrimSpace(oidcApp.LoginBaseURI),
 	))
 
 	addedApplication.AppID = oidcApp.AppID
+	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -251,6 +261,9 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.ClockSkew,
 		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
 		oidc.SkipNativeAppSuccessPage,
+		strings.TrimSpace(oidc.BackChannelLogoutURI),
+		oidc.LoginVersion,
+		strings.TrimSpace(oidc.LoginBaseURI),
 	)
 	if err != nil {
 		return nil, err

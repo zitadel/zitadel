@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -24,7 +25,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 		ctx           context.Context
 		project       *domain.Project
 		resourceOwner string
-		ownerID       string
 	}
 	type res struct {
 		want *domain.Project
@@ -44,7 +44,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				project:       &domain.Project{},
 				resourceOwner: "org1",
 			},
@@ -53,10 +53,33 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
-			name: "org with project owner, error already exists",
+			name: "project, resourceowner empty",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				project: &domain.Project{
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+				resourceOwner: "",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "project, error already exists",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
 					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internl"),
 						project.NewProjectAddedEvent(
 							context.Background(),
@@ -64,18 +87,12 @@ func TestCommandSide_AddProject(t *testing.T) {
 							"project", true, true, true,
 							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 						),
-						project.NewProjectMemberAddedEvent(
-							context.Background(),
-							&project.NewAggregate("project1", "org1").Aggregate,
-							"user1",
-							[]string{domain.RoleProjectOwner}...,
-						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				project: &domain.Project{
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
@@ -84,17 +101,48 @@ func TestCommandSide_AddProject(t *testing.T) {
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
-				ownerID:       "user1",
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
-			name: "org with project owner, ok",
+			name: "project, already exists",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				project: &domain.Project{
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "project, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
 					expectPush(
 						project.NewProjectAddedEvent(
 							context.Background(),
@@ -102,18 +150,12 @@ func TestCommandSide_AddProject(t *testing.T) {
 							"project", true, true, true,
 							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 						),
-						project.NewProjectMemberAddedEvent(
-							context.Background(),
-							&project.NewAggregate("project1", "org1").Aggregate,
-							"user1",
-							[]string{domain.RoleProjectOwner}...,
-						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				project: &domain.Project{
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
@@ -122,7 +164,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
-				ownerID:       "user1",
 			},
 			res: res{
 				want: &domain.Project{
@@ -141,11 +182,12 @@ func TestCommandSide_AddProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner, tt.args.ownerID)
+			c.setMilestonesCompletedForTest("instanceID")
+			got, err := c.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -946,6 +988,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 								"https://test.com/saml/metadata",
 								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 								"http://localhost:8080/saml/metadata",
+								domain.LoginVersionUnspecified,
+								"",
 							),
 						),
 					),
@@ -997,6 +1041,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 								"https://test1.com/saml/metadata",
 								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 								"",
+								domain.LoginVersionUnspecified,
+								"",
 							),
 						),
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
@@ -1011,6 +1057,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 								"https://test2.com/saml/metadata",
 								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 								"",
+								domain.LoginVersionUnspecified,
+								"",
 							),
 						),
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
@@ -1024,6 +1072,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 								"app3",
 								"https://test3.com/saml/metadata",
 								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+								"",
+								domain.LoginVersionUnspecified,
 								"",
 							),
 						),
@@ -1159,9 +1209,6 @@ func TestAddProject(t *testing.T) {
 						false,
 						domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 					),
-					project.NewProjectMemberAddedEvent(ctx, &agg.Aggregate,
-						"CAOS AG",
-						domain.RoleProjectOwner),
 				},
 			},
 		},

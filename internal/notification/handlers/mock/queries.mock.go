@@ -12,7 +12,10 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
+	jose "github.com/go-jose/go-jose/v4"
+	authz "github.com/zitadel/zitadel/internal/api/authz"
 	domain "github.com/zitadel/zitadel/internal/domain"
 	query "github.com/zitadel/zitadel/internal/query"
 	gomock "go.uber.org/mock/gomock"
@@ -42,6 +45,20 @@ func (m *MockQueries) EXPECT() *MockQueriesMockRecorder {
 	return m.recorder
 }
 
+// ActiveInstances mocks base method.
+func (m *MockQueries) ActiveInstances() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ActiveInstances")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// ActiveInstances indicates an expected call of ActiveInstances.
+func (mr *MockQueriesMockRecorder) ActiveInstances() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveInstances", reflect.TypeOf((*MockQueries)(nil).ActiveInstances))
+}
+
 // ActiveLabelPolicyByOrg mocks base method.
 func (m *MockQueries) ActiveLabelPolicyByOrg(arg0 context.Context, arg1 string, arg2 bool) (*query.LabelPolicy, error) {
 	m.ctrl.T.Helper()
@@ -57,6 +74,21 @@ func (mr *MockQueriesMockRecorder) ActiveLabelPolicyByOrg(arg0, arg1, arg2 any) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveLabelPolicyByOrg", reflect.TypeOf((*MockQueries)(nil).ActiveLabelPolicyByOrg), arg0, arg1, arg2)
 }
 
+// ActivePrivateSigningKey mocks base method.
+func (m *MockQueries) ActivePrivateSigningKey(arg0 context.Context, arg1 time.Time) (*query.PrivateKeys, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ActivePrivateSigningKey", arg0, arg1)
+	ret0, _ := ret[0].(*query.PrivateKeys)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ActivePrivateSigningKey indicates an expected call of ActivePrivateSigningKey.
+func (mr *MockQueriesMockRecorder) ActivePrivateSigningKey(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActivePrivateSigningKey", reflect.TypeOf((*MockQueries)(nil).ActivePrivateSigningKey), arg0, arg1)
+}
+
 // CustomTextListByTemplate mocks base method.
 func (m *MockQueries) CustomTextListByTemplate(arg0 context.Context, arg1, arg2 string, arg3 bool) (*query.CustomTexts, error) {
 	m.ctrl.T.Helper()
@@ -70,6 +102,21 @@ func (m *MockQueries) CustomTextListByTemplate(arg0 context.Context, arg1, arg2 
 func (mr *MockQueriesMockRecorder) CustomTextListByTemplate(arg0, arg1, arg2, arg3 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CustomTextListByTemplate", reflect.TypeOf((*MockQueries)(nil).CustomTextListByTemplate), arg0, arg1, arg2, arg3)
+}
+
+// GetActiveSigningWebKey mocks base method.
+func (m *MockQueries) GetActiveSigningWebKey(arg0 context.Context) (*jose.JSONWebKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetActiveSigningWebKey", arg0)
+	ret0, _ := ret[0].(*jose.JSONWebKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetActiveSigningWebKey indicates an expected call of GetActiveSigningWebKey.
+func (mr *MockQueriesMockRecorder) GetActiveSigningWebKey(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveSigningWebKey", reflect.TypeOf((*MockQueries)(nil).GetActiveSigningWebKey), arg0)
 }
 
 // GetDefaultLanguage mocks base method.
@@ -114,6 +161,21 @@ func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 st
 func (mr *MockQueriesMockRecorder) GetNotifyUserByID(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), arg0, arg1, arg2)
+}
+
+// InstanceByID mocks base method.
+func (m *MockQueries) InstanceByID(arg0 context.Context, arg1 string) (authz.Instance, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstanceByID", arg0, arg1)
+	ret0, _ := ret[0].(authz.Instance)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InstanceByID indicates an expected call of InstanceByID.
+func (mr *MockQueriesMockRecorder) InstanceByID(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceByID", reflect.TypeOf((*MockQueries)(nil).InstanceByID), arg0, arg1)
 }
 
 // MailTemplateByOrg mocks base method.
@@ -222,16 +284,16 @@ func (mr *MockQueriesMockRecorder) SearchMilestones(arg0, arg1, arg2 any) *gomoc
 }
 
 // SessionByID mocks base method.
-func (m *MockQueries) SessionByID(arg0 context.Context, arg1 bool, arg2, arg3 string) (*query.Session, error) {
+func (m *MockQueries) SessionByID(arg0 context.Context, arg1 bool, arg2, arg3 string, arg4 domain.PermissionCheck) (*query.Session, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SessionByID", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "SessionByID", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(*query.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SessionByID indicates an expected call of SessionByID.
-func (mr *MockQueriesMockRecorder) SessionByID(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) SessionByID(arg0, arg1, arg2, arg3, arg4 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SessionByID", reflect.TypeOf((*MockQueries)(nil).SessionByID), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SessionByID", reflect.TypeOf((*MockQueries)(nil).SessionByID), arg0, arg1, arg2, arg3, arg4)
 }

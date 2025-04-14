@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"net/http"
 
 	"golang.org/x/text/language"
@@ -40,6 +41,13 @@ type registerData struct {
 	OrgRegister        bool
 }
 
+func determineResourceOwner(ctx context.Context, authRequest *domain.AuthRequest) string {
+	if authRequest != nil && authRequest.RequestedOrgID != "" {
+		return authRequest.RequestedOrgID
+	}
+	return authz.GetInstance(ctx).DefaultOrganisationID()
+}
+
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 	data := new(registerFormData)
 	authRequest, err := l.getAuthRequestAndParseData(r, data)
@@ -47,7 +55,28 @@ func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authRequest, err)
 		return
 	}
+	if err := l.checkRegistrationAllowed(r, determineResourceOwner(r.Context(), authRequest), authRequest); err != nil {
+		l.renderError(w, r, authRequest, err)
+		return
+	}
 	l.renderRegister(w, r, authRequest, data, nil)
+}
+
+func (l *Login) checkRegistrationAllowed(r *http.Request, orgID string, authReq *domain.AuthRequest) error {
+	if authReq != nil {
+		if registrationAllowed(authReq) {
+			return nil
+		}
+		return zerrors.ThrowPreconditionFailed(nil, "VIEW-RRGRXz4kGw", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
+	}
+	loginPolicy, err := l.getLoginPolicy(r, orgID)
+	if err != nil {
+		return err
+	}
+	if loginPolicy.AllowRegister && loginPolicy.AllowUsernamePassword {
+		return nil
+	}
+	return zerrors.ThrowPreconditionFailed(nil, "VIEW-Vq3bduAacD", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
 }
 
 func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
@@ -57,16 +86,15 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authRequest, err)
 		return
 	}
+	resourceOwner := determineResourceOwner(r.Context(), authRequest)
+	if err := l.checkRegistrationAllowed(r, resourceOwner, authRequest); err != nil {
+		l.renderError(w, r, authRequest, err)
+		return
+	}
 	if data.Password != data.Password2 {
 		err := zerrors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderRegister(w, r, authRequest, data, err)
 		return
-	}
-
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != resourceOwner {
-		resourceOwner = authRequest.RequestedOrgID
 	}
 	// For consistency with the external authentication flow,
 	// the setMetadata() function is provided on the pre creation hook, for now,
@@ -114,10 +142,6 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerFormData, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authRequest)
 	if formData == nil {
 		formData = new(registerFormData)
@@ -126,17 +150,9 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		formData.Language = l.renderer.ReqLang(translator, r).String()
 	}
 
-	var resourceOwner string
-	if authRequest != nil {
-		resourceOwner = authRequest.RequestedOrgID
-	}
-
-	if resourceOwner == "" {
-		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
-	}
-
+	resourceOwner := determineResourceOwner(r.Context(), authRequest)
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, translator, "RegistrationUser.Title", "RegistrationUser.Description", errID, errMessage),
+		baseData:         l.getBaseData(r, authRequest, translator, "RegistrationUser.Title", "RegistrationUser.Description", err),
 		registerFormData: *formData,
 	}
 

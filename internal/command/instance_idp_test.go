@@ -22,6 +22,93 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+var (
+	validSAMLMetadata = []byte(`<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://localhost:8080/saml/v2/metadata" ID="_8b02ecf6-aea4-4eda-96c6-190551f05b07">
+  <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <CanonicalizationMethod xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></CanonicalizationMethod>
+      <SignatureMethod xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></SignatureMethod>
+      <Reference xmlns="http://www.w3.org/2000/09/xmldsig#" URI="#_8b02ecf6-aea4-4eda-96c6-190551f05b07">
+        <Transforms xmlns="http://www.w3.org/2000/09/xmldsig#">
+          <Transform xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></Transform>
+          <Transform xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></Transform>
+        </Transforms>
+        <DigestMethod xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+        <DigestValue xmlns="http://www.w3.org/2000/09/xmldsig#">Tyw4csdpNNq0E7wi5FXWdVNkdPNg+cM6kK21VB2+iF0=</DigestValue>
+      </Reference>
+    </SignedInfo>
+    <SignatureValue xmlns="http://www.w3.org/2000/09/xmldsig#">hWQSYmnBJENy/okk2qRDuHaZiyqpDsdV6BF9/T/LNjUh/8z4dV2NEZvkNhFEyQ+bqdj+NmRWvKqpg1dtgNJxQc32+IsLQvXNYyhMCtyG570/jaTOtm8daV4NKJyTV7SdwM6yfXgubz5YCRTyV13W2gBIFYppIRImIv5NDcjz+lEmWhnrkw8G2wRSFUY7VvkDn9rgsTzw/Pnsw6hlzpjGDYPMPx3ux3kjFVevdhFGNo+VC7t9ozruuGyH3yue9Re6FZoqa4oyWaPSOwei0ZH6UNqkX93Eo5Y49QKwaO8Rm+kWsOhdTqebVmCc+SpWbbrZbQj4nSLgWGlvCkZSivmH7ezr4Ol1ZkRetQ92UQ7xJS7E0y6uXAGvdgpDnyqHCOFfhTS6yqltHtc3m7JZex327xkv6e69uAEOSiv++sifVUIE0h/5u3hZLvwmTPrkoRVY4wgZ4ieb86QPvhw4UPeYapOhCBk5RfjoEFIeYwPUw5rtOlpTyeBJiKMpH1+mDAoa+8HQytZoMrnnY1s612vINtY7jU5igMwIk6MitQpRGibnBVBHRc2A6aE+XS333ganFK9hX6TzNkpHUb66NINDZ8Rgb1thn3MABArGlomtM5/enrAixWExZp70TSElor7SBdBW57H7OZCYUCobZuPRDLsCO6LLKeVrbdygWeRqr/o=</SignatureValue>
+    <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+	  <X509Data xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<X509Certificate xmlns="http://www.w3.org/2000/09/xmldsig#">MIIFIjCCAwqgAwIBAgICA7YwDQYJKoZIhvcNAQELBQAwLDEQMA4GA1UEChMHWklUQURFTDEYMBYGA1UEAxMPWklUQURFTCBTQU1MIENBMB4XDTI0MTEyNzEwMjc0NFoXDTI1MTEyNzE2Mjc0NFowMjEQMA4GA1UEChMHWklUQURFTDEeMBwGA1UEAxMVWklUQURFTCBTQU1MIG1ldGFkYXRhMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEApEpYT7EjbRBp0Hw7PGCiSgUoJtwd2nwZOhGy5WZVWvraAtHzW5ih2B6UwEShjwCmRJZeKYEN9JKJbpAy2EdL/l2rm/pArVNvSQu6sN4izz5p2rd9NfHAO3/EcvYdrelWLQj8WQx6LVM282Z4wbclp8Jz1y8Ow43352hGfFVc1x8gauoNl5MAy4kdbvs8UqihqcRmEyIOWl6UwTApb+XIRSRz0Yop99Fv9ALJwfUppsx+d4j9rlRDvrQJMJz7GC/19L9INTbY0HsVEiTltdAWHwREwrpwxNJQt42p3W/zpf1mjwXd3qNNDZAr1t2POPP4SXd598kabBZ3EMWGGxFw+NYYajyjG5EFOZw09FFJn2jIcovejvigfdqem5DGPECvHefqcqHkBPGukI3RaotXpAYyAGfnV7slVytSW484IX3KloAJLICbETbFGGsGQzIDw8rUqWyaOCOttw2fVNDyRFUMHrGe1PhJ9qA1If+KCWYD0iJqF03rIEhdrvNSdQNYkRa0DdtpacQLpzQtqsUioODqX0W3uzLceJEXLBbU0ZEk8mWZM/auwMo3ycPNXDVwrb6AkUKar+sqSumUuixw7da3KF1/mynh6M2Eo4NRB16oUiyN0EYrit/RRJjsTdH+71cj0V+8KqO88cBpmm+lO6x4RM5xpOf/EwwQHivxgRkCAwEAAaNIMEYwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFIzl7uckcPWldirXeOFL3rH6K8FLMA0GCSqGSIb3DQEBCwUAA4ICAQBz+7R99uX1Us9T4BB2RK3RD9K8Q5foNmxJ8GbxpOQFL8IG1DE3FqBssciJkOsKY+1+Y6eow2TgmD9MxfCY444C8k8YDDjxIcs+4dEaWMUxA6NoEy378ciy0U1E6rpYLxWYTxXmsELyODWwTrRNIiWfbBD2m0w9HYbK6QvX6IYQqYoTOJJ3WJKsMCeQ8XhQsJYNINZEq8RsERY/aikOlTWN7ax4Mkr3bfnz1euXGClExCOM6ej4m2I33i4nyYBvvRkRRZRQCfkAQ+5WFVZoVXrQHNe/Oifit7tfLaDuybcjgkzzY3o0YbczzbdV69fVoj53VpR3QQOB+PCF/VJPUMtUFPEC05yH76g24KVBiM/Ws8GaERW1AxgupHSmvTY3GSiwDXQ2NzgDxUHfRHo8rxenJdEcPlGM0DstbUONDSFGLwvGDiidUVtqj1UB4yGL26bgtmwf61G4qsTn9PJMWdRmCeeOf7fmloRxTA0EEey3bulBBHim466tWHUhgOP+g1X0iE7CnwL8aJ//CCiQOAv1O6x5RLyxrmVTehPLr1T8qvnBmxpmuYU0kfbYpO3tMVe7VLabBx0cYh7izClZKHhgEj1w4aE9tIk7nqVAwvVocT3io8RrcKixlnBrFd7RYIuF3+RsYC/kYEgnZYKAig5u2TySgGmJ7nIS24FYW68WDg==</X509Certificate>
+      </X509Data>
+	</KeyInfo>
+  </Signature>
+  <IDPSSODescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" WantAuthnRequestsSigned="1" ID="_fd70402c-8a31-4a9a-a4a7-da526524c609" validUntil="2024-12-02T16:54:55.656Z" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+	<SingleSignOnService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8080/saml/v2/SSO"></SingleSignOnService>
+	<SingleSignOnService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://localhost:8080/saml/v2/SSO"></SingleSignOnService>
+	<AttributeProfile>urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic</AttributeProfile>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="Email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="SurName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FullName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<SingleLogoutService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8080/saml/v2/SLO"></SingleLogoutService>
+	<SingleLogoutService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://localhost:8080/saml/v2/SLO"></SingleLogoutService>
+	<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+	<KeyDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" use="signing">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<KeyName>http://localhost:8080/saml/v2/metadata IDP signing</KeyName>
+		<X509Data xmlns="http://www.w3.org/2000/09/xmldsig#">
+		  <X509Certificate xmlns="http://www.w3.org/2000/09/xmldsig#">MIIFIjCCAwqgAwIBAgICA7QwDQYJKoZIhvcNAQELBQAwLDEQMA4GA1UEChMHWklUQURFTDEYMBYGA1UEAxMPWklUQURFTCBTQU1MIENBMB4XDTI0MTEyNzEwMjUwMloXDTI1MTEyNzE2MjUwMlowMjEQMA4GA1UEChMHWklUQURFTDEeMBwGA1UEAxMVWklUQURFTCBTQU1MIHJlc3BvbnNlMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2lUgaI6AS/9xvM9DNSWK6Ho64LpK8UIioM26QfvAfeQ/I2pgX6SwWxEbd7qv+PkJzaFTjrXSlwOmWsJYma+UsdyFClaGFRyCgY8SWxPceandC8a+hQIDS/irLd9XF33RWp0b/09HjQl+n0HZ4teUFDUd2U1mUf3XCpn0+Ho316bmi6xSW6zaMy5RsbUl01hgWj2fgapAsGAHSBphwCE3Dz/9I/UfHWQw1k2/UTgjc9uIujcza6WgOxfsKluXYIOxwNKTfmzzOJMUwXz6GRgB2jhQI29MuKOZOITA7pXq5kZKf0lSRU8zKFTMJaK4zAHQ6f877Drr8XdAHemuXGZ2JdH/Dbdwarzy3YBMCWsAYlpeEvaVAdiSpyR7fAZktNuHd39Zg00Vlj2wdc44Vk5yVssW7pv5qnVZ7JTrXX2uBYFecLAXmplQ2ph1VdSXZLEDGgjiNA2T/fBj7G4/VjsuCBZFm1I0KCJp3HWEJx5dwwhSVc5wOJEzl7fMuPYMKWH/RM6P/7LnO1ulpdmiKPa4gHzdg3hDZn42NKcVt3UYf0phtxpWMrZp/DUEeizhckrC4ed6cfGtS3CUtJEqoycrCROJ5Hy+ONHl5Aqxt+JoPU+t/XATuctfPxQVcDr0itHzo2cjh/AVTU+IC7C0oQHSS9CC8Fp58UqbtYwFtSAd7ecCAwEAAaNIMEYwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFIzl7uckcPWldirXeOFL3rH6K8FLMA0GCSqGSIb3DQEBCwUAA4ICAQAp+IGZScVIbRdCq5HPjlYBPOY7UbL8ZXnlMW/HLELV9GndnULuFhnuQTIdA5dquCsk8RI1fKsScEV1rqWvHZeSo5nVbvUaPJctoD/4GACqE6F8axs1AgSOvpJMyuycjSzSh6gDM1z37Fdqc/2IRqgi7SKdDsfJpi8XW8LtErpp4kyE1rEXopsXG2fe1UH25bZpXraUqYvp61rwVUCazAtV/U7ARG5AnT0mPqzUriIPrfL+v/+2ntV/BSc8/uCqYnHbwpIwjPURCaxo1Pmm6EEkm+V/Ss4ieNwwkD2bLLLST1LoVMim7Ebfy53PEKpsznKsGlVSu0YYKUsStWQVpwhKQw0bQLCJHdpvZtZSDgS9RbSMZz+aY/fpoNx6wDvmMgtdrb3pVXZ8vPKdq9YDrGfFqP60QdZ3CuSHXCM/zX4742GgImJ4KYAcTuF1+BkGf5JLAJOUZBkfCQ/kBT5wr8+EotLxASOC6717whLBYMEG6N8osEk+LDqoJRTLqkzirJsyOHWChKK47yGkdS3HBIZfo91QrJwKpfATYziBjEnqipkTu+6jFylBIkxKTPye4b3vgcodZP8LSNVXAsMGTPNPJxzPWQ37ba4zMnYZ5iUerlaox/SNsn68DT6RajIb1A1JDq+HNFc3hQP2bzk2y5pCax8zo5swjdklnm4clfB2Lw==</X509Certificate>
+		</X509Data>
+      </KeyInfo>
+	</KeyDescriptor>
+  </IDPSSODescriptor>
+  <AttributeAuthorityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="_b3fed381-af56-4160-abf5-5ffd1e21cf61" validUntil="2024-12-02T16:54:55.656Z" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+	<AttributeService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://localhost:8080/saml/v2/attribute"></AttributeService>
+	<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+	<AttributeProfile>urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic</AttributeProfile>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="Email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="SurName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FullName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<KeyDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" use="signing">
+	  <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<KeyName>http://localhost:8080/saml/v2/metadata IDP signing</KeyName>
+  		<X509Data xmlns="http://www.w3.org/2000/09/xmldsig#">
+		  <X509Certificate xmlns="http://www.w3.org/2000/09/xmldsig#">MIIFIjCCAwqgAwIBAgICA7QwDQYJKoZIhvcNAQELBQAwLDEQMA4GA1UEChMHWklUQURFTDEYMBYGA1UEAxMPWklUQURFTCBTQU1MIENBMB4XDTI0MTEyNzEwMjUwMloXDTI1MTEyNzE2MjUwMlowMjEQMA4GA1UEChMHWklUQURFTDEeMBwGA1UEAxMVWklUQURFTCBTQU1MIHJlc3BvbnNlMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2lUgaI6AS/9xvM9DNSWK6Ho64LpK8UIioM26QfvAfeQ/I2pgX6SwWxEbd7qv+PkJzaFTjrXSlwOmWsJYma+UsdyFClaGFRyCgY8SWxPceandC8a+hQIDS/irLd9XF33RWp0b/09HjQl+n0HZ4teUFDUd2U1mUf3XCpn0+Ho316bmi6xSW6zaMy5RsbUl01hgWj2fgapAsGAHSBphwCE3Dz/9I/UfHWQw1k2/UTgjc9uIujcza6WgOxfsKluXYIOxwNKTfmzzOJMUwXz6GRgB2jhQI29MuKOZOITA7pXq5kZKf0lSRU8zKFTMJaK4zAHQ6f877Drr8XdAHemuXGZ2JdH/Dbdwarzy3YBMCWsAYlpeEvaVAdiSpyR7fAZktNuHd39Zg00Vlj2wdc44Vk5yVssW7pv5qnVZ7JTrXX2uBYFecLAXmplQ2ph1VdSXZLEDGgjiNA2T/fBj7G4/VjsuCBZFm1I0KCJp3HWEJx5dwwhSVc5wOJEzl7fMuPYMKWH/RM6P/7LnO1ulpdmiKPa4gHzdg3hDZn42NKcVt3UYf0phtxpWMrZp/DUEeizhckrC4ed6cfGtS3CUtJEqoycrCROJ5Hy+ONHl5Aqxt+JoPU+t/XATuctfPxQVcDr0itHzo2cjh/AVTU+IC7C0oQHSS9CC8Fp58UqbtYwFtSAd7ecCAwEAAaNIMEYwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFIzl7uckcPWldirXeOFL3rH6K8FLMA0GCSqGSIb3DQEBCwUAA4ICAQAp+IGZScVIbRdCq5HPjlYBPOY7UbL8ZXnlMW/HLELV9GndnULuFhnuQTIdA5dquCsk8RI1fKsScEV1rqWvHZeSo5nVbvUaPJctoD/4GACqE6F8axs1AgSOvpJMyuycjSzSh6gDM1z37Fdqc/2IRqgi7SKdDsfJpi8XW8LtErpp4kyE1rEXopsXG2fe1UH25bZpXraUqYvp61rwVUCazAtV/U7ARG5AnT0mPqzUriIPrfL+v/+2ntV/BSc8/uCqYnHbwpIwjPURCaxo1Pmm6EEkm+V/Ss4ieNwwkD2bLLLST1LoVMim7Ebfy53PEKpsznKsGlVSu0YYKUsStWQVpwhKQw0bQLCJHdpvZtZSDgS9RbSMZz+aY/fpoNx6wDvmMgtdrb3pVXZ8vPKdq9YDrGfFqP60QdZ3CuSHXCM/zX4742GgImJ4KYAcTuF1+BkGf5JLAJOUZBkfCQ/kBT5wr8+EotLxASOC6717whLBYMEG6N8osEk+LDqoJRTLqkzirJsyOHWChKK47yGkdS3HBIZfo91QrJwKpfATYziBjEnqipkTu+6jFylBIkxKTPye4b3vgcodZP8LSNVXAsMGTPNPJxzPWQ37ba4zMnYZ5iUerlaox/SNsn68DT6RajIb1A1JDq+HNFc3hQP2bzk2y5pCax8zo5swjdklnm4clfB2Lw==</X509Certificate>
+		</X509Data>
+	  </KeyInfo>
+	</KeyDescriptor>
+  </AttributeAuthorityDescriptor>
+</EntityDescriptor>`)
+	validLDAPRootCA = []byte(`-----BEGIN CERTIFICATE-----
+MIIDITCCAgmgAwIBAgIUKjAUmxsHO44X+/TKBNciPgNl1GEwDQYJKoZIhvcNAQEL
+BQAwIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1wbGUuY29tMB4XDTI0MTIxOTEz
+Mzc1MVoXDTI1MTIxOTEzMzc1MVowIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0QYuJsayILRI
+hVT7G1DlitVSXnt1iw3gEXJZfe81Egz06fUbvXF6Yo1LJmwYpqe/rm+hf4FNUb8e
+2O+LH2FieA9FkVe4P2gKOzw87A/KxvpV8stgNgl4LlqRCokbc1AzeE/NiLr5TcTD
+RXm3DUcYxXxinprtDu2jftFysaOZmNAukvE/iL6qS3X6ggVEDDM7tY9n5FV2eJ4E
+p0ImKfypi2aZYROxOK+v5x9ryFRMl4y07lMDvmtcV45uXYmfGNCgG9PNf91Kk/mh
+JxEQbxycJwFoSi9XWljR8ahPdO11LXG7Dsj/RVbY8k2LdKNstl6Ae3aCpbe9u2Pj
+vxYs1bVJuQIDAQABo1MwUTAdBgNVHQ4EFgQU+mRVN5HYJWgnpopReaLhf2cMcoYw
+HwYDVR0jBBgwFoAU+mRVN5HYJWgnpopReaLhf2cMcoYwDwYDVR0TAQH/BAUwAwEB
+/zANBgkqhkiG9w0BAQsFAAOCAQEABJpHVuc9tGhD04infRVlofvqXIUizTlOrjZX
+vozW9pIhSWEHX8o+sJP8AMZLnrsdq+bm0HE0HvgYrw7Lb8pd4FpR46TkFHjeukoj
+izqfgckjIBl2nwPGlynbKA0/U/rTCSxVt7XiAn+lgYUGIpOzNdk06/hRMitrMNB7
+t2C97NseVC4b1ZgyFrozsefCfUmD8IJF0+XJ4Wzmsh0jRrI8koCtVmPYnKn6vw1b
+cZprg/97CWHYrsavd406wOB60CMtYl83Q16ucOF1dretDFqJC5kY+aFLvuqfag2+
+kIaoPV1MnGsxveQyyHdOsEatS5XOv/1OWcmnvePDPxcvb9jCcw==
+-----END CERTIFICATE-----
+`)
+)
+
 func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
@@ -203,6 +290,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							nil,
+							true,
 							idp.Options{},
 						),
 					),
@@ -220,6 +308,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 				},
 			},
 			res: res{
@@ -248,6 +337,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							[]string{"user"},
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -271,6 +361,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 					UserEndpoint:          "user",
 					Scopes:                []string{"user"},
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -502,6 +593,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								idp.Options{},
 							)),
 					),
@@ -517,6 +609,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 				},
 			},
 			res: res{
@@ -544,6 +637,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -566,6 +660,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 									idp.ChangeOAuthUserEndpoint("new user"),
 									idp.ChangeOAuthScopes([]string{"openid", "profile"}),
 									idp.ChangeOAuthIDAttribute("newAttribute"),
+									idp.ChangeOAuthUsePKCE(true),
 									idp.ChangeOAuthOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -592,6 +687,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 					UserEndpoint:          "new user",
 					Scopes:                []string{"openid", "profile"},
 					IDAttribute:           "newAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -738,6 +834,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 							},
 							nil,
 							false,
+							true,
 							idp.Options{},
 						),
 					),
@@ -752,6 +849,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 					Issuer:       "issuer",
 					ClientID:     "clientID",
 					ClientSecret: "clientSecret",
+					UsePKCE:      true,
 				},
 			},
 			res: res{
@@ -778,6 +876,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 							},
 							[]string{openid.ScopeOpenID},
 							true,
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -799,6 +898,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "clientSecret",
 					Scopes:           []string{openid.ScopeOpenID},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -962,6 +1062,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -999,6 +1100,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1019,6 +1121,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 									}),
 									idp.ChangeOIDCScopes([]string{"openid", "profile"}),
 									idp.ChangeOIDCIsIDTokenMapping(true),
+									idp.ChangeOIDCUsePKCE(true),
 									idp.ChangeOIDCOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -1043,6 +1146,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "newSecret",
 					Scopes:           []string{"openid", "profile"},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -1186,6 +1290,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1243,6 +1348,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 									Crypted:    []byte("clientSecret"),
 								},
 								nil,
+								false,
 								false,
 								idp.Options{},
 							)),
@@ -1408,6 +1514,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1459,6 +1566,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 									Crypted:    []byte("clientSecret"),
 								},
 								nil,
+								false,
 								false,
 								idp.Options{},
 							)),
@@ -4171,6 +4279,34 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					StartTLS:          false,
+					BaseDN:            "baseDN",
+					BindDN:            "dn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-cwqVVdBwKt", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4193,6 +4329,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
+							nil,
 							idp.LDAPAttributes{},
 							idp.Options{},
 						),
@@ -4244,6 +4381,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
+							validLDAPRootCA,
 							idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "firstName",
@@ -4284,6 +4422,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "firstName",
@@ -4510,6 +4649,32 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "binddn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-cwqVVdBwKt", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4559,6 +4724,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
+								validLDAPRootCA,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4578,6 +4744,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
+					RootCA:            validLDAPRootCA,
 				},
 			},
 			res: res{
@@ -4607,6 +4774,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
+								nil,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4653,6 +4821,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
+									idp.ChangeLDAPRootCA(validLDAPRootCA),
 								},
 							)
 							return event
@@ -4675,6 +4844,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"new object"},
 					UserFilters:       []string{"new filter"},
 					Timeout:           time.Second * 20,
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "new id",
 						FirstNameAttribute:         "new firstName",
@@ -5180,7 +5350,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		provider SAMLProvider
+		provider *SAMLProvider
 	}
 	type res struct {
 		id   string
@@ -5201,7 +5371,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{},
+				provider: &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5210,20 +5380,39 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
+			"invalid metadata, error",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: &SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5236,7 +5425,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 						instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 							"id1",
 							"name",
-							[]byte("metadata"),
+							validSAMLMetadata,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5258,9 +5447,9 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
@@ -5277,7 +5466,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 						instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 							"id1",
 							"name",
-							[]byte("metadata"),
+							validSAMLMetadata,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5304,9 +5493,9 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "name",
-					Metadata:                      []byte("metadata"),
+					Metadata:                      validSAMLMetadata,
 					Binding:                       "binding",
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
@@ -5356,7 +5545,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 	type args struct {
 		ctx      context.Context
 		id       string
-		provider SAMLProvider
+		provider *SAMLProvider
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -5375,7 +5564,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{},
+				provider: &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5391,7 +5580,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
 				id:       "id1",
-				provider: SAMLProvider{},
+				provider: &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5400,20 +5589,39 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-iw1rxnf4sf", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: &SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dsfj3kl2", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5427,9 +5635,9 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
@@ -5445,7 +5653,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 							instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 								"id1",
 								"name",
-								[]byte("metadata"),
+								validSAMLMetadata,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5465,9 +5673,9 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
@@ -5505,7 +5713,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 								"id1",
 								[]idp.SAMLIDPChanges{
 									idp.ChangeSAMLName("new name"),
-									idp.ChangeSAMLMetadata([]byte("new metadata")),
+									idp.ChangeSAMLMetadata(validSAMLMetadata),
 									idp.ChangeSAMLBinding("new binding"),
 									idp.ChangeSAMLWithSignedRequest(true),
 									idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
@@ -5527,9 +5735,9 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "new name",
-					Metadata:                      []byte("new metadata"),
+					Metadata:                      validSAMLMetadata,
 					Binding:                       "new binding",
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),

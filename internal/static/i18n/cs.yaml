@@ -541,12 +541,23 @@ Errors:
     AlreadyExists: Požadavek na autentizaci již existuje
     NotExisting: Požadavek na autentizaci neexistuje
     WrongLoginClient: Požadavek na autentizaci vytvořen jiným klientem přihlášení
+    AlreadyHandled: Žádost o ověření již byla zpracována
   OIDCSession:
     RefreshTokenInvalid: Obnovovací token je neplatný
     Token:
       Invalid: Token je neplatný
       Expired: Token vypršel
     InvalidClient: Token nebyl vydán pro tohoto klienta
+  SAMLRequest:
+    AlreadyExists: SAMLRequest již existuje
+    NotExisting: SAMLRequest neexistuje
+    WrongLoginClient: SAMLRequest vytvořený jiným přihlašovacím klientem
+    AlreadyHandled: SAML požadavek již byl zpracován
+  SAMLSession:
+    InvalidClient: Pro tohoto klienta nebyla vydána odpověď SAMLResponse
+  DeviceAuth:
+    NotFound: Žádost o autorizaci zařízení neexistuje
+    AlreadyHandled: Žádost o autorizaci zařízení již byla zpracována
   Feature:
     NotExisting: Funkce neexistuje
     TypeNotSupported: Typ funkce není podporován
@@ -621,6 +632,8 @@ AggregateTypes:
   system: Systém
   session: Sezení
   web_key: Webový klíč
+  saml_request: Žádost SAML
+  saml_session: Relace SAML
 
 EventTypes:
   execution:

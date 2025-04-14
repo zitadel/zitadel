@@ -96,3 +96,7 @@ func (p *PasswordlessInitCode) Link(baseURL string) string {
 func PasswordlessInitCodeLink(baseURL, userID, resourceOwner, codeID, code string) string {
 	return fmt.Sprintf("%s?userID=%s&orgID=%s&codeID=%s&code=%s", baseURL, userID, resourceOwner, codeID, code)
 }
+
+func PasswordlessInitCodeLinkTemplate(baseURL, userID, resourceOwner, codeID string) string {
+	return PasswordlessInitCodeLink(baseURL, userID, resourceOwner, codeID, "{{.Code}}")
+}

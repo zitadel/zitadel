@@ -13,7 +13,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -55,6 +54,7 @@ type Human struct {
 	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
 	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
 	PasswordChanged        time.Time           `json:"password_changed,omitempty"`
+	MFAInitSkipped         time.Time           `json:"mfa_init_skipped,omitempty"`
 }
 
 type Profile struct {
@@ -271,6 +271,10 @@ var (
 		name:  projection.HumanPasswordChanged,
 		table: humanTable,
 	}
+	HumanMFAInitSkippedCol = Column{
+		name:  projection.HumanMFAInitSkipped,
+		table: humanTable,
+	}
 )
 
 var (
@@ -363,6 +367,10 @@ func (q *Queries) GetUserByIDWithPermission(ctx context.Context, shouldTriggerBu
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string) (user *User, err error) {
+	return q.GetUserByIDWithResourceOwner(ctx, shouldTriggerBulk, userID, "")
+}
+
+func (q *Queries) GetUserByIDWithResourceOwner(ctx context.Context, shouldTriggerBulk bool, userID, resourceOwner string) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -377,6 +385,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		},
 		userByIDQuery,
 		userID,
+		resourceOwner,
 		authz.GetInstance(ctx).InstanceID(),
 	)
 	return user, err
@@ -418,39 +427,11 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 	return user, err
 }
 
-// Deprecated: use either GetUserByID or GetUserByLoginName
-func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (user *User, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	if shouldTriggerBulk {
-		triggerUserProjections(ctx)
-	}
-
-	query, scan := prepareUserQuery(ctx, q.client)
-	for _, q := range queries {
-		query = q.toQuery(query)
-	}
-	eq := sq.Eq{
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	stmt, args, err := query.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		user, err = scan(row)
-		return err
-	}, stmt, args...)
-	return user, err
-}
-
 func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (profile *Profile, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProfileQuery(ctx, q.client)
+	query, scan := prepareProfileQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -474,7 +455,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...S
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareEmailQuery(ctx, q.client)
+	query, scan := prepareEmailQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -498,7 +479,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := preparePhoneQuery(ctx, q.client)
+	query, scan := preparePhoneQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -585,7 +566,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 		triggerUserProjections(ctx)
 	}
 
-	query, scan := prepareNotifyUserQuery(ctx, q.client)
+	query, scan := prepareNotifyUserQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -604,25 +585,54 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 	return user, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
-	users, err := q.searchUsers(ctx, queries)
+func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (count uint64, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareCountUsersQuery()
+	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	if err != nil {
+		return 0, zerrors.ThrowInternal(err, "QUERY-w3Dx", "Errors.Query.SQLStatment")
+	}
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		count, err = scan(rows)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return 0, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
+	}
+	return count, err
+}
+
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheck domain.PermissionCheck) (*Users, error) {
+	users, err := q.searchUsers(ctx, queries, filterOrgIds, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		usersCheckPermission(ctx, users, permissionCheck)
 	}
 	return users, nil
 }
 
-func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries) (users *Users, err error) {
+func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheckV2 bool) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUsersQuery(ctx, q.client)
-	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	stmt, args, err := queries.toQuery(query).Where(eq).
-		ToSql()
+	query, scan := prepareUsersQuery()
+	query = queries.toQuery(query).Where(sq.Eq{
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	})
+	if permissionCheckV2 {
+		query, err = wherePermittedOrgsOrCurrentUser(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
+		if err != nil {
+			return nil, zerrors.ThrowInternal(err, "AUTHZ-HS4us", "Errors.Internal")
+		}
+	}
+
+	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
@@ -642,7 +652,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserUniqueQuery(ctx, q.client)
+	query, scan := prepareUserUniqueQuery()
 	queries := make([]SearchQuery, 0, 3)
 	if username != "" {
 		usernameQuery, err := NewUserUsernameSearchQuery(username, TextEquals)
@@ -701,15 +711,19 @@ func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 func NewUserOrSearchQuery(values []SearchQuery) (SearchQuery, error) {
 	return NewOrQuery(values...)
 }
+
 func NewUserAndSearchQuery(values []SearchQuery) (SearchQuery, error) {
 	return NewAndQuery(values...)
 }
+
 func NewUserNotSearchQuery(value SearchQuery) (SearchQuery, error) {
 	return NewNotQuery(value)
 }
+
 func NewUserInUserIdsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(UserIDCol, values)
 }
+
 func NewUserInUserEmailsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(HumanEmailCol, values)
 }
@@ -771,7 +785,7 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 }
 
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	//linking queries for the subselect
+	// linking queries for the subselect
 	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
 	if err != nil {
 		return nil, err
@@ -780,12 +794,12 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	//text query to select data from the linked sub select
+	// text query to select data from the linked sub select
 	loginNameQuery, err := NewTextQuery(LoginNameNameCol, value, comparison)
 	if err != nil {
 		return nil, err
 	}
-	//full definition of the sub select
+	// full definition of the sub select
 	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, loginNameQuery})
 	if err != nil {
 		return nil, err
@@ -846,6 +860,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	isPhoneVerified := sql.NullBool{}
 	passwordChangeRequired := sql.NullBool{}
 	passwordChanged := sql.NullTime{}
+	mfaInitSkipped := sql.NullTime{}
 
 	machineID := sql.NullString{}
 	name := sql.NullString{}
@@ -878,6 +893,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&isPhoneVerified,
 		&passwordChangeRequired,
 		&passwordChanged,
+		&mfaInitSkipped,
 		&machineID,
 		&name,
 		&description,
@@ -910,6 +926,7 @@ func scanUser(row *sql.Row) (*User, error) {
 			IsPhoneVerified:        isPhoneVerified.Bool,
 			PasswordChangeRequired: passwordChangeRequired.Bool,
 			PasswordChanged:        passwordChanged.Time,
+			MFAInitSkipped:         mfaInitSkipped.Time,
 		}
 	} else if machineID.Valid {
 		u.Machine = &Machine{
@@ -922,7 +939,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	return u, nil
 }
 
-func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -956,6 +973,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			HumanIsPhoneVerifiedCol.identifier(),
 			HumanPasswordChangeRequiredCol.identifier(),
 			HumanPasswordChangedCol.identifier(),
+			HumanMFAInitSkippedCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -972,14 +990,14 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 
 		scanUser
 }
 
-func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) {
+func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -995,7 +1013,7 @@ func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			HumanGenderCol.identifier(),
 			HumanAvatarURLCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Profile, error) {
 			p := new(Profile)
@@ -1045,7 +1063,7 @@ func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareEmailQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
+func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1056,7 +1074,7 @@ func prepareEmailQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Email, error) {
 			e := new(Email)
@@ -1092,7 +1110,7 @@ func prepareEmailQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 		}
 }
 
-func preparePhoneQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
+func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1103,7 +1121,7 @@ func preparePhoneQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Phone, error) {
 			e := new(Phone)
@@ -1139,7 +1157,7 @@ func preparePhoneQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 		}
 }
 
-func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
+func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
 	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -1184,7 +1202,7 @@ func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		scanNotifyUser
@@ -1273,7 +1291,25 @@ func scanNotifyUser(row *sql.Row) (*NotifyUser, error) {
 	return u, nil
 }
 
-func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
+func prepareCountUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+	return sq.Select(countColumn.identifier()).
+			From(userTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			LeftJoin(join(MachineUserIDCol, UserIDCol)).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (count uint64, err error) {
+			// the count is implemented as a windowing function,
+			// if it is zero, no row is returned at all.
+			if !rows.Next() {
+				return
+			}
+
+			err = rows.Scan(&count)
+			return
+		}
+}
+
+func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserStateCol.identifier(),
@@ -1282,7 +1318,7 @@ func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (bool, error) {
 			userID := sql.NullString{}
@@ -1310,7 +1346,7 @@ func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		}
 }
 
-func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -1359,7 +1395,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {

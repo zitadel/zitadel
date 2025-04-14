@@ -2,88 +2,44 @@ package query
 
 import (
 	"context"
-	"fmt"
-	"strings"
+	"time"
 
+	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/cache"
-	"github.com/zitadel/zitadel/internal/cache/gomap"
-	"github.com/zitadel/zitadel/internal/cache/noop"
-	"github.com/zitadel/zitadel/internal/cache/pg"
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type Caches struct {
-	connectors *cacheConnectors
-	instance   cache.Cache[instanceIndex, string, *authzInstance]
+	instance cache.Cache[instanceIndex, string, *authzInstance]
+	org      cache.Cache[orgIndex, string, *Org]
+
+	activeInstances *expirable.LRU[string, bool]
 }
 
-func startCaches(background context.Context, conf *cache.CachesConfig, client *database.DB) (_ *Caches, err error) {
-	caches := &Caches{
-		instance: noop.NewCache[instanceIndex, string, *authzInstance](),
-	}
-	if conf == nil {
-		return caches, nil
-	}
-	caches.connectors, err = startCacheConnectors(background, conf, client)
+type ActiveInstanceConfig struct {
+	MaxEntries int
+	TTL        time.Duration
+}
+
+func startCaches(background context.Context, connectors connector.Connectors, instanceConfig ActiveInstanceConfig) (_ *Caches, err error) {
+	caches := new(Caches)
+	caches.instance, err = connector.StartCache[instanceIndex, string, *authzInstance](background, instanceIndexValues(), cache.PurposeAuthzInstance, connectors.Config.Instance, connectors)
 	if err != nil {
 		return nil, err
 	}
-	caches.instance, err = startCache[instanceIndex, string, *authzInstance](background, instanceIndexValues(), "authz_instance", conf.Instance, caches.connectors)
+	caches.org, err = connector.StartCache[orgIndex, string, *Org](background, orgIndexValues(), cache.PurposeOrganization, connectors.Config.Organization, connectors)
 	if err != nil {
 		return nil, err
 	}
+
+	caches.activeInstances = expirable.NewLRU[string, bool](instanceConfig.MaxEntries, nil, instanceConfig.TTL)
+
 	caches.registerInstanceInvalidation()
-
+	caches.registerOrgInvalidation()
 	return caches, nil
-}
-
-type cacheConnectors struct {
-	memory   *cache.AutoPruneConfig
-	postgres *pgxPoolCacheConnector
-}
-
-type pgxPoolCacheConnector struct {
-	*cache.AutoPruneConfig
-	client *database.DB
-}
-
-func startCacheConnectors(_ context.Context, conf *cache.CachesConfig, client *database.DB) (_ *cacheConnectors, err error) {
-	connectors := new(cacheConnectors)
-	if conf.Connectors.Memory.Enabled {
-		connectors.memory = &conf.Connectors.Memory.AutoPrune
-	}
-	if conf.Connectors.Postgres.Enabled {
-		connectors.postgres = &pgxPoolCacheConnector{
-			AutoPruneConfig: &conf.Connectors.Postgres.AutoPrune,
-			client:          client,
-		}
-	}
-	return connectors, nil
-}
-
-func startCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Context, indices []I, name string, conf *cache.CacheConfig, connectors *cacheConnectors) (cache.Cache[I, K, V], error) {
-	if conf == nil || conf.Connector == "" {
-		return noop.NewCache[I, K, V](), nil
-	}
-	if strings.EqualFold(conf.Connector, "memory") && connectors.memory != nil {
-		c := gomap.NewCache[I, K, V](background, indices, *conf)
-		connectors.memory.StartAutoPrune(background, c, name)
-		return c, nil
-	}
-	if strings.EqualFold(conf.Connector, "postgres") && connectors.postgres != nil {
-		client := connectors.postgres.client
-		c, err := pg.NewCache[I, K, V](background, name, *conf, indices, client.Pool, client.Type())
-		if err != nil {
-			return nil, fmt.Errorf("query start cache: %w", err)
-		}
-		connectors.postgres.StartAutoPrune(background, c, name)
-		return c, nil
-	}
-
-	return nil, fmt.Errorf("cache connector %q not enabled", conf.Connector)
 }
 
 type invalidator[I comparable] interface {

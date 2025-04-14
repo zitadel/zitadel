@@ -11,7 +11,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -27,7 +26,7 @@ type querier interface {
 	eventQuery(useV1 bool) string
 	maxSequenceQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
-	db() *database.DB
+	Client() *database.DB
 	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
 	dialect.Database
 }
@@ -65,11 +64,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if where == "" || query == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
-	if q.Tx == nil {
-		if travel := prepareTimeTravel(ctx, criteria, q.AllowTimeTravel); travel != "" {
-			query += travel
-		}
-	}
 	query += where
 
 	// instead of using the max function of the database (which doesn't work for postgres)
@@ -105,12 +99,24 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
+	if q.LockRows {
+		query += " FOR UPDATE"
+		switch q.LockOption {
+		case eventstore.LockOptionWait: // default behavior
+		case eventstore.LockOptionNoWait:
+			query += " NOWAIT"
+		case eventstore.LockOptionSkipLocked:
+			query += " SKIP LOCKED"
+
+		}
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
 		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
 	}
-	contextQuerier = criteria.db()
+	contextQuerier = criteria.Client()
 	if q.Tx != nil {
 		contextQuerier = &tx{Tx: q.Tx}
 	}
@@ -146,15 +152,7 @@ func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (s
 	}
 }
 
-func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string {
-	if !allow {
-		return ""
-	}
-	took := call.Took(ctx)
-	return criteria.Timetravel(took)
-}
-
-func maxSequenceScanner(row scan, dest interface{}) (err error) {
+func maxSequenceScanner(row scan, dest any) (err error) {
 	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
 		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
@@ -271,8 +269,37 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		args = append(args, additionalArgs...)
 	}
 
+	excludeAggregateIDs := query.ExcludeAggregateIDs
+	if len(excludeAggregateIDs) > 0 {
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position, query.CreatedAfter, query.CreatedBefore)
+	}
+	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
+	if excludeAggregateIDsClauses != "" {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		if useV1 {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
+		} else {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
+		}
+		args = append(args, excludeAggregateIDsArgs...)
+	}
+
 	if query.AwaitOpenTransactions {
+		instanceIDs := make(database.TextArray[string], 0, 3)
+		if query.InstanceID != nil {
+			instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
+		} else if query.InstanceIDs != nil {
+			instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
+		}
+
+		for i := range instanceIDs {
+			instanceIDs[i] = "zitadel_es_pusher_" + instanceIDs[i]
+		}
+
 		clauses += awaitOpenTransactions(useV1)
+		args = append(args, instanceIDs)
 	}
 
 	if clauses == "" {

@@ -22,8 +22,6 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	t.Parallel()
-
 	isoInstance := integration.NewInstance(CTX)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t, isoInstance.Client)
@@ -75,6 +73,7 @@ func requireEventually(
 	assertCounts func(assert.TestingT, *eventCounts),
 	msg string,
 ) (counts *eventCounts) {
+	t.Helper()
 	countTimeout := 30 * time.Second
 	assertTimeout := countTimeout + time.Second
 	countCtx, cancel := context.WithTimeout(ctx, time.Minute)

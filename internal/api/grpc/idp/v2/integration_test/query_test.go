@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -67,7 +68,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				IamCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID%d", time.Now().UnixNano())
+					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
 					resp := Instance.AddGenericOAuthProvider(ctx, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -75,6 +76,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -115,7 +117,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				UserCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID%d", time.Now().UnixNano())
+					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
 					resp := Instance.AddGenericOAuthProvider(IamCTX, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -123,6 +125,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -136,7 +139,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				CTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID%d", time.Now().UnixNano())
+					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
 					resp := Instance.AddOrgGenericOAuthProvider(ctx, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -144,6 +147,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -184,7 +188,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				UserCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID%d", time.Now().UnixNano())
+					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
 					resp := Instance.AddOrgGenericOAuthProvider(CTX, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -192,6 +196,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -203,20 +208,14 @@ func TestServer_GetIDPByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			idpAttr := tt.args.dep(tt.args.ctx, tt.args.req)
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, getErr := Client.GetIDPByID(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.GetIDPByID(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, getErr)
-				if getErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
 
 				// set provided info from creation
 				tt.want.Idp.Details = idpAttr.Details
@@ -229,7 +228,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				tt.want.Idp.Details = got.Idp.Details
 				// to check the rest of the content
 				assert.Equal(ttt, tt.want.Idp, got.Idp)
-			}, retryDuration, time.Second)
+			}, retryDuration, tick)
 		})
 	}
 }

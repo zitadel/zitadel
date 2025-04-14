@@ -1,11 +1,6 @@
 version: '3.8'
 
 services:
-  cockroach:
-    extends:
-      file: '../../../e2e/config/localhost/docker-compose.yaml'
-      service: 'db'
-  
   postgres:
     restart: 'always'
     image: 'postgres:latest'
@@ -23,3 +18,9 @@ services:
       start_period: '20s'
     ports:
       - 5432:5432
+
+  cache:
+    restart: 'always'
+    image: 'redis:latest'
+    ports:
+      - 6379:6379

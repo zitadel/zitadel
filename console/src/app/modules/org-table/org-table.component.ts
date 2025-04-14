@@ -36,7 +36,6 @@ export class OrgTableComponent {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public activeOrg!: Org.AsObject;
-  public OrgListSearchKey: any = OrgListSearchKey;
   public initialLimit: number = 20;
   public timestamp: Timestamp.AsObject | undefined = undefined;
   public totalResult: number = 0;

@@ -1,4 +1,3 @@
-version: '3.8'
 services:
 
   traefik:
@@ -15,7 +14,7 @@ services:
     restart: 'always'
     networks:
       - 'zitadel'
-    image: 'ghcr.io/zitadel/zitadel:stable'
+    image: 'ghcr.io/zitadel/zitadel:latest'
     command: 'start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}" --tlsMode external'
     depends_on:
       db:
@@ -26,7 +25,7 @@ services:
       - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
 
   db:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     restart: always
     environment:
       - POSTGRES_USER=root

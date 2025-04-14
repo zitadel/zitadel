@@ -18,11 +18,55 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+type ContextQuerier interface {
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+}
+
+type ContextExecuter interface {
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+}
+
+type ContextQueryExecuter interface {
+	ContextQuerier
+	ContextExecuter
+}
+
+type Client interface {
+	ContextQueryExecuter
+	Beginner
+	Conn(ctx context.Context) (*sql.Conn, error)
+}
+
+type Beginner interface {
+	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+}
+
+type Tx interface {
+	ContextQueryExecuter
+	Commit() error
+	Rollback() error
+}
+
+var (
+	_ Client = (*sql.DB)(nil)
+	_ Tx     = (*sql.Tx)(nil)
+)
+
+func CloseTransaction(tx Tx, err error) error {
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		logging.OnError(rollbackErr).Error("failed to rollback transaction")
+		return err
+	}
+
+	commitErr := tx.Commit()
+	logging.OnError(commitErr).Error("failed to commit transaction")
+	return commitErr
+}
+
 type Config struct {
-	Dialects                   map[string]interface{} `mapstructure:",remain"`
-	EventPushConnRatio         float64
-	ProjectionSpoolerConnRatio float64
-	connector                  dialect.Connector
+	Dialects  map[string]interface{} `mapstructure:",remain"`
+	connector dialect.Connector
 }
 
 func (c *Config) SetConnector(connector dialect.Connector) {
@@ -40,20 +84,7 @@ func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error
 }
 
 func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
-		}
-		err = tx.Commit()
-	}()
-
-	rows, err := tx.QueryContext(ctx, query, args...)
+	rows, err := db.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -73,20 +104,7 @@ func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (er
 }
 
 func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
-		}
-		err = tx.Commit()
-	}()
-
-	row := tx.QueryRowContext(ctx, query, args...)
+	row := db.DB.QueryRowContext(ctx, query, args...)
 	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)
@@ -114,8 +132,8 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 	return obj, nil
 }
 
-func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, error) {
-	client, pool, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
+func Connect(config Config, useAdmin bool) (*DB, error) {
+	client, pool, err := config.connector.Connect(useAdmin)
 	if err != nil {
 		return nil, err
 	}
@@ -131,33 +149,40 @@ func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, erro
 	}, nil
 }
 
-func DecodeHook(from, to reflect.Value) (_ interface{}, err error) {
-	if to.Type() != reflect.TypeOf(Config{}) {
-		return from.Interface(), nil
-	}
-
-	config := new(Config)
-	if err = mapstructure.Decode(from.Interface(), config); err != nil {
-		return nil, err
-	}
-
-	configuredDialect := dialect.SelectByConfig(config.Dialects)
-	configs := make([]interface{}, 0, len(config.Dialects)-1)
-
-	for name, dialectConfig := range config.Dialects {
-		if !configuredDialect.Matcher.MatchName(name) {
-			continue
+func DecodeHook(allowCockroach bool) func(from, to reflect.Value) (_ interface{}, err error) {
+	return func(from, to reflect.Value) (_ interface{}, err error) {
+		if to.Type() != reflect.TypeOf(Config{}) {
+			return from.Interface(), nil
 		}
 
-		configs = append(configs, dialectConfig)
-	}
+		config := new(Config)
+		if err = mapstructure.Decode(from.Interface(), config); err != nil {
+			return nil, err
+		}
 
-	config.connector, err = configuredDialect.Matcher.Decode(configs)
-	if err != nil {
-		return nil, err
-	}
+		configuredDialect := dialect.SelectByConfig(config.Dialects)
+		configs := make([]any, 0, len(config.Dialects))
 
-	return config, nil
+		for name, dialectConfig := range config.Dialects {
+			if !configuredDialect.Matcher.MatchName(name) {
+				continue
+			}
+
+			configs = append(configs, dialectConfig)
+		}
+
+		if !allowCockroach && configuredDialect.Matcher.Type() == dialect.DatabaseTypeCockroach {
+			logging.Info("Cockroach support was removed with Zitadel v3, please refer to https://zitadel.com/docs/self-hosting/manage/cli/mirror to migrate your data to postgres")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "DATAB-0pIWD", "Cockroach support was removed with Zitadel v3")
+		}
+
+		config.connector, err = configuredDialect.Matcher.Decode(configs)
+		if err != nil {
+			return nil, err
+		}
+
+		return config, nil
+	}
 }
 
 func (c Config) DatabaseName() string {
@@ -172,7 +197,7 @@ func (c Config) Password() string {
 	return c.connector.Password()
 }
 
-func (c Config) Type() string {
+func (c Config) Type() dialect.DatabaseType {
 	return c.connector.Type()
 }
 

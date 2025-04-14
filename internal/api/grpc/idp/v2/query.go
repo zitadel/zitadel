@@ -31,6 +31,7 @@ func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
 				Sequence:      idp.Sequence,
 				EventDate:     idp.ChangeDate,
 				ResourceOwner: idp.ResourceOwner,
+				CreationDate:  idp.CreationDate,
 			}),
 		State:  idpStateToPb(idp.State),
 		Name:   idp.Name,
@@ -96,7 +97,7 @@ func configToPb(config *query.IDPTemplate) *idp_pb.IDPConfig {
 			IsCreationAllowed: config.IsCreationAllowed,
 			IsAutoCreation:    config.IsAutoCreation,
 			IsAutoUpdate:      config.IsAutoUpdate,
-			AutoLinking:       autoLinkingOptionToPb(config.AutoLinking),
+			AutoLinking:       AutoLinkingOptionToPb(config.AutoLinking),
 		},
 	}
 	if config.OAuthIDPTemplate != nil {
@@ -150,7 +151,7 @@ func configToPb(config *query.IDPTemplate) *idp_pb.IDPConfig {
 	return idpConfig
 }
 
-func autoLinkingOptionToPb(linking domain.AutoLinkingOption) idp_pb.AutoLinkingOption {
+func AutoLinkingOptionToPb(linking domain.AutoLinkingOption) idp_pb.AutoLinkingOption {
 	switch linking {
 	case domain.AutoLinkingOptionUnspecified:
 		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED
@@ -288,6 +289,7 @@ func ldapConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.LDAPIDPTemplate
 			UserObjectClasses: template.UserObjectClasses,
 			UserFilters:       template.UserFilters,
 			Timeout:           timeout,
+			RootCa:            template.RootCA,
 			Attributes:        ldapAttributesToPb(template.LDAPAttributes),
 		},
 	}

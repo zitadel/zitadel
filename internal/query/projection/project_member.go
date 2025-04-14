@@ -60,19 +60,19 @@ func (p *projectMemberProjection) Reducers() []handler.AggregateReducer {
 			Aggregate: project.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
-					Event:  project.MemberAddedType,
+					Event:  project.MemberAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  project.MemberChangedType,
+					Event:  project.MemberChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 				{
-					Event:  project.MemberCascadeRemovedType,
+					Event:  project.MemberCascadeRemovedEventType,
 					Reduce: p.reduceCascadeRemoved,
 				},
 				{
-					Event:  project.MemberRemovedType,
+					Event:  project.MemberRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 				{
@@ -114,7 +114,7 @@ func (p *projectMemberProjection) Reducers() []handler.AggregateReducer {
 func (p *projectMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberAddedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-bgx5Q", "reduce.wrong.event.type %s", project.MemberAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-bgx5Q", "reduce.wrong.event.type %s", project.MemberAddedEventType)
 	}
 	ctx := setMemberContext(e.Aggregate())
 	userOwner, err := getUserResourceOwner(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
@@ -131,7 +131,7 @@ func (p *projectMemberProjection) reduceAdded(event eventstore.Event) (*handler.
 func (p *projectMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberChangedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-90WJ1", "reduce.wrong.event.type %s", project.MemberChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-90WJ1", "reduce.wrong.event.type %s", project.MemberChangedEventType)
 	}
 	return reduceMemberChanged(
 		*member.NewMemberChangedEvent(&e.BaseEvent, e.UserID, e.Roles...),
@@ -142,7 +142,7 @@ func (p *projectMemberProjection) reduceChanged(event eventstore.Event) (*handle
 func (p *projectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberCascadeRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-aGd43", "reduce.wrong.event.type %s", project.MemberCascadeRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-aGd43", "reduce.wrong.event.type %s", project.MemberCascadeRemovedEventType)
 	}
 	return reduceMemberCascadeRemoved(
 		*member.NewCascadeRemovedEvent(&e.BaseEvent, e.UserID),
@@ -153,7 +153,7 @@ func (p *projectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (
 func (p *projectMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eJZPh", "reduce.wrong.event.type %s", project.MemberRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eJZPh", "reduce.wrong.event.type %s", project.MemberRemovedEventType)
 	}
 	return reduceMemberRemoved(e,
 		withMemberCond(MemberUserIDCol, e.UserID),

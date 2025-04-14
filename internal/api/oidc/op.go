@@ -31,7 +31,6 @@ type Config struct {
 	AuthMethodPrivateKeyJWT           bool
 	GrantTypeRefreshToken             bool
 	RequestObjectSupported            bool
-	SigningKeyAlgorithm               string
 	DefaultAccessTokenLifetime        time.Duration
 	DefaultIdTokenLifetime            time.Duration
 	DefaultRefreshTokenIdleExpiration time.Duration
@@ -42,6 +41,7 @@ type Config struct {
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
 	PublicKeyCacheMaxAge              time.Duration
+	DefaultBackChannelLogoutLifetime  time.Duration
 }
 
 type EndpointConfig struct {
@@ -70,12 +70,12 @@ type OPStorage struct {
 	defaultLogoutURLV2                string
 	defaultAccessTokenLifetime        time.Duration
 	defaultIdTokenLifetime            time.Duration
-	signingKeyAlgorithm               string
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
 	encAlg                            crypto.EncryptionAlgorithm
 	locker                            crdb.Locker
 	assetAPIPrefix                    func(ctx context.Context) string
+	contextToIssuer                   func(context.Context) string
 }
 
 // Provider is used to overload certain [op.Provider] methods
@@ -120,7 +120,7 @@ func NewServer(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections)
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, ContextToIssuer)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
@@ -161,7 +161,6 @@ func NewServer(
 		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
-		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
 		encAlg:                     encryptionAlg,
 		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
 		assetAPIPrefix:             assets.AssetAPI(),
@@ -184,9 +183,13 @@ func NewServer(
 	return server, nil
 }
 
+func ContextToIssuer(ctx context.Context) string {
+	return http_utils.DomainContext(ctx).Origin()
+}
+
 func IssuerFromContext(_ bool) (op.IssuerFromRequest, error) {
 	return func(r *http.Request) string {
-		return http_utils.DomainContext(r.Context()).Origin()
+		return ContextToIssuer(r.Context())
 	}, nil
 }
 
@@ -222,7 +225,7 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB) *OPStorage {
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, contextToIssuer func(context.Context) string) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -231,7 +234,6 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		defaultLoginURLV2:                 config.DefaultLoginURLV2,
 		defaultLogoutURLV2:                config.DefaultLogoutURLV2,
-		signingKeyAlgorithm:               config.SigningKeyAlgorithm,
 		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
@@ -239,6 +241,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		encAlg:                            encAlg,
 		locker:                            crdb.NewLocker(db.DB, locksTable, signingKey),
 		assetAPIPrefix:                    assets.AssetAPI(),
+		contextToIssuer:                   contextToIssuer,
 	}
 }
 

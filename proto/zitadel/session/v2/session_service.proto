@@ -28,7 +28,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
   schemes: HTTPS;
@@ -379,7 +379,7 @@ message Checks {
   ];
   optional CheckPassword password = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+      description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request. On failed password check id: \"COMMAND-3M0fs\" wll be returned. On user locked out id: \"COMMAND-JLK35\"/\"COMMAND-SFA3t\" will be returned\"";
     }
   ];
   optional CheckWebAuthN web_auth_n = 3 [

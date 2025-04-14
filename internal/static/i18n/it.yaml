@@ -543,12 +543,23 @@ Errors:
     AlreadyExists: Auth Request esiste già
     NotExisting: Auth Request non esiste
     WrongLoginClient: Auth Request creato da un altro client di accesso
+    AlreadyHandled: Auth Request è già stata gestita
   OIDCSession:
     RefreshTokenInvalid: Refresh Token non è valido
     Token:
       Invalid: Token non è valido
       Expired: Token è scaduto
     InvalidClient: Il token non è stato emesso per questo cliente
+  SAMLRequest:
+    AlreadyExists: SAMLRequest esiste già
+    NotExisting: SAMLRequest non esiste
+    WrongLoginClient: SAMLRequest creato da un altro client di accesso
+    AlreadyHandled: SAMLRequest è già stata gestita
+  SAMLSession:
+    InvalidClient: SAMLResponse non è stato emesso per questo client
+  DeviceAuth:
+    NotFound: La richiesta di autorizzazione del dispositivo non esiste
+    AlreadyHandled: La richiesta di autorizzazione del dispositivo è già stata gestita
   Feature:
     NotExisting: La funzionalità non esiste
     TypeNotSupported: Il tipo di funzionalità non è supportato
@@ -623,6 +634,8 @@ AggregateTypes:
   system: Sistema
   session: Sessione
   web_key: Chiave Web
+  saml_request: Richiesta SAML
+  saml_session: Sessione SAML
 
 EventTypes:
   execution:

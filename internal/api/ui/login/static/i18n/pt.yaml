@@ -259,6 +259,9 @@ RegistrationUser:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -300,6 +303,9 @@ ExternalRegistrationUserOverview:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -375,6 +381,9 @@ ExternalNotFound:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
 
 DeviceAuth:
   Title: Autorização de dispositivo
@@ -496,6 +505,10 @@ Errors:
       CreationNotAllowed: A criação de um novo usuário não é permitida neste provedor
       LinkingNotAllowed: A vinculação de um usuário não é permitida neste provedor
       NoOptionAllowed: Nem criação nem vinculação são permitidas neste fornecedor. Contate o seu administrador.
+      LoginFailedSwitchLocal: |
+        Falha no login no provedor de identidade externo. Retornando ao login local.
+
+        Detalhes do erro: {{.Details}}
     GrantRequired: Login não é possível. O usuário precisa ter pelo menos uma permissão no aplicativo. Entre em contato com o administrador.
     ProjectRequired: Login não é possível. A organização do usuário precisa ser concedida ao projeto. Entre em contato com o administrador.
   IdentityProvider:
