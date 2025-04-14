@@ -16,11 +16,11 @@ import (
 )
 
 func TestServer_CreateProject(t *testing.T) {
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.AppName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 	alreadyExistingProjectName := gofakeit.AppName()
-	instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), alreadyExistingProjectName, false, false)
+	instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), alreadyExistingProjectName, false, false)
 
 	type want struct {
 		id           bool
@@ -43,7 +43,7 @@ func TestServer_CreateProject(t *testing.T) {
 		},
 		{
 			name: "empty name",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  iamOwnerCtx,
 			req: &project.CreateProjectRequest{
 				Name: "",
 			},
@@ -51,7 +51,7 @@ func TestServer_CreateProject(t *testing.T) {
 		},
 		{
 			name: "empty organization",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  iamOwnerCtx,
 			req: &project.CreateProjectRequest{
 				Name:           gofakeit.Name(),
 				OrganizationId: "",
@@ -60,7 +60,7 @@ func TestServer_CreateProject(t *testing.T) {
 		},
 		{
 			name: "already existing, error",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  iamOwnerCtx,
 			req: &project.CreateProjectRequest{
 				Name:           alreadyExistingProjectName,
 				OrganizationId: orgResp.GetOrganizationId(),
@@ -69,7 +69,7 @@ func TestServer_CreateProject(t *testing.T) {
 		},
 		{
 			name: "empty, ok",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  iamOwnerCtx,
 			req: &project.CreateProjectRequest{
 				Name:           gofakeit.Name(),
 				OrganizationId: orgResp.GetOrganizationId(),
@@ -114,8 +114,8 @@ func assertCreateProjectResponse(t *testing.T, creationDate, changeDate time.Tim
 }
 
 func TestServer_UpdateProject(t *testing.T) {
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.AppName(), gofakeit.Email())
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 
 	type args struct {
 		ctx context.Context
@@ -135,7 +135,7 @@ func TestServer_UpdateProject(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *project.UpdateProjectRequest) {
-				projectResp := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
 				request.Id = projectResp.GetId()
 			},
 			args: args{
@@ -153,7 +153,7 @@ func TestServer_UpdateProject(t *testing.T) {
 				return
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.UpdateProjectRequest{
 					Name: gu.Ptr(gofakeit.Name()),
 				},
@@ -164,12 +164,12 @@ func TestServer_UpdateProject(t *testing.T) {
 			name: "no change, ok",
 			prepare: func(request *project.UpdateProjectRequest) {
 				name := gofakeit.AppName()
-				projectID := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), name, false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false).GetId()
 				request.Id = projectID
 				request.Name = gu.Ptr(name)
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.UpdateProjectRequest{},
 			},
 			want: want{
@@ -180,11 +180,11 @@ func TestServer_UpdateProject(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *project.UpdateProjectRequest) {
-				projectID := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
 				request.Id = projectID
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.UpdateProjectRequest{
 					Name: gu.Ptr(gofakeit.AppName()),
 				},
@@ -197,11 +197,11 @@ func TestServer_UpdateProject(t *testing.T) {
 		{
 			name: "change full, ok",
 			prepare: func(request *project.UpdateProjectRequest) {
-				projectID := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
 				request.Id = projectID
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.UpdateProjectRequest{
 					Name:                   gu.Ptr(gofakeit.AppName()),
 					ProjectRoleAssertion:   gu.Ptr(true),
@@ -340,8 +340,8 @@ func assertDeleteProjectResponse(t *testing.T, creationDate, deletionDate time.T
 }
 
 func TestServer_DeactivateProject(t *testing.T) {
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.AppName(), gofakeit.Email())
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 
 	type args struct {
 		ctx context.Context
@@ -361,7 +361,7 @@ func TestServer_DeactivateProject(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *project.DeactivateProjectRequest) {
-				projectResp := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
 				request.Id = projectResp.GetId()
 			},
 			args: args{
@@ -377,7 +377,7 @@ func TestServer_DeactivateProject(t *testing.T) {
 				return
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.DeactivateProjectRequest{},
 			},
 			wantErr: true,
@@ -386,12 +386,12 @@ func TestServer_DeactivateProject(t *testing.T) {
 			name: "no change, ok",
 			prepare: func(request *project.DeactivateProjectRequest) {
 				name := gofakeit.AppName()
-				projectID := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), name, false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false).GetId()
 				request.Id = projectID
-				instance.DeactivateProject(isolatedIAMOwnerCTX, t, projectID)
+				instance.DeactivateProject(iamOwnerCtx, t, projectID)
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.DeactivateProjectRequest{},
 			},
 			wantErr: true,
@@ -399,11 +399,11 @@ func TestServer_DeactivateProject(t *testing.T) {
 		{
 			name: "change, ok",
 			prepare: func(request *project.DeactivateProjectRequest) {
-				projectID := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
 				request.Id = projectID
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.DeactivateProjectRequest{},
 			},
 			want: want{
@@ -445,8 +445,8 @@ func assertDeactivateProjectResponse(t *testing.T, creationDate, changeDate time
 }
 
 func TestServer_ActivateProject(t *testing.T) {
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.AppName(), gofakeit.Email())
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 
 	type args struct {
 		ctx context.Context
@@ -466,7 +466,7 @@ func TestServer_ActivateProject(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *project.ActivateProjectRequest) {
-				projectResp := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
 				request.Id = projectResp.GetId()
 			},
 			args: args{
@@ -482,7 +482,7 @@ func TestServer_ActivateProject(t *testing.T) {
 				return
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.ActivateProjectRequest{},
 			},
 			wantErr: true,
@@ -491,11 +491,11 @@ func TestServer_ActivateProject(t *testing.T) {
 			name: "no change, ok",
 			prepare: func(request *project.ActivateProjectRequest) {
 				name := gofakeit.AppName()
-				projectID := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), name, false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false).GetId()
 				request.Id = projectID
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.ActivateProjectRequest{},
 			},
 			wantErr: true,
@@ -503,12 +503,12 @@ func TestServer_ActivateProject(t *testing.T) {
 		{
 			name: "change, ok",
 			prepare: func(request *project.ActivateProjectRequest) {
-				projectID := instance.CreateProject(isolatedIAMOwnerCTX, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
 				request.Id = projectID
-				instance.DeactivateProject(isolatedIAMOwnerCTX, t, projectID)
+				instance.DeactivateProject(iamOwnerCtx, t, projectID)
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: iamOwnerCtx,
 				req: &project.ActivateProjectRequest{},
 			},
 			want: want{
