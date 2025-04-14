@@ -255,9 +255,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s52IDPTemplate6LDAP2,
 		steps.s53InitPermittedOrgsFunction,
 	} {
-		err := executeMigration(ctx, eventstoreClient, step, "migration failed")
-		if err != nil {
-			setupErr = err
+		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if setupErr != nil {
 			return
 		}
 	}
@@ -293,9 +292,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}
 
 	for _, repeatableStep := range repeatableSteps {
-		err := executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
-		if err != nil {
-			setupErr = err
+		setupErr = executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
+		if setupErr != nil {
 			return
 		}
 	}
@@ -313,18 +311,16 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
 	} {
-		err := executeMigration(ctx, eventstoreClient, step, "migration failed")
-		if err != nil {
-			setupErr = err
+		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if setupErr != nil {
 			return
 		}
 	}
 
 	// projection initialization must be done last, since the steps above might add required columns to the projections
 	if !config.ForMirror && config.InitProjections.Enabled {
-		err := initProjections(ctx, eventstoreClient)
-		if err != nil {
-			setupErr = err
+		setupErr = initProjections(ctx, eventstoreClient)
+		if setupErr != nil {
 			return
 		}
 	}
@@ -348,7 +344,7 @@ func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventsto
 			"hint", pgErr.Hint,
 		)
 	}
-	logging.WithFields(logFields...).WithError(err)
+	logging.WithFields(logFields...).WithError(err).Error(errorMsg)
 	return fmt.Errorf("%s: %w", errorMsg, err)
 }
 
@@ -559,28 +555,28 @@ func initProjections(
 
 	for _, p := range projection.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err)
+			logging.WithFields("name", p.String()).OnError(err).Error("projection migration failed")
 			return err
 		}
 	}
 
 	for _, p := range admin_handler.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err)
+			logging.WithFields("name", p.String()).OnError(err).Error("admin schema migration failed")
 			return err
 		}
 	}
 
 	for _, p := range auth_handler.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err)
+			logging.WithFields("name", p.String()).OnError(err).Error("auth schema migration failed")
 			return err
 		}
 	}
 
 	for _, p := range notify_handler.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
-			logging.WithFields("name", p.String()).OnError(err)
+			logging.WithFields("name", p.String()).OnError(err).Error("notification migration failed")
 			return err
 		}
 	}
