@@ -2074,9 +2074,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
-            summary: "Deprecated: Remove Social Login";
+            summary: "Remove Social Login";
             deprecated: true;
-            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)"
+            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use user service v2 RemoveLinkedIDP"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";

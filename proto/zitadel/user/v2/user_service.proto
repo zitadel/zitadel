@@ -535,7 +535,8 @@ service UserService {
   // UpdateUser
   //
   // UpdateUser allows to partially update an existing user.
-  // Specify the side effects if you change the users email, phone or password.
+  // If you change the users email, phone, you can specify how the ownership should be verified.
+  // If you change the users password, you can specify if the password should be changed again on the users next login.
   //
   // Required permission:
   //   - user.write
@@ -1856,18 +1857,19 @@ message AddHumanUserResponse {
 
 message CreateUserRequest{
   message Human {
+    // Set the users profile information.
     SetHumanProfile profile = 1 [
       (validate.rules).message.required = true,
       (google.api.field_behavior) = REQUIRED
     ];
-    // change the users email address and/or trigger a verification email
+    // Set the users email address and optionally send a verification email.
     SetHumanEmail email = 2 [
       (validate.rules).message.required = true,
       (google.api.field_behavior) = REQUIRED
     ];
-    // change the users phone number and/or trigger a verification SMS
+    // Set the users phone number and optionally send a verification SMS.
     optional SetHumanPhone phone = 3;
-    // set the users password and or require the user to set a new password without resetting it
+    // Set the users initial password and optionally require the user to set a new password.
     oneof password_type {
       option (validate.required) = true;
       Password password = 4;
@@ -1883,21 +1885,27 @@ message CreateUserRequest{
     repeated IDPLink idp_links = 7;
     // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
     // Currently no other options are supported, and if anything different is used the validation will fail.
-    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
     optional string totp_secret = 8 [
-      (validate.rules).string = {max_len: 200}
+      (validate.rules).string = {max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+      }
     ];
   }
   message Machine {
-    // name is a human readable field that helps identifying the user.
-    // For example "Acceptance Test User"
+    // The machine users name is a human readable field that helps identifying the user.
     string name = 1 [
-      (validate.rules).string = {min_len: 1, max_len: 200}
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"Acceptance Test User\"";
+      }
     ];
-    // description is a field that helps noting down the purpose of the user.
-    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
+    // The description is a field that helps to remember the purpose of the user.
     optional string description = 2 [
-      (validate.rules).string = {max_len: 500}
+      (validate.rules).string = {min_len: 1, max_len: 500},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"The user calls the session API in the continuous integration pipeline for acceptance tests.\"";
+      }
     ];
   }
 
@@ -1906,19 +1914,29 @@ message CreateUserRequest{
   zitadel.object.v2.Organization organization = 1 [
     (validate.rules).message.required = true
   ];
-  // optionally set your own unique id for the user.
+  // The ID is a unique identifier for the user in the instance.
+  // If not specified, it will be generated.
+  // You can set your own user id that is unique within the instance.
   // This is useful in migration scenarios, for example if the user already has an ID in another Zitadel system.
-  // For example "163840776835432345"
+  // If not specified, it will be generated.
+  // It can't be changed after creation.
   optional string user_id = 2 [
-    (validate.rules).string = {max_len: 200}
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
   ];
 
-  // optionally set a username that is unique within the instance.
+  // The username is a unique identifier for the user in the organization.
   // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
-  // For example "minnie-mouse"
+  // It is used to identify the user in the organization and can be used for login.
   optional string username = 3 [
-    (validate.rules).string = {max_len: 200}
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"minnie-mouse\"";
+    }
   ];
+
   // The type of the user.
   oneof user_type {
     option (validate.required) = true;
@@ -1949,13 +1967,18 @@ message CreateUserResponse {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
-  // The
+  // The email verification code if it was requested by setting the email verification to return_code.
   optional string email_code = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"XTA6BC\"";
     }
   ];
-  optional string phone_code = 4;
+  // The phone verification code if it was requested by setting the phone verification to return_code.
+  optional string phone_code = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"XTA6BC\"";
+    }
+  ];
 }
 
 message GetUserByIDRequest {
@@ -2216,80 +2239,114 @@ message DeleteUserResponse {
 message UpdateUserRequest{
   message Human {
     message Profile {
-      // given_name is the first name of the user.
-      // It can be used to personalize notifications.
-      // For example "Minnie" in "Minnie Mouse".
+      // The given name is the first name of the user.
+      // For example, it can be used to personalize notifications and login UIs.
       optional string given_name = 1  [
-        (validate.rules).string = {max_len: 200}
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          max_length: 200;
+          example: "\"Minnie\"";
+        }
       ];
-      // family_name is the last name of the user.
-      // It can be used to personalize notifications.
-      // For example "Mouse" in "Minnie Mouse".
+      // The family name is the last name of the user.
+      // For example, it can be used to personalize user interfaces and notifications.
       optional string family_name = 2  [
-        (validate.rules).string = {max_len: 200}
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          max_length: 200;
+          example: "\"Mouse\"";
+        }
       ];
-      // nick_name can be used to personalize notifications.
-      // For example "Mini" for "Minnie Mouse".
+      // The nick name is the users short name.
+      // For example, it can be used to personalize user interfaces and notifications.
       optional string nick_name = 3 [
-        (validate.rules).string = {max_len: 200}
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          max_length: 200;
+          example: "\"Mini\"";
+        }
       ];
-      // display_name is the name of the user that is primarily displayed in the UI.
-      // For example "Minnie Mouse"
+      // The display name is how a user should primarily be displayed in lists.
+      // It can also for example be used to personalize user interfaces and notifications.
       optional string display_name = 4 [
-        (validate.rules).string = {max_len: 200}
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          max_length: 200;
+          example: "\"Minnie Mouse\"";
+        }
       ];
-      // preferred_language is the language that is primarily used by the user.
-      // It is used where no higher prioritized preferred language can be used.
-      // Notification messages use the users preferred language if available.
-      // Instance and organization settings can define a default language for users without a specific preferred language.
-      // Browser settings can overwrite a users preferred_language.
-      // For example "en-US" for "English (United States)" or "de-DE" for "German (Germany)".
+      // The users preferred language is the language that systems should use to interact with the user.
+      // It has the format of a [BCP-47 language tag](https://datatracker.ietf.org/doc/html/rfc3066).
+      // It is used by Zitadel where no higher prioritized preferred language can be used.
+      // For example, browser settings can overwrite a users preferred_language.
+      // Notification messages and standard login UIs use the users preferred language if it is supported and allowed on the instance.
+      // Else, the default language of the instance is used.
       optional string preferred_language = 5 [
-        (validate.rules).string = {max_len: 10}
+        (validate.rules).string = {max_len: 10},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          max_length: 200;
+          example: "\"en-US\"";
+        }
       ];
-      // gender can be used to personalize notifications.
-      // For example "GENDER_FEMALE"
-      optional Gender gender = 6;
+      // The users gender can for example be used to personalize user interfaces and notifications.
+      optional Gender gender = 6 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"GENDER_FEMALE\"";
+        }
+      ];
     }
-    // change the users profile information
+    // Change the users profile information
     optional Profile profile = 1;
-    // change the users email address and/or trigger a verification email
+    // Change the users email address and/or trigger a verification email
     optional SetHumanEmail email = 2;
-    // change the users phone number and/or trigger a verification SMS
+    // Change the users phone number and/or trigger a verification SMS
     optional SetHumanPhone phone = 3;
-    // change the users password.
+    // Change the users password.
+    // You need to provide the old password to change the password.
     optional SetPassword password = 4;
     // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
     // Currently no other options are supported, and if anything different is used the validation will fail.
-    // For example "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
     optional string totp_secret = 5 [
-      (validate.rules).string = {max_len: 200}
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+      }
     ];
   }
   message Machine {
-    // name is a human readable field that helps identifying the user.
-    // For example "Acceptance Test User"
+    // The machine users name is a human readable field that helps identifying the user.
     optional string name = 1 [
-      (validate.rules).string = {max_len: 200}
+      (validate.rules).string = {max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"Acceptance Test User\"";
+      }
     ];
-    // description is a field that helps noting down the purpose of the user.
-    // For example "The user calls the session API in the continuous integration pipeline for acceptance tests."
+    // The description is a field that helps to remember the purpose of the user.
     optional string description = 2 [
-      (validate.rules).string = {max_len: 500}
+      (validate.rules).string = {max_len: 500},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"The user calls the session API in the continuous integration pipeline for acceptance tests.\"";
+      }
     ];
   }
   reserved 3 to 9;
-  // The users resource ID.
-  // For example "163840776835432345"
+  // The user id is the users unique identifier in the instance.
+  // It can't be changed.
   string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200}
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
   ];
-  // optionally set a username that is unique within the instance.
-  // For example "minnie-mouse"
+  // Set a new username that is unique within the instance.
+  // Beware that active tokens and sessions are invalidated when the username is changed.
   optional string username = 2 [
-    (validate.rules).string = {max_len: 200}
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"minnie-mouse\"";
+    }
   ];
-  // optionally change type specific properties of the user.
+  // Change type specific properties of the user.
   oneof user_type {
     Human human = 10;
     Machine machine = 11;
@@ -2298,9 +2355,9 @@ message UpdateUserRequest{
 
 message UpdateUserResponse {
   zitadel.object.v2.Details details = 1;
-  // in case the email verification was set to return_code, the code will be returned
+  // In case the email verification was set to return_code, the code will be returned
   optional string email_code = 2;
-  // in case the phone verification was set to return_code, the code will be returned
+  // In case the phone verification was set to return_code, the code will be returned
   optional string phone_code = 3;
 }
 
