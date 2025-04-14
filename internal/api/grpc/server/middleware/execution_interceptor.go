@@ -34,7 +34,7 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 
 func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req interface{}) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	// if no targets are found, return without any calls
 	if len(targets) == 0 {
@@ -56,7 +56,7 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 
 func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	// if no targets are found, return without any calls
 	if len(targets) == 0 {

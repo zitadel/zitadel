@@ -2,7 +2,6 @@
   [loading]="dataSource.loading$ | async"
   [selection]="selection"
   (refreshed)="refreshPage()"
-  [dataSize]="dataSource.totalResult"
   [timestamp]="dataSource.viewTimestamp"
 >
   <ng-template cnslHasRole [hasRole]="['project.app.write']" actions>

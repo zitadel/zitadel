@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 	"slices"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -158,7 +158,7 @@ func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodsQuery(ctx, q.client)
+	query, scan := prepareUserAuthMethodsQuery()
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
@@ -185,7 +185,7 @@ func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, ac
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodTypesQuery(ctx, q.client, activeOnly, includeWithoutDomain, queryDomain)
+	query, scan := prepareUserAuthMethodTypesQuery(activeOnly, includeWithoutDomain, queryDomain)
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -212,6 +212,9 @@ type UserAuthMethodRequirements struct {
 	ForceMFALocalOnly bool
 }
 
+//go:embed user_auth_method_types_required.sql
+var listUserAuthMethodTypesStmt string
+
 func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID string) (requirements *UserAuthMethodRequirements, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
@@ -222,20 +225,33 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, q.client)
-	eq := sq.Eq{
-		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	stmt, args, err := query.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-E5ut4", "Errors.Query.InvalidRequest")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		requirements, err = scan(row)
-		return err
-	}, stmt, args...)
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			var userType sql.NullInt32
+			var forceMFA sql.NullBool
+			var forceMFALocalOnly sql.NullBool
+			err := row.Scan(
+				&userType,
+				&forceMFA,
+				&forceMFALocalOnly,
+			)
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return zerrors.ThrowNotFound(err, "QUERY-SF3h2", "Errors.Internal")
+				}
+				return zerrors.ThrowInternal(err, "QUERY-Sf3rt", "Errors.Internal")
+			}
+			requirements = &UserAuthMethodRequirements{
+				UserType:          domain.UserType(userType.Int32),
+				ForceMFA:          forceMFA.Bool,
+				ForceMFALocalOnly: forceMFALocalOnly.Bool,
+			}
+			return nil
+		},
+		listUserAuthMethodTypesStmt,
+		userID,
+		authz.GetInstance(ctx).InstanceID(),
+	)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
 	}
@@ -349,7 +365,7 @@ func (q *UserAuthMethodSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectB
 	return query
 }
 
-func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
+func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
 	return sq.Select(
 			UserAuthMethodColumnTokenID.identifier(),
 			UserAuthMethodColumnCreationDate.identifier(),
@@ -361,7 +377,7 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			UserAuthMethodColumnState.identifier(),
 			UserAuthMethodColumnMethodType.identifier(),
 			countColumn.identifier()).
-			From(userAuthMethodTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(userAuthMethodTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthMethods, error) {
 			userAuthMethods := make([]*AuthMethod, 0)
@@ -399,7 +415,7 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 		}
 }
 
-func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, activeOnly bool, includeWithoutDomain bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
 	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery(activeOnly, includeWithoutDomain, queryDomain)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -420,7 +436,7 @@ func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, ac
 				authMethodsArgs...).
 			LeftJoin("(" + idpsQuery + ") AS " + userIDPsCountTable.alias + " ON " +
 				userIDPsCountUserID.identifier() + " = " + UserIDCol.identifier() + " AND " +
-				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier() + db.Timetravel(call.Took(ctx))).
+				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthMethodTypes, error) {
 			userAuthMethodTypes := make([]domain.UserAuthMethodType, 0)
@@ -461,45 +477,6 @@ func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, ac
 		}
 }
 
-func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserAuthMethodRequirements, error)) {
-	loginPolicyQuery, err := prepareAuthMethodsForceMFAQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	return sq.Select(
-			UserTypeCol.identifier(),
-			forceMFAForce.identifier(),
-			forceMFAForceLocalOnly.identifier()).
-			From(userTable.identifier()).
-			LeftJoin("(" + loginPolicyQuery + ") AS " + forceMFATable.alias + " ON " +
-				"(" + forceMFAOrgID.identifier() + " = " + UserInstanceIDCol.identifier() + " OR " + forceMFAOrgID.identifier() + " = " + UserResourceOwnerCol.identifier() + ") AND " +
-				forceMFAInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
-			OrderBy(forceMFAIsDefault.identifier()).
-			Limit(1).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*UserAuthMethodRequirements, error) {
-			var userType sql.NullInt32
-			var forceMFA sql.NullBool
-			var forceMFALocalOnly sql.NullBool
-			err := row.Scan(
-				&userType,
-				&forceMFA,
-				&forceMFALocalOnly,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-SF3h2", "Errors.Internal")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-Sf3rt", "Errors.Internal")
-			}
-			return &UserAuthMethodRequirements{
-				UserType:          domain.UserType(userType.Int32),
-				ForceMFA:          forceMFA.Bool,
-				ForceMFALocalOnly: forceMFALocalOnly.Bool,
-			}, nil
-		}
-}
-
 func prepareAuthMethodsIDPsQuery() (string, error) {
 	idpsQuery, _, err := sq.Select(
 		userIDPsCountUserID.identifier(),
@@ -535,17 +512,4 @@ func prepareAuthMethodQuery(activeOnly bool, includeWithoutDomain bool, queryDom
 	}
 
 	return q.ToSql()
-}
-
-func prepareAuthMethodsForceMFAQuery() (string, error) {
-	loginPolicyQuery, _, err := sq.Select(
-		forceMFAForce.identifier(),
-		forceMFAForceLocalOnly.identifier(),
-		forceMFAInstanceID.identifier(),
-		forceMFAOrgID.identifier(),
-		forceMFAIsDefault.identifier(),
-	).
-		From(forceMFATable.identifier()).
-		ToSql()
-	return loginPolicyQuery, err
 }

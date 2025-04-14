@@ -415,6 +415,10 @@ func createUsers(ctx context.Context, orgID string, count int, passwordChangeReq
 
 func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) userAttr {
 	username := gofakeit.Email()
+	return createUserWithUserName(ctx, username, orgID, passwordChangeRequired)
+}
+
+func createUserWithUserName(ctx context.Context, username string, orgID string, passwordChangeRequired bool) userAttr {
 	// used as default country prefix
 	phone := "+41" + gofakeit.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
@@ -1173,6 +1177,97 @@ func TestServer_ListUsers(t *testing.T) {
 						}
 					}
 					integration.AssertListDetails(ttt, tt.want, got)
+				}, retryDuration, tick, "timeout waiting for expected user result")
+			})
+		}
+	}
+}
+
+func TestServer_SystemUsers_ListUsers(t *testing.T) {
+	defer func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	}()
+
+	org1 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	org2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), "org2@zitadel.com")
+	org3 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser1@zitadel.com", org1.OrganizationId, false)
+	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser2@zitadel.com", org2.OrganizationId, false)
+	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser3@zitadel.com", org3.OrganizationId, false)
+
+	tests := []struct {
+		name                       string
+		ctx                        context.Context
+		req                        *user.ListUsersRequest
+		expectedFoundUsernames     []string
+		checkNumberOfUsersReturned bool
+	}{
+		{
+			name: "list users with neccessary permissions",
+			ctx:  SystemCTX,
+			req:  &user.ListUsersRequest{},
+			// the number of users returned will vary from test run to test run,
+			// so just check the system user gets back users from different orgs whcih it is not a memeber of
+			checkNumberOfUsersReturned: false,
+			expectedFoundUsernames:     []string{"Test_SystemUsers_ListUser1@zitadel.com", "Test_SystemUsers_ListUser2@zitadel.com", "Test_SystemUsers_ListUser3@zitadel.com"},
+		},
+		{
+			name: "list users without neccessary permissions",
+			ctx:  SystemUserWithNoPermissionsCTX,
+			req:  &user.ListUsersRequest{},
+			// check no users returned
+			checkNumberOfUsersReturned: true,
+		},
+		{
+			name: "list users with neccessary permissions specifying org",
+			req: &user.ListUsersRequest{
+				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
+			},
+			ctx:                        SystemCTX,
+			expectedFoundUsernames:     []string{"Test_SystemUsers_ListUser2@zitadel.com", "org2@zitadel.com"},
+			checkNumberOfUsersReturned: true,
+		},
+		{
+			name: "list users without neccessary permissions specifying org",
+			req: &user.ListUsersRequest{
+				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
+			},
+			ctx: SystemUserWithNoPermissionsCTX,
+			// check no users returned
+			checkNumberOfUsersReturned: true,
+		},
+	}
+
+	for _, f := range permissionCheckV2Settings {
+		f := f
+		for _, tt := range tests {
+			t.Run(f.TestNamePrependString+tt.name, func(t *testing.T) {
+				setPermissionCheckV2Flag(t, f.SetFlag)
+
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 1*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					got, err := Client.ListUsers(tt.ctx, tt.req)
+					require.NoError(ttt, err)
+
+					if tt.checkNumberOfUsersReturned {
+						require.Equal(t, len(tt.expectedFoundUsernames), len(got.Result))
+					}
+
+					if tt.expectedFoundUsernames != nil {
+						for _, user := range got.Result {
+							for i, username := range tt.expectedFoundUsernames {
+								if username == user.Username {
+									tt.expectedFoundUsernames = tt.expectedFoundUsernames[i+1:]
+									break
+								}
+							}
+							if len(tt.expectedFoundUsernames) == 0 {
+								return
+							}
+						}
+						require.FailNow(t, "unable to find all users with specified usernames")
+					}
 				}, retryDuration, tick, "timeout waiting for expected user result")
 			})
 		}
