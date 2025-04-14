@@ -113,6 +113,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	defer func() {
 		stop()
 
+		if setupErr == nil {
+			logging.Info("setup completed")
+			return
+		}
+
 		if setupErr != nil && !errors.Is(setupErr, context.Canceled) {
 			// If Setup failed for some other reason than the context being cancelled,
 			// then this could be a fatal error we should not retry
