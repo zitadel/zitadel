@@ -106,44 +106,28 @@ func bindForMirror(cmd *cobra.Command) error {
 
 func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) {
 	logging.Info("setup started")
+
 	var setupErr error
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	stop := make(chan os.Signal, 1)
-	// catch interrupt from terminal or SIGTERM from kubernetes
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-	var signalReceived os.Signal
-
-	go func() {
-		select {
-		case sig := <-stop:
-			logging.Infof("received interrupt signal, shutting down: %s", sig)
-			signalReceived = sig
-			cancel()
-		case <-ctx.Done():
-			return
-		}
-	}()
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 
 	defer func() {
-		if signalReceived != nil {
-			if setupErr != nil && !errors.Is(setupErr, context.Canceled) {
-				// if somehow the setup step failed for some other reason than the context being cancelled
-				// by the signal, skip cleanup as this might be a fatal error we should not retry
-				logging.WithFields("error", setupErr).Fatal("setup failed, skipping cleanup")
-				return
-			}
-			// if we're in the middle of long-running setup, run cleanup before exiting
-			// so if/when we're restarted we can pick up where we left off rather than
-			// booting into a broken state that requires manual intervention
-			// kubernetes will typically kill the pod after 30 seconds if the container does not exit
-			cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cleanupCancel()
+		stop()
 
-			Cleanup(cleanupCtx, config)
+		if setupErr != nil && !errors.Is(setupErr, context.Canceled) {
+			// If Setup failed for some other reason than the context being cancelled,
+			// then this could be a fatal error we should not retry
+			logging.WithFields("error", setupErr).Fatal("setup failed, skipping cleanup")
+			return
 		}
+
+		// if we're in the middle of long-running setup, run cleanup before exiting
+		// so if/when we're restarted we can pick up where we left off rather than
+		// booting into a broken state that requires manual intervention
+		// kubernetes will typically kill the pod after 30 seconds if the container does not exit
+		cleanupCtx, cleanupCancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+		defer cleanupCancel()
+
+		Cleanup(cleanupCtx, config)
 	}()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
