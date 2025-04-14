@@ -43,14 +43,14 @@ func Test_isHostBlocked(t *testing.T) {
 			args: args{
 				address: mustNewURL(t, "https://192.168.5.4/hodor"),
 			},
-			want: NewAddressBlockedErr("192.168.5.0/24"),
+			want: NewAddressBlockedError("192.168.5.0/24"),
 		},
 		{
 			name: "exact ip",
 			args: args{
 				address: mustNewURL(t, "http://127.0.0.1:8080/hodor"),
 			},
-			want: NewAddressBlockedErr("127.0.0.1"),
+			want: NewAddressBlockedError("127.0.0.1"),
 		},
 		{
 			name: "address match",
@@ -62,7 +62,7 @@ func Test_isHostBlocked(t *testing.T) {
 			args: args{
 				address: mustNewURL(t, "https://test.com:42/hodor"),
 			},
-			want: NewAddressBlockedErr("test.com"),
+			want: NewAddressBlockedError("test.com"),
 		},
 		{
 			name: "address not match",
@@ -86,7 +86,7 @@ func Test_isHostBlocked(t *testing.T) {
 			args: args{
 				address: mustNewURL(t, "https://test2.com/hodor"),
 			},
-			want: NewAddressBlockedErr("127.0.0.1"),
+			want: NewAddressBlockedError("127.0.0.1"),
 		},
 		{
 			name: "looked up failure",

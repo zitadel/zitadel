@@ -81,20 +81,20 @@ type HostChecker struct {
 	Domain string
 }
 
-type AddressBlockedErr struct {
+type AddressBlockedError struct {
 	blockedBy string
 }
 
-func NewAddressBlockedErr(blockedBy string) *AddressBlockedErr {
-	return &AddressBlockedErr{blockedBy: blockedBy}
+func NewAddressBlockedError(blockedBy string) *AddressBlockedError {
+	return &AddressBlockedError{blockedBy: blockedBy}
 }
 
-func (e *AddressBlockedErr) Error() string {
+func (e *AddressBlockedError) Error() string {
 	return fmt.Sprintf("address is blocked by '%s'", e.blockedBy)
 }
 
-func (e *AddressBlockedErr) Is(target error) bool {
-	var addressBlockedErr *AddressBlockedErr
+func (e *AddressBlockedError) Is(target error) bool {
+	var addressBlockedErr *AddressBlockedError
 	if !errors.As(target, &addressBlockedErr) {
 		return false
 	}
@@ -104,15 +104,15 @@ func (e *AddressBlockedErr) Is(target error) bool {
 func (c *HostChecker) CheckBlocked(ips []net.IP, address string) error {
 	// if the address matches the domain, no additional checks as needed
 	if c.Domain == address {
-		return NewAddressBlockedErr(c.Domain)
+		return NewAddressBlockedError(c.Domain)
 	}
 	// otherwise we need to check on ips (incl. the resolved ips of the host)
 	for _, ip := range ips {
 		if c.Net != nil && c.Net.Contains(ip) {
-			return NewAddressBlockedErr(c.Net.String())
+			return NewAddressBlockedError(c.Net.String())
 		}
 		if c.IP != nil && c.IP.Equal(ip) {
-			return NewAddressBlockedErr(c.IP.String())
+			return NewAddressBlockedError(c.IP.String())
 		}
 	}
 	return nil
