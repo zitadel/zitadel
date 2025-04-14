@@ -1594,7 +1594,8 @@ service UserService {
 
   // AddSecret
   //
-  // AddSecret generates a new client ID and client secret for the user.
+  // AddSecret generates a client secret for the user.
+  // The client id is the users username.
   // If the user already has a secret, it is overwritten.
   // Only users of type machine can have a secret.
   //
@@ -2354,7 +2355,12 @@ message UpdateUserRequest{
 }
 
 message UpdateUserResponse {
-  zitadel.object.v2.Details details = 1;
+  // The timestamp of the change of the user.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
   // In case the email verification was set to return_code, the code will be returned
   optional string email_code = 2;
   // In case the phone verification was set to return_code, the code will be returned
@@ -3197,95 +3203,167 @@ message HumanMFAInitSkippedResponse {
 
 message AddSecretRequest {
   // The users resource ID.
-  // For example "163840776835432345"
-  string user_id = 1 [(validate.rules).string.min_len = 1];
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
 }
 
 message AddSecretResponse {
-  zitadel.object.v2.Details details = 1;
-  string client_id = 2;
-  string client_secret = 3;
+  // The timestamp of the secret creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The client secret.
+  // Store this secret in a secure place.
+  // It is not possible to retrieve it again.
+  string client_secret = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"WoYLHB23HAZaCSxeMJGEzbu8urHICVdFp2IegVr6Q5U4lZHKAtRvmaalNDWfCuHV\"";
+    }
+  ];
 }
 
 message RemoveSecretRequest {
   // The users resource ID.
-  // For example "163840776835432345"
-  string user_id = 1 [(validate.rules).string.min_len = 1];
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
 }
 
 message RemoveSecretResponse {
-  zitadel.object.v2.Details details = 1;
+  // The timestamp of the secret deletion.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
 }
 
 message AddKeyRequest {
   // The users resource ID.
-  // For example "163840776835432345"
-  string user_id = 1 [(validate.rules).string.min_len = 1];
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
 }
 
 message AddKeyResponse {
-  zitadel.object.v2.Details details = 1;
-  string key_id = 2;
+  // The timestamp of the key creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The keys resource ID.
+  string key_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // The key which is usable to authenticate against the API.
   bytes key_content = 3;
 }
 
 
 message RemoveKeyRequest {
+  // TODO: How do we handle sub resources? Should we omit the user_id in the gateway paths?
   // The users resource ID.
-  // For example "163840776835432345"
-  string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200}
+  optional string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
   ];
   // The keys resource ID.
-  // For example "163840776835432345"
   string key_id = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200}
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
   ];
 }
 
 message RemoveKeyResponse {
-  zitadel.object.v2.Details details = 1;
+  // The timestamp of the key deletion.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
 }
-
 
 message AddPersonalAccessTokenRequest {
   // The users resource ID.
-  // For example "163840776835432345"
   string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200}
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
   ];
   // Providing your own token allows you for example to configure your integrations before the token is created.
   // This is useful for easily repeatable setups of testing environments.
   optional string token = 2 [
-    (validate.rules).string = {max_len: 200}
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"";
+    }
   ];
   // The timestamp when the token will expire.
-  // For example "2519-04-01T08:45:00.000000Z"
   google.protobuf.Timestamp expiration_date = 3 [
-    (validate.rules).timestamp.required = true
+    (validate.rules).timestamp.required = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2519-04-01T08:45:00.000000Z\"";
+    }
   ];
 }
 
 message AddPersonalAccessTokenResponse {
-  zitadel.object.v2.Details details = 1;
+  // The timestamp of the personal access token creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
   // The personal access token that can be used to authenticate against the API
-  // For example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjM4NDA3NzY4MzU0MzI0NTMiLCJleHBfdGltZSI6MTY4MjQwNzE5N30.8f7a3e7b8d8f8e8f8e8f8e8f8e8f8e8f"
-  string token = 2;
+  string token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"";
+    }
+  ];
 }
 
 message RemovePersonalAccessTokenRequest {
   // The users resource ID.
-  // For example "163840776835432345"
   string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200}
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
   ];
   // The tokens resource ID.
-  // For example "163840776835432345"
   string token_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200}
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
   ];
 }
 
 message RemovePersonalAccessTokenResponse {
-  zitadel.object.v2.Details details = 1;
+  // The timestamp of the personal access token deletion.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
 }
