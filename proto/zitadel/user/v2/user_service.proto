@@ -1671,7 +1671,7 @@ service UserService {
   //   - user.write
   rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/keys"
+      post: "/v2/users/keys"
       body: "*"
     };
 
@@ -1710,7 +1710,7 @@ service UserService {
   //   - user.write
   rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/{user_id}/keys/{key_id}"
+      delete: "/v2/users/keys/{key_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1729,6 +1729,40 @@ service UserService {
     };
   }
 
+  // ListKeys
+  //
+  // List all matching machine user keys. By default all machine user keys of the instance on which the caller has permission to read the owning users are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - user.read
+  rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/keys/search"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all machine user keys matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+    };
+  }
+
   // AddPersonalAccessToken
   //
   // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
@@ -1739,7 +1773,7 @@ service UserService {
   //   - user.write
   rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/pats"
+      post: "/v2/users/pats"
       body: "*"
     };
 
@@ -1778,7 +1812,7 @@ service UserService {
   //   - user.write
   rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/{user_id}/pats/{token_id}"
+      delete: "/v2/users/pats/{token_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1793,6 +1827,40 @@ service UserService {
         value: {
           description: "The personal access token was either successfully removed or it was not found in the first place.";
         }
+      };
+    };
+  }
+
+  // ListPersonalAccessTokens
+  //
+  // List all personal access tokens. By default all personal access tokens of the instance on which the caller has permission to read the owning users are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - user.read
+  rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/pats/search"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all personal access tokens matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
       };
     };
   }
@@ -1911,9 +1979,14 @@ message CreateUserRequest{
   }
 
   reserved 4 to 9;
-  // Specify in which organization the user should be created.
-  zitadel.object.v2.Organization organization = 1 [
-    (validate.rules).message.required = true
+  // The unique identifier of the organization the user belongs to.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
   ];
   // The ID is a unique identifier for the user in the instance.
   // If not specified, it will be generated.
@@ -3276,14 +3349,6 @@ message AddKeyResponse {
 
 
 message RemoveKeyRequest {
-  // TODO: How do we handle sub resources? Should we omit the user_id in the gateway paths?
-  // The users resource ID.
-  optional string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"163840776835432345\"";
-    }
-  ];
   // The keys resource ID.
   string key_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -3343,13 +3408,6 @@ message AddPersonalAccessTokenResponse {
 }
 
 message RemovePersonalAccessTokenRequest {
-  // The users resource ID.
-  string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"163840776835432345\"";
-    }
-  ];
   // The tokens resource ID.
   string token_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
