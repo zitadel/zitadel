@@ -21,14 +21,12 @@ func NewCleanup() *cobra.Command {
 		Long:  `cleans up migration if they got stuck`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
-			Cleanup(config)
+			Cleanup(cmd.Context(), config)
 		},
 	}
 }
 
-func Cleanup(config *Config) {
-	ctx := context.Background()
-
+func Cleanup(ctx context.Context, config *Config) {
 	logging.Info("cleanup started")
 
 	dbClient, err := database.Connect(config.Database, false)
