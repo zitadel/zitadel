@@ -6,7 +6,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -34,63 +33,59 @@ func TestPermissionClause(t *testing.T) {
 
 	type args struct {
 		ctx        context.Context
-		query      sq.SelectBuilder
-		enabled    bool
 		orgIDCol   Column
 		permission string
 		options    []PermissionOption
 	}
 	tests := []struct {
-		name      string
-		args      args
-		wantQuery string
-		wantArgs  []any
+		name       string
+		args       args
+		wantClause sq.Or
 	}{
-		{
-			name: "disabled",
-			args: args{
-				ctx:        ctx,
-				query:      sq.Select("foo", "bar").From("users").Where(sq.Eq{"instance_id": "instanceID"}),
-				enabled:    false,
-				orgIDCol:   UserResourceOwnerCol,
-				permission: "permission1",
-			},
-			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ?",
-			wantArgs:  []any{"instanceID"},
-		},
 		{
 			name: "no options",
 			args: args{
 				ctx:        ctx,
-				query:      sq.Select("foo", "bar").From("users").Where(sq.Eq{"instance_id": "instanceID"}),
-				enabled:    true,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
 			},
-			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)))",
-			wantArgs:  []any{"instanceID", "instanceID", "userID", database.NewJSONArray(permissions), "permission1", ""},
+			wantClause: sq.Or{
+				sq.Expr(
+					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
+					"instanceID",
+					"userID",
+					database.NewJSONArray(permissions),
+					"permission1",
+					"",
+				),
+			},
 		},
 		{
 			name: "owned rows option",
 			args: args{
 				ctx:        ctx,
-				query:      sq.Select("foo", "bar").From("users").Where(sq.Eq{"instance_id": "instanceID"}),
-				enabled:    true,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
 				options: []PermissionOption{
 					OwnedRowsPermissionOption(UserIDCol),
 				},
 			},
-			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)) OR projections.users14.id = ?)",
-			wantArgs:  []any{"instanceID", "instanceID", "userID", database.NewJSONArray(permissions), "permission1", "", "userID"},
+			wantClause: sq.Or{
+				sq.Expr(
+					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
+					"instanceID",
+					"userID",
+					database.NewJSONArray(permissions),
+					"permission1",
+					"",
+				),
+				sq.Eq{"projections.users14.id": "userID"},
+			},
 		},
 		{
 			name: "connection rows option",
 			args: args{
 				ctx:        ctx,
-				query:      sq.Select("foo", "bar").From("users").Where(sq.Eq{"instance_id": "instanceID"}),
-				enabled:    true,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
 				options: []PermissionOption{
@@ -98,15 +93,23 @@ func TestPermissionClause(t *testing.T) {
 					ConnectionPermissionOption(UserStateCol, "bar"),
 				},
 			},
-			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)) OR projections.users14.id = ? OR projections.users14.state = ?)",
-			wantArgs:  []any{"instanceID", "instanceID", "userID", database.NewJSONArray(permissions), "permission1", "", "userID", "bar"},
+			wantClause: sq.Or{
+				sq.Expr(
+					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
+					"instanceID",
+					"userID",
+					database.NewJSONArray(permissions),
+					"permission1",
+					"",
+				),
+				sq.Eq{"projections.users14.id": "userID"},
+				sq.Eq{"projections.users14.state": "bar"},
+			},
 		},
 		{
 			name: "single org option",
 			args: args{
 				ctx:        ctx,
-				query:      sq.Select("foo", "bar").From("users").Where(sq.Eq{"instance_id": "instanceID"}),
-				enabled:    true,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
 				options: []PermissionOption{
@@ -116,17 +119,22 @@ func TestPermissionClause(t *testing.T) {
 					}),
 				},
 			},
-			wantQuery: "SELECT foo, bar FROM users WHERE instance_id = ? AND (projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?)))",
-			wantArgs:  []any{"instanceID", "instanceID", "userID", database.NewJSONArray(permissions), "permission1", "orgID"},
+			wantClause: sq.Or{
+				sq.Expr(
+					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
+					"instanceID",
+					"userID",
+					database.NewJSONArray(permissions),
+					"permission1",
+					"orgID",
+				),
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			query := PermissionClause(tt.args.ctx, tt.args.query, tt.args.enabled, tt.args.orgIDCol, tt.args.permission, tt.args.options...)
-			gotQuery, gotArgs, err := query.ToSql()
-			require.NoError(t, err)
-			assert.Equal(t, tt.wantQuery, gotQuery)
-			assert.Equal(t, tt.wantArgs, gotArgs)
+			gotClause := PermissionClause(tt.args.ctx, tt.args.orgIDCol, tt.args.permission, tt.args.options...)
+			assert.Equal(t, tt.wantClause, gotClause)
 		})
 	}
 }

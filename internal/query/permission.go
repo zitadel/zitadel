@@ -24,15 +24,15 @@ type permissionClauseBuilder struct {
 	systemPermissions []authz.SystemUserPermissions
 	permission        string
 	orgID             string
-	overrides         []sq.Eq
+	connections       []sq.Eq
 }
 
 func (b *permissionClauseBuilder) appendConnection(column string, value any) {
-	b.overrides = append(b.overrides, sq.Eq{column: value})
+	b.connections = append(b.connections, sq.Eq{column: value})
 }
 
 func (b *permissionClauseBuilder) clauses() sq.Or {
-	clauses := make(sq.Or, 1, len(b.overrides)+1)
+	clauses := make(sq.Or, 1, len(b.connections)+1)
 	clauses[0] = sq.Expr(
 		fmt.Sprintf(wherePermittedOrgsExpr, b.orgIDColumn.identifier()),
 		b.instanceID,
@@ -41,7 +41,7 @@ func (b *permissionClauseBuilder) clauses() sq.Or {
 		b.permission,
 		b.orgID,
 	)
-	for _, include := range b.overrides {
+	for _, include := range b.connections {
 		clauses = append(clauses, include)
 	}
 	return clauses
@@ -78,11 +78,7 @@ func SingleOrgPermissionOption(queries []SearchQuery) PermissionOption {
 // which filters returned rows the current authenticated user has the requested permission to.
 //
 // Experimental: Work in progress. Currently only organization permissions are supported
-func PermissionClause(ctx context.Context, query sq.SelectBuilder, enabled bool, orgIDCol Column, permission string, options ...PermissionOption) sq.SelectBuilder {
-	if !enabled {
-		return query
-	}
-
+func PermissionClause(ctx context.Context, orgIDCol Column, permission string, options ...PermissionOption) sq.Or {
 	ctxData := authz.GetCtxData(ctx)
 	b := &permissionClauseBuilder{
 		orgIDColumn:       orgIDCol,
@@ -101,10 +97,10 @@ func PermissionClause(ctx context.Context, query sq.SelectBuilder, enabled bool,
 		"system_user_permissions", b.systemPermissions,
 		"permission", b.permission,
 		"org_id", b.orgID,
-		"overrides", b.overrides,
+		"overrides", b.connections,
 	).Debug("permitted orgs check used")
 
-	return query.Where(b.clauses())
+	return b.clauses()
 }
 
 // PermissionV2 checks are enabled when the feature flag is set and the permission check function is not nil.

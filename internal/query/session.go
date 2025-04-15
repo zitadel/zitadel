@@ -114,10 +114,11 @@ func sessionCheckPermission(ctx context.Context, resourceOwner string, creator s
 }
 
 func sessionsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
-	return PermissionClause(
+	if !enabled {
+		return query
+	}
+	return query.Where(PermissionClause(
 		ctx,
-		query,
-		enabled,
 		SessionColumnResourceOwner,
 		domain.PermissionSessionRead,
 		// Allow if user is creator
@@ -125,7 +126,7 @@ func sessionsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enab
 		// Allow if session belongs to the user
 		OwnedRowsPermissionOption(SessionColumnUserID),
 		ConnectionPermissionOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
-	)
+	))
 }
 
 func (q *SessionsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
