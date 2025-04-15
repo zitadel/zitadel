@@ -1030,7 +1030,7 @@ message ListProjectRolesRequest {
 
 message ListProjectRolesResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated ProjectRole result = 2;
+  repeated ProjectRole project_roles = 2;
 }
 
 
