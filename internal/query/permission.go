@@ -2,74 +2,109 @@ package query
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/internal/database"
+	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 )
 
 const (
-	// eventstore.permitted_orgs(instanceid text, userid text, system_user_perms JSONB, perm text filter_orgs text)
-	wherePermittedOrgsClause              = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))"
-	wherePermittedOrgsOrCurrentUserClause = "(" + wherePermittedOrgsClause + " OR %s = ?" + ")"
+	// eventstore.permitted_orgs(instanceid text, userid text, system_user_perms JSONB, perm text, filter_org text)
+	wherePermittedOrgsExpr = "%s = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))"
 )
 
-// wherePermittedOrgs sets a `WHERE` clause to the query that filters the orgs
-// for which the authenticated user has the requested permission for.
-// The user ID is taken from the context.
-// The `orgIDColumn` specifies the table column to which this filter must be applied,
-// and is typically the `resource_owner` column in ZITADEL.
-// We use full identifiers in the query builder so this function should be
-// called with something like `UserResourceOwnerCol.identifier()` for example.
-// func wherePermittedOrgs(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, permission string) (sq.SelectBuilder, error) {
-// 	userID := authz.GetCtxData(ctx).UserID
-// 	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
+type permissionClauseBuilder struct {
+	orgIDColumn       Column
+	instanceID        string
+	userID            string
+	systemPermissions []authz.SystemUserPermissions
+	permission        string
+	orgID             string
+	connections       []sq.Eq
+}
 
-// 	systemUserPermissions := authz.GetSystemUserPermissions(ctx)
-// 	var systemUserPermissionsJson []byte
-// 	if systemUserPermissions != nil {
-// 		var err error
-// 		systemUserPermissionsJson, err = json.Marshal(systemUserPermissions)
-// 		if err != nil {
-// 			return query, err
-// 		}
-// 	}
+func (b *permissionClauseBuilder) appendConnection(column string, value any) {
+	b.connections = append(b.connections, sq.Eq{column: value})
+}
 
-// 	return query.Where(
-// 		fmt.Sprintf(wherePermittedOrgsClause, orgIDColumn),
-// 		authz.GetInstance(ctx).InstanceID(),
-// 		userID,
-// 		systemUserPermissionsJson,
-// 		permission,
-// 		filterOrgIds,
-// 	), nil
-// }
-
-func wherePermittedOrgsOrCurrentUser(ctx context.Context, query sq.SelectBuilder, filterOrgIds, orgIDColumn, userIdColum, permission string) (sq.SelectBuilder, error) {
-	userID := authz.GetCtxData(ctx).UserID
-	logging.WithFields("permission_check_v2_flag", authz.GetFeatures(ctx).PermissionCheckV2, "org_id_column", orgIDColumn, "user_id_colum", userIdColum, "permission", permission, "user_id", userID).Debug("permitted orgs check used")
-
-	systemUserPermissions := authz.GetSystemUserPermissions(ctx)
-	var systemUserPermissionsJson []byte
-	if systemUserPermissions != nil {
-		var err error
-		systemUserPermissionsJson, err = json.Marshal(systemUserPermissions)
-		if err != nil {
-			return query, zerrors.ThrowInternal(err, "AUTHZ-HS4us", "Errors.Internal")
-		}
+func (b *permissionClauseBuilder) clauses() sq.Or {
+	clauses := make(sq.Or, 1, len(b.connections)+1)
+	clauses[0] = sq.Expr(
+		fmt.Sprintf(wherePermittedOrgsExpr, b.orgIDColumn.identifier()),
+		b.instanceID,
+		b.userID,
+		database.NewJSONArray(b.systemPermissions),
+		b.permission,
+		b.orgID,
+	)
+	for _, include := range b.connections {
+		clauses = append(clauses, include)
 	}
+	return clauses
+}
 
-	return query.Where(
-		fmt.Sprintf(wherePermittedOrgsOrCurrentUserClause, orgIDColumn, userIdColum),
-		authz.GetInstance(ctx).InstanceID(),
-		userID,
-		systemUserPermissionsJson,
-		permission,
-		filterOrgIds,
-		userID,
-	), nil
+type PermissionOption func(b *permissionClauseBuilder)
+
+// OwnedRowsPermissionOption allows rows to be returned of which the current user is the owner.
+// Even if the user does not have an explicit permission for the organization.
+// For example an authenticated user can always see his own user account.
+func OwnedRowsPermissionOption(userIDColumn Column) PermissionOption {
+	return func(b *permissionClauseBuilder) {
+		b.appendConnection(userIDColumn.identifier(), b.userID)
+	}
+}
+
+// ConnectionPermissionOption allows returning of rows where the value is matched.
+// Even if the user does not have an explicit permission for the organization.
+func ConnectionPermissionOption(column Column, value any) PermissionOption {
+	return func(b *permissionClauseBuilder) {
+		b.appendConnection(column.identifier(), value)
+	}
+}
+
+// SingleOrgPermissionOption may be used to optimize the permitted orgs function by limiting the
+// returned organizations, to the one used in the requested filters.
+func SingleOrgPermissionOption(queries []SearchQuery) PermissionOption {
+	return func(b *permissionClauseBuilder) {
+		b.orgID = findTextEqualsQuery(b.orgIDColumn, queries)
+	}
+}
+
+// PermissionClause sets a `WHERE` clause to query,
+// which filters returned rows the current authenticated user has the requested permission to.
+//
+// Experimental: Work in progress. Currently only organization permissions are supported
+func PermissionClause(ctx context.Context, orgIDCol Column, permission string, options ...PermissionOption) sq.Or {
+	ctxData := authz.GetCtxData(ctx)
+	b := &permissionClauseBuilder{
+		orgIDColumn:       orgIDCol,
+		instanceID:        authz.GetInstance(ctx).InstanceID(),
+		userID:            ctxData.UserID,
+		systemPermissions: ctxData.SystemUserPermissions,
+		permission:        permission,
+	}
+	for _, opt := range options {
+		opt(b)
+	}
+	logging.WithFields(
+		"org_id_column", b.orgIDColumn,
+		"instance_id", b.instanceID,
+		"user_id", b.userID,
+		"system_user_permissions", b.systemPermissions,
+		"permission", b.permission,
+		"org_id", b.orgID,
+		"overrides", b.connections,
+	).Debug("permitted orgs check used")
+
+	return b.clauses()
+}
+
+// PermissionV2 checks are enabled when the feature flag is set and the permission check function is not nil.
+// When the permission check function is nil, it indicates a v1 API and no resource based permission check is needed.
+func PermissionV2(ctx context.Context, cf domain_pkg.PermissionCheck) bool {
+	return authz.GetFeatures(ctx).PermissionCheckV2 && cf != nil
 }
