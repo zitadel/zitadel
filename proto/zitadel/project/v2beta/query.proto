@@ -11,7 +11,7 @@ import "google/protobuf/timestamp.proto";
 
 import "zitadel/filter/v2beta/filter.proto";
 
-message GrantedProject {
+message ProjectGrant {
   // The unique identifier of the granted project.
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
