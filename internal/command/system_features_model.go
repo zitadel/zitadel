@@ -64,7 +64,6 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemLegacyIntrospectionEventType,
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
-			feature_v2.SystemActionsEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
 			feature_v2.SystemOIDCSingleV1SessionTerminationEventType,
 			feature_v2.SystemDisableUserTokenEvent,

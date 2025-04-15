@@ -71,7 +71,6 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
-			feature_v2.InstanceActionsEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,

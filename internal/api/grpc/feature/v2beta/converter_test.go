@@ -62,10 +62,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: true,
 		},
-		Actions: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
-			Value: true,
-		},
 		TokenExchange: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: false,
@@ -163,10 +159,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Value: true,
 		},
 		UserSchema: query.FeatureSource[bool]{
-			Level: feature.LevelInstance,
-			Value: true,
-		},
-		Actions: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},
