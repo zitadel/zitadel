@@ -276,6 +276,7 @@ service ProjectService {
   // Deactivate Project
   //
   // Set the state of a project to deactivated. Request returns no error if the project is already deactivated.
+  // Applications under deactivated projects are not able to login anymore.
   //
   // Required permission:
   //   - `project.write`
