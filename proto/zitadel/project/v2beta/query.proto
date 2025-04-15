@@ -11,14 +11,14 @@ import "google/protobuf/timestamp.proto";
 
 import "zitadel/filter/v2beta/filter.proto";
 
-message GrantedProject {
-  // The unique identifier of the granted project.
+message ProjectGrant {
+  // The unique identifier of the project grant.
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
     }
   ];
-  // The unique identifier of the organization the project grant belongs to.
+  // The unique identifier of the organization which granted the project to the granted_organization_id.
   string organization_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
@@ -37,13 +37,13 @@ message GrantedProject {
     }
   ];
   // The ID of the organization the project is granted to.
-  string granted_org_id = 5 [
+  string granted_organization_id = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
     }
   ];
   // The name of the organization the project is granted to.
-  string granted_org_name = 6 [
+  string granted_organization_name = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"Some Organization\""
     }
@@ -170,10 +170,6 @@ enum ProjectFieldName {
   PROJECT_FIELD_NAME_CREATED_DATE = 2;
   PROJECT_FIELD_NAME_CHANGED_DATE = 3;
   PROJECT_FIELD_NAME_NAME = 4;
-  PROJECT_FIELD_NAME_PROJECT_TYPE = 5;
-  PROJECT_FIELD_NAME_URL = 6;
-  PROJECT_FIELD_NAME_TIMEOUT = 7;
-  PROJECT_FIELD_NAME_INTERRUPT_ON_ERROR = 8;
 }
 
 message ProjectSearchFilter {

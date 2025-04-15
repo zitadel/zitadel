@@ -240,7 +240,7 @@ service ProjectService {
 
   // List projects
   //
-  // List all matching projects. By default all projects of the instance are returned.
+  // List all matching projects. By default all projects of the instance that the caller has permission to read are returned.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
@@ -276,6 +276,7 @@ service ProjectService {
   // Deactivate Project
   //
   // Set the state of a project to deactivated. Request returns no error if the project is already deactivated.
+  // Applications under deactivated projects are not able to login anymore.
   //
   // Required permission:
   //   - `project.write`
@@ -827,7 +828,7 @@ message ListProjectsRequest {
 
 message ListProjectsResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated Project result = 2;
+  repeated Project projects = 2;
 }
 
 message DeactivateProjectRequest {
@@ -1030,7 +1031,7 @@ message ListProjectRolesRequest {
 
 message ListProjectRolesResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated ProjectRole result = 2;
+  repeated ProjectRole project_roles = 2;
 }
 
 
@@ -1215,5 +1216,5 @@ message ListProjectGrantsRequest {
 
 message ListProjectGrantsResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated GrantedProject result = 2;
+  repeated ProjectGrant project_grants = 2;
 }
