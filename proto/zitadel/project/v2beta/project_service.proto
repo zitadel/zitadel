@@ -827,7 +827,7 @@ message ListProjectsRequest {
 
 message ListProjectsResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated Project result = 2;
+  repeated Project projects = 2;
 }
 
 message DeactivateProjectRequest {
