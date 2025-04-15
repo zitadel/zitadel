@@ -11,6 +11,7 @@ import "zitadel/feature/v2/feature.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
 
 message SetSystemFeaturesRequest{
+  reserved 6;
   optional bool login_default_org = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -103,6 +104,7 @@ message ResetSystemFeaturesResponse {
 message GetSystemFeaturesRequest {}
 
 message GetSystemFeaturesResponse {
+  reserved 7;
   zitadel.object.v2.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

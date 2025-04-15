@@ -94,7 +94,7 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
 		features.TokenExchange.set(level, event.Value)
-	case feature.KeyActions:
+	case feature.KeyActionsDeprecated:
 		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)

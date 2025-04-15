@@ -15,7 +15,7 @@ const (
 	KeyLegacyIntrospection
 	KeyUserSchema
 	KeyTokenExchange
-	KeyActions
+	KeyActionsDeprecated
 	KeyImprovedPerformance
 	KeyWebKey
 	KeyDebugOIDCParentError

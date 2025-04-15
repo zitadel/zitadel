@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -513,7 +514,7 @@ func TestServer_ListExecutions(t *testing.T) {
 								},
 							},
 						},
-						Targets: executionTargetsSingleTarget(targetResp.GetId()),
+						Targets: []string{targetResp.GetId()},
 					},
 				},
 			},
@@ -546,7 +547,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					response.Result[0].CreationDate = resp.GetSetDate()
 					response.Result[0].ChangeDate = resp.GetSetDate()
 					response.Result[0].Condition = cond
-					response.Result[0].Targets = executionTargetsSingleTarget(target.GetId())
+					response.Result[0].Targets = []string{target.GetId()}
 				},
 				req: &action.ListExecutionsRequest{
 					Filters: []*action.ExecutionSearchFilter{{}},
@@ -560,7 +561,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				Result: []*action.Execution{
 					{
 						Condition: &action.Condition{},
-						Targets:   executionTargetsSingleTarget(""),
+						Targets:   []string{""},
 					},
 				},
 			},
@@ -607,7 +608,7 @@ func TestServer_ListExecutions(t *testing.T) {
 						CreationDate: resp1.GetSetDate(),
 						ChangeDate:   resp1.GetSetDate(),
 						Condition:    cond1,
-						Targets:      executionTargetsSingleTarget(targetResp.GetId()),
+						Targets:      []string{targetResp.GetId()},
 					}
 
 					cond2 := request.Filters[0].GetInConditionsFilter().GetConditions()[1]
@@ -616,7 +617,7 @@ func TestServer_ListExecutions(t *testing.T) {
 						CreationDate: resp2.GetSetDate(),
 						ChangeDate:   resp2.GetSetDate(),
 						Condition:    cond2,
-						Targets:      executionTargetsSingleTarget(targetResp.GetId()),
+						Targets:      []string{targetResp.GetId()},
 					}
 
 					cond3 := request.Filters[0].GetInConditionsFilter().GetConditions()[2]
@@ -625,7 +626,7 @@ func TestServer_ListExecutions(t *testing.T) {
 						CreationDate: resp3.GetSetDate(),
 						ChangeDate:   resp3.GetSetDate(),
 						Condition:    cond3,
-						Targets:      executionTargetsSingleTarget(targetResp.GetId()),
+						Targets:      []string{targetResp.GetId()},
 					}
 				},
 				req: &action.ListExecutionsRequest{
@@ -656,7 +657,7 @@ func TestServer_ListExecutions(t *testing.T) {
 							CreationDate: resp.GetSetDate(),
 							ChangeDate:   resp.GetSetDate(),
 							Condition:    cond,
-							Targets:      executionTargetsSingleTarget(targetResp.GetId()),
+							Targets:      []string{targetResp.GetId()},
 						}
 					}
 				},
@@ -675,6 +676,63 @@ func TestServer_ListExecutions(t *testing.T) {
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: "user"}}}},
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}},
 									{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: "presamlresponse"}}},
+								},
+							},
+						},
+					}},
+				},
+			},
+			want: &action.ListExecutionsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  10,
+					AppliedLimit: 100,
+				},
+				Result: []*action.Execution{
+					{},
+					{},
+					{},
+					{},
+					{},
+					{},
+					{},
+					{},
+					{},
+					{},
+				},
+			},
+		},
+		{
+			name: "list multiple conditions all types, sort id",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
+					conditions := request.Filters[0].GetInConditionsFilter().GetConditions()
+					for i, cond := range conditions {
+						resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
+						response.Result[i] = &action.Execution{
+							CreationDate: resp.GetSetDate(),
+							ChangeDate:   resp.GetSetDate(),
+							Condition:    cond,
+							Targets:      []string{targetResp.GetId()},
+						}
+					}
+				},
+				req: &action.ListExecutionsRequest{
+					SortingColumn: gu.Ptr(action.ExecutionFieldName_EXECUTION_FIELD_NAME_ID),
+					Filters: []*action.ExecutionSearchFilter{{
+						Filter: &action.ExecutionSearchFilter_InConditionsFilter{
+							InConditionsFilter: &action.InConditionsFilter{
+								Conditions: []*action.Condition{
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: "/zitadel.session.v2.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: "zitadel.session.v2.SessionService"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: "/zitadel.session.v2.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: "zitadel.session.v2.SessionService"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}},
+									{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: "presamlresponse"}}},
+									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: "user.added"}}}},
+									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: "user"}}}},
+									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}},
 								},
 							},
 						},

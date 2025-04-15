@@ -317,14 +317,12 @@ func executionsToPb(executions []*query.Execution) []*action.Execution {
 }
 
 func executionToPb(e *query.Execution) *action.Execution {
-	targets := make([]*action.ExecutionTargetType, len(e.Targets))
+	targets := make([]string, len(e.Targets))
 	for i := range e.Targets {
 		switch e.Targets[i].Type {
-		case domain.ExecutionTargetTypeInclude:
-			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Include{Include: executionIDToCondition(e.Targets[i].Target)}}
 		case domain.ExecutionTargetTypeTarget:
-			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Target{Target: e.Targets[i].Target}}
-		case domain.ExecutionTargetTypeUnspecified:
+			targets[i] = e.Targets[i].Target
+		case domain.ExecutionTargetTypeInclude, domain.ExecutionTargetTypeUnspecified:
 			continue
 		default:
 			continue

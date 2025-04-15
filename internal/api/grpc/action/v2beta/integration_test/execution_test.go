@@ -15,14 +15,6 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
-func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
-	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Target{Target: id}}}
-}
-
-func executionTargetsSingleInclude(include *action.Condition) []*action.ExecutionTargetType {
-	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Include{Include: include}}}
-}
-
 func TestServer_SetExecution_Request(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

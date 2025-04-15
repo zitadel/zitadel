@@ -105,10 +105,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, false,
-					)),
 				),
 			),
 			args: args{true},
@@ -129,10 +125,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
-					Level: feature.LevelInstance,
-					Value: false,
-				},
-				Actions: FeatureSource[bool]{
 					Level: feature.LevelInstance,
 					Value: false,
 				},
@@ -161,10 +153,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
@@ -197,10 +185,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
-				Actions: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
-				},
 			},
 		},
 		{
@@ -222,10 +206,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
@@ -255,10 +235,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
-				},
-				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},

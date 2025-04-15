@@ -98,7 +98,6 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.LegacyIntrospection = m.system.LegacyIntrospection
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
-	m.instance.Actions = m.system.Actions
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
 	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
@@ -125,7 +124,7 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
 		features.TokenExchange.set(level, event.Value)
-	case feature.KeyActions:
+	case feature.KeyActionsDeprecated:
 		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
