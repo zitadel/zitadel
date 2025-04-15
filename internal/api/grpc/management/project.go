@@ -47,7 +47,7 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	if err != nil {
 		return nil, err
 	}
-	projects, err := s.query.SearchProjects(ctx, queries)
+	projects, err := s.query.SearchProjects(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}

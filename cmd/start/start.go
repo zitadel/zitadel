@@ -488,7 +488,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, action_v2_beta.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, project_v2beta.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, project_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {

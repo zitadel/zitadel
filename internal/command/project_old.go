@@ -34,6 +34,9 @@ func (c *Commands) deactivateProjectOld(ctx context.Context, projectID string, r
 	if existingProject.State != domain.ProjectStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-mki55", "Errors.Project.NotActive")
 	}
+	if err := c.checkPermissionUpdateProject(ctx, existingProject.ResourceOwner, existingProject.AggregateID); err != nil {
+		return nil, err
+	}
 
 	//nolint: contextcheck
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
@@ -58,6 +61,9 @@ func (c *Commands) reactivateProjectOld(ctx context.Context, projectID string, r
 	}
 	if existingProject.State != domain.ProjectStateInactive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInactive")
+	}
+	if err := c.checkPermissionUpdateProject(ctx, existingProject.ResourceOwner, existingProject.AggregateID); err != nil {
+		return nil, err
 	}
 
 	//nolint: contextcheck

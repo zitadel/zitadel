@@ -32,12 +32,12 @@ func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsR
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchProjects(ctx, queries)
+	resp, err := s.query.SearchProjects(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
 	return &project_pb.ListProjectsResponse{
-		Result:     projectsToPb(resp.Projects),
+		Projects:   projectsToPb(resp.Projects),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }

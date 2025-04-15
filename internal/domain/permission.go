@@ -38,6 +38,9 @@ const (
 	PermissionOrgRead             = "org.read"
 	PermissionIDPRead             = "iam.idp.read"
 	PermissionOrgIDPRead          = "org.idp.read"
+	PermissionProjectWrite        = "project.write"
+	PermissionProjectRead         = "project.read"
+	PermissionProjectDelete       = "project.delete"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.

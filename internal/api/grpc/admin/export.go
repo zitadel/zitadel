@@ -736,7 +736,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
-	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
+	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}}, nil)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}

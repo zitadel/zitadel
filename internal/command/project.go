@@ -60,6 +60,9 @@ func (c *Commands) AddProject(ctx context.Context, add *AddProject) (_ *domain.O
 	if isProjectStateExists(wm.State) {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
 	}
+	if err := c.checkPermissionUpdateProject(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+		return nil, err
+	}
 
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(
@@ -119,6 +122,10 @@ func AddProjectCommand(
 			}, nil
 		}, nil
 	}
+}
+
+func (c *Commands) checkPermissionUpdateProject(ctx context.Context, resourceOwner, projectID string) error {
+	return c.checkPermission(ctx, domain.PermissionProjectWrite, resourceOwner, projectID)
 }
 
 func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, resourceOwner string) (project *ProjectWriteModel, err error) {
@@ -217,6 +224,9 @@ func (c *Commands) ChangeProject(ctx context.Context, change *ChangeProject) (_ 
 	if !isProjectStateExists(existing.State) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
+	if err := c.checkPermissionUpdateProject(ctx, existing.ResourceOwner, existing.AggregateID); err != nil {
+		return nil, err
+	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existing.WriteModel)
 	changedEvent := existing.NewChangedEvent(
@@ -257,6 +267,9 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 	if state != domain.ProjectStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-mki55", "Errors.Project.NotActive")
 	}
+	if err := c.checkPermissionUpdateProject(ctx, projectAgg.ResourceOwner, projectAgg.ID); err != nil {
+		return nil, err
+	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
 	if err != nil {
@@ -289,6 +302,9 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 	}
 	if state != domain.ProjectStateInactive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInactive")
+	}
+	if err := c.checkPermissionUpdateProject(ctx, projectAgg.ResourceOwner, projectAgg.ID); err != nil {
+		return nil, err
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
@@ -364,6 +380,9 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 	if !isProjectStateExists(existing.State) {
 		return existing.WriteModel.ChangeDate, nil
 	}
+	if err := c.checkPermissionDeleteProject(ctx, existing.ResourceOwner, existing.AggregateID); err != nil {
+		return time.Time{}, err
+	}
 
 	samlEntityIDsAgg, err := c.getSAMLEntityIdsWriteModelByProjectID(ctx, id, resourceOwner)
 	if err != nil {
@@ -390,6 +409,10 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 		return time.Time{}, err
 	}
 	return existing.WriteModel.ChangeDate, nil
+}
+
+func (c *Commands) checkPermissionDeleteProject(ctx context.Context, resourceOwner, projectID string) error {
+	return c.checkPermission(ctx, domain.PermissionProjectDelete, resourceOwner, projectID)
 }
 
 func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (_ *ProjectWriteModel, err error) {

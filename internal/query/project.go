@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -77,6 +78,18 @@ type Projects struct {
 	Projects []*Project
 }
 
+func projectsCheckPermission(ctx context.Context, projects *Projects, permissionCheck domain.PermissionCheck) {
+	projects.Projects = slices.DeleteFunc(projects.Projects,
+		func(project *Project) bool {
+			return projectCheckPermission(ctx, project.ResourceOwner, project.ID, permissionCheck) != nil
+		},
+	)
+}
+
+func projectCheckPermission(ctx context.Context, resourceOwner string, projectID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectRead, resourceOwner, projectID)
+}
+
 type Project struct {
 	ID            string
 	CreationDate  time.Time
@@ -125,7 +138,18 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	return project, err
 }
 
-func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries) (projects *Projects, err error) {
+func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries, permissionCheck domain.PermissionCheck) (*Projects, error) {
+	projects, err := q.searchProjects(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil {
+		projectsCheckPermission(ctx, projects, permissionCheck)
+	}
+	return projects, nil
+}
+
+func (q *Queries) searchProjects(ctx context.Context, queries *ProjectSearchQueries) (projects *Projects, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
