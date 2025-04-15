@@ -1215,5 +1215,5 @@ message ListProjectGrantsRequest {
 
 message ListProjectGrantsResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated GrantedProject result = 2;
+  repeated ProjectGrant project_grants = 2;
 }
