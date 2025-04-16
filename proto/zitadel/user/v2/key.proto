@@ -6,6 +6,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "zitadel/user/v2/filter.proto";
 
 message Key {
   // The unique identifier of the key.
@@ -28,3 +30,42 @@ message Key {
   ];
 }
 
+// Connect multiple sub-condition with and OR operator.
+message KeysOrFilter {
+  repeated KeysSearchFilter filters = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the sub queries to 'OR'"
+    }
+  ];
+}
+
+// Connect multiple sub-condition with and AND operator.
+message KeysAndFilter {
+  repeated KeysSearchFilter filters = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the sub queries to 'AND'"
+    }
+  ];
+}
+
+// Negate the sub-condition.
+message KeysNotFilter {
+  KeysSearchFilter filter = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the sub query to negate (NOT)"
+    }
+  ];
+}
+
+message KeysSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    KeysOrFilter or_filter = 1;
+    KeysAndFilter and_filter = 2;
+    KeysNotFilter not_filter = 3;
+
+    UserIDFilter user_id_filter = 4;
+    OrganizationIDFilter organization_id_filter = 5;
+  }
+}

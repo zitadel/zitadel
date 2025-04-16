@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package zitadel.user.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/filter/v2/filter.proto";
+
+message UserIDFilter {
+  // Only return resources that belong to this user id.
+  string user_id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"123\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
+
+
+message OrganizationIDFilter {
+  // Only return resources that belong to this organization id.
+  string organization_id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"123\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
