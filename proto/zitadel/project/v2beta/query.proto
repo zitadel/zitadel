@@ -12,12 +12,6 @@ import "google/protobuf/timestamp.proto";
 import "zitadel/filter/v2beta/filter.proto";
 
 message ProjectGrant {
-  // The unique identifier of the project grant.
-  string id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629012906488334\"";
-    }
-  ];
   // The unique identifier of the organization which granted the project to the granted_organization_id.
   string organization_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -119,35 +113,23 @@ message Project {
   ];
   // Describes if the roles of the user should be added to the token.
   bool project_role_assertion = 7;
-  // ZITADEL checks if the user has at least one on this project.
-  bool project_role_check = 8;
-  // ZITADEL checks if the org of the user has permission for this project.
-  bool has_project_check = 9;
+  // When enabled ZITADEL will check if a user has an authorization to use this project assigned when login into an application of this project.
+  bool authorization_required = 8;
+  // When enabled ZITADEL will check if the organization of the user, that is trying to log in, has access to this project (either owns the project or is granted).
+  bool project_access_required = 9;
   // Defines from where the private labeling should be triggered.
   PrivateLabelingSetting private_labeling_setting = 10;
 
-  // The unique identifier of the granted project.
-  optional string grant_id = 11 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629012906488334\"";
-    }
-  ];
   // The ID of the organization the project is granted to.
-  optional string granted_org_id = 12 [
+  optional string granted_organization_id = 12 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
     }
   ];
   // The name of the organization the project is granted to.
-  optional string granted_org_name = 13 [
+  optional string granted_organization_name = 13 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"Some Organization\""
-    }
-  ];
-  // The roles of the granted project.
-  repeated string granted_role_keys = 14 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "[\"role.super.man\"]"
     }
   ];
 }
@@ -178,7 +160,9 @@ message ProjectSearchFilter {
 
     ProjectNameFilter project_name_filter = 1;
     InProjectIDsFilter in_project_ids_filter = 2;
-    ProjectsOnlyFilter projects_only_filter = 3;
+    ProjectResourceOwnerFilter project_resource_owner_filter = 3;
+    ProjectGrantResourceOwnerFilter project_grant_resource_owner_filter = 4;
+    ProjectOrganizationIDFilter project_organization_id_filter = 5;
   }
 }
 
@@ -210,26 +194,9 @@ message InProjectIDsFilter {
   ];
 }
 
-message ProjectsOnlyFilter {
-  // Defines to only query for projects.
-  bool projects_only = 1;
-}
-
-
-message ProjectGrantSearchFilter {
-  oneof filter {
-    option (validate.required) = true;
-
-    GrantProjectNameFilter project_name_filter = 1;
-    GrantRoleKeyFilter role_key_filter = 2;
-    InProjectIDsFilter in_project_ids_filter = 3;
-    GrantedOrgIDFilter granted_org_id_filter = 4;
-  }
-}
-
-message GrantedOrgIDFilter {
-  // Defines the ID of organization the project is granted to query for.
-  string granted_org_id = 1 [
+message ProjectResourceOwnerFilter {
+  // Defines the ID of organization the project belongs to query for.
+  string project_resource_owner = 1 [
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
@@ -237,31 +204,46 @@ message GrantedOrgIDFilter {
   ];
 }
 
-message GrantRoleKeyFilter {
-  // Defines the role key of the project grant to query for.
-  string role_key = 1 [
+message ProjectGrantResourceOwnerFilter {
+  // Defines the ID of organization the project grant belongs to query for.
+  string project_grant_resource_owner = 1 [
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"role.super.man\""
+      example: "\"69629023906488334\""
     }
-  ];
-  // Defines which text comparison method used for the key query.
-  zitadel.filter.v2beta.TextFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true
   ];
 }
 
-message GrantProjectNameFilter {
-  // Defines the name of the project to query for.
-  string name = 1 [
+message ProjectOrganizationIDFilter {
+  // Defines the ID of organization the project and granted project belong to query for.
+  string project_organization_id = 1 [
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"ZITADEL\""
+      example: "\"69629023906488334\""
     }
   ];
-  // Defines which text comparison method used for the name query.
-  zitadel.filter.v2beta.TextFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true
+}
+
+
+message ProjectGrantSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    ProjectNameFilter project_name_filter = 1;
+    ProjectRoleKeyFilter role_key_filter = 2;
+    InProjectIDsFilter in_project_ids_filter = 3;
+    ProjectResourceOwnerFilter project_resource_owner_filter = 4;
+    ProjectGrantResourceOwnerFilter project_grant_resource_owner_filter = 5;
+  }
+}
+
+message GrantedOrganizationIDFilter {
+  // Defines the ID of organization the project is granted to query for.
+  string granted_organization_id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
   ];
 }
 
