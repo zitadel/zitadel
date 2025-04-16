@@ -7,8 +7,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -26,14 +24,13 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier)
+	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier, systemRolePermissionMapping)
 	if err != nil {
 		return nil, err
 	}
 
 	if requiredAuthOption.Permission == authenticated {
 		return func(parent context.Context) context.Context {
-			parent = addGetSystemUserRolesToCtx(parent, systemRolePermissionMapping, ctxData)
 			return context.WithValue(parent, dataKey, ctxData)
 		}, nil
 	}
@@ -54,7 +51,6 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		parent = context.WithValue(parent, dataKey, ctxData)
 		parent = context.WithValue(parent, allPermissionsKey, allPermissions)
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
-		parent = addGetSystemUserRolesToCtx(parent, systemRolePermissionMapping, ctxData)
 		return parent
 	}, nil
 }
@@ -131,42 +127,32 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 	return ctxIDs
 }
 
-type SystemUserPermissionsDBQuery struct {
-	MemberType  string   `json:"member_type"`
-	AggregateID string   `json:"aggregate_id"`
-	ObjectID    string   `json:"object_id"`
-	Permissions []string `json:"permissions"`
+type SystemUserPermissions struct {
+	MemberType  MemberType `json:"member_type"`
+	AggregateID string     `json:"aggregate_id"`
+	ObjectID    string     `json:"object_id"`
+	Permissions []string   `json:"permissions"`
 }
 
-func addGetSystemUserRolesToCtx(ctx context.Context, systemUserRoleMap []RoleMapping, ctxData CtxData) context.Context {
-	if len(ctxData.SystemMemberships) == 0 {
-		return ctx
+// systemMembershipsToUserPermissions converts system memberships based on roles,
+// to SystemUserPermissions, using the passed role mapping.
+func systemMembershipsToUserPermissions(memberships Memberships, roleMap []RoleMapping) []SystemUserPermissions {
+	if memberships == nil {
+		return nil
 	}
-	systemUserPermissions := make([]SystemUserPermissionsDBQuery, len(ctxData.SystemMemberships))
-	for i, systemPerm := range ctxData.SystemMemberships {
+	systemUserPermissions := make([]SystemUserPermissions, len(memberships))
+	for i, systemPerm := range memberships {
 		permissions := make([]string, 0, len(systemPerm.Roles))
 		for _, role := range systemPerm.Roles {
-			permissions = append(permissions, getPermissionsFromRole(systemUserRoleMap, role)...)
+			permissions = append(permissions, getPermissionsFromRole(roleMap, role)...)
 		}
 		slices.Sort(permissions)
-		permissions = slices.Compact(permissions)
+		permissions = slices.Compact(permissions) // remove duplicates
 
-		systemUserPermissions[i].MemberType = systemPerm.MemberType.String()
+		systemUserPermissions[i].MemberType = systemPerm.MemberType
 		systemUserPermissions[i].AggregateID = systemPerm.AggregateID
+		systemUserPermissions[i].ObjectID = systemPerm.ObjectID
 		systemUserPermissions[i].Permissions = permissions
 	}
-	return context.WithValue(ctx, systemUserRolesKey, systemUserPermissions)
-}
-
-func GetSystemUserPermissions(ctx context.Context) []SystemUserPermissionsDBQuery {
-	getSystemUserRolesFuncValue := ctx.Value(systemUserRolesKey)
-	if getSystemUserRolesFuncValue == nil {
-		return nil
-	}
-	systemUserRoles, ok := getSystemUserRolesFuncValue.([]SystemUserPermissionsDBQuery)
-	if !ok {
-		logging.WithFields("Authz").Error("unable to cast []SystemUserPermissionsDBQuery")
-		return nil
-	}
-	return systemUserRoles
+	return systemUserPermissions
 }
