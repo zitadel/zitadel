@@ -185,6 +185,32 @@
           "DESCRIPTION": "The idle refresh token lifetime is the maximum time a refresh token can be unused."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Manage your OIDC Web Keys to securely sign and validate tokens for your ZITADEL instance.",
+        "TABLE": {
+          "TITLE": "Active and Future Web Keys",
+          "DESCRIPTION": "Your active and upcoming web keys. Activating a new key will deactivate the current one.",
+          "NOTE": "Note: The JWKs OIDC endpoint returns a cacheable response (default 5 min). Avoid activating a key too soon, as it may not be available to caches and clients yet.",
+          "ACTIVATE": "Activate next Web Key",
+          "ACTIVE": "Currently active",
+          "NEXT": "Next in queue",
+          "FUTURE": "Future",
+          "WARNING": "Web Key is less than 5 min old"
+        },
+        "CREATE": {
+          "TITLE": "Create new Web Key",
+          "DESCRIPTION": "Creating a new web key adds it to your list. ZITADEL uses RSA2048 keys with a SHA256 hasher by default.",
+          "KEY_TYPE": "Key Type",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Curve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Previous Web Keys",
+          "DESCRIPTION": "These are your previous web keys that are no longer active.",
+          "DEACTIVATED_ON": "Deactivated on"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Message Texts",
         "DESCRIPTION": "Customize the texts of your notification email or SMS messages. If you want to disable some of the languages, restrict them in your instances language settings.",
@@ -502,6 +528,114 @@
     "DOWNLOAD": "Download",
     "APPLY": "Apply"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Actions",
+      "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and itegrate with other systems.",
+      "TYPES": {
+        "request": "Request",
+        "response": "Response",
+        "events": "Events",
+        "function": "Function"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Create an Action",
+        "UPDATE_TITLE": "Update an Action",
+        "TYPE": {
+          "DESCRIPTION": "Select when you want this Action to run",
+          "REQUEST": {
+            "TITLE": "Request",
+            "DESCRIPTION": "Requests that occur within Zitadel. This could be something as a login request call."
+          },
+          "RESPONSE": {
+            "TITLE": "Response",
+            "DESCRIPTION": "A response from a request within Zitadel. Think of the response you get back from fetching a user."
+          },
+          "EVENTS": {
+            "TITLE": "Events",
+            "DESCRIPTION": "Events that happen within Zitadel. This could be anything like a user creating an account, a successful login etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Functions",
+            "DESCRIPTION": "Functions that you can call within Zitadel. This could be anything from sending an email to creating a user."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Choose whether this action applies to all request, a specific service (ec. user management), or a single request (e.g. create user).",
+          "ALL": {
+            "TITLE": "All",
+            "DESCRIPTION": "Select this if you want to run your action on every request"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Select Service",
+            "DESCRIPTION": "Choose a Zitadel Service for you action."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Select Method",
+            "DESCRIPTION": "If you want to only execute on a specific request, select it here",
+            "NOTE": "If you don't select a method, your action will run on every request in your selected service."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Function Name",
+            "DESCRIPTION": "Choose the function you want to execute"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Set Group",
+            "DESCRIPTION": "If you want to only execute on a group of events, set the group here"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Select Event",
+            "DESCRIPTION": "If you want to only execute on a specific event, specify it here"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "You can choose to execute a target, or to run it on the same conditions as other targets.",
+          "TARGET": {
+            "DESCRIPTION": "The target you want to execute for this action"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Execution Conditions"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condition",
+        "TYPE": "Type",
+        "TARGET": "Target",
+        "CREATIONDATE": "Creation Date"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Targets",
+      "DESCRIPTION": "A target is the destination of the code you want to execute from an action. Create a target here and at it to your actions.",
+      "CREATE": {
+        "TITLE": "Create your Target",
+        "DESCRIPTION": "Create your own target outside of Zitadel",
+        "NAME": "Name",
+        "NAME_DESCRIPTION": "Give your target a clear, descriptive name to make it easy to identify later",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Call",
+          "restAsync": "REST Async"
+        },
+        "ENDPOINT": "Endpoint",
+        "ENDPOINT_DESCRIPTION": "Enter the endpoint where your code is hosted. Make sure it is accessible to us!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Set the maximum time your target has to respond. If it takes longer, we will stop the request.",
+        "INTERRUPT_ON_ERROR": "Interrupt on Error",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop all executions when the targets returns with an error",
+        "INTERRUPT_ON_ERROR_WARNING": "Caution: “Interrupt on Error” halts operations on failure, risking lockout. Test with it disabled to prevent blocking login/creation.",
+        "AWAIT_RESPONSE": "Await Response",
+        "AWAIT_RESPONSE_DESCRIPTION": "We'll Wait for a response before we do anything else. Useful if you intend to use multiple targets for a single action"
+      },
+      "TABLE": {
+        "NAME": "Name",
+        "ENDPOINT": "Endpoint",
+        "CREATIONDATE": "Creation Date"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Has control over the whole instance, including all organizations",
     "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
@@ -509,6 +643,7 @@
     "IAM_USER_MANAGER": "Has permission to create and manage users",
     "IAM_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from all organizations",
     "IAM_END_USER_IMPERSONATOR": "Has permission to impersonate end users from all organizations",
+    "IAM_LOGIN_CLIENT": "Has permission to manage login clients",
     "ORG_OWNER": "Has permission over the whole organization",
     "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
     "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
@@ -1356,11 +1491,14 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "External links",
       "OIDC": "OIDC Token lifetime and expiration",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Security settings",
       "EVENTS": "Events",
       "FAILEDEVENTS": "Failed Events",
-      "VIEWS": "Views"
+      "VIEWS": "Views",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "General Information",
@@ -1370,7 +1508,8 @@
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
       "OTHER": "Other",
-      "STORAGE": "Storage"
+      "STORAGE": "Storage",
+      "ACTIONS": "Actions"
     }
   },
   "SETTING": {
@@ -1515,7 +1654,10 @@
       },
       "RESET": "Set all to inherit",
       "CONSOLEUSEV2USERAPI": "Use V2 Api in Console for User creation",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
+      "LOGINV2_BASEURI": "Base URI"
     },
     "DIALOG": {
       "RESET": {

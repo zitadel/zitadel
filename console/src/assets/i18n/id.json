@@ -173,6 +173,32 @@
           "DESCRIPTION": "Masa pakai token penyegaran yang menganggur adalah waktu maksimum token penyegaran tidak dapat digunakan."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Kelola Kunci Web OIDC Anda untuk menandatangani dan memvalidasi token dengan aman untuk instance ZITADEL Anda.",
+        "TABLE": {
+          "TITLE": "Kunci Web Aktif dan Mendatang",
+          "DESCRIPTION": "Kunci web Anda yang aktif dan akan datang. Mengaktifkan kunci baru akan menonaktifkan kunci yang sedang digunakan.",
+          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan klien.",
+          "ACTIVATE": "Aktifkan Kunci Web Berikutnya",
+          "ACTIVE": "Saat ini aktif",
+          "NEXT": "Berikutnya dalam antrean",
+          "FUTURE": "Mendatang",
+          "WARNING": "Kunci Web berusia kurang dari 5 menit"
+        },
+        "CREATE": {
+          "TITLE": "Buat Kunci Web Baru",
+          "DESCRIPTION": "Membuat kunci web baru akan menambahkannya ke daftar Anda. ZITADEL secara default menggunakan kunci RSA2048 dengan fungsi hash SHA256.",
+          "KEY_TYPE": "Jenis Kunci",
+          "BITS": "Bit",
+          "HASHER": "Hasher",
+          "CURVE": "Kurva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Kunci Web Sebelumnya",
+          "DESCRIPTION": "Ini adalah kunci web sebelumnya yang tidak lagi aktif.",
+          "DEACTIVATED_ON": "Dinonaktifkan pada"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Teks Pesan",
         "DESCRIPTION": "Sesuaikan teks email notifikasi atau pesan SMS Anda. Jika Anda ingin menonaktifkan beberapa bahasa, batasi bahasa tersebut di pengaturan bahasa instance Anda.",
@@ -469,6 +495,114 @@
     "DOWNLOAD": "Unduh",
     "APPLY": "Menerapkan"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "Tindakan",
+      "DESCRIPTION": "Tindakan memungkinkan Anda menjalankan kode khusus sebagai respons terhadap permintaan API, peristiwa, atau fungsi tertentu. Gunakan ini untuk memperluas Zitadel, mengotomatiskan alur kerja, dan berintegrasi dengan sistem lain.",
+      "TYPES": {
+        "request": "Permintaan",
+        "response": "Respons",
+        "events": "Peristiwa",
+        "function": "Fungsi"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Buat Tindakan",
+        "UPDATE_TITLE": "Perbarui Tindakan",
+        "TYPE": {
+          "DESCRIPTION": "Pilih kapan Anda ingin Tindakan ini dijalankan",
+          "REQUEST": {
+            "TITLE": "Permintaan",
+            "DESCRIPTION": "Permintaan yang terjadi di dalam Zitadel. Ini bisa berupa sesuatu seperti panggilan permintaan login."
+          },
+          "RESPONSE": {
+            "TITLE": "Respons",
+            "DESCRIPTION": "Respons dari permintaan di dalam Zitadel. Pikirkan respons yang Anda dapatkan kembali dari pengambilan pengguna."
+          },
+          "EVENTS": {
+            "TITLE": "Peristiwa",
+            "DESCRIPTION": "Peristiwa yang terjadi di dalam Zitadel. Ini bisa berupa apa saja seperti pengguna membuat akun, login berhasil, dll."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Fungsi",
+            "DESCRIPTION": "Fungsi yang dapat Anda panggil di dalam Zitadel. Ini bisa berupa apa saja mulai dari mengirim email hingga membuat pengguna."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Pilih apakah tindakan ini berlaku untuk semua permintaan, layanan tertentu (mis. manajemen pengguna), atau permintaan tunggal (mis. buat pengguna).",
+          "ALL": {
+            "TITLE": "Semua",
+            "DESCRIPTION": "Pilih ini jika Anda ingin menjalankan tindakan Anda pada setiap permintaan"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "Pilih Layanan",
+            "DESCRIPTION": "Pilih Layanan Zitadel untuk tindakan Anda."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Pilih Metode",
+            "DESCRIPTION": "Jika Anda hanya ingin menjalankan pada permintaan tertentu, pilih di sini",
+            "NOTE": "Jika Anda tidak memilih metode, tindakan Anda akan berjalan pada setiap permintaan di layanan yang Anda pilih."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nama Fungsi",
+            "DESCRIPTION": "Pilih fungsi yang ingin Anda jalankan"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Tetapkan Grup",
+            "DESCRIPTION": "Jika Anda hanya ingin menjalankan pada grup peristiwa, tetapkan grup di sini"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Pilih Peristiwa",
+            "DESCRIPTION": "Jika Anda hanya ingin menjalankan pada peristiwa tertentu, tentukan di sini"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Anda dapat memilih untuk menjalankan target, atau menjalankannya dengan kondisi yang sama dengan target lain.",
+          "TARGET": {
+            "DESCRIPTION": "Target yang ingin Anda jalankan untuk tindakan ini"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Kondisi Eksekusi"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Kondisi",
+        "TYPE": "Jenis",
+        "TARGET": "Target",
+        "CREATIONDATE": "Tanggal Pembuatan"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Target",
+      "DESCRIPTION": "Target adalah tujuan kode yang ingin Anda jalankan dari tindakan. Buat target di sini dan tambahkan ke tindakan Anda.",
+      "CREATE": {
+        "TITLE": "Buat Target Anda",
+        "DESCRIPTION": "Buat target Anda sendiri di luar Zitadel",
+        "NAME": "Nama",
+        "NAME_DESCRIPTION": "Beri target Anda nama yang jelas dan deskriptif agar mudah diidentifikasi nanti",
+        "TYPE": "Jenis",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Panggilan REST",
+          "restAsync": "REST Asinkron"
+        },
+        "ENDPOINT": "Titik Akhir",
+        "ENDPOINT_DESCRIPTION": "Masukkan titik akhir tempat kode Anda dihosting. Pastikan dapat diakses oleh kami!",
+        "TIMEOUT": "Batas Waktu",
+        "TIMEOUT_DESCRIPTION": "Tetapkan waktu maksimum target Anda untuk merespons. Jika membutuhkan waktu lebih lama, kami akan menghentikan permintaan.",
+        "INTERRUPT_ON_ERROR": "Interupsi jika Terjadi Kesalahan",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Hentikan semua eksekusi saat target mengembalikan kesalahan",
+        "INTERRUPT_ON_ERROR_WARNING": "Perhatian: \"Interupsi jika Terjadi Kesalahan\" akan menghentikan operasi jika terjadi kegagalan, berisiko mengunci akses. Uji dengan opsi ini dinonaktifkan untuk mencegah pemblokiran login/pembuatan.",
+        "AWAIT_RESPONSE": "Tunggu Respons",
+        "AWAIT_RESPONSE_DESCRIPTION": "Kami akan menunggu respons sebelum melakukan hal lain. Berguna jika Anda berniat menggunakan beberapa target untuk satu tindakan"
+      },
+      "TABLE": {
+        "NAME": "Nama",
+        "ENDPOINT": "Titik Akhir",
+        "CREATIONDATE": "Tanggal Pembuatan"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Memiliki kendali atas seluruh instansi, termasuk semua organisasi",
     "IAM_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh instansi, termasuk semua organisasi",
@@ -476,6 +610,7 @@
     "IAM_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna",
     "IAM_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari semua organisasi",
     "IAM_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari semua organisasi",
+    "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola klien masuk",
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
@@ -1234,6 +1369,7 @@
       "BRANDING": "merek",
       "PRIVACYPOLICY": "Tautan eksternal",
       "OIDC": "Masa berlaku dan masa berlaku Token OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Pembuat Rahasia",
       "SECURITY": "Pengaturan keamanan",
       "EVENTS": "Acara",
@@ -1382,7 +1518,10 @@
       },
       "RESET": "Tetapkan semua untuk diwarisi",
       "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol untuk pembuatan pengguna",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
+      "LOGINV2_BASEURI": "URI dasar"
     },
     "DIALOG": {
       "RESET": {

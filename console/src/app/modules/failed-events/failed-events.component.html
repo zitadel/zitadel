@@ -2,7 +2,7 @@
 <p class="failed-events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IAM_FAILED_EVENTS.DESCRIPTION' | translate }}</p>
 
 <div class="table-wrapper">
-  <cnsl-refresh-table (refreshed)="loadEvents()" [dataSize]="eventDataSource.data.length" [loading]="loading$ | async">
+  <cnsl-refresh-table (refreshed)="loadEvents()" [loading]="loading$ | async">
     <table [dataSource]="eventDataSource" mat-table class="table" aria-label="Elements">
       <ng-container matColumnDef="viewName">
         <th mat-header-cell *matHeaderCellDef>{{ 'IAM.FAILEDEVENTS.VIEWNAME' | translate }}</th>

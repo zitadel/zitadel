@@ -3,7 +3,6 @@ package dialect
 import (
 	"database/sql"
 	"sync"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -22,8 +21,16 @@ var (
 
 type Matcher interface {
 	MatchName(string) bool
-	Decode([]interface{}) (Connector, error)
+	Decode([]any) (Connector, error)
+	Type() DatabaseType
 }
+
+type DatabaseType uint8
+
+const (
+	DatabaseTypePostgres DatabaseType = iota
+	DatabaseTypeCockroach
+)
 
 const (
 	DefaultAppName = "zitadel"
@@ -38,8 +45,7 @@ type Connector interface {
 type Database interface {
 	DatabaseName() string
 	Username() string
-	Type() string
-	Timetravel(time.Duration) string
+	Type() DatabaseType
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {

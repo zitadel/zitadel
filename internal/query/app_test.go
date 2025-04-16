@@ -1,7 +1,6 @@
 package query
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -111,20 +110,17 @@ var (
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`)
 	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps7_api_configs.client_id,` +
 		` projections.apps7_oidc_configs.client_id` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
-		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id`)
 	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps7.project_id` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects4.id,` +
 		` projections.projects4.creation_date,` +
 		` projections.projects4.change_date,` +
@@ -140,8 +136,7 @@ var (
 		` JOIN projections.apps7 ON projections.projects4.id = projections.apps7.project_id AND projections.projects4.instance_id = projections.apps7.instance_id` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`)
 
 	appCols = database.TextArray[string]{
 		"id",
@@ -1228,7 +1223,7 @@ func Test_AppsPrepare(t *testing.T) {
 			if tt.name == "prepareAppsQuery oidc app" {
 				_ = tt.name
 			}
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -1246,8 +1241,8 @@ func Test_AppPrepare(t *testing.T) {
 	}{
 		{
 			name: "prepareAppQuery no result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueriesScanErr(
@@ -1266,8 +1261,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery found",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -1330,8 +1325,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery api app",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1400,8 +1395,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1489,8 +1484,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app active only",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, true)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(true)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1578,8 +1573,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery saml app",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1651,8 +1646,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app IsDevMode inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1740,8 +1735,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertAccessTokenRole inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1829,8 +1824,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertIDTokenRole inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1918,8 +1913,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertIDTokenUserinfo inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -2007,8 +2002,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery sql err",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -2027,7 +2022,7 @@ func Test_AppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -2113,7 +2108,7 @@ func Test_AppIDsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -2179,7 +2174,7 @@ func Test_ProjectIDByAppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -2377,7 +2372,7 @@ func Test_ProjectByAppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

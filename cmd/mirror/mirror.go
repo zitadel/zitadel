@@ -56,7 +56,6 @@ Order of execution:
 			copyEventstore(cmd.Context(), config)
 
 			projections(cmd.Context(), projectionConfig, masterKey)
-			verifyMigration(cmd.Context(), config)
 		},
 	}
 
