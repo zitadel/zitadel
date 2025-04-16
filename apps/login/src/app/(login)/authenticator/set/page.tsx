@@ -157,17 +157,20 @@ export default async function Page(props: {
           ></ChooseAuthenticatorToSetup>
         )}
 
-        <div className="py-3 flex flex-col">
-          <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
-        </div>
-
         {loginSettings?.allowExternalIdp && identityProviders && (
-          <SignInWithIdp
-            identityProviders={identityProviders}
-            requestId={requestId}
-            organization={sessionWithData.factors?.user?.organizationId}
-            linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
-          ></SignInWithIdp>
+          <>
+            {identityProviders.length && (
+              <div className="py-3 flex flex-col">
+                <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
+              </div>
+            )}
+            <SignInWithIdp
+              identityProviders={identityProviders}
+              requestId={requestId}
+              organization={sessionWithData.factors?.user?.organizationId}
+              linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
+            ></SignInWithIdp>
+          </>
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">
