@@ -28,6 +28,7 @@
     "@docusaurus/theme-search-algolia": "3.4.0",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
+    "@inkeep/cxkit-docusaurus": "^0.5.64",
     "@mdx-js/react": "^3.0.0",
     "@swc/core": "^1.3.74",
     "autoprefixer": "^10.4.13",
