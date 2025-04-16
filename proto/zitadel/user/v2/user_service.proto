@@ -3380,7 +3380,7 @@ message ListKeysRequest {
     }
   ];
   // Define the criteria to query for.
-  repeated KeySearchFilter filters = 3;
+  repeated KeysSearchFilter filters = 3;
 }
 
 message ListKeysResponse {
@@ -3458,7 +3458,7 @@ message ListPersonalAccessTokensRequest {
     }
   ];
   // Define the criteria to query for.
-  repeated PersonalAccessTokenSearchFilter filters = 3;
+  repeated PersonalAccessTokensSearchFilter filters = 3;
 }
 
 message ListPersonalAccessTokensResponse {
