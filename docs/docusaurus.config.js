@@ -379,6 +379,46 @@ module.exports = {
         },
       };
     },
+    ["@inkeep/cxkit-docusaurus", {
+      SearchBar: {
+        baseSettings: {
+          apiKey: "9dd3ec7b3a74b43b15a0f61cfc44f3883bd01c41f5823bea",
+          primaryBrandColor: "#26D6FF",
+          organizationDisplayName: "Inkeep",
+          // ...optional settings
+          theme: {
+            // optional path to a custom stylesheet
+            styles: [
+              {
+                key: "main",
+                type: "link",
+                value: "/path/to/stylesheets",
+              },
+            ],
+            syntaxHighlighter: {
+              lightTheme: lightCodeTheme, // optional -- pass in the Prism theme you're using
+              darkTheme: darkCodeTheme, // optional -- pass in the Prism theme you're using
+            },
+          }
+        },
+        modalSettings: {
+          // optional settings
+        },
+        searchSettings: {
+          // optional settings
+        },
+        aiChatSettings: {
+          // optional settings
+          aiAssistantAvatar: "/img/logo.svg", // optional -- use your own ai assistant avatar
+          exampleQuestions: [
+            "Example question 1?",
+            "Example question 2?",
+            "Example question 3?",
+          ],
+        },
+      }
+    }
+  ],
   ],
   themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
 };
