@@ -19,6 +19,7 @@ import "zitadel/user/v2/idp.proto";
 import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
 import "zitadel/user/v2/query.proto";
+import "zitadel/filter/v2/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
@@ -1738,7 +1739,7 @@ service UserService {
   //   - user.read
   rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
     option (google.api.http) = {
-      post: "/v2/users/keys/search"
+      post: "/v2/users/keys/_search"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1840,7 +1841,7 @@ service UserService {
   //   - user.read
   rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
     option (google.api.http) = {
-      post: "/v2/users/pats/search"
+      post: "/v2/users/pats/_search"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -3367,6 +3368,24 @@ message RemoveKeyResponse {
   ];
 }
 
+message ListKeysRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional KeyFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"KEY_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated KeySearchFilter filters = 3;
+}
+
+message ListKeysResponse {
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated Key keys = 2;
+}
+
 message AddPersonalAccessTokenRequest {
   // The users resource ID.
   string user_id = 1 [
@@ -3424,4 +3443,23 @@ message RemovePersonalAccessTokenResponse {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
+}
+
+
+message ListPersonalAccessTokensRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional PersonalAccessTokenFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated PersonalAccessTokenSearchFilter filters = 3;
+}
+
+message ListPersonalAccessTokensResponse {
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated PersonalAccessToken personal_access_tokens = 2;
 }
