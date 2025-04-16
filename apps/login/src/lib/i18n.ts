@@ -28,6 +28,10 @@ export const LANGS: Lang[] = [
     name: "简体中文",
     code: "zh",
   },
+  {
+    name: "Русский",
+    code: "ru",
+  },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
