@@ -126,9 +126,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserService {
 
-  // CreateUser
+  // Create a User
   //
-  // CreateUser creates a new human or machine user in the specified organization.
+  // Create a new human or machine user in the specified organization.
   //
   // Required permission:
   //   - user.write
@@ -535,10 +535,10 @@ service UserService {
   }
 
 
-  // UpdateUser
+  // Update a User
   //
-  // UpdateUser allows to partially update an existing user.
-  // If you change the users email, phone, you can specify how the ownership should be verified.
+  // Partially update an existing user.
+  // If you change the users email or phone, you can specify how the ownership should be verified.
   // If you change the users password, you can specify if the password should be changed again on the users next login.
   //
   // Required permission:
@@ -587,7 +587,7 @@ service UserService {
     };
   }
 
-  // Update User
+  // Update Human User
   //
   // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type human instead.
   //
@@ -1595,9 +1595,9 @@ service UserService {
     };
   }
 
-  // AddSecret
+  // Add a Users Secret
   //
-  // AddSecret generates a client secret for the user.
+  // Generates a client secret for the user.
   // The client id is the users username.
   // If the user already has a secret, it is overwritten.
   // Only users of type machine can have a secret.
@@ -1637,9 +1637,9 @@ service UserService {
     };
   }
 
-  // RemoveSecret
+  // Remove a Users Secret
   //
-  // RemoveSecret removes the current client ID and client secret from a machine user.
+  // Remove the current client ID and client secret from a machine user.
   //
   // Required permission:
   //   - user.write
@@ -1664,9 +1664,9 @@ service UserService {
     };
   }
 
-  // AddKey
+  // Add a Key
   //
-  // Keys can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
+  // Add a keys that can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
   // Make sure you store the returned key safely, as you won't be able to read it from the Zitadel API anymore.
   // Only users of type machine can have keys.
   //
@@ -1705,7 +1705,7 @@ service UserService {
     };
   }
 
-  // RemoveKey
+  // Remove a Key
   //
   // Remove a machine users key by the given key ID and an optionally given user ID.
   //
@@ -1732,7 +1732,7 @@ service UserService {
     };
   }
 
-  // ListKeys
+  // Search Keys
   //
   // List all matching machine user keys. By default all machine user keys of the instance on which the caller has permission to read the owning users are returned.
   // Make sure to include a limit and sorting for pagination.
@@ -1742,6 +1742,7 @@ service UserService {
   rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
     option (google.api.http) = {
       post: "/v2/users/keys/_search"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1766,7 +1767,7 @@ service UserService {
     };
   }
 
-  // AddPersonalAccessToken
+  // Add a Personal Access Token
   //
   // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
   // Make sure you store the returned PAT safely, as you won't be able to read it from the Zitadel API anymore.
@@ -1807,7 +1808,7 @@ service UserService {
     };
   }
 
-  // RemovePersonalAccessToken
+  // Remove a Personal Access Token
   //
   // Removes a machine users personal access token by the given token ID and an optionally given user ID.
   //
@@ -1834,7 +1835,7 @@ service UserService {
     };
   }
 
-  // ListPersonalAccessTokens
+  // Search Personal Access Tokens
   //
   // List all personal access tokens. By default all personal access tokens of the instance on which the caller has permission to read the owning users are returned.
   // Make sure to include a limit and sorting for pagination.
@@ -1844,6 +1845,7 @@ service UserService {
   rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
     option (google.api.http) = {
       post: "/v2/users/pats/_search"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -2029,6 +2031,9 @@ message CreateUserRequest{
     // You can change the users token type to JWT by using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
     Machine machine = 11;
   }
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"organizationId\":\"69629026806489455\",\"userId\":\"163840776835432345\",\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"nickName\":\"Mini\",\"displayName\":\"Minnie Mouse\",\"preferredLanguage\":\"en\",\"gender\":\"GENDER_FEMALE\"},\"email\":{\"email\":\"mini@mouse.com\",\"sendCode\":{\"urlTemplate\":\"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"idpLinks\":[{\"idpId\":\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\",\"userId\":\"6516849804890468048461403518\",\"userName\":\"user@external.com\"}],\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
+  };
 }
 
 message CreateUserResponse {
@@ -2428,6 +2433,9 @@ message UpdateUserRequest{
     Human human = 10;
     Machine machine = 11;
   }
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"displayName\":\"Minnie Mouse\"},\"email\":{\"email\":\"mini@mouse.com\",\"returnCode\":{}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"verificationCode\":\"SKJd342k\"},\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
+  };
 }
 
 message UpdateUserResponse {
@@ -3381,6 +3389,9 @@ message ListKeysRequest {
   ];
   // Define the criteria to query for.
   repeated KeysSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":10,\"asc\":false},\"sortingColumn\":\"KEY_FIELD_NAME_CREATED_DATE\",\"filters\":[{\"andFilter\":{\"filters\":[{\"organizationIdFilter\":{\"organizationId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"notFilter\":{\"filter\":{\"userIdFilter\":{\"userId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}}},{\"orFilter\":{\"filters\":[{\"keyIdFilter\":{\"keyId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"keyIdFilter\":{\"keyId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}]}}]}}]}";
+  };
 }
 
 message ListKeysResponse {
@@ -3459,6 +3470,9 @@ message ListPersonalAccessTokensRequest {
   ];
   // Define the criteria to query for.
   repeated PersonalAccessTokensSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":10,\"asc\":false},\"sortingColumn\":\"PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATED_DATE\",\"filters\":[{\"andFilter\":{\"filters\":[{\"organizationIdFilter\":{\"organizationId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"notFilter\":{\"filter\":{\"userIdFilter\":{\"userId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}}},{\"orFilter\":{\"filters\":[{\"personalAccessTokenIdFilter\":{\"personalAccessTokenId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"personalAccessTokenIdFilter\":{\"personalAccessTokenId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}]}}]}}]}";
+  };
 }
 
 message ListPersonalAccessTokensResponse {

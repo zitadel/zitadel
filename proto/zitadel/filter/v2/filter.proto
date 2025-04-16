@@ -32,28 +32,40 @@ enum TimestampFilterMethod {
 
 message PaginationRequest {
   // Starting point for retrieval, in combination of offset used to query a set list of objects.
-  uint64 offset = 1;
+  uint64 offset = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "0";
+    }
+  ];
   // limit is the maximum amount of objects returned. The default is set to 100
   // with a maximum of 1000 in the runtime configuration.
   // If the limit exceeds the maximum configured ZITADEL will throw an error.
   // If no limit is present the default is taken.
-  uint32 limit = 2;
+  uint32 limit = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "10";
+    }
+  ];
   // Asc is the sorting order. If true the list is sorted ascending, if false
   // the list is sorted descending. The default is descending.
-  bool asc = 3;
+  bool asc = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "false";
+    }
+  ];
 }
 
 message PaginationResponse {
   // Absolute number of objects matching the query, regardless of applied limit.
   uint64 total_result = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"100\"";
+      example: "100";
     }
   ];
   // Applied limit from query, defines maximum amount of objects per request, to compare if all objects are returned.
   uint64 applied_limit = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"100\"";
+      example: "100";
     }
   ];
 }

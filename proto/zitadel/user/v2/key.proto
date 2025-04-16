@@ -8,6 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "zitadel/user/v2/filter.proto";
+import "zitadel/filter/v2/filter.proto";
 
 message Key {
   // The unique identifier of the key.
@@ -65,7 +66,27 @@ message KeysSearchFilter {
     KeysAndFilter and_filter = 2;
     KeysNotFilter not_filter = 3;
 
-    UserIDFilter user_id_filter = 4;
-    OrganizationIDFilter organization_id_filter = 5;
+    OrganizationIDFilter organization_id_filter = 4;
+    UserIDFilter user_id_filter = 5;
+
+    KeyIDFilter key_id_filter = 6;
   }
+}
+
+message KeyIDFilter {
+  // Only return the resource that belong to this key id.
+  string key_id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"123\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
 }
