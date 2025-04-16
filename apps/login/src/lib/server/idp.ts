@@ -6,10 +6,44 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
+
+export type RedirectToIdpState = { error?: string | null } | undefined;
+
+export async function redirectToIdp(
+  prevState: RedirectToIdpState,
+  formData: FormData,
+): Promise<RedirectToIdpState> {
+  const params = new URLSearchParams();
+
+  const linkOnly = formData.get("linkOnly") === "true";
+  const requestId = formData.get("requestId") as string;
+  const organization = formData.get("organization") as string;
+  const idpId = formData.get("id") as string;
+  const provider = formData.get("provider") as string;
+
+  if (linkOnly) params.set("link", "true");
+  if (requestId) params.set("requestId", requestId);
+  if (organization) params.set("organization", organization);
+
+  const response = await startIDPFlow({
+    idpId,
+    successUrl: `/idp/${provider}/success?` + params.toString(),
+    failureUrl: `/idp/${provider}/failure?` + params.toString(),
+  });
+
+  if (response && "error" in response && response?.error) {
+    return { error: response.error };
+  }
+
+  if (response && "redirect" in response && response?.redirect) {
+    redirect(response.redirect);
+  }
+}
 
 export type StartIDPFlowCommand = {
   idpId: string;

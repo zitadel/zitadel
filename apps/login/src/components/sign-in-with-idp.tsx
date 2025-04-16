@@ -1,13 +1,12 @@
 "use client";
 
 import { idpTypeToSlug } from "@/lib/idp";
-import { startIDPFlow } from "@/lib/server/idp";
+import { redirectToIdp } from "@/lib/server/idp";
 import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useRouter } from "next/navigation";
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode, useActionState } from "react";
 import { Alert } from "./alert";
 import { SignInWithIdentityProviderProps } from "./idps/base-button";
 import { SignInWithApple } from "./idps/sign-in-with-apple";
@@ -31,45 +30,10 @@ export function SignInWithIdp({
   organization,
   linkOnly,
 }: Readonly<SignInWithIDPProps>) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [state, action, _isPending] = useActionState(redirectToIdp, {});
 
-  const startFlow = useCallback(
-    async (idpId: string, provider: string) => {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (linkOnly) params.set("link", "true");
-      if (requestId) params.set("requestId", requestId);
-      if (organization) params.set("organization", organization);
-
-      try {
-        const response = await startIDPFlow({
-          idpId,
-          successUrl: `/idp/${provider}/success?` + params.toString(),
-          failureUrl: `/idp/${provider}/failure?` + params.toString(),
-        });
-
-        if (response && "error" in response && response?.error) {
-          setError(response.error);
-          return;
-        }
-
-        if (response && "redirect" in response && response?.redirect) {
-          return router.push(response.redirect);
-        }
-      } catch {
-        setError("Could not start IDP flow");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [requestId, organization, linkOnly, router],
-  );
-
-  const renderIDPButton = (idp: IdentityProvider) => {
+  const renderIDPButton = (idp: IdentityProvider, index: number) => {
     const { id, name, type } = idp;
-    const onClick = () => startFlow(id, idpTypeToSlug(type));
 
     const components: Partial<
       Record<
@@ -93,16 +57,27 @@ export function SignInWithIdp({
 
     const Component = components[type];
     return Component ? (
-      <Component key={id} name={name} onClick={onClick} />
+      <form action={action} className="flex" key={`idp-${index}`}>
+        <input type="hidden" name="id" value={id} />
+        <input type="hidden" name="provider" value={idpTypeToSlug(type)} />
+        <input type="hidden" name="requestId" value={requestId} />
+        <input type="hidden" name="organization" value={organization} />
+        <input
+          type="hidden"
+          name="linkOnly"
+          value={linkOnly ? "true" : "false"}
+        />
+        <Component key={id} name={name} />
+      </form>
     ) : null;
   };
 
   return (
     <div className="flex flex-col w-full space-y-2 text-sm">
       {identityProviders?.map(renderIDPButton)}
-      {error && (
+      {state?.error && (
         <div className="py-4">
-          <Alert>{error}</Alert>
+          <Alert>{state?.error}</Alert>
         </div>
       )}
     </div>
