@@ -247,7 +247,7 @@ service ProjectService {
   //   - `project.read`
   rpc ListProjects (ListProjectsRequest) returns (ListProjectsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/_search",
+      post: "/v2beta/projects/search",
       body: "*"
     };
 
@@ -282,7 +282,7 @@ service ProjectService {
   //   - `project.write`
   rpc DeactivateProject (DeactivateProjectRequest) returns (DeactivateProjectResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/{id}/_deactivate"
+      post: "/v2beta/projects/{id}/deactivate"
       body: "*"
     };
 
@@ -316,7 +316,7 @@ service ProjectService {
   //   - `project.write`
   rpc ActivateProject (ActivateProjectRequest) returns (ActivateProjectResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/{id}/_activate"
+      post: "/v2beta/projects/{id}/activate"
       body: "*"
     };
 
@@ -451,7 +451,7 @@ service ProjectService {
   //   - `project.role.read`
   rpc ListProjectRoles (ListProjectRolesRequest) returns (ListProjectRolesResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/projects/{project_id}/roles/_search"
+      delete: "/v2beta/projects/{project_id}/roles/search"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -485,7 +485,7 @@ service ProjectService {
   //   - `project.grant.create`
   rpc CreateProjectGrant (CreateProjectGrantRequest) returns (CreateProjectGrantResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/{project_id}/grants"
+      post: "/v2beta/projects/{project_id}/grants/{granted_organization_id}"
       body: "*"
     };
 
@@ -520,7 +520,7 @@ service ProjectService {
   //   - `project.grant.write`
   rpc UpdateProjectGrant (UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/grants/{id}"
+      post: "/v2beta/projects/{project_id}/grants/{granted_organization_id}"
       body: "*"
     };
 
@@ -579,12 +579,13 @@ service ProjectService {
   // Deactivate Project Grant
   //
   // Set the state of the project grant to deactivated.
+  // Applications under deactivated projects grants are not able to login anymore.
   //
   // Required permission:
   //   - `project.grant.write`
   rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/grants/{id}/_deactivate"
+      post: "/v2beta/projects/grants/{id}/deactivate"
       body: "*"
     };
 
@@ -612,7 +613,7 @@ service ProjectService {
   //   - `project.grant.write`
   rpc ActivateProjectGrant(ActivateProjectGrantRequest) returns (ActivateProjectGrantResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/grants/{id}/_activate"
+      post: "/v2beta/projects/grants/{id}/activate"
       body: "*"
     };
 
@@ -641,7 +642,7 @@ service ProjectService {
   //   - `project.grant.write`
   rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/grants/_search"
+      post: "/v2beta/projects/grants/search"
       body: "*"
     };
 
@@ -699,10 +700,10 @@ message CreateProjectRequest {
   ];
   // Enable this setting to have role information included in the user info endpoint. It is also dependent on your application settings to include it in tokens and other types.
   bool project_role_assertion = 4;
-  // When enabled ZITADEL will check if a user has a role of this project assigned when login into an application of this project.
-  bool project_role_check = 5;
-  // When enabled ZITADEL will check if the organization of the user, that is trying to log in, has a grant to this project.
-  bool has_project_check = 6;
+  // When enabled ZITADEL will check if a user has an authorization to use this project assigned when login into an application of this project.
+  bool authorization_required = 5;
+  // When enabled ZITADEL will check if the organization of the user, that is trying to log in, has access to this project (either owns the project or is granted).
+  bool project_access_required = 6;
   // Define which private labeling/branding should trigger when getting to a login of this project.
   PrivateLabelingSetting private_labeling_setting = 7 [
     (validate.rules).enum = {defined_only: true}
@@ -816,7 +817,7 @@ message ListProjectsRequest {
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional ProjectFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      default: "\"TARGET_FIELD_NAME_CREATION_DATE\""
+      default: "\"PROJECT_FIELD_NAME_CREATION_DATE\""
     }
   ];
   // Define the criteria to query for.
@@ -1036,15 +1037,6 @@ message ListProjectRolesResponse {
 
 
 message CreateProjectGrantRequest {
-  // The unique identifier of the project grant.
-  optional string id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"69629026806489455\"";
-    }
-  ];
   // ID of the project.
   string project_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1089,16 +1081,6 @@ message CreateProjectGrantResponse {
 }
 
 message UpdateProjectGrantRequest {
-  // The unique identifier of the project grant.
-  string id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"69629026806489455\"";
-    }
-  ];
   // ID of the project.
   string project_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
