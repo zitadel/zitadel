@@ -7,8 +7,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
-message Key {
-  // The unique identifier of the key.
+message PersonalAccessToken {
+  // The unique identifier of the personal access token.
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
@@ -20,7 +20,7 @@ message Key {
       example: "\"69629012906488334\"";
     }
   ];
-  // The timestamp of the key creation.
+  // The timestamp of the personal access token creation.
   google.protobuf.Timestamp creation_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";

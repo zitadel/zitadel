@@ -19,6 +19,7 @@ import "zitadel/user/v2/idp.proto";
 import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
 import "zitadel/user/v2/key.proto";
+import "zitadel/user/v2/pat.proto";
 import "zitadel/user/v2/query.proto";
 import "zitadel/filter/v2/filter.proto";
 
@@ -3375,7 +3376,7 @@ message ListKeysRequest {
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional KeyFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      default: "\"KEY_FIELD_NAME_CREATION_DATE\""
+      default: "\"KEY_FIELD_NAME_CREATED_DATE\""
     }
   ];
   // Define the criteria to query for.
@@ -3453,7 +3454,7 @@ message ListPersonalAccessTokensRequest {
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional PersonalAccessTokenFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      default: "\"PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATION_DATE\""
+      default: "\"PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATED_DATE\""
     }
   ];
   // Define the criteria to query for.
