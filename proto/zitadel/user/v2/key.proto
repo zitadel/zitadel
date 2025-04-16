@@ -1,0 +1,28 @@
+
+message Key {
+  // The unique identifier of the project.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The unique identifier of the organization the project belongs to.
+  string organization_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the project creation.
+  google.protobuf.Timestamp creation_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the project (e.g. creation, activation, deactivation).
+  google.protobuf.Timestamp change_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+

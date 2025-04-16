@@ -18,6 +18,7 @@ import "zitadel/user/v2/phone.proto";
 import "zitadel/user/v2/idp.proto";
 import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
+import "zitadel/user/v2/key.proto";
 import "zitadel/user/v2/query.proto";
 import "zitadel/filter/v2/filter.proto";
 
