@@ -37,14 +37,25 @@ CREATE TABLE zitadel.security_policies (
 
 -- Security Generator
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+DROP TYPE IF EXISTS zitadel.secret_generator_types CASCADE;
+CREATE TYPE zitadel.secret_generator_types AS ENUM (
+  'INIT_CODE',
+  'VERIFY_EMAIL_CODE',
+  'VERIFY_PHONE_CODE',
+  'PASSWORD_RESET_CODE',
+  'PASSWORDLESS_INIT_CODE',
+  'APP_SECRET',
+  'OTP_SMS',
+  'OTP_EMAIL'
+);
+
 DROP TABLE IF EXISTS zitadel.secret_generators CASCADE;
 CREATE TABLE zitadel.secret_generators (
   id SERIAL NOT NULL PRIMARY KEY,
   -- TODO investigate if this will only ever be applied to instance
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- TODO: maybe make generator_type a enum
-  generator_type SMALLINT NOT NULL,
+  generator_type zitadel.secret_generator_types NOT NULL,
   length BIGINT NOT NULL,
   expiry BIGINT NOT NULL,
   include_lower_letters BOOLEAN NOT NULL,
@@ -74,9 +85,36 @@ CREATE TABLE zitadel.oidc_settings (
   deleted_at TIMESTAMP DEFAULT NULL
 );
 
--- TODO language table
 -- Languages
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS zitadel.languages CASCADE;
+CREATE TABLE zitadel.languages (
+  code VARCHAR(2) NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  
+  deleted_at TIMESTAMP DEFAULT NULL
+);
+INSERT INTO zitadel.languages (code, name)
+VALUES 
+  ('bg','bulgerian'),
+  ('cs','czechian'),
+  ('de','german'),
+  ('en','english'),
+  ('es','spanish'),
+  ('fr','french'),
+  ('hu','hungarian'),
+  ('id','indonesian'),
+  ('it','italian'),
+  ('ja','japanese'),
+  ('ko','korean'),
+  ('mk','macedonian'),
+  ('nl','dutch'),
+  ('pl','polish'),
+  ('pt','portuguese'),
+  ('ro','romanian'),
+  ('ru','russian'),
+  ('sv','swedish'),
+  ('zh','zhuang');
 
 -- Privacy Policy
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +124,7 @@ CREATE TABLE zitadel.privacy_policies (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- TODO what is state?
+  -- https://zitadel.slack.com/archives/C07SVSZU38X/p1744291107892309
   state SMALLINT NOT NULL,
   is_default BOOLEAN DEFAULT FALSE NOT NULL,
   privacy_link VARCHAR(200) NOT NULL,
@@ -96,8 +134,6 @@ CREATE TABLE zitadel.privacy_policies (
   docs_link VARCHAR(200) DEFAULT 'https://zitadel.com/docs'::text NOT NULL,
   custom_link VARCHAR(200) NOT NULL,
   custom_link_text VARCHAR(100) NOT NULL,
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -116,10 +152,9 @@ CREATE TABLE zitadel.custom_texts (
 
   is_default BOOLEAN NOT NULL,
   template VARCHAR(200) NOT NULL,
-  language VARCHAR(2) NOT NULL,
+  language VARCHAR(2) REFERENCES languages(code),
   key VARCHAR(30) NOT NULL,
   text VARCHAR(200) NOT NULL,
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
 
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
@@ -136,9 +171,8 @@ CREATE TABLE zitadel.message_text (
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
   -- TODO what is state?
   state SMALLINT NOT NULL,
-  -- TODO what is type?
   type text NOT NULL,
-  language VARCHAR(2) NOT NULL,
+  language VARCHAR(2) REFERENCES languages(code),
   title VARCHAR(100),
   pre_header VARCHAR(100),
   subject VARCHAR(100),
@@ -146,8 +180,6 @@ CREATE TABLE zitadel.message_text (
   text VARCHAR(100),
   button_text VARCHAR(100),
   footer_text VARCHAR(100),
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -162,14 +194,14 @@ CREATE TABLE zitadel.styling (
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
   label_policy_state SMALLINT DEFAULT (0)::SMALLINT NOT NULL,
-  primary_color VARCHAR(20),
-  background_color VARCHAR(20),
-  warn_color VARCHAR(20),
-  font_color VARCHAR(20),
-  primary_color_dark VARCHAR(20),
-  background_color_dark VARCHAR(20),
-  warn_color_dark VARCHAR(20),
-  font_color_dark VARCHAR(20),
+  primary_color TEXT,
+  background_color TEXT,
+  warn_color TEXT,
+  font_color TEXT,
+  primary_color_dark TEXT,
+  background_color_dark TEXT,
+  warn_color_dark TEXT,
+  font_color_dark TEXT,
   logo_url VARCHAR(200),
   icon_url VARCHAR(200),
   logo_dark_url VARCHAR(200),
@@ -178,8 +210,6 @@ CREATE TABLE zitadel.styling (
   err_msg_popup BOOLEAN,
   disable_watermark BOOLEAN,
   hide_login_name_suffix BOOLEAN,
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -198,8 +228,6 @@ CREATE TABLE zitadel.domain_policies (
   validate_org_domains BOOLEAN NOT NULL,
   smtp_sender_address_matches_instance_domain BOOLEAN NOT NULL,
   is_default BOOLEAN DEFAULT FALSE NOT NULL,
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -236,8 +264,6 @@ CREATE TABLE zitadel.password_age_policies (
   is_default BOOLEAN DEFAULT FALSE NOT NULL,
   expire_warn_days BIGINT NOT NULL,
   max_age_days BIGINT NOT NULL,
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -257,8 +283,6 @@ CREATE TABLE zitadel.password_complexity_policies (
   has_uppercase BOOLEAN NOT NULL,
   has_symbol BOOLEAN NOT NULL,
   has_number BOOLEAN NOT NULL,
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -267,7 +291,7 @@ CREATE TABLE zitadel.password_complexity_policies (
 -- idp
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 DROP TYPE IF EXISTS idp_type CASCADE;
-CREATE TYPE idp_type AS ENUM ('oauth2', 'oidc', 'jwt');
+CREATE TYPE idp_type AS ENUM ('oauth2', 'oidc', 'jwt', 'azure', 'github', 'gitlab', 'github_enterprise', 'gitlab_self_hosted', 'google', 'ldap', 'saml', 'apple');
 DROP TABLE IF EXISTS zitadel.idp_providers CASCADE;
 CREATE TABLE zitadel.idp_providers (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -336,7 +360,6 @@ CREATE TABLE zitadel.idp_google (
   CONSTRAINT idp_provider_id_fk FOREIGN KEY(idp_provider_id) REFERENCES idp_providers(id),
   client_id VARCHAR(100) NOT NULL,
   client_secret JSONB  NOT NULL,
-  -- TODO check if there's a better type for scopes than text[]
   scopes text[]
 );
 
@@ -347,7 +370,6 @@ CREATE TABLE zitadel.idp_gitlab_self_hosted (
   issuer VARCHAR(200) NOT NULL,
   client_id VARCHAR(100) NOT NULL,
   client_secret JSONB  NOT NULL,
-  -- TODO check if there's a better type for scopes than text[]
   scopes text[]
 );
 
@@ -428,7 +450,6 @@ CREATE TABLE zitadel.idp_oauth2 (
   user_endpoint VARCHAR(100)  NOT NULL,
   id_attribute VARCHAR(100) NOT NULL,
   use_pkce BOOLEAN DEFAULT FALSE NOT NULL,
-  -- TODO check if there's a better type for scopes than text[]
   scopes text[]
 );
 
@@ -441,8 +462,6 @@ CREATE TABLE zitadel.idps ( -- based on idp_templates6
   name VARCHAR(100) NOT NULL,
   owner_type SMALLINT NOT NULL,
   type SMALLINT NOT NULL,
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
   is_creation_allowed BOOLEAN DEFAULT FALSE NOT NULL,
   is_linking_allowed BOOLEAN DEFAULT FALSE NOT NULL,
   is_auto_creation BOOLEAN DEFAULT FALSE NOT NULL,
@@ -485,8 +504,6 @@ CREATE TABLE zitadel.login_policies (
   mfa_init_skip_lifetime BIGINT NOT NULL,
   second_factor_check_lifetime BIGINT NOT NULL,
   multi_factor_check_lifetime BIGINT NOT NULL,
-  -- TODO what is owner_removed?
-  owner_removed BOOLEAN DEFAULT FALSE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -560,19 +577,24 @@ CREATE TABLE zitadel.sms_twilio (
 
 -- notifications
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
--- i think notification_polices need to be reworked
--- CREATE TABLE projections.notification_policies (
---     id text NOT NULL,
---     creation_date timestamp with time zone NOT NULL,
---     change_date timestamp with time zone NOT NULL,
---     resource_owner text NOT NULL,
---     instance_id text NOT NULL,
---     sequence BIGINT NOT NULL,
---     state SMALLINT NOT NULL,
---     is_default BOOLEAN NOT NULL,
---     password_change BOOLEAN NOT NULL,
---     owner_removed BOOLEAN DEFAULT FALSE NOT NULL
--- );
+CREATE TYPE zitadel.notifications_types AS ENUM (
+  'PASSWORD_CHANGE'
+);
+
+DROP TABLE IF EXISTS zitadel.notification_policies CASCADE;
+CREATE TABLE zitadel.notification_policies (
+  id SERIAL NOT NULL PRIMARY KEY,
+  instance_id VARCHAR(100) NOT NULL,
+  CONSTRAINT instance_id_fk     FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
+  state SMALLINT NOT NULL,
+  is_default BOOLEAN NOT NULL,
+  -- NOTE: discuss if this should or shouldn't be an enum
+  notification_type notifications_types NOT NULL,
+  send_notification BOOLEAN NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP DEFAULT NULL
+);
 
 -- smtp config
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
