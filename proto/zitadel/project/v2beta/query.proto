@@ -162,7 +162,7 @@ message ProjectSearchFilter {
     InProjectIDsFilter in_project_ids_filter = 2;
     ProjectResourceOwnerFilter project_resource_owner_filter = 3;
     ProjectGrantResourceOwnerFilter project_grant_resource_owner_filter = 4;
-    ProjectOrganizationFilter project_organization_filter = 5;
+    ProjectOrganizationIDFilter project_organization_id_filter = 5;
   }
 }
 
@@ -214,9 +214,9 @@ message ProjectGrantResourceOwnerFilter {
   ];
 }
 
-message ProjectOrganizationFilter {
+message ProjectOrganizationIDFilter {
   // Defines the ID of organization the project and granted project belong to query for.
-  string project_grant_resource_owner = 1 [
+  string project_organization_id = 1 [
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
@@ -229,10 +229,11 @@ message ProjectGrantSearchFilter {
   oneof filter {
     option (validate.required) = true;
 
-    GrantProjectNameFilter project_name_filter = 1;
-    GrantRoleKeyFilter role_key_filter = 2;
+    ProjectNameFilter project_name_filter = 1;
+    ProjectRoleKeyFilter role_key_filter = 2;
     InProjectIDsFilter in_project_ids_filter = 3;
-    GrantedOrganizationIDFilter granted_organization_id_filter = 4;
+    ProjectResourceOwnerFilter project_resource_owner_filter = 4;
+    ProjectGrantResourceOwnerFilter project_grant_resource_owner_filter = 5;
   }
 }
 
@@ -243,34 +244,6 @@ message GrantedOrganizationIDFilter {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
     }
-  ];
-}
-
-message GrantRoleKeyFilter {
-  // Defines the role key of the project grant to query for.
-  string role_key = 1 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"role.super.man\""
-    }
-  ];
-  // Defines which text comparison method used for the key query.
-  zitadel.filter.v2beta.TextFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true
-  ];
-}
-
-message GrantProjectNameFilter {
-  // Defines the name of the project to query for.
-  string name = 1 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"ZITADEL\""
-    }
-  ];
-  // Defines which text comparison method used for the name query.
-  zitadel.filter.v2beta.TextFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true
   ];
 }
 
