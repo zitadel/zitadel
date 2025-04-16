@@ -14,15 +14,15 @@
       *ngSwitchCase="Page.Condition"
       [conditionType]="typeSignal()"
       (back)="back()"
-      (continue)="conditionSignal.set($event); continue()"
+      (continue)="conditionSignal.set({ conditionType: { case: typeSignal(), value: $event}}); continue()"
     ></cnsl-actions-two-add-action-condition>
 
     <cnsl-actions-two-add-action-target
       *ngSwitchCase="Page.Target"
       (back)="back()"
       [hideBackButton]="!!data.execution"
-      (continue)="targetSignal.set($event); continue()"
-      [selectedCondition]="data.execution?.condition"
+      (continue)="targetsSignal.set($event); continue()"
+      [preselectedTargetIds]="preselectedTargetIds"
     ></cnsl-actions-two-add-action-target>
   </div>
 </mat-dialog-content>

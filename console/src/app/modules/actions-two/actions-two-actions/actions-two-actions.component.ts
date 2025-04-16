@@ -1,19 +1,23 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
 import { ActionService } from 'src/app/services/action.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
-import { defer, firstValueFrom, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
-import { catchError, filter, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
+import { defer, firstValueFrom, lastValueFrom, Observable, of, shareReplay, Subject, TimeoutError } from 'rxjs';
+import { catchError, map, startWith, switchMap, timeout } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANIZATIONS } from '../../settings-list/settings';
-import { ActionTwoAddActionDialogComponent } from '../actions-two-add-action/actions-two-add-action-dialog.component';
+import {
+  ActionTwoAddActionDialogComponent,
+  ActionTwoAddActionDialogData,
+  ActionTwoAddActionDialogResult,
+  correctlyTypeExecution,
+} from '../actions-two-add-action/actions-two-add-action-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { Execution, ExecutionSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Execution } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
-import { Value } from 'google-protobuf/google/protobuf/struct_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -104,31 +108,35 @@ export class ActionsTwoActionsComponent implements OnInit {
     );
   }
 
-  public openDialog(execution?: Execution): void {
-    const ref = this.dialog.open<ActionTwoAddActionDialogComponent>(ActionTwoAddActionDialogComponent, {
-      width: '400px',
-      data: execution
-        ? {
-            execution: execution,
-          }
-        : {},
-    });
+  public async openDialog(execution?: Execution): Promise<void> {
+    const request$ = this.dialog
+      .open<ActionTwoAddActionDialogComponent, ActionTwoAddActionDialogData, ActionTwoAddActionDialogResult>(
+        ActionTwoAddActionDialogComponent,
+        {
+          width: '400px',
+          data: execution
+            ? {
+                execution: correctlyTypeExecution(execution),
+              }
+            : {},
+        },
+      )
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef));
 
-    ref.afterClosed().subscribe((request?: MessageInitShape<typeof SetExecutionRequestSchema>) => {
-      if (request) {
-        this.actionService
-          .setExecution(request)
-          .then(() => {
-            setTimeout(() => {
-              this.refresh.next(true);
-            }, 1000);
-          })
-          .catch((error) => {
-            console.error(error);
-            this.toast.showError(error);
-          });
-      }
-    });
+    const request = await lastValueFrom(request$);
+    if (!request) {
+      return;
+    }
+
+    try {
+      await this.actionService.setExecution(request);
+      await new Promise((res) => setTimeout(res, 1000));
+      this.refresh.next(true);
+    } catch (error) {
+      console.error(error);
+      this.toast.showError(error);
+    }
   }
 
   public async deleteExecution(execution: Execution) {
@@ -136,8 +144,13 @@ export class ActionsTwoActionsComponent implements OnInit {
       condition: execution.condition,
       targets: [],
     };
-    await this.actionService.setExecution(deleteReq);
-    await new Promise((res) => setTimeout(res, 1000));
-    this.refresh.next(true);
+    try {
+      await this.actionService.setExecution(deleteReq);
+      await new Promise((res) => setTimeout(res, 1000));
+      this.refresh.next(true);
+    } catch (error) {
+      console.error(error);
+      this.toast.showError(error);
+    }
   }
 }
