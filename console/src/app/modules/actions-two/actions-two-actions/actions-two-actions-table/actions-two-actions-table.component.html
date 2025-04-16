@@ -69,6 +69,7 @@
         class="highlight pointer"
         mat-row
         *matRowDef="let row; columns: ['condition', 'type', 'target', 'creationDate', 'actions']"
+        (click)="selected.emit(row)"
       ></tr>
     </table>
   </div>
