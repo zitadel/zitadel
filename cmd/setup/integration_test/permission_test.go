@@ -8,6 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -549,7 +550,7 @@ func TestPermittedOrgs(t *testing.T) {
 		authUserID      string
 		systemUserPerms []authz.SystemUserPermissions
 		perm            string
-		filterOrg       string
+		filterOrg       *string
 	}
 	type result struct {
 		InstancePermitted bool
@@ -617,7 +618,7 @@ func TestPermittedOrgs(t *testing.T) {
 				reqInstanceID: instanceID,
 				authUserID:    "org_user",
 				perm:          "org.read",
-				filterOrg:     orgID,
+				filterOrg:     gu.Ptr(orgID),
 			},
 			want: result{
 				OrgIDs: pgtype.FlatArray[string]{orgID},
@@ -629,7 +630,7 @@ func TestPermittedOrgs(t *testing.T) {
 				reqInstanceID: instanceID,
 				authUserID:    "org_user",
 				perm:          "org.read",
-				filterOrg:     "foobar",
+				filterOrg:     gu.Ptr("foobar"),
 			},
 			want: result{},
 		},
@@ -639,7 +640,7 @@ func TestPermittedOrgs(t *testing.T) {
 				reqInstanceID: instanceID,
 				authUserID:    "foobar",
 				perm:          "org.read",
-				filterOrg:     orgID,
+				filterOrg:     gu.Ptr(orgID),
 			},
 			want: result{},
 		},
@@ -672,14 +673,13 @@ func TestPermittedProjects(t *testing.T) {
 	createMember(t, tx, org.AggregateType, "org_user")
 	createMember(t, tx, project.AggregateType, "project_user")
 
-	const query = "SELECT instance_permitted, org_ids, project_ids FROM eventstore.permitted_projects($1,$2,$3,$4,$5,$6);"
+	const query = "SELECT instance_permitted, org_ids, project_ids FROM eventstore.permitted_projects($1,$2,$3,$4,$5);"
 	type args struct {
 		reqInstanceID   string
 		authUserID      string
 		systemUserPerms []authz.SystemUserPermissions
 		perm            string
-		filterOrg       string
-		filterProject   string
+		filterOrg       *string
 	}
 	type result struct {
 		InstancePermitted bool
@@ -787,7 +787,7 @@ func TestPermittedProjects(t *testing.T) {
 				reqInstanceID: instanceID,
 				authUserID:    "org_user",
 				perm:          "project.read",
-				filterOrg:     orgID,
+				filterOrg:     gu.Ptr(orgID),
 			},
 			want: result{
 				InstancePermitted: false,
@@ -800,7 +800,7 @@ func TestPermittedProjects(t *testing.T) {
 				reqInstanceID: instanceID,
 				authUserID:    "org_user",
 				perm:          "project.read",
-				filterOrg:     "foobar",
+				filterOrg:     gu.Ptr("foobar"),
 			},
 			want: result{},
 		},
@@ -816,41 +816,19 @@ func TestPermittedProjects(t *testing.T) {
 			},
 		},
 		{
-			name: "project member, filter",
-			args: args{
-				reqInstanceID: instanceID,
-				authUserID:    "project_user",
-				perm:          "project.read",
-				filterProject: projectID,
-			},
-			want: result{
-				ProjectIDs: pgtype.FlatArray[string]{projectID},
-			},
-		},
-		{
-			name: "project member, filter wrong project",
-			args: args{
-				reqInstanceID: instanceID,
-				authUserID:    "project_user",
-				perm:          "project.read",
-				filterProject: "foobar",
-			},
-			want: result{},
-		},
-		{
 			name: "no permission",
 			args: args{
 				reqInstanceID: instanceID,
 				authUserID:    "foobar",
 				perm:          "project.read",
-				filterOrg:     orgID,
+				filterOrg:     gu.Ptr(orgID),
 			},
 			want: result{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rows, err := tx.Query(CTX, query, tt.args.reqInstanceID, tt.args.authUserID, database.NewJSONArray(tt.args.systemUserPerms), tt.args.perm, tt.args.filterOrg, tt.args.filterProject)
+			rows, err := tx.Query(CTX, query, tt.args.reqInstanceID, tt.args.authUserID, database.NewJSONArray(tt.args.systemUserPerms), tt.args.perm, tt.args.filterOrg)
 			require.NoError(t, err)
 			got, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByPos[result])
 			require.NoError(t, err)

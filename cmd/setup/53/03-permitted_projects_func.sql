@@ -1,3 +1,11 @@
+-- recreate the view to include the resource_owner
+CREATE OR REPLACE VIEW eventstore.project_members AS
+SELECT instance_id, resource_owner as org_id, aggregate_id as project_id, object_id as user_id, text_value as role
+FROM eventstore.fields
+WHERE aggregate_type = 'project'
+AND object_type = 'project_member_role'
+AND field_name = 'project_role';
+
 DROP FUNCTION IF EXISTS eventstore.permitted_projects;
 
 CREATE OR REPLACE FUNCTION eventstore.permitted_projects(
@@ -6,7 +14,6 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_projects(
     , system_user_perms JSONB
     , perm TEXT
     , filter_org TEXT
-    , filter_project TEXT
 
     , instance_permitted OUT BOOLEAN
     , org_ids OUT TEXT[]
@@ -44,11 +51,7 @@ BEGIN
 	        WHERE pm.role = ANY(matched_roles)
 	        AND pm.instance_id = req_instance_id
 	        AND pm.user_id = auth_user_id
-	        AND (
-	            pm.project_id = filter_project
-	            OR filter_project IS NULL
-	            OR filter_project = ''
-	        )
+	        AND (filter_org IS NULL OR pm.org_id = filter_org)
 	    ) AS sub;
 	END;
 END;

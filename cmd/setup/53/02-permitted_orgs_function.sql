@@ -1,4 +1,5 @@
 DROP FUNCTION IF EXISTS eventstore.permitted_orgs;
+DROP FUNCTION IF EXISTS eventstore.find_roles;
 
 -- find_roles finds all roles containing the permission
 CREATE OR REPLACE FUNCTION eventstore.find_roles(
@@ -63,11 +64,7 @@ BEGIN
             WHERE om.role = ANY(matched_roles)
             AND om.instance_id = req_instance_id
             AND om.user_id = auth_user_id
-            AND (
-                om.org_id = filter_org
-                OR filter_org IS NULL
-                OR filter_org = ''
-            )
+            AND (filter_org IS NULL OR om.org_id = filter_org)
         ) AS sub;
     END;
 END;
