@@ -47,11 +47,8 @@ export ZITADEL_DEV_UID="$(id -u)"
 # Pull images
 docker compose --file ./acceptance/docker-compose.yaml pull
 
-# Run ZITADEL and configure ./apps/login/.env.local
-docker compose --file ./acceptance/docker-compose.yaml run setup
-
-# Configure your shell to use the environment variables written to ./apps/login/.env.acceptance
-export $(cat ./apps/login/.env.acceptance | xargs)
+# Run ZITADEL with local notification sink and configure ./apps/login/.env.local
+pnpm run-sink
 ```
 
 ### Developing Against Your ZITADEL Cloud Instance
@@ -78,6 +75,22 @@ pnpm dev
 ```
 
 The application is now available at `http://localhost:3000`
+
+### Adding applications and IDPs
+
+```sh
+# OPTIONAL Run SAML SP
+pnpm run-samlsp
+
+# OPTIONAL Run OIDC RP
+pnpm run-oidcrp
+
+# OPTIONAL Run SAML IDP
+pnpm run-samlidp
+
+# OPTIONAL Run OIDC OP
+pnpm run-oidcop
+```
 
 ### Testing
 
