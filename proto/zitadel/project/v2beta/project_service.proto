@@ -485,7 +485,7 @@ service ProjectService {
   //   - `project.grant.create`
   rpc CreateProjectGrant (CreateProjectGrantRequest) returns (CreateProjectGrantResponse) {
     option (google.api.http) = {
-      post: "/v2beta/projects/{project_id}/grants/{granted_organization_id}"
+      post: "/v2beta/projects/{project_id}/grants"
       body: "*"
     };
 
