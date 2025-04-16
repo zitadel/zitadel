@@ -395,10 +395,10 @@ module.exports = {
                 value: "/path/to/stylesheets",
               },
             ],
-            syntaxHighlighter: {
-              lightTheme: lightCodeTheme, // optional -- pass in the Prism theme you're using
-              darkTheme: darkCodeTheme, // optional -- pass in the Prism theme you're using
-            },
+            // syntaxHighlighter: {
+            //   lightTheme: lightCodeTheme, // optional -- pass in the Prism theme you're using
+            //   darkTheme: darkCodeTheme, // optional -- pass in the Prism theme you're using
+            // },
           }
         },
         modalSettings: {
