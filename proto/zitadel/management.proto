@@ -1763,7 +1763,7 @@ service ManagementService {
 
     // Get Machine user Key By ID
     //
-    // Deprecated: use [user service v2 GetKeyByID](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
+    // Deprecated: use [user service v2 ListKeys](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
     //
     // Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication.
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
@@ -1909,7 +1909,7 @@ service ManagementService {
 
     // Get Personal-Access-Token (PAT) by ID
     //
-    // Deprecated: use [user service v2 GetPersonalAccessTokenByID](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
+    // Deprecated: use [user service v2 ListPersonalAccessTokens](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
     //
     // Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {

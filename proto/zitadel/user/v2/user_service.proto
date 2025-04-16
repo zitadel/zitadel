@@ -306,10 +306,6 @@ service UserService {
   }
 
   // Resend code to verify user email
-  //
-  // Deprecated: [Update the users email verification](apis/resources/user_service_v2/user-service-update-user.api.mdx) and leave the email address empty to resend a verification code for the current email address.
-  //
-  // Resend code to verify user email.
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/resend"
@@ -323,7 +319,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -472,8 +467,6 @@ service UserService {
   }
 
   // Resend code to verify user phone
-  //
-  // Deprecated: [Update the users phone verification](apis/resources/user_service_v2/user-service-update-user.api.mdx) and leave the phone number empty to resend a code.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -487,7 +480,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
