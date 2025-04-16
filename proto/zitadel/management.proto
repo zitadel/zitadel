@@ -434,7 +434,7 @@ service ManagementService {
 
     // Create User (Human)
     //
-    // Deprecated: use [ImportHumanUser](apis/mgmt/management-service-import-human-user.api.mdx) instead.
+    // Deprecated: use [ImportHumanUser](apis/resources/mgmt/management-service-import-human-user.api.mdx) instead.
     //
     // Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -1761,6 +1761,11 @@ service ManagementService {
         };
     }
 
+    // Get Machine user Key By ID
+    //
+    // Deprecated: use [user service v2 GetKeyByID](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
+    //
+    // Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication.
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/keys/{key_id}"
@@ -1771,8 +1776,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get Machine user Key By ID";
-            description: "Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication."
+            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1792,6 +1796,11 @@ service ManagementService {
         };
     }
 
+    // Get Machine user Key By ID
+    //
+    // Deprecated: use [user service v2 ListKeys](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
+    //
+    // Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication.
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys/_search"
@@ -1803,8 +1812,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get Machine user Key By ID";
-            description: "Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication."
+            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1899,6 +1907,11 @@ service ManagementService {
         };
     }
 
+    // Get Personal-Access-Token (PAT) by ID
+    //
+    // Deprecated: use [user service v2 GetPersonalAccessTokenByID](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
+    //
+    // Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/pats/{token_id}"
@@ -1909,8 +1922,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get a Personal-Access-Token (PAT) by ID";
-            description: "Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header."
+            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1930,6 +1942,11 @@ service ManagementService {
         };
     }
 
+    // List Personal-Access-Tokens (PATs)
+    //
+    // Deprecated: use [user service v2 ListPersonalAccessTokens](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
+    //
+    // Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/pats/_search"
@@ -1941,8 +1958,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get a Personal-Access-Token (PAT) by ID";
-            description: "Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header."
+            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
