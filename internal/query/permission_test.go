@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -38,30 +38,29 @@ func TestPermissionClause(t *testing.T) {
 		options    []PermissionOption
 	}
 	tests := []struct {
-		name       string
-		args       args
-		wantClause sq.Or
+		name     string
+		args     args
+		wantSql  string
+		wantArgs []any
 	}{
 		{
-			name: "no options",
+			name: "org, no options",
 			args: args{
 				ctx:        ctx,
 				orgIDCol:   UserResourceOwnerCol,
 				permission: "permission1",
 			},
-			wantClause: sq.Or{
-				sq.Expr(
-					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
-					"instanceID",
-					"userID",
-					database.NewJSONArray(permissions),
-					"permission1",
-					"",
-				),
+			wantSql: "INNER JOIN eventstore.permitted_orgs(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted OR projections.users14.resource_owner = ANY(permissions.org_ids))",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				(*string)(nil),
 			},
 		},
 		{
-			name: "owned rows option",
+			name: "org, owned rows option",
 			args: args{
 				ctx:        ctx,
 				orgIDCol:   UserResourceOwnerCol,
@@ -70,20 +69,18 @@ func TestPermissionClause(t *testing.T) {
 					OwnedRowsPermissionOption(UserIDCol),
 				},
 			},
-			wantClause: sq.Or{
-				sq.Expr(
-					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
-					"instanceID",
-					"userID",
-					database.NewJSONArray(permissions),
-					"permission1",
-					"",
-				),
-				sq.Eq{"projections.users14.id": "userID"},
+			wantSql: "INNER JOIN eventstore.permitted_orgs(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted OR projections.users14.resource_owner = ANY(permissions.org_ids) OR projections.users14.id = ?)",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				(*string)(nil),
+				"userID",
 			},
 		},
 		{
-			name: "connection rows option",
+			name: "org, connection rows option",
 			args: args{
 				ctx:        ctx,
 				orgIDCol:   UserResourceOwnerCol,
@@ -93,21 +90,19 @@ func TestPermissionClause(t *testing.T) {
 					ConnectionPermissionOption(UserStateCol, "bar"),
 				},
 			},
-			wantClause: sq.Or{
-				sq.Expr(
-					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
-					"instanceID",
-					"userID",
-					database.NewJSONArray(permissions),
-					"permission1",
-					"",
-				),
-				sq.Eq{"projections.users14.id": "userID"},
-				sq.Eq{"projections.users14.state": "bar"},
+			wantSql: "INNER JOIN eventstore.permitted_orgs(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted OR projections.users14.resource_owner = ANY(permissions.org_ids) OR projections.users14.id = ? OR projections.users14.state = ?)",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				(*string)(nil),
+				"userID",
+				"bar",
 			},
 		},
 		{
-			name: "single org option",
+			name: "org, with ID",
 			args: args{
 				ctx:        ctx,
 				orgIDCol:   UserResourceOwnerCol,
@@ -119,22 +114,62 @@ func TestPermissionClause(t *testing.T) {
 					}),
 				},
 			},
-			wantClause: sq.Or{
-				sq.Expr(
-					"projections.users14.resource_owner = ANY(eventstore.permitted_orgs(?, ?, ?, ?, ?))",
-					"instanceID",
-					"userID",
-					database.NewJSONArray(permissions),
-					"permission1",
-					"orgID",
-				),
+			wantSql: "INNER JOIN eventstore.permitted_orgs(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted OR projections.users14.resource_owner = ANY(permissions.org_ids))",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				gu.Ptr("orgID"),
+			},
+		},
+		{
+			name: "project",
+			args: args{
+				ctx:        ctx,
+				orgIDCol:   ProjectColumnResourceOwner,
+				permission: "permission1",
+				options: []PermissionOption{
+					WithProjectsPermissionOption(ProjectColumnID),
+				},
+			},
+			wantSql: "INNER JOIN eventstore.permitted_projects(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted OR projections.projects4.resource_owner = ANY(permissions.org_ids) OR projections.projects4.id = ANY(permissions.project_ids))",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				(*string)(nil),
+			},
+		},
+		{
+			name: "project, single org",
+			args: args{
+				ctx:        ctx,
+				orgIDCol:   ProjectColumnResourceOwner,
+				permission: "permission1",
+				options: []PermissionOption{
+					WithProjectsPermissionOption(ProjectColumnID),
+					SingleOrgPermissionOption([]SearchQuery{
+						mustSearchQuery(NewProjectResourceOwnerSearchQuery("orgID")),
+					}),
+				},
+			},
+			wantSql: "INNER JOIN eventstore.permitted_projects(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted OR projections.projects4.resource_owner = ANY(permissions.org_ids) OR projections.projects4.id = ANY(permissions.project_ids))",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				gu.Ptr("orgID"),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotClause := PermissionClause(tt.args.ctx, tt.args.orgIDCol, tt.args.permission, tt.args.options...)
-			assert.Equal(t, tt.wantClause, gotClause)
+			gotSql, gotArgs := PermissionClause(tt.args.ctx, tt.args.orgIDCol, tt.args.permission, tt.args.options...)
+			assert.Equal(t, tt.wantSql, gotSql)
+			assert.Equal(t, tt.wantArgs, gotArgs)
 		})
 	}
 }

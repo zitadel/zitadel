@@ -149,15 +149,15 @@ func triggerBatch(ctx context.Context, handlers ...*handler.Handler) {
 	wg.Wait()
 }
 
-func findTextEqualsQuery(column Column, queries []SearchQuery) string {
+func findTextEqualsQuery(column Column, queries []SearchQuery) (text string, ok bool) {
 	for _, query := range queries {
 		if query.Col() != column {
 			continue
 		}
 		tq, ok := query.(*textQuery)
 		if ok && tq.Compare == TextEquals {
-			return tq.Text
+			return tq.Text, true
 		}
 	}
-	return ""
+	return "", false
 }
