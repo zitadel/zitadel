@@ -102,9 +102,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						SigningKey: targetCreated.GetSigningKey(),
 					},
 				}
-				// has to be set separately because of the pointers
+
+				// content for update
 				response.Target = &action.Target{
-					Id:           targetCreated.GetId(),
+					Id:           "changed",
 					CreationDate: targetCreated.GetCreationDate(),
 					ChangeDate:   targetCreated.GetCreationDate(),
 					Name:         targetCreatedName,
@@ -118,18 +119,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					SigningKey: targetCreated.GetSigningKey(),
 				}
 
-				// content for partial update
-				changedResponse := &action.GetTargetResponse{
-					Target: &action.Target{
-						Id: targetCreated.GetId(),
-						TargetType: &action.Target_RestCall{
-							RestCall: &action.RESTCall{
-								InterruptOnError: false,
-							},
-						},
-					},
-				}
-
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
 					FullMethod: fullMethod,
@@ -141,7 +130,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					Response:   expectedResponse,
 				}
 				// after request with different targetID, return changed response
-				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusOK, changedResponse)
+				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusOK, response)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, false)
 				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()})
@@ -166,9 +155,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				Id: "something",
 			},
 			want: &action.GetTargetResponse{
-				Target: &action.Target{
-					Id: "changed",
-				},
+				// defined in the dependency function
 			},
 		},
 		{
@@ -181,7 +168,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
-				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
+				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusInternalServerError, nil)
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, true)
 				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()})
@@ -233,17 +220,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						SigningKey: targetCreated.GetSigningKey(),
 					},
 				}
-				// content for partial update
-				changedResponse := &action.GetTargetResponse{
-					Target: &action.Target{
-						Id: "changed",
-						TargetType: &action.Target_RestCall{
-							RestCall: &action.RESTCall{
-								InterruptOnError: false,
-							},
-						},
-					},
-				}
 
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
@@ -256,7 +232,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					Response:   expectedResponse,
 				}
 				// after request with different targetID, return changed response
-				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
+				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusInternalServerError, nil)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, true)
 				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()})
