@@ -107,7 +107,8 @@ type Project struct {
 
 type ProjectSearchQueries struct {
 	SearchRequest
-	Queries []SearchQuery
+	Queries      []SearchQuery
+	GrantQueries []SearchQuery
 }
 
 func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string) (project *Project, err error) {

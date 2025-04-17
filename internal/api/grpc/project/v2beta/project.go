@@ -44,8 +44,8 @@ func projectCreateToCommand(req *project_pb.CreateProjectRequest) *command.AddPr
 		},
 		Name:                   req.Name,
 		ProjectRoleAssertion:   req.ProjectRoleAssertion,
-		ProjectRoleCheck:       req.ProjectRoleCheck,
-		HasProjectCheck:        req.HasProjectCheck,
+		ProjectRoleCheck:       req.AuthorizationRequired,
+		HasProjectCheck:        req.ProjectAccessRequired,
 		PrivateLabelingSetting: privateLabelingSettingToDomain(req.PrivateLabelingSetting),
 	}
 }

@@ -44,7 +44,7 @@ func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsR
 
 func (s *Server) listProjectRequestToModel(req *project_pb.ListProjectsRequest) (*query.ProjectSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
-	queries, err := projectFiltersToQuery(req.Filters)
+	queriesProjects, queriesGrants, err := projectFiltersToQuery(req.Filters)
 	if err != nil {
 		return nil, err
 	}
@@ -54,19 +54,27 @@ func (s *Server) listProjectRequestToModel(req *project_pb.ListProjectsRequest) 
 			Limit:  limit,
 			Asc:    asc,
 		},
-		Queries: queries,
+		Queries:      queriesProjects,
+		GrantQueries: queriesGrants,
 	}, nil
 }
 
-func projectFiltersToQuery(queries []*project_pb.ProjectSearchFilter) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries))
+func projectFiltersToQuery(queries []*project_pb.ProjectSearchFilter) (_ []query.SearchQuery, _ []query.SearchQuery, err error) {
+	q1 := make([]query.SearchQuery, len(queries))
 	for i, qry := range queries {
-		q[i], err = projectFilterToModel(qry)
+		q1[i], err = projectFilterToModel(qry)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
-	return q, nil
+	q2 := make([]query.SearchQuery, len(queries))
+	for i, qry := range queries {
+		q2[i], err = projectGrantFilterToModel(qry)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	return q1, q2, nil
 }
 
 func projectFilterToModel(filter *project_pb.ProjectSearchFilter) (query.SearchQuery, error) {
@@ -75,8 +83,27 @@ func projectFilterToModel(filter *project_pb.ProjectSearchFilter) (query.SearchQ
 		return projectNameFilterToQuery(q.ProjectNameFilter)
 	case *project_pb.ProjectSearchFilter_InProjectIdsFilter:
 		return projectInIDsFilterToQuery(q.InProjectIdsFilter)
-	case *project_pb.ProjectSearchFilter_ProjectsOnlyFilter:
-		return projectOnlyProjectsFilterToQuery(q.ProjectsOnlyFilter)
+	case *project_pb.ProjectSearchFilter_ProjectResourceOwnerFilter:
+		return projectResourceOwnerFilterToQuery(q.ProjectResourceOwnerFilter)
+	case *project_pb.ProjectSearchFilter_ProjectOrganizationIdFilter:
+		return projectOrganizationIDFilterToQuery(q.ProjectOrganizationIdFilter)
+	case *project_pb.ProjectSearchFilter_ProjectGrantResourceOwnerFilter:
+		return nil, nil
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
+	}
+}
+
+func projectGrantFilterToModel(filter *project_pb.ProjectSearchFilter) (query.SearchQuery, error) {
+	switch q := filter.Filter.(type) {
+	case *project_pb.ProjectSearchFilter_ProjectGrantResourceOwnerFilter:
+		return projectGrantResourceOwnerFilterToQuery(q.ProjectGrantResourceOwnerFilter)
+	case *project_pb.ProjectSearchFilter_ProjectOrganizationIdFilter:
+		return projectGrantOrganizationIDFilterToQuery(q.ProjectOrganizationIdFilter)
+	case *project_pb.ProjectSearchFilter_ProjectNameFilter,
+		*project_pb.ProjectSearchFilter_InProjectIdsFilter,
+		*project_pb.ProjectSearchFilter_ProjectResourceOwnerFilter:
+		return nil, nil
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
@@ -90,9 +117,20 @@ func projectInIDsFilterToQuery(q *project_pb.InProjectIDsFilter) (query.SearchQu
 	return query.NewProjectIDSearchQuery(q.ProjectIds)
 }
 
-func projectOnlyProjectsFilterToQuery(q *project_pb.ProjectsOnlyFilter) (query.SearchQuery, error) {
-	// TODO
-	return nil, nil
+func projectResourceOwnerFilterToQuery(q *project_pb.ProjectResourceOwnerFilter) (query.SearchQuery, error) {
+	return query.NewProjectResourceOwnerSearchQuery(q.ProjectResourceOwner)
+}
+
+func projectOrganizationIDFilterToQuery(q *project_pb.ProjectOrganizationIDFilter) (query.SearchQuery, error) {
+	return query.NewProjectResourceOwnerSearchQuery(q.ProjectOrganizationId)
+}
+
+func projectGrantResourceOwnerFilterToQuery(q *project_pb.ProjectGrantResourceOwnerFilter) (query.SearchQuery, error) {
+	return query.NewProjectResourceOwnerSearchQuery(q.ProjectGrantResourceOwner)
+}
+
+func projectGrantOrganizationIDFilterToQuery(q *project_pb.ProjectOrganizationIDFilter) (query.SearchQuery, error) {
+	return query.NewProjectGrantGrantedOrgIDSearchQuery(q.ProjectOrganizationId)
 }
 
 func projectsToPb(projects []*query.Project) []*project_pb.Project {
@@ -112,9 +150,9 @@ func projectToPb(project *query.Project) *project_pb.Project {
 		State:                  projectStateToPb(project.State),
 		Name:                   project.Name,
 		PrivateLabelingSetting: privateLabelingSettingToPb(project.PrivateLabelingSetting),
-		HasProjectCheck:        project.HasProjectCheck,
+		ProjectAccessRequired:  project.HasProjectCheck,
 		ProjectRoleAssertion:   project.ProjectRoleAssertion,
-		ProjectRoleCheck:       project.ProjectRoleCheck,
+		AuthorizationRequired:  project.ProjectRoleCheck,
 	}
 }
 
