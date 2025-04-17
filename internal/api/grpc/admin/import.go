@@ -621,7 +621,7 @@ func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	}
 	for _, project := range org.GetProjects() {
 		logging.Debugf("import project: %s", project.GetProjectId())
-		_, err := s.command.AddProjectWithID(ctx, management.ProjectCreateToDomain(project.GetProject()), org.GetOrgId(), project.GetProjectId())
+		_, err := s.command.AddProject(ctx, management.ProjectCreateToCommand(project.GetProject(), project.GetProjectId(), org.GetOrgId()))
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project", Id: project.GetProjectId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {

@@ -3,10 +3,13 @@ package management
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -14,8 +17,12 @@ import (
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
 
-func ProjectCreateToDomain(req *mgmt_pb.AddProjectRequest) *domain.Project {
-	return &domain.Project{
+func ProjectCreateToCommand(req *mgmt_pb.AddProjectRequest, projectID string, resourceOwner string) *command.AddProject {
+	return &command.AddProject{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
+		},
 		Name:                   req.Name,
 		ProjectRoleAssertion:   req.ProjectRoleAssertion,
 		ProjectRoleCheck:       req.ProjectRoleCheck,
@@ -24,16 +31,17 @@ func ProjectCreateToDomain(req *mgmt_pb.AddProjectRequest) *domain.Project {
 	}
 }
 
-func ProjectUpdateToDomain(req *mgmt_pb.UpdateProjectRequest) *domain.Project {
-	return &domain.Project{
+func ProjectUpdateToCommand(req *mgmt_pb.UpdateProjectRequest, resourceOwner string) *command.ChangeProject {
+	return &command.ChangeProject{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.Id,
+			AggregateID:   req.Id,
+			ResourceOwner: resourceOwner,
 		},
-		Name:                   req.Name,
-		ProjectRoleAssertion:   req.ProjectRoleAssertion,
-		ProjectRoleCheck:       req.ProjectRoleCheck,
-		HasProjectCheck:        req.HasProjectCheck,
-		PrivateLabelingSetting: privateLabelingSettingToDomain(req.PrivateLabelingSetting),
+		Name:                   gu.Ptr(req.Name),
+		ProjectRoleAssertion:   gu.Ptr(req.ProjectRoleAssertion),
+		ProjectRoleCheck:       gu.Ptr(req.ProjectRoleCheck),
+		HasProjectCheck:        gu.Ptr(req.HasProjectCheck),
+		PrivateLabelingSetting: gu.Ptr(privateLabelingSettingToDomain(req.PrivateLabelingSetting)),
 	}
 }
 
