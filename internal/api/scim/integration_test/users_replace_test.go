@@ -85,6 +85,7 @@ func TestReplaceUser(t *testing.T) {
 					{
 						Value:   "bjensen-replaced-full@example.com",
 						Primary: true,
+						Type:    "work-updated",
 					},
 				},
 				Addresses: []*resources.ScimAddress{
