@@ -613,3 +613,31 @@ p strong {
   top: 0;
   left: 0;
 }
+
+/*
+  The overview list components are enriched by swizzled DocCardList and DocSidebarItems wrappers.
+  Deprecated list item titles have the class zitadel-lifecycle-deprecated.
+  We strike them through, because this is well-known practice and reduces mental overhead for finding the right method to solve a task.
+ */
+.card:has(.zitadel-lifecycle-deprecated) {
+  position: relative;
+}
+
+.card:has(.zitadel-lifecycle-deprecated)::after {
+  content: "DEPRECATED";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--ifm-color-danger-contrast-background);
+  color: var(--ifm-color-danger-contrast-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.zitadel-lifecycle-deprecated {
+  text-decoration: line-through;
+}

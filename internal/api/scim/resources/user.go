@@ -240,7 +240,7 @@ func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListRes
 		return NewListResponse(count, q.SearchRequest, make([]*ScimUser, 0)), nil
 	}
 
-	users, err := h.query.SearchUsers(ctx, q, authz.GetCtxData(ctx).OrgID, nil)
+	users, err := h.query.SearchUsers(ctx, q, nil)
 	if err != nil {
 		return nil, err
 	}
