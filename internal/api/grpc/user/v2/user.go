@@ -2,6 +2,9 @@ package user
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	object2 "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 
 	"golang.org/x/text/language"
@@ -118,7 +121,7 @@ func genderToDomain(gender user.Gender) domain.Gender {
 }
 
 func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserRequest) (_ *user.UpdateHumanUserResponse, err error) {
-	human, err := UpdateUserRequestToChangeHuman(req)
+	human, err := UpdateHumanUserRequestToChangeHuman(req)
 	if err != nil {
 		return nil, err
 	}
@@ -180,86 +183,6 @@ func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
 	}
 	pVal := conv(*value)
 	return &pVal
-}
-
-func UpdateUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.ChangeHuman, error) {
-	email, err := SetHumanEmailToEmail(req.Email, req.GetUserId())
-	if err != nil {
-		return nil, err
-	}
-	return &command.ChangeHuman{
-		ID:       req.GetUserId(),
-		Username: req.Username,
-		Profile:  SetHumanProfileToProfile(req.Profile),
-		Email:    email,
-		Phone:    SetHumanPhoneToPhone(req.Phone),
-		Password: SetHumanPasswordToPassword(req.Password),
-	}, nil
-}
-
-func SetHumanProfileToProfile(profile *user.SetHumanProfile) *command.Profile {
-	if profile == nil {
-		return nil
-	}
-	var firstName *string
-	if profile.GivenName != "" {
-		firstName = &profile.GivenName
-	}
-	var lastName *string
-	if profile.FamilyName != "" {
-		lastName = &profile.FamilyName
-	}
-	return &command.Profile{
-		FirstName:         firstName,
-		LastName:          lastName,
-		NickName:          profile.NickName,
-		DisplayName:       profile.DisplayName,
-		PreferredLanguage: ifNotNilPtr(profile.PreferredLanguage, language.Make),
-		Gender:            ifNotNilPtr(profile.Gender, genderToDomain),
-	}
-}
-
-func SetHumanEmailToEmail(email *user.SetHumanEmail, userID string) (*command.Email, error) {
-	if email == nil {
-		return nil, nil
-	}
-	var urlTemplate string
-	if email.GetSendCode() != nil && email.GetSendCode().UrlTemplate != nil {
-		urlTemplate = *email.GetSendCode().UrlTemplate
-		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, userID, "code", "orgID"); err != nil {
-			return nil, err
-		}
-	}
-	return &command.Email{
-		Address:     domain.EmailAddress(email.Email),
-		Verified:    email.GetIsVerified(),
-		ReturnCode:  email.GetReturnCode() != nil,
-		URLTemplate: urlTemplate,
-	}, nil
-}
-
-func SetHumanPhoneToPhone(phone *user.SetHumanPhone) *command.Phone {
-	if phone == nil {
-		return nil
-	}
-	return &command.Phone{
-		Number:     domain.PhoneNumber(phone.GetPhone()),
-		Verified:   phone.GetIsVerified(),
-		ReturnCode: phone.GetReturnCode() != nil,
-	}
-}
-
-func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
-	if password == nil {
-		return nil
-	}
-	return &command.Password{
-		PasswordCode:        password.GetVerificationCode(),
-		OldPassword:         password.GetCurrentPassword(),
-		Password:            password.GetPassword().GetPassword(),
-		EncodedPasswordHash: password.GetHashedPassword().GetHash(),
-		ChangeRequired:      password.GetPassword().GetChangeRequired() || password.GetHashedPassword().GetChangeRequired(),
-	}
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
@@ -485,9 +408,97 @@ func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInit
 }
 
 func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "not implemented")
+	orgId := req.GetOrganizationId()
+	if err := s.command.CheckOrgExists(ctx, orgId); err != nil {
+		return nil, err
+	}
+	switch userType := req.GetUserType().(type) {
+	case *user.CreateUserRequest_Human_:
+		addHumanReq := &user.AddHumanUserRequest{
+			UserId:   req.UserId,
+			Username: req.Username,
+			Organization: &object2.Organization{
+				Org: &object2.Organization_OrgId{OrgId: req.OrganizationId},
+			},
+			Profile:    userType.Human.Profile,
+			Email:      userType.Human.Email,
+			Phone:      userType.Human.Phone,
+			IdpLinks:   userType.Human.IdpLinks,
+			TotpSecret: userType.Human.TotpSecret,
+		}
+		switch pwType := userType.Human.GetPasswordType().(type) {
+		case *user.CreateUserRequest_Human_HashedPassword:
+			addHumanReq.PasswordType = &user.AddHumanUserRequest_HashedPassword{
+				HashedPassword: pwType.HashedPassword,
+			}
+		case *user.CreateUserRequest_Human_Password:
+			addHumanReq.PasswordType = &user.AddHumanUserRequest_Password{
+				Password: pwType.Password,
+			}
+		default:
+			return nil, zerrors.ThrowInvalidArgument(nil, "", "password type is not set")
+		}
+		human, err := AddUserRequestToAddHuman(addHumanReq)
+		if err != nil {
+			return nil, err
+		}
+		if err = s.command.AddUserHuman(ctx, orgId, human, false, s.userCodeAlg); err != nil {
+			return nil, err
+		}
+		return &user.CreateUserResponse{
+			Id:           human.ID,
+			CreationDate: timestamppb.New(human.Details.EventDate),
+			EmailCode:    human.EmailCode,
+			PhoneCode:    human.PhoneCode,
+		}, nil
+	case *user.CreateUserRequest_Machine_:
+		cmd := &command.Machine{
+			Username:        req.GetUsername(),
+			Name:            userType.Machine.Name,
+			Description:     userType.Machine.GetDescription(),
+			AccessTokenType: domain.OIDCTokenTypeBearer,
+			ObjectRoot: models.ObjectRoot{
+				ResourceOwner: orgId,
+			},
+		}
+		details, err := s.command.AddMachine(ctx, cmd, command.WithUsernameToIDFallback)
+		if err != nil {
+			return nil, err
+		}
+		return &user.CreateUserResponse{
+			Id:           details.ID,
+			CreationDate: timestamppb.New(details.EventDate),
+		}, nil
+	default:
+		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
+	}
 }
 
 func (s *Server) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "not implemented")
+	switch userType := req.GetUserType().(type) {
+	case *user.UpdateUserRequest_Human_:
+		cmd, err := patchHumanUserToCommand(req.UserId, req.Username, userType.Human)
+		if err != nil {
+			return nil, err
+		}
+		if err = s.command.ChangeUserHuman(ctx, cmd, s.userCodeAlg); err != nil {
+			return nil, err
+		}
+		return &user.UpdateUserResponse{
+			ChangeDate: timestamppb.New(cmd.Details.EventDate),
+			EmailCode:  cmd.EmailCode,
+			PhoneCode:  cmd.PhoneCode,
+		}, nil
+	case *user.UpdateUserRequest_Machine_:
+		cmd := patchMachineUserToCommand(req.UserId, req.Username, userType.Machine)
+		err := s.command.ChangeUserMachine(ctx, cmd)
+		if err != nil {
+			return nil, err
+		}
+		return &user.UpdateUserResponse{
+			ChangeDate: timestamppb.New(cmd.Details.EventDate),
+		}, nil
+	default:
+		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
+	}
 }

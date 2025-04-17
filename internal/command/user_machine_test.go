@@ -391,7 +391,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 }
 
 func newMachineChangedEvent(ctx context.Context, userID, resourceOwner, name, description string) *user.MachineChangedEvent {
-	event, _ := user.NewMachineChangedEvent(ctx,
+	event := user.NewMachineChangedEvent(ctx,
 		&user.NewAggregate(userID, resourceOwner).Aggregate,
 		[]user.MachineChanges{
 			user.ChangeName(name),

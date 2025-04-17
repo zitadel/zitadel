@@ -27,6 +27,14 @@ type Machine struct {
 	AccessTokenType domain.OIDCTokenType
 }
 
+type AddMachineOption func(*Machine)
+
+func WithUsernameToIDFallback(m *Machine) {
+	if m.Username == "" {
+		m.Username = m.AggregateID
+	}
+}
+
 func (m *Machine) IsZero() bool {
 	return m.Username == "" && m.Name == ""
 }
@@ -67,7 +75,7 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...AddMachineOption) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -80,6 +88,9 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (_ *domain.
 	}
 
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
+	for _, option := range options {
+		option(machine)
+	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
 		return nil, err
@@ -97,6 +108,7 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (_ *domain.
 	}, nil
 }
 
+// Deprecated: use ChangeUserMachine instead
 func (c *Commands) ChangeMachine(ctx context.Context, machine *Machine) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, changeMachineCommand(agg, machine))
@@ -132,10 +144,7 @@ func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Valid
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, zerrors.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 			}
-			changedEvent, hasChanged, err := writeModel.NewChangedEvent(ctx, &a.Aggregate, machine.Name, machine.Description, machine.AccessTokenType)
-			if err != nil {
-				return nil, err
-			}
+			changedEvent, hasChanged := writeModel.NewChangedEvent(ctx, &a.Aggregate, machine.Name, machine.Description, machine.AccessTokenType)
 			if !hasChanged {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.NotChanged")
 			}

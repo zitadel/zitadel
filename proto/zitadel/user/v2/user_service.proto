@@ -2383,7 +2383,7 @@ message UpdateUserRequest{
     // Change the users phone number and/or trigger a verification SMS
     optional SetHumanPhone phone = 3;
     // Change the users password.
-    // You need to provide the old password to change the password.
+    // You can optionally require the current password or the verification code to be correct.
     optional SetPassword password = 4;
     // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
     // Currently no other options are supported, and if anything different is used the validation will fail.
