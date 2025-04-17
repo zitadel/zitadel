@@ -22,7 +22,6 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
 		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
-		Actions:                             gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:                 nil,
 		OidcSingleV1SessionTermination:      gu.Ptr(true),
@@ -32,7 +31,6 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		TriggerIntrospectionProjections: gu.Ptr(false),
 		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
-		Actions:                         gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:             nil,
 		OIDCSingleV1SessionTermination:  gu.Ptr(true),
@@ -61,10 +59,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Value: true,
 		},
 		UserSchema: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
-			Value: true,
-		},
-		Actions: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: true,
 		},
@@ -107,10 +101,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
-		Actions: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_SYSTEM,
-		},
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
 			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
@@ -131,7 +121,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
-		Actions:                             gu.Ptr(true),
 		ImprovedPerformance:                 nil,
 		WebKey:                              gu.Ptr(true),
 		OidcSingleV1SessionTermination:      gu.Ptr(true),
@@ -142,7 +131,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
-		Actions:                         gu.Ptr(true),
 		ImprovedPerformance:             nil,
 		WebKey:                          gu.Ptr(true),
 		OIDCSingleV1SessionTermination:  gu.Ptr(true),
@@ -171,10 +159,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Value: true,
 		},
 		UserSchema: query.FeatureSource[bool]{
-			Level: feature.LevelInstance,
-			Value: true,
-		},
-		Actions: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},
@@ -214,10 +198,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		UserSchema: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
-		},
-		Actions: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},

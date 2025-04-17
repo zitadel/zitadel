@@ -21,7 +21,6 @@ type InstanceFeatures struct {
 	LegacyIntrospection             *bool
 	UserSchema                      *bool
 	TokenExchange                   *bool
-	Actions                         *bool
 	ImprovedPerformance             []feature.ImprovedPerformanceType
 	WebKey                          *bool
 	DebugOIDCParentError            *bool
@@ -39,7 +38,6 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
-		m.Actions == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.WebKey == nil &&

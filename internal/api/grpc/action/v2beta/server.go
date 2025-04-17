@@ -1,8 +1,6 @@
 package action
 
 import (
-	"context"
-
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -10,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
@@ -64,11 +61,4 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return action.RegisterActionServiceHandler
-}
-
-func checkActionsEnabled(ctx context.Context) error {
-	if authz.GetInstance(ctx).Features().Actions {
-		return nil
-	}
-	return zerrors.ThrowPreconditionFailed(nil, "ACTION-8o6pvqfjhs", "Errors.Action.NotEnabled")
 }

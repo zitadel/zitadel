@@ -15,17 +15,8 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
-func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
-	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Target{Target: id}}}
-}
-
-func executionTargetsSingleInclude(include *action.Condition) []*action.ExecutionTargetType {
-	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Include{Include: include}}}
-}
-
 func TestServer_SetExecution_Request(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
@@ -59,7 +50,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						Request: &action.RequestExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -76,7 +67,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -93,7 +84,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -110,7 +101,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -127,7 +118,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -144,7 +135,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -181,125 +172,8 @@ func assertSetExecutionResponse(t *testing.T, creationDate, setDate time.Time, e
 	}
 }
 
-func TestServer_SetExecution_Request_Include(t *testing.T) {
-	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
-	executionCond := &action.Condition{
-		ConditionType: &action.Condition_Request{
-			Request: &action.RequestExecution{
-				Condition: &action.RequestExecution_All{
-					All: true,
-				},
-			},
-		},
-	}
-	instance.SetExecution(isolatedIAMOwnerCTX, t,
-		executionCond,
-		executionTargetsSingleTarget(targetResp.GetId()),
-	)
-
-	circularExecutionService := &action.Condition{
-		ConditionType: &action.Condition_Request{
-			Request: &action.RequestExecution{
-				Condition: &action.RequestExecution_Service{
-					Service: "zitadel.session.v2beta.SessionService",
-				},
-			},
-		},
-	}
-	instance.SetExecution(isolatedIAMOwnerCTX, t,
-		circularExecutionService,
-		executionTargetsSingleInclude(executionCond),
-	)
-	circularExecutionMethod := &action.Condition{
-		ConditionType: &action.Condition_Request{
-			Request: &action.RequestExecution{
-				Condition: &action.RequestExecution_Method{
-					Method: "/zitadel.session.v2beta.SessionService/ListSessions",
-				},
-			},
-		},
-	}
-	instance.SetExecution(isolatedIAMOwnerCTX, t,
-		circularExecutionMethod,
-		executionTargetsSingleInclude(circularExecutionService),
-	)
-
-	tests := []struct {
-		name        string
-		ctx         context.Context
-		req         *action.SetExecutionRequest
-		wantSetDate bool
-		wantErr     bool
-	}{
-		{
-			name: "method, circular error",
-			ctx:  isolatedIAMOwnerCTX,
-			req: &action.SetExecutionRequest{
-				Condition: circularExecutionService,
-				Targets:   executionTargetsSingleInclude(circularExecutionMethod),
-			},
-			wantErr: true,
-		},
-		{
-			name: "method, ok",
-			ctx:  isolatedIAMOwnerCTX,
-			req: &action.SetExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
-							},
-						},
-					},
-				},
-				Targets: executionTargetsSingleInclude(executionCond),
-			},
-			wantSetDate: true,
-		},
-		{
-			name: "service, ok",
-			ctx:  isolatedIAMOwnerCTX,
-			req: &action.SetExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_Service{
-								Service: "zitadel.user.v2beta.UserService",
-							},
-						},
-					},
-				},
-				Targets: executionTargetsSingleInclude(executionCond),
-			},
-			wantSetDate: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			creationDate := time.Now().UTC()
-			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
-			setDate := time.Now().UTC()
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
-
-			// cleanup to not impact other requests
-			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
-		})
-	}
-}
-
 func TestServer_SetExecution_Response(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
@@ -333,7 +207,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -350,7 +224,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -367,7 +241,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -384,7 +258,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -401,7 +275,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -418,7 +292,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -444,7 +318,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 
 func TestServer_SetExecution_Event(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
@@ -480,7 +353,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						Event: &action.EventExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -497,7 +370,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -514,7 +387,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -531,7 +404,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -548,7 +421,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -565,7 +438,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -582,7 +455,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},
@@ -608,7 +481,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 
 func TestServer_SetExecution_Function(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
@@ -642,7 +514,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -655,7 +527,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Function: &action.FunctionExecution{Name: "xxx"},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantErr: true,
 		},
@@ -668,7 +540,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Function: &action.FunctionExecution{Name: "presamlresponse"},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Targets: []string{targetResp.GetId()},
 			},
 			wantSetDate: true,
 		},

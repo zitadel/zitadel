@@ -202,10 +202,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
-				Actions: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
 			},
 		},
 		{
@@ -215,7 +211,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					LoginDefaultOrg:                     gu.Ptr(true),
 					OidcTriggerIntrospectionProjections: gu.Ptr(false),
 					UserSchema:                          gu.Ptr(true),
-					Actions:                             gu.Ptr(true),
 				})
 				require.NoError(t, err)
 			},
@@ -233,10 +228,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
 				UserSchema: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_INSTANCE,
-				},
-				Actions: &feature.FeatureFlag{
 					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
@@ -270,10 +261,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				UserSchema: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
-				Actions: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},

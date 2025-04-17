@@ -15,7 +15,6 @@ type SystemFeatures struct {
 	LegacyIntrospection             *bool
 	TokenExchange                   *bool
 	UserSchema                      *bool
-	Actions                         *bool
 	ImprovedPerformance             []feature.ImprovedPerformanceType
 	OIDCSingleV1SessionTermination  *bool
 	DisableUserTokenEvent           *bool
@@ -30,7 +29,6 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
-		m.Actions == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&

@@ -2,15 +2,15 @@ package middleware
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
@@ -89,7 +89,13 @@ type ContextInfoRequest struct {
 }
 
 func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
-	data, err := json.Marshal(c)
+	jsonpb := &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+			AllowPartial:   true,
+		},
+	}
+	data, err := jsonpb.Marshal(c)
 	if err != nil {
 		return nil
 	}
@@ -97,10 +103,13 @@ func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
-	if !json.Valid(resp) {
-		return zerrors.ThrowPreconditionFailed(nil, "ACTION-4m9s2", "Errors.Execution.ResponseIsNotValidJSON")
+	jsonpb := &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+			AllowPartial:   true,
+		},
 	}
-	return json.Unmarshal(resp, c.Request)
+	return jsonpb.Unmarshal(resp, c.Request)
 }
 
 func (c *ContextInfoRequest) GetContent() interface{} {
@@ -120,7 +129,13 @@ type ContextInfoResponse struct {
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
-	data, err := json.Marshal(c)
+	jsonpb := &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+			AllowPartial:   true,
+		},
+	}
+	data, err := jsonpb.Marshal(c)
 	if err != nil {
 		return nil
 	}
@@ -128,7 +143,13 @@ func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
-	return json.Unmarshal(resp, c.Response)
+	jsonpb := &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+			AllowPartial:   true,
+		},
+	}
+	return jsonpb.Unmarshal(resp, c.Response)
 }
 
 func (c *ContextInfoResponse) GetContent() interface{} {

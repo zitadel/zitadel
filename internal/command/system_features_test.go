@@ -118,24 +118,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "set Actions",
-			eventstore: expectEventstore(
-				expectFilter(),
-				expectPush(
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
-						feature_v2.SystemActionsEventType, true,
-					),
-				),
-			),
-			args: args{context.Background(), &SystemFeatures{
-				Actions: gu.Ptr(true),
-			}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "SYSTEM",
-			},
-		},
-		{
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(),
@@ -174,10 +156,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemActionsEventType, true,
-					),
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
 						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, true,
 					),
 				),
@@ -187,7 +165,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
-				Actions:                         gu.Ptr(true),
 				OIDCSingleV1SessionTermination:  gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
@@ -235,10 +212,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemActionsEventType, false,
-					),
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
 						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, false,
 					),
 				),
@@ -248,7 +221,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
-				Actions:                         gu.Ptr(false),
 				OIDCSingleV1SessionTermination:  gu.Ptr(false),
 			}},
 			want: &domain.ObjectDetails{

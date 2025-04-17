@@ -30,7 +30,7 @@ func _KeyNoOp() {
 	_ = x[KeyLegacyIntrospection-(3)]
 	_ = x[KeyUserSchema-(4)]
 	_ = x[KeyTokenExchange-(5)]
-	_ = x[KeyActions-(6)]
+	_ = x[KeyActionsDeprecated-(6)]
 	_ = x[KeyImprovedPerformance-(7)]
 	_ = x[KeyWebKey-(8)]
 	_ = x[KeyDebugOIDCParentError-(9)]
@@ -42,7 +42,7 @@ func _KeyNoOp() {
 	_ = x[KeyConsoleUseV2UserApi-(15)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActionsDeprecated, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName[0:11]:         KeyUnspecified,
@@ -57,8 +57,8 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName[81:92]:   KeyUserSchema,
 	_KeyName[92:106]:       KeyTokenExchange,
 	_KeyLowerName[92:106]:  KeyTokenExchange,
-	_KeyName[106:113]:      KeyActions,
-	_KeyLowerName[106:113]: KeyActions,
+	_KeyName[106:113]:      KeyActionsDeprecated,
+	_KeyLowerName[106:113]: KeyActionsDeprecated,
 	_KeyName[113:133]:      KeyImprovedPerformance,
 	_KeyLowerName[113:133]: KeyImprovedPerformance,
 	_KeyName[133:140]:      KeyWebKey,

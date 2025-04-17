@@ -11,6 +11,8 @@ import "zitadel/feature/v2/feature.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
 
 message SetSystemFeaturesRequest{
+  reserved 6;
+  reserved "actions";
   optional bool login_default_org = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -43,13 +45,6 @@ message SetSystemFeaturesRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
-    }
-  ];
-
-  optional bool actions = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Actions allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
     }
   ];
 
@@ -110,6 +105,8 @@ message ResetSystemFeaturesResponse {
 message GetSystemFeaturesRequest {}
 
 message GetSystemFeaturesResponse {
+  reserved 7;
+  reserved "actions";
   zitadel.object.v2.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -143,13 +140,6 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
-    }
-  ];
-
-  FeatureFlag actions = 7 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
     }
   ];
 
