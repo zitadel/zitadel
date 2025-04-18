@@ -2,19 +2,19 @@ package user
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	object2 "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	object2 "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 

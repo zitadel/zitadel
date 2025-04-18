@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -9,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
- 
+
 func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.AddKeyResponse, error) {
 	machineKey := &command.MachineKey{
 		ObjectRoot: models.ObjectRoot{
