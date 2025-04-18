@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -42,8 +41,4 @@ func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *user.Remove
 	return &user.RemovePersonalAccessTokenResponse{
 		DeletionDate: timestamppb.New(objectDetails.EventDate),
 	}, nil
-}
-
-func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPersonalAccessTokensRequest) (*user.ListPersonalAccessTokensResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "not implemented")
 }
