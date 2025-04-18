@@ -134,7 +134,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 		}
 		pat.TokenID = tokenID
 		c.pats = append(c.pats, pat)
-		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm))
+		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm, true))
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgAgg.ID, machine.Machine.AggregateID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
@@ -144,7 +144,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 		}
 		machineKey.KeyID = keyID
 		c.machineKeys = append(c.machineKeys, machineKey)
-		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize))
+		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize, true))
 	}
 	return nil
 }
@@ -274,7 +274,7 @@ func (c *Commands) getOrg(ctx context.Context, orgID string) (*domain.Org, error
 	return orgWriteModelToOrg(writeModel), nil
 }
 
-func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
+func (c *Commands) CheckOrgExists(ctx context.Context, orgID string) error {
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
 		return err

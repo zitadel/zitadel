@@ -131,7 +131,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 					ClientSecret: emptyConfig,
 				},
 			}
-			got, err := r.GenerateMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.set)
+			got, err := r.GenerateMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, true, tt.args.set)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -289,7 +289,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			got, err := r.RemoveMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, true)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

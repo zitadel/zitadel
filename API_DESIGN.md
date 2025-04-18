@@ -158,7 +158,7 @@ Additionally, state changes, specific actions or operations that do not fit into
 The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
 automatically return an error if the token is invalid.
 
-Permissions grated to the user might be organization specific and can therefore only be checked based on the queried resource.
+Permissions granted to the user might be organization specific and can therefore only be checked based on the queried resource.
 In such case, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
 If the permission can be checked by the API itself, e.g. if the permission is instance wide, it can be annotated on the endpoint in the proto file (see below).
 In any case, the required permissions need to be documented in the [API documentation](#documentation).

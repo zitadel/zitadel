@@ -160,6 +160,22 @@ func NewPersonalAccessTokenUserIDSearchQuery(value string) (SearchQuery, error) 
 	return NewTextQuery(PersonalAccessTokenColumnUserID, value, TextEquals)
 }
 
+func NewPersonalAccessTokenIDQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(PersonalAccessTokenColumnID, id, TextEquals)
+}
+
+func NewPersonalAccessTokenCreationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(PersonalAccessTokenColumnCreationDate, ts, compare)
+}
+
+func NewPersonalAccessTokenChangedDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(PersonalAccessTokenColumnChangeDate, ts, compare)
+}
+
+func NewPersonalAccessTokenExpirationDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(PersonalAccessTokenColumnExpiration, ts, compare)
+}
+
 func (r *PersonalAccessTokenSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	query, err := NewPersonalAccessTokenResourceOwnerSearchQuery(orgID)
 	if err != nil {

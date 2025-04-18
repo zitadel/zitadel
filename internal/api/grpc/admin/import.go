@@ -567,7 +567,7 @@ func importMachineKeys(ctx context.Context, s *Server, errors *[]*admin_pb.Impor
 			Type:           authn.KeyTypeToDomain(key.Type),
 			ExpirationDate: key.ExpirationDate.AsTime(),
 			PublicKey:      key.PublicKey,
-		})
+		}, true)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user_key", Id: key.KeyId, Message: err.Error()})
 			if isCtxTimeout(ctx) {

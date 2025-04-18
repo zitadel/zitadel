@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Commands) SetOrgMetadata(ctx context.Context, orgID string, metadata *domain.Metadata) (_ *domain.Metadata, err error) {
-	err = c.checkOrgExists(ctx, orgID)
+	err = c.CheckOrgExists(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, metadat
 	if len(metadatas) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
-	err = c.checkOrgExists(ctx, orgID)
+	err = c.CheckOrgExists(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey str
 	if metadataKey == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "META-2n0f1", "Errors.Metadata.Invalid")
 	}
-	err = c.checkOrgExists(ctx, orgID)
+	err = c.CheckOrgExists(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, meta
 	if len(metadataKeys) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mw2d", "Errors.Metadata.NoData")
 	}
-	err = c.checkOrgExists(ctx, orgID)
+	err = c.CheckOrgExists(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
