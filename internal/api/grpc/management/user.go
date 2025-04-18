@@ -756,7 +756,7 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, query, false)
+	result, err := s.query.SearchAuthNKeys(ctx, query)
 	if err != nil {
 		return nil, err
 	}

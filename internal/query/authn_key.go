@@ -84,6 +84,7 @@ type AuthNKeys struct {
 
 type AuthNKey struct {
 	ID            string
+	AggregateID   string
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -124,7 +125,7 @@ func (q *AuthNKeySearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries, withOwnerRemoved bool) (authNKeys *AuthNKeys, err error) {
+func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries) (authNKeys *AuthNKeys, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -249,6 +250,18 @@ func NewAuthNKeyObjectIDQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnObjectID, id, TextEquals)
 }
 
+func NewAuthNKeyCreationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(AuthNKeyColumnCreationDate, ts, compare)
+}
+
+func NewAuthNKeyChangedDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(AuthNKeyColumnChangeDate, ts, compare)
+}
+
+func NewAuthNKeyExpirationDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(AuthNKeyColumnExpiration, ts, compare)
+}
+
 //go:embed authn_key_user.sql
 var authNKeyUserQuery string
 
@@ -290,6 +303,7 @@ func (q *Queries) GetAuthNKeyUser(ctx context.Context, keyID, userID string) (_ 
 func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys, error)) {
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
+			AuthNKeyColumnAggregateID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
 			AuthNKeyColumnChangeDate.identifier(),
 			AuthNKeyColumnResourceOwner.identifier(),
@@ -306,6 +320,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				authNKey := new(AuthNKey)
 				err := rows.Scan(
 					&authNKey.ID,
+					&authNKey.AggregateID,
 					&authNKey.CreationDate,
 					&authNKey.ChangeDate,
 					&authNKey.ResourceOwner,

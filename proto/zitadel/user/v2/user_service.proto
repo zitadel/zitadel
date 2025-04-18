@@ -3408,7 +3408,7 @@ message ListKeysRequest {
 
 message ListKeysResponse {
   zitadel.filter.v2.PaginationResponse pagination = 1;
-  repeated Key keys = 2;
+  repeated Key result = 2;
 }
 
 message AddPersonalAccessTokenRequest {
@@ -3488,5 +3488,5 @@ message ListPersonalAccessTokensRequest {
 
 message ListPersonalAccessTokensResponse {
   zitadel.filter.v2.PaginationResponse pagination = 1;
-  repeated PersonalAccessToken personal_access_tokens = 2;
+  repeated PersonalAccessToken result = 2;
 }

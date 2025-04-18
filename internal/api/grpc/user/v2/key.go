@@ -2,16 +2,14 @@ package user
 
 import (
 	"context"
-
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
-
+ 
 func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.AddKeyResponse, error) {
 	machineKey := &command.MachineKey{
 		ObjectRoot: models.ObjectRoot{
@@ -51,8 +49,4 @@ func (s *Server) RemoveKey(ctx context.Context, req *user.RemoveKeyRequest) (*us
 	return &user.RemoveKeyResponse{
 		DeletionDate: timestamppb.New(objectDetails.EventDate),
 	}, nil
-}
-
-func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user.ListKeysResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "not implemented")
 }

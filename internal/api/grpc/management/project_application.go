@@ -271,7 +271,7 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 	if err != nil {
 		return nil, err
 	}
-	keys, err := s.query.SearchAuthNKeys(ctx, queries, false)
+	keys, err := s.query.SearchAuthNKeys(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
