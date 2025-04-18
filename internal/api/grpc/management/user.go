@@ -770,11 +770,10 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	machineKey := AddMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
 	// If there is no pubkey supplied, then AddUserMachineKey will generate a new one
 	pubkeySupplied := len(machineKey.PublicKey) > 0
-	details, err := s.command.AddUserMachineKey(ctx, machineKey)
+	details, err := s.command.AddUserMachineKey(ctx, machineKey, true)
 	if err != nil {
 		return nil, err
 	}
-
 	// Return key details only if the pubkey wasn't supplied, otherwise the user already has
 	// private key locally
 	var keyDetails []byte
@@ -793,7 +792,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 }
 
 func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachineKeyRequest) (*mgmt_pb.RemoveMachineKeyResponse, error) {
-	objectDetails, err := s.command.RemoveUserMachineKey(ctx, RemoveMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
+	objectDetails, err := s.command.RemoveUserMachineKey(ctx, RemoveMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID), true, true)
 	if err != nil {
 		return nil, err
 	}
@@ -809,7 +808,7 @@ func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.Generat
 	}
 
 	set := new(command.GenerateMachineSecret)
-	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, set)
+	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, true, set)
 	if err != nil {
 		return nil, err
 	}
@@ -821,7 +820,7 @@ func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.Generat
 }
 
 func (s *Server) RemoveMachineSecret(ctx context.Context, req *mgmt_pb.RemoveMachineSecretRequest) (*mgmt_pb.RemoveMachineSecretResponse, error) {
-	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, true)
 	if err != nil {
 		return nil, err
 	}
@@ -866,7 +865,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPersonalAccessTokenRequest) (*mgmt_pb.AddPersonalAccessTokenResponse, error) {
 	scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
 	pat := AddPersonalAccessTokenRequestToCommand(req, authz.GetCtxData(ctx).OrgID, scopes, domain.UserTypeMachine)
-	details, err := s.command.AddPersonalAccessToken(ctx, pat)
+	details, err := s.command.AddPersonalAccessToken(ctx, pat, true)
 	if err != nil {
 		return nil, err
 	}
@@ -878,7 +877,7 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPer
 }
 
 func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *mgmt_pb.RemovePersonalAccessTokenRequest) (*mgmt_pb.RemovePersonalAccessTokenResponse, error) {
-	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, RemovePersonalAccessTokenRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
+	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, RemovePersonalAccessTokenRequestToCommand(req, authz.GetCtxData(ctx).OrgID), true, true)
 	if err != nil {
 		return nil, err
 	}

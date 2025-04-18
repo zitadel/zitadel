@@ -459,6 +459,7 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*
 			AccessTokenType: domain.OIDCTokenTypeBearer,
 			ObjectRoot: models.ObjectRoot{
 				ResourceOwner: orgId,
+				AggregateID:   req.GetUserId(),
 			},
 		}
 		details, err := s.command.AddMachine(ctx, cmd, command.WithUsernameToIDFallback)

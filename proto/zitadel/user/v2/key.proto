@@ -10,6 +10,12 @@ import "validate/validate.proto";
 import "zitadel/user/v2/filter.proto";
 import "zitadel/filter/v2/filter.proto";
 
+
+enum KeyType {
+  KEY_TYPE_UNSPECIFIED = 0;
+  KEY_TYPE_JSON = 1;
+}
+
 message Key {
   // The unique identifier of the key.
   string id = 1 [

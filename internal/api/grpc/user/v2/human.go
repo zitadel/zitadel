@@ -1,11 +1,13 @@
 package user
 
 import (
+	"io"
+
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	"golang.org/x/text/language"
-	"io"
 )
 
 func patchHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human) (*command.ChangeHuman, error) {

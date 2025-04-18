@@ -3337,6 +3337,19 @@ message AddKeyRequest {
       example: "\"163840776835432345\"";
     }
   ];
+  // The date the key will expire and no logins will be possible anymore.
+  google.protobuf.Timestamp expiration_date = 2 [
+    (validate.rules).timestamp.required = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2519-04-01T08:45:00.000000Z\"";
+    }
+  ];
+  // Optionally provide a public key of your own generated RSA private key.
+  bytes public_key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+    }
+  ];
 }
 
 message AddKeyResponse {
@@ -3346,7 +3359,7 @@ message AddKeyResponse {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
-  // The keys resource ID.
+  // The keys ID.
   string key_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432345\"";
@@ -3358,7 +3371,7 @@ message AddKeyResponse {
 
 
 message RemoveKeyRequest {
-  // The keys resource ID.
+  // The keys ID.
   string key_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3381,6 +3394,7 @@ message ListKeysRequest {
   optional zitadel.filter.v2.PaginationRequest pagination = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional KeyFieldName sorting_column = 2 [
+    (validate.rules).enum = {defined_only: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       default: "\"KEY_FIELD_NAME_CREATED_DATE\""
     }
@@ -3405,14 +3419,6 @@ message AddPersonalAccessTokenRequest {
       example: "\"163840776835432345\"";
     }
   ];
-  // Providing your own token allows you for example to configure your integrations before the token is created.
-  // This is useful for easily repeatable setups of testing environments.
-  optional string token = 2 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"";
-    }
-  ];
   // The timestamp when the token will expire.
   google.protobuf.Timestamp expiration_date = 3 [
     (validate.rules).timestamp.required = true,
@@ -3429,8 +3435,14 @@ message AddPersonalAccessTokenResponse {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
+  // The tokens ID.
+  string token_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
   // The personal access token that can be used to authenticate against the API
-  string token = 2 [
+  string token = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"";
     }
@@ -3438,7 +3450,7 @@ message AddPersonalAccessTokenResponse {
 }
 
 message RemovePersonalAccessTokenRequest {
-  // The tokens resource ID.
+  // The tokens ID.
   string token_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3462,6 +3474,7 @@ message ListPersonalAccessTokensRequest {
   optional zitadel.filter.v2.PaginationRequest pagination = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional PersonalAccessTokenFieldName sorting_column = 2 [
+    (validate.rules).enum = {defined_only: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       default: "\"PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATED_DATE\""
     }

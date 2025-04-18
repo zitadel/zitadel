@@ -42,11 +42,11 @@ func NewPersonalAccessToken(resourceOwner string, userID string, expirationDate 
 	}
 }
 
-func (pat *PersonalAccessToken) content() error {
-	if pat.ResourceOwner == "" {
+func (pat *PersonalAccessToken) content(requireResourceOwner, requireUserId bool) error {
+	if requireResourceOwner && pat.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-xs0k2n", "Errors.ResourceOwnerMissing")
 	}
-	if pat.AggregateID == "" {
+	if requireUserId && pat.AggregateID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-0pzb1", "Errors.User.UserIDMissing")
 	}
 	if pat.TokenID == "" {
@@ -55,8 +55,8 @@ func (pat *PersonalAccessToken) content() error {
 	return nil
 }
 
-func (pat *PersonalAccessToken) valid() (err error) {
-	if err := pat.content(); err != nil {
+func (pat *PersonalAccessToken) valid(requireResourceOwner, requireUserId bool) (err error) {
+	if err := pat.content(requireResourceOwner, requireUserId); err != nil {
 		return err
 	}
 	pat.ExpirationDate, err = domain.ValidateExpirationDate(pat.ExpirationDate)
@@ -77,14 +77,14 @@ func (pat *PersonalAccessToken) checkAggregate(ctx context.Context, filter prepa
 	return nil
 }
 
-func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAccessToken) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAccessToken, requireResourceOwner bool) (_ *domain.ObjectDetails, err error) {
 	if pat.TokenID == "" {
 		pat.TokenID, err = c.idGenerator.Next()
 		if err != nil {
 			return nil, err
 		}
 	}
-	validation := prepareAddPersonalAccessToken(pat, c.keyAlgorithm)
+	validation := prepareAddPersonalAccessToken(pat, c.keyAlgorithm, requireResourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -100,9 +100,9 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 	}, nil
 }
 
-func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.EncryptionAlgorithm) preparation.Validation {
+func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.EncryptionAlgorithm, requireResourceOwner bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := pat.valid(); err != nil {
+		if err := pat.valid(requireResourceOwner, true); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
@@ -132,8 +132,8 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 	}
 }
 
-func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalAccessToken) (*domain.ObjectDetails, error) {
-	validation := prepareRemovePersonalAccessToken(pat)
+func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalAccessToken, requireResourceOwner, requireUserId bool) (*domain.ObjectDetails, error) {
+	validation := prepareRemovePersonalAccessToken(pat, requireResourceOwner, requireUserId)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -149,9 +149,9 @@ func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalA
 	}, nil
 }
 
-func prepareRemovePersonalAccessToken(pat *PersonalAccessToken) preparation.Validation {
+func prepareRemovePersonalAccessToken(pat *PersonalAccessToken, requireResourceOwner, requireUserId bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := pat.content(); err != nil {
+		if err := pat.content(requireResourceOwner, requireUserId); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {

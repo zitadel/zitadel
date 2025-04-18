@@ -638,7 +638,7 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 		if err != nil {
 			return nil, nil, err
 		}
-		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.keyAlgorithm))
+		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.keyAlgorithm, true))
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgID, userID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
@@ -646,7 +646,7 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 		if err != nil {
 			return nil, nil, err
 		}
-		*validations = append(*validations, prepareAddUserMachineKey(machineKey, commands.machineKeySize))
+		*validations = append(*validations, prepareAddUserMachineKey(machineKey, commands.machineKeySize, true))
 	}
 	return pat, machineKey, nil
 }
