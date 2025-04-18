@@ -259,7 +259,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			got, err := c.AddUserMachineKey(tt.args.ctx, tt.args.key)
+			got, err := c.AddUserMachineKey(tt.args.ctx, tt.args.key, true)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
