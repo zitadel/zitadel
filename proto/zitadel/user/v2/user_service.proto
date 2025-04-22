@@ -1844,7 +1844,7 @@ service UserService {
   //   - user.read
   rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
     option (google.api.http) = {
-      post: "/v2/users/pats/_search"
+      post: "/v2/users/pats/search"
       body: "*"
     };
 
