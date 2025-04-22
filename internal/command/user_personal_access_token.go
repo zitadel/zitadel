@@ -42,11 +42,11 @@ func NewPersonalAccessToken(resourceOwner string, userID string, expirationDate 
 	}
 }
 
-func (pat *PersonalAccessToken) content(requireResourceOwner, requireUserId bool) error {
+func (pat *PersonalAccessToken) content(requireResourceOwner bool) error {
 	if requireResourceOwner && pat.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-xs0k2n", "Errors.ResourceOwnerMissing")
 	}
-	if requireUserId && pat.AggregateID == "" {
+	if pat.AggregateID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-0pzb1", "Errors.User.UserIDMissing")
 	}
 	if pat.TokenID == "" {
@@ -55,8 +55,8 @@ func (pat *PersonalAccessToken) content(requireResourceOwner, requireUserId bool
 	return nil
 }
 
-func (pat *PersonalAccessToken) valid(requireResourceOwner, requireUserId bool) (err error) {
-	if err := pat.content(requireResourceOwner, requireUserId); err != nil {
+func (pat *PersonalAccessToken) valid(requireResourceOwner bool) (err error) {
+	if err := pat.content(requireResourceOwner); err != nil {
 		return err
 	}
 	pat.ExpirationDate, err = domain.ValidateExpirationDate(pat.ExpirationDate)
@@ -102,7 +102,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 
 func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.EncryptionAlgorithm, requireResourceOwner bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := pat.valid(requireResourceOwner, true); err != nil {
+		if err := pat.valid(requireResourceOwner); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
@@ -132,8 +132,8 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 	}
 }
 
-func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalAccessToken, requireResourceOwner, requireUserId bool) (*domain.ObjectDetails, error) {
-	validation := prepareRemovePersonalAccessToken(pat, requireResourceOwner, requireUserId)
+func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalAccessToken, requireResourceOwner bool) (*domain.ObjectDetails, error) {
+	validation := prepareRemovePersonalAccessToken(pat, requireResourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -149,9 +149,9 @@ func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalA
 	}, nil
 }
 
-func prepareRemovePersonalAccessToken(pat *PersonalAccessToken, requireResourceOwner, requireUserId bool) preparation.Validation {
+func prepareRemovePersonalAccessToken(pat *PersonalAccessToken, requireResourceOwner bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := pat.content(requireResourceOwner, requireUserId); err != nil {
+		if err := pat.content(requireResourceOwner); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {

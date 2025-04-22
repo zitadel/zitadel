@@ -792,7 +792,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 }
 
 func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachineKeyRequest) (*mgmt_pb.RemoveMachineKeyResponse, error) {
-	objectDetails, err := s.command.RemoveUserMachineKey(ctx, RemoveMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID), true, true)
+	objectDetails, err := s.command.RemoveUserMachineKey(ctx, RemoveMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID), true)
 	if err != nil {
 		return nil, err
 	}
@@ -877,7 +877,7 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPer
 }
 
 func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *mgmt_pb.RemovePersonalAccessTokenRequest) (*mgmt_pb.RemovePersonalAccessTokenResponse, error) {
-	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, RemovePersonalAccessTokenRequestToCommand(req, authz.GetCtxData(ctx).OrgID), true, true)
+	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, RemovePersonalAccessTokenRequestToCommand(req, authz.GetCtxData(ctx).OrgID), true)
 	if err != nil {
 		return nil, err
 	}
