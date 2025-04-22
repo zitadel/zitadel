@@ -3430,7 +3430,7 @@ message AddPersonalAccessTokenRequest {
     }
   ];
   // The timestamp when the token will expire.
-  google.protobuf.Timestamp expiration_date = 3 [
+  google.protobuf.Timestamp expiration_date = 2 [
     (validate.rules).timestamp.required = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2519-04-01T08:45:00.000000Z\"";
