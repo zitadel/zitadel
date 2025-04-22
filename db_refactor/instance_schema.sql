@@ -1,5 +1,37 @@
 DROP SCHEMA IF EXISTS zitadel CASCADE;
 CREATE SCHEMA zitadel;
+
+-- Languages
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS zitadel.languages CASCADE;
+CREATE TABLE zitadel.languages (
+  code VARCHAR(2) NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  
+  deleted_at TIMESTAMP DEFAULT NULL
+);
+INSERT INTO zitadel.languages (code, name)
+VALUES 
+  ('bg','bulgerian'),
+  ('cs','czechian'),
+  ('de','german'),
+  ('en','english'),
+  ('es','spanish'),
+  ('fr','french'),
+  ('hu','hungarian'),
+  ('id','indonesian'),
+  ('it','italian'),
+  ('ja','japanese'),
+  ('ko','korean'),
+  ('mk','macedonian'),
+  ('nl','dutch'),
+  ('pl','polish'),
+  ('pt','portuguese'),
+  ('ro','romanian'),
+  ('ru','russian'),
+  ('sv','swedish'),
+  ('zh','zhuang');
+
 --------------------------------------- instance ---------------------------------------
 -- instances
 DROP TABLE IF EXISTS zitadel.instances CASCADE;
@@ -10,7 +42,7 @@ CREATE TABLE zitadel.instances (
   iam_project_id VARCHAR(100) NOT NULL,
   console_client_id VARCHAR(100) NOT NULL,
   console_app_id VARCHAR(100) NOT NULL,
-  default_language CHAR(2) NOT NULL,
+  language VARCHAR(2) REFERENCES languages(code),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -80,44 +112,23 @@ CREATE TABLE zitadel.oidc_settings (
   id_token_lifetime BIGINT NOT NULL,
   refresh_token_idle_expiration BIGINT NOT NULL,
   refresh_token_expiration BIGINT NOT NULL,
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
 );
 
--- Languages
------------------------------------------------------------------------------------------------------------------------------------------------------------
-DROP TABLE IF EXISTS zitadel.languages CASCADE;
-CREATE TABLE zitadel.languages (
-  code VARCHAR(2) NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
-  
-  deleted_at TIMESTAMP DEFAULT NULL
-);
-INSERT INTO zitadel.languages (code, name)
-VALUES 
-  ('bg','bulgerian'),
-  ('cs','czechian'),
-  ('de','german'),
-  ('en','english'),
-  ('es','spanish'),
-  ('fr','french'),
-  ('hu','hungarian'),
-  ('id','indonesian'),
-  ('it','italian'),
-  ('ja','japanese'),
-  ('ko','korean'),
-  ('mk','macedonian'),
-  ('nl','dutch'),
-  ('pl','polish'),
-  ('pt','portuguese'),
-  ('ro','romanian'),
-  ('ru','russian'),
-  ('sv','swedish'),
-  ('zh','zhuang');
-
 -- Privacy Policy
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+DROP TYPE IF EXISTS zitadel.privacy_policy_state CASCADE;
+CREATE TYPE zitadel.privacy_policy_state AS ENUM (
+	'POLICYSTATEUNSPECIFIED',
+	'POLICYSTATEACTIVE',
+	'POLICYSTATEREMOVED',
+
+	'POLICYSTATECOUNT'
+);
+
 -- NOTE this is 'External Links' in the UI
 DROP TABLE IF EXISTS zitadel.privacy_policies CASCADE;
 CREATE TABLE zitadel.privacy_policies (
@@ -125,7 +136,7 @@ CREATE TABLE zitadel.privacy_policies (
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
   -- https://zitadel.slack.com/archives/C07SVSZU38X/p1744291107892309
-  state SMALLINT NOT NULL,
+  state privacy_policy_state NOT NULL,
   is_default BOOLEAN DEFAULT FALSE NOT NULL,
   privacy_link VARCHAR(200) NOT NULL,
   tos_link VARCHAR(200) NOT NULL,
@@ -156,6 +167,7 @@ CREATE TABLE zitadel.custom_texts (
   key VARCHAR(30) NOT NULL,
   text VARCHAR(200) NOT NULL,
 
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
@@ -163,14 +175,14 @@ CREATE TABLE zitadel.custom_texts (
 
 -- Message Text
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
--- TODO double check size of all fields in zitadel.message_text
 DROP TABLE IF EXISTS zitadel.message_text CASCADE;
 CREATE TABLE zitadel.message_text (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- TODO what is state?
-  state SMALLINT NOT NULL,
+  -- NOTE in the code the state field is the same as in privacy polciies
+  state privacy_policy_state NOT NULL,
+  is_default BOOLEAN DEFAULT FALSE NOT NULL,
   type text NOT NULL,
   language VARCHAR(2) REFERENCES languages(code),
   title VARCHAR(100),
@@ -187,13 +199,23 @@ CREATE TABLE zitadel.message_text (
 
 -- Styling ; 'Branding' in the UI
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+DROP TYPE IF EXISTS zitadel.label_policy_state CASCADE;
+CREATE TYPE zitadel.label_policy_state AS ENUM (
+	'LabelPolicyStateUnspecified',
+	'LabelPolicyStateActive',
+	'LabelPolicyStateRemoved',
+	'LabelPolicyStatePreview',
+
+	'labelPolicyStateCount'
+);
 -- NOTE: styling is in adminapi schema currently NOT adminapi.styling2
 DROP TABLE IF EXISTS zitadel.styling CASCADE;
 CREATE TABLE zitadel.styling (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  label_policy_state SMALLINT DEFAULT (0)::SMALLINT NOT NULL,
+  -- label_policy_state label_policy_state NOT NULL,
+  state label_policy_state NOT NULL,
   primary_color TEXT,
   background_color TEXT,
   warn_color TEXT,
@@ -217,13 +239,20 @@ CREATE TABLE zitadel.styling (
 
 -- Domain Policies
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+DROP TYPE IF EXISTS zitadel.policy_state CASCADE;
+CREATE TYPE zitadel.policy_state AS ENUM (
+	'PolicyStateUnspecified',
+	'PolicyStateActive',
+	'PolicyStateRemoved',
+
+	'policyStateCount'
+);
 DROP TABLE IF EXISTS zitadel.domain_policies CASCADE;
 CREATE TABLE zitadel.domain_policies (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- TODO what is state?
-  state SMALLINT NOT NULL,
+  state policy_state NOT NULL,
   user_login_must_be_domain BOOLEAN NOT NULL,
   validate_org_domains BOOLEAN NOT NULL,
   smtp_sender_address_matches_instance_domain BOOLEAN NOT NULL,
@@ -242,8 +271,7 @@ CREATE TABLE zitadel.lockout_policies (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- TODO what is state?
-  state SMALLINT NOT NULL,
+  state policy_state NOT NULL,
   is_default BOOLEAN DEFAULT FALSE NOT NULL,
   max_password_attempts BIGINT NOT NULL,
   max_otp_attempts BIGINT DEFAULT 0 NOT NULL,
@@ -259,8 +287,7 @@ CREATE TABLE zitadel.password_age_policies (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- TODO what is state?
-  state SMALLINT NOT NULL,
+  state policy_state NOT NULL,
   is_default BOOLEAN DEFAULT FALSE NOT NULL,
   expire_warn_days BIGINT NOT NULL,
   max_age_days BIGINT NOT NULL,
@@ -275,8 +302,7 @@ CREATE TABLE zitadel.password_complexity_policies (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- TODO what is state?
-  state SMALLINT NOT NULL,
+  state policy_state NOT NULL,
   is_default BOOLEAN DEFAULT FALSE NOT NULL,
   min_length BIGINT NOT NULL,
   has_lowercase BOOLEAN NOT NULL,
@@ -290,8 +316,8 @@ CREATE TABLE zitadel.password_complexity_policies (
 
 -- idp
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-DROP TYPE IF EXISTS idp_type CASCADE;
-CREATE TYPE idp_type AS ENUM ('oauth2', 'oidc', 'jwt', 'azure', 'github', 'gitlab', 'github_enterprise', 'gitlab_self_hosted', 'google', 'ldap', 'saml', 'apple');
+DROP TYPE IF EXISTS zitadel.idp_type CASCADE;
+CREATE TYPE zitadel.idp_type AS ENUM ('oauth2', 'oidc', 'jwt', 'azure', 'github', 'gitlab', 'github_enterprise', 'gitlab_self_hosted', 'google', 'ldap', 'saml', 'apple');
 DROP TABLE IF EXISTS zitadel.idp_providers CASCADE;
 CREATE TABLE zitadel.idp_providers (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -404,8 +430,8 @@ CREATE TABLE zitadel.idp_github(
   scopes text[]
 );
 
-DROP TYPE IF EXISTS tenant CASCADE;
-CREATE TYPE tenant AS ENUM ('consumer', 'common', 'organization');
+DROP TYPE IF EXISTS zitadel.tenant CASCADE;
+CREATE TYPE zitadel.tenant AS ENUM ('consumer', 'common', 'organization');
 DROP TABLE IF EXISTS zitadel.idp_azure CASCADE;
 CREATE TABLE zitadel.idp_azure (
   idp_provider_id INTEGER NOT NULL,
@@ -453,12 +479,22 @@ CREATE TABLE zitadel.idp_oauth2 (
   scopes text[]
 );
 
+DROP TYPE IF EXISTS zitadel.idps_config_state CASCADE;
+CREATE TYPE zitadel.idps_config_state AS ENUM (
+	'IDPConfigStateUnspecified',
+	'IDPConfigStateActive',
+	'IDPConfigStateInactive',
+	'IDPConfigStateRemoved',
+
+	'idpConfigStateCount'
+);
+
 DROP TABLE IF EXISTS zitadel.idps CASCADE;
 CREATE TABLE zitadel.idps ( -- based on idp_templates6
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  state SMALLINT NOT NULL,
+  state idps_config_state NOT NULL,
   name VARCHAR(100) NOT NULL,
   owner_type SMALLINT NOT NULL,
   type SMALLINT NOT NULL,
@@ -475,7 +511,6 @@ CREATE TABLE zitadel.idps ( -- based on idp_templates6
   updated_at TIMESTAMP DEFAULT NOW(),
   deleted_at TIMESTAMP DEFAULT NULL
 );
-
 
 -- login policies
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -523,8 +558,8 @@ CREATE TABLE zitadel.login_policies (
 
 -- sms
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-DROP TYPE IF EXISTS sms_type CASCADE;
-CREATE TYPE sms_type AS ENUM ('sms', 'http', 'twilio');
+DROP TYPE IF EXISTS zitadel.sms_type CASCADE;
+CREATE TYPE zitadel.sms_type AS ENUM ('sms', 'http', 'twilio');
 
 DROP TABLE IF EXISTS zitadel.sms_configs CASCADE;
 CREATE TABLE zitadel.sms_configs (
@@ -538,6 +573,14 @@ CREATE TABLE zitadel.sms_configs (
   deleted_at TIMESTAMP DEFAULT NULL
 );
 
+DROP TYPE IF EXISTS zitadel.sms_state CASCADE;
+CREATE TYPE zitadel.sms_state AS ENUM (
+	'SMSConfigStateUnspecified',
+	'SMSConfigStateActive',
+	'SMSConfigStateInactive',
+	'SMSConfigStateRemoved'
+);
+
 DROP TABLE IF EXISTS zitadel.sms CASCADE;
 CREATE TABLE zitadel.sms (
   id SERIAL NOT NULL PRIMARY KEY,
@@ -545,8 +588,7 @@ CREATE TABLE zitadel.sms (
   CONSTRAINT instance_id_fk     FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
   -- I'm assuming the aggregate_id will always be the instance_id, so I'm remocing it
   -- aggregate_id text NOT NULL,
-  -- TODO look to turn state into enum
-  state SMALLINT NOT NULL,
+  state sms_state NOT NULL,
   -- I'm assuming the resource_owner will always be the instance_id, so I'm remocing it
   -- resource_owner text NOT NULL,
   description VARCHAR(200)  NOT NULL
@@ -556,10 +598,8 @@ DROP TABLE IF EXISTS zitadel.sms_http CASCADE;
 CREATE TABLE zitadel.sms_http (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
-  CONSTRAINT instance_id_fk     FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  -- in the grpc defnition, it says the max lenght is 2048,
-  -- I don't think this is a sensible value
-  endpoint VARCHAR(2048) NOT NULL
+  CONSTRAINT instance_id_fk FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
+  endpoint VARCHAR(200) NOT NULL
 );
 
 DROP TABLE IF EXISTS zitadel.sms_twilio CASCADE;
@@ -577,8 +617,17 @@ CREATE TABLE zitadel.sms_twilio (
 
 -- notifications
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+-- TODO sort out notificaitons
+DROP TYPE IF EXISTS zitadel.notifications_types CASCADE;
 CREATE TYPE zitadel.notifications_types AS ENUM (
   'PASSWORD_CHANGE'
+);
+
+DROP TYPE IF EXISTS zitadel.notification_method CASCADE;
+CREATE TYPE zitadel.notification_method AS ENUM (
+  'NOTIFICATION_TYPE_Unspecified',
+  'NOTIFICATION_TYPE_Email',
+  'NOTIFICATION_TYPE_SMS'
 );
 
 DROP TABLE IF EXISTS zitadel.notification_policies CASCADE;
@@ -586,10 +635,12 @@ CREATE TABLE zitadel.notification_policies (
   id SERIAL NOT NULL PRIMARY KEY,
   instance_id VARCHAR(100) NOT NULL,
   CONSTRAINT instance_id_fk     FOREIGN KEY(instance_id) REFERENCES instances(id) ON DELETE CASCADE,
-  state SMALLINT NOT NULL,
+  state policy_state NOT NULL,
   is_default BOOLEAN NOT NULL,
   -- NOTE: discuss if this should or shouldn't be an enum
   notification_type notifications_types NOT NULL,
+  notification_method notification_method NOT NULL,
+  text TEXT NOT NULL,
   send_notification BOOLEAN NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
