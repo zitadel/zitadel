@@ -112,10 +112,6 @@ func (q *Queries) Health(ctx context.Context) error {
 	return q.client.Ping()
 }
 
-type prepareDatabase interface {
-	Timetravel(d time.Duration) string
-}
-
 // cleanStaticQueries removes whitespaces,
 // such as ` `, \t, \n, from queries to improve
 // readability in logs and errors.
@@ -151,4 +147,17 @@ func triggerBatch(ctx context.Context, handlers ...*handler.Handler) {
 	}
 
 	wg.Wait()
+}
+
+func findTextEqualsQuery(column Column, queries []SearchQuery) (text string, ok bool) {
+	for _, query := range queries {
+		if query.Col() != column {
+			continue
+		}
+		tq, ok := query.(*textQuery)
+		if ok && tq.Compare == TextEquals {
+			return tq.Text, true
+		}
+	}
+	return "", false
 }

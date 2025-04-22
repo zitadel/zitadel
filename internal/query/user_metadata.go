@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -87,7 +86,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareUserMetadataQuery(ctx, q.client)
+	query, scan := prepareUserMetadataQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -119,7 +118,7 @@ func (q *Queries) SearchUserMetadataForUsers(ctx context.Context, shouldTriggerB
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareUserMetadataListQuery(ctx, q.client)
+	query, scan := prepareUserMetadataListQuery()
 	eq := sq.Eq{
 		UserMetadataUserIDCol.identifier():     userIDs,
 		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -151,7 +150,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareUserMetadataListQuery(ctx, q.client)
+	query, scan := prepareUserMetadataListQuery()
 	eq := sq.Eq{
 		UserMetadataUserIDCol.identifier():     userID,
 		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -235,7 +234,7 @@ func NewUserMetadataExistsQuery(key string, value []byte, keyComparison TextComp
 	)
 }
 
-func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserMetadata, error)) {
+func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata, error)) {
 	return sq.Select(
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
@@ -244,7 +243,7 @@ func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 		).
-			From(userMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(userMetadataTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*UserMetadata, error) {
 			m := new(UserMetadata)
@@ -267,7 +266,7 @@ func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 		}
 }
 
-func prepareUserMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserMetadataList, error)) {
+func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMetadataList, error)) {
 	return sq.Select(
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
@@ -277,7 +276,7 @@ func prepareUserMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.S
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 			countColumn.identifier()).
-			From(userMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(userMetadataTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*UserMetadataList, error) {
 			metadata := make([]*UserMetadata, 0)

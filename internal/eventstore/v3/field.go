@@ -156,10 +156,11 @@ func (es *Eventstore) handleFieldCommands(ctx context.Context, tx database.Tx, c
 
 func handleFieldFillEvents(ctx context.Context, tx database.Tx, events []eventstore.FillFieldsEvent) error {
 	for _, event := range events {
-		if len(event.Fields()) > 0 {
-			if err := handleFieldOperations(ctx, tx, event.Fields()); err != nil {
-				return err
-			}
+		if len(event.Fields()) == 0 {
+			continue
+		}
+		if err := handleFieldOperations(ctx, tx, event.Fields()); err != nil {
+			return err
 		}
 	}
 	return nil

@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -153,7 +152,7 @@ func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (c
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
+	stmt, scan := prepareSMTPConfigQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnResourceOwner.identifier(): resourceOwner,
 		SMTPConfigColumnInstanceID.identifier():    resourceOwner,
@@ -174,7 +173,7 @@ func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, id string) (co
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
+	stmt, scan := prepareSMTPConfigQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnInstanceID.identifier(): instanceID,
 		SMTPConfigColumnID.identifier():         id,
@@ -190,7 +189,7 @@ func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, id string) (co
 	return config, err
 }
 
-func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
+func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
 	password := new(crypto.CryptoValue)
 
 	return sq.Select(
@@ -215,7 +214,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMTPConfigHTTPColumnEndpoint.identifier()).
 			From(smtpConfigsTable.identifier()).
 			LeftJoin(join(SMTPConfigSMTPColumnID, SMTPConfigColumnID)).
-			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
@@ -255,7 +254,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		}
 }
 
-func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
+func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
 	return sq.Select(
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
@@ -279,7 +278,7 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			countColumn.identifier(),
 		).From(smtpConfigsTable.identifier()).
 			LeftJoin(join(SMTPConfigSMTPColumnID, SMTPConfigColumnID)).
-			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*SMTPConfigs, error) {
 			configs := &SMTPConfigs{Configs: []*SMTPConfig{}}
@@ -329,7 +328,7 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMTPConfigsQuery(ctx, q.client)
+	query, scan := prepareSMTPConfigsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SMTPConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),

@@ -185,6 +185,32 @@
           "DESCRIPTION": "空闲刷新令牌的生命周期是刷新令牌可以未使用的最长时间。"
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "管理您的 OIDC Web 密钥，以安全地签署和验证您的 ZITADEL 实例的令牌。",
+        "TABLE": {
+          "TITLE": "活动和未来的 Web 密钥",
+          "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "ACTIVATE": "激活下一个 Web 密钥",
+          "ACTIVE": "当前活动",
+          "NEXT": "队列中的下一个",
+          "FUTURE": "未来",
+          "WARNING": "Web密钥不到5分钟。"
+        },
+        "CREATE": {
+          "TITLE": "创建新的 Web 密钥",
+          "DESCRIPTION": "创建新的 Web 密钥会将其添加到您的列表。ZITADEL 默认使用 RSA2048 密钥和 SHA256 哈希算法。",
+          "KEY_TYPE": "密钥类型",
+          "BITS": "位数",
+          "HASHER": "哈希算法",
+          "CURVE": "曲线"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "先前的 Web 密钥",
+          "DESCRIPTION": "这些是您之前使用但不再活动的 Web 密钥。",
+          "DEACTIVATED_ON": "停用时间"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "消息文本",
         "DESCRIPTION": "自定义您的通知电子邮件或短信消息的文本。如果您想禁用某些语言，请在您的实例语言设置中限制它们。",
@@ -502,6 +528,114 @@
     "DOWNLOAD": "下载",
     "APPLY": "申请"
   },
+  "ACTIONSTWO": {
+    "EXECUTION": {
+      "TITLE": "操作",
+      "DESCRIPTION": "操作允许您运行自定义代码以响应 API 请求、事件或特定函数。使用它们来扩展 Zitadel、自动化工作流程并与其他系统集成。",
+      "TYPES": {
+        "request": "请求",
+        "response": "响应",
+        "events": "事件",
+        "function": "函数"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "创建操作",
+        "UPDATE_TITLE": "更新操作",
+        "TYPE": {
+          "DESCRIPTION": "选择您希望此操作运行的时间",
+          "REQUEST": {
+            "TITLE": "请求",
+            "DESCRIPTION": "Zitadel 中发生的请求。这可能是登录请求调用之类的操作。"
+          },
+          "RESPONSE": {
+            "TITLE": "响应",
+            "DESCRIPTION": "来自 Zitadel 中请求的响应。考虑一下从获取用户返回的响应。"
+          },
+          "EVENTS": {
+            "TITLE": "事件",
+            "DESCRIPTION": "Zitadel 中发生的事件。这可能是用户创建帐户、成功登录等任何操作。"
+          },
+          "FUNCTIONS": {
+            "TITLE": "函数",
+            "DESCRIPTION": "您可以在 Zitadel 中调用的函数。这可能是从发送电子邮件到创建用户的任何操作。"
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "选择此操作是适用于所有请求、特定服务（例如用户管理）还是单个请求（例如创建用户）。",
+          "ALL": {
+            "TITLE": "全部",
+            "DESCRIPTION": "如果您希望在每个请求上运行您的操作，请选择此项"
+          },
+          "SELECT_SERVICE": {
+            "TITLE": "选择服务",
+            "DESCRIPTION": "为您的操作选择一个 Zitadel 服务。"
+          },
+          "SELECT_METHOD": {
+            "TITLE": "选择方法",
+            "DESCRIPTION": "如果您只想在特定请求上执行，请在此处选择它",
+            "NOTE": "如果您不选择方法，您的操作将在您选择的服务中的每个请求上运行。"
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "函数名称",
+            "DESCRIPTION": "选择您要执行的函数"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "设置组",
+            "DESCRIPTION": "如果您只想在事件组上执行，请在此处设置组"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "选择事件",
+            "DESCRIPTION": "如果您只想在特定事件上执行，请在此处指定它"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "您可以选择执行目标，或在与其他目标相同的条件下运行它。",
+          "TARGET": {
+            "DESCRIPTION": "您要为此操作执行的目标"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "执行条件"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "条件",
+        "TYPE": "类型",
+        "TARGET": "目标",
+        "CREATIONDATE": "创建日期"
+      }
+    },
+    "TARGET": {
+      "TITLE": "目标",
+      "DESCRIPTION": "目标是您要从操作中执行的代码的目标。在此处创建一个目标并将其添加到您的操作中。",
+      "CREATE": {
+        "TITLE": "创建您的目标",
+        "DESCRIPTION": "在 Zitadel 外部创建您自己的目标",
+        "NAME": "名称",
+        "NAME_DESCRIPTION": "为您的目标提供清晰、描述性的名称，以便稍后轻松识别",
+        "TYPE": "类型",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST 调用",
+          "restAsync": "REST 异步"
+        },
+        "ENDPOINT": "端点",
+        "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
+        "TIMEOUT": "超时",
+        "TIMEOUT_DESCRIPTION": "设置您的目标必须响应的最大时间。如果花费的时间更长，我们将停止请求。",
+        "INTERRUPT_ON_ERROR": "错误时中断",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "当目标返回错误时，停止所有执行",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：“出错时中断”会在失败时停止操作，存在被锁定的风险。请在禁用该选项的情况下进行测试，以避免阻止登录/创建。",
+        "AWAIT_RESPONSE": "等待响应",
+        "AWAIT_RESPONSE_DESCRIPTION": "我们将在执行任何其他操作之前等待响应。如果您打算为单个操作使用多个目标，这将非常有用"
+      },
+      "TABLE": {
+        "NAME": "名称",
+        "ENDPOINT": "端点",
+        "CREATIONDATE": "创建日期"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",
     "IAM_OWNER_VIEWER": "有权审查整个实例，包括所有组织",
@@ -509,6 +643,7 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
+    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
@@ -1356,6 +1491,7 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "验证码外观",
       "SECURITY": "安全设置",
       "EVENTS": "活动",
@@ -1515,7 +1651,10 @@
       },
       "RESET": "全部设置为继承",
       "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。"
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
+      "LOGINV2": "登录 V2",
+      "LOGINV2_DESCRIPTION": "启用此选项将激活基于 TypeScript 的新登录界面，具有更高的安全性、性能和可定制性。",
+      "LOGINV2_BASEURI": "基础 URI"
     },
     "DIALOG": {
       "RESET": {

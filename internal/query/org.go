@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
@@ -94,6 +93,18 @@ func orgsCheckPermission(ctx context.Context, orgs *Orgs, permissionCheck domain
 	)
 }
 
+func orgsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		OrgColumnID,
+		domain_pkg.PermissionOrgRead,
+	)
+	return query.JoinClause(join, args...)
+}
+
 type OrgSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -164,7 +175,7 @@ func (q *Queries) oldOrgByID(ctx context.Context, shouldTriggerBulk bool, id str
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareOrgQuery(ctx, q.client)
+	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnID.identifier():         id,
 		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -189,7 +200,7 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *O
 		return org, nil
 	}
 
-	stmt, scan := prepareOrgQuery(ctx, q.client)
+	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.identifier():     domain,
 		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -213,7 +224,7 @@ func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (org *
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareOrgWithDomainsQuery(ctx, q.client)
+	stmt, scan := prepareOrgWithDomainsQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgDomainDomainCol.identifier():     domain,
 		OrgDomainIsVerifiedCol.identifier(): true,
@@ -237,7 +248,7 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 	if name == "" && domain == "" {
 		return false, zerrors.ThrowInvalidArgument(nil, "QUERY-DGqfd", "Errors.Query.InvalidRequest")
 	}
-	query, scan := prepareOrgUniqueQuery(ctx, q.client)
+	query, scan := prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
@@ -284,21 +295,23 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 }
 
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries, permissionCheck domain_pkg.PermissionCheck) (*Orgs, error) {
-	orgs, err := q.searchOrgs(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	orgs, err := q.searchOrgs(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
+	if permissionCheck != nil && !permissionCheckV2 {
 		orgsCheckPermission(ctx, orgs, permissionCheck)
 	}
 	return orgs, nil
 }
 
-func (q *Queries) searchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
+func (q *Queries) searchOrgs(ctx context.Context, queries *OrgSearchQueries, permissionCheckV2 bool) (orgs *Orgs, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareOrgsQuery(ctx, q.client)
+	query, scan := prepareOrgsQuery()
+	query = orgsPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.And{
 			sq.Eq{
@@ -361,7 +374,7 @@ func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
 	return NewListQuery(OrgColumnID, list, ListIn)
 }
 
-func prepareOrgsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
+func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),
 			OrgColumnCreationDate.identifier(),
@@ -372,7 +385,7 @@ func prepareOrgsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 			countColumn.identifier()).
-			From(orgsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(orgsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
@@ -409,42 +422,7 @@ func prepareOrgsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 		}
 }
 
-func prepareOrgQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
-	return sq.Select(
-			OrgColumnID.identifier(),
-			OrgColumnCreationDate.identifier(),
-			OrgColumnChangeDate.identifier(),
-			OrgColumnResourceOwner.identifier(),
-			OrgColumnState.identifier(),
-			OrgColumnSequence.identifier(),
-			OrgColumnName.identifier(),
-			OrgColumnDomain.identifier(),
-		).
-			From(orgsTable.identifier() + db.Timetravel(call.Took(ctx))).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Org, error) {
-			o := new(Org)
-			err := row.Scan(
-				&o.ID,
-				&o.CreationDate,
-				&o.ChangeDate,
-				&o.ResourceOwner,
-				&o.State,
-				&o.Sequence,
-				&o.Name,
-				&o.Domain,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-iTTGJ", "Errors.Org.NotFound")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-pWS5H", "Errors.Internal")
-			}
-			return o, nil
-		}
-}
-
-func prepareOrgWithDomainsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),
 			OrgColumnCreationDate.identifier(),
@@ -456,7 +434,6 @@ func prepareOrgWithDomainsQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			OrgColumnDomain.identifier(),
 		).
 			From(orgsTable.identifier()).
-			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
@@ -480,10 +457,46 @@ func prepareOrgWithDomainsQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 		}
 }
 
-func prepareOrgUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
+func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+	return sq.Select(
+			OrgColumnID.identifier(),
+			OrgColumnCreationDate.identifier(),
+			OrgColumnChangeDate.identifier(),
+			OrgColumnResourceOwner.identifier(),
+			OrgColumnState.identifier(),
+			OrgColumnSequence.identifier(),
+			OrgColumnName.identifier(),
+			OrgColumnDomain.identifier(),
+		).
+			From(orgsTable.identifier()).
+			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
+			PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Org, error) {
+			o := new(Org)
+			err := row.Scan(
+				&o.ID,
+				&o.CreationDate,
+				&o.ChangeDate,
+				&o.ResourceOwner,
+				&o.State,
+				&o.Sequence,
+				&o.Name,
+				&o.Domain,
+			)
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-iTTGJ", "Errors.Org.NotFound")
+				}
+				return nil, zerrors.ThrowInternal(err, "QUERY-pWS5H", "Errors.Internal")
+			}
+			return o, nil
+		}
+}
+
+func prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select(uniqueColumn.identifier()).
 			From(orgsTable.identifier()).
-			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
