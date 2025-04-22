@@ -1741,7 +1741,7 @@ service UserService {
   //   - user.read
   rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
     option (google.api.http) = {
-      post: "/v2/users/keys/_search"
+      post: "/v2/users/keys/search"
       body: "*"
     };
 
