@@ -436,9 +436,11 @@ service UserService {
     };
   }
 
-  // Remove the user phone
+  // Delete the user phone
   //
-  // Remove the user phone
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+  //
+  // Delete the phone number of a user.
   rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/phone"
@@ -452,8 +454,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Delete the user phone";
-      description: "Delete the phone number of a user."
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -2381,6 +2382,7 @@ message UpdateUserRequest{
     // Change the users email address and/or trigger a verification email
     optional SetHumanEmail email = 2;
     // Change the users phone number and/or trigger a verification SMS
+    // To delete the users phone number, leave the phone field empty and omit the verification field.
     optional SetHumanPhone phone = 3;
     // Change the users password.
     // You can optionally require the current password or the verification code to be correct.
