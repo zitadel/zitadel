@@ -7,11 +7,17 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func patchHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human) (*command.ChangeHuman, error) {
-	email, err := SetHumanEmailToEmail(human.Email, userId)
+	phone := human.GetPhone()
+	if phone != nil && phone.Phone == "" && phone.GetVerification() != nil {
+		// TODO: Translate
+		return nil, zerrors.ThrowInvalidArgument(nil, "USERv2-4f3d6", "Errors.User.Phone.RemoveWithVerification")
+	}
+	email, err := setHumanEmailToEmail(human.Email, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -20,13 +26,13 @@ func patchHumanUserToCommand(userId string, userName *string, human *user.Update
 		Username: userName,
 		Profile:  SetHumanProfileToProfile(human.Profile),
 		Email:    email,
-		Phone:    SetHumanPhoneToPhone(human.Phone),
-		Password: SetHumanPasswordToPassword(human.Password),
+		Phone:    setHumanPhoneToPhone(human.Phone, true),
+		Password: setHumanPasswordToPassword(human.Password),
 	}, nil
 }
 
-func UpdateHumanUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.ChangeHuman, error) {
-	email, err := SetHumanEmailToEmail(req.Email, req.GetUserId())
+func updateHumanUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.ChangeHuman, error) {
+	email, err := setHumanEmailToEmail(req.Email, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +40,8 @@ func UpdateHumanUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*com
 		ID:       req.GetUserId(),
 		Username: req.Username,
 		Email:    email,
-		Phone:    SetHumanPhoneToPhone(req.Phone),
-		Password: SetHumanPasswordToPassword(req.Password),
+		Phone:    setHumanPhoneToPhone(req.Phone, false),
+		Password: setHumanPasswordToPassword(req.Password),
 	}
 	if profile := req.GetProfile(); profile != nil {
 		var firstName *string
@@ -72,7 +78,7 @@ func SetHumanProfileToProfile(profile *user.UpdateUserRequest_Human_Profile) *co
 	}
 }
 
-func SetHumanEmailToEmail(email *user.SetHumanEmail, userID string) (*command.Email, error) {
+func setHumanEmailToEmail(email *user.SetHumanEmail, userID string) (*command.Email, error) {
 	if email == nil {
 		return nil, nil
 	}
@@ -91,18 +97,20 @@ func SetHumanEmailToEmail(email *user.SetHumanEmail, userID string) (*command.Em
 	}, nil
 }
 
-func SetHumanPhoneToPhone(phone *user.SetHumanPhone) *command.Phone {
+func setHumanPhoneToPhone(phone *user.SetHumanPhone, withRemove bool) *command.Phone {
 	if phone == nil {
 		return nil
 	}
+	number := phone.GetPhone()
 	return &command.Phone{
-		Number:     domain.PhoneNumber(phone.GetPhone()),
+		Number:     domain.PhoneNumber(number),
 		Verified:   phone.GetIsVerified(),
 		ReturnCode: phone.GetReturnCode() != nil,
+		Remove:     withRemove && number == "",
 	}
 }
 
-func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
+func setHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 	if password == nil {
 		return nil
 	}
