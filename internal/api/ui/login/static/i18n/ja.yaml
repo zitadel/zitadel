@@ -417,7 +417,7 @@ Footer:
   Help: ヘルプ
   SupportEmail: サポートメール
 
-SignIn: '{{.Provider}} でサインイン'
+SignIn: "{{.Provider}} でサインイン"
 
 Errors:
   Internal: 内部でエラーが発生しました
@@ -528,5 +528,11 @@ Errors:
       RegistrationNotAllowed: 新規登録は許可されていません
   DeviceAuth:
     NotExisting: ユーザーコードが存在しません
+  Captcha:
+    InitializationFailed: Captchaの初期化に失敗しました
+    InvalidCaptcha: Captchaの検証に失敗しました。トークンが無効か期限切れです
+    MissingToken: Captchaトークンが見つかりません
+    UnexpectedType: 設定内の予期しないCaptchaタイプです
+    ValidationFailed: Captchaトークンの検証中にエラーが発生しました
 
 optional: "（オプション）"

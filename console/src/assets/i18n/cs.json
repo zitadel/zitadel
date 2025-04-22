@@ -2380,6 +2380,34 @@
     "USEPKCE": "Použijte PKCE",
     "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
   },
+  "CAPTCHA": {
+    "TITLE": "Ověření Captcha",
+    "DESCRIPTION": "Přidejte Captcha do registračních a přihlašovacích formulářů.",
+    "REGISTER": {
+      "TITLE": "Povolit pro registraci",
+      "DESCRIPTION": "Povolit Captcha pro registrační formulář."
+    },
+    "LOGIN": {
+      "TITLE": "Povolit pro přihlášení",
+      "DESCRIPTION": "Povolit Captcha pro přihlašovací formulář."
+    },
+    "METHOD": {
+      "TITLE": "Metoda Captcha",
+      "DESCRIPTION": "Vyberte metodu Captcha, která se má použít.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha Site Key"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha Secret Key"
+        }
+      },
+      "LIST": {
+        "1": "Zakázáno",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "Bezheslové přihlášení",

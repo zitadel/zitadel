@@ -9,7 +9,7 @@ Login:
   UsernamePlaceHolder: потребителско име
   LoginnamePlaceHolder: потребителско име@домейн
   ExternalUserDescription: Влезте с външен потребител.
-  MustBeMemberOfOrg: 'Потребителят трябва да е член на {{.OrgName}} организация.'
+  MustBeMemberOfOrg: "Потребителят трябва да е член на {{.OrgName}} организация."
   RegisterButtonText: регистрирам
   NextButtonText: следващия
 LDAP:
@@ -22,12 +22,12 @@ SelectAccount:
   Title: Изберете акаунт
   Description: Използвайте вашия ZITADEL-акаунт
   TitleLinking: Изберете акаунт за свързване на потребител
-  DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
+  DescriptionLinking: "Изберете своя акаунт, който да свържете с вашия външен потребител."
   OtherUser: Друг потребител
   SessionState0: активен
   SessionState1: Не сте в профила си
-  MustBeMemberOfOrg: 'Потребителят трябва да е член на {{.OrgName}} организация.'
-  
+  MustBeMemberOfOrg: "Потребителят трябва да е член на {{.OrgName}} организация."
+
 Password:
   Title: Парола
   Description: Въведете данните си за вход.
@@ -94,15 +94,15 @@ InitMFAPrompt:
   Description: >-
     Двуфакторното удостоверяване ви дава допълнителна сигурност за вашия
     потребителски акаунт.
-  Provider0: 'Приложение за удостоверяване (напр. Google/Microsoft Authenticator, Authy)'
-  Provider1: 'Зависи от устройството (напр. FaceID, Windows Hello, пръстов отпечатък)'
+  Provider0: "Приложение за удостоверяване (напр. Google/Microsoft Authenticator, Authy)"
+  Provider1: "Зависи от устройството (напр. FaceID, Windows Hello, пръстов отпечатък)"
   Provider3: OTP SMS
   Provider4: OTP имейл
   NextButtonText: следващия
   SkipButtonText: пропуснете
 InitMFAOTP:
   Title: 2-факторна проверка
-  Description: 'Създайте своя 2-фактор. '
+  Description: "Създайте своя 2-фактор. "
   OTPDescription: >-
     Сканирайте кода с вашето приложение за удостоверяване (напр.
     Google/Microsoft Authenticator, Authy) или копирайте тайната и поставете
@@ -127,19 +127,19 @@ InitMFAU2F:
     вашия телефон, да използва Bluetooth или да се включи директно в USB порта
     на вашия компютър.
   TokenNameLabel: Име на защитния ключ/устройство
-  NotSupported: 'WebAuthN не се поддържа от вашия браузър. '
+  NotSupported: "WebAuthN не се поддържа от вашия браузър. "
   RegisterTokenButtonText: Добавете ключ за сигурност
   ErrorRetry: >-
     Опитайте отново, създайте ново предизвикателство или изберете различен
     метод.
 InitMFADone:
   Title: Ключът за сигурност е проверен
-  Description: 'Страхотно! '
+  Description: "Страхотно! "
   NextButtonText: следващия
   CancelButtonText: анулиране
 MFAProvider:
-  Provider0: 'Приложение за удостоверяване (напр. Google/Microsoft Authenticator, Authy)'
-  Provider1: 'Зависи от устройството (напр. FaceID, Windows Hello, пръстов отпечатък)'
+  Provider0: "Приложение за удостоверяване (напр. Google/Microsoft Authenticator, Authy)"
+  Provider1: "Зависи от устройството (напр. FaceID, Windows Hello, пръстов отпечатък)"
   Provider3: OTP SMS
   Provider4: OTP имейл
   ChooseOther: или изберете друга опция
@@ -159,15 +159,15 @@ VerifyMFAU2F:
   Description: >-
     Потвърдете своя 2-фактор с регистрираното устройство (напр. FaceID, Windows
     Hello, пръстов отпечатък)
-  NotSupported: 'WebAuthN не се поддържа от вашия браузър. '
-  ErrorRetry: 'Опитайте отново, създайте нова заявка или изберете друг метод.'
+  NotSupported: "WebAuthN не се поддържа от вашия браузър. "
+  ErrorRetry: "Опитайте отново, създайте нова заявка или изберете друг метод."
   ValidateTokenButtonText: Проверете 2-фактора
 Passwordless:
   Title: Вход без парола
   Description: >-
     Влезте с методи за удостоверяване, предоставени от вашето устройство, като
     FaceID, Windows Hello или пръстов отпечатък.
-  NotSupported: 'WebAuthN не се поддържа от вашия браузър. '
+  NotSupported: "WebAuthN не се поддържа от вашия браузър. "
   ErrorRetry: >-
     Опитайте отново, създайте ново предизвикателство или изберете различен
     метод.
@@ -175,8 +175,8 @@ Passwordless:
   ValidateTokenButtonText: Влезте без парола
 PasswordlessPrompt:
   Title: Настройка без парола
-  Description: 'Искате ли да настроите влизане без парола? '
-  DescriptionInit: 'Трябва да настроите влизане без парола. '
+  Description: "Искате ли да настроите влизане без парола? "
+  DescriptionInit: "Трябва да настроите влизане без парола. "
   PasswordlessButtonText: Преминете без парола
   NextButtonText: следващия
   SkipButtonText: пропуснете
@@ -187,7 +187,7 @@ PasswordlessRegistration:
     MacBook и т.н.) и след това щракнете върху бутона „Регистриране без парола“
     по-долу.
   TokenNameLabel: Име на устройството
-  NotSupported: 'WebAuthN не се поддържа от вашия браузър. '
+  NotSupported: "WebAuthN не се поддържа от вашия браузър. "
   RegisterTokenButtonText: Регистрирайте се без парола
   ErrorRetry: >-
     Опитайте отново, създайте ново предизвикателство или изберете различен
@@ -200,7 +200,7 @@ PasswordlessRegistrationDone:
   CancelButtonText: анулиране
 PasswordChange:
   Title: Промяна на паролата
-  Description: 'Променете паролата си. '
+  Description: "Променете паролата си. "
   ExpiredDescription: Паролата ви е изтекла и трябва да бъде променена. Въведете старата и новата си парола.
   OldPasswordLabel: Стара парола
   NewPasswordLabel: нова парола
@@ -214,11 +214,11 @@ PasswordChangeDone:
   NextButtonText: следващия
 PasswordResetDone:
   Title: Връзката за повторно задаване на парола е изпратена
-  Description: 'Проверете имейла си, за да нулирате паролата си.'
+  Description: "Проверете имейла си, за да нулирате паролата си."
   NextButtonText: следващия
 EmailVerification:
   Title: Потвърждение на имейла
-  Description: 'Изпратихме ви имейл, за да потвърдим адреса ви. '
+  Description: "Изпратихме ви имейл, за да потвърдим адреса ви. "
   CodeLabel: Код
   NextButtonText: следващия
   ResendButtonText: код за препращане
@@ -236,7 +236,7 @@ RegisterOption:
   LoginButtonText: Влизам
 RegistrationUser:
   Title: Регистрация
-  Description: 'Въведете своите потребителски данни. '
+  Description: "Въведете своите потребителски данни. "
   DescriptionOrgRegister: Въведете своите потребителски данни.
   EmailLabel: Електронна поща
   UsernameLabel: Потребителско име
@@ -279,7 +279,7 @@ RegistrationUser:
   NextButtonText: следващия
 ExternalRegistrationUserOverview:
   Title: Регистрация на външен потребител
-  Description: 'Взехме вашите потребителски данни от избрания доставчик. '
+  Description: "Взехме вашите потребителски данни от избрания доставчик. "
   EmailLabel: Електронна поща
   UsernameLabel: Потребителско име
   FirstnameLabel: Първо име
@@ -333,7 +333,7 @@ RegistrationOrg:
   SaveButtonText: Създайте организация
 LoginSuccess:
   Title: Успешен вход
-  AutoRedirectDescription: 'Ще бъдете насочени обратно към вашето приложение автоматично. '
+  AutoRedirectDescription: "Ще бъдете насочени обратно към вашето приложение автоматично. "
   RedirectedDescription: Сега можете да затворите този прозорец.
   NextButtonText: следващия
 LogoutDone:
@@ -352,7 +352,7 @@ LinkingUsersDone:
   NextButtonText: следващия
 ExternalNotFound:
   Title: Външен потребител не е намерен
-  Description: 'Външен потребител не е намерен. '
+  Description: "Външен потребител не е намерен. "
   LinkButtonText: Връзка
   AutoRegisterButtonText: регистрирам
   TosAndPrivacyLabel: Правила и условия
@@ -384,7 +384,7 @@ DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
     Label: Потребителски код
-    Description: 'Въведете потребителския код, представен на устройството.'
+    Description: "Въведете потребителския код, представен на устройството."
     ButtonNext: следващия
   Action:
     Description: Дайте достъп до устройството.
@@ -395,8 +395,8 @@ DeviceAuth:
       Deny: отричам
   Done:
     Description: Свършен.
-    Approved: 'Упълномощаването на устройството е одобрено. '
-    Denied: 'Упълномощаването на устройството е отказано. '
+    Approved: "Упълномощаването на устройството е одобрено. "
+    Denied: "Упълномощаването на устройството е отказано. "
 Footer:
   PoweredBy: Задвижвани от
   Tos: TOS
@@ -503,8 +503,8 @@ Errors:
         Вход в външен доставчик на идентификация е неуспешен. Връщане към локален вход.
 
         Подробности за грешката: {{.Details}}
-    GrantRequired: 'Влизането не е възможно. '
-    ProjectRequired: 'Влизането не е възможно. '
+    GrantRequired: "Влизането не е възможно. "
+    ProjectRequired: "Влизането не е възможно. "
   IdentityProvider:
     InvalidConfig: Конфигурацията на доставчика на самоличност е невалидна
   IAM:
@@ -515,4 +515,11 @@ Errors:
       RegistrationNotAllowed: Регистрацията не е разрешена
   DeviceAuth:
     NotExisting: Потребителският код не съществува
+  Captcha:
+    InitializationFailed: Неуспешно инициализиране на Captcha
+    InvalidCaptcha: Неуспешна проверка на Captcha. Токенът е невалиден или е изтекъл
+    MissingToken: Липсва Captcha токен
+    UnexpectedType: Неочакван тип Captcha в конфигурацията
+    ValidationFailed: Възникна грешка при проверка на Captcha токена
+
 optional: (по избор)

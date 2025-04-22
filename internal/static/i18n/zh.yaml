@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: Web 密钥功能已禁用
     NoActive: 未找到活动 Web 密钥
     NotFound: 未找到 Web 密钥
+  Captcha:
+    InitializationFailed: 无法初始化验证码
+    InvalidCaptcha: 验证码验证失败。验证码令牌无效或已过期
+    MissingToken: 缺少验证码令牌
+    UnexpectedType: 配置中的验证码类型意外
+    ValidationFailed: 验证验证码令牌时发生错误
 
 AggregateTypes:
   action: 动作

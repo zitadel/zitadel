@@ -40,6 +40,11 @@ const (
 	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
 	SecondFactorCheckLifetimeCol        = "second_factor_check_lifetime"
 	MultiFactorCheckLifetimeCol         = "multi_factor_check_lifetime"
+	EnableRegistrationCaptchaCol        = "enable_registration_captcha"
+	EnableLoginCaptchaCol               = "enable_login_captcha"
+	CaptchaTypeCol                      = "captcha_type"
+	CaptchaSiteKeyCol                   = "captcha_site_key"
+	CaptchaSecretKeyCol                 = "captcha_secret_key"
 	LoginPolicyOwnerRemovedCol          = "owner_removed"
 )
 
@@ -81,6 +86,11 @@ func (*loginPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(MFAInitSkipLifetimeCol, handler.ColumnTypeInt64),
 			handler.NewColumn(SecondFactorCheckLifetimeCol, handler.ColumnTypeInt64),
 			handler.NewColumn(MultiFactorCheckLifetimeCol, handler.ColumnTypeInt64),
+			handler.NewColumn(EnableRegistrationCaptchaCol, handler.ColumnTypeBool),
+			handler.NewColumn(EnableLoginCaptchaCol, handler.ColumnTypeBool),
+			handler.NewColumn(CaptchaTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(CaptchaSiteKeyCol, handler.ColumnTypeText),
+			handler.NewColumn(CaptchaSecretKeyCol, handler.ColumnTypeText),
 			handler.NewColumn(LoginPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
@@ -202,6 +212,11 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(MFAInitSkipLifetimeCol, policyEvent.MFAInitSkipLifetime),
 		handler.NewCol(SecondFactorCheckLifetimeCol, policyEvent.SecondFactorCheckLifetime),
 		handler.NewCol(MultiFactorCheckLifetimeCol, policyEvent.MultiFactorCheckLifetime),
+		handler.NewCol(EnableRegistrationCaptchaCol, policyEvent.EnableRegistrationCaptcha),
+		handler.NewCol(EnableLoginCaptchaCol, policyEvent.EnableLoginCaptcha),
+		handler.NewCol(CaptchaTypeCol, policyEvent.CaptchaType),
+		handler.NewCol(CaptchaSiteKeyCol, policyEvent.CaptchaSiteKey),
+		handler.NewCol(CaptchaSecretKeyCol, policyEvent.CaptchaSecretKey),
 	}), nil
 }
 
@@ -270,6 +285,21 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	}
 	if policyEvent.MultiFactorCheckLifetime != nil {
 		cols = append(cols, handler.NewCol(MultiFactorCheckLifetimeCol, *policyEvent.MultiFactorCheckLifetime))
+	}
+	if policyEvent.EnableRegistrationCaptcha != nil {
+		cols = append(cols, handler.NewCol(EnableRegistrationCaptchaCol, *policyEvent.EnableRegistrationCaptcha))
+	}
+	if policyEvent.EnableLoginCaptcha != nil {
+		cols = append(cols, handler.NewCol(EnableLoginCaptchaCol, *policyEvent.EnableLoginCaptcha))
+	}
+	if policyEvent.CaptchaType != nil {
+		cols = append(cols, handler.NewCol(CaptchaTypeCol, *policyEvent.CaptchaType))
+	}
+	if policyEvent.CaptchaSiteKey != nil {
+		cols = append(cols, handler.NewCol(CaptchaSiteKeyCol, *policyEvent.CaptchaSiteKey))
+	}
+	if policyEvent.CaptchaSecretKey != nil {
+		cols = append(cols, handler.NewCol(CaptchaSecretKeyCol, *policyEvent.CaptchaSecretKey))
 	}
 
 	return handler.NewUpdateStatement(

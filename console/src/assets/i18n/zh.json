@@ -2371,6 +2371,34 @@
     "USEPKCE": "使用PKCE",
     "USEPKCE_DESC": "确定 auth 请求中是否包含 code_challenge 和 code_challenge_method 参数"
   },
+  "CAPTCHA": {
+    "TITLE": "验证码验证",
+    "DESCRIPTION": "在注册和登录表单中添加验证码。",
+    "REGISTER": {
+      "TITLE": "注册时启用",
+      "DESCRIPTION": "为注册表单启用验证码。"
+    },
+    "LOGIN": {
+      "TITLE": "登录时启用",
+      "DESCRIPTION": "为登录表单启用验证码。"
+    },
+    "METHOD": {
+      "TITLE": "验证码方法",
+      "DESCRIPTION": "选择要使用的验证码方法。",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha Site Key"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha Secret Key"
+        }
+      },
+      "LIST": {
+        "1": "已禁用",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "无密码身份认证",

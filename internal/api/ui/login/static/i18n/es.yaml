@@ -391,7 +391,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
-  
+
 Footer:
   PoweredBy: Powered By
   Tos: TDS
@@ -496,7 +496,7 @@ Errors:
       NoOptionAllowed: Ni la creación ni la vinculación están permitidas en este proveedor. Póngase en contacto con su administrador.
       LoginFailedSwitchLocal: |
         Error al iniciar sesión en el proveedor de identidad externo. Volviendo al inicio de sesión local.
-        
+
         Detalles del error: {{.Details}}
     GrantRequired: El inicio de sesión no es posible. Se requiere que el usuario tenga al menos una concesión sobre la aplicación. Por favor contacta con tu administrador.
     ProjectRequired: El inicio de sesión no es posible. La organización del usuario debe tener el acceso concedido para el proyecto. Por favor contacta con tu administrador.
@@ -508,5 +508,11 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: El registro no está permitido
+  Captcha:
+    InitializationFailed: Error al inicializar el Captcha
+    InvalidCaptcha: Falló la verificación del Captcha. El token es inválido o ha expirado
+    MissingToken: Falta el token del Captcha
+    UnexpectedType: Tipo de Captcha inesperado en la configuración
+    ValidationFailed: Ocurrió un error al validar el token del Captcha
 
 optional: (opcional)

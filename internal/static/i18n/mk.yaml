@@ -609,6 +609,12 @@ Errors:
     FeatureDisabled: Функцијата за веб-клуч е оневозможена
     NoActive: Не е пронајден активен веб-клуч
     NotFound: Веб-клучот не е пронајден
+  Captcha:
+    InitializationFailed: Неуспешно иницијализирање на Captcha
+    InvalidCaptcha: Неуспешна Captcha верификација. Токенот е невалиден или истечен
+    MissingToken: Недостасува Captcha токен
+    UnexpectedType: Неочекуван тип Captcha во конфигурацијата
+    ValidationFailed: Се случи грешка при верификација на Captcha токенот
 
 AggregateTypes:
   action: Акција

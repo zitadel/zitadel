@@ -146,6 +146,122 @@
 
 <br />
 
+<h3>{{ 'CAPTCHA.TITLE' | translate }}</h3>
+<p class="cnsl-secondary-text">{{ 'CAPTCHA.DESCRIPTION' | translate }}</p>
+
+<div *ngIf="loginData" class="login-policy-row">
+  <mat-checkbox
+    card-actions
+    class="login-policy-toggle"
+    color="primary"
+    matTooltip="{{ 'CAPTCHA.REGISTER.DESCRIPTION' | translate }}"
+    ngDefaultControl
+    [(ngModel)]="loginData.enableRegistrationCaptcha"
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : '',
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
+    {{ 'CAPTCHA.REGISTER.TITLE' | translate }}
+  </mat-checkbox>
+</div>
+<div *ngIf="loginData" class="login-policy-row">
+  <mat-checkbox
+    card-actions
+    class="login-policy-toggle"
+    color="primary"
+    matTooltip="{{ 'CAPTCHA.LOGIN.DESCRIPTION' | translate }}"
+    ngDefaultControl
+    [(ngModel)]="loginData.enableLoginCaptcha"
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : '',
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
+    {{ 'CAPTCHA.LOGIN.TITLE' | translate }}
+  </mat-checkbox>
+</div>
+<form class="captcha-form" *ngIf="loginData" (ngSubmit)="savePolicy()" [formGroup]="captchaForm" autocomplete="off">
+  <cnsl-card
+    [title]="'CAPTCHA.METHOD.TITLE' | translate"
+    [description]="'CAPTCHA.METHOD.DESCRIPTION' | translate"
+  >
+    <cnsl-form-field *ngIf="loginData" class="captcha-form-field" label="Captcha Method" required="true">
+      <mat-select
+        formControlName="captchaType"
+        (selectionChange)="onCaptchaTypeChange()"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+                ? 'policy.write'
+                : '',
+          ]
+            | hasRole
+            | async) === false
+        "
+      >
+        <mat-option *ngFor="let cm of captchaTypes" [value]="cm">
+          {{ 'CAPTCHA.METHOD.LIST.' + cm | translate }}
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+    <cnsl-form-field class="form-field" *ngIf="captchaForm.get('captchaType')?.value !== CaptchaType.CAPTCHA_TYPE_DISABLED" label="Site Key">
+      <cnsl-label>{{ 'CAPTCHA.METHOD.CONFIG.SITE_KEY.LABEL' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        formControlName="captchaSiteKey"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+                ? 'policy.write'
+                : '',
+          ]
+            | hasRole
+            | async) === false
+        "
+      />
+    </cnsl-form-field>
+    <cnsl-form-field class="form-field" *ngIf="captchaForm.get('captchaType')?.value !== CaptchaType.CAPTCHA_TYPE_DISABLED" label="Secret Key">
+      <cnsl-label>{{ 'CAPTCHA.METHOD.CONFIG.SECRET_KEY.LABEL' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        formControlName="captchaSecretKey"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+                ? 'policy.write'
+                : '',
+          ]
+            | hasRole
+            | async) === false
+        "
+      />
+    </cnsl-form-field>
+  </cnsl-card>
+</form>
+
+<br />
+
 <h3>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.TITLE' | translate }}</h3>
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.DESCRIPTION' | translate }}</p>
 <form class="lifetime-form" (ngSubmit)="savePolicy()" [formGroup]="lifetimeForm" autocomplete="off">

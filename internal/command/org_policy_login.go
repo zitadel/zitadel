@@ -36,6 +36,11 @@ type AddLoginPolicy struct {
 	MultiFactorCheckLifetime   time.Duration
 	DisableLoginWithEmail      bool
 	DisableLoginWithPhone      bool
+	EnableRegistrationCaptcha  bool
+	EnableLoginCaptcha         bool
+	CaptchaType                domain.CaptchaType
+	CaptchaSiteKey             string
+	CaptchaSecretKey           string
 }
 
 type AddLoginPolicyIDP struct {
@@ -61,6 +66,11 @@ type ChangeLoginPolicy struct {
 	MultiFactorCheckLifetime   time.Duration
 	DisableLoginWithEmail      bool
 	DisableLoginWithPhone      bool
+	EnableRegistrationCaptcha  bool
+	EnableLoginCaptcha         bool
+	CaptchaType                domain.CaptchaType
+	CaptchaSiteKey             string
+	CaptchaSecretKey           string
 }
 
 func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *AddLoginPolicy) (_ *domain.ObjectDetails, err error) {
@@ -446,6 +456,11 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
 				policy.MultiFactorCheckLifetime,
+				policy.EnableRegistrationCaptcha,
+				policy.EnableLoginCaptcha,
+				policy.CaptchaType,
+				policy.CaptchaSiteKey,
+				policy.CaptchaSecretKey,
 			))
 			for _, factor := range policy.SecondFactors {
 				cmds = append(cmds, org.NewLoginPolicySecondFactorAddedEvent(ctx, &a.Aggregate, factor))
@@ -491,7 +506,13 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 				policy.ExternalLoginCheckLifetime,
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
-				policy.MultiFactorCheckLifetime)
+				policy.MultiFactorCheckLifetime,
+				policy.EnableRegistrationCaptcha,
+				policy.EnableLoginCaptcha,
+				policy.CaptchaType,
+				policy.CaptchaSiteKey,
+				policy.CaptchaSecretKey,
+			)
 			if !hasChanged {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
 			}

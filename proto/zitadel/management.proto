@@ -10684,6 +10684,31 @@ message AddCustomLoginPolicyRequest {
             description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
         }
     ];
+    bool enable_registration_captcha = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, a captcha will be shown and required during user registration."
+        }
+    ];
+    bool enable_login_captcha = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, a captcha will be shown and required during user login."
+        }
+    ];
+    zitadel.policy.v1.CaptchaType captcha_type = 23 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines the captcha type"
+        }
+    ];
+    string captcha_site_key = 24 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "captcha key for the site, required depending on the captcha type"
+        }
+    ];
+    string captcha_secret_key = 25 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "captcha secret key for the API validation, required depending on the captcha type"
+        }
+    ];
 }
 
 message AddCustomLoginPolicyResponse {
@@ -10731,6 +10756,31 @@ message UpdateCustomLoginPolicyRequest {
     bool force_mfa_local_only = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
+        }
+    ];
+    bool enable_registration_captcha = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, a captcha will be shown and required during user registration."
+        }
+    ];
+    bool enable_login_captcha = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, a captcha will be shown and required during user login."
+        }
+    ];
+    zitadel.policy.v1.CaptchaType captcha_type = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines the captcha type"
+        }
+    ];
+    string captcha_site_key = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "captcha key for the site, required depending on the captcha type"
+        }
+    ];
+    string captcha_secret_key = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "captcha secret key for the API validation, required depending on the captcha type"
         }
     ];
 }

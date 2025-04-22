@@ -212,7 +212,7 @@ func instancePoliciesEvents(ctx context.Context, instanceID string) []eventstore
 		instance.NewPasswordComplexityPolicyAddedEvent(ctx, &instanceAgg.Aggregate, 8, true, true, true, true),
 		instance.NewPasswordAgePolicyAddedEvent(ctx, &instanceAgg.Aggregate, 0, 0),
 		instance.NewDomainPolicyAddedEvent(ctx, &instanceAgg.Aggregate, false, false, false),
-		instance.NewLoginPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240*time.Hour, 240*time.Hour, 720*time.Hour, 18*time.Hour, 12*time.Hour),
+		instance.NewLoginPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240*time.Hour, 240*time.Hour, 720*time.Hour, 18*time.Hour, 12*time.Hour, false, false, domain.CaptchaTypeDisabled, "", ""),
 		instance.NewLoginPolicySecondFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecondFactorTypeTOTP),
 		instance.NewLoginPolicySecondFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecondFactorTypeU2F),
 		instance.NewLoginPolicyMultiFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.MultiFactorTypeU2FWithPIN),
@@ -260,7 +260,12 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 			MfaInitSkipLifetime        time.Duration
 			SecondFactorCheckLifetime  time.Duration
 			MultiFactorCheckLifetime   time.Duration
-		}{true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240 * time.Hour, 240 * time.Hour, 720 * time.Hour, 18 * time.Hour, 12 * time.Hour},
+			EnableRegistrationCaptcha  bool
+			EnableLoginCaptcha         bool
+			CaptchaType                domain.CaptchaType
+			CaptchaSiteKey             string
+			CaptchaSecretKey           string
+		}{true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240 * time.Hour, 240 * time.Hour, 720 * time.Hour, 18 * time.Hour, 12 * time.Hour, false, false, domain.CaptchaTypeDisabled, "", ""},
 		NotificationPolicy: struct {
 			PasswordChange bool
 		}{true},

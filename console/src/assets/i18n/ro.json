@@ -2388,6 +2388,34 @@
     "ISIDTOKENMAPPING": "Mapați din tokenul ID",
     "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo."
   },
+  "CAPTCHA": {
+    "TITLE": "Validare Captcha",
+    "DESCRIPTION": "Adăugați Captcha la formularele de înregistrare și autentificare.",
+    "REGISTER": {
+      "TITLE": "Activează pentru înregistrare",
+      "DESCRIPTION": "Activează Captcha pentru formularul de înregistrare."
+    },
+    "LOGIN": {
+      "TITLE": "Activează pentru autentificare",
+      "DESCRIPTION": "Activează Captcha pentru formularul de autentificare."
+    },
+    "METHOD": {
+      "TITLE": "Metodă Captcha",
+      "DESCRIPTION": "Selectați metoda Captcha care va fi utilizată.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha Site Key"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha Secret Key"
+        }
+      },
+      "LIST": {
+        "1": "Dezactivat",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "Fără parolă",

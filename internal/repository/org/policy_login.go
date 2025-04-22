@@ -39,6 +39,11 @@ func NewLoginPolicyAddedEvent(
 	mfaInitSkipLifetime,
 	secondFactorCheckLifetime,
 	multiFactorCheckLifetime time.Duration,
+	enableRegistrationCaptcha,
+	enableLoginCaptcha bool,
+	captchaType domain.CaptchaType,
+	captchaSiteKey string,
+	captchaSecretKey string,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		LoginPolicyAddedEvent: *policy.NewLoginPolicyAddedEvent(
@@ -63,6 +68,11 @@ func NewLoginPolicyAddedEvent(
 			mfaInitSkipLifetime,
 			secondFactorCheckLifetime,
 			multiFactorCheckLifetime,
+			enableRegistrationCaptcha,
+			enableLoginCaptcha,
+			captchaType,
+			captchaSiteKey,
+			captchaSecretKey,
 		),
 	}
 }

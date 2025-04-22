@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: Funzione chiave Web disabilitata
     NoActive: Nessuna chiave Web attiva trovata
     NotFound: Chiave Web non trovata
+  Captcha:
+    InitializationFailed: Impossibile inizializzare il Captcha
+    InvalidCaptcha: Verifica del Captcha non riuscita. Il token è invalido o scaduto
+    MissingToken: Token Captcha mancante
+    UnexpectedType: Tipo di Captcha inatteso nella configurazione
+    ValidationFailed: Si è verificato un errore durante la validazione del token Captcha
 
 AggregateTypes:
   action: Azione

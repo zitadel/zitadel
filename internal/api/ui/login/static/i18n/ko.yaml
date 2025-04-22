@@ -527,5 +527,11 @@ Errors:
       RegistrationNotAllowed: 등록이 허용되지 않습니다
   DeviceAuth:
     NotExisting: 사용자 코드가 존재하지 않습니다
+  Captcha:
+    InitializationFailed: Captcha를 초기화할 수 없습니다
+    InvalidCaptcha: Captcha 검증에 실패했습니다. 토큰이 유효하지 않거나 만료되었습니다
+    MissingToken: Captcha 토큰이 없습니다
+    UnexpectedType: 구성에 예기치 않은 Captcha 유형이 있습니다
+    ValidationFailed: Captcha 토큰을 검증하는 중 오류가 발생했습니다
 
 optional: (선택 사항)

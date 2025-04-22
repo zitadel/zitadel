@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: Función de clave web deshabilitada
     NoActive: No se encontró ninguna clave web activa
     NotFound: Clave web no encontrada
+  Captcha:
+    InitializationFailed: Error al inicializar el Captcha
+    InvalidCaptcha: Falló la verificación del Captcha. El token es inválido o ha expirado
+    MissingToken: Falta el token del Captcha
+    UnexpectedType: Tipo de Captcha inesperado en la configuración
+    ValidationFailed: Ocurrió un error al validar el token del Captcha
 
 AggregateTypes:
   action: Acción
@@ -1349,7 +1355,7 @@ EventTypes:
       updated: Usuario actualizado
       deleted: Usuario eliminado
       email:
-        updated:  Dirección de correo electrónico modificada
+        updated: Dirección de correo electrónico modificada
         verified: Dirección de correo electrónico verificada
         verification:
           failed: Error en la verificación de la dirección de correo electrónico

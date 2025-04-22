@@ -528,5 +528,11 @@ Errors:
       RegistrationNotAllowed: Не е дозволена регистрација
   DeviceAuth:
     NotExisting: Кодот на корисникот не постои
+  Captcha:
+    InitializationFailed: Неуспешно иницијализирање на Captcha
+    InvalidCaptcha: Неуспешна Captcha верификација. Токенот е невалиден или истечен
+    MissingToken: Недостасува Captcha токен
+    UnexpectedType: Неочекуван тип Captcha во конфигурацијата
+    ValidationFailed: Се случи грешка при верификација на Captcha токенот
 
 optional: (опционално)

@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: Funkcja klucza internetowego jest wyłączona
     NoActive: Nie znaleziono aktywnego klucza internetowego
     NotFound: Nie znaleziono klucza internetowego
+  Captcha:
+    InitializationFailed: Nie udało się zainicjować Captcha
+    InvalidCaptcha: Weryfikacja Captcha nie powiodła się. Token jest nieważny lub wygasł
+    MissingToken: Brak tokenu Captcha
+    UnexpectedType: Nieoczekiwany typ Captcha w konfiguracji
+    ValidationFailed: Wystąpił błąd podczas weryfikacji tokenu Captcha
 
 AggregateTypes:
   action: Działanie

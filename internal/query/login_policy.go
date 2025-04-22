@@ -43,6 +43,11 @@ type LoginPolicy struct {
 	MFAInitSkipLifetime        database.Duration
 	SecondFactorCheckLifetime  database.Duration
 	MultiFactorCheckLifetime   database.Duration
+	EnableRegistrationCaptcha  bool
+	EnableLoginCaptcha         bool
+	CaptchaType                domain.CaptchaType
+	CaptchaSiteKey             string
+	CaptchaSecretKey           string
 	IDPLinks                   []*IDPLoginPolicyLink
 }
 
@@ -159,6 +164,26 @@ var (
 	}
 	LoginPolicyColumnMultiFactorCheckLifetime = Column{
 		name:  projection.MultiFactorCheckLifetimeCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnEnableRegistrationCaptcha = Column{
+		name:  projection.EnableRegistrationCaptchaCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnEnableLoginCaptcha = Column{
+		name:  projection.EnableLoginCaptchaCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnCaptchaType = Column{
+		name:  projection.CaptchaTypeCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnCaptchaSiteKey = Column{
+		name:  projection.CaptchaSiteKeyCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnCaptchaSecretKey = Column{
+		name:  projection.CaptchaSecretKeyCol,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnOwnerRemoved = Column{
@@ -383,6 +408,11 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
 			LoginPolicyColumnSecondFactorCheckLifetime.identifier(),
 			LoginPolicyColumnMultiFactorCheckLifetime.identifier(),
+			LoginPolicyColumnEnableRegistrationCaptcha.identifier(),
+			LoginPolicyColumnEnableLoginCaptcha.identifier(),
+			LoginPolicyColumnCaptchaType.identifier(),
+			LoginPolicyColumnCaptchaSiteKey.identifier(),
+			LoginPolicyColumnCaptchaSecretKey.identifier(),
 		).From(loginPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {
@@ -414,6 +444,11 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&p.MFAInitSkipLifetime,
 					&p.SecondFactorCheckLifetime,
 					&p.MultiFactorCheckLifetime,
+					&p.EnableRegistrationCaptcha,
+					&p.EnableLoginCaptcha,
+					&p.CaptchaType,
+					&p.CaptchaSiteKey,
+					&p.CaptchaSecretKey,
 				)
 				if err != nil {
 					return nil, zerrors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")

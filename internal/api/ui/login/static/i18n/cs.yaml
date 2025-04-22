@@ -510,7 +510,7 @@ Errors:
       NoExternalUserData: Nebyla přijata žádná externí uživatelská data
       CreationNotAllowed: Vytvoření nového uživatele není na tomto poskytovateli povoleno
       LinkingNotAllowed: Propojení uživatele není na tomto poskytovateli povoleno
-      NoOptionAllowed:   Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
+      NoOptionAllowed: Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
       LoginFailedSwitchLocal: |
         Přihlášení u externího poskytovatele identit selhalo. Vracíme se k místnímu přihlášení.
 
@@ -527,5 +527,11 @@ Errors:
       RegistrationNotAllowed: Registrace není povolena
   DeviceAuth:
     NotExisting: Kód uživatelského zařízení neexistuje
+  Captcha:
+    InitializationFailed: Nepodařilo se inicializovat Captcha
+    InvalidCaptcha: Ověření Captcha selhalo. Token je neplatný nebo vypršel
+    MissingToken: Chybí Captcha token
+    UnexpectedType: Neočekávaný typ Captcha v konfiguraci
+    ValidationFailed: Při ověřování Captcha tokenu došlo k chybě
 
 optional: (volitelné)

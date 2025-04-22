@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/captcha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -25,6 +26,7 @@ type registerFormData struct {
 	Language     string              `schema:"language"`
 	Password     string              `schema:"register-password"`
 	Password2    string              `schema:"register-password-confirmation"`
+	CaptchaToken string              `schema:"captchaToken"`
 	TermsConfirm bool                `schema:"terms-confirm"`
 }
 
@@ -96,6 +98,14 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
+
+	if authRequest.LoginPolicy.CaptchaType != domain.CaptchaTypeDisabled && authRequest.LoginPolicy.EnableRegistrationCaptcha {
+		if err := captcha.VerifyCaptcha(r, authRequest); err != nil {
+			l.renderRegister(w, r, authRequest, data, err)
+			return
+		}
+	}
+
 	// For consistency with the external authentication flow,
 	// the setMetadata() function is provided on the pre creation hook, for now,
 	// like for the ExternalAuthentication flow.
@@ -194,6 +204,9 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 				return false
 			}
 			return formData.Language == l
+		},
+		"hasCaptcha": func() bool {
+			return authRequest != nil && authRequest.LoginPolicy != nil && authRequest.LoginPolicy.EnableRegistrationCaptcha && authRequest.LoginPolicy.CaptchaType != domain.CaptchaTypeDisabled && authRequest.LoginPolicy.CaptchaSiteKey != ""
 		},
 	}
 	if authRequest == nil {

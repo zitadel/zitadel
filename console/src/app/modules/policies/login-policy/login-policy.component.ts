@@ -11,7 +11,7 @@ import {
   GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
   UpdateCustomLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
+import { LoginPolicy, PasswordlessType, CaptchaType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -24,6 +24,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
 import { map, takeUntil } from 'rxjs/operators';
 import { LoginPolicyService } from '../../../services/login-policy.service';
+import { Validators } from '@angular/forms';
 
 const minValueValidator = (minValue: number) => (control: AbstractControl) => {
   const value = control.value;
@@ -44,6 +45,10 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
     PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
     PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
   ];
+  public captchaTypes: Array<CaptchaType> = [
+    CaptchaType.CAPTCHA_TYPE_DISABLED,
+    CaptchaType.CAPTCHA_TYPE_RECAPTCHA,
+  ];
   public loginData?: LoginPolicy.AsObject;
   public allowOrgRegistration: boolean = false;
 
@@ -54,12 +59,18 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
+  public CaptchaType: any = CaptchaType;
   public lifetimeForm: UntypedFormGroup = this.fb.group({
     passwordCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
     externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
     mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
     secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
     multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+  });
+  public captchaForm: UntypedFormGroup = this.fb.group({
+    captchaType: [{ disabled: true }, [requiredValidator]],
+    captchaSiteKey: [{ disabled: true }, []],
+    captchaSecretKey: [{ disabled: true }, []],
   });
   private destroy$: Subject<void> = new Subject();
 
@@ -119,6 +130,11 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
         this.multiFactorCheckLifetime?.setValue(
           this.loginData.multiFactorCheckLifetime?.seconds ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60 : 0,
         );
+
+        this.captchaType?.setValue(this.loginData.captchaType);
+        this.onCaptchaTypeChange(); // Update validators based on captcha type
+        this.captchaSiteKey?.setValue(this.loginData.captchaSiteKey);
+        this.captchaSecretKey?.setValue(this.loginData.captchaSecretKey);
       },
       error: this.toast.showError,
       complete: () => {
@@ -190,6 +206,17 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
             mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
             mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
             mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
+            mgmtreq.setEnableRegistrationCaptcha(this.loginData.enableRegistrationCaptcha);
+            mgmtreq.setEnableLoginCaptcha(this.loginData.enableLoginCaptcha);
+
+            const ct: CaptchaType = this.captchaType?.value ?? CaptchaType.CAPTCHA_TYPE_DISABLED;
+            mgmtreq.setCaptchaType(ct);
+
+            const csk: string = this.captchaSiteKey?.value ?? '';
+            mgmtreq.setCaptchaSiteKey(csk);
+            
+            const cseck: string = this.captchaSecretKey?.value ?? '';
+            mgmtreq.setCaptchaSecretKey(cseck);
 
             const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setPasswordCheckLifetime(pcl);
@@ -224,6 +251,17 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
           adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
           adminreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
           adminreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
+          adminreq.setEnableRegistrationCaptcha(this.loginData.enableRegistrationCaptcha);
+          adminreq.setEnableLoginCaptcha(this.loginData.enableLoginCaptcha);
+          
+          const act: CaptchaType = this.captchaType?.value ?? CaptchaType.CAPTCHA_TYPE_DISABLED;
+          adminreq.setCaptchaType(act);
+
+          const acsk: string = this.captchaSiteKey?.value ?? '';
+          adminreq.setCaptchaSiteKey(acsk);
+
+          const acseck: string = this.captchaSecretKey?.value ?? '';
+          adminreq.setCaptchaSecretKey(acseck);
 
           const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setPasswordCheckLifetime(admin_pcl);
@@ -247,6 +285,7 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
           calls.push((this.service as AdminService).updateLoginPolicy(adminreq));
           break;
       }
+
     } else {
       calls.push(Promise.reject());
     }
@@ -262,6 +301,10 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
     if (this.lifetimeForm.invalid) {
       // Display error message
       this.toast.showError('POLICY.LOGIN_POLICY.LIFETIME_INVALID', false, true);
+      return;
+    }
+    if (this.captchaForm.invalid) {
+      this.toast.showError('POLICY.LOGIN_POLICY.CAPTCHA_INVALID', false, true); // TODO: translate
       return;
     }
 
@@ -386,5 +429,32 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
 
   public get multiFactorCheckLifetime(): AbstractControl | null {
     return this.lifetimeForm.get('multiFactorCheckLifetime');
+  }
+  
+  public get captchaType(): AbstractControl | null {
+    return this.captchaForm.get('captchaType');
+  }
+
+  public get captchaSiteKey(): AbstractControl | null {
+    return this.captchaForm.get('captchaSiteKey');
+  }
+  
+  public get captchaSecretKey(): AbstractControl | null {
+    return this.captchaForm.get('captchaSecretKey');
+  }
+
+  public onCaptchaTypeChange(): void {
+    const ct: CaptchaType = this.captchaType?.value ?? CaptchaType.CAPTCHA_TYPE_DISABLED;
+    if (ct !== CaptchaType.CAPTCHA_TYPE_DISABLED) {
+      this.captchaSiteKey?.setValidators([Validators.required]);
+      this.captchaSiteKey?.updateValueAndValidity();
+      this.captchaSecretKey?.setValidators([Validators.required]);
+      this.captchaSecretKey?.updateValueAndValidity();
+    } else {
+      this.captchaSiteKey?.clearValidators();
+      this.captchaSiteKey?.updateValueAndValidity();
+      this.captchaSecretKey?.clearValidators();
+      this.captchaSecretKey?.updateValueAndValidity();
+    }
   }
 }

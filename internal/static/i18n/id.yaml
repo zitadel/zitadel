@@ -57,7 +57,7 @@ Errors:
     NotEmailMessage: pesan bukan EmailMessage
     RequiredAttributes: subjek, penerima dan konten harus disetel tetapi sebagian atau semuanya kosong
     CouldNotSplit: tidak dapat membagi host dan port untuk terhubung ke smtp
-    CouldNotDial: 'tidak dapat menghubungi server SMTP, periksa port, masalah firewall...'
+    CouldNotDial: "tidak dapat menghubungi server SMTP, periksa port, masalah firewall..."
     CouldNotDialTLS: tidak dapat menghubungi server SMTP menggunakan TLS, periksa port, masalah firewall...
     CouldNotCreateClient: tidak dapat membuat klien smtp
     CouldNotStartTLS: tidak dapat memulai tls
@@ -150,7 +150,7 @@ Errors:
       Invalid: Kata sandi tidak valid
       NotSet: Pengguna belum menetapkan kata sandi
       NotChanged: Kata sandi baru tidak boleh sama dengan kata sandi Anda saat ini
-      NotSupported: 'Pengkodean hash kata sandi tidak didukung. '
+      NotSupported: "Pengkodean hash kata sandi tidak didukung. "
     PasswordComplexityPolicy:
       NotFound: Kebijakan kata sandi tidak ditemukan
       MinLength: Kata sandi terlalu pendek
@@ -230,7 +230,7 @@ Errors:
     IdpIsNotOIDC: Konfigurasi IDP bukan bertipe oidc
     Domain:
       AlreadyExists: Domain sudah ada
-      InvalidCharacter: 'Hanya karakter alfanumerik, . '
+      InvalidCharacter: "Hanya karakter alfanumerik, . "
       EmptyString: Karakter non numerik dan alfabet yang tidak valid diganti dengan spasi kosong dan domain yang dihasilkan berupa string kosong
     IDP:
       InvalidSearchQuery: Kueri penelusuran tidak valid
@@ -343,7 +343,7 @@ Errors:
       NotActive: Hibah proyek tidak aktif
       NotInactive: Hibah proyek bukannya tidak aktif
   IAM:
-    NotFound: 'Contoh tidak ditemukan. '
+    NotFound: "Contoh tidak ditemukan. "
     Member:
       RolesNotChanged: Peran belum diubah
     MemberInvalid: Anggota tidak valid
@@ -588,7 +588,7 @@ Errors:
     NotInactive: Skema Pengguna tidak aktif
     NotExists: Skema Pengguna tidak ada
   TokenExchange:
-    FeatureDisabled: 'Fitur Token Exchange dinonaktifkan untuk instance Anda. '
+    FeatureDisabled: "Fitur Token Exchange dinonaktifkan untuk instance Anda. "
     Token:
       Missing: Tokennya hilang
       Invalid: Token tidak valid
@@ -605,6 +605,12 @@ Errors:
     FeatureDisabled: Fitur kunci web dinonaktifkan
     NoActive: Tidak ditemukan kunci web aktif
     NotFound: Kunci web tidak ditemukan
+  Captcha:
+    InitializationFailed: Gagal menginisialisasi Captcha
+    InvalidCaptcha: Verifikasi Captcha gagal. Token tidak valid atau sudah kedaluwarsa
+    MissingToken: Token Captcha hilang
+    UnexpectedType: Jenis Captcha tak terduga dalam konfigurasi
+    ValidationFailed: Terjadi kesalahan saat memvalidasi token Captcha
 
 AggregateTypes:
   action: Tindakan

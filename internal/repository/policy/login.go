@@ -35,6 +35,11 @@ type LoginPolicyAddedEvent struct {
 	MFAInitSkipLifetime        time.Duration           `json:"mfaInitSkipLifetime,omitempty"`
 	SecondFactorCheckLifetime  time.Duration           `json:"secondFactorCheckLifetime,omitempty"`
 	MultiFactorCheckLifetime   time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
+	EnableRegistrationCaptcha  bool                    `json:"enableRegistrationCaptcha,omitempty"`
+	EnableLoginCaptcha         bool                    `json:"enableLoginCaptcha,omitempty"`
+	CaptchaType                domain.CaptchaType      `json:"captchaType,omitempty"`
+	CaptchaSiteKey             string                  `json:"captchaSiteKey,omitempty"`
+	CaptchaSecretKey           string                  `json:"captchaSecretKey,omitempty"`
 }
 
 func (e *LoginPolicyAddedEvent) Payload() interface{} {
@@ -64,6 +69,11 @@ func NewLoginPolicyAddedEvent(
 	mfaInitSkipLifetime,
 	secondFactorCheckLifetime,
 	multiFactorCheckLifetime time.Duration,
+	enableRegistrationCaptcha,
+	enableLoginCaptcha bool,
+	captchaType domain.CaptchaType,
+	captchaSiteKey string,
+	captchaSecretKey string,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		BaseEvent:                  *base,
@@ -84,6 +94,11 @@ func NewLoginPolicyAddedEvent(
 		MultiFactorCheckLifetime:   multiFactorCheckLifetime,
 		DisableLoginWithEmail:      disableLoginWithEmail,
 		DisableLoginWithPhone:      disableLoginWithPhone,
+		EnableRegistrationCaptcha:  enableRegistrationCaptcha,
+		EnableLoginCaptcha:         enableLoginCaptcha,
+		CaptchaType:                captchaType,
+		CaptchaSiteKey:             captchaSiteKey,
+		CaptchaSecretKey:           captchaSecretKey,
 	}
 }
 
@@ -120,6 +135,11 @@ type LoginPolicyChangedEvent struct {
 	MFAInitSkipLifetime        *time.Duration           `json:"mfaInitSkipLifetime,omitempty"`
 	SecondFactorCheckLifetime  *time.Duration           `json:"secondFactorCheckLifetime,omitempty"`
 	MultiFactorCheckLifetime   *time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
+	EnableRegistrationCaptcha  *bool                    `json:"enableRegistrationCaptcha,omitempty"`
+	EnableLoginCaptcha         *bool                    `json:"enableLoginCaptcha,omitempty"`
+	CaptchaType                *domain.CaptchaType      `json:"captchaType,omitempty"`
+	CaptchaSiteKey             *string                  `json:"captchaSiteKey,omitempty"`
+	CaptchaSecretKey           *string                  `json:"captchaSecretKey,omitempty"`
 }
 
 func (e *LoginPolicyChangedEvent) Payload() interface{} {
@@ -217,6 +237,36 @@ func ChangeSecondFactorCheckLifetime(secondFactorCheckLifetime time.Duration) fu
 func ChangeMultiFactorCheckLifetime(multiFactorCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.MultiFactorCheckLifetime = &multiFactorCheckLifetime
+	}
+}
+
+func ChangeEnableRegistrationCaptcha(enableRegistrationCaptcha bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.EnableRegistrationCaptcha = &enableRegistrationCaptcha
+	}
+}
+
+func ChangeEnableLoginCaptcha(enableLoginCaptcha bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.EnableLoginCaptcha = &enableLoginCaptcha
+	}
+}
+
+func ChangeCaptchaType(captchaType domain.CaptchaType) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.CaptchaType = &captchaType
+	}
+}
+
+func ChangeCaptchaSiteKey(captchaSiteKey string) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.CaptchaSiteKey = &captchaSiteKey
+	}
+}
+
+func ChangeCaptchaSecretKey(captchaSecretKey string) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.CaptchaSecretKey = &captchaSecretKey
 	}
 }
 
