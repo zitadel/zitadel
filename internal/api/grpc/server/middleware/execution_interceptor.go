@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/execution"
@@ -43,12 +44,13 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoRequest{
-		FullMethod: fullMethod,
-		InstanceID: authz.GetInstance(ctx).InstanceID(),
-		ProjectID:  ctxData.ProjectID,
-		OrgID:      ctxData.OrgID,
-		UserID:     ctxData.UserID,
-		Request:    req,
+		FullMethod:      fullMethod,
+		InstanceID:      authz.GetInstance(ctx).InstanceID(),
+		ProjectID:       ctxData.ProjectID,
+		OrgID:           ctxData.OrgID,
+		UserID:          ctxData.UserID,
+		originalRequest: req,
+		Request:         Message{req.(proto.Message)},
 	}
 
 	return execution.CallTargets(ctx, targets, info)
@@ -65,13 +67,14 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoResponse{
-		FullMethod: fullMethod,
-		InstanceID: authz.GetInstance(ctx).InstanceID(),
-		ProjectID:  ctxData.ProjectID,
-		OrgID:      ctxData.OrgID,
-		UserID:     ctxData.UserID,
-		Request:    req,
-		Response:   resp,
+		FullMethod:       fullMethod,
+		InstanceID:       authz.GetInstance(ctx).InstanceID(),
+		ProjectID:        ctxData.ProjectID,
+		OrgID:            ctxData.OrgID,
+		UserID:           ctxData.UserID,
+		Request:          Message{req.(proto.Message)},
+		originalResponse: resp,
+		Response:         Message{resp.(proto.Message)},
 	}
 
 	return execution.CallTargets(ctx, targets, info)
@@ -80,22 +83,33 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 var _ execution.ContextInfo = &ContextInfoRequest{}
 
 type ContextInfoRequest struct {
-	FullMethod string      `json:"fullMethod,omitempty"`
-	InstanceID string      `json:"instanceID,omitempty"`
-	OrgID      string      `json:"orgID,omitempty"`
-	ProjectID  string      `json:"projectID,omitempty"`
-	UserID     string      `json:"userID,omitempty"`
-	Request    interface{} `json:"request,omitempty"`
+	FullMethod      string  `json:"fullMethod,omitempty"`
+	InstanceID      string  `json:"instanceID,omitempty"`
+	OrgID           string  `json:"orgID,omitempty"`
+	ProjectID       string  `json:"projectID,omitempty"`
+	UserID          string  `json:"userID,omitempty"`
+	Request         Message `json:"request,omitempty"`
+	originalRequest interface{}
+}
+
+type Message struct {
+	proto.Message `json:""`
+}
+
+func (r *Message) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r.Message)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *Message) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r.Message)
 }
 
 func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
-	jsonpb := &runtime.JSONPb{
-		UnmarshalOptions: protojson.UnmarshalOptions{
-			DiscardUnknown: true,
-			AllowPartial:   true,
-		},
-	}
-	data, err := jsonpb.Marshal(c)
+	data, err := json.Marshal(c)
 	if err != nil {
 		return nil
 	}
@@ -103,39 +117,28 @@ func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
-	jsonpb := &runtime.JSONPb{
-		UnmarshalOptions: protojson.UnmarshalOptions{
-			DiscardUnknown: true,
-			AllowPartial:   true,
-		},
-	}
-	return jsonpb.Unmarshal(resp, c.Request)
+	return json.Unmarshal(resp, c.originalRequest)
 }
 
 func (c *ContextInfoRequest) GetContent() interface{} {
-	return c.Request
+	return c.originalRequest
 }
 
 var _ execution.ContextInfo = &ContextInfoResponse{}
 
 type ContextInfoResponse struct {
-	FullMethod string      `json:"fullMethod,omitempty"`
-	InstanceID string      `json:"instanceID,omitempty"`
-	OrgID      string      `json:"orgID,omitempty"`
-	ProjectID  string      `json:"projectID,omitempty"`
-	UserID     string      `json:"userID,omitempty"`
-	Request    interface{} `json:"request,omitempty"`
-	Response   interface{} `json:"response,omitempty"`
+	FullMethod       string  `json:"fullMethod,omitempty"`
+	InstanceID       string  `json:"instanceID,omitempty"`
+	OrgID            string  `json:"orgID,omitempty"`
+	ProjectID        string  `json:"projectID,omitempty"`
+	UserID           string  `json:"userID,omitempty"`
+	Request          Message `json:"request,omitempty"`
+	Response         Message `json:"response,omitempty"`
+	originalResponse interface{}
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
-	jsonpb := &runtime.JSONPb{
-		UnmarshalOptions: protojson.UnmarshalOptions{
-			DiscardUnknown: true,
-			AllowPartial:   true,
-		},
-	}
-	data, err := jsonpb.Marshal(c)
+	data, err := json.Marshal(c)
 	if err != nil {
 		return nil
 	}
@@ -143,15 +146,9 @@ func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
-	jsonpb := &runtime.JSONPb{
-		UnmarshalOptions: protojson.UnmarshalOptions{
-			DiscardUnknown: true,
-			AllowPartial:   true,
-		},
-	}
-	return jsonpb.Unmarshal(resp, c.Response)
+	return json.Unmarshal(resp, c.originalResponse)
 }
 
 func (c *ContextInfoResponse) GetContent() interface{} {
-	return c.Response
+	return c.originalResponse
 }

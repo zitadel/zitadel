@@ -76,7 +76,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// request received by target
-				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
+				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: middleware.Message{Message: request}}
 				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusOK, changedRequest)
@@ -126,8 +126,8 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					OrgID:      orgID,
 					ProjectID:  projectID,
 					UserID:     userID,
-					Request:    changedRequest,
-					Response:   expectedResponse,
+					Request:    middleware.Message{Message: changedRequest},
+					Response:   middleware.Message{Message: expectedResponse},
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusOK, response)
@@ -167,7 +167,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
 
 				// request received by target
-				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
+				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: middleware.Message{Message: request}}
 				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusInternalServerError, nil)
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, true)
@@ -228,8 +228,8 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					OrgID:      orgID,
 					ProjectID:  projectID,
 					UserID:     userID,
-					Request:    request,
-					Response:   expectedResponse,
+					Request:    middleware.Message{Message: request},
+					Response:   middleware.Message{Message: expectedResponse},
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusInternalServerError, nil)

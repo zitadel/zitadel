@@ -1,15 +1,13 @@
 package integration
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"sync"
 	"time"
-
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type server struct {
@@ -56,14 +54,9 @@ func TestServerCall(
 	}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		jsonpb := &runtime.JSONPb{
-			UnmarshalOptions: protojson.UnmarshalOptions{
-				DiscardUnknown: true,
-			},
-		}
 		server.Increase()
 		if reqBody != nil {
-			data, err := jsonpb.Marshal(reqBody)
+			data, err := json.Marshal(reqBody)
 			if err != nil {
 				http.Error(w, "error, marshall: "+err.Error(), http.StatusInternalServerError)
 				return
@@ -87,7 +80,7 @@ func TestServerCall(
 
 		if respBody != nil {
 			w.Header().Set("Content-Type", "application/json")
-			resp, err := jsonpb.Marshal(respBody)
+			resp, err := json.Marshal(respBody)
 			if err != nil {
 				http.Error(w, "error", http.StatusInternalServerError)
 				return
