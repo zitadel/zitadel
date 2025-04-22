@@ -1673,7 +1673,7 @@ service UserService {
   //   - user.write
   rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
     option (google.api.http) = {
-      post: "/v2/users/keys"
+      post: "/v2/users/{user_id}/keys"
       body: "*"
     };
 
@@ -1712,7 +1712,7 @@ service UserService {
   //   - user.write
   rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/keys/{key_id}"
+      delete: "/v2/users/{user_id}/keys/{key_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1733,7 +1733,8 @@ service UserService {
 
   // Search Keys
   //
-  // List all matching machine user keys. By default all machine user keys of the instance on which the caller has permission to read the owning users are returned.
+  // List all matching keys. By default all keys of the instance on which the caller has permission to read the owning users are returned.
+  // Beware that not only keys for users are returned but also keys for applications.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
@@ -1776,7 +1777,7 @@ service UserService {
   //   - user.write
   rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
     option (google.api.http) = {
-      post: "/v2/users/pats"
+      post: "/v2/users/{user_id}/pats"
       body: "*"
     };
 
@@ -1815,7 +1816,7 @@ service UserService {
   //   - user.write
   rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/pats/{token_id}"
+      delete: "/v2/users/{user_id}/pats/{token_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -3373,6 +3374,13 @@ message AddKeyResponse {
 
 
 message RemoveKeyRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
   // The keys ID.
   string key_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -3452,6 +3460,13 @@ message AddPersonalAccessTokenResponse {
 }
 
 message RemovePersonalAccessTokenRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
   // The tokens ID.
   string token_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
