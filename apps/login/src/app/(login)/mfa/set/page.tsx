@@ -68,6 +68,7 @@ export default async function Page(props: {
           user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
         return {
+          id: session.id,
           factors: session?.factors,
           authMethods: methods.authMethodTypes ?? [],
           phoneVerified: humanUser?.phone?.isVerified ?? false,
@@ -142,7 +143,7 @@ export default async function Page(props: {
             <ChooseSecondFactorToSetup
               userId={sessionWithData.factors?.user?.id}
               loginName={loginName}
-              sessionId={sessionId}
+              sessionId={sessionWithData.id}
               requestId={requestId}
               organization={organization}
               loginSettings={loginSettings}
