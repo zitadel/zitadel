@@ -2,9 +2,9 @@ name: Quality
 
 on:
   pull_request:
-  schedule:
+  # schedule:
     # Every morning at 6:00 AM CET
-    - cron: '0 4 * * *'
+    # - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       target-env:
@@ -109,6 +109,14 @@ jobs:
       - name: Create Production Build
         run: pnpm build
         if: ${{ startsWith(matrix.command, 'test:acceptance') }}
+
+      - name: Run SAML SP
+        run: ZITADEL_DEV_UID=root pnpm run-samlsp
+        if: ${{ matrix.command == 'test:acceptance' }}
+
+      - name: Run OIDC RP
+        run: ZITADEL_DEV_UID=root pnpm run-oidcrp
+        if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Check
         id: check

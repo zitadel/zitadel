@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  packages: write
 
 jobs:
   build:
@@ -39,7 +43,14 @@ jobs:
         with:
           driver-opts: 'image=moby/buildkit:v0.11.6'
 
-      - name: Login
+      - name: Login Public
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login Private
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.DOCKER_REGISTRY }}
@@ -50,9 +61,15 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_IMAGE }}
-          # generate Docker tags based on the following events/attributes
-          tags: type=sha
+          images: |
+            ghcr.io/zitadel/login
+            ${{ secrets.DOCKER_IMAGE }}
+          tags: |
+            type=edge
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+            type=sha
 
       - name: Install dependencies
         run: pnpm install
@@ -69,8 +86,23 @@ jobs:
         timeout-minutes: 10
         with:
           context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests/app
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/app/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests
+          path: /tmp/digests
+          if-no-files-found: error
+          retention-days: 1

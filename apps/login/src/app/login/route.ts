@@ -473,40 +473,16 @@ export async function GET(request: NextRequest) {
       if (url && binding.case === "redirect") {
         return NextResponse.redirect(url);
       } else if (url && binding.case === "post") {
-        // Create form data after SAML standard
-        const formData = {
-          RelayState: binding.value.relayState,
-          SAMLResponse: binding.value.samlResponse,
-        };
+        const redirectUrl = constructUrl(request, "/saml-post");
 
-        // Convert form data to URL-encoded string
-        const formBody = Object.entries(formData)
-          .map(
-            ([key, value]) =>
-              encodeURIComponent(key) + "=" + encodeURIComponent(value),
-          )
-          .join("&");
+        redirectUrl.searchParams.set("url", url);
+        redirectUrl.searchParams.set("RelayState", binding.value.relayState);
+        redirectUrl.searchParams.set(
+          "SAMLResponse",
+          binding.value.samlResponse,
+        );
 
-        // Make a POST request to the external URL with the form data
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formBody,
-        });
-
-        // Handle the response from the external URL
-        if (response.ok) {
-          return NextResponse.json({
-            message: "SAML request completed successfully",
-          });
-        } else {
-          return NextResponse.json(
-            { error: "Failed to complete SAML request" },
-            { status: response.status },
-          );
-        }
+        return NextResponse.redirect(redirectUrl.toString());
       } else {
         console.log(
           "could not create response, redirect user to choose other account",
