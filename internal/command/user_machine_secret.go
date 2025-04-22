@@ -64,6 +64,8 @@ func (c *Commands) prepareGenerateMachineSecret(a *user.Aggregate, set *Generate
 
 func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resourceOwner string, requireResourceOwner bool) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
+	// We decided to not invest in a new command for removing the machine secret
+	// The overhead is too high regarding the high probability that the new code is anyway removed soon.
 	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveMachineSecret(agg, requireResourceOwner))
 	if err != nil {
