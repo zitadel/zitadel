@@ -26,7 +26,7 @@ import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActionsTwoActionsComponent implements OnInit {
-  protected readonly refresh = new Subject<true>();
+  protected readonly refresh$ = new Subject<true>();
   private readonly actionsEnabled$: Observable<boolean>;
   protected readonly executions$: Observable<Execution[]>;
   protected readonly targets$: Observable<Target[]>;
@@ -62,7 +62,7 @@ export class ActionsTwoActionsComponent implements OnInit {
   }
 
   private getExecutions$(actionsEnabled$: Observable<boolean>) {
-    return this.refresh.pipe(
+    return this.refresh$.pipe(
       startWith(true),
       switchMap(() => {
         return this.actionService.listExecutions({});
@@ -79,7 +79,7 @@ export class ActionsTwoActionsComponent implements OnInit {
   }
 
   private getTargets$(actionsEnabled$: Observable<boolean>) {
-    return this.refresh.pipe(
+    return this.refresh$.pipe(
       startWith(true),
       switchMap(() => {
         return this.actionService.listTargets({});
@@ -130,9 +130,10 @@ export class ActionsTwoActionsComponent implements OnInit {
     }
 
     try {
+      console.log(request);
       await this.actionService.setExecution(request);
       await new Promise((res) => setTimeout(res, 1000));
-      this.refresh.next(true);
+      this.refresh$.next(true);
     } catch (error) {
       console.error(error);
       this.toast.showError(error);
@@ -147,7 +148,7 @@ export class ActionsTwoActionsComponent implements OnInit {
     try {
       await this.actionService.setExecution(deleteReq);
       await new Promise((res) => setTimeout(res, 1000));
-      this.refresh.next(true);
+      this.refresh$.next(true);
     } catch (error) {
       console.error(error);
       this.toast.showError(error);
