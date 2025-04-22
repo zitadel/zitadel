@@ -108,12 +108,13 @@ func userAuthMethodPermissionCheckV2(ctx context.Context, query sq.SelectBuilder
 	if !enabled {
 		return query
 	}
-	return query.Where(PermissionClause(
+	join, args := PermissionClause(
 		ctx,
 		UserAuthMethodColumnResourceOwner,
 		domain.PermissionUserRead,
 		OwnedRowsPermissionOption(UserIDCol),
-	))
+	)
+	return query.JoinClause(join, args...)
 }
 
 type AuthMethod struct {
