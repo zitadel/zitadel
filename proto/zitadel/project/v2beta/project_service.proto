@@ -1038,7 +1038,7 @@ message ListProjectRolesResponse {
 
 message CreateProjectGrantRequest {
   // ID of the project.
-  string project_id = 2 [
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1048,7 +1048,7 @@ message CreateProjectGrantRequest {
     }
   ];
   // Organization the project is granted to.
-  string granted_organization_id = 3 [
+  string granted_organization_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1058,7 +1058,7 @@ message CreateProjectGrantRequest {
     }
   ];
   // Keys of the role available for the project grant.
-  repeated string role_keys = 4 [
+  repeated string role_keys = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"RoleKey1\", \"RoleKey2\"]";
     }
@@ -1076,7 +1076,7 @@ message CreateProjectGrantResponse {
 
 message UpdateProjectGrantRequest {
   // ID of the project.
-  string project_id = 2 [
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1086,7 +1086,7 @@ message UpdateProjectGrantRequest {
     }
   ];
   // Organization the project is granted to.
-  string granted_organization_id = 3 [
+  string granted_organization_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1096,7 +1096,7 @@ message UpdateProjectGrantRequest {
     }
   ];
   // Keys of the role available for the project grant.
-  repeated string role_keys = 4 [
+  repeated string role_keys = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"RoleKey1\", \"RoleKey2\"]";
     }
@@ -1113,14 +1113,24 @@ message UpdateProjectGrantResponse {
 }
 
 message DeleteProjectGrantRequest {
-  // The unique identifier of the project grant.
-  string id = 1 [
+  // ID of the project.
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
+      min_length: 1;
+      max_length: 200;
       example: "\"69629026806489455\"";
+    }
+  ];
+  // Organization the project is granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
     }
   ];
 }
@@ -1137,14 +1147,24 @@ message DeleteProjectGrantResponse {
 }
 
 message DeactivateProjectGrantRequest {
-  // The unique identifier of the project grant.
-  string id = 1 [
+  // ID of the project.
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
+      min_length: 1;
+      max_length: 200;
       example: "\"69629026806489455\"";
+    }
+  ];
+  // Organization the project is granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
     }
   ];
 }
@@ -1159,14 +1179,24 @@ message DeactivateProjectGrantResponse {
 }
 
 message ActivateProjectGrantRequest {
-  // The unique identifier of the project grant.
-  string id = 1 [
+  // ID of the project.
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
+      min_length: 1;
+      max_length: 200;
       example: "\"69629026806489455\"";
+    }
+  ];
+  // Organization the project is granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
     }
   ];
 }
