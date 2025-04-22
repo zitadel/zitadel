@@ -607,6 +607,16 @@ EncryptionKeys:
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
 SystemAPIUsers:
+  - superuser:
+    Path: /path/to/superuser/key.pem
+    Memberships:
+      - MemberType: Organization
+        Roles: "ORG_OWNER"
+        AggregateID: "123456789012345678"
+      - MemberType: Project
+        Roles: "PROJECT_OWNER"
+
+
 # # Add keys for authentication of the systemAPI here:
 # # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
