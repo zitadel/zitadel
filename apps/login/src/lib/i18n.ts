@@ -21,8 +21,16 @@ export const LANGS: Lang[] = [
     code: "es",
   },
   {
+    name: "Polski",
+    code: "pl",
+  },
+  {
     name: "简体中文",
     code: "zh",
+  },
+  {
+    name: "Русский",
+    code: "ru",
   },
 ];
 
