@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Input, Output } from '@angular/core';
-import { Observable, ReplaySubject, shareReplay } from 'rxjs';
+import { combineLatestWith, Observable, ReplaySubject } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
 import { Execution, ExecutionTargetType } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
@@ -32,12 +32,14 @@ export class ActionsTwoActionsTableComponent {
   @Output()
   public readonly selected = new EventEmitter<Execution>();
 
-  protected readonly executions$ = new ReplaySubject<Execution[] | null>(1);
+  private readonly executions$ = new ReplaySubject<Execution[] | null>(1);
 
   private readonly targets$ = new ReplaySubject<Target[] | null>(1);
   private readonly targetsMap = this.getTargetsMap();
 
   protected readonly dataSource = this.getDataSource();
+
+  protected readonly loading = this.getLoading();
 
   private getTargetsMap() {
     const targets$ = this.targets$.pipe(filter(Boolean), startWith([] as Target[]));
@@ -66,6 +68,16 @@ export class ActionsTwoActionsTableComponent {
     });
 
     return dataSource;
+  }
+
+  private getLoading() {
+    const loading$ = this.executions$.pipe(
+      combineLatestWith(this.targets$),
+      map(([executions, targets]) => executions === null || targets === null),
+      startWith(true),
+    );
+
+    return toSignal(loading$, { requireSync: true });
   }
 
   protected filteredTargetTypes(targets: ExecutionTargetType[]): Target[] {

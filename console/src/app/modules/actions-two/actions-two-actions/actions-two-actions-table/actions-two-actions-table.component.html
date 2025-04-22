@@ -1,4 +1,4 @@
-<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="(executions$ | async) === null">
+<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="loading()">
   <div actions>
     <ng-content></ng-content>
   </div>
