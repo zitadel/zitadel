@@ -79,6 +79,11 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	mfaInitSkipLifetime,
 	secondFactorCheckLifetime,
 	multiFactorCheckLifetime time.Duration,
+	enableRegistrationCaptcha,
+	enableLoginCaptcha bool,
+	captchaType domain.CaptchaType,
+	captchaSiteKey,
+	captchaSecretKey string,
 ) (*org.LoginPolicyChangedEvent, bool) {
 
 	changes := make([]policy.LoginPolicyChanges, 0)
@@ -132,6 +137,21 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.DisableLoginWithPhone != disableLoginWithPhone {
 		changes = append(changes, policy.ChangeDisableLoginWithPhone(disableLoginWithPhone))
+	}
+	if wm.EnableRegistrationCaptcha != enableRegistrationCaptcha {
+		changes = append(changes, policy.ChangeEnableRegistrationCaptcha(enableRegistrationCaptcha))
+	}
+	if wm.EnableLoginCaptcha != enableLoginCaptcha {
+		changes = append(changes, policy.ChangeEnableLoginCaptcha(enableLoginCaptcha))
+	}
+	if wm.CaptchaType.Valid() && wm.CaptchaType != captchaType {
+		changes = append(changes, policy.ChangeCaptchaType(captchaType))
+	}
+	if wm.CaptchaSiteKey != captchaSiteKey {
+		changes = append(changes, policy.ChangeCaptchaSiteKey(captchaSiteKey))
+	}
+	if wm.CaptchaSecretKey != captchaSecretKey {
+		changes = append(changes, policy.ChangeCaptchaSecretKey(captchaSecretKey))
 	}
 	if len(changes) == 0 {
 		return nil, false
