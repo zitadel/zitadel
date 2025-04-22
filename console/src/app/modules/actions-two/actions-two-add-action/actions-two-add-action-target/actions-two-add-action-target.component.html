@@ -18,7 +18,8 @@
       </mat-option>
       <mat-option
         *ngFor="let target of selectableTargets(); trackBy: trackTarget"
-        #option (click)="addTarget(target); option.deselect()"
+        #option
+        (click)="addTarget(target); option.deselect()"
         [value]="target.name"
       >
         {{ target.name }}
@@ -26,31 +27,22 @@
     </mat-autocomplete>
   </cnsl-form-field>
 
-  <table mat-table
-         cdkDropList
-         (cdkDropListDropped)="drop($event)"
-         [dataSource]="dataSource"
-         [trackBy]="trackTarget"
-  >
+  <table mat-table cdkDropList (cdkDropListDropped)="drop($event)" [dataSource]="dataSource" [trackBy]="trackTarget">
     <ng-container matColumnDef="order">
-      <th mat-header-cell *matHeaderCellDef>
-        Reorder
-      </th>
+      <th mat-header-cell *matHeaderCellDef>Reorder</th>
       <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
         <i class="las la-bars"></i>
       </td>
     </ng-container>
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>
-        Name
-      </th>
+      <th mat-header-cell *matHeaderCellDef>Name</th>
       <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-        <cnsl-project-role-chip  [roleName]="row.name">{{ row.name }}</cnsl-project-role-chip>
+        <cnsl-project-role-chip [roleName]="row.name">{{ row.name }}</cnsl-project-role-chip>
       </td>
     </ng-container>
     <ng-container matColumnDef="deleteAction" stickyEnd>
       <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *cnslCellDef="let i = index; dataSource: dataSource" >
+      <td mat-cell *cnslCellDef="let i = index; dataSource: dataSource">
         <cnsl-table-actions>
           <button
             actions

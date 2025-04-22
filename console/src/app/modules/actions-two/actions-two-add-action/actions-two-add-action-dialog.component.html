@@ -14,7 +14,7 @@
       *ngSwitchCase="Page.Condition"
       [conditionType]="typeSignal()"
       (back)="back()"
-      (continue)="conditionSignal.set({ conditionType: { case: typeSignal(), value: $event}}); continue()"
+      (continue)="conditionSignal.set({ conditionType: { case: typeSignal(), value: $event } }); continue()"
     ></cnsl-actions-two-add-action-condition>
 
     <cnsl-actions-two-add-action-target
