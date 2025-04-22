@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef } from '@angular/core';
 import { ActionService } from 'src/app/services/action.service';
 import { lastValueFrom, Observable, of, Subject } from 'rxjs';
 import { catchError, map, startWith, switchMap } from 'rxjs/operators';
