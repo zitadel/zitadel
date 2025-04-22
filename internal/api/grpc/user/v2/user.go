@@ -121,7 +121,7 @@ func genderToDomain(gender user.Gender) domain.Gender {
 }
 
 func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserRequest) (_ *user.UpdateHumanUserResponse, err error) {
-	human, err := UpdateHumanUserRequestToChangeHuman(req)
+	human, err := updateHumanUserRequestToChangeHuman(req)
 	if err != nil {
 		return nil, err
 	}
