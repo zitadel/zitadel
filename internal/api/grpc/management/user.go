@@ -752,11 +752,11 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	q, err := ListMachineKeysRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, query)
+	result, err := s.query.SearchAuthNKeys(ctx, q, query.JoinFilterUserMachine)
 	if err != nil {
 		return nil, err
 	}

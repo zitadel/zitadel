@@ -125,12 +125,32 @@ func (q *AuthNKeySearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries) (authNKeys *AuthNKeys, err error) {
+type JoinFilter int
+
+const (
+	JoinFilterUnspecified JoinFilter = iota
+	JoinFilterApp
+	JoinFilterUserMachine
+)
+
+func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries, joinFilter JoinFilter) (authNKeys *AuthNKeys, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareAuthNKeysQuery()
 	query = queries.toQuery(query)
+
+	switch joinFilter {
+	case JoinFilterUnspecified:
+		// Select all authN keys
+	case JoinFilterApp:
+		joinCol := ProjectColumnID
+		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnAggregateID.identifier() + " = " + joinCol.identifier())
+	case JoinFilterUserMachine:
+		joinCol := MachineUserIDCol
+		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnAggregateID.identifier() + " = " + joinCol.identifier())
+	}
+
 	eq := sq.Eq{
 		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -301,51 +321,52 @@ func (q *Queries) GetAuthNKeyUser(ctx context.Context, keyID, userID string) (_ 
 }
 
 func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys, error)) {
-	return sq.Select(
-			AuthNKeyColumnID.identifier(),
-			AuthNKeyColumnAggregateID.identifier(),
-			AuthNKeyColumnCreationDate.identifier(),
-			AuthNKeyColumnChangeDate.identifier(),
-			AuthNKeyColumnResourceOwner.identifier(),
-			AuthNKeyColumnSequence.identifier(),
-			AuthNKeyColumnExpiration.identifier(),
-			AuthNKeyColumnType.identifier(),
-			countColumn.identifier(),
-		).From(authNKeyTable.identifier()).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*AuthNKeys, error) {
-			authNKeys := make([]*AuthNKey, 0)
-			var count uint64
-			for rows.Next() {
-				authNKey := new(AuthNKey)
-				err := rows.Scan(
-					&authNKey.ID,
-					&authNKey.AggregateID,
-					&authNKey.CreationDate,
-					&authNKey.ChangeDate,
-					&authNKey.ResourceOwner,
-					&authNKey.Sequence,
-					&authNKey.Expiration,
-					&authNKey.Type,
-					&count,
-				)
-				if err != nil {
-					return nil, err
-				}
-				authNKeys = append(authNKeys, authNKey)
-			}
+	query := sq.Select(
+		AuthNKeyColumnID.identifier(),
+		AuthNKeyColumnAggregateID.identifier(),
+		AuthNKeyColumnCreationDate.identifier(),
+		AuthNKeyColumnChangeDate.identifier(),
+		AuthNKeyColumnResourceOwner.identifier(),
+		AuthNKeyColumnSequence.identifier(),
+		AuthNKeyColumnExpiration.identifier(),
+		AuthNKeyColumnType.identifier(),
+		countColumn.identifier(),
+	).From(authNKeyTable.identifier()).
+		PlaceholderFormat(sq.Dollar)
 
-			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-Dgfn3", "Errors.Query.CloseRows")
+	return query, func(rows *sql.Rows) (*AuthNKeys, error) {
+		authNKeys := make([]*AuthNKey, 0)
+		var count uint64
+		for rows.Next() {
+			authNKey := new(AuthNKey)
+			err := rows.Scan(
+				&authNKey.ID,
+				&authNKey.AggregateID,
+				&authNKey.CreationDate,
+				&authNKey.ChangeDate,
+				&authNKey.ResourceOwner,
+				&authNKey.Sequence,
+				&authNKey.Expiration,
+				&authNKey.Type,
+				&count,
+			)
+			if err != nil {
+				return nil, err
 			}
-
-			return &AuthNKeys{
-				AuthNKeys: authNKeys,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
+			authNKeys = append(authNKeys, authNKey)
 		}
+
+		if err := rows.Close(); err != nil {
+			return nil, zerrors.ThrowInternal(err, "QUERY-Dgfn3", "Errors.Query.CloseRows")
+		}
+
+		return &AuthNKeys{
+			AuthNKeys: authNKeys,
+			SearchResponse: SearchResponse{
+				Count: count,
+			},
+		}, nil
+	}
 }
 
 func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, error)) {
