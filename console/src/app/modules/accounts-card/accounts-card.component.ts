@@ -136,6 +136,7 @@ export class AccountsCardComponent {
         userName: s.factors?.user?.loginName ?? '',
       })),
       toArray(),
+      map((sessions) => Array.from(new Map(sessions.map((s) => [s.loginName, s])).values())), // Ensure unique loginNames
     );
   }
 
