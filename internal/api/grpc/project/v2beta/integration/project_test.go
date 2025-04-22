@@ -248,7 +248,7 @@ func assertUpdateProjectResponse(t *testing.T, creationDate, changeDate time.Tim
 	}
 }
 
-func TestServer_DeleteTarget(t *testing.T) {
+func TestServer_DeleteProject(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 

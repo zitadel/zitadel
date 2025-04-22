@@ -132,12 +132,24 @@ message Project {
       example: "\"Some Organization\""
     }
   ];
+  // Describes the current state of the granted project.
+  GrantedProjectState granted_state = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the granted project";
+    }
+  ];
 }
 
 enum ProjectState {
   PROJECT_STATE_UNSPECIFIED = 0;
   PROJECT_STATE_ACTIVE = 1;
   PROJECT_STATE_INACTIVE = 2;
+}
+
+enum GrantedProjectState {
+  GRANTED_PROJECT_STATE_UNSPECIFIED = 0;
+  GRANTED_PROJECT_STATE_ACTIVE = 1;
+  GRANTED_PROJECT_STATE_INACTIVE = 2;
 }
 
 enum PrivateLabelingSetting {
@@ -223,7 +235,6 @@ message ProjectOrganizationIDFilter {
     }
   ];
 }
-
 
 message ProjectGrantSearchFilter {
   oneof filter {

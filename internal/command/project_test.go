@@ -72,37 +72,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
-			name: "project, error already exists",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internl"),
-						project.NewProjectAddedEvent(
-							context.Background(),
-							&project.NewAggregate("project1", "org1").Aggregate,
-							"project", true, true, true,
-							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-						),
-					),
-				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
-			},
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
-				project: &AddProject{
-					ObjectRoot:             models.ObjectRoot{ResourceOwner: "org1"},
-					Name:                   "project",
-					ProjectRoleAssertion:   true,
-					ProjectRoleCheck:       true,
-					HasProjectCheck:        true,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-				},
-			},
-			res: res{
-				err: zerrors.IsErrorAlreadyExists,
-			},
-		},
-		{
 			name: "project, already exists",
 			fields: fields{
 				eventstore: expectEventstore(

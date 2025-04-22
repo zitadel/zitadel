@@ -69,8 +69,8 @@ func TestServer_GetProject(t *testing.T) {
 				Project: &project.Project{
 					State:                  1,
 					ProjectRoleAssertion:   false,
-					ProjectRoleCheck:       false,
-					HasProjectCheck:        false,
+					ProjectAccessRequired:  false,
+					AuthorizationRequired:  false,
 					PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 				},
 			},
@@ -98,8 +98,8 @@ func TestServer_GetProject(t *testing.T) {
 				Project: &project.Project{
 					State:                  1,
 					ProjectRoleAssertion:   false,
-					ProjectRoleCheck:       true,
-					HasProjectCheck:        true,
+					ProjectAccessRequired:  true,
+					AuthorizationRequired:  true,
 					PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 				},
 			},
@@ -125,7 +125,7 @@ func TestServer_GetProject(t *testing.T) {
 	}
 }
 
-func TestServer_ListTargets(t *testing.T) {
+func TestServer_ListProjects(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
@@ -139,10 +139,22 @@ func TestServer_ListTargets(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "missing permission",
+			name: "list by id, missing permission",
 			args: args{
 				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
-				req: &project.ListProjectsRequest{},
+				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
+					name := gofakeit.Name()
+					orgID := instance.DefaultOrg.GetId()
+					resp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
+					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
+						InProjectIdsFilter: &project.InProjectIDsFilter{
+							ProjectIds: []string{resp.GetId()},
+						},
+					}
+				},
+				req: &project.ListProjectsRequest{
+					Filters: []*project.ProjectSearchFilter{{}},
+				},
 			},
 			wantErr: true,
 		},
@@ -166,7 +178,6 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  0,
 					AppliedLimit: 100,
 				},
-				Result: []*project.Project{},
 			},
 		},
 		{
@@ -183,11 +194,11 @@ func TestServer_ListTargets(t *testing.T) {
 						},
 					}
 
-					response.Result[0].Id = resp.GetId()
-					response.Result[0].Name = name
-					response.Result[0].OrganizationId = orgID
-					response.Result[0].CreationDate = resp.GetCreationDate()
-					response.Result[0].ChangeDate = resp.GetCreationDate()
+					response.Projects[0].Id = resp.GetId()
+					response.Projects[0].Name = name
+					response.Projects[0].OrganizationId = orgID
+					response.Projects[0].CreationDate = resp.GetCreationDate()
+					response.Projects[0].ChangeDate = resp.GetCreationDate()
 				},
 				req: &project.ListProjectsRequest{
 					Filters: []*project.ProjectSearchFilter{{}},
@@ -198,17 +209,18 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
-				Result: []*project.Project{
+				Projects: []*project.Project{
 					{
 						State:                  1,
 						ProjectRoleAssertion:   false,
-						ProjectRoleCheck:       false,
-						HasProjectCheck:        false,
+						ProjectAccessRequired:  false,
+						AuthorizationRequired:  false,
 						PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 					},
 				},
 			},
-		}, {
+		},
+		{
 			name: "list single name",
 			args: args{
 				ctx: iamOwnerCtx,
@@ -222,11 +234,11 @@ func TestServer_ListTargets(t *testing.T) {
 						},
 					}
 
-					response.Result[0].Id = resp.GetId()
-					response.Result[0].Name = name
-					response.Result[0].OrganizationId = orgID
-					response.Result[0].CreationDate = resp.GetCreationDate()
-					response.Result[0].ChangeDate = resp.GetCreationDate()
+					response.Projects[0].Id = resp.GetId()
+					response.Projects[0].Name = name
+					response.Projects[0].OrganizationId = orgID
+					response.Projects[0].CreationDate = resp.GetCreationDate()
+					response.Projects[0].ChangeDate = resp.GetCreationDate()
 				},
 				req: &project.ListProjectsRequest{
 					Filters: []*project.ProjectSearchFilter{{}},
@@ -237,12 +249,12 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
-				Result: []*project.Project{
+				Projects: []*project.Project{
 					{
 						State:                  1,
 						ProjectRoleAssertion:   false,
-						ProjectRoleCheck:       false,
-						HasProjectCheck:        false,
+						ProjectAccessRequired:  false,
+						AuthorizationRequired:  false,
 						PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 					},
 				},
@@ -266,23 +278,23 @@ func TestServer_ListTargets(t *testing.T) {
 						},
 					}
 
-					response.Result[0].Id = resp1.GetId()
-					response.Result[0].Name = name1
-					response.Result[0].OrganizationId = orgID
-					response.Result[0].CreationDate = resp1.GetCreationDate()
-					response.Result[0].ChangeDate = resp1.GetCreationDate()
+					response.Projects[2].Id = resp1.GetId()
+					response.Projects[2].Name = name1
+					response.Projects[2].OrganizationId = orgID
+					response.Projects[2].CreationDate = resp1.GetCreationDate()
+					response.Projects[2].ChangeDate = resp1.GetCreationDate()
 
-					response.Result[1].Id = resp2.GetId()
-					response.Result[1].Name = name2
-					response.Result[1].OrganizationId = orgID
-					response.Result[1].CreationDate = resp2.GetCreationDate()
-					response.Result[1].ChangeDate = resp2.GetCreationDate()
+					response.Projects[1].Id = resp2.GetId()
+					response.Projects[1].Name = name2
+					response.Projects[1].OrganizationId = orgID
+					response.Projects[1].CreationDate = resp2.GetCreationDate()
+					response.Projects[1].ChangeDate = resp2.GetCreationDate()
 
-					response.Result[2].Id = resp3.GetId()
-					response.Result[2].Name = name3
-					response.Result[2].OrganizationId = orgID
-					response.Result[2].CreationDate = resp3.GetCreationDate()
-					response.Result[2].ChangeDate = resp3.GetCreationDate()
+					response.Projects[0].Id = resp3.GetId()
+					response.Projects[0].Name = name3
+					response.Projects[0].OrganizationId = orgID
+					response.Projects[0].CreationDate = resp3.GetCreationDate()
+					response.Projects[0].ChangeDate = resp3.GetCreationDate()
 				},
 				req: &project.ListProjectsRequest{
 					Filters: []*project.ProjectSearchFilter{{}},
@@ -293,26 +305,26 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  3,
 					AppliedLimit: 100,
 				},
-				Result: []*project.Project{
+				Projects: []*project.Project{
 					{
 						State:                  1,
 						ProjectRoleAssertion:   false,
-						ProjectRoleCheck:       false,
-						HasProjectCheck:        false,
+						ProjectAccessRequired:  false,
+						AuthorizationRequired:  true,
 						PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 					},
 					{
 						State:                  1,
 						ProjectRoleAssertion:   false,
-						ProjectRoleCheck:       true,
-						HasProjectCheck:        false,
+						ProjectAccessRequired:  true,
+						AuthorizationRequired:  false,
 						PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 					},
 					{
 						State:                  1,
 						ProjectRoleAssertion:   false,
-						ProjectRoleCheck:       false,
-						HasProjectCheck:        true,
+						ProjectAccessRequired:  false,
+						AuthorizationRequired:  false,
 						PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 					},
 				},
@@ -335,9 +347,9 @@ func TestServer_ListTargets(t *testing.T) {
 				require.NoError(ttt, listErr)
 
 				// always first check length, otherwise its failed anyway
-				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					for i := range tt.want.Result {
-						assert.EqualExportedValues(ttt, tt.want.Result[i], got.Result[i])
+				if assert.Len(ttt, got.Projects, len(tt.want.Projects)) {
+					for i := range tt.want.Projects {
+						assert.EqualExportedValues(ttt, tt.want.Projects[i], got.Projects[i])
 					}
 				}
 				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
