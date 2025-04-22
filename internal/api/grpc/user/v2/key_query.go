@@ -12,7 +12,6 @@ import (
 )
 
 func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user.ListKeysResponse, error) {
-
 	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
 	if err != nil {
 		return nil, err
@@ -31,7 +30,7 @@ func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user
 		},
 		Queries: filters,
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, search)
+	result, err := s.query.SearchAuthNKeys(ctx, search, query.JoinFilterUserMachine)
 	if err != nil {
 		return nil, err
 	}
