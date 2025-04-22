@@ -360,7 +360,7 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.RemovePersonalAccessToken(tt.args.ctx, tt.args.pat, true, true)
+			got, err := c.RemovePersonalAccessToken(tt.args.ctx, tt.args.pat, true)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

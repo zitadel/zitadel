@@ -43,7 +43,13 @@ func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.Add
 }
 
 func (s *Server) RemoveKey(ctx context.Context, req *user.RemoveKeyRequest) (*user.RemoveKeyResponse, error) {
-	objectDetails, err := s.command.RemoveUserMachineKey(ctx, &command.MachineKey{KeyID: req.KeyId}, false, false)
+	machineKey := &command.MachineKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: req.UserId,
+		},
+		KeyID: req.KeyId,
+	}
+	objectDetails, err := s.command.RemoveUserMachineKey(ctx, machineKey, false)
 	if err != nil {
 		return nil, err
 	}

@@ -34,7 +34,7 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *user.AddPerson
 }
 
 func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *user.RemovePersonalAccessTokenRequest) (*user.RemovePersonalAccessTokenResponse, error) {
-	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, &command.PersonalAccessToken{TokenID: req.TokenId}, false, false)
+	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, &command.PersonalAccessToken{TokenID: req.TokenId}, false)
 	if err != nil {
 		return nil, err
 	}
