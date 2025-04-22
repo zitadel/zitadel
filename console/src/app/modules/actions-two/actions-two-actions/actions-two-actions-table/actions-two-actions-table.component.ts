@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Inp
 import { combineLatestWith, Observable, ReplaySubject } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
-import { Execution, ExecutionTargetType } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { CorrectlyTypedExecution } from '../../actions-two-add-action/actions-two-add-action-dialog.component';
 
 @Component({
   selector: 'cnsl-actions-two-actions-table',
@@ -17,10 +17,13 @@ export class ActionsTwoActionsTableComponent {
   public readonly refresh = new EventEmitter<void>();
 
   @Output()
-  public readonly delete = new EventEmitter<Execution>();
+  public readonly selected = new EventEmitter<CorrectlyTypedExecution>();
+
+  @Output()
+  public readonly delete = new EventEmitter<CorrectlyTypedExecution>();
 
   @Input({ required: true })
-  public set executions(executions: Execution[] | null) {
+  public set executions(executions: CorrectlyTypedExecution[] | null) {
     this.executions$.next(executions);
   }
 
@@ -29,17 +32,51 @@ export class ActionsTwoActionsTableComponent {
     this.targets$.next(targets);
   }
 
-  @Output()
-  public readonly selected = new EventEmitter<Execution>();
-
-  private readonly executions$ = new ReplaySubject<Execution[] | null>(1);
+  private readonly executions$ = new ReplaySubject<CorrectlyTypedExecution[] | null>(1);
 
   private readonly targets$ = new ReplaySubject<Target[] | null>(1);
-  private readonly targetsMap = this.getTargetsMap();
 
   protected readonly dataSource = this.getDataSource();
 
   protected readonly loading = this.getLoading();
+
+  private getDataSource() {
+    const executions$: Observable<CorrectlyTypedExecution[]> = this.executions$.pipe(filter(Boolean), startWith([]));
+    const executionsSignal = toSignal(executions$, { requireSync: true });
+
+    const targetsMapSignal = this.getTargetsMap();
+
+    const dataSignal = computed(() => {
+      const executions = executionsSignal();
+      const targetsMap = targetsMapSignal();
+
+      if (targetsMap.size === 0) {
+        return [];
+      }
+
+      return executions.map((execution) => {
+        const mappedTargets = execution.targets.map((target) => {
+          const targetType = targetsMap.get(target.type.value);
+          if (!targetType) {
+            throw new Error(`Target with id ${target.type.value} not found`);
+          }
+          return targetType;
+        });
+        return { execution, mappedTargets };
+      });
+    });
+
+    const dataSource = new MatTableDataSource(dataSignal());
+
+    effect(() => {
+      const data = dataSignal();
+      if (dataSource.data !== data) {
+        dataSource.data = data;
+      }
+    });
+
+    return dataSource;
+  }
 
   private getTargetsMap() {
     const targets$ = this.targets$.pipe(filter(Boolean), startWith([] as Target[]));
@@ -54,22 +91,6 @@ export class ActionsTwoActionsTableComponent {
     });
   }
 
-  private getDataSource() {
-    const executions$: Observable<Execution[]> = this.executions$.pipe(filter(Boolean), startWith([]));
-    const executionsSignal = toSignal(executions$, { requireSync: true });
-
-    const dataSource = new MatTableDataSource(executionsSignal());
-
-    effect(() => {
-      const executions = executionsSignal();
-      if (dataSource.data !== executions) {
-        dataSource.data = executions;
-      }
-    });
-
-    return dataSource;
-  }
-
   private getLoading() {
     const loading$ = this.executions$.pipe(
       combineLatestWith(this.targets$),
@@ -78,14 +99,6 @@ export class ActionsTwoActionsTableComponent {
     );
 
     return toSignal(loading$, { requireSync: true });
-  }
-
-  protected filteredTargetTypes(targets: ExecutionTargetType[]): Target[] {
-    return targets
-      .map((t) => t.type)
-      .filter((t): t is Extract<ExecutionTargetType['type'], { case: 'target' }> => t.case === 'target')
-      .map((t) => this.targetsMap().get(t.value))
-      .filter((target): target is Target => !!target);
   }
 
   protected trackTarget(_: number, target: Target) {

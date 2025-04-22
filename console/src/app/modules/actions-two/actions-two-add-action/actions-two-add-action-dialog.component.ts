@@ -25,45 +25,37 @@ enum Page {
   Target,
 }
 
-type CorrectlyTypedCondition = { conditionType: Extract<Condition['conditionType'], { case: string }> };
+export type CorrectlyTypedCondition = Condition & { conditionType: Extract<Condition['conditionType'], { case: string }> };
 
 type CorrectlyTypedTargets = { type: Extract<ExecutionTargetType['type'], { case: 'target' }> };
 
-type CorrectlyTypedExecution = Omit<Execution, 'targets' | 'condition'> & {
+export type CorrectlyTypedExecution = Omit<Execution, 'targets' | 'condition'> & {
   condition: CorrectlyTypedCondition;
   targets: CorrectlyTypedTargets[];
 };
 
 export const correctlyTypeExecution = (execution: Execution): CorrectlyTypedExecution => {
-  const conditionType = execution.condition?.conditionType;
-  if (!conditionType?.case) {
+  if (!execution.condition?.conditionType?.case) {
     throw new Error('Condition is required');
   }
+  const conditionType = execution.condition.conditionType;
+
+  const condition = {
+    ...execution.condition,
+    conditionType,
+  };
 
   return {
     ...execution,
-    condition: {
-      conditionType,
-    },
-    targets: getTargets(execution.targets),
+    condition,
+    targets: execution.targets
+      .map(({ type }) => ({ type }))
+      .filter((target): target is CorrectlyTypedTargets => target.type.case === 'target'),
   };
 };
 
 export type ActionTwoAddActionDialogData = {
   execution?: CorrectlyTypedExecution;
-};
-
-const getTargets = (targets: ExecutionTargetType[]): CorrectlyTypedTargets[] => {
-  const correctTargets: CorrectlyTypedTargets[] = [];
-
-  for (const target of targets) {
-    if (target.type.case !== 'target') {
-      continue;
-    }
-    correctTargets.push({ type: target.type });
-  }
-
-  return correctTargets;
 };
 
 export type ActionTwoAddActionDialogResult = MessageInitShape<typeof SetExecutionRequestSchema>;

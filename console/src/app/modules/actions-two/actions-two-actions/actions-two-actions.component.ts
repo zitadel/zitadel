@@ -11,6 +11,8 @@ import {
   ActionTwoAddActionDialogComponent,
   ActionTwoAddActionDialogData,
   ActionTwoAddActionDialogResult,
+  CorrectlyTypedCondition,
+  CorrectlyTypedExecution,
   correctlyTypeExecution,
 } from '../actions-two-add-action/actions-two-add-action-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -28,7 +30,7 @@ import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 export class ActionsTwoActionsComponent implements OnInit {
   protected readonly refresh$ = new Subject<true>();
   private readonly actionsEnabled$: Observable<boolean>;
-  protected readonly executions$: Observable<Execution[]>;
+  protected readonly executions$: Observable<CorrectlyTypedExecution[]>;
   protected readonly targets$: Observable<Target[]>;
 
   constructor(
@@ -67,7 +69,7 @@ export class ActionsTwoActionsComponent implements OnInit {
       switchMap(() => {
         return this.actionService.listExecutions({});
       }),
-      map(({ result }) => result),
+      map(({ result }) => result.map(correctlyTypeExecution)),
       catchError(async (err) => {
         const actionsEnabled = await firstValueFrom(actionsEnabled$);
         if (actionsEnabled) {
@@ -108,7 +110,7 @@ export class ActionsTwoActionsComponent implements OnInit {
     );
   }
 
-  public async openDialog(execution?: Execution): Promise<void> {
+  public async openDialog(execution?: CorrectlyTypedExecution): Promise<void> {
     const request$ = this.dialog
       .open<ActionTwoAddActionDialogComponent, ActionTwoAddActionDialogData, ActionTwoAddActionDialogResult>(
         ActionTwoAddActionDialogComponent,
@@ -116,7 +118,7 @@ export class ActionsTwoActionsComponent implements OnInit {
           width: '400px',
           data: execution
             ? {
-                execution: correctlyTypeExecution(execution),
+                execution,
               }
             : {},
         },
@@ -140,7 +142,7 @@ export class ActionsTwoActionsComponent implements OnInit {
     }
   }
 
-  public async deleteExecution(execution: Execution) {
+  public async deleteExecution(execution: CorrectlyTypedExecution) {
     const deleteReq: MessageInitShape<typeof SetExecutionRequestSchema> = {
       condition: execution.condition,
       targets: [],
