@@ -79,7 +79,6 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 						},
 					},
 				},
-				TotpSecret: ptr("totpSecret"),
 			},
 		},
 		want: &command.ChangeHuman{
