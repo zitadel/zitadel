@@ -135,8 +135,9 @@ export class AccountsCardComponent {
         authState: V2SessionState.ACTIVE,
         userName: s.factors?.user?.loginName ?? '',
       })),
+      map((s) => [s.loginName, s] as const),
       toArray(),
-      map((sessions) => Array.from(new Map(sessions.map((s) => [s.loginName, s])).values())), // Ensure unique loginNames
+      map((sessions) => new Map(sessions).values()), // Ensure unique loginNames
     );
   }
 
