@@ -1966,8 +1966,6 @@ message CreateUserRequest{
       }
     ];
   }
-
-  reserved 4 to 9;
   // The unique identifier of the organization the user belongs to.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -2008,12 +2006,12 @@ message CreateUserRequest{
     // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
     // To make sure these messages are sent, configure and activate valid SMTP and Twilio configurations.
     // Read more about your options for controlling this behaviour in the email and phone field documentations.
-    Human human = 10;
+    Human human = 4;
     // Users of type machine are users that are meant to be used by a machine.
     // In order to authenticate, [add a secret](apis/resources/user_service_v2/user-service-add-secret.api.mdx), [a key](apis/resources/user_service_v2/user-service-add-key.api.mdx) or [a personal access token](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) to the user.
     // Tokens generated for new users of type machine will be of an opaque Bearer type.
     // You can change the users token type to JWT by using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
-    Machine machine = 11;
+    Machine machine = 5;
   }
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"organizationId\":\"69629026806489455\",\"userId\":\"163840776835432345\",\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"nickName\":\"Mini\",\"displayName\":\"Minnie Mouse\",\"preferredLanguage\":\"en\",\"gender\":\"GENDER_FEMALE\"},\"email\":{\"email\":\"mini@mouse.com\",\"sendCode\":{\"urlTemplate\":\"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"idpLinks\":[{\"idpId\":\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\",\"userId\":\"6516849804890468048461403518\",\"userName\":\"user@external.com\"}],\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
@@ -2403,7 +2401,6 @@ message UpdateUserRequest{
       }
     ];
   }
-  reserved 3 to 9;
   // The user id is the users unique identifier in the instance.
   // It can't be changed.
   string user_id = 1 [
@@ -2422,8 +2419,8 @@ message UpdateUserRequest{
   ];
   // Change type specific properties of the user.
   oneof user_type {
-    Human human = 10;
-    Machine machine = 11;
+    Human human = 3;
+    Machine machine = 4;
   }
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"displayName\":\"Minnie Mouse\"},\"email\":{\"email\":\"mini@mouse.com\",\"returnCode\":{}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"verificationCode\":\"SKJd342k\"},\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
@@ -3297,7 +3294,7 @@ message AddSecretResponse {
   // The client secret.
   // Store this secret in a secure place.
   // It is not possible to retrieve it again.
-  string client_secret = 3 [
+  string client_secret = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"WoYLHB23HAZaCSxeMJGEzbu8urHICVdFp2IegVr6Q5U4lZHKAtRvmaalNDWfCuHV\"";
     }
