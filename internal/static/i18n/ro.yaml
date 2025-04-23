@@ -116,6 +116,7 @@ Errors:
       AlreadyVerified: Numărul de telefon este deja verificat
       Empty: Numărul de telefon este gol
       NotChanged: Numărul de telefon nu a fost schimbat
+      VerifyingRemovalIsNotSupported: Verificarea eliminării nu este acceptată
     Address:
       NotFound: Adresa nu a fost găsită
       NotChanged: Adresa nu a fost schimbată

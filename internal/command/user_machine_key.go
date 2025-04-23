@@ -92,9 +92,7 @@ func (key *MachineKey) valid(requireResourceOwner bool) (err error) {
 
 func (key *MachineKey) checkAggregate(ctx context.Context, filter preparation.FilterToQueryReducer) error {
 	if exists, err := ExistsUser(ctx, filter, key.AggregateID, key.ResourceOwner, true); err != nil || !exists {
-		// TODO: Also restrict secrets and pats to machine users
-		// TODO: Translate error
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-bnipwm1", "Errors.User.Machine.NotFound")
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-bnipwm1", "Errors.User.NotFound")
 	}
 	return nil
 }

@@ -14,8 +14,7 @@ import (
 func patchHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human) (*command.ChangeHuman, error) {
 	phone := human.GetPhone()
 	if phone != nil && phone.Phone == "" && phone.GetVerification() != nil {
-		// TODO: Translate
-		return nil, zerrors.ThrowInvalidArgument(nil, "USERv2-4f3d6", "Errors.User.Phone.RemoveWithVerification")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USERv2-4f3d6", "Errors.User.Phone.VerifyingRemovalIsNotSupported")
 	}
 	email, err := setHumanEmailToEmail(human.Email, userId)
 	if err != nil {
