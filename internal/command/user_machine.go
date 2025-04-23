@@ -27,16 +27,16 @@ type Machine struct {
 	AccessTokenType domain.OIDCTokenType
 }
 
+func (m *Machine) IsZero() bool {
+	return m.Username == "" && m.Name == ""
+}
+
 type AddMachineOption func(*Machine)
 
 func WithUsernameToIDFallback(m *Machine) {
 	if m.Username == "" {
 		m.Username = m.AggregateID
 	}
-}
-
-func (m *Machine) IsZero() bool {
-	return m.Username == "" && m.Name == ""
 }
 
 func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
@@ -90,6 +90,9 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
 	for _, option := range options {
 		option(machine)
+	}
+	if err := c.checkPermission(ctx, domain.PermissionUserWrite, machine.ResourceOwner, machine.AggregateID); err != nil {
+		return nil, err
 	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
