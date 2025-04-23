@@ -144,14 +144,11 @@ service UserService {
       auth_option: {
         permission: "authenticated"
       }
-      http_response: {
-        success_code: 201
-      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
-        key: "201"
+        key: "200"
         value: {
           description: "OK";
         }
@@ -187,7 +184,7 @@ service UserService {
         org_field: "organization"
       }
       http_response: {
-        success_code: 201
+        success_code: 200
       }
     };
 
