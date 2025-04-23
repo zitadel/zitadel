@@ -82,11 +82,11 @@ func CallTarget(
 	case domain.TargetTypeCall:
 		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
 	case domain.TargetTypeAsync:
-		go func(target Target, info []byte) {
-			if _, err := Call(context.Background(), target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey()); err != nil {
+		go func(ctx context.Context, target Target, info []byte) {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
-		}(target, info.GetHTTPRequestBody())
+		}(context.Background(), target, info.GetHTTPRequestBody())
 		return nil, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
