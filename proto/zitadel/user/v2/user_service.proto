@@ -1944,8 +1944,10 @@ message CreateUserRequest{
     // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
     // Currently no other options are supported, and if anything different is used the validation will fail.
     optional string totp_secret = 8 [
-      (validate.rules).string = {max_len: 200},
+      (validate.rules).string = {min_len: 1 max_len: 200},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 200,
         example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
       }
     ];
@@ -1955,6 +1957,8 @@ message CreateUserRequest{
     string name = 1 [
       (validate.rules).string = {min_len: 1, max_len: 200},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 200,
         example: "\"Acceptance Test User\"";
       }
     ];
@@ -1962,6 +1966,8 @@ message CreateUserRequest{
     optional string description = 2 [
       (validate.rules).string = {min_len: 1, max_len: 500},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 500,
         example: "\"The user calls the session API in the continuous integration pipeline for acceptance tests.\"";
       }
     ];
@@ -1982,8 +1988,10 @@ message CreateUserRequest{
   // If not specified, it will be generated.
   // It can't be changed after creation.
   optional string user_id = 2 [
-    (validate.rules).string = {max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
       example: "\"163840776835432345\"";
     }
   ];
@@ -1992,8 +2000,10 @@ message CreateUserRequest{
   // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
   // It is used to identify the user in the organization and can be used for login.
   optional string username = 3 [
-    (validate.rules).string = {max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
       example: "\"minnie-mouse\"";
     }
   ];
@@ -2313,8 +2323,9 @@ message UpdateUserRequest{
       // The given name is the first name of the user.
       // For example, it can be used to personalize notifications and login UIs.
       optional string given_name = 1  [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
           max_length: 200;
           example: "\"Minnie\"";
         }
@@ -2322,8 +2333,9 @@ message UpdateUserRequest{
       // The family name is the last name of the user.
       // For example, it can be used to personalize user interfaces and notifications.
       optional string family_name = 2  [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
           max_length: 200;
           example: "\"Mouse\"";
         }
@@ -2331,8 +2343,9 @@ message UpdateUserRequest{
       // The nick name is the users short name.
       // For example, it can be used to personalize user interfaces and notifications.
       optional string nick_name = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
           max_length: 200;
           example: "\"Mini\"";
         }
@@ -2340,8 +2353,9 @@ message UpdateUserRequest{
       // The display name is how a user should primarily be displayed in lists.
       // It can also for example be used to personalize user interfaces and notifications.
       optional string display_name = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
           max_length: 200;
           example: "\"Minnie Mouse\"";
         }
@@ -2353,9 +2367,10 @@ message UpdateUserRequest{
       // Notification messages and standard login UIs use the users preferred language if it is supported and allowed on the instance.
       // Else, the default language of the instance is used.
       optional string preferred_language = 5 [
-        (validate.rules).string = {max_len: 10},
+        (validate.rules).string = {min_len: 1, max_len: 10},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          max_length: 200;
+          min_length: 1;
+          max_length: 10;
           example: "\"en-US\"";
         }
       ];
@@ -2377,13 +2392,6 @@ message UpdateUserRequest{
     // Change the users password.
     // You can optionally require the current password or the verification code to be correct.
     optional SetPassword password = 4;
-    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
-    // Currently no other options are supported, and if anything different is used the validation will fail.
-    optional string totp_secret = 5 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
-      }
-    ];
   }
   message Machine {
     // The machine users name is a human readable field that helps identifying the user.
@@ -2406,14 +2414,18 @@ message UpdateUserRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"163840776835432345\"";
     }
   ];
   // Set a new username that is unique within the instance.
   // Beware that active tokens and sessions are invalidated when the username is changed.
   optional string username = 2 [
-    (validate.rules).string = {max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"minnie-mouse\"";
     }
   ];
@@ -3325,6 +3337,8 @@ message AddKeyRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"163840776835432345\"";
     }
   ];
@@ -3366,6 +3380,8 @@ message RemoveKeyRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"163840776835432345\"";
     }
   ];
@@ -3373,6 +3389,8 @@ message RemoveKeyRequest {
   string key_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"163840776835432345\"";
     }
   ];
@@ -3414,6 +3432,8 @@ message AddPersonalAccessTokenRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"163840776835432345\"";
     }
   ];
@@ -3452,6 +3472,8 @@ message RemovePersonalAccessTokenRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"163840776835432345\"";
     }
   ];
@@ -3459,6 +3481,8 @@ message RemovePersonalAccessTokenRequest {
   string token_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "\"163840776835432345\"";
     }
   ];
