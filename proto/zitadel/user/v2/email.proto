@@ -19,7 +19,7 @@ message SetHumanEmail {
       example: "\"mini@mouse.com\"";
     }
   ];
-  // if no verification is specified, an email is sent with the default url
+  // If no verification is specified, an email is sent with the default url
   oneof verification {
     SendEmailVerificationCode send_code = 2;
     ReturnEmailVerificationCode return_code = 3;
