@@ -7,6 +7,10 @@ deps:
 breaking:
   use:
     - FILE
+    - FIELD_NO_DELETE_UNLESS_NAME_RESERVED
+    - FIELD_NO_DELETE_UNLESS_NUMBER_RESERVED
+  except:
+    - FIELD_NO_DELETE
   ignore_unstable_packages: true
 lint:
   use:
