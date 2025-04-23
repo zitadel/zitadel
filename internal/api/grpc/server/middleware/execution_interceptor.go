@@ -44,13 +44,12 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoRequest{
-		FullMethod:      fullMethod,
-		InstanceID:      authz.GetInstance(ctx).InstanceID(),
-		ProjectID:       ctxData.ProjectID,
-		OrgID:           ctxData.OrgID,
-		UserID:          ctxData.UserID,
-		originalRequest: req,
-		Request:         Message{req.(proto.Message)},
+		FullMethod: fullMethod,
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		ProjectID:  ctxData.ProjectID,
+		OrgID:      ctxData.OrgID,
+		UserID:     ctxData.UserID,
+		Request:    Message{req.(proto.Message)},
 	}
 
 	return execution.CallTargets(ctx, targets, info)
@@ -67,14 +66,13 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoResponse{
-		FullMethod:       fullMethod,
-		InstanceID:       authz.GetInstance(ctx).InstanceID(),
-		ProjectID:        ctxData.ProjectID,
-		OrgID:            ctxData.OrgID,
-		UserID:           ctxData.UserID,
-		Request:          Message{req.(proto.Message)},
-		originalResponse: resp,
-		Response:         Message{resp.(proto.Message)},
+		FullMethod: fullMethod,
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		ProjectID:  ctxData.ProjectID,
+		OrgID:      ctxData.OrgID,
+		UserID:     ctxData.UserID,
+		Request:    Message{req.(proto.Message)},
+		Response:   Message{resp.(proto.Message)},
 	}
 
 	return execution.CallTargets(ctx, targets, info)
@@ -83,13 +81,12 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 var _ execution.ContextInfo = &ContextInfoRequest{}
 
 type ContextInfoRequest struct {
-	FullMethod      string  `json:"fullMethod,omitempty"`
-	InstanceID      string  `json:"instanceID,omitempty"`
-	OrgID           string  `json:"orgID,omitempty"`
-	ProjectID       string  `json:"projectID,omitempty"`
-	UserID          string  `json:"userID,omitempty"`
-	Request         Message `json:"request,omitempty"`
-	originalRequest interface{}
+	FullMethod string  `json:"fullMethod,omitempty"`
+	InstanceID string  `json:"instanceID,omitempty"`
+	OrgID      string  `json:"orgID,omitempty"`
+	ProjectID  string  `json:"projectID,omitempty"`
+	UserID     string  `json:"userID,omitempty"`
+	Request    Message `json:"request,omitempty"`
 }
 
 type Message struct {
@@ -117,24 +114,23 @@ func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
-	return json.Unmarshal(resp, c.originalRequest)
+	return json.Unmarshal(resp, c.Request.Message)
 }
 
 func (c *ContextInfoRequest) GetContent() interface{} {
-	return c.originalRequest
+	return c.Request.Message
 }
 
 var _ execution.ContextInfo = &ContextInfoResponse{}
 
 type ContextInfoResponse struct {
-	FullMethod       string  `json:"fullMethod,omitempty"`
-	InstanceID       string  `json:"instanceID,omitempty"`
-	OrgID            string  `json:"orgID,omitempty"`
-	ProjectID        string  `json:"projectID,omitempty"`
-	UserID           string  `json:"userID,omitempty"`
-	Request          Message `json:"request,omitempty"`
-	Response         Message `json:"response,omitempty"`
-	originalResponse interface{}
+	FullMethod string  `json:"fullMethod,omitempty"`
+	InstanceID string  `json:"instanceID,omitempty"`
+	OrgID      string  `json:"orgID,omitempty"`
+	ProjectID  string  `json:"projectID,omitempty"`
+	UserID     string  `json:"userID,omitempty"`
+	Request    Message `json:"request,omitempty"`
+	Response   Message `json:"response,omitempty"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
@@ -146,9 +142,9 @@ func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
-	return json.Unmarshal(resp, c.originalResponse)
+	return json.Unmarshal(resp, c.Response.Message)
 }
 
 func (c *ContextInfoResponse) GetContent() interface{} {
-	return c.originalResponse
+	return c.Response.Message
 }
