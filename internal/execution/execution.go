@@ -86,6 +86,7 @@ func CallTarget(
 			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
+			//nolint: contextcheck
 		}(context.Background(), target, info.GetHTTPRequestBody())
 		return nil, nil
 	default:
