@@ -1930,7 +1930,6 @@ message CreateUserRequest{
     optional SetHumanPhone phone = 3;
     // Set the users initial password and optionally require the user to set a new password.
     oneof password_type {
-      option (validate.required) = true;
       Password password = 4;
       HashedPassword hashed_password = 5;
     }
