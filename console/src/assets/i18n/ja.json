@@ -632,7 +632,8 @@
       "TABLE": {
         "NAME": "名前",
         "ENDPOINT": "エンドポイント",
-        "CREATIONDATE": "作成日"
+        "CREATIONDATE": "作成日",
+        "REORDER": "順序を変更"
       }
     }
   },
