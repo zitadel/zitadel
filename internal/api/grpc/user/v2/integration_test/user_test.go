@@ -667,7 +667,6 @@ func TestServer_AddHumanUser(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
@@ -685,520 +684,712 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_CreateUser(t *testing.T) {
-	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
 		req *user.CreateUserRequest
 	}
-	tests := []struct {
-		name    string
+	type testCase struct {
 		args    args
 		want    *user.CreateUserResponse
 		wantErr bool
+	}
+	tests := []struct {
+		name     string
+		testCase func(runId string) testCase
 	}{
 		{
 			name: "default verification",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-							},
-							Phone: &user.SetHumanPhone{},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									Phone: &user.SetHumanPhone{},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
+									},
 								},
 							},
 						},
 					},
-				},
-			},
-			want: &user.CreateUserResponse{},
-		},
-		{
-			name: "default verification (org domain ctx)",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-							},
-							Phone: &user.SetHumanPhone{},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
-								},
-							},
-						},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: username,
 					},
-				},
+					wantErr: false,
+				}
 			},
-			want: &user.CreateUserResponse{},
 		},
 		{
 			name: "return email verification code",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-								Verification: &user.SetHumanEmail_ReturnCode{
-									ReturnCode: &user.ReturnEmailVerificationCode{},
-								},
-							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_ReturnCode{
+											ReturnCode: &user.ReturnEmailVerificationCode{},
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
+									},
 								},
 							},
 						},
 					},
-				},
-			},
-			want: &user.CreateUserResponse{
-				EmailCode: gu.Ptr("something"),
+					want: &user.CreateUserResponse{
+						Id:        "is generated",
+						Username:  username,
+						EmailCode: gu.Ptr("something"),
+					},
+				}
 			},
 		},
 		{
 			name: "custom template",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-								Verification: &user.SetHumanEmail_SendCode{
-									SendCode: &user.SendEmailVerificationCode{
-										UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+											},
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
 									},
 								},
 							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
-								},
-							},
 						},
 					},
-				},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
 			},
-			want: &user.CreateUserResponse{},
 		},
 		{
 			name: "return phone verification code",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-							},
-							Phone: &user.SetHumanPhone{
-								Phone: "+41791234567",
-								Verification: &user.SetHumanPhone_ReturnCode{
-									ReturnCode: &user.ReturnPhoneVerificationCode{},
-								},
-							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									Phone: &user.SetHumanPhone{
+										Phone: "+41791234567",
+										Verification: &user.SetHumanPhone_ReturnCode{
+											ReturnCode: &user.ReturnPhoneVerificationCode{},
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
+									},
 								},
 							},
 						},
 					},
-				},
-			},
-			want: &user.CreateUserResponse{
-				PhoneCode: gu.Ptr("something"),
+					want: &user.CreateUserResponse{
+						Id:        "is generated",
+						Username:  username,
+						PhoneCode: gu.Ptr("something"),
+					},
+				}
 			},
 		},
 		{
 			name: "custom template error",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-								Verification: &user.SetHumanEmail_SendCode{
-									SendCode: &user.SendEmailVerificationCode{
-										UrlTemplate: gu.Ptr("{{"),
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("{{"),
+											},
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
 									},
 								},
 							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
-								},
-							},
 						},
 					},
-				},
+					wantErr: true,
+				}
 			},
-			wantErr: true,
 		},
 		{
 			name: "missing REQUIRED profile",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-								Verification: &user.SetHumanEmail_ReturnCode{
-									ReturnCode: &user.ReturnEmailVerificationCode{},
-								},
-							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_ReturnCode{
+											ReturnCode: &user.ReturnEmailVerificationCode{},
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
+									},
 								},
 							},
 						},
 					},
-				},
+					wantErr: true,
+				}
 			},
-			wantErr: true,
 		},
 		{
 			name: "missing REQUIRED email",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: true,
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
+									},
 								},
 							},
 						},
 					},
-				},
+					wantErr: true,
+				}
 			},
-			wantErr: true,
 		},
 		{
 			name: "missing idp",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-								Verification: &user.SetHumanEmail_IsVerified{
-									IsVerified: true,
-								},
-							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: false,
-								},
-							},
-							IdpLinks: []*user.IDPLink{
-								{
-									IdpId:    "idpID",
-									UserId:   "userID",
-									UserName: "username",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: false,
+										},
+									},
+									IdpLinks: []*user.IDPLink{
+										{
+											IdpId:    "idpID",
+											UserId:   "userID",
+											UserName: "username",
+										},
+									},
 								},
 							},
 						},
 					},
-				},
+					wantErr: true,
+				}
 			},
-			wantErr: true,
 		},
 		{
 			name: "with idp",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-								Verification: &user.SetHumanEmail_IsVerified{
-									IsVerified: true,
-								},
-							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: false,
-								},
-							},
-							IdpLinks: []*user.IDPLink{
-								{
-									IdpId:    idpResp.Id,
-									UserId:   "userID",
-									UserName: "username",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: false,
+										},
+									},
+									IdpLinks: []*user.IDPLink{
+										{
+											IdpId:    idpResp.Id,
+											UserId:   "userID",
+											UserName: "username",
+										},
+									},
 								},
 							},
 						},
 					},
-				},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
 			},
-			want: &user.CreateUserResponse{},
 		},
 		{
 			name: "with totp",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-								Verification: &user.SetHumanEmail_IsVerified{
-									IsVerified: true,
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: false,
+										},
+									},
+									TotpSecret: gu.Ptr("secret"),
 								},
 							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password:       "DifficultPW666!",
-									ChangeRequired: false,
-								},
-							},
-							TotpSecret: gu.Ptr("secret"),
 						},
 					},
-				},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
 			},
-			want: &user.CreateUserResponse{},
 		},
 		{
 			name: "password not complexity conform",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-							},
-							PasswordType: &user.CreateUserRequest_Human_Password{
-								Password: &user.Password{
-									Password: "insufficient",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password: "insufficient",
+										},
+									},
 								},
 							},
 						},
 					},
-				},
+					wantErr: true,
+				}
 			},
-			wantErr: true,
 		},
 		{
 			name: "hashed password",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-							},
-							PasswordType: &user.CreateUserRequest_Human_HashedPassword{
-								HashedPassword: &user.HashedPassword{
-									Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									PasswordType: &user.CreateUserRequest_Human_HashedPassword{
+										HashedPassword: &user.HashedPassword{
+											Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+										},
+									},
 								},
 							},
 						},
 					},
-				},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
 			},
-			want: &user.CreateUserResponse{},
 		},
 		{
 			name: "unsupported hashed password",
-			args: args{
-				CTX,
-				&user.CreateUserRequest{
-					OrganizationId: Instance.DefaultOrg.Id,
-					UserType: &user.CreateUserRequest_Human_{
-						Human: &user.CreateUserRequest_Human{
-							Profile: &user.SetHumanProfile{
-								GivenName:         "Donald",
-								FamilyName:        "Duck",
-								NickName:          gu.Ptr("Dukkie"),
-								DisplayName:       gu.Ptr("Donald Duck"),
-								PreferredLanguage: gu.Ptr("en"),
-								Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-							},
-							Email: &user.SetHumanEmail{
-								Email: "this is set to a unique and valid value in the test execution",
-							},
-							PasswordType: &user.CreateUserRequest_Human_HashedPassword{
-								HashedPassword: &user.HashedPassword{
-									Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									PasswordType: &user.CreateUserRequest_Human_HashedPassword{
+										HashedPassword: &user.HashedPassword{
+											Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+										},
+									},
 								},
 							},
 						},
 					},
-				},
+					wantErr: true,
+				}
 			},
-			wantErr: true,
+		},
+		{
+			name: "human default username",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+										Gender:     user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									Phone: &user.SetHumanPhone{},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password:       "DifficultPW666!",
+											ChangeRequired: true,
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: email,
+					},
+				}
+			},
+		},
+		{
+			name: "machine user",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
+			},
+		},
+		{
+			name: "machine default username to generated id",
+			testCase: func(runId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: "is id",
+					},
+				}
+			},
+		},
+		{
+			name: "machine default username to given id",
+			testCase: func(runId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							UserId:         &runId,
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id:       "is generated",
+						Username: runId,
+					},
+				}
+			},
 		},
 	}
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
-			userID := fmt.Sprint(now.UnixNano() + int64(i))
-			tt.args.req.UserId = &userID
-			if tt.want != nil {
-				tt.want.Id = userID
-			}
-			// In order to prevent unique constraint errors, we set the email to a unique value
-			if email := tt.args.req.GetHuman().GetEmail(); email != nil {
-				email.Email = fmt.Sprintf("%s@me.now", userID)
-			}
-			got, err := Client.CreateUser(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
+			runId := fmt.Sprint(now.UnixNano() + int64(i))
+			test := tt.testCase(runId)
+			got, err := Client.CreateUser(test.args.ctx, test.args.req)
+			if test.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
-			assert.Equal(t, tt.want.GetId(), got.GetId())
-			if tt.want.GetEmailCode() != "" {
-				assert.NotEmpty(t, got.GetEmailCode())
+			creationDate := got.CreationDate.AsTime()
+			assert.Greater(t, creationDate, now, "creation date is before the test started")
+			assert.Less(t, creationDate, time.Now(), "creation date is in the future")
+			if test.want.GetEmailCode() != "" {
+				assert.NotEmpty(t, got.GetEmailCode(), "email code is empty")
 			} else {
-				assert.Empty(t, got.GetEmailCode())
+				assert.Empty(t, got.GetEmailCode(), "email code is not empty")
 			}
-			if tt.want.GetPhoneCode() != "" {
-				assert.NotEmpty(t, got.GetPhoneCode())
+			if test.want.GetPhoneCode() != "" {
+				assert.NotEmpty(t, got.GetPhoneCode(), "phone code is empty")
 			} else {
-				assert.Empty(t, got.GetPhoneCode())
+				assert.Empty(t, got.GetPhoneCode(), "phone code is not empty")
 			}
-			assert.WithinRange(t, got.GetCreationDate().AsTime(), now, time.Now())
+			if test.want.GetId() == "is generated" {
+				assert.Len(t, got.GetId(), 18, "ID is not 18 characters")
+			} else {
+				assert.Equal(t, test.want.GetId(), got.GetId(), "ID is not the same")
+			}
+			if test.want.GetUsername() == "is id" {
+				assert.Equal(t, got.GetId(), got.GetUsername(), "username is not the same as id")
+			} else {
+				assert.Equal(t, test.want.GetUsername(), got.GetUsername(), "username is not the same")
+			}
 		})
 	}
 }
