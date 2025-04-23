@@ -57,7 +57,7 @@
       </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="['order', 'name', 'deleteAction']"></tr>
-    <tr cdkDrag mat-row *matRowDef="let row; columns: ['order', 'name', 'deleteAction']"></tr>
+    <tr class="drag-row" cdkDrag mat-row *matRowDef="let row; columns: ['order', 'name', 'deleteAction']"></tr>
   </table>
 
   <div class="actions">

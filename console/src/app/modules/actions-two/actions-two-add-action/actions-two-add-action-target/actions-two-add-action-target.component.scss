@@ -30,3 +30,7 @@
 .cdk-drop-list-dragging .mat-row:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+
+.drag-row {
+  backdrop-filter: blur(10px);
+}
