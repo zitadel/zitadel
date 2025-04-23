@@ -11,7 +11,7 @@ import { WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
 })
 export class OidcWebKeysInactiveTableComponent {
   @Input({ required: true })
-  public set InactiveWebKeys(webKeys: WebKey[] | null) {
+  public set inactiveWebKeys(webKeys: WebKey[] | null) {
     this.inactiveWebKeys$.next(webKeys);
   }
 
