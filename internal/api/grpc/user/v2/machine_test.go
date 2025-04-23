@@ -1,10 +1,11 @@
 package user
 
 import (
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"golang.org/x/text/language"
-	"testing"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"

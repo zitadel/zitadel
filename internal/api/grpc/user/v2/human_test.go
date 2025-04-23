@@ -2,12 +2,12 @@ package user
 
 import (
 	"fmt"
-	"github.com/google/go-cmp/cmp/cmpopts"
-	"golang.org/x/text/language"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
