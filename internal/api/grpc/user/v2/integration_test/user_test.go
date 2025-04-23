@@ -711,22 +711,11 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
-									},
-									Phone: &user.SetHumanPhone{},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
-										},
 									},
 								},
 							},
@@ -754,23 +743,13 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
 										Verification: &user.SetHumanEmail_ReturnCode{
 											ReturnCode: &user.ReturnEmailVerificationCode{},
-										},
-									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
 										},
 									},
 								},
@@ -799,12 +778,8 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
@@ -812,12 +787,6 @@ func TestServer_CreateUser(t *testing.T) {
 											SendCode: &user.SendEmailVerificationCode{
 												UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
 											},
-										},
-									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
 										},
 									},
 								},
@@ -845,12 +814,8 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
@@ -859,12 +824,6 @@ func TestServer_CreateUser(t *testing.T) {
 										Phone: "+41791234567",
 										Verification: &user.SetHumanPhone_ReturnCode{
 											ReturnCode: &user.ReturnPhoneVerificationCode{},
-										},
-									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
 										},
 									},
 								},
@@ -893,12 +852,8 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
@@ -906,12 +861,6 @@ func TestServer_CreateUser(t *testing.T) {
 											SendCode: &user.SendEmailVerificationCode{
 												UrlTemplate: gu.Ptr("{{"),
 											},
-										},
-									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
 										},
 									},
 								},
@@ -941,12 +890,6 @@ func TestServer_CreateUser(t *testing.T) {
 											ReturnCode: &user.ReturnEmailVerificationCode{},
 										},
 									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
-										},
-									},
 								},
 							},
 						},
@@ -968,19 +911,34 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
-										},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "missing empty email",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
+									Email: &user.SetHumanEmail{},
 								},
 							},
 						},
@@ -1003,23 +961,13 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
 										Verification: &user.SetHumanEmail_IsVerified{
 											IsVerified: true,
-										},
-									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: false,
 										},
 									},
 									IdpLinks: []*user.IDPLink{
@@ -1052,23 +1000,13 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
 										Verification: &user.SetHumanEmail_IsVerified{
 											IsVerified: true,
-										},
-									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: false,
 										},
 									},
 									IdpLinks: []*user.IDPLink{
@@ -1103,23 +1041,13 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
 										Verification: &user.SetHumanEmail_IsVerified{
 											IsVerified: true,
-										},
-									},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: false,
 										},
 									},
 									TotpSecret: gu.Ptr("secret"),
@@ -1185,12 +1113,8 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
@@ -1225,12 +1149,8 @@ func TestServer_CreateUser(t *testing.T) {
 							UserType: &user.CreateUserRequest_Human_{
 								Human: &user.CreateUserRequest_Human{
 									Profile: &user.SetHumanProfile{
-										GivenName:         "Donald",
-										FamilyName:        "Duck",
-										NickName:          gu.Ptr("Dukkie"),
-										DisplayName:       gu.Ptr("Donald Duck"),
-										PreferredLanguage: gu.Ptr("en"),
-										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+										GivenName:  "Donald",
+										FamilyName: "Duck",
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
@@ -1263,17 +1183,9 @@ func TestServer_CreateUser(t *testing.T) {
 									Profile: &user.SetHumanProfile{
 										GivenName:  "Donald",
 										FamilyName: "Duck",
-										Gender:     user.Gender_GENDER_DIVERSE.Enum(),
 									},
 									Email: &user.SetHumanEmail{
 										Email: email,
-									},
-									Phone: &user.SetHumanPhone{},
-									PasswordType: &user.CreateUserRequest_Human_Password{
-										Password: &user.Password{
-											Password:       "DifficultPW666!",
-											ChangeRequired: true,
-										},
 									},
 								},
 							},
@@ -1349,7 +1261,7 @@ func TestServer_CreateUser(t *testing.T) {
 						},
 					},
 					want: &user.CreateUserResponse{
-						Id:       "is generated",
+						Id:       runId,
 						Username: runId,
 					},
 				}
@@ -1386,10 +1298,180 @@ func TestServer_CreateUser(t *testing.T) {
 				assert.Equal(t, test.want.GetId(), got.GetId(), "ID is not the same")
 			}
 			if test.want.GetUsername() == "is id" {
-				assert.Equal(t, got.GetId(), got.GetUsername(), "username is not the same as id")
+				assert.Equal(t, got.GetUsername(), got.GetId(), "username is not the same as id")
 			} else {
 				assert.Equal(t, test.want.GetUsername(), got.GetUsername(), "username is not the same")
 			}
+		})
+	}
+}
+
+func TestServer_CreateUser_Permission(t *testing.T) {
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	type args struct {
+		ctx context.Context
+		req *user.CreateUserRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "human system, ok",
+			args: args{
+				SystemCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "human instance, ok",
+			args: args{
+				IamCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "human org, error",
+			args: args{
+				CTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "human user, error",
+			args: args{
+				UserCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "machine system, ok",
+			args: args{
+				SystemCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "machine instance, ok",
+			args: args{
+				IamCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "machine org, error",
+			args: args{
+				CTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "machine user, error",
+			args: args{
+				UserCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			userID := fmt.Sprint(time.Now().UnixNano() + int64(i))
+			tt.args.req.UserId = &userID
+			if email := tt.args.req.GetHuman().GetEmail(); email != nil {
+				email.Email = fmt.Sprintf("%s@example.com", userID)
+			}
+			_, err := Client.CreateUser(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
 		})
 	}
 }
