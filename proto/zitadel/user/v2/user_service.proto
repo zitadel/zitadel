@@ -144,14 +144,11 @@ service UserService {
       auth_option: {
         permission: "authenticated"
       }
-      http_response: {
-        success_code: 201
-      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
-        key: "201"
+        key: "200"
         value: {
           description: "OK";
         }
@@ -187,7 +184,7 @@ service UserService {
         org_field: "organization"
       }
       http_response: {
-        success_code: 201
+        success_code: 200
       }
     };
 
@@ -306,8 +303,6 @@ service UserService {
   }
 
   // Resend code to verify user email
-  //
-  // Deprecated: [Update the users email](apis/resources/user_service_v2/user-service-update-user.api.mdx) to resend a verification code.
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/resend"
@@ -321,7 +316,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -338,10 +332,6 @@ service UserService {
   }
 
   // Send code to verify user email
-  //
-  // Deprecated: [Update the users email](apis/resources/user_service_v2/user-service-update-user.api.mdx) to send a verification code.
-  //
-  // Send code to verify user email.
   rpc SendEmailCode (SendEmailCodeRequest) returns (SendEmailCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/send"
@@ -355,7 +345,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -471,8 +460,6 @@ service UserService {
   }
 
   // Resend code to verify user phone
-  //
-  // Deprecated: [Update the users phone](apis/resources/user_service_v2/user-service-update-user.api.mdx) to resend a verification code.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -486,7 +473,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1741,7 +1727,7 @@ service UserService {
   //   - user.read
   rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
     option (google.api.http) = {
-      post: "/v2/users/keys/_search"
+      post: "/v2/users/keys/search"
       body: "*"
     };
 
@@ -1844,7 +1830,7 @@ service UserService {
   //   - user.read
   rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
     option (google.api.http) = {
-      post: "/v2/users/pats/_search"
+      post: "/v2/users/pats/search"
       body: "*"
     };
 
@@ -2049,14 +2035,21 @@ message CreateUserResponse {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
+  // The username that is unique within the instance.
+  string username = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"minnie-mouse\"";
+    }
+  ];
   // The email verification code if it was requested by setting the email verification to return_code.
-  optional string email_code = 3 [
+  optional string email_code = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"XTA6BC\"";
     }
   ];
   // The phone verification code if it was requested by setting the phone verification to return_code.
-  optional string phone_code = 4 [
+  optional string phone_code = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"XTA6BC\"";
     }
