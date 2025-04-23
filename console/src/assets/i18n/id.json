@@ -599,7 +599,8 @@
       "TABLE": {
         "NAME": "Nama",
         "ENDPOINT": "Titik Akhir",
-        "CREATIONDATE": "Tanggal Pembuatan"
+        "CREATIONDATE": "Tanggal Pembuatan",
+        "REORDER": "Susun ulang"
       }
     }
   },
