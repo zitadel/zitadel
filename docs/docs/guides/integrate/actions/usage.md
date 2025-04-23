@@ -338,7 +338,7 @@ The information sent to the Endpoint is structured as JSON:
   "event_type": "Type of the event",
   "created_at": "Time the event was created",
   "userID": "ID of the creator of the event",
-  "event_payload": "Base64 encoded content of the event"
+  "event_payload": "Content of the event in JSON format"
 }
 ```
 

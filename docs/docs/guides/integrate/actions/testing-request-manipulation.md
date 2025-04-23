@@ -37,10 +37,28 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type contextRequest struct {
-	Request *user.AddHumanUserRequest `json:"request"`
+	Request *addHumanUserRequestWrapper `json:"request"`
+}
+
+// addHumanUserRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type addHumanUserRequestWrapper struct {
+	user.AddHumanUserRequest
+}
+
+func (r *addHumanUserRequestWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *addHumanUserRequestWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
 }
 
 // call HandleFunc to read the request body, manipulate the content and return the manipulated request

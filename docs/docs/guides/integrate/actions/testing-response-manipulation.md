@@ -37,11 +37,46 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
-type response struct {
-	Request  *user.RetrieveIdentityProviderIntentRequest  `json:"request"`
-	Response *user.RetrieveIdentityProviderIntentResponse `json:"response"`
+type contextResponse struct {
+	Request  *retrieveIdentityProviderIntentRequestWrapper  `json:"request"`
+	Response *retrieveIdentityProviderIntentResponseWrapper `json:"response"`
+}
+
+// RetrieveIdentityProviderIntentRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type retrieveIdentityProviderIntentRequestWrapper struct {
+	user.RetrieveIdentityProviderIntentRequest
+}
+
+func (r *retrieveIdentityProviderIntentRequestWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *retrieveIdentityProviderIntentRequestWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
+}
+
+// RetrieveIdentityProviderIntentResponseWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type retrieveIdentityProviderIntentResponseWrapper struct {
+	user.RetrieveIdentityProviderIntentResponse
+}
+
+func (r *retrieveIdentityProviderIntentResponseWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *retrieveIdentityProviderIntentResponseWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
 }
 
 // call HandleFunc to read the response body, manipulate the content and return the response
@@ -56,7 +91,7 @@ func call(w http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 
 	// read the response into the expected structure
-	request := new(response)
+	request := new(contextResponse)
 	if err := json.Unmarshal(sentBody, request); err != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 	}
