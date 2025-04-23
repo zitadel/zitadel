@@ -1669,6 +1669,359 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 	}
 }
 
+func TestServer_UpdateUser(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		req *user.UpdateUserRequest
+	}
+	type testCase struct {
+		args    args
+		want    *user.UpdateUserResponse
+		wantErr bool
+	}
+	tests := []struct {
+		name     string
+		testCase func(runId, userId string) testCase
+	}{
+		{
+			name: "default verification",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+					wantErr: false,
+				}
+			},
+		},
+		{
+			name: "return email verification code",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_ReturnCode{
+											ReturnCode: &user.ReturnEmailVerificationCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:        "is generated",
+						Username:  username,
+						EmailCode: gu.Ptr("something"),
+					},
+				}
+			},
+		},
+		{
+			name: "custom template",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
+			},
+		},
+		{
+			name: "return phone verification code",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Phone: &user.SetHumanPhone{
+										Phone: "+41791234567",
+										Verification: &user.SetHumanPhone_ReturnCode{
+											ReturnCode: &user.ReturnPhoneVerificationCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:        "is generated",
+						Username:  username,
+						PhoneCode: gu.Ptr("something"),
+					},
+				}
+			},
+		},
+		{
+			name: "custom template error",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("{{"),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "missing empty email",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "password not complexity conform",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Password: &user.SetPassword{
+										PasswordType: &user.SetPassword_Password{
+											Password: &user.Password{
+												Password: "insufficient",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "hashed password",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Password: &user.SetPassword{
+										PasswordType: &user.SetPassword_HashedPassword{
+											HashedPassword: &user.HashedPassword{
+												Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
+			},
+		},
+		{
+			name: "unsupported hashed password",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Password: &user.SetPassword{
+										PasswordType: &user.SetPassword_HashedPassword{
+											HashedPassword: &user.HashedPassword{
+												Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "machine user",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:       "is generated",
+						Username: username,
+					},
+				}
+			},
+		},
+		{
+			name: "machine default username to generated id",
+			testCase: func(runId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:       "is generated",
+						Username: "is id",
+					},
+				}
+			},
+		},
+		{
+			name: "machine default username to given id",
+			testCase: func(runId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId:         &runId,
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						Id:       runId,
+						Username: runId,
+					},
+				}
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			now := time.Now()
+			runId := fmt.Sprint(now.UnixNano() + int64(i))
+			test := tt.testCase(runId)
+			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			creationDate := got.ChangeDate.AsTime()
+			assert.Greater(t, creationDate, now, "creation date is before the test started")
+			assert.Less(t, creationDate, time.Now(), "creation date is in the future")
+			if test.want.GetEmailCode() != "" {
+				assert.NotEmpty(t, got.GetEmailCode(), "email code is empty")
+			} else {
+				assert.Empty(t, got.GetEmailCode(), "email code is not empty")
+			}
+			if test.want.GetPhoneCode() != "" {
+				assert.NotEmpty(t, got.GetPhoneCode(), "phone code is empty")
+			} else {
+				assert.Empty(t, got.GetPhoneCode(), "phone code is not empty")
+			}
+		})
+	}
+}
+
 func TestServer_UpdateHumanUser(t *testing.T) {
 	type args struct {
 		ctx context.Context
