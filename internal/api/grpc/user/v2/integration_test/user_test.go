@@ -683,6 +683,199 @@ func TestServer_AddHumanUser(t *testing.T) {
 	}
 }
 
+func TestServer_AddHumanUser_Permission(t *testing.T) {
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	type args struct {
+		ctx context.Context
+		req *user.AddHumanUserRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.AddHumanUserResponse
+		wantErr bool
+	}{
+		{
+			name: "System, ok",
+			args: args{
+				SystemCTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "Instance, ok",
+			args: args{
+				IamCTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "Org, error",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "User, error",
+			args: args{
+				UserCTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			userID := fmt.Sprint(time.Now().UnixNano() + int64(i))
+			tt.args.req.UserId = &userID
+			if email := tt.args.req.GetEmail(); email != nil {
+				email.Email = fmt.Sprintf("%s@me.now", userID)
+			}
+
+			if tt.want != nil {
+				tt.want.UserId = userID
+			}
+
+			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
 func TestServer_CreateUser(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -1611,199 +1804,6 @@ func TestServer_CreateUser_Permission(t *testing.T) {
 	}
 }
 
-func TestServer_AddHumanUser_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
-	type args struct {
-		ctx context.Context
-		req *user.AddHumanUserRequest
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *user.AddHumanUserResponse
-		wantErr bool
-	}{
-		{
-			name: "System, ok",
-			args: args{
-				SystemCTX,
-				&user.AddHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
-					Profile: &user.SetHumanProfile{
-						GivenName:         "Donald",
-						FamilyName:        "Duck",
-						NickName:          gu.Ptr("Dukkie"),
-						DisplayName:       gu.Ptr("Donald Duck"),
-						PreferredLanguage: gu.Ptr("en"),
-						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-					},
-					Email: &user.SetHumanEmail{},
-					Phone: &user.SetHumanPhone{},
-					Metadata: []*user.SetMetadataEntry{
-						{
-							Key:   "somekey",
-							Value: []byte("somevalue"),
-						},
-					},
-					PasswordType: &user.AddHumanUserRequest_Password{
-						Password: &user.Password{
-							Password:       "DifficultPW666!",
-							ChangeRequired: true,
-						},
-					},
-				},
-			},
-			want: &user.AddHumanUserResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: newOrg.GetOrganizationId(),
-				},
-			},
-		},
-		{
-			name: "Instance, ok",
-			args: args{
-				IamCTX,
-				&user.AddHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
-					Profile: &user.SetHumanProfile{
-						GivenName:         "Donald",
-						FamilyName:        "Duck",
-						NickName:          gu.Ptr("Dukkie"),
-						DisplayName:       gu.Ptr("Donald Duck"),
-						PreferredLanguage: gu.Ptr("en"),
-						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-					},
-					Email: &user.SetHumanEmail{},
-					Phone: &user.SetHumanPhone{},
-					Metadata: []*user.SetMetadataEntry{
-						{
-							Key:   "somekey",
-							Value: []byte("somevalue"),
-						},
-					},
-					PasswordType: &user.AddHumanUserRequest_Password{
-						Password: &user.Password{
-							Password:       "DifficultPW666!",
-							ChangeRequired: true,
-						},
-					},
-				},
-			},
-			want: &user.AddHumanUserResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: newOrg.GetOrganizationId(),
-				},
-			},
-		},
-		{
-			name: "Org, error",
-			args: args{
-				CTX,
-				&user.AddHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
-					Profile: &user.SetHumanProfile{
-						GivenName:         "Donald",
-						FamilyName:        "Duck",
-						NickName:          gu.Ptr("Dukkie"),
-						DisplayName:       gu.Ptr("Donald Duck"),
-						PreferredLanguage: gu.Ptr("en"),
-						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-					},
-					Email: &user.SetHumanEmail{},
-					Phone: &user.SetHumanPhone{},
-					Metadata: []*user.SetMetadataEntry{
-						{
-							Key:   "somekey",
-							Value: []byte("somevalue"),
-						},
-					},
-					PasswordType: &user.AddHumanUserRequest_Password{
-						Password: &user.Password{
-							Password:       "DifficultPW666!",
-							ChangeRequired: true,
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "User, error",
-			args: args{
-				UserCTX,
-				&user.AddHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
-					Profile: &user.SetHumanProfile{
-						GivenName:         "Donald",
-						FamilyName:        "Duck",
-						NickName:          gu.Ptr("Dukkie"),
-						DisplayName:       gu.Ptr("Donald Duck"),
-						PreferredLanguage: gu.Ptr("en"),
-						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
-					},
-					Email: &user.SetHumanEmail{},
-					Phone: &user.SetHumanPhone{},
-					Metadata: []*user.SetMetadataEntry{
-						{
-							Key:   "somekey",
-							Value: []byte("somevalue"),
-						},
-					},
-					PasswordType: &user.AddHumanUserRequest_Password{
-						Password: &user.Password{
-							Password:       "DifficultPW666!",
-							ChangeRequired: true,
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-	}
-	for i, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			userID := fmt.Sprint(time.Now().UnixNano() + int64(i))
-			tt.args.req.UserId = &userID
-			if email := tt.args.req.GetEmail(); email != nil {
-				email.Email = fmt.Sprintf("%s@me.now", userID)
-			}
-
-			if tt.want != nil {
-				tt.want.UserId = userID
-			}
-
-			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
-			integration.AssertDetails(t, tt.want, got)
-		})
-	}
-}
-
 func TestServer_UpdateUserTypeHuman(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -2091,6 +2091,203 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			} else {
 				assert.Empty(t, got.GetPhoneCode(), "phone code is not empty")
 			}
+		})
+	}
+}
+
+func TestServer_UpdateUser_Permission(t *testing.T) {
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newHumanUserID := newOrg.CreatedAdmins[0].GetUserId()
+	machineUserResp, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
+		OrganizationId: newOrg.OrganizationId,
+		UserType: &user.CreateUserRequest_Machine_{
+			Machine: &user.CreateUserRequest_Machine{
+				Name: "Donald",
+			},
+		},
+	})
+	require.NoError(t, err)
+	newMachineUserID := machineUserResp.GetId()
+	Instance.TriggerUserByID(IamCTX, newMachineUserID)
+	type args struct {
+		ctx context.Context
+		req *user.UpdateUserRequest
+	}
+	type testCase struct {
+		args    args
+		wantErr bool
+	}
+	tests := []struct {
+		name     string
+		testCase func() testCase
+	}{
+		{
+			name: "human, system, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						SystemCTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "human instance, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						IamCTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "human org, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "human user, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						UserCTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "machine system, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						SystemCTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "machine instance, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						IamCTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "machine org, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "machine user, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						UserCTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			test := tt.testCase()
+			_, err := Client.UpdateUser(test.args.ctx, test.args.req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
 		})
 	}
 }
