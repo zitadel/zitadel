@@ -122,8 +122,6 @@ message ResetInstanceFeaturesResponse {
 }
 
 message GetInstanceFeaturesRequest {
-  reserved 7;
-  reserved "actions";
   bool inheritance = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -133,6 +131,8 @@ message GetInstanceFeaturesRequest {
 }
 
 message GetInstanceFeaturesResponse {
+  reserved 7;
+  reserved "actions";
   zitadel.object.v2.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
