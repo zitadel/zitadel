@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { Observable, ReplaySubject } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Input, Output } from '@angular/core';
+import { combineLatestWith, Observable, ReplaySubject } from 'rxjs';
+import { filter, map, startWith } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
-import { Condition, Execution, ExecutionTargetType } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { CorrectlyTypedExecution } from '../../actions-two-add-action/actions-two-add-action-dialog.component';
 
 @Component({
   selector: 'cnsl-actions-two-actions-table',
@@ -16,10 +17,13 @@ export class ActionsTwoActionsTableComponent {
   public readonly refresh = new EventEmitter<void>();
 
   @Output()
-  public readonly delete = new EventEmitter<Execution>();
+  public readonly selected = new EventEmitter<CorrectlyTypedExecution>();
+
+  @Output()
+  public readonly delete = new EventEmitter<CorrectlyTypedExecution>();
 
   @Input({ required: true })
-  public set executions(executions: Execution[] | null) {
+  public set executions(executions: CorrectlyTypedExecution[] | null) {
     this.executions$.next(executions);
   }
 
@@ -28,33 +32,76 @@ export class ActionsTwoActionsTableComponent {
     this.targets$.next(targets);
   }
 
-  @Output()
-  public readonly selected = new EventEmitter<Execution>();
+  private readonly executions$ = new ReplaySubject<CorrectlyTypedExecution[] | null>(1);
 
-  private readonly executions$ = new ReplaySubject<Execution[] | null>(1);
   private readonly targets$ = new ReplaySubject<Target[] | null>(1);
 
-  protected readonly dataSource$ = this.executions$.pipe(
-    filter(Boolean),
-    map((keys) => new MatTableDataSource(keys)),
-  );
+  protected readonly dataSource = this.getDataSource();
 
-  protected filteredTargetTypes(targets: ExecutionTargetType[]): Observable<Target[]> {
-    const targetIds = targets
-      .map((t) => t.type)
-      .filter((t): t is Extract<ExecutionTargetType['type'], { case: 'target' }> => t.case === 'target')
-      .map((t) => t.value);
+  protected readonly loading = this.getLoading();
 
-    return this.targets$.pipe(
-      filter(Boolean),
-      map((alltargets) => alltargets!.filter((target) => targetIds.includes(target.id))),
-    );
+  private getDataSource() {
+    const executions$: Observable<CorrectlyTypedExecution[]> = this.executions$.pipe(filter(Boolean), startWith([]));
+    const executionsSignal = toSignal(executions$, { requireSync: true });
+
+    const targetsMapSignal = this.getTargetsMap();
+
+    const dataSignal = computed(() => {
+      const executions = executionsSignal();
+      const targetsMap = targetsMapSignal();
+
+      if (targetsMap.size === 0) {
+        return [];
+      }
+
+      return executions.map((execution) => {
+        const mappedTargets = execution.targets.map((target) => {
+          const targetType = targetsMap.get(target.type.value);
+          if (!targetType) {
+            throw new Error(`Target with id ${target.type.value} not found`);
+          }
+          return targetType;
+        });
+        return { execution, mappedTargets };
+      });
+    });
+
+    const dataSource = new MatTableDataSource(dataSignal());
+
+    effect(() => {
+      const data = dataSignal();
+      if (dataSource.data !== data) {
+        dataSource.data = data;
+      }
+    });
+
+    return dataSource;
   }
 
-  protected filteredIncludeConditions(targets: ExecutionTargetType[]): Condition[] {
-    return targets
-      .map((t) => t.type)
-      .filter((t): t is Extract<ExecutionTargetType['type'], { case: 'include' }> => t.case === 'include')
-      .map(({ value }) => value);
+  private getTargetsMap() {
+    const targets$ = this.targets$.pipe(filter(Boolean), startWith([] as Target[]));
+    const targetsSignal = toSignal(targets$, { requireSync: true });
+
+    return computed(() => {
+      const map = new Map<string, Target>();
+      for (const target of targetsSignal()) {
+        map.set(target.id, target);
+      }
+      return map;
+    });
+  }
+
+  private getLoading() {
+    const loading$ = this.executions$.pipe(
+      combineLatestWith(this.targets$),
+      map(([executions, targets]) => executions === null || targets === null),
+      startWith(true),
+    );
+
+    return toSignal(loading$, { requireSync: true });
+  }
+
+  protected trackTarget(_: number, target: Target) {
+    return target.id;
   }
 }

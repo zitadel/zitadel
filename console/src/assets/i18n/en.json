@@ -632,7 +632,8 @@
       "TABLE": {
         "NAME": "Name",
         "ENDPOINT": "Endpoint",
-        "CREATIONDATE": "Creation Date"
+        "CREATIONDATE": "Creation Date",
+        "REORDER": "Reorder"
       }
     }
   },
