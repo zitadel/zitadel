@@ -1720,7 +1720,6 @@ service UserService {
   // Search Keys
   //
   // List all matching keys. By default all keys of the instance on which the caller has permission to read the owning users are returned.
-  // Beware that not only keys for users are returned but also keys for applications.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
