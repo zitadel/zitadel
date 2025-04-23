@@ -64,13 +64,13 @@ func grantedProjectFieldNameToSortingColumn(field *project_pb.ProjectFieldName) 
 		return query.GrantedProjectColumnCreationDate
 	}
 	switch *field {
-	case project_pb.ProjectFieldName_PROJECT_FIELD_NAME_CREATED_DATE:
+	case project_pb.ProjectFieldName_PROJECT_FIELD_NAME_CREATION_DATE:
 		return query.GrantedProjectColumnCreationDate
 	case project_pb.ProjectFieldName_PROJECT_FIELD_NAME_ID:
 		return query.GrantedProjectColumnID
 	case project_pb.ProjectFieldName_PROJECT_FIELD_NAME_NAME:
 		return query.GrantedProjectColumnName
-	case project_pb.ProjectFieldName_PROJECT_FIELD_NAME_CHANGED_DATE:
+	case project_pb.ProjectFieldName_PROJECT_FIELD_NAME_CHANGE_DATE:
 		return query.GrantedProjectColumnChangeDate
 	case project_pb.ProjectFieldName_PROJECT_FIELD_NAME_UNSPECIFIED:
 		return query.GrantedProjectColumnCreationDate
