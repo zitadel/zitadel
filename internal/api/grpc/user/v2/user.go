@@ -447,7 +447,6 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*
 		}
 		return &user.CreateUserResponse{
 			Id:           human.ID,
-			Username:     human.Username,
 			CreationDate: timestamppb.New(human.Details.EventDate),
 			EmailCode:    human.EmailCode,
 			PhoneCode:    human.PhoneCode,
@@ -469,7 +468,6 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*
 		}
 		return &user.CreateUserResponse{
 			Id:           cmd.AggregateID,
-			Username:     cmd.Username,
 			CreationDate: timestamppb.New(details.EventDate),
 		}, nil
 	default:
