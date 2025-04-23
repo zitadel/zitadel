@@ -2049,14 +2049,21 @@ message CreateUserResponse {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
+  // The username that is unique within the instance.
+  string username = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"minnie-mouse\"";
+    }
+  ];
   // The email verification code if it was requested by setting the email verification to return_code.
-  optional string email_code = 3 [
+  optional string email_code = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"XTA6BC\"";
     }
   ];
   // The phone verification code if it was requested by setting the phone verification to return_code.
-  optional string phone_code = 4 [
+  optional string phone_code = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"XTA6BC\"";
     }
