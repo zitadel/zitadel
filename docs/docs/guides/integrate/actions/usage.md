@@ -36,6 +36,11 @@ The information sent to the Endpoint is structured as JSON:
 }
 ```
 
+:::warning
+To marshal and unmarshal the request please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson), 
+as the request is a protocol buffer message, to avoid potential problems with the attribute names.
+:::
+
 ### Sent information Response
 
 The information sent to the Endpoint is structured as JSON:
@@ -55,6 +60,11 @@ The information sent to the Endpoint is structured as JSON:
   }
 }
 ```
+
+:::warning
+To marshal and unmarshal the request and response please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),
+as the request and response are protocol buffer messages, to avoid potential problems with the attribute names.
+:::
 
 ### Sent information Function
 

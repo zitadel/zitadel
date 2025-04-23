@@ -86,8 +86,7 @@ func CallTarget(
 			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
-			//nolint: contextcheck
-		}(context.Background(), target, info.GetHTTPRequestBody())
+		}(context.Background(), target, info.GetHTTPRequestBody()) //nolint: contextcheck
 		return nil, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
