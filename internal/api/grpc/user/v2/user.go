@@ -436,7 +436,7 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*
 				Password: pwType.Password,
 			}
 		default:
-			return nil, zerrors.ThrowInvalidArgument(nil, "", "password type is not set")
+			// optional password is not set
 		}
 		human, err := AddUserRequestToAddHuman(addHumanReq)
 		if err != nil {
@@ -468,12 +468,12 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*
 			return nil, err
 		}
 		return &user.CreateUserResponse{
-			Id:           details.ID,
+			Id:           cmd.AggregateID,
 			Username:     cmd.Username,
 			CreationDate: timestamppb.New(details.EventDate),
 		}, nil
 	default:
-		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
+		return nil, zerrors.ThrowInternal(nil, "", "user type is not implemented")
 	}
 }
 
