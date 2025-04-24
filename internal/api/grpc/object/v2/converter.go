@@ -2,6 +2,7 @@ package object
 
 import (
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -175,4 +176,23 @@ func MFAStateToPb(state domain.MFAState) user_pb.AuthFactorState {
 	default:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	}
+}
+
+func ToViewDetailsPb(
+	sequence uint64,
+	creationDate,
+	changeDate time.Time,
+	resourceOwner string,
+) *object.Details {
+	details := &object.Details{
+		Sequence:      sequence,
+		ResourceOwner: resourceOwner,
+	}
+	if !creationDate.IsZero() {
+		details.CreationDate = timestamppb.New(creationDate)
+	}
+	if !changeDate.IsZero() {
+		details.ChangeDate = timestamppb.New(changeDate)
+	}
+	return details
 }

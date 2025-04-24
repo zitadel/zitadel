@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/object/v2/object.proto";
+
+package zitadel.instance.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2;instance";
+
+message Instance {
+  string id = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"69629023906488334\""
+      }
+  ];
+  zitadel.object.v2.Details details = 2;
+  State state = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "current state of the instance";
+      }
+  ];
+  string name = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"ZITADEL\"";
+      }
+  ];
+  string version = 5 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"1.0.0\"";
+      }
+  ];
+  repeated Domain domains = 6;
+}
+
+enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_CREATING = 1;
+    STATE_RUNNING = 2;
+    STATE_STOPPING = 3;
+    STATE_STOPPED = 4;
+}
+
+message Domain {
+    zitadel.object.v2.Details details = 1;
+    string domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.com\""
+        }
+    ];
+    bool primary = 3;
+    bool generated = 4;
+}

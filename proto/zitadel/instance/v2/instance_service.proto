@@ -4,6 +4,8 @@ package zitadel.instance.v2;
 
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
+import "zitadel/instance/v2/instance.proto";
+import "google/protobuf/empty.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -115,6 +117,10 @@ message DeleteInstanceResponse {
   zitadel.object.v2.Details details = 1;
 }
 
+message GetInstanceResponse {
+  zitadel.instance.v2.Instance instance = 1;
+}
+
 service InstanceService {
 
   // DeleteInstance deletes an instance with the given ID.
@@ -148,10 +154,39 @@ service InstanceService {
       }
     };
   }
+
+  // GetInstance returns the instance for the current context.
+  rpc GetInstance(google.protobuf.Empty) returns (GetInstanceResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Gets the instance associated to the current context";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The instance of the context.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/GetInstanceResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      get: "/v2/instances/current"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "instance.get"
+      }
+    };
+  }
+
 }
 
 // UpdateInstance
-// GetInstance
 // ListInstances
 // DeleteInstance
 
