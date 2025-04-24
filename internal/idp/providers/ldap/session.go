@@ -82,6 +82,10 @@ func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 	)
 }
 
+func (s *Session) ExpiresAt() time.Time {
+	return time.Time{} // falls back to the default expiration time
+}
+
 func tryBind(
 	server string,
 	startTLS bool,

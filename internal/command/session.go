@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -32,31 +33,33 @@ type SessionCommands struct {
 	eventstore        *eventstore.Eventstore
 	eventCommands     []eventstore.Command
 
-	hasher          *crypto.Hasher
-	intentAlg       crypto.EncryptionAlgorithm
-	totpAlg         crypto.EncryptionAlgorithm
-	otpAlg          crypto.EncryptionAlgorithm
-	createCode      encryptedCodeWithDefaultFunc
-	createPhoneCode encryptedCodeGeneratorWithDefaultFunc
-	createToken     func(sessionID string) (id string, token string, err error)
-	getCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error)
-	now             func() time.Time
+	hasher               *crypto.Hasher
+	intentAlg            crypto.EncryptionAlgorithm
+	totpAlg              crypto.EncryptionAlgorithm
+	otpAlg               crypto.EncryptionAlgorithm
+	createCode           encryptedCodeWithDefaultFunc
+	createPhoneCode      encryptedCodeGeneratorWithDefaultFunc
+	createToken          func(sessionID string) (id string, token string, err error)
+	getCodeVerifier      func(ctx context.Context, id string) (senders.CodeGenerator, error)
+	now                  func() time.Time
+	maxIdPIntentLifetime time.Duration
 }
 
 func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
 	return &SessionCommands{
-		sessionCommands:   cmds,
-		sessionWriteModel: session,
-		eventstore:        c.eventstore,
-		hasher:            c.userPasswordHasher,
-		intentAlg:         c.idpConfigEncryption,
-		totpAlg:           c.multifactors.OTP.CryptoMFA,
-		otpAlg:            c.userEncryption,
-		createCode:        c.newEncryptedCodeWithDefault,
-		createPhoneCode:   c.newPhoneCode,
-		createToken:       c.sessionTokenCreator,
-		getCodeVerifier:   c.phoneCodeVerifierFromConfig,
-		now:               time.Now,
+		sessionCommands:      cmds,
+		sessionWriteModel:    session,
+		eventstore:           c.eventstore,
+		hasher:               c.userPasswordHasher,
+		intentAlg:            c.idpConfigEncryption,
+		totpAlg:              c.multifactors.OTP.CryptoMFA,
+		otpAlg:               c.userEncryption,
+		createCode:           c.newEncryptedCodeWithDefault,
+		createPhoneCode:      c.newPhoneCode,
+		createToken:          c.sessionTokenCreator,
+		getCodeVerifier:      c.phoneCodeVerifierFromConfig,
+		now:                  time.Now,
+		maxIdPIntentLifetime: c.maxIdPIntentLifetime,
 	}
 }
 
@@ -92,13 +95,16 @@ func CheckIntent(intentID, token string) SessionCommand {
 		if err := crypto.CheckToken(cmd.intentAlg, token, intentID); err != nil {
 			return nil, err
 		}
-		cmd.intentWriteModel = NewIDPIntentWriteModel(intentID, "")
+		cmd.intentWriteModel = NewIDPIntentWriteModel(intentID, "", cmd.maxIdPIntentLifetime)
 		err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.intentWriteModel)
 		if err != nil {
 			return nil, err
 		}
 		if cmd.intentWriteModel.State != domain.IDPIntentStateSucceeded {
 			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded")
+		}
+		if time.Now().After(cmd.intentWriteModel.ExpiresAt()) {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAf42", "Errors.Intent.Expired")
 		}
 		if cmd.intentWriteModel.UserID != "" {
 			if cmd.intentWriteModel.UserID != cmd.sessionWriteModel.UserID {
@@ -168,6 +174,7 @@ func (s *SessionCommands) PasswordChecked(ctx context.Context, checkedAt time.Ti
 
 func (s *SessionCommands) IntentChecked(ctx context.Context, checkedAt time.Time) {
 	s.eventCommands = append(s.eventCommands, session.NewIntentCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+	s.eventCommands = append(s.eventCommands, idpintent.NewConsumedEvent(ctx, IDPIntentAggregateFromWriteModel(&s.intentWriteModel.WriteModel)))
 }
 
 func (s *SessionCommands) WebAuthNChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement, rpid string) {

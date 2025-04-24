@@ -768,6 +768,9 @@ SystemDefaults:
   DefaultQueryLimit: 100 # ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT
   # MaxQueryLimit limits the number of items that can be queried in a single v3 API search request with explicitly passing a limit.
   MaxQueryLimit: 1000 # ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT
+  # The maximum duration of the IDP intent lifetime after which the IDP intent expires and can not be retrieved or used anymore.
+  # Note that this time is measured only after the IdP intent was successful and not after the IDP intent was created.
+  MaxIdPIntentLifetime: 1h # ZITADEL_SYSTEMDEFAULTS_MAXIDPINTENTLIFETIME
 
 Actions:
   HTTP:

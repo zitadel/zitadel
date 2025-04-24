@@ -536,6 +536,7 @@ Errors:
     StateMissing: State-parameter saknas i begäran
     NotStarted: Avsikten har inte startat eller har redan avslutats
     NotSucceeded: Avsikten har inte lyckats
+    Expired: Avsikten har gått ut
     TokenCreationFailed: Token-skapande misslyckades
     InvalidToken: Avsiktstoken är ogiltig
     OtherUser: Avsikten är avsedd för en annan användare

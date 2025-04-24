@@ -2,12 +2,14 @@ package idp
 
 import (
 	"context"
+	"time"
 )
 
 // Session is the minimal implementation for a session of a 3rd party authentication [Provider]
 type Session interface {
 	GetAuth(ctx context.Context) (content string, redirect bool)
 	FetchUser(ctx context.Context) (User, error)
+	ExpiresAt() time.Time
 }
 
 // SessionSupportsMigration is an optional extension to the Session interface.

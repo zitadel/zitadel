@@ -472,6 +472,26 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 	return resp
 }
 
+func (i *Instance) AddGenericOIDCProvider(ctx context.Context, name string) *admin.AddGenericOIDCProviderResponse {
+	resp, err := i.Client.Admin.AddGenericOIDCProvider(ctx, &admin.AddGenericOIDCProviderRequest{
+		Name:         name,
+		Issuer:       "https://example.com",
+		ClientId:     "clientID",
+		ClientSecret: "clientSecret",
+		Scopes:       []string{"openid", "profile", "email"},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+		},
+		IsIdTokenMapping: false,
+	})
+	logging.OnError(err).Panic("create generic oidc idp")
+	return resp
+}
+
 func (i *Instance) AddSAMLProvider(ctx context.Context) string {
 	resp, err := i.Client.Admin.AddSAMLProvider(ctx, &admin.AddSAMLProviderRequest{
 		Name: "saml-idp",
@@ -523,6 +543,32 @@ func (i *Instance) AddSAMLPostProvider(ctx context.Context) string {
 		},
 	})
 	logging.OnError(err).Panic("create saml idp")
+	return resp.GetId()
+}
+
+func (i *Instance) AddLDAPProvider(ctx context.Context) string {
+	resp, err := i.Client.Admin.AddLDAPProvider(ctx, &admin.AddLDAPProviderRequest{
+		Name:              "ldap-idp-post",
+		Servers:           []string{"https://localhost:8000"},
+		StartTls:          false,
+		BaseDn:            "baseDn",
+		BindDn:            "admin",
+		BindPassword:      "admin",
+		UserBase:          "dn",
+		UserObjectClasses: []string{"user"},
+		UserFilters:       []string{"(objectclass=*)"},
+		Timeout:           durationpb.New(10 * time.Second),
+		Attributes: &idp.LDAPAttributes{
+			IdAttribute: "id",
+		},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	logging.OnError(err).Panic("create ldap idp")
 	return resp.GetId()
 }
 
@@ -589,6 +635,23 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 			},
 			Password: &session.CheckPassword{
 				Password: password,
+			},
+		},
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), createResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
+}
+
+func (i *Instance) CreateIntentSession(t *testing.T, ctx context.Context, userID, intentID, intentToken string) (id, token string, start, change time.Time) {
+	createResp, err := i.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: intentToken,
 			},
 		},
 	})

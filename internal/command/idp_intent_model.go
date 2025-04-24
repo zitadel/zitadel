@@ -2,6 +2,7 @@ package command
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -28,16 +29,27 @@ type IDPIntentWriteModel struct {
 	RequestID string
 	Assertion *crypto.CryptoValue
 
-	State domain.IDPIntentState
+	State                domain.IDPIntentState
+	succeededAt          time.Time
+	maxIdPIntentLifetime time.Duration
+	expiresAt            time.Time
 }
 
-func NewIDPIntentWriteModel(id, resourceOwner string) *IDPIntentWriteModel {
+func NewIDPIntentWriteModel(id, resourceOwner string, maxIdPIntentLifetime time.Duration) *IDPIntentWriteModel {
 	return &IDPIntentWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   id,
 			ResourceOwner: resourceOwner,
 		},
+		maxIdPIntentLifetime: maxIdPIntentLifetime,
 	}
+}
+
+func (wm *IDPIntentWriteModel) ExpiresAt() time.Time {
+	if wm.expiresAt.IsZero() {
+		return wm.succeededAt.Add(wm.maxIdPIntentLifetime)
+	}
+	return wm.expiresAt
 }
 
 func (wm *IDPIntentWriteModel) Reduce() error {
@@ -55,6 +67,8 @@ func (wm *IDPIntentWriteModel) Reduce() error {
 			wm.reduceLDAPSucceededEvent(e)
 		case *idpintent.FailedEvent:
 			wm.reduceFailedEvent(e)
+		case *idpintent.ConsumedEvent:
+			wm.reduceConsumedEvent(e)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -73,6 +87,7 @@ func (wm *IDPIntentWriteModel) Query() *eventstore.SearchQueryBuilder {
 			idpintent.SAMLRequestEventType,
 			idpintent.LDAPSucceededEventType,
 			idpintent.FailedEventType,
+			idpintent.ConsumedEventType,
 		).
 		Builder()
 }
@@ -91,6 +106,8 @@ func (wm *IDPIntentWriteModel) reduceSAMLSucceededEvent(e *idpintent.SAMLSucceed
 	wm.IDPUserName = e.IDPUserName
 	wm.Assertion = e.Assertion
 	wm.State = domain.IDPIntentStateSucceeded
+	wm.succeededAt = e.CreationDate()
+	wm.expiresAt = e.ExpiresAt
 }
 
 func (wm *IDPIntentWriteModel) reduceLDAPSucceededEvent(e *idpintent.LDAPSucceededEvent) {
@@ -100,6 +117,8 @@ func (wm *IDPIntentWriteModel) reduceLDAPSucceededEvent(e *idpintent.LDAPSucceed
 	wm.IDPUserName = e.IDPUserName
 	wm.IDPEntryAttributes = e.EntryAttributes
 	wm.State = domain.IDPIntentStateSucceeded
+	wm.succeededAt = e.CreationDate()
+	wm.expiresAt = e.ExpiresAt
 }
 
 func (wm *IDPIntentWriteModel) reduceOAuthSucceededEvent(e *idpintent.SucceededEvent) {
@@ -110,6 +129,8 @@ func (wm *IDPIntentWriteModel) reduceOAuthSucceededEvent(e *idpintent.SucceededE
 	wm.IDPAccessToken = e.IDPAccessToken
 	wm.IDPIDToken = e.IDPIDToken
 	wm.State = domain.IDPIntentStateSucceeded
+	wm.succeededAt = e.CreationDate()
+	wm.expiresAt = e.ExpiresAt
 }
 
 func (wm *IDPIntentWriteModel) reduceSAMLRequestEvent(e *idpintent.SAMLRequestEvent) {
@@ -118,6 +139,10 @@ func (wm *IDPIntentWriteModel) reduceSAMLRequestEvent(e *idpintent.SAMLRequestEv
 
 func (wm *IDPIntentWriteModel) reduceFailedEvent(e *idpintent.FailedEvent) {
 	wm.State = domain.IDPIntentStateFailed
+}
+
+func (wm *IDPIntentWriteModel) reduceConsumedEvent(e *idpintent.ConsumedEvent) {
+	wm.State = domain.IDPIntentStateConsumed
 }
 
 func IDPIntentAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
