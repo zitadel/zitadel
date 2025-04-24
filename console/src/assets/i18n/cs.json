@@ -632,7 +632,8 @@
       "TABLE": {
         "NAME": "Název",
         "ENDPOINT": "Koncový bod",
-        "CREATIONDATE": "Datum vytvoření"
+        "CREATIONDATE": "Datum vytvoření",
+        "REORDER": "Změnit pořadí"
       }
     }
   },
