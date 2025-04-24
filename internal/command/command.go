@@ -79,6 +79,7 @@ type Commands struct {
 	publicKeyLifetime       time.Duration
 	certificateLifetime     time.Duration
 	defaultSecretGenerators *SecretGenerators
+	maxIdPIntentLifetime    time.Duration
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	webKeyGenerator                func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
@@ -150,6 +151,7 @@ func StartCommands(
 		privateKeyLifetime:              defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:               defaults.KeyConfig.PublicKeyLifetime,
 		certificateLifetime:             defaults.KeyConfig.CertificateLifetime,
+		maxIdPIntentLifetime:            defaults.MaxIdPIntentLifetime,
 		idpConfigEncryption:             idpConfigEncryption,
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,

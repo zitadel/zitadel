@@ -17,6 +17,7 @@ import (
 
 	crewjam_saml "github.com/crewjam/saml"
 	"github.com/go-chi/chi/v5"
+	goldap "github.com/go-ldap/ldap/v3"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
@@ -27,6 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 )
@@ -47,7 +49,7 @@ func CallURL(ch Channel) string {
 	return u.String()
 }
 
-func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
 	u := url.URL{
 		Scheme: "http",
 		Host:   host,
@@ -58,6 +60,7 @@ func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string,
 		IDPID:      idpID,
 		IDPUserID:  idpUserID,
 		UserID:     userID,
+		Expiry:     expiry,
 	})
 	if err != nil {
 		return "", "", time.Time{}, uint64(0), err
@@ -65,7 +68,26 @@ func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string,
 	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
 }
 
-func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+func SuccessfulOIDCIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
+	u := url.URL{
+		Scheme: "http",
+		Host:   host,
+		Path:   successfulIntentOIDCPath(),
+	}
+	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
+		InstanceID: instanceID,
+		IDPID:      idpID,
+		IDPUserID:  idpUserID,
+		UserID:     userID,
+		Expiry:     expiry,
+	})
+	if err != nil {
+		return "", "", time.Time{}, uint64(0), err
+	}
+	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
+}
+
+func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
 	u := url.URL{
 		Scheme: "http",
 		Host:   host,
@@ -76,6 +98,7 @@ func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string) (string, 
 		IDPID:      idpID,
 		IDPUserID:  idpUserID,
 		UserID:     userID,
+		Expiry:     expiry,
 	})
 	if err != nil {
 		return "", "", time.Time{}, uint64(0), err
@@ -119,6 +142,7 @@ func StartServer(commands *command.Commands) (close func()) {
 		router.HandleFunc(rootPath(ch), fwd.receiveHandler)
 		router.HandleFunc(subscribePath(ch), fwd.subscriptionHandler)
 		router.HandleFunc(successfulIntentOAuthPath(), successfulIntentHandler(commands, createSuccessfulOAuthIntent))
+		router.HandleFunc(successfulIntentOIDCPath(), successfulIntentHandler(commands, createSuccessfulOIDCIntent))
 		router.HandleFunc(successfulIntentSAMLPath(), successfulIntentHandler(commands, createSuccessfulSAMLIntent))
 		router.HandleFunc(successfulIntentLDAPPath(), successfulIntentHandler(commands, createSuccessfulLDAPIntent))
 	}
@@ -157,6 +181,10 @@ func successfulIntentPath() string {
 
 func successfulIntentOAuthPath() string {
 	return path.Join(successfulIntentPath(), "/", "oauth")
+}
+
+func successfulIntentOIDCPath() string {
+	return path.Join(successfulIntentPath(), "/", "oidc")
 }
 
 func successfulIntentSAMLPath() string {
@@ -258,10 +286,11 @@ func readLoop(ws *websocket.Conn) (done chan error) {
 }
 
 type SuccessfulIntentRequest struct {
-	InstanceID string `json:"instance_id"`
-	IDPID      string `json:"idp_id"`
-	IDPUserID  string `json:"idp_user_id"`
-	UserID     string `json:"user_id"`
+	InstanceID string    `json:"instance_id"`
+	IDPID      string    `json:"idp_id"`
+	IDPUserID  string    `json:"idp_user_id"`
+	UserID     string    `json:"user_id"`
+	Expiry     time.Time `json:"expiry"`
 }
 type SuccessfulIntentResponse struct {
 	IntentID   string    `json:"intent_id"`
@@ -335,6 +364,42 @@ func createIntent(ctx context.Context, cmd *command.Commands, instanceID, idpID 
 
 func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
 	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	if err != nil {
+		return nil, err
+	}
+	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	if err != nil {
+		return nil, err
+	}
+	idAttribute := "id"
+	idpUser := oauth.NewUserMapper(idAttribute)
+	idpUser.RawInfo = map[string]interface{}{
+		idAttribute:          req.IDPUserID,
+		"preferred_username": "username",
+	}
+	idpSession := &oauth.Session{
+		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+			Token: &oauth2.Token{
+				AccessToken: "accessToken",
+				Expiry:      req.Expiry,
+			},
+			IDToken: "idToken",
+		},
+	}
+	token, err := cmd.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &SuccessfulIntentResponse{
+		intentID,
+		token,
+		writeModel.ChangeDate,
+		writeModel.ProcessedSequence,
+	}, nil
+}
+
+func createSuccessfulOIDCIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
 	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
 	idpUser := openid.NewUser(
 		&oidc.UserInfo{
@@ -348,6 +413,7 @@ func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
 				AccessToken: "accessToken",
+				Expiry:      req.Expiry,
 			},
 			IDToken: "idToken",
 		},
@@ -372,9 +438,16 @@ func createSuccessfulSAMLIntent(ctx context.Context, cmd *command.Commands, req 
 		ID:         req.IDPUserID,
 		Attributes: map[string][]string{"attribute1": {"value1"}},
 	}
-	assertion := &crewjam_saml.Assertion{ID: "id"}
+	session := &saml.Session{
+		Assertion: &crewjam_saml.Assertion{
+			ID: "id",
+			Conditions: &crewjam_saml.Conditions{
+				NotOnOrAfter: req.Expiry,
+			},
+		},
+	}
 
-	token, err := cmd.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, req.UserID, assertion)
+	token, err := cmd.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, req.UserID, session)
 	if err != nil {
 		return nil, err
 	}
@@ -406,8 +479,14 @@ func createSuccessfulLDAPIntent(ctx context.Context, cmd *command.Commands, req 
 		"",
 		"",
 	)
-	attributes := map[string][]string{"id": {req.IDPUserID}, "username": {username}, "language": {lang.String()}}
-	token, err := cmd.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, req.UserID, attributes)
+	session := &ldap.Session{Entry: &goldap.Entry{
+		Attributes: []*goldap.EntryAttribute{
+			{Name: "id", Values: []string{req.IDPUserID}},
+			{Name: "username", Values: []string{username}},
+			{Name: "language", Values: []string{lang.String()}},
+		},
+	}}
+	token, err := cmd.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, req.UserID, session)
 	if err != nil {
 		return nil, err
 	}

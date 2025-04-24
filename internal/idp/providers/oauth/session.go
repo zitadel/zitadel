@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"
@@ -67,6 +68,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, err
 	}
 	return mapper, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.Tokens == nil {
+		return time.Time{}
+	}
+	return s.Tokens.Expiry
 }
 
 func (s *Session) authorize(ctx context.Context) (err error) {
