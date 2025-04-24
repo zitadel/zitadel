@@ -198,7 +198,7 @@ func (t *transport) isHostBlocked(denyList []AddressChecker, address *url.URL) e
 		}
 	}
 	for _, denied := range denyList {
-		if err := denied.CheckBlocked(ips, host); err != nil {
+		if err := denied.IsDenied(ips, host); err != nil {
 			return err
 		}
 	}
@@ -206,5 +206,5 @@ func (t *transport) isHostBlocked(denyList []AddressChecker, address *url.URL) e
 }
 
 type AddressChecker interface {
-	CheckBlocked([]net.IP, string) error
+	IsDenied([]net.IP, string) error
 }

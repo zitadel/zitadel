@@ -81,38 +81,38 @@ type HostChecker struct {
 	Domain string
 }
 
-type AddressBlockedError struct {
-	blockedBy string
+type AddressDeniedError struct {
+	deniedBy string
 }
 
-func NewAddressBlockedError(blockedBy string) *AddressBlockedError {
-	return &AddressBlockedError{blockedBy: blockedBy}
+func NewAddressDeniedError(deniedBy string) *AddressDeniedError {
+	return &AddressDeniedError{deniedBy: deniedBy}
 }
 
-func (e *AddressBlockedError) Error() string {
-	return fmt.Sprintf("address is blocked by '%s'", e.blockedBy)
+func (e *AddressDeniedError) Error() string {
+	return fmt.Sprintf("address is denied by '%s'", e.deniedBy)
 }
 
-func (e *AddressBlockedError) Is(target error) bool {
-	var addressBlockedErr *AddressBlockedError
-	if !errors.As(target, &addressBlockedErr) {
+func (e *AddressDeniedError) Is(target error) bool {
+	var addressDeniedErr *AddressDeniedError
+	if !errors.As(target, &addressDeniedErr) {
 		return false
 	}
-	return e.blockedBy == addressBlockedErr.blockedBy
+	return e.deniedBy == addressDeniedErr.deniedBy
 }
 
-func (c *HostChecker) CheckBlocked(ips []net.IP, address string) error {
+func (c *HostChecker) IsDenied(ips []net.IP, address string) error {
 	// if the address matches the domain, no additional checks as needed
 	if c.Domain == address {
-		return NewAddressBlockedError(c.Domain)
+		return NewAddressDeniedError(c.Domain)
 	}
 	// otherwise we need to check on ips (incl. the resolved ips of the host)
 	for _, ip := range ips {
 		if c.Net != nil && c.Net.Contains(ip) {
-			return NewAddressBlockedError(c.Net.String())
+			return NewAddressDeniedError(c.Net.String())
 		}
 		if c.IP != nil && c.IP.Equal(ip) {
-			return NewAddressBlockedError(c.IP.String())
+			return NewAddressDeniedError(c.IP.String())
 		}
 	}
 	return nil
