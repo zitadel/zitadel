@@ -48,37 +48,6 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	}, nil
 }
 
-func conditionToInclude(cond *action.Condition) (string, error) {
-	switch t := cond.GetConditionType().(type) {
-	case *action.Condition_Request:
-		cond := executionConditionFromRequest(t.Request)
-		if err := cond.IsValid(); err != nil {
-			return "", err
-		}
-		return cond.ID(domain.ExecutionTypeRequest), nil
-	case *action.Condition_Response:
-		cond := executionConditionFromResponse(t.Response)
-		if err := cond.IsValid(); err != nil {
-			return "", err
-		}
-		return cond.ID(domain.ExecutionTypeRequest), nil
-	case *action.Condition_Event:
-		cond := executionConditionFromEvent(t.Event)
-		if err := cond.IsValid(); err != nil {
-			return "", err
-		}
-		return cond.ID(), nil
-	case *action.Condition_Function:
-		cond := command.ExecutionFunctionCondition(t.Function.GetName())
-		if err := cond.IsValid(); err != nil {
-			return "", err
-		}
-		return cond.ID(), nil
-	default:
-		return "", zerrors.ThrowInvalidArgument(nil, "ACTION-9BBob", "Errors.Execution.ConditionInvalid")
-	}
-}
-
 func (s *Server) ListExecutionFunctions(ctx context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
 	return &action.ListExecutionFunctionsResponse{
 		Functions: s.ListActionFunctions(),

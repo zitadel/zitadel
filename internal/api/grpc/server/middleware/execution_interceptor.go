@@ -90,7 +90,7 @@ type ContextInfoRequest struct {
 }
 
 type Message struct {
-	proto.Message `json:""`
+	proto.Message
 }
 
 func (r *Message) MarshalJSON() ([]byte, error) {
