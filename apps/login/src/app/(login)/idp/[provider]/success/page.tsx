@@ -15,7 +15,7 @@ import {
   listUsers,
   retrieveIDPIntent,
 } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { ConnectError, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import {
@@ -223,10 +223,20 @@ export default async function Page(props: {
         );
       }
 
-      newUser = await addHuman({
-        serviceUrl,
-        request: addHumanUserWithOrganization,
-      });
+      try {
+        newUser = await addHuman({
+          serviceUrl,
+          request: addHumanUserWithOrganization,
+        });
+      } catch (error: unknown) {
+        console.error(error);
+        return loginFailed(
+          branding,
+          (error as ConnectError).message
+            ? (error as ConnectError).message
+            : "Could not create user",
+        );
+      }
     }
 
     if (newUser) {
