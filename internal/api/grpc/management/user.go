@@ -808,7 +808,7 @@ func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.Generat
 	}
 
 	set := new(command.GenerateMachineSecret)
-	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, true, set)
+	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, set)
 	if err != nil {
 		return nil, err
 	}
@@ -820,7 +820,7 @@ func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.Generat
 }
 
 func (s *Server) RemoveMachineSecret(ctx context.Context, req *mgmt_pb.RemoveMachineSecretRequest) (*mgmt_pb.RemoveMachineSecretResponse, error) {
-	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, true)
+	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
