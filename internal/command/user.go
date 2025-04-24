@@ -361,7 +361,9 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 	if !machineOnly {
 		eventTypes = append(eventTypes,
 			user.HumanRegisteredType,
+			user.UserV1RegisteredType,
 			user.HumanAddedType,
+			user.UserV1AddedType,
 		)
 	}
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).

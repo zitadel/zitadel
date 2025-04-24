@@ -5,16 +5,13 @@ import (
 	"io"
 
 	"golang.org/x/text/language"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object2 "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -408,68 +405,11 @@ func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInit
 }
 
 func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
-	orgId := req.GetOrganizationId()
-	if err := s.command.CheckOrgExists(ctx, orgId); err != nil {
-		return nil, err
-	}
 	switch userType := req.GetUserType().(type) {
 	case *user.CreateUserRequest_Human_:
-		addHumanReq := &user.AddHumanUserRequest{
-			UserId:   req.UserId,
-			Username: req.Username,
-			Organization: &object2.Organization{
-				Org: &object2.Organization_OrgId{OrgId: req.OrganizationId},
-			},
-			Profile:    userType.Human.Profile,
-			Email:      userType.Human.Email,
-			Phone:      userType.Human.Phone,
-			IdpLinks:   userType.Human.IdpLinks,
-			TotpSecret: userType.Human.TotpSecret,
-		}
-		switch pwType := userType.Human.GetPasswordType().(type) {
-		case *user.CreateUserRequest_Human_HashedPassword:
-			addHumanReq.PasswordType = &user.AddHumanUserRequest_HashedPassword{
-				HashedPassword: pwType.HashedPassword,
-			}
-		case *user.CreateUserRequest_Human_Password:
-			addHumanReq.PasswordType = &user.AddHumanUserRequest_Password{
-				Password: pwType.Password,
-			}
-		default:
-			// optional password is not set
-		}
-		human, err := AddUserRequestToAddHuman(addHumanReq)
-		if err != nil {
-			return nil, err
-		}
-		if err = s.command.AddUserHuman(ctx, orgId, human, false, s.userCodeAlg); err != nil {
-			return nil, err
-		}
-		return &user.CreateUserResponse{
-			Id:           human.ID,
-			CreationDate: timestamppb.New(human.Details.EventDate),
-			EmailCode:    human.EmailCode,
-			PhoneCode:    human.PhoneCode,
-		}, nil
+		return s.createUserTypeHuman(ctx, userType.Human, req.OrganizationId, req.Username, req.UserId)
 	case *user.CreateUserRequest_Machine_:
-		cmd := &command.Machine{
-			Username:        req.GetUsername(),
-			Name:            userType.Machine.Name,
-			Description:     userType.Machine.GetDescription(),
-			AccessTokenType: domain.OIDCTokenTypeBearer,
-			ObjectRoot: models.ObjectRoot{
-				ResourceOwner: orgId,
-				AggregateID:   req.GetUserId(),
-			},
-		}
-		details, err := s.command.AddMachine(ctx, cmd, command.WithUsernameToIDFallback)
-		if err != nil {
-			return nil, err
-		}
-		return &user.CreateUserResponse{
-			Id:           cmd.AggregateID,
-			CreationDate: timestamppb.New(details.EventDate),
-		}, nil
+		return s.createUserTypeMachine(ctx, userType.Machine, req.OrganizationId, req.GetUsername(), req.GetUserId())
 	default:
 		return nil, zerrors.ThrowInternal(nil, "", "user type is not implemented")
 	}
@@ -478,27 +418,9 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*
 func (s *Server) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
 	switch userType := req.GetUserType().(type) {
 	case *user.UpdateUserRequest_Human_:
-		cmd, err := patchHumanUserToCommand(req.UserId, req.Username, userType.Human)
-		if err != nil {
-			return nil, err
-		}
-		if err = s.command.ChangeUserHuman(ctx, cmd, s.userCodeAlg); err != nil {
-			return nil, err
-		}
-		return &user.UpdateUserResponse{
-			ChangeDate: timestamppb.New(cmd.Details.EventDate),
-			EmailCode:  cmd.EmailCode,
-			PhoneCode:  cmd.PhoneCode,
-		}, nil
+		return s.updateUserTypeHuman(ctx, userType.Human, req.UserId, req.Username)
 	case *user.UpdateUserRequest_Machine_:
-		cmd := patchMachineUserToCommand(req.UserId, req.Username, userType.Machine)
-		err := s.command.ChangeUserMachine(ctx, cmd)
-		if err != nil {
-			return nil, err
-		}
-		return &user.UpdateUserResponse{
-			ChangeDate: timestamppb.New(cmd.Details.EventDate),
-		}, nil
+		return s.updateUserTypeMachine(ctx, userType.Machine, req.UserId, req.Username)
 	default:
 		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
 	}

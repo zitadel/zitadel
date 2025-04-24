@@ -1,17 +1,82 @@
 package user
 
 import (
+	"context"
 	"io"
 
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	legacyobject "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func patchHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human) (*command.ChangeHuman, error) {
+func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string) (*user.CreateUserResponse, error) {
+	addHumanPb := &user.AddHumanUserRequest{
+		Username: userName,
+		UserId:   userId,
+		Organization: &legacyobject.Organization{
+			Org: &legacyobject.Organization_OrgId{OrgId: orgId},
+		},
+		Profile:    humanPb.Profile,
+		Email:      humanPb.Email,
+		Phone:      humanPb.Phone,
+		IdpLinks:   humanPb.IdpLinks,
+		TotpSecret: humanPb.TotpSecret,
+	}
+	switch pwType := humanPb.GetPasswordType().(type) {
+	case *user.CreateUserRequest_Human_HashedPassword:
+		addHumanPb.PasswordType = &user.AddHumanUserRequest_HashedPassword{
+			HashedPassword: pwType.HashedPassword,
+		}
+	case *user.CreateUserRequest_Human_Password:
+		addHumanPb.PasswordType = &user.AddHumanUserRequest_Password{
+			Password: pwType.Password,
+		}
+	default:
+		// optional password is not set
+	}
+	newHuman, err := AddUserRequestToAddHuman(addHumanPb)
+	if err != nil {
+		return nil, err
+	}
+	if err = s.command.AddUserHuman(
+		ctx,
+		orgId,
+		newHuman,
+		false,
+		s.userCodeAlg,
+		s.command.AddUserHumanWithResourceOwnerExistenceCheck(),
+	); err != nil {
+		return nil, err
+	}
+	return &user.CreateUserResponse{
+		Id:           newHuman.ID,
+		CreationDate: timestamppb.New(newHuman.Details.EventDate),
+		EmailCode:    newHuman.EmailCode,
+		PhoneCode:    newHuman.PhoneCode,
+	}, nil
+}
+
+func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUserRequest_Human, userId string, userName *string) (*user.UpdateUserResponse, error) {
+	cmd, err := updateHumanUserToCommand(userId, userName, humanPb)
+	if err != nil {
+		return nil, err
+	}
+	if err = s.command.ChangeUserHuman(ctx, cmd, s.userCodeAlg); err != nil {
+		return nil, err
+	}
+	return &user.UpdateUserResponse{
+		ChangeDate: timestamppb.New(cmd.Details.EventDate),
+		EmailCode:  cmd.EmailCode,
+		PhoneCode:  cmd.PhoneCode,
+	}, nil
+}
+
+func updateHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human) (*command.ChangeHuman, error) {
 	phone := human.GetPhone()
 	if phone != nil && phone.Phone == "" && phone.GetVerification() != nil {
 		return nil, zerrors.ThrowInvalidArgument(nil, "USERv2-4f3d6", "Errors.User.Phone.VerifyingRemovalIsNotSupported")

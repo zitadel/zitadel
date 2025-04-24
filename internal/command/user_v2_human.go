@@ -117,11 +117,27 @@ func (h *ChangeHuman) Changed() bool {
 	return false
 }
 
-func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
+type addUserHumanOption func(context.Context, *AddHuman) error
+
+func (c *Commands) AddUserHumanWithResourceOwnerExistenceCheck() addUserHumanOption {
+	return func(ctx context.Context, human *AddHuman) error {
+		return c.CheckOrgExists(ctx, human.Details.ResourceOwner)
+	}
+}
+
+func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm, options ...addUserHumanOption) (err error) {
 	if resourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-095xh8fll1", "Errors.Internal")
 	}
-
+	if human.Details == nil {
+		human.Details = &domain.ObjectDetails{}
+	}
+	human.Details.ResourceOwner = resourceOwner
+	for _, option := range options {
+		if err := option(ctx, human); err != nil {
+			return err
+		}
+	}
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -341,7 +357,6 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 	if human.State != nil {
 		// only allow toggling between active and inactive
 		// any other target state is not supported
-		// the existing human's state has to be the
 		switch {
 		case isUserStateActive(*human.State):
 			if isUserStateActive(existingHuman.UserState) {

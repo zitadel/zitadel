@@ -13,7 +13,6 @@ import (
 type ChangeMachine struct {
 	ID            string
 	ResourceOwner string
-	State         *domain.UserState
 	Username      *string
 	Name          *string
 	Description   *string
@@ -56,39 +55,6 @@ func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine
 		cmds, err = c.changeUsername(ctx, cmds, existingMachine, *machine.Username)
 		if err != nil {
 			return err
-		}
-	}
-	if machine.State != nil {
-		// only allow toggling between active and inactive
-		// any other target state is not supported
-		// the existing machine's state has to be the
-		switch {
-		case isUserStateActive(*machine.State):
-			if isUserStateActive(existingMachine.UserState) {
-				// user is already active => no change needed
-				break
-			}
-
-			// do not allow switching from other states than active (e.g. locked)
-			if !isUserStateInactive(existingMachine.UserState) {
-				return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex1", "Errors.User.State.Invalid")
-			}
-
-			cmds = append(cmds, user.NewUserReactivatedEvent(ctx, &existingMachine.Aggregate().Aggregate))
-		case isUserStateInactive(*machine.State):
-			if isUserStateInactive(existingMachine.UserState) {
-				// user is already inactive => no change needed
-				break
-			}
-
-			// do not allow switching from other states than active (e.g. locked)
-			if !isUserStateActive(existingMachine.UserState) {
-				return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex2", "Errors.User.State.Invalid")
-			}
-
-			cmds = append(cmds, user.NewUserDeactivatedEvent(ctx, &existingMachine.Aggregate().Aggregate))
-		default:
-			return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex3", "Errors.User.State.Invalid")
 		}
 	}
 	var machineChanges []user.MachineChanges

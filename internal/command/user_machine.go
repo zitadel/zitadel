@@ -31,14 +31,6 @@ func (m *Machine) IsZero() bool {
 	return m.Username == "" && m.Name == ""
 }
 
-type AddMachineOption func(*Machine)
-
-func WithUsernameToIDFallback(m *Machine) {
-	if m.Username == "" {
-		m.Username = m.AggregateID
-	}
-}
-
 func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if a.ResourceOwner == "" {
@@ -75,7 +67,24 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...AddMachineOption) (_ *domain.ObjectDetails, err error) {
+type addMachineOption func(context.Context, *Machine) error
+
+func AddMachineWithUsernameToIDFallback() addMachineOption {
+	return func(ctx context.Context, m *Machine) error {
+		if m.Username == "" {
+			m.Username = m.AggregateID
+		}
+		return nil
+	}
+}
+
+func (c *Commands) AddMachineWithResourceOwnerExistenceCheck() addMachineOption {
+	return func(ctx context.Context, m *Machine) error {
+		return c.CheckOrgExists(ctx, m.ResourceOwner)
+	}
+}
+
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...addMachineOption) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -89,7 +98,9 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...
 
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
 	for _, option := range options {
-		option(machine)
+		if err = option(ctx, machine); err != nil {
+			return nil, err
+		}
 	}
 	if err := c.checkPermission(ctx, domain.PermissionUserWrite, machine.ResourceOwner, machine.AggregateID); err != nil {
 		return nil, err
