@@ -631,7 +631,8 @@
       "TABLE": {
         "NAME": "Nome",
         "ENDPOINT": "Endpoint",
-        "CREATIONDATE": "Data di creazione"
+        "CREATIONDATE": "Data di creazione",
+        "REORDER": "Riordina"
       }
     }
   },
@@ -642,6 +643,7 @@
     "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
     "IAM_ADMIN_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare l'amministratore e gli utenti finali di tutte le organizzazioni",
     "IAM_END_USER_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare gli utenti finali di tutte le organizzazioni",
+    "IAM_LOGIN_CLIENT": "Ha il permesso di gestire i client di accesso",
     "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
     "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",

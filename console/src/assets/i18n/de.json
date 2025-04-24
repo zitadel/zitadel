@@ -632,7 +632,8 @@
       "TABLE": {
         "NAME": "Name",
         "ENDPOINT": "Endpunkt",
-        "CREATIONDATE": "Erstellungsdatum"
+        "CREATIONDATE": "Erstellungsdatum",
+        "REORDER": "Verschieben"
       }
     }
   },
@@ -643,6 +644,7 @@
     "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
     "IAM_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer aller Organisationen auszugeben",
     "IAM_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer aller Organisationen auszugeben",
+    "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeclients zu verwalten",
     "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",

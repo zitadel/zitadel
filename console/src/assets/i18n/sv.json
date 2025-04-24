@@ -632,7 +632,8 @@
       "TABLE": {
         "NAME": "Namn",
         "ENDPOINT": "Slutpunkt",
-        "CREATIONDATE": "Skapat datum"
+        "CREATIONDATE": "Skapat datum",
+        "REORDER": "Ordna om"
       }
     }
   },
@@ -643,6 +644,7 @@
     "IAM_USER_MANAGER": "Har behörighet att skapa och hantera användare",
     "IAM_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från alla organisationer",
     "IAM_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från alla organisationer",
+    "IAM_LOGIN_CLIENT": "Har behörighet att hantera inloggningsklienter",
     "ORG_OWNER": "Har behörighet över hela organisationen",
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",

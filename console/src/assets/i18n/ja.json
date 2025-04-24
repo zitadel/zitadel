@@ -632,7 +632,8 @@
       "TABLE": {
         "NAME": "名前",
         "ENDPOINT": "エンドポイント",
-        "CREATIONDATE": "作成日"
+        "CREATIONDATE": "作成日",
+        "REORDER": "順序を変更"
       }
     }
   },
@@ -643,6 +644,7 @@
     "IAM_USER_MANAGER": "ユーザーの作成および管理する権限を持ちます",
     "IAM_ADMIN_IMPERSONATOR": "すべての組織の管理者およびエンドユーザーになりすます権限を持っています",
     "IAM_END_USER_IMPERSONATOR": "すべての組織のエンドユーザーになりすます権限を持っています",
+    "IAM_LOGIN_CLIENT": "ログインクライアントを管理する権限を持っています",
     "ORG_OWNER": "組織全体に対する権限を持ちます",
     "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
     "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",

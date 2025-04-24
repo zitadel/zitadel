@@ -113,6 +113,24 @@ func sessionCheckPermission(ctx context.Context, resourceOwner string, creator s
 	return permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, "")
 }
 
+func sessionsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		SessionColumnResourceOwner,
+		domain.PermissionSessionRead,
+		// Allow if user is creator
+		OwnedRowsPermissionOption(SessionColumnCreator),
+		// Allow if session belongs to the user
+		OwnedRowsPermissionOption(SessionColumnUserID),
+		// Allow if session belongs to the same useragent
+		ConnectionPermissionOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
+	)
+	return query.JoinClause(join, args...)
+}
+
 func (q *SessionsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -282,21 +300,23 @@ func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id st
 }
 
 func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheck domain.PermissionCheck) (*Sessions, error) {
-	sessions, err := q.searchSessions(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	sessions, err := q.searchSessions(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
+	if permissionCheck != nil && !permissionCheckV2 {
 		sessionsCheckPermission(ctx, sessions, permissionCheck)
 	}
 	return sessions, nil
 }
 
-func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
+func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheckV2 bool) (sessions *Sessions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareSessionsQuery()
+	query = sessionsPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
