@@ -229,7 +229,11 @@ export default async function Page(props: {
           request: addHumanUserWithOrganization,
         });
       } catch (error: unknown) {
-        console.error(error);
+        console.error(
+          "An error occurred while creating the user:",
+          error,
+          addHumanUser,
+        );
         return loginFailed(
           branding,
           (error as ConnectError).message
