@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+package zitadel.instance.v2;
+
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2;instance";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Instance Service";
+    version: "2.0";
+    description: "This API is intended to manage instances in ZITADEL.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "AGPL-3.0-only",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+message DeleteInstanceRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"id of the instance to terminate\"";
+      example: "\"222430354126975533\"";
+    }
+  ];
+}
+
+message DeleteInstanceResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+service InstanceService {
+
+  // DeleteInstance deletes an instance with the given ID.
+  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Deletes an instance with the given ID.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The deleted instance.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/DeleteInstanceResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2/instances/{instance_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "instance.delete"
+      }
+      http_response: {
+        success_code: 204
+      }
+    };
+  }
+}
+
+// UpdateInstance
+// GetInstance
+// ListInstances
+// DeleteInstance
+
+// Add Custom Domain
+// Remove Custom Domain
+// List Custom Domains
+// Add Trusted Domain
+// Remove Trusted Domain
+// List Trusted Domain
