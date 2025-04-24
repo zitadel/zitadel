@@ -112,7 +112,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service OrganizationService {
 
   // Create a new organization and grant the user(s) permission to manage it
-  rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {
+  rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2beta/organizations"
       body: "*"
@@ -140,7 +140,7 @@ service OrganizationService {
   }
 }
 
-message AddOrganizationRequest{
+message CreateOrganizationRequest{
   message Admin {
     oneof user_type{
       string user_id = 1;
@@ -162,7 +162,7 @@ message AddOrganizationRequest{
   repeated Admin admins = 2;
 }
 
-message AddOrganizationResponse{
+message CreateOrganizationResponse{
   message CreatedAdmin {
     string user_id = 1;
     optional string email_code = 2;
