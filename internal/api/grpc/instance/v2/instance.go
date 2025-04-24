@@ -25,3 +25,19 @@ func (s *Server) DeleteInstance(ctx context.Context, request *instance.DeleteIns
 	}, nil
 
 }
+
+func (s *Server) UpdateInstance(ctx context.Context, request *instance.UpdateInstanceRequest) (*instance.UpdateInstanceResponse, error) {
+	instanceName := strings.TrimSpace(request.GetInstanceName())
+	if instanceName == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "instance_name", "instance name must not be empty")
+	}
+
+	obj, err := s.command.UpdateInstance(ctx, instanceName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &instance.UpdateInstanceResponse{
+		Details: object.DomainToDetailsPb(obj),
+	}, nil
+}

@@ -121,6 +121,22 @@ message GetInstanceResponse {
   zitadel.instance.v2.Instance instance = 1;
 }
 
+message UpdateInstanceRequest {
+  string instance_name = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"name of the instance to update\"";
+      example: "\"my instance\"";
+    }
+  ];
+}
+
+message UpdateInstanceResponse {
+    zitadel.object.v2.Details details = 1;
+}
+
 service InstanceService {
 
   // DeleteInstance deletes an instance with the given ID.
@@ -184,11 +200,39 @@ service InstanceService {
     };
   }
 
+  // UpdateInstance updates the current instance with the given name.
+  rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Updates the current instance with the given name.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The updated instance.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/UpdateInstanceResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      put: "/v2/instances/current"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "instance.update"
+      }
+    };
+  }
 }
 
 // UpdateInstance
 // ListInstances
-// DeleteInstance
 
 // Add Custom Domain
 // Remove Custom Domain
