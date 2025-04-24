@@ -405,15 +405,11 @@ func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInit
 }
 
 func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
-	orgId := req.GetOrganizationId()
-	if err := s.command.CheckOrgExists(ctx, orgId); err != nil {
-		return nil, err
-	}
 	switch userType := req.GetUserType().(type) {
 	case *user.CreateUserRequest_Human_:
-		return s.createUserTypeHuman(ctx, userType.Human, orgId, req.Username, req.UserId)
+		return s.createUserTypeHuman(ctx, userType.Human, req.OrganizationId, req.Username, req.UserId)
 	case *user.CreateUserRequest_Machine_:
-		return s.createUserTypeMachine(ctx, userType.Machine, orgId, req.GetUsername(), req.GetUserId())
+		return s.createUserTypeMachine(ctx, userType.Machine, req.OrganizationId, req.GetUsername(), req.GetUserId())
 	default:
 		return nil, zerrors.ThrowInternal(nil, "", "user type is not implemented")
 	}

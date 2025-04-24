@@ -22,7 +22,12 @@ func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.Crea
 			AggregateID:   userId,
 		},
 	}
-	details, err := s.command.AddMachine(ctx, cmd, command.WithUsernameToIDFallback)
+	details, err := s.command.AddMachine(
+		ctx,
+		cmd,
+		command.AddMachineWithUsernameToIDFallback(),
+		s.command.AddMachineWithResourceOwnerExistenceCheck(),
+	)
 	if err != nil {
 		return nil, err
 	}

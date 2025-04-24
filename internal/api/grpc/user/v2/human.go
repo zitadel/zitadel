@@ -43,7 +43,14 @@ func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUs
 	if err != nil {
 		return nil, err
 	}
-	if err = s.command.AddUserHuman(ctx, orgId, newHuman, false, s.userCodeAlg); err != nil {
+	if err = s.command.AddUserHuman(
+		ctx,
+		orgId,
+		newHuman,
+		false,
+		s.userCodeAlg,
+		s.command.AddUserHumanWithResourceOwnerExistenceCheck(),
+	); err != nil {
 		return nil, err
 	}
 	return &user.CreateUserResponse{
