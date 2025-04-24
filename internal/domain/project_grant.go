@@ -30,15 +30,6 @@ func (p *ProjectGrant) IsValid() bool {
 	return p.GrantedOrgID != ""
 }
 
-func (g *ProjectGrant) HasInvalidRoles(validRoles []string) bool {
-	for _, roleKey := range g.RoleKeys {
-		if !containsRoleKey(roleKey, validRoles) {
-			return true
-		}
-	}
-	return false
-}
-
 func GetRemovedRoles(existingRoles, newRoles []string) []string {
 	removed := make([]string, 0)
 	for _, role := range existingRoles {

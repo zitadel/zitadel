@@ -714,10 +714,10 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
-func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *mgmt.AddProjectGrantResponse {
-	resp, err := i.Client.Mgmt.AddProjectGrant(ctx, &mgmt.AddProjectGrantRequest{
-		GrantedOrgId: grantedOrgID,
-		ProjectId:    projectID,
+func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *project_v2beta.CreateProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.CreateProjectGrant(ctx, &project_v2beta.CreateProjectGrantRequest{
+		GrantedOrganizationId: grantedOrgID,
+		ProjectId:             projectID,
 	})
 	logging.OnError(err).Panic("create project grant")
 	return resp

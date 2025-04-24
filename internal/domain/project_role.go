@@ -28,6 +28,15 @@ func (p *ProjectRole) IsValid() bool {
 	return p.AggregateID != "" && p.Key != ""
 }
 
+func HasInvalidRoles(validRoles, roles []string) bool {
+	for _, roleKey := range roles {
+		if !containsRoleKey(roleKey, validRoles) {
+			return true
+		}
+	}
+	return false
+}
+
 func containsRoleKey(roleKey string, validRoles []string) bool {
 	for _, validRole := range validRoles {
 		if roleKey == validRole {

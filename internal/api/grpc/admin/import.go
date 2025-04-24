@@ -1023,7 +1023,7 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	if org.ProjectGrants != nil {
 		for _, grant := range org.GetProjectGrants() {
 			logging.Debugf("import projectgrant: %s", grant.GetGrantId()+"_"+grant.GetProjectGrant().GetProjectId()+"_"+grant.GetProjectGrant().GetGrantedOrgId())
-			_, err := s.command.AddProjectGrantWithID(ctx, management.AddProjectGrantRequestToDomain(grant.GetProjectGrant()), grant.GetGrantId(), org.GetOrgId())
+			_, err := s.command.AddProjectGrant(ctx, management.AddProjectGrantRequestToCommand(grant.GetProjectGrant(), grant.GetGrantId(), org.GetOrgId()))
 			if err != nil {
 				*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectGrant().GetProjectId() + "_" + grant.GetProjectGrant().GetGrantedOrgId(), Message: err.Error()})
 				if isCtxTimeout(ctx) {

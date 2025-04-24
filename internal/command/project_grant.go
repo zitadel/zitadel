@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -16,46 +17,67 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
+type AddProjectGrant struct {
+	es_models.ObjectRoot
+
+	GrantID      string
+	GrantedOrgID string
+	RoleKeys     []string
+}
+
+func (p *AddProjectGrant) IsValid() error {
+	if p.AggregateID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.Project.Grant.Invalid")
+	}
+	if p.GrantedOrgID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.Project.Grant.Invalid")
+	}
+	return nil
+}
+
+func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
+	if grant.GrantID == "" {
+		grant.GrantID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return c.addProjectGrantWithID(ctx, grant, grant.GrantID)
 }
 
-func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string) (_ *domain.ProjectGrant, err error) {
-	if !grant.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-3b8fs", "Errors.Project.Grant.Invalid")
-	}
-	err = c.checkProjectGrantPreCondition(ctx, grant, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
+func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
-	grantID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
+	return c.addProjectGrantWithID(ctx, grant, "")
 }
 
-func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
-	grant.GrantID = grantID
+func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *AddProjectGrant, grantID string) (_ *domain.ObjectDetails, err error) {
+	if err := grant.IsValid(); err != nil {
+		return nil, err
+	}
 
-	addedGrant := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, resourceOwner)
-	projectAgg := ProjectAggregateFromWriteModel(&addedGrant.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
-		ctx,
-		project.NewGrantAddedEvent(ctx, projectAgg, grant.GrantID, grant.GrantedOrgID, grant.RoleKeys))
+	err = c.checkProjectGrantPreCondition(ctx, grant.AggregateID, grant.GrantedOrgID, grant.ResourceOwner, grant.RoleKeys)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedGrant, pushedEvents...)
-	if err != nil {
+
+	wm := NewProjectGrantWriteModel(grantID, grant.AggregateID, grant.ResourceOwner)
+	if err := c.pushAppendAndReduce(ctx,
+		wm,
+		project.NewGrantAddedEvent(ctx,
+			ProjectAggregateFromWriteModel(&wm.WriteModel),
+			grantID,
+			grant.GrantedOrgID,
+			grant.RoleKeys),
+	); err != nil {
 		return nil, err
 	}
-	return projectGrantWriteModelToProjectGrant(addedGrant), nil
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
 func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string, cascadeUserGrantIDs ...string) (_ *domain.ProjectGrant, err error) {
@@ -67,7 +89,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 		return nil, err
 	}
 	grant.GrantedOrgID = existingGrant.GrantedOrgID
-	err = c.checkProjectGrantPreCondition(ctx, grant, resourceOwner)
+	err = c.checkProjectGrantPreCondition(ctx, grant.AggregateID, grant.GrantedOrgID, resourceOwner, grant.RoleKeys)
 	if err != nil {
 		return nil, err
 	}
@@ -249,16 +271,16 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 	return writeModel, nil
 }
 
-func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant, resourceOwner string) error {
+func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectID, grantedOrgID, resourceOwner string, roles []string) error {
 	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
-		return c.checkProjectGrantPreConditionOld(ctx, projectGrant, resourceOwner)
+		return c.checkProjectGrantPreConditionOld(ctx, projectID, grantedOrgID, resourceOwner, roles)
 	}
-	existingRoleKeys, err := c.searchProjectGrantState(ctx, projectGrant.AggregateID, projectGrant.GrantedOrgID, resourceOwner)
+	existingRoleKeys, err := c.searchProjectGrantState(ctx, projectID, grantedOrgID, resourceOwner)
 	if err != nil {
 		return err
 	}
 
-	if projectGrant.HasInvalidRoles(existingRoleKeys) {
+	if domain.HasInvalidRoles(existingRoleKeys, roles) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
 	return nil

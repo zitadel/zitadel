@@ -65,16 +65,17 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 }
 
 func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGrantRequest) (*mgmt_pb.AddProjectGrantResponse, error) {
-	grant, err := s.command.AddProjectGrant(ctx, AddProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	grant := AddProjectGrantRequestToCommand(req, "", authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.AddProjectGrantWithID(ctx, grant)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectGrantResponse{
 		GrantId: grant.GrantID,
 		Details: object_grpc.AddToDetailsPb(
-			grant.Sequence,
-			grant.ChangeDate,
-			grant.ResourceOwner,
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner,
 		),
 	}, nil
 }

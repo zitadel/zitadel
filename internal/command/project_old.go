@@ -79,8 +79,8 @@ func (c *Commands) reactivateProjectOld(ctx context.Context, projectID string, r
 	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
-func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, projectGrant *domain.ProjectGrant, resourceOwner string) error {
-	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID, resourceOwner)
+func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, projectID, grantedOrgID, resourceOwner string, roles []string) error {
+	preConditions := NewProjectGrantPreConditionReadModel(projectID, grantedOrgID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return err
@@ -91,7 +91,7 @@ func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, project
 	if !preConditions.GrantedOrgExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 	}
-	if projectGrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
+	if domain.HasInvalidRoles(preConditions.ExistingRoleKeys, roles) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
 	return nil
