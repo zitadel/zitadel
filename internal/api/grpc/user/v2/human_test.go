@@ -241,7 +241,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := patchHumanUserToCommand(tt.args.userId, tt.args.userName, tt.args.human)
+			got, err := updateHumanUserToCommand(tt.args.userId, tt.args.userName, tt.args.human)
 			if !tt.wantErr(t, err, fmt.Sprintf("patchHumanUserToCommand(%v, %v, %v)", tt.args.userId, tt.args.userName, tt.args.human)) {
 				return
 			}

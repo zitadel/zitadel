@@ -1290,7 +1290,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 		testCase func(runId, userId string) testCase
 	}{
 		{
-			name: "default verification",
+			name: "update machine, ok",
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{

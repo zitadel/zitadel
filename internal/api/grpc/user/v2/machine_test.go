@@ -52,7 +52,7 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := patchMachineUserToCommand(tt.args.userId, tt.args.userName, tt.args.machine)
+			got := updateMachineUserToCommand(tt.args.userId, tt.args.userName, tt.args.machine)
 			if diff := cmp.Diff(tt.want, got, cmpopts.EquateComparable(language.Tag{})); diff != "" {
 				t.Errorf("patchMachineUserToCommand() mismatch (-want +got):\n%s", diff)
 			}
