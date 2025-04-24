@@ -4,7 +4,6 @@ import { linkingFailed } from "@/components/idps/pages/linking-failed";
 import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
-import { idpTypeToIdentityProviderType } from "@/lib/idp";
 import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   addHuman,
@@ -19,7 +18,10 @@ import {
 import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import { AddHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -82,8 +84,6 @@ export default async function Page(props: {
   if (!idp) {
     throw new Error("IDP not found");
   }
-
-  const providerType = idpTypeToIdentityProviderType(idp.type);
 
   if (link) {
     if (!options?.isLinkingAllowed) {
@@ -205,15 +205,23 @@ export default async function Page(props: {
       }
     }
 
-    if (addHumanUser && orgToRegisterOn) {
-      const organizationSchema = create(OrganizationSchema, {
-        org: { case: "orgId", value: orgToRegisterOn },
-      });
+    if (addHumanUser) {
+      let addHumanUserWithOrganization: AddHumanUserRequest;
+      if (orgToRegisterOn) {
+        const organizationSchema = create(OrganizationSchema, {
+          org: { case: "orgId", value: orgToRegisterOn },
+        });
 
-      const addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
-        ...addHumanUser,
-        organization: organizationSchema,
-      });
+        addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
+          ...addHumanUser,
+          organization: organizationSchema,
+        });
+      } else {
+        addHumanUserWithOrganization = create(
+          AddHumanUserRequestSchema,
+          addHumanUser,
+        );
+      }
 
       newUser = await addHuman({
         serviceUrl,
