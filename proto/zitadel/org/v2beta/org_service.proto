@@ -138,6 +138,30 @@ service OrganizationService {
       };
     };
   }
+
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
+    option (google.api.http) = {
+      put: "/v2beta/organizations"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "org.write"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Update Organization";
+      description: "Change the name of the organization."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
 }
 
 message CreateOrganizationRequest{
@@ -171,4 +195,20 @@ message CreateOrganizationResponse{
   zitadel.object.v2beta.Details details = 1;
   string organization_id = 2;
   repeated CreatedAdmin created_admins = 3;
+}
+
+message UpdateOrganizationRequest {
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Customer 1\"";
+        }
+    ];
+}
+
+message UpdateOrganizationResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
