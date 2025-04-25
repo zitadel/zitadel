@@ -3783,7 +3783,6 @@ func TestServer_HumanMFAInitSkipped(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
-
 			got, err := Client.HumanMFAInitSkipped(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)

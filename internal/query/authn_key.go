@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -17,6 +18,14 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func keysCheckPermission(ctx context.Context, keys *AuthNKeys, permissionCheck domain.PermissionCheck) {
+	keys.AuthNKeys = slices.DeleteFunc(keys.AuthNKeys,
+		func(key *AuthNKey) bool {
+			return userCheckPermission(ctx, key.ResourceOwner, key.AggregateID, permissionCheck) != nil
+		},
+	)
+}
 
 var (
 	authNKeyTable = table{
@@ -133,12 +142,26 @@ const (
 	JoinFilterUserMachine
 )
 
-func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries, joinFilter JoinFilter) (authNKeys *AuthNKeys, err error) {
+func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries, filter JoinFilter, permissionCheck domain.PermissionCheck) (authNKeys *AuthNKeys, err error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	keys, err := q.searchAuthNKeys(ctx, queries, filter, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		keysCheckPermission(ctx, keys, permissionCheck)
+	}
+	return keys, nil
+}
+
+func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries, joinFilter JoinFilter, permissionCheckV2 bool) (authNKeys *AuthNKeys, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareAuthNKeysQuery()
+
 	query = queries.toQuery(query)
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
 
 	switch joinFilter {
 	case JoinFilterUnspecified:
@@ -268,6 +291,10 @@ func NewAuthNKeyAggregateIDQuery(id string) (SearchQuery, error) {
 
 func NewAuthNKeyObjectIDQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnObjectID, id, TextEquals)
+}
+
+func NewAuthNKeyIDQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(AuthNKeyColumnID, id, TextEquals)
 }
 
 func NewAuthNKeyCreationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
