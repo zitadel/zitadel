@@ -104,6 +104,19 @@ func authMethodsCheckPermission(ctx context.Context, methods *AuthMethods, permi
 	)
 }
 
+func userAuthMethodPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		UserAuthMethodColumnResourceOwner,
+		domain.PermissionUserRead,
+		OwnedRowsPermissionOption(UserIDCol),
+	)
+	return query.JoinClause(join, args...)
+}
+
 type AuthMethod struct {
 	UserID        string
 	CreationDate  time.Time
@@ -137,11 +150,12 @@ func (q *UserAuthMethodSearchQueries) hasUserID() bool {
 }
 
 func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, permissionCheck domain.PermissionCheck) (userAuthMethods *AuthMethods, err error) {
-	methods, err := q.searchUserAuthMethods(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	methods, err := q.searchUserAuthMethods(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && len(methods.AuthMethods) > 0 {
+	if permissionCheck != nil && len(methods.AuthMethods) > 0 && !permissionCheckV2 {
 		// when userID for query is provided, only one check has to be done
 		if queries.hasUserID() {
 			if err := userCheckPermission(ctx, methods.AuthMethods[0].ResourceOwner, methods.AuthMethods[0].UserID, permissionCheck); err != nil {
@@ -154,11 +168,12 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	return methods, nil
 }
 
-func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries) (userAuthMethods *AuthMethods, err error) {
+func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, permissionCheckV2 bool) (userAuthMethods *AuthMethods, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUserAuthMethodsQuery()
+	query = userAuthMethodPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")

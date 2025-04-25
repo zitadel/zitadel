@@ -631,7 +631,8 @@
       "TABLE": {
         "NAME": "Nazwa",
         "ENDPOINT": "Punkt końcowy",
-        "CREATIONDATE": "Data utworzenia"
+        "CREATIONDATE": "Data utworzenia",
+        "REORDER": "Zmień kolejność"
       }
     }
   },
