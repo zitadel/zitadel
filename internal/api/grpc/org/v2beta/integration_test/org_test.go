@@ -187,6 +187,75 @@ func TestServer_CreateOrganization(t *testing.T) {
 	}
 }
 
+func TestServer_UpdateOrganization(t *testing.T) {
+	orgName := "new_org_name"
+	orgId, err := createOrg(orgName)
+	if err != nil {
+		assert.Fail(t, "unable to create org")
+	}
+
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		req     *org.UpdateOrganizationRequest
+		want    *org.UpdateOrganizationResponse
+		wantErr bool
+	}{
+		{
+			name: "update org with same name",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			req: &org.UpdateOrganizationRequest{
+				Id:   orgId,
+				Name: orgName,
+			},
+		},
+		{
+			name: "update org with new name",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			req: &org.UpdateOrganizationRequest{
+				Id:   orgId,
+				Name: "new org name",
+			},
+		},
+		{
+			name: "update org with no id",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			req: &org.UpdateOrganizationRequest{
+				Id: orgId,
+				// Name: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.UpdateOrganization(tt.ctx, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			// check details
+			assert.NotZero(t, got.GetDetails().GetSequence())
+			gotCD := got.GetDetails().GetChangeDate().AsTime()
+			now := time.Now()
+			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
+		})
+	}
+}
+
+func createOrg(orgName string) (string, error) {
+	org, err := Client.CreateOrganization(CTX,
+		&org.CreateOrganizationRequest{
+			Name: orgName,
+		},
+	)
+
+	return org.OrganizationId, err
+}
+
 func assertCreatedAdmin(t *testing.T, expected, got *org.CreateOrganizationResponse_CreatedAdmin) {
 	if expected.GetUserId() != "" {
 		assert.NotEmpty(t, got.GetUserId())

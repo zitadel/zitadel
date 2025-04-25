@@ -756,7 +756,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			_, err := r.ChangeOrg(tt.args.ctx, tt.args.orgID, tt.args.name)
+			_, err := r.UpdateOrg(tt.args.ctx, tt.args.orgID, tt.args.name)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

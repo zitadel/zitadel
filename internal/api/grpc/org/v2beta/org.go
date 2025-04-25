@@ -22,6 +22,17 @@ func (s *Server) CreateOrganization(ctx context.Context, request *org.CreateOrga
 	return createdOrganizationToPb(createdOrg)
 }
 
+func (s *Server) UpdateOrganization(ctx context.Context, request *org.UpdateOrganizationRequest) (*org.UpdateOrganizationResponse, error) {
+	updated_org, err := s.command.UpdateOrg(ctx, request.Id, request.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &org.UpdateOrganizationResponse{
+		Details: object.DomainToDetailsPb(updated_org),
+	}, nil
+}
+
 func createOrganizationRequestToCommand(request *org.CreateOrganizationRequest) (*command.OrgSetup, error) {
 	admins, err := createOrganizationRequestAdminsToCommand(request.GetAdmins())
 	if err != nil {

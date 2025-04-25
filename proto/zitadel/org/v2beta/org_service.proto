@@ -145,8 +145,13 @@ service OrganizationService {
       body: "*"
     };
 
-    option (zitadel.v1.auth_option) = {
-      permission: "org.write"
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+      http_response: {
+        success_code: 200
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -198,17 +203,28 @@ message CreateOrganizationResponse{
 }
 
 message UpdateOrganizationRequest {
-    string name = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            min_length: 1;
-            max_length: 200;
-            example: "\"Customer 1\"";
-        }
-    ];
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want to update."
+    }
+  ];
+
+  string name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Customer 1\"";
+    }
+  ];
 }
 
 message UpdateOrganizationResponse {
-    zitadel.v1.ObjectDetails details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
