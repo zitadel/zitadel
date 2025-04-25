@@ -326,6 +326,8 @@ func TestServer_RemoveKey_Permission(t *testing.T) {
 func TestServer_ListKeys(t *testing.T) {
 	/*	otherInstance := integration.NewInstance(SystemCTX)
 		otherInstanceUserId := otherInstance.CreateUserTypeMachine(SystemCTX).GetId()*/
+	setPermissionCheckV2Flag(t, true)
+	defer setPermissionCheckV2Flag(t, false)
 	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListKeys-%s", gofakeit.AppName()), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
