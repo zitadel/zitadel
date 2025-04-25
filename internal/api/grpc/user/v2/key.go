@@ -12,16 +12,14 @@ import (
 )
 
 func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.AddKeyResponse, error) {
-	machineKey := &command.MachineKey{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.UserId,
-		},
-		PublicKey:      req.PublicKey,
-		Type:           domain.AuthNKeyTypeJSON,
-		ExpirationDate: req.ExpirationDate.AsTime(),
+	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
+	if err != nil {
+		return nil, err
 	}
+	machineKey := command.NewMachineKey(owner, req.UserId, req.GetExpirationDate().AsTime(), domain.AuthNKeyTypeJSON)
+	machineKey.PublicKey = req.PublicKey
 	pubkeySupplied := len(machineKey.PublicKey) > 0
-	details, err := s.command.AddUserMachineKey(ctx, machineKey, false)
+	details, err := s.command.AddUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}
@@ -43,13 +41,18 @@ func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.Add
 }
 
 func (s *Server) RemoveKey(ctx context.Context, req *user.RemoveKeyRequest) (*user.RemoveKeyResponse, error) {
+	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
+	if err != nil {
+		return nil, err
+	}
 	machineKey := &command.MachineKey{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.UserId,
+			AggregateID:   req.UserId,
+			ResourceOwner: owner,
 		},
 		KeyID: req.KeyId,
 	}
-	objectDetails, err := s.command.RemoveUserMachineKey(ctx, machineKey, false)
+	objectDetails, err := s.command.RemoveUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}

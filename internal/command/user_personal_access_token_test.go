@@ -262,7 +262,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			got, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.pat, true)
+			got, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.pat)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -360,7 +360,7 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.RemovePersonalAccessToken(tt.args.ctx, tt.args.pat, true)
+			got, err := c.RemovePersonalAccessToken(tt.args.ctx, tt.args.pat)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -63,8 +63,8 @@ func (key *MachineKey) Detail() ([]byte, error) {
 	return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
 }
 
-func (key *MachineKey) content(requireResourceOwner bool) error {
-	if requireResourceOwner && key.ResourceOwner == "" {
+func (key *MachineKey) content() error {
+	if key.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-kqpoix", "Errors.ResourceOwnerMissing")
 	}
 	if key.AggregateID == "" {
@@ -76,8 +76,8 @@ func (key *MachineKey) content(requireResourceOwner bool) error {
 	return nil
 }
 
-func (key *MachineKey) valid(requireResourceOwner bool) (err error) {
-	if err := key.content(requireResourceOwner); err != nil {
+func (key *MachineKey) valid() (err error) {
+	if err := key.content(); err != nil {
 		return err
 	}
 	// If a key is supplied, it should be a valid public key
@@ -97,7 +97,7 @@ func (key *MachineKey) checkAggregate(ctx context.Context, filter preparation.Fi
 	return nil
 }
 
-func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey, requireResourceOwner bool) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -109,7 +109,7 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey
 		machineKey.KeyID = keyID
 	}
 
-	validation := prepareAddUserMachineKey(machineKey, c.machineKeySize, requireResourceOwner)
+	validation := prepareAddUserMachineKey(machineKey, c.machineKeySize)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -125,9 +125,9 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey
 	}, nil
 }
 
-func prepareAddUserMachineKey(machineKey *MachineKey, keySize int, requireResourceOwner bool) preparation.Validation {
+func prepareAddUserMachineKey(machineKey *MachineKey, keySize int) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := machineKey.valid(requireResourceOwner); err != nil {
+		if err := machineKey.valid(); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -163,8 +163,8 @@ func prepareAddUserMachineKey(machineKey *MachineKey, keySize int, requireResour
 	}
 }
 
-func (c *Commands) RemoveUserMachineKey(ctx context.Context, machineKey *MachineKey, requireResourceOwner bool) (*domain.ObjectDetails, error) {
-	validation := prepareRemoveUserMachineKey(machineKey, requireResourceOwner)
+func (c *Commands) RemoveUserMachineKey(ctx context.Context, machineKey *MachineKey) (*domain.ObjectDetails, error) {
+	validation := prepareRemoveUserMachineKey(machineKey)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -180,9 +180,9 @@ func (c *Commands) RemoveUserMachineKey(ctx context.Context, machineKey *Machine
 	}, nil
 }
 
-func prepareRemoveUserMachineKey(machineKey *MachineKey, requireResourceOwner bool) preparation.Validation {
+func prepareRemoveUserMachineKey(machineKey *MachineKey) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := machineKey.content(requireResourceOwner); err != nil {
+		if err := machineKey.content(); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
