@@ -73,9 +73,33 @@
         color: inherit;
         text-decoration: none;
 
+        .logout-button {
+          visibility: hidden;
+          display: flex;
+          font-size: 1.2rem;
+          height: 1.2rem;
+          width: 1.2rem;
+          align-items: center;
+          justify-content: center;
+
+          .icon {
+            font-size: 1.2rem;
+          }
+
+          &:hover {
+            .icon {
+              color: $warn-color;
+            }
+          }
+        }
+
         &:hover {
           cursor: pointer;
           background-color: #00000010;
+
+          .logout-button {
+            visibility: visible;
+          }
         }
 
         .small-avatar {

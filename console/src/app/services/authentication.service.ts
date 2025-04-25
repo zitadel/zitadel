@@ -60,8 +60,15 @@ export class AuthenticationService {
   }
 
   public signout(): void {
-    this.oauthService.logOut();
+    this.oauthService.revokeTokenAndLogout();
     this._authenticated = false;
+    this._authenticationChanged.next(false);
+  }
+
+  public signoutSession(loginHint: string): void {
+    this.oauthService.logOut({
+      id_token_hint: loginHint,
+    });
     this._authenticationChanged.next(false);
   }
 }
