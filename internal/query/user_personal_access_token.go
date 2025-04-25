@@ -150,6 +150,7 @@ func (q *Queries) searchPersonalAccessTokens(ctx context.Context, withOwnerRemov
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := preparePersonalAccessTokensQuery()
+	query = queries.toQuery(query)
 	query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, PersonalAccessTokenColumnResourceOwner, PersonalAccessTokenColumnUserID)
 	eq := sq.Eq{
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -157,7 +158,7 @@ func (q *Queries) searchPersonalAccessTokens(ctx context.Context, withOwnerRemov
 	if !withOwnerRemoved {
 		eq[PersonalAccessTokenColumnOwnerRemoved.identifier()] = false
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-Hjw2w", "Errors.Query.InvalidRequest")
 	}

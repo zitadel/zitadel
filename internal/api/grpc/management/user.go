@@ -852,7 +852,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, false)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, false, nil)
 	if err != nil {
 		return nil, err
 	}

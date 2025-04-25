@@ -14,13 +14,13 @@ func TimestampMethodPbToQuery(method filter.TimestampFilterMethod) query.Timesta
 	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_EQUALS:
 		return query.TimestampEquals
 	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE:
-		return query.TimestampGreater
-	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER:
-		return query.TimestampGreaterOrEquals
-	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE_OR_EQUALS:
 		return query.TimestampLess
-	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS:
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER:
+		return query.TimestampGreater
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE_OR_EQUALS:
 		return query.TimestampLessOrEquals
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS:
+		return query.TimestampGreaterOrEquals
 	default:
 		return -1
 	}
