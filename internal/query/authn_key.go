@@ -159,10 +159,7 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareAuthNKeysQuery()
-
 	query = queries.toQuery(query)
-	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
-
 	switch joinFilter {
 	case JoinFilterUnspecified:
 		// Select all authN keys
@@ -172,8 +169,8 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	case JoinFilterUserMachine:
 		joinCol := MachineUserIDCol
 		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnAggregateID.identifier() + " = " + joinCol.identifier())
+		query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, AuthNKeyColumnResourceOwner, AuthNKeyColumnAggregateID)
 	}
-
 	eq := sq.Eq{
 		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),

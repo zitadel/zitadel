@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,11 +12,20 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func patsCheckPermission(ctx context.Context, tokens *PersonalAccessTokens, permissionCheck domain.PermissionCheck) {
+	tokens.PersonalAccessTokens = slices.DeleteFunc(tokens.PersonalAccessTokens,
+		func(token *PersonalAccessToken) bool {
+			return userCheckPermission(ctx, token.ResourceOwner, token.UserID, permissionCheck) != nil
+		},
+	)
+}
 
 var (
 	personalAccessTokensTable = table{
@@ -123,11 +133,24 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	return pat, nil
 }
 
-func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool) (personalAccessTokens *PersonalAccessTokens, err error) {
+func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool, permissionCheck domain.PermissionCheck) (authNKeys *PersonalAccessTokens, err error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	keys, err := q.searchPersonalAccessTokens(ctx, withOwnerRemoved, queries, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		patsCheckPermission(ctx, keys, permissionCheck)
+	}
+	return keys, nil
+}
+
+func (q *Queries) searchPersonalAccessTokens(ctx context.Context, withOwnerRemoved bool, queries *PersonalAccessTokenSearchQueries, permissionCheckV2 bool) (personalAccessTokens *PersonalAccessTokens, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := preparePersonalAccessTokensQuery()
+	query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, PersonalAccessTokenColumnResourceOwner, PersonalAccessTokenColumnUserID)
 	eq := sq.Eq{
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
