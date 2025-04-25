@@ -12,7 +12,7 @@ import (
 
 func (s *Server) AddSecret(ctx context.Context, req *user.AddSecretRequest) (*user.AddSecretResponse, error) {
 	newSecret := new(command.GenerateMachineSecret)
-	owner, err := s.command.CheckAggregatePermission(ctx, domain.PermissionUserWrite, req.UserId)
+	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (s *Server) AddSecret(ctx context.Context, req *user.AddSecretRequest) (*us
 }
 
 func (s *Server) RemoveSecret(ctx context.Context, req *user.RemoveSecretRequest) (*user.RemoveSecretResponse, error) {
-	owner, err := s.command.CheckAggregatePermission(ctx, domain.PermissionUserWrite, req.UserId)
+	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
 	if err != nil {
 		return nil, err
 	}
