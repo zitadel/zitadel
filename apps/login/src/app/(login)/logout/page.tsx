@@ -1,0 +1,81 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { SessionsList } from "@/components/sessions-list";
+import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getServiceUrlFromHeaders } from "@/lib/service";
+import {
+  getBrandingSettings,
+  getDefaultOrg,
+  listSessions,
+} from "@/lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
+
+async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
+  const ids: (string | undefined)[] = await getAllSessionCookieIds();
+
+  if (ids && ids.length) {
+    const response = await listSessions({
+      serviceUrl,
+      ids: ids.filter((id) => !!id) as string[],
+    });
+    return response?.sessions ?? [];
+  } else {
+    console.info("No session cookie found.");
+    return [];
+  }
+}
+
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+}) {
+  const searchParams = await props.searchParams;
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "logout" });
+
+  const requestId = searchParams?.requestId;
+  const organization = searchParams?.organization;
+
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  let defaultOrganization;
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+    });
+    if (org) {
+      defaultOrganization = org.id;
+    }
+  }
+
+  let sessions = await loadSessions({ serviceUrl });
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    organization: organization ?? defaultOrganization,
+  });
+
+  const params = new URLSearchParams();
+
+  if (requestId) {
+    params.append("requestId", requestId);
+  }
+
+  if (organization) {
+    params.append("organization", organization);
+  }
+
+  return (
+    <DynamicTheme branding={branding}>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>{t("title")}</h1>
+        <p className="ztdl-p mb-6 block">{t("description")}</p>
+
+        <div className="flex flex-col w-full space-y-2">
+          <SessionsList sessions={sessions} requestId={requestId} />
+        </div>
+      </div>
+    </DynamicTheme>
+  );
+}

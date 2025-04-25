@@ -8,6 +8,10 @@
     "addAnother": "Aggiungi un altro account",
     "noResults": "Nessun account trovato"
   },
+  "logout": {
+    "title": "Esci",
+    "description": "Seleziona l'account che desideri uscire"
+  },
   "loginname": {
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",

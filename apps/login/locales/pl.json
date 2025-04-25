@@ -8,6 +8,10 @@
     "addAnother": "Dodaj kolejne konto",
     "noResults": "Nie znaleziono kont"
   },
+  "logout": {
+    "title": "Wyloguj się",
+    "description": "Wybierz konto, które chcesz usunąć"
+  },
   "loginname": {
     "title": "Witamy ponownie!",
     "description": "Wprowadź dane logowania.",

@@ -8,6 +8,10 @@
     "addAnother": "Agregar otra cuenta",
     "noResults": "No se encontraron cuentas"
   },
+  "logout": {
+    "title": "Cerrar sesión",
+    "description": "Selecciona la cuenta que deseas eliminar"
+  },
   "loginname": {
     "title": "¡Bienvenido de nuevo!",
     "description": "Introduce tus datos de acceso.",

@@ -8,6 +8,10 @@
     "addAnother": "Add another account",
     "noResults": "No accounts found"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Select the account you want to clear"
+  },
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login data.",
