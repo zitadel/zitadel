@@ -33,5 +33,5 @@ func (mig *InitPermittedOrgsFunction53) Execute(ctx context.Context, _ eventstor
 }
 
 func (*InitPermittedOrgsFunction53) String() string {
-	return "53_init_permitted_orgs_function"
+	return "53_init_permitted_orgs_function_v2"
 }

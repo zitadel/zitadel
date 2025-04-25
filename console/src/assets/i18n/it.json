@@ -631,7 +631,8 @@
       "TABLE": {
         "NAME": "Nome",
         "ENDPOINT": "Endpoint",
-        "CREATIONDATE": "Data di creazione"
+        "CREATIONDATE": "Data di creazione",
+        "REORDER": "Riordina"
       }
     }
   },

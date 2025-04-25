@@ -1,9 +1,9 @@
-<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="(dataSource$ | async) === null">
+<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="(targets$ | async) === null">
   <div actions>
     <ng-content></ng-content>
   </div>
   <div class="table-wrapper">
-    <table *ngIf="dataSource$ | async as dataSource" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+    <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
       <!-- <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.STATE' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
