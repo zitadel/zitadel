@@ -5,6 +5,7 @@ package zitadel.instance.v2;
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
 import "zitadel/instance/v2/instance.proto";
+import "zitadel/filter/v2beta/filter.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/annotations.proto";
@@ -137,6 +138,30 @@ message UpdateInstanceResponse {
     zitadel.object.v2.Details details = 1;
 }
 
+message ListInstancesRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      description: "Search query for lists";
+      required: ["query"]
+    };
+  };
+
+  // pagination and sorting
+  zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  // the field the result is sorted
+  FieldName sorting_column = 2;
+  // criterias the client is looking for
+  repeated Query queries = 3;
+}
+
+message ListInstancesResponse {
+  // the list of instances
+  repeated Instance instances = 1;
+
+  // contains the total number of instances matching the query and the applied limit  
+  zitadel.filter.v2beta.PaginationResponse pagination = 2;
+}
+
 service InstanceService {
 
   // DeleteInstance deletes an instance with the given ID.
@@ -229,10 +254,39 @@ service InstanceService {
       }
     };
   }
-}
 
-// UpdateInstance
-// ListInstances
+  // ListInstances lists instances matching the given query.
+  //
+  // The query can be used to filter either by instance ID or domain.
+  // The request is paginated and returns 100 results by default.
+  rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Lists instances matching the given query.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The list of instances.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/ListInstancesResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      get: "/v2/instances"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.instance.read"
+      }
+    };
+  }
+}
 
 // Add Custom Domain
 // Remove Custom Domain
