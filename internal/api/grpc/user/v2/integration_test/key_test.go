@@ -344,10 +344,10 @@ func TestServer_ListKeys(t *testing.T) {
 	myOrgId := Instance.DefaultOrg.GetId()
 	myUserId := Instance.Users.Get(integration.UserTypeNoPermission).ID
 	expiresInADay := time.Now().Truncate(time.Hour).Add(time.Hour * 24)
-	myDataPoint := setupDataPoint(t, myUserId, myOrgId, expiresInADay)
-	otherUserDataPoint := setupDataPoint(t, otherUserId, myOrgId, expiresInADay)
-	otherOrgDataPointExpiringSoon := setupDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, time.Now().Truncate(time.Hour).Add(time.Hour))
-	otherOrgDataPointExpiringLate := setupDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay.Add(time.Hour*24*30))
+	myDataPoint := setupKeyDataPoint(t, myUserId, myOrgId, expiresInADay)
+	otherUserDataPoint := setupKeyDataPoint(t, otherUserId, myOrgId, expiresInADay)
+	otherOrgDataPointExpiringSoon := setupKeyDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, time.Now().Truncate(time.Hour).Add(time.Hour))
+	otherOrgDataPointExpiringLate := setupKeyDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay.Add(time.Hour*24*30))
 	sortingColumnExpirationDate := user.KeyFieldName_KEY_FIELD_NAME_KEY_EXPIRATION_DATE
 	awaitKeys(t, otherOrgDataPointExpiringSoon.GetId(), otherOrgDataPointExpiringLate.GetId(), otherUserDataPoint.GetId(), myDataPoint.GetId())
 	type args struct {
@@ -546,14 +546,14 @@ func TestServer_ListKeys(t *testing.T) {
 			got, err := Client.ListKeys(tt.args.ctx, tt.args.req)
 			require.NoError(t, err)
 			assert.Len(t, got.Result, len(tt.want.Result))
-			if diff := cmp.Diff(got, tt.want, protocmp.Transform()); diff != "" {
+			if diff := cmp.Diff(tt.want, got, protocmp.Transform()); diff != "" {
 				t.Errorf("ListKeys() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
 }
 
-func setupDataPoint(t *testing.T, userId, orgId string, expirationDate time.Time) *user.Key {
+func setupKeyDataPoint(t *testing.T, userId, orgId string, expirationDate time.Time) *user.Key {
 	expirationDatePb := timestamppb.New(expirationDate)
 	newKey, err := Client.AddKey(SystemCTX, &user.AddKeyRequest{
 		UserId:         userId,

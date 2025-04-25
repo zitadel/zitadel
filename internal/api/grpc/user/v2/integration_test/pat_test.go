@@ -5,14 +5,19 @@ package user_test
 import (
 	"context"
 	"fmt"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/testing/protocmp"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -316,4 +321,315 @@ func TestServer_RemovePersonalAccessToken_Permission(t *testing.T) {
 			assert.Less(t, creationDate, time.Now(), "creation date is in the future")
 		})
 	}
+}
+
+func TestServer_ListPersonalAccessTokens(t *testing.T) {
+	OrgCTX := CTX
+	setPermissionCheckV2Flag(t, true)
+	defer setPermissionCheckV2Flag(t, false)
+	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListPersonalAccessTokens-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
+		OrganizationId: otherOrg.OrganizationId,
+		UserType: &user.CreateUserRequest_Machine_{
+			Machine: &user.CreateUserRequest_Machine{
+				Name: gofakeit.Name(),
+			},
+		},
+	})
+	require.NoError(t, err)
+	otherOrgUserId := otherOrgUser.GetId()
+	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
+	myOrgId := Instance.DefaultOrg.GetId()
+	myUserId := Instance.Users.Get(integration.UserTypeNoPermission).ID
+	expiresInADay := time.Now().Truncate(time.Hour).Add(time.Hour * 24)
+	myDataPoint := setupPATDataPoint(t, myUserId, myOrgId, expiresInADay)
+	otherUserDataPoint := setupPATDataPoint(t, otherUserId, myOrgId, expiresInADay)
+	otherOrgDataPointExpiringSoon := setupPATDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, time.Now().Truncate(time.Hour).Add(time.Hour))
+	otherOrgDataPointExpiringLate := setupPATDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay.Add(time.Hour*24*30))
+	sortingColumnExpirationDate := user.PersonalAccessTokenFieldName_PERSONAL_ACCESS_TOKEN_FIELD_NAME_EXPIRATION_DATE
+	testUnrelatedPatsFilter := &user.PersonalAccessTokensSearchFilter_ExpirationDateFilter{
+		ExpirationDateFilter: &user.TimestampFilter{
+			Timestamp: timestamppb.New(time.Now().Truncate(time.Hour).Add(time.Hour * 24 * 365)),
+			Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE,
+		},
+	}
+	awaitPersonalAccessTokens(t, otherOrgDataPointExpiringSoon.GetId(), otherOrgDataPointExpiringLate.GetId(), otherUserDataPoint.GetId(), myDataPoint.GetId())
+	type args struct {
+		ctx context.Context
+		req *user.ListPersonalAccessTokensRequest
+	}
+	tests := []struct {
+		name string
+		args args
+		want *user.ListPersonalAccessTokensResponse
+	}{
+		{
+			name: "list all, instance",
+			args: args{
+				IamCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Filters: []*user.PersonalAccessTokensSearchFilter{{
+						Filter: testUnrelatedPatsFilter,
+					}},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					otherOrgDataPointExpiringLate,
+					otherOrgDataPointExpiringSoon,
+					otherUserDataPoint,
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  4,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list all, org",
+			args: args{
+				OrgCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Filters: []*user.PersonalAccessTokensSearchFilter{{
+						Filter: testUnrelatedPatsFilter,
+					}},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					otherUserDataPoint,
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list all, user",
+			args: args{
+				UserCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Filters: []*user.PersonalAccessTokensSearchFilter{{
+						Filter: testUnrelatedPatsFilter,
+					}},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list by id",
+			args: args{
+				IamCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Filters: []*user.PersonalAccessTokensSearchFilter{
+						{Filter: testUnrelatedPatsFilter},
+						{
+							Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{
+								TokenIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
+							},
+						},
+					},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					otherOrgDataPointExpiringSoon,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list by multiple ids",
+			args: args{
+				IamCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Filters: []*user.PersonalAccessTokensSearchFilter{
+						{Filter: testUnrelatedPatsFilter},
+						{
+							Filter: &user.PersonalAccessTokensSearchFilter_OrFilter{
+								OrFilter: &user.PersonalAccessTokensOrFilter{
+									Filters: []*user.PersonalAccessTokensSearchFilter{
+										{Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{TokenIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id}}},
+										{Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{TokenIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					otherOrgDataPointExpiringSoon,
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list all from other org",
+			args: args{
+				IamCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Filters: []*user.PersonalAccessTokensSearchFilter{
+						{Filter: testUnrelatedPatsFilter},
+						{
+							Filter: &user.PersonalAccessTokensSearchFilter_OrganizationIdFilter{
+								OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
+							},
+						}},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					otherOrgDataPointExpiringLate,
+					otherOrgDataPointExpiringSoon,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "sort by next expiration dates",
+			args: args{
+				IamCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Pagination: &filter.PaginationRequest{
+						Asc: true,
+					},
+					SortingColumn: &sortingColumnExpirationDate,
+					Filters: []*user.PersonalAccessTokensSearchFilter{
+						{Filter: testUnrelatedPatsFilter},
+						{
+							Filter: &user.PersonalAccessTokensSearchFilter_OrFilter{
+								OrFilter: &user.PersonalAccessTokensOrFilter{
+									Filters: []*user.PersonalAccessTokensSearchFilter{
+										{Filter: &user.PersonalAccessTokensSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
+										{Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{TokenIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					otherOrgDataPointExpiringSoon,
+					myDataPoint,
+					otherOrgDataPointExpiringLate,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  3,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "get page",
+			args: args{
+				IamCTX,
+				&user.ListPersonalAccessTokensRequest{
+					Pagination: &filter.PaginationRequest{
+						Offset: 2,
+						Limit:  2,
+						Asc:    true,
+					},
+					Filters: []*user.PersonalAccessTokensSearchFilter{
+						{Filter: testUnrelatedPatsFilter},
+					},
+				},
+			},
+			want: &user.ListPersonalAccessTokensResponse{
+				Result: []*user.PersonalAccessToken{
+					otherOrgDataPointExpiringSoon,
+					otherOrgDataPointExpiringLate,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  4,
+					AppliedLimit: 2,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.ListPersonalAccessTokens(tt.args.ctx, tt.args.req)
+			require.NoError(t, err)
+			assert.Len(t, got.Result, len(tt.want.Result))
+			if diff := cmp.Diff(tt.want, got, protocmp.Transform()); diff != "" {
+				t.Errorf("ListPersonalAccessTokens() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func setupPATDataPoint(t *testing.T, userId, orgId string, expirationDate time.Time) *user.PersonalAccessToken {
+	expirationDatePb := timestamppb.New(expirationDate)
+	newPersonalAccessToken, err := Client.AddPersonalAccessToken(SystemCTX, &user.AddPersonalAccessTokenRequest{
+		UserId:         userId,
+		ExpirationDate: expirationDatePb,
+	})
+	require.NoError(t, err)
+	return &user.PersonalAccessToken{
+		CreationDate:   newPersonalAccessToken.CreationDate,
+		ChangeDate:     newPersonalAccessToken.CreationDate,
+		Id:             newPersonalAccessToken.GetTokenId(),
+		UserId:         userId,
+		OrganizationId: orgId,
+		ExpirationDate: expirationDatePb,
+	}
+}
+
+func awaitPersonalAccessTokens(t *testing.T, patIds ...string) {
+	sortingColumn := user.PersonalAccessTokenFieldName_PERSONAL_ACCESS_TOKEN_FIELD_NAME_ID
+	slices.Sort(patIds)
+	var filters []*user.PersonalAccessTokensSearchFilter
+	for _, patId := range patIds {
+		filters = append(filters, &user.PersonalAccessTokensSearchFilter{
+			Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{
+				TokenIdFilter: &user.IDFilter{Id: patId},
+			},
+		})
+	}
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		result, err := Client.ListPersonalAccessTokens(SystemCTX, &user.ListPersonalAccessTokensRequest{
+			Filters: []*user.PersonalAccessTokensSearchFilter{{
+				Filter: &user.PersonalAccessTokensSearchFilter_OrFilter{
+					OrFilter: &user.PersonalAccessTokensOrFilter{Filters: filters},
+				},
+			}},
+			SortingColumn: &sortingColumn,
+			Pagination: &filter.PaginationRequest{
+				Asc: true,
+			},
+		})
+		require.NoError(t, err)
+		if !assert.Len(collect, result.Result, len(patIds)) {
+			return
+		}
+		for i := range patIds {
+			patId := patIds[i]
+			require.Equal(collect, patId, result.Result[i].GetId())
+		}
+	}, 5*time.Second, time.Second, "pat not created in time")
 }
