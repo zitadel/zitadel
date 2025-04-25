@@ -125,7 +125,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 	logging.OnError(err).Fatal("unable to set profiler")
 
 	id.Configure(config.Machine)
-	actions.SetHTTPConfig(&config.Actions.HTTP)
+	if config.Actions != nil {
+		actions.SetHTTPConfig(&config.Actions.HTTP)
+	}
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
