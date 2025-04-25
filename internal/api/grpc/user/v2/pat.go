@@ -14,27 +14,45 @@ import (
 )
 
 func (s *Server) AddPersonalAccessToken(ctx context.Context, req *user.AddPersonalAccessTokenRequest) (*user.AddPersonalAccessTokenResponse, error) {
-	pat := &command.PersonalAccessToken{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.UserId,
-		},
-		AllowedUserType: domain.UserTypeMachine,
-		ExpirationDate:  req.ExpirationDate.AsTime(),
-		Scopes:          []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
+	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
+	if err != nil {
+		return nil, err
 	}
-	details, err := s.command.AddPersonalAccessToken(ctx, pat, false)
+	newPat := command.NewPersonalAccessToken(
+		owner,
+		req.UserId,
+		req.ExpirationDate.AsTime(),
+		[]string{
+			oidc.ScopeOpenID,
+			oidc.ScopeProfile,
+			z_oidc.ScopeUserMetaData,
+			z_oidc.ScopeResourceOwner,
+		},
+		domain.UserTypeMachine,
+	)
+	details, err := s.command.AddPersonalAccessToken(ctx, newPat)
 	if err != nil {
 		return nil, err
 	}
 	return &user.AddPersonalAccessTokenResponse{
 		CreationDate: timestamppb.New(details.EventDate),
-		TokenId:      pat.TokenID,
-		Token:        pat.Token,
+		TokenId:      newPat.TokenID,
+		Token:        newPat.Token,
 	}, nil
 }
 
 func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *user.RemovePersonalAccessTokenRequest) (*user.RemovePersonalAccessTokenResponse, error) {
-	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, &command.PersonalAccessToken{TokenID: req.TokenId}, false)
+	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, &command.PersonalAccessToken{
+		TokenID: req.TokenId,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: owner,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}

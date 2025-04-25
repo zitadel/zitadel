@@ -134,7 +134,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 		}
 		pat.TokenID = tokenID
 		c.pats = append(c.pats, pat)
-		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm, true))
+		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm))
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgAgg.ID, machine.Machine.AggregateID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
@@ -144,7 +144,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 		}
 		machineKey.KeyID = keyID
 		c.machineKeys = append(c.machineKeys, machineKey)
-		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize, true))
+		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize))
 	}
 	return nil
 }
