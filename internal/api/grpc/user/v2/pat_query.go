@@ -29,7 +29,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 		},
 		Queries: filters,
 	}
-	result, err := s.query.SearchPersonalAccessTokens(ctx, search, false)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, search, false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

@@ -133,15 +133,19 @@ func usersCheckPermission(ctx context.Context, users *Users, permissionCheck dom
 }
 
 func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery) sq.SelectBuilder {
+	return userPermissionCheckV2WithCustomColumns(ctx, query, enabled, filters, UserResourceOwnerCol, UserIDCol)
+}
+
+func userPermissionCheckV2WithCustomColumns(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery, userResourceOwnerCol, UserID Column) sq.SelectBuilder {
 	if !enabled {
 		return query
 	}
 	return query.Where(PermissionClause(
 		ctx,
-		UserResourceOwnerCol,
+		userResourceOwnerCol,
 		domain.PermissionUserRead,
 		SingleOrgPermissionOption(filters),
-		OwnedRowsPermissionOption(UserIDCol),
+		OwnedRowsPermissionOption(UserID),
 	))
 }
 
