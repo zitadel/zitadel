@@ -112,6 +112,7 @@ func TestServer_AddKey(t *testing.T) {
 }
 
 func TestServer_AddKey_Permission(t *testing.T) {
+	OrgCTX := CTX
 	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddKey-%s", gofakeit.AppName()), gofakeit.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
@@ -145,7 +146,7 @@ func TestServer_AddKey_Permission(t *testing.T) {
 		},
 		{
 			name:    "org, error",
-			args:    args{CTX, request},
+			args:    args{OrgCTX, request},
 			wantErr: true,
 		},
 		{
@@ -255,6 +256,7 @@ func TestServer_RemoveKey(t *testing.T) {
 }
 
 func TestServer_RemoveKey_Permission(t *testing.T) {
+	OrgCTX := CTX
 	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemoveKey-%s", gofakeit.AppName()), gofakeit.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
@@ -296,7 +298,7 @@ func TestServer_RemoveKey_Permission(t *testing.T) {
 		},
 		{
 			name:    "org, error",
-			args:    args{CTX, request, prepare},
+			args:    args{OrgCTX, request, prepare},
 			wantErr: true,
 		},
 		{
@@ -324,8 +326,7 @@ func TestServer_RemoveKey_Permission(t *testing.T) {
 }
 
 func TestServer_ListKeys(t *testing.T) {
-	/*	otherInstance := integration.NewInstance(SystemCTX)
-		otherInstanceUserId := otherInstance.CreateUserTypeMachine(SystemCTX).GetId()*/
+	OrgCTX := CTX
 	setPermissionCheckV2Flag(t, true)
 	defer setPermissionCheckV2Flag(t, false)
 	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListKeys-%s", gofakeit.AppName()), gofakeit.Email())
@@ -342,12 +343,13 @@ func TestServer_ListKeys(t *testing.T) {
 	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
 	myOrgId := Instance.DefaultOrg.GetId()
 	myUserId := Instance.Users.Get(integration.UserTypeNoPermission).ID
-	expiresInADay := time.Now().Truncate(time.Second).Add(time.Hour * 24)
-	//	otherInstanceDataPoint := setupDataPoint(t, otherInstance.Client.UserV2, otherInstanceUserId, otherInstance.DefaultOrg.GetId(), expiresInADay)
-	otherOrgDataPoint := setupDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay)
-	otherUserDataPoint := setupDataPoint(t, otherUserId, myOrgId, expiresInADay)
+	expiresInADay := time.Now().Truncate(time.Hour).Add(time.Hour * 24)
 	myDataPoint := setupDataPoint(t, myUserId, myOrgId, expiresInADay)
-	awaitKeys(t, otherOrgDataPoint.GetId(), otherUserDataPoint.GetId(), myDataPoint.GetId())
+	otherUserDataPoint := setupDataPoint(t, otherUserId, myOrgId, expiresInADay)
+	otherOrgDataPointExpiringSoon := setupDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, time.Now().Truncate(time.Hour).Add(time.Hour))
+	otherOrgDataPointExpiringLate := setupDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay.Add(time.Hour*24*30))
+	sortingColumnExpirationDate := user.KeyFieldName_KEY_FIELD_NAME_KEY_EXPIRATION_DATE
+	awaitKeys(t, otherOrgDataPointExpiringSoon.GetId(), otherOrgDataPointExpiringLate.GetId(), otherUserDataPoint.GetId(), myDataPoint.GetId())
 	type args struct {
 		ctx context.Context
 		req *user.ListKeysRequest
@@ -365,10 +367,149 @@ func TestServer_ListKeys(t *testing.T) {
 			},
 			want: &user.ListKeysResponse{
 				Result: []*user.Key{
-					//					otherInstanceDataPoint,
-					myDataPoint,
+					otherOrgDataPointExpiringLate,
+					otherOrgDataPointExpiringSoon,
 					otherUserDataPoint,
-					otherOrgDataPoint,
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  4,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list all, org",
+			args: args{
+				OrgCTX,
+				&user.ListKeysRequest{},
+			},
+			want: &user.ListKeysResponse{
+				Result: []*user.Key{
+					otherUserDataPoint,
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list all, user",
+			args: args{
+				UserCTX,
+				&user.ListKeysRequest{},
+			},
+			want: &user.ListKeysResponse{
+				Result: []*user.Key{
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list by id",
+			args: args{
+				IamCTX,
+				&user.ListKeysRequest{
+					Filters: []*user.KeysSearchFilter{{
+						Filter: &user.KeysSearchFilter_KeyIdFilter{
+							KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
+						},
+					}},
+				},
+			},
+			want: &user.ListKeysResponse{
+				Result: []*user.Key{
+					otherOrgDataPointExpiringSoon,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list by multiple ids",
+			args: args{
+				IamCTX,
+				&user.ListKeysRequest{
+					Filters: []*user.KeysSearchFilter{{
+						Filter: &user.KeysSearchFilter_OrFilter{
+							OrFilter: &user.KeysOrFilter{
+								Filters: []*user.KeysSearchFilter{
+									{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id}}},
+									{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+								},
+							},
+						},
+					}},
+				},
+			},
+			want: &user.ListKeysResponse{
+				Result: []*user.Key{
+					otherOrgDataPointExpiringSoon,
+					myDataPoint,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list all from other org",
+			args: args{
+				IamCTX,
+				&user.ListKeysRequest{
+					Filters: []*user.KeysSearchFilter{{
+						Filter: &user.KeysSearchFilter_OrganizationIdFilter{
+							OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
+						},
+					}},
+				},
+			},
+			want: &user.ListKeysResponse{
+				Result: []*user.Key{
+					otherOrgDataPointExpiringLate,
+					otherOrgDataPointExpiringSoon,
+				},
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "sort by next expiration dates",
+			args: args{
+				IamCTX,
+				&user.ListKeysRequest{
+					Pagination: &filter.PaginationRequest{
+						Asc: true,
+					},
+					SortingColumn: &sortingColumnExpirationDate,
+					Filters: []*user.KeysSearchFilter{{
+						Filter: &user.KeysSearchFilter_OrFilter{
+							OrFilter: &user.KeysOrFilter{
+								Filters: []*user.KeysSearchFilter{
+									{Filter: &user.KeysSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
+									{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+								},
+							},
+						},
+					}},
+				},
+			},
+			want: &user.ListKeysResponse{
+				Result: []*user.Key{
+					otherOrgDataPointExpiringSoon,
+					myDataPoint,
+					otherOrgDataPointExpiringLate,
 				},
 				Pagination: &filter.PaginationResponse{
 					TotalResult:  3,
@@ -377,45 +518,28 @@ func TestServer_ListKeys(t *testing.T) {
 			},
 		},
 		{
-			name: "list all, org",
+			name: "get page",
 			args: args{
-				CTX,
-				&user.ListKeysRequest{},
+				IamCTX,
+				&user.ListKeysRequest{
+					Pagination: &filter.PaginationRequest{
+						Offset: 2,
+						Limit:  2,
+						Asc:    true,
+					},
+				},
 			},
 			want: &user.ListKeysResponse{
 				Result: []*user.Key{
-					//					otherInstanceDataPoint,
-					myDataPoint,
-					otherUserDataPoint,
+					otherOrgDataPointExpiringSoon,
+					otherOrgDataPointExpiringLate,
 				},
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  2,
-					AppliedLimit: 100,
+					TotalResult:  4,
+					AppliedLimit: 2,
 				},
 			},
 		},
-		/*
-			{
-				name: "list all, user",
-			},
-			{
-				name: "list by id",
-			},
-			{
-				name: "list by multiple ids",
-			},
-			{
-				name: "list all from other instance",
-			},
-			{
-				name: "list all from other instance and org",
-			},
-			{
-				name: "sort by descending expiration date",
-			},
-			{
-				name: "get page",
-			},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
