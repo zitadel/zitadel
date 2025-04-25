@@ -132,7 +132,7 @@ func usersCheckPermission(ctx context.Context, users *Users, permissionCheck dom
 	)
 }
 
-func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *UserSearchQueries) sq.SelectBuilder {
+func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery) sq.SelectBuilder {
 	if !enabled {
 		return query
 	}
@@ -140,7 +140,7 @@ func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled 
 		ctx,
 		UserResourceOwnerCol,
 		domain.PermissionUserRead,
-		SingleOrgPermissionOption(queries.Queries),
+		SingleOrgPermissionOption(filters),
 		OwnedRowsPermissionOption(UserIDCol),
 	))
 }
@@ -636,7 +636,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery()
-	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries)
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()

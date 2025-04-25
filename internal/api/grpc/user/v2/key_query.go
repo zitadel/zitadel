@@ -30,7 +30,7 @@ func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user
 		},
 		Queries: filters,
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, search, query.JoinFilterUserMachine)
+	result, err := s.query.SearchAuthNKeys(ctx, search, query.JoinFilterUserMachine, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func keyFilterToQuery(filter *user.KeysSearchFilter, level uint8) (query.SearchQ
 }
 
 func authnKeyIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
-	return query.NewAuthNKeyObjectIDQuery(f.Id)
+	return query.NewAuthNKeyIDQuery(f.Id)
 }
 
 func authnKeyUserIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
@@ -147,7 +147,7 @@ func authnKeyFieldNameToSortingColumn(field *user.KeyFieldName) query.Column {
 	case user.KeyFieldName_KEY_FIELD_NAME_UNSPECIFIED:
 		return query.AuthNKeyColumnCreationDate
 	case user.KeyFieldName_KEY_FIELD_NAME_ID:
-		return query.AuthNKeyColumnObjectID
+		return query.AuthNKeyColumnID
 	case user.KeyFieldName_KEY_FIELD_NAME_USER_ID:
 		return query.AuthNKeyColumnAggregateID
 	case user.KeyFieldName_KEY_FIELD_NAME_ORGANIZATION_ID:

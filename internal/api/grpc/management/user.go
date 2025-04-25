@@ -756,7 +756,7 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, q, query.JoinFilterUserMachine)
+	result, err := s.query.SearchAuthNKeys(ctx, q, query.JoinFilterUserMachine, nil)
 	if err != nil {
 		return nil, err
 	}
