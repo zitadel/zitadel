@@ -176,16 +176,16 @@ type transport struct {
 }
 
 func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if httpConfig == nil {
+	if httpConfig == nil || len(httpConfig.DenyList) == 0 {
 		return http.DefaultTransport.RoundTrip(req)
 	}
-	if t.isHostBlocked(httpConfig.DenyList, req.URL) {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ACTIO-N72d0", "host is denied")
+	if err := t.isHostBlocked(httpConfig.DenyList, req.URL); err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "ACTIO-N72d0", "host is denied")
 	}
 	return http.DefaultTransport.RoundTrip(req)
 }
 
-func (t *transport) isHostBlocked(denyList []AddressChecker, address *url.URL) bool {
+func (t *transport) isHostBlocked(denyList []AddressChecker, address *url.URL) error {
 	host := address.Hostname()
 	ip := net.ParseIP(host)
 	ips := []net.IP{ip}
@@ -194,17 +194,17 @@ func (t *transport) isHostBlocked(denyList []AddressChecker, address *url.URL) b
 		var err error
 		ips, err = t.lookup(host)
 		if err != nil {
-			return true
+			return zerrors.ThrowInternal(err, "ACTIO-4m9s2", "lookup failed")
 		}
 	}
-	for _, blocked := range denyList {
-		if blocked.Matches(ips, host) {
-			return true
+	for _, denied := range denyList {
+		if err := denied.IsDenied(ips, host); err != nil {
+			return err
 		}
 	}
-	return false
+	return nil
 }
 
 type AddressChecker interface {
-	Matches([]net.IP, string) bool
+	IsDenied([]net.IP, string) error
 }
