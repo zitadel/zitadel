@@ -57,7 +57,7 @@ Do not rely on implicit fallbacks or defaults if the client does not provide cer
 Only use defaults if they are explicitly documented, such as returning a result set for the whole instance if no filter is provided.
 
 Some API calls may create multiple resources such as in the case of `zitadel.org.v2.AddOrganization`, where you can create an organization AND multiple users as admin.
-In such cases the response should include **ALL** created resources and their ids. This removed any amy ambiguity from the users perspective whether or not
+In such cases the response should include **ALL** created resources and their ids. This removes any ambiguity from the users perspective whether or not
 the additional resources were created and it also helps in testing.
 
 ### Naming Conventions
