@@ -140,13 +140,14 @@ func userPermissionCheckV2WithCustomColumns(ctx context.Context, query sq.Select
 	if !enabled {
 		return query
 	}
-	return query.Where(PermissionClause(
+	join, args := PermissionClause(
 		ctx,
 		userResourceOwnerCol,
 		domain.PermissionUserRead,
 		SingleOrgPermissionOption(filters),
 		OwnedRowsPermissionOption(userID),
-	))
+	)
+	return query.JoinClause(join, args...)
 }
 
 type UserSearchQueries struct {

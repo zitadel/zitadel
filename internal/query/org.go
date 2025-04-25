@@ -97,11 +97,12 @@ func orgsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled 
 	if !enabled {
 		return query
 	}
-	return query.Where(PermissionClause(
+	join, args := PermissionClause(
 		ctx,
 		OrgColumnID,
 		domain_pkg.PermissionOrgRead,
-	))
+	)
+	return query.JoinClause(join, args...)
 }
 
 type OrgSearchQueries struct {
