@@ -136,7 +136,7 @@ func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled 
 	return userPermissionCheckV2WithCustomColumns(ctx, query, enabled, filters, UserResourceOwnerCol, UserIDCol)
 }
 
-func userPermissionCheckV2WithCustomColumns(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery, userResourceOwnerCol, UserID Column) sq.SelectBuilder {
+func userPermissionCheckV2WithCustomColumns(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery, userResourceOwnerCol, userID Column) sq.SelectBuilder {
 	if !enabled {
 		return query
 	}
@@ -145,7 +145,7 @@ func userPermissionCheckV2WithCustomColumns(ctx context.Context, query sq.Select
 		userResourceOwnerCol,
 		domain.PermissionUserRead,
 		SingleOrgPermissionOption(filters),
-		OwnedRowsPermissionOption(UserID),
+		OwnedRowsPermissionOption(userID),
 	))
 }
 
