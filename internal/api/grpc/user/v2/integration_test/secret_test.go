@@ -97,7 +97,7 @@ func TestServer_AddSecret(t *testing.T) {
 }
 
 func TestServer_AddSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddSecret-%s", gofakeit.AppName()), gofakeit.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
@@ -146,7 +146,7 @@ func TestServer_AddSecret_Permission(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user, ok", // TODO: Should this be an error for machine users?
+			name: "user, error",
 			args: args{
 				UserCTX,
 				&user.AddSecretRequest{
@@ -244,7 +244,7 @@ func TestServer_RemoveSecret(t *testing.T) {
 }
 
 func TestServer_RemoveSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemoveSecret-%s", gofakeit.AppName()), gofakeit.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
@@ -312,7 +312,7 @@ func TestServer_RemoveSecret_Permission(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user, ok",
+			name: "user, error",
 			args: args{
 				UserCTX,
 				&user.RemoveSecretRequest{
@@ -331,7 +331,7 @@ func TestServer_RemoveSecret_Permission(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
-			require.NoError(t, err)
+			require.NoError(t, tt.args.prepare(tt.args.req))
 			got, err := Client.RemoveSecret(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
