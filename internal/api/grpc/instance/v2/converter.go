@@ -12,8 +12,8 @@ import (
 
 func InstancesToPb(instances []*query.Instance) []*instance.Instance {
 	list := []*instance.Instance{}
-	for i, instance := range instances {
-		list[i] = ToProtoObject(instance)
+	for _, instance := range instances {
+		list = append(list, ToProtoObject(instance))
 	}
 	return list
 }
@@ -88,12 +88,13 @@ func fieldNameToInstanceColumn(fieldName instance.FieldName) query.Column {
 }
 
 func instanceQueriesToModel(queries []*instance.Query) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries))
-	for i, query := range queries {
-		q[i], err = instanceQueryToModel(query)
+	q := []query.SearchQuery{}
+	for _, query := range queries {
+		model, err := instanceQueryToModel(query)
 		if err != nil {
 			return nil, err
 		}
+		q = append(q, model)
 	}
 	return q, nil
 }
