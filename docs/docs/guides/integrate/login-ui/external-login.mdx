@@ -16,6 +16,7 @@ ZITADEL will handle as much as possible from the authentication flow with the ex
 This requires you to initiate the flow with your desired provider.
 
 Send the following two URLs in the request body:
+
 1. SuccessURL: Page that should be shown when the login was successful
 2. ErrorURL: Page that should be shown when an error happens during the authentication
 
@@ -63,6 +64,10 @@ https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_accoun
 
 After the user has successfully authenticated, a redirect to the ZITADEL backend /idps/callback will automatically be performed.
 
+:::warning
+Note that the redirect URL is `https://{YOUR-DOMAIN}/idps/callback` when using the new V2 hosted login compared to the V1 hosted login, which was `https://{YOUR-DOMAIN}/ui/login/login/externalidp/callback`.
+:::
+
 ## Get Provider Information
 
 ZITADEL will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the IDP intentID, a token, and optionally, if a user could be found, a user ID.
@@ -71,6 +76,7 @@ To get the information of the provider, make a request to ZITADEL.
 [Retrieve Identity Provider Intent Documentation](/docs/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent)
 
 ### Request
+
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2/idp_intents/$INTENT_ID \
@@ -115,7 +121,9 @@ curl --request POST \
 ```
 
 ## Handle Provider Information
+
 After successfully authenticating using your identity provider, you have three possible options.
+
 1. Login
 2. Register user
 3. Add social login to existing user
@@ -127,6 +135,7 @@ Create a new session and include the IDP intent ID and the token in the checks.
 This check requires that the previous step ended on the successful page and didn't’t result in an error.
 
 #### Request
+
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2/sessions \
@@ -158,6 +167,7 @@ The display name is used to list the linkings on the users.
 [Create User API Documentation](/docs/apis/resources/user_service_v2/user-service-add-human-user)
 
 #### Request
+
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2/users/human \
@@ -196,6 +206,7 @@ If you want to link/connect to an existing account you can perform the add ident
 [Add IDP Link to existing user documentation](/docs/apis/resources/user_service_v2/user-service-add-idp-link)
 
 #### Request
+
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2/users/users/218385419895570689/links \
