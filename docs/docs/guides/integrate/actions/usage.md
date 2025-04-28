@@ -36,6 +36,11 @@ The information sent to the Endpoint is structured as JSON:
 }
 ```
 
+:::warning
+To marshal and unmarshal the request please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson), 
+as the request is a protocol buffer message, to avoid potential problems with the attribute names.
+:::
+
 ### Sent information Response
 
 The information sent to the Endpoint is structured as JSON:
@@ -55,6 +60,11 @@ The information sent to the Endpoint is structured as JSON:
   }
 }
 ```
+
+:::warning
+To marshal and unmarshal the request and response please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),
+as the request and response are protocol buffer messages, to avoid potential problems with the attribute names.
+:::
 
 ### Sent information Function
 
@@ -338,7 +348,7 @@ The information sent to the Endpoint is structured as JSON:
   "event_type": "Type of the event",
   "created_at": "Time the event was created",
   "userID": "ID of the creator of the event",
-  "event_payload": "Base64 encoded content of the event"
+  "event_payload": "Content of the event in JSON format"
 }
 ```
 

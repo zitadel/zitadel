@@ -145,7 +145,14 @@ the [Sent information Event](./usage#sent-information-event) payload description
   "event_type": "user.human.added",
   "created_at": "2025-03-27T10:22:43.262665+01:00",
   "userID": "312909075212468632",
-  "event_payload": "eyJ1c2VyTmFtZSI6ImV4YW1wbGVAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwiZGlzcGxheU5hbWUiOiJUZXN0IFVzZXIiLCJwcmVmZXJyZWRMYW5ndWFnZSI6InVuZCIsImVtYWlsIjoiZXhhbXBsZUB0ZXN0LmNvbSJ9"
+  "event_payload": {
+    "userName":"example@test.com",
+    "firstName":"Test",
+    "lastName":"User",
+    "displayName":"Test User",
+    "preferredLanguage":"und",
+    "email":"example@test.com"
+  }
 }
 ```
 
