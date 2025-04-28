@@ -356,7 +356,7 @@ func (c *Commands) UpdateOrg(ctx context.Context, orgID, name string) (*domain.O
 		return nil, zerrors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.Name == name {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
+		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	events := make([]eventstore.Command, 0)

@@ -6,10 +6,11 @@ package zitadel.org.v2beta;
 import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v2beta/auth.proto";
-import "zitadel/user/v2beta/email.proto";
-import "zitadel/user/v2beta/phone.proto";
-import "zitadel/user/v2beta/idp.proto";
-import "zitadel/user/v2beta/password.proto";
+import "zitadel/org/v2beta/org.proto";
+// import "zitadel/user/v2beta/email.proto";
+// import "zitadel/user/v2beta/phone.proto";
+// import "zitadel/user/v2beta/idp.proto";
+// import "zitadel/user/v2beta/password.proto";
 import "zitadel/user/v2beta/user.proto";
 import "zitadel/user/v2beta/user_service.proto";
 import "google/api/annotations.proto";
@@ -167,6 +168,33 @@ service OrganizationService {
     };
   }
 
+    rpc GetOrganizationByID(GetOrganizationByIDRequest) returns (GetOrganizationByIDResponse) {
+      option (google.api.http) = {
+        get: "/v2beta/organizations"
+      };
+
+      option (zitadel.protoc_gen_zitadel.v2.options) = {
+        auth_option: {
+          permission: "org.read";
+        }
+        http_response: {
+          success_code: 200
+        }
+      };
+
+      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        tags: "Organizations";
+        summary: "Get Organization By ID";
+        description: "Returns an organization by its ID."
+        responses: {
+            key: "200";
+            value: {
+                description: "requested organization found";
+            };
+        };
+      };
+    }
+
 }
 
 message CreateOrganizationRequest{
@@ -227,4 +255,21 @@ message UpdateOrganizationRequest {
 
 message UpdateOrganizationResponse {
   zitadel.object.v2beta.Details details = 1;
+}
+
+message GetOrganizationByIDRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want to get."
+    }
+  ];
+}
+
+message GetOrganizationByIDResponse {
+  zitadel.org.v2beta.Organization organization = 1;
 }

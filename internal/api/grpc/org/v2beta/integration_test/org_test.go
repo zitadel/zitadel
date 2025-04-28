@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	gofakeit "github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/zitadel/internal/integration"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -38,6 +38,51 @@ func TestMain(m *testing.M) {
 		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())
+}
+
+func TestServer_GetOrganizationByID(t *testing.T) {
+	orgName := gofakeit.Name()
+	orgId, err := createOrg(orgName)
+	if err != nil {
+		assert.Fail(t, "unable to create org")
+	}
+
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		req     *org.GetOrganizationByIDRequest
+		want    *org.GetOrganizationByIDResponse
+		wantErr bool
+	}{
+		{
+			name: "get organization happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			req: &org.GetOrganizationByIDRequest{
+				Id: orgId,
+			},
+		},
+		{
+			name: "get organization that doesn't exist",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			req: &org.GetOrganizationByIDRequest{
+				Id: "non existing organization",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.GetOrganizationByID(tt.ctx, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			require.Equal(t, orgId, got.Organization.Id)
+			require.Equal(t, orgName, got.Organization.Name)
+		})
+	}
 }
 
 func TestServer_CreateOrganization(t *testing.T) {
@@ -188,7 +233,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 }
 
 func TestServer_UpdateOrganization(t *testing.T) {
-	orgName := "new_org_name"
+	orgName := gofakeit.Name()
 	orgId, err := createOrg(orgName)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
@@ -252,8 +297,11 @@ func createOrg(orgName string) (string, error) {
 			Name: orgName,
 		},
 	)
+	if err != nil {
+		return "", err
+	}
 
-	return org.OrganizationId, err
+	return org.OrganizationId, nil
 }
 
 func assertCreatedAdmin(t *testing.T, expected, got *org.CreateOrganizationResponse_CreatedAdmin) {
