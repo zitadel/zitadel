@@ -13,11 +13,9 @@ import { isSessionValid } from "./session-item";
 export function SessionClearItem({
   session,
   reload,
-  requestId,
 }: {
   session: Session;
   reload: () => void;
-  requestId?: string;
 }) {
   const t = useTranslations("logout");
 

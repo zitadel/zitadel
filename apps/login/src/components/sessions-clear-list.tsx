@@ -3,18 +3,21 @@
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert, AlertType } from "./alert";
 import { SessionClearItem } from "./session-clear-item";
 
 type Props = {
   sessions: Session[];
-  requestId?: string;
+  postLogoutRedirectUri?: string;
 };
 
-export function SessionsClearList({ sessions, requestId }: Props) {
+export function SessionsClearList({ sessions, postLogoutRedirectUri }: Props) {
   const t = useTranslations("logout");
   const [list, setList] = useState<Session[]>(sessions);
+  const router = useRouter();
+
   return sessions ? (
     <div className="flex flex-col space-y-2">
       {list
@@ -34,9 +37,11 @@ export function SessionsClearList({ sessions, requestId }: Props) {
           return (
             <SessionClearItem
               session={session}
-              requestId={requestId}
               reload={() => {
                 setList(list.filter((s) => s.id !== session.id));
+                if (postLogoutRedirectUri) {
+                  router.push(postLogoutRedirectUri);
+                }
               }}
               key={"session-" + index}
             />

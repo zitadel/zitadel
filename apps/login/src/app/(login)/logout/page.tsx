@@ -33,8 +33,8 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "logout" });
 
-  const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
+  const postLogoutRedirectUri = searchParams?.post_logout_redirect_uri;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -58,10 +58,6 @@ export default async function Page(props: {
 
   const params = new URLSearchParams();
 
-  if (requestId) {
-    params.append("requestId", requestId);
-  }
-
   if (organization) {
     params.append("organization", organization);
   }
@@ -73,7 +69,10 @@ export default async function Page(props: {
         <p className="ztdl-p mb-6 block">{t("description")}</p>
 
         <div className="flex flex-col w-full space-y-2">
-          <SessionsClearList sessions={sessions} requestId={requestId} />
+          <SessionsClearList
+            sessions={sessions}
+            postLogoutRedirectUri={postLogoutRedirectUri}
+          />
         </div>
       </div>
     </DynamicTheme>
