@@ -20,6 +20,8 @@ type Server struct {
 	query           *query.Queries
 	checkPermission domain.PermissionCheck
 	systemDefaults  systemdefaults.SystemDefaults
+	defaultInstance command.InstanceSetup
+	externalDomain  string
 }
 
 type Config struct{}
@@ -29,12 +31,16 @@ func CreateServer(
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
 	systemDefaults systemdefaults.SystemDefaults,
+	defaultInstance command.InstanceSetup,
+	externalDomain string,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,
 		systemDefaults:  systemDefaults,
+		defaultInstance: defaultInstance,
+		externalDomain:  externalDomain,
 	}
 }
 

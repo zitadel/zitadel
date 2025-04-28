@@ -1,13 +1,21 @@
 package instance
 
 import (
+	"strings"
+
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/zitadel/cmd/build"
+	authn "github.com/zitadel/zitadel/internal/api/grpc/authn/v2beta"
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	"golang.org/x/text/language"
 )
 
 func InstancesToPb(instances []*query.Instance) []*instance.Instance {
@@ -108,4 +116,127 @@ func instanceQueryToModel(searchQuery *instance.Query) (query.SearchQuery, error
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "INST-3m0se", "List.Query.Invalid")
 	}
+}
+
+func CreateInstancePbToSetupInstance(req *instance.CreateInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
+	instance := defaultInstance
+	if req.InstanceName != "" {
+		instance.InstanceName = req.InstanceName
+		instance.Org.Name = req.InstanceName
+	}
+	if req.CustomDomain != "" {
+		instance.CustomDomain = req.CustomDomain
+	}
+	if req.FirstOrgName != "" {
+		instance.Org.Name = req.FirstOrgName
+	}
+
+	if user := req.GetMachine(); user != nil {
+		defaultMachine := instance.Org.Machine
+		if defaultMachine == nil {
+			defaultMachine = new(command.AddMachine)
+		}
+
+		instance.Org.Machine = createInstancePbToAddMachine(user, *defaultMachine)
+		instance.Org.Human = nil
+	} else if user := req.GetHuman(); user != nil {
+		defaultHuman := instance.Org.Human
+		if instance.Org.Human != nil {
+			defaultHuman = new(command.AddHuman)
+		}
+
+		instance.Org.Human = createInstancePbToAddHuman(user, *defaultHuman, instance.DomainPolicy.UserLoginMustBeDomain, instance.Org.Name, externalDomain)
+		instance.Org.Machine = nil
+	}
+
+	if lang := language.Make(req.DefaultLanguage); !lang.IsRoot() {
+		instance.DefaultLanguage = lang
+	}
+
+	return &instance
+}
+
+func createInstancePbToAddHuman(req *instance.CreateInstanceRequest_Human, defaultHuman command.AddHuman, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
+	user := defaultHuman
+	if req.Email != nil {
+		user.Email.Address = domain.EmailAddress(req.Email.Email)
+		user.Email.Verified = req.Email.IsEmailVerified
+	}
+	if req.Profile != nil {
+		if req.Profile.FirstName != "" {
+			user.FirstName = req.Profile.FirstName
+		}
+		if req.Profile.LastName != "" {
+			user.LastName = req.Profile.LastName
+		}
+		if req.Profile.PreferredLanguage != "" {
+			lang, err := language.Parse(req.Profile.PreferredLanguage)
+			if err == nil {
+				user.PreferredLanguage = lang
+			}
+		}
+	}
+	// check if default username is email style or else append @<orgname>.<custom-domain>
+	// this way we have the same value as before changing `UserLoginMustBeDomain` to false
+	if !userLoginMustBeDomain && !strings.Contains(user.Username, "@") {
+		orgDomain, _ := domain.NewIAMDomainName(org, externalDomain)
+		user.Username = user.Username + "@" + orgDomain
+	}
+	if req.UserName != "" {
+		user.Username = req.UserName
+	}
+
+	if req.Password != nil {
+		user.Password = req.Password.Password
+		user.PasswordChangeRequired = req.Password.PasswordChangeRequired
+	}
+	return &user
+}
+
+func createInstancePbToAddMachine(req *instance.CreateInstanceRequest_Machine, defaultMachine command.AddMachine) (machine *command.AddMachine) {
+	machine = new(command.AddMachine)
+	if defaultMachine.Machine != nil {
+		machineCopy := *defaultMachine.Machine
+		machine.Machine = &machineCopy
+	} else {
+		machine.Machine = new(command.Machine)
+	}
+
+	if req.UserName != "" {
+		machine.Machine.Username = req.UserName
+	}
+	if req.Name != "" {
+		machine.Machine.Name = req.Name
+	}
+
+	if defaultMachine.Pat != nil || req.PersonalAccessToken != nil {
+		pat := command.AddPat{
+			// Scopes are currently static and can not be overwritten
+			Scopes: []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
+		}
+		if req.GetPersonalAccessToken().GetExpirationDate().IsValid() {
+			pat.ExpirationDate = req.PersonalAccessToken.ExpirationDate.AsTime()
+		} else if defaultMachine.Pat != nil && !defaultMachine.Pat.ExpirationDate.IsZero() {
+			pat.ExpirationDate = defaultMachine.Pat.ExpirationDate
+		}
+		machine.Pat = &pat
+	}
+
+	if defaultMachine.MachineKey != nil || req.MachineKey != nil {
+		machineKey := command.AddMachineKey{}
+		if defaultMachine.MachineKey != nil {
+			machineKey = *defaultMachine.MachineKey
+		}
+		if req.MachineKey != nil {
+			if req.MachineKey.Type != 0 {
+				machineKey.Type = authn.KeyTypeToDomain(req.MachineKey.Type)
+			}
+			if req.MachineKey.ExpirationDate.IsValid() {
+				machineKey.ExpirationDate = req.MachineKey.ExpirationDate.AsTime()
+			}
+		}
+		machine.MachineKey = &machineKey
+	}
+
+	return machine
 }
