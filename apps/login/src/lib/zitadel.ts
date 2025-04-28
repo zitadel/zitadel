@@ -929,6 +929,20 @@ export async function getAuthRequest({
   });
 }
 
+export async function getDeviceAuthorizationRequest({
+  serviceUrl,
+  userCode,
+}: {
+  serviceUrl: string;
+  userCode: string;
+}) {
+  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+
+  return oidcService.getDeviceAuthorizationRequest({
+    userCode,
+  });
+}
+
 export async function createCallback({
   serviceUrl,
   req,
