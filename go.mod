@@ -72,7 +72,7 @@ require (
 	github.com/twilio/twilio-go v1.22.2
 	github.com/zitadel/logging v0.6.1
 	github.com/zitadel/oidc/v3 v3.36.1
-	github.com/zitadel/passwap v0.7.0
+	github.com/zitadel/passwap v0.9.0
 	github.com/zitadel/saml v0.3.4
 	github.com/zitadel/schema v1.3.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0

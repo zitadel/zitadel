@@ -699,6 +699,7 @@ SystemDefaults:
     #   - "md5"      # md5Crypt with salt and password shuffling.
     #   - "md5plain" # md5 digest of a password without salt
     #   - "md5salted" # md5 digest of a salted password
+    #   - "phpass"
     #   - "sha2" # crypt(3) SHA-256 and SHA-512
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.

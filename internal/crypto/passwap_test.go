@@ -79,6 +79,7 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 					HashNameBcrypt,
 					HashNameMd5,
 					HashNameMd5Salted,
+					HashNamePHPass,
 					HashNameScrypt,
 					HashNameSha2,
 					"foobar",
@@ -140,6 +141,15 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 			fields: fields{
 				Hasher: HasherConfig{
 					Algorithm: HashNameMd5Salted,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid phpass",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePHPass,
 				},
 			},
 			wantErr: true,

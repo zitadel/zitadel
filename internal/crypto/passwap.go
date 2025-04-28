@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/passwap/md5plain"
 	"github.com/zitadel/passwap/md5salted"
 	"github.com/zitadel/passwap/pbkdf2"
+	"github.com/zitadel/passwap/phpass"
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/sha2"
 	"github.com/zitadel/passwap/verifier"
@@ -52,6 +53,7 @@ const (
 	HashNameMd5       HashName = "md5"       // verify only, as hashing with md5 is insecure and deprecated
 	HashNameMd5Plain  HashName = "md5plain"  // verify only, as hashing with md5 is insecure and deprecated
 	HashNameMd5Salted HashName = "md5salted" // verify only, as hashing with md5 is insecure and deprecated
+	HashNamePHPass    HashName = "phpass"    // verify only, as hashing with md5 is insecure and deprecated
 	HashNameSha2      HashName = "sha2"      // hash and verify
 	HashNameScrypt    HashName = "scrypt"    // hash and verify
 	HashNamePBKDF2    HashName = "pbkdf2"    // hash and verify
@@ -130,6 +132,10 @@ var knowVerifiers = map[HashName]prefixVerifier{
 	HashNameSha2: {
 		prefixes: []string{sha2.Sha256Identifier, sha2.Sha512Identifier},
 		verifier: sha2.Verifier,
+	},
+	HashNamePHPass: {
+		prefixes: []string{phpass.IdentifierP, phpass.IdentifierH},
+		verifier: phpass.Verifier,
 	},
 }
 
