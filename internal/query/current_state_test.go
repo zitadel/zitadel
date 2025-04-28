@@ -19,8 +19,7 @@ var (
 		` projections.current_states.aggregate_id,` +
 		` projections.current_states.sequence,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.current_states` +
-		" AS OF SYSTEM TIME '-1 ms' "
+		` FROM projections.current_states`
 
 	currentSequenceCols = []string{
 		"last_updated",
@@ -175,7 +174,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

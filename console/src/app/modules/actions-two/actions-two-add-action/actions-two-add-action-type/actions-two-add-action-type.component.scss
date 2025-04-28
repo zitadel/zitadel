@@ -1,0 +1,20 @@
+.execution-radio-group {
+  .execution-radio-button {
+    display: block;
+    margin-bottom: 1rem;
+
+    .execution-type-text {
+      display: flex;
+      flex-direction: column;
+
+      .description {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+}

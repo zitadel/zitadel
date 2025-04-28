@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/saml"
@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -56,6 +57,7 @@ type Config struct {
 	Profiler            profiler.Config
 	Projections         projection.Config
 	Notifications       handlers.WorkerConfig
+	Executions          execution.WorkerConfig
 	Auth                auth_es.Config
 	Admin               admin_es.Config
 	UserAgentCookie     *middleware.UserAgentCookieConfig
@@ -65,12 +67,13 @@ type Config struct {
 	Login               login.Config
 	Console             console.Config
 	AssetStorage        static_config.AssetStorageConfig
-	InternalAuthZ       internal_authz.Config
+	InternalAuthZ       authz.Config
+	SystemAuthZ         authz.Config
 	SystemDefaults      systemdefaults.SystemDefaults
 	EncryptionKeys      *encryption.EncryptionKeyConfig
 	DefaultInstance     command.InstanceSetup
 	AuditLogRetention   time.Duration
-	SystemAPIUsers      map[string]*internal_authz.SystemAPIUser
+	SystemAPIUsers      map[string]*authz.SystemAPIUser
 	CustomerPortal      string
 	Machine             *id.Config
 	Actions             *actions.Config
@@ -94,12 +97,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
-			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
-			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.SliceTypeStringDecode[authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
-			database.DecodeHook,
+			database.DecodeHook(false),
 			actions.HTTPConfigDecodeHook,
-			hook.EnumHookFunc(internal_authz.MemberTypeString),
+			hook.EnumHookFunc(authz.MemberTypeString),
 			hooks.MapTypeStringDecode[domain.Feature, any],
 			hooks.SliceTypeStringDecode[*command.SetQuota],
 			hook.Base64ToBytesHookFunc(),
@@ -125,7 +128,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 	logging.OnError(err).Fatal("unable to set profiler")
 
 	id.Configure(config.Machine)
-	actions.SetHTTPConfig(&config.Actions.HTTP)
+	if config.Actions != nil {
+		actions.SetHTTPConfig(&config.Actions.HTTP)
+	}
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings

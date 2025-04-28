@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package zitadel.action.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2beta;action";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+import "zitadel/action/v2beta/execution.proto";
+import "zitadel/filter/v2beta/filter.proto";
+
+message ExecutionSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    InConditionsFilter in_conditions_filter = 1;
+    ExecutionTypeFilter execution_type_filter = 2;
+    TargetFilter target_filter = 3;
+  }
+}
+
+message InConditionsFilter {
+  // Defines the conditions to query for.
+  repeated Condition conditions = 1;
+}
+
+message ExecutionTypeFilter {
+  // Defines the type to query for.
+  ExecutionType execution_type = 1;
+}
+
+message TargetFilter {
+  // Defines the id to query for.
+  string target_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the id of the targets to include"
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+enum TargetFieldName {
+  TARGET_FIELD_NAME_UNSPECIFIED = 0;
+  TARGET_FIELD_NAME_ID = 1;
+  TARGET_FIELD_NAME_CREATED_DATE = 2;
+  TARGET_FIELD_NAME_CHANGED_DATE = 3;
+  TARGET_FIELD_NAME_NAME = 4;
+  TARGET_FIELD_NAME_TARGET_TYPE = 5;
+  TARGET_FIELD_NAME_URL = 6;
+  TARGET_FIELD_NAME_TIMEOUT = 7;
+  TARGET_FIELD_NAME_INTERRUPT_ON_ERROR = 8;
+}
+
+message TargetSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    TargetNameFilter target_name_filter = 1;
+    InTargetIDsFilter in_target_ids_filter = 2;
+  }
+}
+
+message TargetNameFilter {
+  // Defines the name of the target to query for.
+  string target_name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
+
+message InTargetIDsFilter {
+  // Defines the ids to query for.
+  repeated string target_ids = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the ids of the targets to include"
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
+
+enum ExecutionType {
+  EXECUTION_TYPE_UNSPECIFIED = 0;
+  EXECUTION_TYPE_REQUEST = 1;
+  EXECUTION_TYPE_RESPONSE = 2;
+  EXECUTION_TYPE_EVENT = 3;
+  EXECUTION_TYPE_FUNCTION = 4;
+}
+
+
+enum ExecutionFieldName {
+  EXECUTION_FIELD_NAME_UNSPECIFIED = 0;
+  EXECUTION_FIELD_NAME_ID = 1;
+  EXECUTION_FIELD_NAME_CREATED_DATE = 2;
+  EXECUTION_FIELD_NAME_CHANGED_DATE = 3;
+}

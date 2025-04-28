@@ -42,7 +42,7 @@ func CallTargets(
 	info ContextInfo,
 ) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	for _, target := range targets {
 		// call the type of target
@@ -72,7 +72,7 @@ func CallTarget(
 	info ContextInfoRequest,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
@@ -82,11 +82,11 @@ func CallTarget(
 	case domain.TargetTypeCall:
 		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
 	case domain.TargetTypeAsync:
-		go func(target Target, info ContextInfoRequest) {
-			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey()); err != nil {
+		go func(ctx context.Context, target Target, info []byte) {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
-		}(target, info)
+		}(context.WithoutCancel(ctx), target, info.GetHTTPRequestBody())
 		return nil, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")

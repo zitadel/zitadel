@@ -31,9 +31,8 @@ func TestCommands_AddTarget(t *testing.T) {
 		resourceOwner string
 	}
 	type res struct {
-		id      string
-		details *domain.ObjectDetails
-		err     func(error) bool
+		id  string
+		err func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -213,10 +212,6 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 			res{
 				id: "id1",
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
 			},
 		},
 		{
@@ -249,10 +244,6 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 			res{
 				id: "id1",
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
 			},
 		},
 	}
@@ -264,7 +255,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			details, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
+			_, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -273,7 +264,6 @@ func TestCommands_AddTarget(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, tt.args.add.AggregateID)
-				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -291,8 +281,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		resourceOwner string
 	}
 	type res struct {
-		details *domain.ObjectDetails
-		err     func(error) bool
+		err func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -434,12 +423,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				},
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
-			},
+			res{},
 		},
 		{
 			"unique constraint failed, error",
@@ -504,12 +488,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				},
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
-			},
+			res{},
 		},
 		{
 			"push full ok",
@@ -557,12 +536,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				},
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
-			},
+			res{},
 		},
 	}
 	for _, tt := range tests {
@@ -572,15 +546,12 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			details, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
+			_, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -596,8 +567,7 @@ func TestCommands_DeleteTarget(t *testing.T) {
 		resourceOwner string
 	}
 	type res struct {
-		details *domain.ObjectDetails
-		err     func(error) bool
+		err func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -631,9 +601,7 @@ func TestCommands_DeleteTarget(t *testing.T) {
 				id:            "id1",
 				resourceOwner: "instance",
 			},
-			res{
-				err: zerrors.IsNotFound,
-			},
+			res{},
 		},
 		{
 			"remove ok",
@@ -657,12 +625,31 @@ func TestCommands_DeleteTarget(t *testing.T) {
 				id:            "id1",
 				resourceOwner: "instance",
 			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-					ID:            "id1",
-				},
+			res{},
+		},
+		{
+			"already removed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							targetAddEvent("id1", "instance"),
+						),
+						eventFromEventPusher(
+							target.NewRemovedEvent(context.Background(),
+								target.NewAggregate("id1", "instance"),
+								"name",
+							),
+						),
+					),
+				),
 			},
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "instance",
+			},
+			res{},
 		},
 	}
 	for _, tt := range tests {
@@ -670,15 +657,12 @@ func TestCommands_DeleteTarget(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			details, err := c.DeleteTarget(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
+			_, err := c.DeleteTarget(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}

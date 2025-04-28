@@ -21,6 +21,11 @@
           {{ 'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate }}
         </mat-checkbox>
       </div>
+      <cnsl-form-field class="username">
+        <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
+        <input class="stretchInput" cnslInput formControlName="username" required />
+      </cnsl-form-field>
+
       <cnsl-form-field class="givenName">
         <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</cnsl-label>
         <input cnslInput formControlName="givenName" required />
@@ -28,14 +33,6 @@
       <cnsl-form-field class="familyName">
         <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</cnsl-label>
         <input cnslInput formControlName="familyName" required />
-      </cnsl-form-field>
-      <cnsl-form-field class="nickName">
-        <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
-        <input cnslInput formControlName="nickName" />
-      </cnsl-form-field>
-      <cnsl-form-field class="username">
-        <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
-        <input cnslInput formControlName="username" required />
       </cnsl-form-field>
 
       <div class="authenticationFactor">

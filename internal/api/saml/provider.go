@@ -60,6 +60,7 @@ func NewProvider(
 		projections,
 		fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		conf.DefaultLoginURLV2,
+		ContextToIssuer,
 	)
 	if err != nil {
 		return nil, err
@@ -117,6 +118,7 @@ func newStorage(
 	db *database.DB,
 	defaultLoginURL string,
 	defaultLoginURLV2 string,
+	contextToIssuer func(context.Context) string,
 ) (*Storage, error) {
 	return &Storage{
 		encAlg:            encAlg,
@@ -128,6 +130,7 @@ func newStorage(
 		query:             query,
 		defaultLoginURL:   defaultLoginURL,
 		defaultLoginURLv2: defaultLoginURLV2,
+		contextToIssuer:   contextToIssuer,
 	}, nil
 }
 
