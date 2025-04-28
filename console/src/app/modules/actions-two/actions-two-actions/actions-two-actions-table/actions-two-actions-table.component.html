@@ -1,14 +1,14 @@
-<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="(dataSource$ | async) === null">
+<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="loading()">
   <div actions>
     <ng-content></ng-content>
   </div>
   <div class="table-wrapper">
-    <table *ngIf="dataSource$ | async as dataSource" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+    <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
       <ng-container matColumnDef="condition">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.CONDITION' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          <span *ngIf="row.condition?.conditionType?.value">
-            {{ row?.condition | condition }}
+          <span>
+            {{ row.execution.condition | condition }}
           </span>
         </td>
       </ng-container>
@@ -16,7 +16,7 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TYPE' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          {{ 'ACTIONSTWO.EXECUTION.TYPES.' + row?.condition?.conditionType?.case | translate }}
+          {{ 'ACTIONSTWO.EXECUTION.TYPES.' + row.execution.condition.conditionType.case | translate }}
         </td>
       </ng-container>
 
@@ -24,15 +24,8 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TARGET' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
           <div class="target-key">
-            <cnsl-project-role-chip *ngFor="let target of filteredTargetTypes(row.targets) | async" [roleName]="target.name"
+            <cnsl-project-role-chip *ngFor="let target of row.mappedTargets; trackBy: trackTarget" [roleName]="target.name"
               >{{ target.name }}
-            </cnsl-project-role-chip>
-            <cnsl-project-role-chip
-              *ngFor="let condition of filteredIncludeConditions(row.targets)"
-              [roleName]="condition | condition"
-            >
-              <mat-icon class="icon">refresh</mat-icon>
-              {{ condition | condition }}
             </cnsl-project-role-chip>
           </div>
         </td>
@@ -43,7 +36,7 @@
           {{ 'ACTIONSTWO.EXECUTION.TABLE.CREATIONDATE' | translate }}
         </th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
-          <span class="no-break">{{ row.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
+          <span class="no-break">{{ row.execution.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
         </td>
       </ng-container>
 
@@ -55,7 +48,7 @@
               actions
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               color="warn"
-              (click)="$event.stopPropagation(); delete.emit(row)"
+              (click)="$event.stopPropagation(); delete.emit(row.execution)"
               mat-icon-button
             >
               <i class="las la-trash"></i>
@@ -69,6 +62,7 @@
         class="highlight pointer"
         mat-row
         *matRowDef="let row; columns: ['condition', 'type', 'target', 'creationDate', 'actions']"
+        (click)="selected.emit(row.execution)"
       ></tr>
     </table>
   </div>

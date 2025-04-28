@@ -27,7 +27,6 @@ import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-featur
 
 // to add a new feature, add the key here and in the FEATURE_KEYS array
 const FEATURE_KEYS = [
-  'actions',
   'consoleUseV2UserApi',
   'debugOidcParentError',
   'disableUserTokenEvent',

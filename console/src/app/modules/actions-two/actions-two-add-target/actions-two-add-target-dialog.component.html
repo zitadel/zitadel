@@ -59,7 +59,7 @@
       {{ 'ACTIONS.CANCEL' | translate }}
     </button>
     <button color="primary" [disabled]="targetForm.invalid" mat-raised-button (click)="closeWithResult()" cdkFocusInitial>
-      {{ 'ACTIONS.CREATE' | translate }}
+      {{ (data.target ? 'ACTIONS.CHANGE' : 'ACTIONS.CREATE') | translate }}
     </button>
   </mat-dialog-actions>
 </div>
