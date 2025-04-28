@@ -114,7 +114,7 @@ func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
-	return json.Unmarshal(resp, c.Request.Message)
+	return json.Unmarshal(resp, &c.Request)
 }
 
 func (c *ContextInfoRequest) GetContent() interface{} {
@@ -142,7 +142,7 @@ func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
-	return json.Unmarshal(resp, c.Response.Message)
+	return json.Unmarshal(resp, &c.Response)
 }
 
 func (c *ContextInfoResponse) GetContent() interface{} {
