@@ -207,7 +207,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 
 func response(resp any, err error) (*op.Response, error) {
 	if err != nil {
-		return nil, err
+		return nil, oidcError(err)
 	}
 	return op.NewResponse(resp), nil
 }

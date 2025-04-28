@@ -3,6 +3,8 @@ package oidc
 import (
 	"errors"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
@@ -19,6 +21,7 @@ func oidcError(err error) error {
 	if err == nil {
 		return nil
 	}
+	logging.WithError(err).Warn("OIDC error")
 	if errors.Is(err, op.ErrInvalidRefreshToken) {
 		err = zerrors.ThrowInvalidArgument(err, "OIDCS-ef2Gi", "Errors.User.RefreshToken.Invalid")
 	}
@@ -42,6 +45,14 @@ func oidcError(err error) error {
 	if statusCode < 500 {
 		newOidcErr = oidc.ErrInvalidRequest
 	}
+
+	entry := logging.WithError(err).WithField("status_code", statusCode)
+	if statusCode >= 500 {
+		entry.Error("OIDC error")
+	} else {
+		entry.Warn("OIDC error")
+	}
+
 	return op.NewStatusError(
 		newOidcErr().
 			WithParent(err).
