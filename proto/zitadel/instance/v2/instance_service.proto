@@ -286,7 +286,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "instance.delete"
+        permission: "system.instance.delete"
       }
       http_response: {
         success_code: 204
@@ -318,7 +318,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "instance.get"
+        permission: "system.instance.read"
       }
     };
   }
@@ -348,7 +348,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "instance.update"
+        permission: "system.instance.write"
       }
     };
   }
