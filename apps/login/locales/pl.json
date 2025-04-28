@@ -10,7 +10,8 @@
   },
   "logout": {
     "title": "Wyloguj się",
-    "description": "Wybierz konto, które chcesz usunąć"
+    "description": "Wybierz konto, które chcesz usunąć",
+    "noResults": "Nie znaleziono kont"
   },
   "loginname": {
     "title": "Witamy ponownie!",

@@ -1,5 +1,5 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { SessionsList } from "@/components/sessions-list";
+import { SessionsClearList } from "@/components/sessions-clear-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
@@ -73,7 +73,7 @@ export default async function Page(props: {
         <p className="ztdl-p mb-6 block">{t("description")}</p>
 
         <div className="flex flex-col w-full space-y-2">
-          <SessionsList sessions={sessions} requestId={requestId} />
+          <SessionsClearList sessions={sessions} requestId={requestId} />
         </div>
       </div>
     </DynamicTheme>

@@ -10,7 +10,8 @@
   },
   "logout": {
     "title": "Logout",
-    "description": "Select the account you want to clear"
+    "description": "Click the accounts you want to clear",
+    "noResults": "No accounts found"
   },
   "loginname": {
     "title": "Welcome back!",

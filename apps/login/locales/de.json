@@ -10,7 +10,8 @@
   },
   "logout": {
     "title": "Logout",
-    "description": "Wählen Sie den Account aus, das Sie entfernen möchten"
+    "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
+    "noResults": "Keine Konten gefunden"
   },
   "loginname": {
     "title": "Willkommen zurück!",
