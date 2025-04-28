@@ -11,8 +11,8 @@ import (
 
 func (s *Server) DeleteInstance(ctx context.Context, request *instance.DeleteInstanceRequest) (*instance.DeleteInstanceResponse, error) {
 	instanceID := strings.TrimSpace(request.GetInstanceId())
-	if instanceID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "instance_id", "instance id must not be empty")
+	if err := validateParam(instanceID, "instance_id"); err != nil {
+		return nil, err
 	}
 
 	obj, err := s.command.RemoveInstance(ctx, instanceID)
@@ -28,8 +28,8 @@ func (s *Server) DeleteInstance(ctx context.Context, request *instance.DeleteIns
 
 func (s *Server) UpdateInstance(ctx context.Context, request *instance.UpdateInstanceRequest) (*instance.UpdateInstanceResponse, error) {
 	instanceName := strings.TrimSpace(request.GetInstanceName())
-	if instanceName == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "instance_name", "instance name must not be empty")
+	if err := validateParam(instanceName, "instance_name"); err != nil {
+		return nil, err
 	}
 
 	obj, err := s.command.UpdateInstance(ctx, instanceName)
@@ -40,4 +40,11 @@ func (s *Server) UpdateInstance(ctx context.Context, request *instance.UpdateIns
 	return &instance.UpdateInstanceResponse{
 		Details: object.DomainToDetailsPb(obj),
 	}, nil
+}
+
+func validateParam(param string, paramName string) error {
+	if strings.TrimSpace(param) == "" {
+		return zerrors.ThrowInvalidArgument(nil, paramName, paramName+" must not be empty")
+	}
+	return nil
 }
