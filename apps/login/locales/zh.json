@@ -11,7 +11,8 @@
   "logout": {
     "title": "注销",
     "description": "选择您想注销的账户",
-    "noResults": "未找到账户"
+    "noResults": "未找到账户",
+    "clear": "清除"
   },
   "loginname": {
     "title": "欢迎回来！",

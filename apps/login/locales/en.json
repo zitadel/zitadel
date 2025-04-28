@@ -11,7 +11,8 @@
   "logout": {
     "title": "Logout",
     "description": "Click the accounts you want to clear",
-    "noResults": "No accounts found"
+    "noResults": "No accounts found",
+    "clear": "Clear"
   },
   "loginname": {
     "title": "Welcome back!",

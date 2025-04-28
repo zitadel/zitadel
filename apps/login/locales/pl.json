@@ -11,7 +11,8 @@
   "logout": {
     "title": "Wyloguj się",
     "description": "Wybierz konto, które chcesz usunąć",
-    "noResults": "Nie znaleziono kont"
+    "noResults": "Nie znaleziono kont",
+    "clear": "Usuń"
   },
   "loginname": {
     "title": "Witamy ponownie!",

@@ -11,7 +11,8 @@
   "logout": {
     "title": "Esci",
     "description": "Seleziona l'account che desideri uscire",
-    "noResults": "Nessun account trovato"
+    "noResults": "Nessun account trovato",
+    "clear": "Rimuovi"
   },
   "loginname": {
     "title": "Bentornato!",

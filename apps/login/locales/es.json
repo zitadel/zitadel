@@ -11,7 +11,8 @@
   "logout": {
     "title": "Cerrar sesión",
     "description": "Selecciona la cuenta que deseas eliminar",
-    "noResults": "No se encontraron cuentas"
+    "noResults": "No se encontraron cuentas",
+    "clear": "Eliminar"
   },
   "loginname": {
     "title": "¡Bienvenido de nuevo!",
