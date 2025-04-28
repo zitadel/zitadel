@@ -32,6 +32,7 @@ jobs:
       if: ${{ !inputs.dry_run }}
       with:
         path: .artifacts
+        pattern: "{checksums.txt,zitadel-*}"
     -
       name: Semantic Release
       uses: cycjimmy/semantic-release-action@v4
