@@ -4,7 +4,7 @@ import (
 	"context"
 
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package zitadel.instance.v2;
+package zitadel.instance.v2beta;
 
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
-import "zitadel/instance/v2/instance.proto";
+import "zitadel/instance/v2beta/instance.proto";
 import "zitadel/filter/v2beta/filter.proto";
 import "zitadel/authn/v2beta/authn.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -14,7 +14,7 @@ import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2;instance";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta;instance";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -187,7 +187,7 @@ message DeleteInstanceResponse {
 }
 
 message GetInstanceResponse {
-  zitadel.instance.v2.Instance instance = 1;
+  zitadel.instance.v2beta.Instance instance = 1;
 }
 
 message UpdateInstanceRequest {

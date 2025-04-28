@@ -6,7 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
 func (s *Server) CreateInstance(ctx context.Context, req *instance.CreateInstanceRequest) (*instance.CreateInstanceResponse, error) {

@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"golang.org/x/text/language"
 )
 

@@ -26,6 +26,7 @@ import (
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
@@ -70,6 +71,7 @@ type Client struct {
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
 	SCIM           *scim.Client
+	InstanceV2Beta instance.InstanceServiceClient
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
