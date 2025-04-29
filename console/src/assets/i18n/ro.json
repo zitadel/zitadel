@@ -632,7 +632,8 @@
       "TABLE": {
         "NAME": "Nume",
         "ENDPOINT": "Punct Final",
-        "CREATIONDATE": "Data Creării"
+        "CREATIONDATE": "Data Creării",
+        "REORDER": "Reordonați"
       }
     }
   },
@@ -643,6 +644,7 @@
     "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
     "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
     "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
+    "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona clientii de login",
     "ORG_OWNER": "Are permisiunea asupra întregii organizații",
     "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
     "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",

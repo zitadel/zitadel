@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, NgIterable, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
 import { SessionState as V1SessionState, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
@@ -52,7 +52,7 @@ export class AccountsCardComponent {
   protected readonly user$ = new ReplaySubject<User.AsObject>(1);
   protected readonly UserState = UserState;
   private readonly labelpolicy = toSignal(this.userService.labelpolicy$, { initialValue: undefined });
-  protected readonly sessions$: Observable<V1AndV2Session[] | undefined>;
+  protected readonly sessions$: Observable<V1AndV2Session[]>;
 
   constructor(
     protected readonly authService: AuthenticationService,
@@ -135,7 +135,9 @@ export class AccountsCardComponent {
         authState: V2SessionState.ACTIVE,
         userName: s.factors?.user?.loginName ?? '',
       })),
+      map((s) => [s.loginName, s] as const),
       toArray(),
+      map((sessions) => Array.from(new Map(sessions).values())), // Ensure unique loginNames
     );
   }
 
