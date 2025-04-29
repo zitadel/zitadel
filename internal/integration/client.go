@@ -74,6 +74,10 @@ type Client struct {
 	InstanceV2Beta instance.InstanceServiceClient
 }
 
+func NewDefaultClient(ctx context.Context) (*Client, error) {
+	return newClient(ctx, loadedConfig.Host())
+}
+
 func newClient(ctx context.Context, target string) (*Client, error) {
 	cc, err := grpc.NewClient(target,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -105,6 +109,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
 		SCIM:           scim.NewScimClient(target),
+		InstanceV2Beta: instance.NewInstanceServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
