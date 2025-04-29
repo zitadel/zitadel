@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "流程",
         "DESCRIPTION": "选择一个认证流程，并在该流程中的特定事件上触发您的操作。"
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2，一个全新改进版的Actions，现在已上线。目前版本仍可使用，但未来开发将专注于新版本，最终将取代当前版本。"
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "申请"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "您目前正在使用新的 Actions V2（测试版）。之前的版本1仍可使用，但未来将停止支持。请报告任何问题或反馈意见。",
     "EXECUTION": {
       "TITLE": "操作",
       "DESCRIPTION": "操作允许您运行自定义代码以响应 API 请求、事件或特定函数。使用它们来扩展 Zitadel、自动化工作流程并与其他系统集成。",
@@ -619,6 +621,7 @@
           "restCall": "REST 调用",
           "restAsync": "REST 异步"
         },
+        "TYPES_DESCRIPTION": "Webhook，调用处理状态码但响应无关紧要\nCall，调用处理状态码和响应\nAsync，调用既不处理状态码也不处理响应，但可以与其他目标并行调用",
         "ENDPOINT": "端点",
         "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
         "TIMEOUT": "超时",
@@ -632,7 +635,8 @@
       "TABLE": {
         "NAME": "名称",
         "ENDPOINT": "端点",
-        "CREATIONDATE": "创建日期"
+        "CREATIONDATE": "创建日期",
+        "REORDER": "重新排序"
       }
     }
   },
@@ -643,6 +647,7 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
+    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
@@ -1506,7 +1511,8 @@
       "APPEARANCE": "外观",
       "OTHER": "其他",
       "STORAGE": "贮存"
-    }
+    },
+    "BETA": "测试版"
   },
   "SETTING": {
     "LANGUAGES": {

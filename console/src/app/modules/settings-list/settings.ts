@@ -231,6 +231,7 @@ export const ACTIONS: SidenavSetting = {
     // todo: figure out roles
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
+  beta: true,
 };
 
 export const ACTIONS_TARGETS: SidenavSetting = {
@@ -241,4 +242,5 @@ export const ACTIONS_TARGETS: SidenavSetting = {
     // todo: figure out roles
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
+  beta: true,
 };

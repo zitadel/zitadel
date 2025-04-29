@@ -18,6 +18,11 @@ Note that this guide assumes that ZITADEL is running on the same machine as the 
 In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
 :::
 
+:::warning
+To marshal and unmarshal the request and response please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),
+as the request and response are protocol buffer messages, to avoid potential problems with the attribute names.
+:::
+
 ## Start example target
 
 To test the actions feature, you need to create a target that will be called when an API endpoint is called.

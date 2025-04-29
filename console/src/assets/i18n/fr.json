@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flux",
         "DESCRIPTION": "Choisissez un flux d'authentification et déclenchez votre action sur un événement spécifique dans ce flux."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, une nouvelle version améliorée de Actions, est désormais disponible. La version actuelle reste accessible, mais notre développement futur se concentrera sur la nouvelle, qui finira par remplacer la version actuelle."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Appliquer"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Vous utilisez actuellement la nouvelle version Actions V2, qui est en phase bêta. L'ancienne version 1 est toujours disponible mais sera arrêtée à l'avenir. Veuillez signaler tout problème ou commentaire.",
     "EXECUTION": {
       "TITLE": "Actions",
       "DESCRIPTION": "Les actions vous permettent d'exécuter du code personnalisé en réponse à des requêtes API, des événements ou des fonctions spécifiques. Utilisez-les pour étendre Zitadel, automatiser les flux de travail et vous intégrer à d'autres systèmes.",
@@ -619,6 +621,7 @@
           "restCall": "Appel REST",
           "restAsync": "REST Asynchrone"
         },
+        "TYPES_DESCRIPTION": "Webhook, l'appel gère le code d'état mais la réponse est sans importance\nCall, l'appel gère le code d'état et la réponse\nAsync, l'appel ne gère ni le code d'état ni la réponse, mais peut être appelé en parallèle avec d'autres cibles",
         "ENDPOINT": "Point de terminaison",
         "ENDPOINT_DESCRIPTION": "Entrez le point de terminaison où votre code est hébergé. Assurez-vous qu'il nous est accessible !",
         "TIMEOUT": "Délai d'attente",
@@ -632,7 +635,8 @@
       "TABLE": {
         "NAME": "Nom",
         "ENDPOINT": "Point de terminaison",
-        "CREATIONDATE": "Date de création"
+        "CREATIONDATE": "Date de création",
+        "REORDER": "Réorganiser"
       }
     }
   },
@@ -643,6 +647,7 @@
     "IAM_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs",
     "IAM_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de toutes les organisations",
     "IAM_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de toutes les organisations",
+    "IAM_LOGIN_CLIENT": "A la permission de gérer les clients de connexion",
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
@@ -1506,7 +1511,8 @@
       "APPEARANCE": "Apparence",
       "OTHER": "Autres",
       "STORAGE": "Stockage"
-    }
+    },
+    "BETA": "BÊTA"
   },
   "SETTING": {
     "LANGUAGES": {

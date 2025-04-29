@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "플로우",
         "DESCRIPTION": "인증 플로우를 선택하고 이 플로우 내의 특정 이벤트에서 작업을 트리거하세요."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, 개선된 새로운 버전이 출시되었습니다. 현재 버전은 여전히 접근할 수 있지만, 앞으로의 개발은 새로운 버전에 집중될 것이며, 결국 현재 버전을 대체할 것입니다."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "적용"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "현재 베타 버전인 새로운 Actions V2를 사용하고 있습니다. 이전 버전 1은 여전히 사용 가능하지만, 향후 중단될 예정입니다. 문제나 피드백이 있으면 알려주세요.",
     "EXECUTION": {
       "TITLE": "작업",
       "DESCRIPTION": "작업을 통해 API 요청, 이벤트 또는 특정 함수에 대한 응답으로 사용자 지정 코드를 실행할 수 있습니다. 이를 사용하여 Zitadel을 확장하고 워크플로를 자동화하며 다른 시스템과 통합합니다.",
@@ -619,6 +621,7 @@
           "restCall": "REST 호출",
           "restAsync": "REST 비동기"
         },
+        "TYPES_DESCRIPTION": "Webhook, 호출은 상태 코드를 처리하지만 응답은 중요하지 않습니다\nCall, 호출은 상태 코드와 응답을 처리합니다\nAsync, 호출은 상태 코드나 응답을 처리하지 않지만 다른 대상과 병렬로 호출할 수 있습니다",
         "ENDPOINT": "엔드포인트",
         "ENDPOINT_DESCRIPTION": "코드가 호스팅되는 엔드포인트를 입력하십시오. 우리에게 액세스할 수 있는지 확인하십시오!",
         "TIMEOUT": "시간 초과",
@@ -632,7 +635,8 @@
       "TABLE": {
         "NAME": "이름",
         "ENDPOINT": "엔드포인트",
-        "CREATIONDATE": "생성 날짜"
+        "CREATIONDATE": "생성 날짜",
+        "REORDER": "재정렬"
       }
     }
   },
@@ -643,6 +647,7 @@
     "IAM_USER_MANAGER": "사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "IAM_ADMIN_IMPERSONATOR": "모든 조직의 관리자와 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_END_USER_IMPERSONATOR": "모든 조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
+    "IAM_LOGIN_CLIENT": "로그인 클라이언트를 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
@@ -1506,7 +1511,8 @@
       "APPEARANCE": "외형",
       "OTHER": "기타",
       "STORAGE": "저장소"
-    }
+    },
+    "BETA": "베타"
   },
   "SETTING": {
     "LANGUAGES": {

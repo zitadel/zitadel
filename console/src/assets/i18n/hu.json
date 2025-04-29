@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Folyamatok",
         "DESCRIPTION": "Válassz egy hitelesítési folyamatot, és váltasd ki a műveletedet egy adott esemény bekövetkezésekor ebben a folyamatban."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Az Actions V2, az Actions új, továbbfejlesztett verziója mostantól elérhető. A jelenlegi verzió továbbra is elérhető, de a jövőbeli fejlesztéseink az új verzióra összpontosítanak, amely végül felváltja a jelenlegi verziót."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Alkalmaz"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Jelenleg az új Actions V2-t használja, amely béta verzióban van. Az előző 1-es verzió továbbra is elérhető, de a jövőben megszűnik. Kérjük, jelezze az esetleges problémákat vagy visszajelzéseit.",
     "EXECUTION": {
       "TITLE": "Műveletek",
       "DESCRIPTION": "A műveletek lehetővé teszik egyedi kód futtatását API-kérésekre, eseményekre vagy konkrét függvényekre válaszul. Használja őket a Zitadel kiterjesztéséhez, a munkafolyamatok automatizálásához és más rendszerekkel való integrációhoz.",
@@ -619,6 +621,7 @@
           "restCall": "REST Hívás",
           "restAsync": "REST Aszinkron"
         },
+        "TYPES_DESCRIPTION": "Webhook, a hívás kezeli az állapotkódot, de a válasz lényegtelen\nCall, a hívás kezeli az állapotkódot és a választ\nAsync, a hívás sem az állapotkódot, sem a választ nem kezeli, de párhuzamosan hívható más célokkal",
         "ENDPOINT": "Végpont",
         "ENDPOINT_DESCRIPTION": "Adja meg azt a végpontot, ahol a kódja található. Győződjön meg arról, hogy elérhető számunkra!",
         "TIMEOUT": "Időtúllépés",
@@ -632,7 +635,8 @@
       "TABLE": {
         "NAME": "Név",
         "ENDPOINT": "Végpont",
-        "CREATIONDATE": "Létrehozás dátuma"
+        "CREATIONDATE": "Létrehozás dátuma",
+        "REORDER": "Újrarendelés"
       }
     }
   },
@@ -643,6 +647,7 @@
     "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
     "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
     "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
+    "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési kliensek kezelésére",
     "ORG_OWNER": "Engedélye van az egész szervezet fölött",
     "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
@@ -1506,7 +1511,8 @@
       "APPEARANCE": "Megjelenés",
       "OTHER": "Egyéb",
       "STORAGE": "Tárolás"
-    }
+    },
+    "BETA": "BÉTA"
   },
   "SETTING": {
     "LANGUAGES": {

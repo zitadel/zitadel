@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Vyberte proces autentizace a spusťte vaši akci na konkrétní události v rámci tohoto procesu."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, nová a vylepšená verze Actions, je nyní k dispozici. Aktuální verze je stále přístupná, ale budoucí vývoj se zaměří na novou verzi, která nakonec nahradí tu současnou."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Platit"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Aktuálně používáte novou verzi Actions V2, která je v beta verzi. Předchozí verze 1 je stále k dispozici, ale v budoucnu bude ukončena. Prosím, hlaste jakékoliv problémy nebo zpětnou vazbu.",
     "EXECUTION": {
       "TITLE": "Akce",
       "DESCRIPTION": "Akce vám umožňují spouštět vlastní kód v reakci na požadavky API, události nebo specifické funkce. Použijte je k rozšíření Zitadel, automatizaci pracovních postupů a integraci s dalšími systémy.",
@@ -619,6 +621,7 @@
           "restCall": "REST Volání",
           "restAsync": "REST Asynchronní"
         },
+        "TYPES_DESCRIPTION": "Webhook, volání zpracovává stavový kód, ale odpověď je irelevantní\nCall, volání zpracovává stavový kód a odpověď\nAsync, volání nezpracovává ani stavový kód, ani odpověď, ale může být spuštěno paralelně s jinými cíli",
         "ENDPOINT": "Koncový bod",
         "ENDPOINT_DESCRIPTION": "Zadejte koncový bod, kde je hostován váš kód. Ujistěte se, že je pro nás přístupný!",
         "TIMEOUT": "Časový limit",
@@ -632,7 +635,8 @@
       "TABLE": {
         "NAME": "Název",
         "ENDPOINT": "Koncový bod",
-        "CREATIONDATE": "Datum vytvoření"
+        "CREATIONDATE": "Datum vytvoření",
+        "REORDER": "Změnit pořadí"
       }
     }
   },
@@ -643,6 +647,7 @@
     "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
     "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
     "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
+    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací klienty",
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
@@ -1506,7 +1511,8 @@
       "APPEARANCE": "Vzhled",
       "OTHER": "Ostatní",
       "STORAGE": "Data"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {

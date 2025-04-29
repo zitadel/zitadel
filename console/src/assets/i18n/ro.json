@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Fluxuri",
         "DESCRIPTION": "Alegeți un flux de autentificare și declanșați acțiunea dvs. la un anumit eveniment din cadrul acestui flux."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, o nouă versiune îmbunătățită a Actions, este acum disponibilă. Versiunea actuală este încă accesibilă, dar dezvoltarea viitoare se va concentra pe cea nouă, care în cele din urmă va înlocui versiunea actuală."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Aplicați"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "În prezent utilizați noua versiune Actions V2, care este în faza beta. Versiunea anterioară 1 este încă disponibilă, dar va fi întreruptă în viitor. Vă rugăm să raportați orice problemă sau feedback.",
     "EXECUTION": {
       "TITLE": "Acțiuni",
       "DESCRIPTION": "Acțiunile vă permit să rulați cod personalizat ca răspuns la cereri API, evenimente sau funcții specifice. Folosiți-le pentru a extinde Zitadel, a automatiza fluxurile de lucru și a vă integra cu alte sisteme.",
@@ -619,6 +621,7 @@
           "restCall": "Apel REST",
           "restAsync": "REST Asincron"
         },
+        "TYPES_DESCRIPTION": "Webhook, apelul gestionează codul de stare, dar răspunsul este irelevant\nCall, apelul gestionează codul de stare și răspunsul\nAsync, apelul nu gestionează nici codul de stare, nici răspunsul, dar poate fi apelat în paralel cu alte Ținte",
         "ENDPOINT": "Punct Final",
         "ENDPOINT_DESCRIPTION": "Introduceți punctul final unde este găzduit codul dvs. Asigurați-vă că este accesibil pentru noi!",
         "TIMEOUT": "Timeout",
@@ -632,7 +635,8 @@
       "TABLE": {
         "NAME": "Nume",
         "ENDPOINT": "Punct Final",
-        "CREATIONDATE": "Data Creării"
+        "CREATIONDATE": "Data Creării",
+        "REORDER": "Reordonați"
       }
     }
   },
@@ -643,6 +647,7 @@
     "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
     "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
     "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
+    "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona clientii de login",
     "ORG_OWNER": "Are permisiunea asupra întregii organizații",
     "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
     "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",
@@ -1504,7 +1509,8 @@
       "APPEARANCE": "Aspect",
       "OTHER": "Altele",
       "STORAGE": "Stocare"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
