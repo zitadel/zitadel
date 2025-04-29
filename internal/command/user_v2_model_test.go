@@ -2441,7 +2441,7 @@ func TestCommandSide_userHumanWriteModel_idpLinks(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID, "")
+			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID, "", r.CheckPermissionUserDelete(tt.args.ctx, true))
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
