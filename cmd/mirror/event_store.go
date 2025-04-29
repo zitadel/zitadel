@@ -70,6 +70,7 @@ func positionQuery(db *db.DB) string {
 }
 
 func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
+	logging.Info("starting to copy events")
 	start := time.Now()
 	reader, writer := io.Pipe()
 
@@ -128,7 +129,10 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 				if err != nil {
 					return zerrors.ThrowUnknownf(err, "MIGRA-KTuSq", "unable to copy events from source during iteration %d", i)
 				}
+				logging.WithFields("batch_count", i).Info("batch of events copied")
+
 				if tag.RowsAffected() < int64(bulkSize) {
+					logging.WithFields("batch_count", i).Info("last batch of events copied")
 					return nil
 				}
 
@@ -204,6 +208,7 @@ func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, sou
 }
 
 func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
+	logging.Info("starting to copy unique constraints")
 	start := time.Now()
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
