@@ -12,8 +12,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -72,9 +74,17 @@ type Client struct {
 	SCIM           *scim.Client
 }
 
+// newClient creates a new Zitadel client that panics on each internal error.
 func newClient(ctx context.Context, target string) (*Client, error) {
 	cc, err := grpc.NewClient(target,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+			err := invoker(ctx, method, req, reply, cc, opts...)
+			if status.Convert(err).Code() == codes.Internal {
+				panic(err)
+			}
+			return err
+		}),
 	)
 	if err != nil {
 		return nil, err
