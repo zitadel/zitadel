@@ -21,6 +21,7 @@ type AddPat struct {
 
 type PersonalAccessToken struct {
 	models.ObjectRoot
+	PermissionCheck eventstore.PermissionCheck
 
 	ExpirationDate  time.Time
 	Scopes          []string

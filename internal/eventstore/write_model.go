@@ -1,17 +1,22 @@
 package eventstore
 
-import "time"
+import (
+	"time"
+)
+
+type PermissionCheck func(resourceOwner, aggregateID string) error
 
 // WriteModel is the minimum representation of a command side write model.
 // It implements a basic reducer
 // it's purpose is to reduce events to create new ones
 type WriteModel struct {
-	AggregateID       string    `json:"-"`
-	ProcessedSequence uint64    `json:"-"`
-	Events            []Event   `json:"-"`
-	ResourceOwner     string    `json:"-"`
-	InstanceID        string    `json:"-"`
-	ChangeDate        time.Time `json:"-"`
+	AggregateID       string          `json:"-"`
+	ProcessedSequence uint64          `json:"-"`
+	Events            []Event         `json:"-"`
+	ResourceOwner     string          `json:"-"`
+	InstanceID        string          `json:"-"`
+	ChangeDate        time.Time       `json:"-"`
+	PermissionCheck   PermissionCheck `json:"-"`
 }
 
 // AppendEvents adds all the events to the read model.
@@ -27,12 +32,18 @@ func (wm *WriteModel) Reduce() error {
 		return nil
 	}
 
+	if wm.PermissionCheck != nil {
+		return wm.PermissionCheck(wm.Events[0].Aggregate().ResourceOwner, wm.AggregateID)
+	}
+
 	if wm.AggregateID == "" {
 		wm.AggregateID = wm.Events[0].Aggregate().ID
 	}
+
 	if wm.ResourceOwner == "" {
 		wm.ResourceOwner = wm.Events[0].Aggregate().ResourceOwner
 	}
+
 	if wm.InstanceID == "" {
 		wm.InstanceID = wm.Events[0].Aggregate().InstanceID
 	}
@@ -43,5 +54,6 @@ func (wm *WriteModel) Reduce() error {
 	// all events processed and not needed anymore
 	wm.Events = nil
 	wm.Events = []Event{}
+
 	return nil
 }

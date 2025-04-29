@@ -117,16 +117,28 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
+// TODO: Move to a central place
+func (c *Commands) CheckPermission(ctx context.Context, permission string) eventstore.PermissionCheck {
+	return func(resourceOwner, aggregateID string) error {
+		return c.checkPermission(ctx, permission, resourceOwner, aggregateID)
 	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
 }
 
+func (c *Commands) CheckPermissionUserWrite(ctx context.Context, allowSelf bool) eventstore.PermissionCheck {
+	return func(resourceOwner, aggregateID string) error {
+		if allowSelf && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
+			return nil
+		}
+		return c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, aggregateID)
+	}
+}
+
+// Deprecated: use CheckPermissionUserWrite and use the returned function as PermissionCheck in eventstore.WriteModel to protect an API
+func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
+	return c.CheckPermissionUserWrite(ctx, true)(resourceOwner, userID)
+}
+
+// Deprecated: use CheckPermission, allow self and use the returned function as PermissionCheck in eventstore.WriteModel to protect an API
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
 	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil
@@ -137,6 +149,7 @@ func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, res
 	return nil
 }
 
+// Deprecated: use CheckPermission, allow self and use the returned function as PermissionCheck in eventstore.WriteModel to protect an API
 func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
 	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil

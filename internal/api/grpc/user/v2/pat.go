@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -14,22 +13,20 @@ import (
 )
 
 func (s *Server) AddPersonalAccessToken(ctx context.Context, req *user.AddPersonalAccessTokenRequest) (*user.AddPersonalAccessTokenResponse, error) {
-	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
-	if err != nil {
-		return nil, err
-	}
-	newPat := command.NewPersonalAccessToken(
-		owner,
-		req.UserId,
-		req.ExpirationDate.AsTime(),
-		[]string{
+	newPat := &command.PersonalAccessToken{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: req.UserId,
+		},
+		PermissionCheck: s.command.CheckPermissionUserWrite(ctx, false),
+		ExpirationDate:  req.ExpirationDate.AsTime(),
+		Scopes: []string{
 			oidc.ScopeOpenID,
 			oidc.ScopeProfile,
 			z_oidc.ScopeUserMetaData,
 			z_oidc.ScopeResourceOwner,
 		},
-		domain.UserTypeMachine,
-	)
+		AllowedUserType: domain.UserTypeMachine,
+	}
 	details, err := s.command.AddPersonalAccessToken(ctx, newPat)
 	if err != nil {
 		return nil, err
@@ -42,16 +39,12 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *user.AddPerson
 }
 
 func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *user.RemovePersonalAccessTokenRequest) (*user.RemovePersonalAccessTokenResponse, error) {
-	owner, err := s.command.CheckPermission(ctx, domain.PermissionUserWrite, req.UserId, false)
-	if err != nil {
-		return nil, err
-	}
 	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, &command.PersonalAccessToken{
 		TokenID: req.TokenId,
 		ObjectRoot: models.ObjectRoot{
-			AggregateID:   req.UserId,
-			ResourceOwner: owner,
+			AggregateID: req.UserId,
 		},
+		PermissionCheck: s.command.CheckPermissionUserWrite(ctx, false),
 	})
 	if err != nil {
 		return nil, err

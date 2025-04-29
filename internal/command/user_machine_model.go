@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -21,11 +20,12 @@ type MachineWriteModel struct {
 	HashedSecret    string
 }
 
-func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
+func NewMachineWriteModel(userID, resourceOwner string, permissionCheck eventstore.PermissionCheck) *MachineWriteModel {
 	return &MachineWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   userID,
-			ResourceOwner: resourceOwner,
+			AggregateID:     userID,
+			ResourceOwner:   resourceOwner,
+			PermissionCheck: permissionCheck,
 		},
 	}
 }

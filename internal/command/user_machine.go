@@ -25,6 +25,7 @@ type Machine struct {
 	Name            string
 	Description     string
 	AccessTokenType domain.OIDCTokenType
+	PermissionCheck eventstore.PermissionCheck
 }
 
 func (m *Machine) IsZero() bool {
@@ -33,8 +34,8 @@ func (m *Machine) IsZero() bool {
 
 func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xiown2", "Errors.ResourceOwnerMissing")
+		if a.ResourceOwner == "" && machine.PermissionCheck == nil {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xiown3", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-p0p2mi", "Errors.User.UserIDMissing")
@@ -49,7 +50,7 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
 
-			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
+			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter, machine.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -80,7 +81,7 @@ func AddMachineWithUsernameToIDFallback() addMachineOption {
 
 func (c *Commands) AddMachineWithResourceOwnerExistenceCheck() addMachineOption {
 	return func(ctx context.Context, m *Machine) error {
-		return c.CheckOrgExists(ctx, m.ResourceOwner)
+		return c.CheckOrgExists(ctx, m.ObjectRoot.ResourceOwner)
 	}
 }
 
@@ -144,14 +145,14 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *Machine) (*domain
 
 func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
+		if a.ResourceOwner == "" && machine.PermissionCheck == nil {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xiown3", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-p0p3mi", "Errors.User.UserIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
+			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter, machine.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -170,11 +171,10 @@ func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Valid
 	}
 }
 
-func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer) (_ *MachineWriteModel, err error) {
+func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer, permissionCheck eventstore.PermissionCheck) (_ *MachineWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	writeModel := NewMachineWriteModel(userID, resourceOwner)
+	writeModel := NewMachineWriteModel(userID, resourceOwner, permissionCheck)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
