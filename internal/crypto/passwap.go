@@ -331,7 +331,7 @@ func (c *HasherConfig) sha2Params() (use512 bool, rounds int, err error) {
 		return false, 0, fmt.Errorf("cannot use %s with sha2", dst.Hash)
 	}
 	if dst.Rounds > sha2.RoundsMax {
-		return false, 0, fmt.Errorf("rounds with sha2 cannot be larger than %d", dst.Rounds)
+		return false, 0, fmt.Errorf("rounds with sha2 cannot be larger than %d", sha2.RoundsMax)
 	} else {
 		rounds = int(dst.Rounds)
 	}
