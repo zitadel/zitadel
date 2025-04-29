@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Stromen",
         "DESCRIPTION": "Kies een authenticatiestroom en activeer je actie bij een specifieke gebeurtenis binnen deze stroom."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, een nieuwe en verbeterde versie van Actions, is nu beschikbaar. De huidige versie blijft toegankelijk, maar onze toekomstige ontwikkeling zal zich richten op de nieuwe versie, die uiteindelijk de huidige zal vervangen."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Toepassen"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "U gebruikt momenteel de nieuwe Actions V2, die zich in de bètaversie bevindt. De vorige versie 1 is nog beschikbaar maar zal in de toekomst worden stopgezet. Meld alstublieft eventuele problemen of feedback.",
     "EXECUTION": {
       "TITLE": "Acties",
       "DESCRIPTION": "Met acties kunt u aangepaste code uitvoeren als reactie op API-verzoeken, gebeurtenissen of specifieke functies. Gebruik ze om Zitadel uit te breiden, workflows te automatiseren en te integreren met andere systemen.",
@@ -1508,7 +1510,8 @@
       "APPEARANCE": "Verschijning",
       "OTHER": "Andere",
       "STORAGE": "opslag"
-    }
+    },
+    "BETA": "BÈTA"
   },
   "SETTING": {
     "LANGUAGES": {

@@ -69,7 +69,8 @@
       "FLOWS": {
         "TITLE": "Mengalir",
         "DESCRIPTION": "Pilih alur autentikasi dan picu tindakan Anda pada peristiwa tertentu dalam alur ini."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, versi baru dan lebih baik dari Actions, sekarang tersedia. Versi saat ini masih dapat diakses, tetapi pengembangan di masa depan akan difokuskan pada versi baru ini yang pada akhirnya akan menggantikan versi saat ini."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -496,6 +497,7 @@
     "APPLY": "Menerapkan"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Anda saat ini menggunakan Actions V2 baru, yang masih dalam versi beta. Versi sebelumnya, Versi 1, masih tersedia tetapi akan dihentikan di masa depan. Silakan laporkan masalah atau berikan masukan.",
     "EXECUTION": {
       "TITLE": "Tindakan",
       "DESCRIPTION": "Tindakan memungkinkan Anda menjalankan kode khusus sebagai respons terhadap permintaan API, peristiwa, atau fungsi tertentu. Gunakan ini untuk memperluas Zitadel, mengotomatiskan alur kerja, dan berintegrasi dengan sistem lain.",
@@ -1386,7 +1388,8 @@
       "APPEARANCE": "Penampilan",
       "OTHER": "Lainnya",
       "STORAGE": "Penyimpanan"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {

@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flöden",
         "DESCRIPTION": "Välj ett autentiseringsflöde och trigga din åtgärd vid en specifik händelse inom detta flöde."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, en ny och förbättrad version av Actions, är nu tillgänglig. Den nuvarande versionen är fortfarande tillgänglig, men framtida utveckling kommer att fokusera på den nya, som så småningom kommer att ersätta den nuvarande."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Tillämpa"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Du använder för närvarande nya Actions V2, som är i betaversion. Den tidigare versionen 1 är fortfarande tillgänglig men kommer att avvecklas i framtiden. Vänligen rapportera eventuella problem eller ge feedback.",
     "EXECUTION": {
       "TITLE": "Åtgärder",
       "DESCRIPTION": "Åtgärder låter dig köra anpassad kod som svar på API-förfrågningar, händelser eller specifika funktioner. Använd dem för att utöka Zitadel, automatisera arbetsflöden och integrera med andra system.",
@@ -1512,7 +1514,8 @@
       "APPEARANCE": "Utseende",
       "OTHER": "Övrigt",
       "STORAGE": "Lagring"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {

@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Vyberte proces autentizace a spusťte vaši akci na konkrétní události v rámci tohoto procesu."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, nová a vylepšená verze Actions, je nyní k dispozici. Aktuální verze je stále přístupná, ale budoucí vývoj se zaměří na novou verzi, která nakonec nahradí tu současnou."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Platit"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Aktuálně používáte novou verzi Actions V2, která je v beta verzi. Předchozí verze 1 je stále k dispozici, ale v budoucnu bude ukončena. Prosím, hlaste jakékoliv problémy nebo zpětnou vazbu.",
     "EXECUTION": {
       "TITLE": "Akce",
       "DESCRIPTION": "Akce vám umožňují spouštět vlastní kód v reakci na požadavky API, události nebo specifické funkce. Použijte je k rozšíření Zitadel, automatizaci pracovních postupů a integraci s dalšími systémy.",
@@ -1508,7 +1510,8 @@
       "APPEARANCE": "Vzhled",
       "OTHER": "Ostatní",
       "STORAGE": "Data"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {

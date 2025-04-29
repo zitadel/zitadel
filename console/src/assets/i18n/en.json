@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Choose an authentication flow and trigger your action on a specific event within this flow."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2 a new, improved version of Actions is now available. The current version is still accessible, but our future development will focus on the new one, which will eventually replace the current version."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Apply"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "You are currently using the new Actions V2, which is in beta. The previous Version 1 is still available but will be discontinued in the future. Please report any issues or feedback.",
     "EXECUTION": {
       "TITLE": "Actions",
       "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and itegrate with other systems.",
@@ -1511,7 +1513,8 @@
       "OTHER": "Other",
       "STORAGE": "Storage",
       "ACTIONS": "Actions"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
