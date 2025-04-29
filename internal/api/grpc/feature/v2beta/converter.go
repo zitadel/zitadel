@@ -109,7 +109,7 @@ func improvedPerformanceTypesToPb(types []feature.ImprovedPerformanceType) []fea
 
 func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb.ImprovedPerformance {
 	switch typ {
-	case feature.ImprovedPerformanceTypeUnknown:
+	case feature.ImprovedPerformanceTypeUnspecified:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
 	case feature.ImprovedPerformanceTypeOrgByID:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
@@ -142,7 +142,7 @@ func improvedPerformanceListToDomain(list []feature_pb.ImprovedPerformance) []fe
 func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.ImprovedPerformanceType {
 	switch typ {
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED:
-		return feature.ImprovedPerformanceTypeUnknown
+		return feature.ImprovedPerformanceTypeUnspecified
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
 		return feature.ImprovedPerformanceTypeOrgByID
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT:
@@ -154,6 +154,6 @@ func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.Imp
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED:
 		return feature.ImprovedPerformanceTypeOrgDomainVerified
 	default:
-		return feature.ImprovedPerformanceTypeUnknown
+		return feature.ImprovedPerformanceTypeUnspecified
 	}
 }
