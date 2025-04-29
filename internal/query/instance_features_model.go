@@ -67,7 +67,6 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
-			feature_v2.InstanceActionsEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
@@ -76,6 +75,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceEnableBackChannelLogout,
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
+			feature_v2.InstanceConsoleUseV2UserApi,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -97,7 +97,6 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.LegacyIntrospection = m.system.LegacyIntrospection
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
-	m.instance.Actions = m.system.Actions
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
 	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
@@ -112,7 +111,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		return err
 	}
 	switch key {
-	case feature.KeyUnspecified:
+	case feature.KeyUnspecified,
+		feature.KeyActionsDeprecated:
 		return nil
 	case feature.KeyLoginDefaultOrg:
 		features.LoginDefaultOrg.set(level, event.Value)
@@ -124,8 +124,6 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
 		features.TokenExchange.set(level, event.Value)
-	case feature.KeyActions:
-		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
 	case feature.KeyWebKey:
@@ -142,6 +140,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.LoginV2.set(level, event.Value)
 	case feature.KeyPermissionCheckV2:
 		features.PermissionCheckV2.set(level, event.Value)
+	case feature.KeyConsoleUseV2UserApi:
+		features.ConsoleUseV2UserApi.set(level, event.Value)
 	}
 	return nil
 }

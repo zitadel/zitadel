@@ -1,35 +1,34 @@
-<cnsl-card title="{{ 'USER.MFA.TITLE' | translate }}" description="{{ 'USER.MFA.DESCRIPTION' | translate }}">
+<cnsl-card
+  *ngIf="mfaQuery$ | async as mfaQuery"
+  title="{{ 'USER.MFA.TITLE' | translate }}"
+  description="{{ 'USER.MFA.DESCRIPTION' | translate }}"
+>
   <button
     card-actions
     mat-icon-button
-    (click)="getMFAs()"
+    (click)="refresh$.next(true)"
     class="icon-button"
     matTooltip="{{ 'ACTIONS.REFRESH' | translate }}"
   >
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <cnsl-refresh-table
-    [hideRefresh]="true"
-    [loading]="loading$ | async"
-    (refreshed)="getMFAs()"
-    [dataSize]="dataSource.data.length"
-  >
-    <table class="table" mat-table [dataSource]="dataSource">
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="mfaQuery.state === 'loading'" (refreshed)="refresh$.next(true)">
+    <table class="table" mat-table [dataSource]="mfaQuery.value">
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.TABLETYPE' | translate }}</th>
         <td mat-cell *matCellDef="let mfa">
-          <span *ngIf="mfa.otp !== undefined">TOTP (Time-based One-Time Password)</span>
-          <span *ngIf="mfa.u2f !== undefined">U2F (Universal 2nd Factor)</span>
-          <span *ngIf="mfa.otpSms !== undefined">One-Time Password SMS</span>
-          <span *ngIf="mfa.otpEmail !== undefined">One-Time Password Email</span>
+          <span *ngIf="mfa.type.case === 'otp'">TOTP (Time-based One-Time Password)</span>
+          <span *ngIf="mfa.type.case === 'u2f'">U2F (Universal 2nd Factor)</span>
+          <span *ngIf="mfa.type.case === 'otpSms'">One-Time Password SMS</span>
+          <span *ngIf="mfa.type.case === 'otpEmail'">One-Time Password Email</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.NAME' | translate }}</th>
         <td mat-cell *matCellDef="let mfa">
-          <span *ngIf="mfa?.u2f?.name" class="centered">
-            {{ mfa.u2f.name }}
+          <span *ngIf="mfa.type.case === 'u2f'" class="centered">
+            {{ mfa.type.value.name }}
           </span>
         </td>
       </ng-container>
@@ -40,8 +39,8 @@
           <span
             class="state"
             [ngClass]="{
-              active: mfa.state === AuthFactorState.AUTH_FACTOR_STATE_READY,
-              inactive: mfa.state === AuthFactorState.AUTH_FACTOR_STATE_NOT_READY,
+              active: mfa.state === AuthFactorState.READY,
+              inactive: mfa.state === AuthFactorState.NOT_READY,
             }"
           >
             {{ 'USER.MFA.STATE.' + mfa.state | translate }}
@@ -58,7 +57,7 @@
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               color="warn"
               mat-icon-button
-              (click)="deleteMFA(mfa)"
+              (click)="deleteMFA(mfaQuery.user, mfa)"
             >
               <i class="las la-trash"></i>
             </button>
@@ -69,13 +68,13 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
+    <div *ngIf="mfaQuery.state === 'success' && !mfaQuery.value.data.length" class="no-content-row">
       <i class="las la-exclamation"></i>
       <span>{{ 'USER.MFA.EMPTY' | translate }}</span>
     </div>
   </cnsl-refresh-table>
   <div class="table-wrapper">
-    <div class="spinner-container" *ngIf="loading$ | async">
+    <div class="spinner-container" *ngIf="mfaQuery.state === 'loading'">
       <mat-spinner diameter="50"></mat-spinner>
     </div>
   </div>

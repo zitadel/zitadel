@@ -12,8 +12,8 @@ import (
 var _ channels.Message = (*Form)(nil)
 
 type Form struct {
-	Serializable    any
-	TriggeringEvent eventstore.Event
+	Serializable        any
+	TriggeringEventType eventstore.EventType
 }
 
 func (msg *Form) GetContent() (string, error) {
@@ -22,6 +22,6 @@ func (msg *Form) GetContent() (string, error) {
 	return values.Encode(), err
 }
 
-func (msg *Form) GetTriggeringEvent() eventstore.Event {
-	return msg.TriggeringEvent
+func (msg *Form) GetTriggeringEventType() eventstore.EventType {
+	return msg.TriggeringEventType
 }

@@ -12,9 +12,11 @@ copy (SELECT
       , approx_quantile(metric_value, 0.95) AS p95
       , approx_quantile(metric_value, 0.99) AS p99
   FROM 
-      read_csv('/path/to/k6-output.csv', auto_detect=false, delim=',', quote='"', escape='"', new_line='\n', skip=0, comment='', header=true, columns={'metric_name': 'VARCHAR', 'timestamp': 'BIGINT', 'metric_value': 'DOUBLE', 'check': 'VARCHAR', 'error': 'VARCHAR', 'error_code': 'VARCHAR', 'expected_response': 'BOOLEAN', 'group': 'VARCHAR', 'method': 'VARCHAR', 'name': 'VARCHAR', 'proto': 'VARCHAR', 'scenario': 'VARCHAR', 'service': 'VARCHAR', 'status': 'BIGINT', 'subproto': 'VARCHAR', 'tls_version': 'VARCHAR', 'url': 'VARCHAR', 'extra_tags': 'VARCHAR', 'metadata': 'VARCHAR'})
+      read_csv('result.csv', auto_detect=false, null_padding=true, delim=',', quote='"', escape='"', new_line='\n', skip=0, comment='', header=true, columns={'metric_name': 'VARCHAR', 'timestamp': 'BIGINT', 'metric_value': 'DOUBLE', 'check': 'VARCHAR', 'error': 'VARCHAR', 'error_code': 'VARCHAR', 'expected_response': 'BOOLEAN', 'group': 'VARCHAR', 'method': 'VARCHAR', 'name': 'VARCHAR', 'proto': 'VARCHAR', 'scenario': 'VARCHAR', 'service': 'VARCHAR', 'status': 'BIGINT', 'subproto': 'VARCHAR', 'tls_version': 'VARCHAR', 'url': 'VARCHAR', 'extra_tags': 'VARCHAR', 'metadata': 'VARCHAR'})
   WHERE
-      metric_name LIKE '%_duration'
+      metric_name <> 'http_req_duration'
+      AND metric_name <> 'iteration_duration'
+      AND metric_name LIKE '%_duration'
   GROUP BY
       metric_name
       , timestamp
@@ -25,8 +27,6 @@ copy (SELECT
 ```
 
 -->
-
-## Summary
 
 TODO: describe the outcome of the test?
 
@@ -48,7 +48,7 @@ TODO: describe the outcome of the test?
 | ZITADEL Version                       |       |
 | ZITADEL Configuration                 |       |
 | ZITADEL feature flags                 |       |
-| Database                              | type: crdb / psql<br />version: |
+| Database                              | type: psql<br />version: |
 | Database location                     |       |
 | Database specification                | vCPU: <br/> memory: Gb |
 | ZITADEL metrics during test           |       |

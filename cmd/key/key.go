@@ -40,7 +40,7 @@ func newKey() *cobra.Command {
 		Long: `create new encryption key(s) (encrypted by the provided master key)
 provide key(s) by YAML file and/or by argument
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		Example: `new -f keys.yaml
 new key1=somekey key2=anotherkey
 new -f keys.yaml key2=anotherkey`,

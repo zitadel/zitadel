@@ -1,7 +1,6 @@
 package query
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -56,7 +55,9 @@ var (
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
 		` projections.apps7_saml_configs.metadata,` +
-		` projections.apps7_saml_configs.metadata_url` +
+		` projections.apps7_saml_configs.metadata_url,` +
+		` projections.apps7_saml_configs.login_version,` +
+		` projections.apps7_saml_configs.login_base_uri` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
@@ -103,24 +104,23 @@ var (
 		` projections.apps7_saml_configs.entity_id,` +
 		` projections.apps7_saml_configs.metadata,` +
 		` projections.apps7_saml_configs.metadata_url,` +
+		` projections.apps7_saml_configs.login_version,` +
+		` projections.apps7_saml_configs.login_base_uri,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`)
 	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps7_api_configs.client_id,` +
 		` projections.apps7_oidc_configs.client_id` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
-		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id`)
 	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps7.project_id` +
 		` FROM projections.apps7` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects4.id,` +
 		` projections.projects4.creation_date,` +
 		` projections.projects4.change_date,` +
@@ -136,8 +136,7 @@ var (
 		` JOIN projections.apps7 ON projections.projects4.id = projections.apps7.project_id AND projections.projects4.instance_id = projections.apps7.instance_id` +
 		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
 		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`)
 
 	appCols = database.TextArray[string]{
 		"id",
@@ -178,6 +177,8 @@ var (
 		"entity_id",
 		"metadata",
 		"metadata_url",
+		"login_version",
+		"login_base_uri",
 	}
 	appsCols = append(appCols, "count")
 )
@@ -252,6 +253,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -317,6 +320,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -393,6 +398,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersionUnspecified,
+							nil,
 						},
 					},
 				),
@@ -463,6 +470,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -559,6 +568,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -647,6 +658,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -743,6 +756,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -831,6 +846,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -927,6 +944,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1019,6 +1038,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 						{
 							"api-app-id",
@@ -1055,6 +1076,8 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1099,6 +1122,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersion2,
+							"https://login.ch/",
 						},
 					},
 				),
@@ -1165,9 +1190,11 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ProjectID:     "project-id",
 						SAMLConfig: &SAMLApp{
-							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-							MetadataURL: "https://test.com/saml/metadata",
-							EntityID:    "https://test.com/saml/metadata",
+							Metadata:     []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							MetadataURL:  "https://test.com/saml/metadata",
+							EntityID:     "https://test.com/saml/metadata",
+							LoginVersion: domain.LoginVersion2,
+							LoginBaseURI: gu.Ptr("https://login.ch/"),
 						},
 					},
 				},
@@ -1196,7 +1223,7 @@ func Test_AppsPrepare(t *testing.T) {
 			if tt.name == "prepareAppsQuery oidc app" {
 				_ = tt.name
 			}
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -1214,8 +1241,8 @@ func Test_AppPrepare(t *testing.T) {
 	}{
 		{
 			name: "prepareAppQuery no result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueriesScanErr(
@@ -1234,8 +1261,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery found",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -1280,6 +1307,8 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1296,8 +1325,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery api app",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1343,6 +1372,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1364,8 +1395,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1411,6 +1442,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1451,8 +1484,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app active only",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, true)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(true)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1498,6 +1531,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1538,8 +1573,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery saml app",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1585,6 +1620,8 @@ func Test_AppPrepare(t *testing.T) {
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
 							"https://test.com/saml/metadata",
+							domain.LoginVersionUnspecified,
+							nil,
 						},
 					},
 				),
@@ -1599,16 +1636,18 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ProjectID:     "project-id",
 				SAMLConfig: &SAMLApp{
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-					MetadataURL: "https://test.com/saml/metadata",
-					EntityID:    "https://test.com/saml/metadata",
+					Metadata:     []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					MetadataURL:  "https://test.com/saml/metadata",
+					EntityID:     "https://test.com/saml/metadata",
+					LoginVersion: domain.LoginVersionUnspecified,
+					LoginBaseURI: nil,
 				},
 			},
 		},
 		{
 			name: "prepareAppQuery oidc app IsDevMode inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1650,6 +1689,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1694,8 +1735,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertAccessTokenRole inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1737,6 +1778,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1781,8 +1824,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertIDTokenRole inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1824,6 +1867,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1868,8 +1913,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertIDTokenUserinfo inactive",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1915,6 +1960,8 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1955,8 +2002,8 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery sql err",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
-				return prepareAppQuery(ctx, db, false)
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(false)
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -1975,7 +2022,7 @@ func Test_AppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -2061,7 +2108,7 @@ func Test_AppIDsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -2127,7 +2174,7 @@ func Test_ProjectIDByAppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -2325,7 +2372,7 @@ func Test_ProjectByAppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

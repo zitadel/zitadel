@@ -63,7 +63,7 @@ func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode stri
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareDeviceAuthQuery(ctx, q.client)
+	stmt, scan := prepareDeviceAuthQuery()
 	eq := sq.Eq{
 		DeviceAuthRequestColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		DeviceAuthRequestColumnUserCode.identifier():   userCode,
@@ -86,15 +86,24 @@ var deviceAuthSelectColumns = []string{
 	DeviceAuthRequestColumnUserCode.identifier(),
 	DeviceAuthRequestColumnScopes.identifier(),
 	DeviceAuthRequestColumnAudience.identifier(),
+	AppColumnName.identifier(),
+	ProjectColumnName.identifier(),
 }
 
-func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
-	return sq.Select(deviceAuthSelectColumns...).From(deviceAuthRequestTable.identifier()).PlaceholderFormat(sq.Dollar),
+func prepareDeviceAuthQuery() (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
+	return sq.Select(deviceAuthSelectColumns...).
+			From(deviceAuthRequestTable.identifier()).
+			LeftJoin(join(AppOIDCConfigColumnClientID, DeviceAuthRequestColumnClientID)).
+			LeftJoin(join(AppColumnID, AppOIDCConfigColumnAppID)).
+			LeftJoin(join(ProjectColumnID, AppColumnProjectID)).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*domain.AuthRequestDevice, error) {
 			dst := new(domain.AuthRequestDevice)
 			var (
-				scopes   database.TextArray[string]
-				audience database.TextArray[string]
+				scopes      database.TextArray[string]
+				audience    database.TextArray[string]
+				appName     sql.NullString
+				projectName sql.NullString
 			)
 
 			err := row.Scan(
@@ -103,15 +112,20 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&dst.UserCode,
 				&scopes,
 				&audience,
+				&appName,
+				&projectName,
 			)
 			if errors.Is(err, sql.ErrNoRows) {
-				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
+				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotFound")
 			}
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
 			}
 			dst.Scopes = scopes
 			dst.Audience = audience
+			dst.AppName = appName.String
+			dst.ProjectName = projectName.String
+
 			return dst, nil
 		}
 }

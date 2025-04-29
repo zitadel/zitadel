@@ -17,7 +17,6 @@ var (
 	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLegacyIntrospection)
 	SystemUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelSystem, feature.KeyUserSchema)
 	SystemTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTokenExchange)
-	SystemActionsEventType                         = setEventTypeFromFeature(feature.LevelSystem, feature.KeyActions)
 	SystemImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyImprovedPerformance)
 	SystemOIDCSingleV1SessionTerminationEventType  = setEventTypeFromFeature(feature.LevelSystem, feature.KeyOIDCSingleV1SessionTermination)
 	SystemDisableUserTokenEvent                    = setEventTypeFromFeature(feature.LevelSystem, feature.KeyDisableUserTokenEvent)
@@ -31,7 +30,6 @@ var (
 	InstanceLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLegacyIntrospection)
 	InstanceUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyUserSchema)
 	InstanceTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTokenExchange)
-	InstanceActionsEventType                         = setEventTypeFromFeature(feature.LevelInstance, feature.KeyActions)
 	InstanceImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyImprovedPerformance)
 	InstanceWebKeyEventType                          = setEventTypeFromFeature(feature.LevelInstance, feature.KeyWebKey)
 	InstanceDebugOIDCParentErrorEventType            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDebugOIDCParentError)
@@ -40,6 +38,7 @@ var (
 	InstanceEnableBackChannelLogout                  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyEnableBackChannelLogout)
 	InstanceLoginVersion                             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginV2)
 	InstancePermissionCheckV2                        = setEventTypeFromFeature(feature.LevelInstance, feature.KeyPermissionCheckV2)
+	InstanceConsoleUseV2UserApi                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyConsoleUseV2UserApi)
 )
 
 const (

@@ -13,6 +13,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -76,19 +77,22 @@ func TestServer_GetAuthRequest(t *testing.T) {
 			now, authRequestID, err := tt.dep()
 			require.NoError(t, err)
 
-			got, err := Client.GetAuthRequest(tt.ctx, &oidc_pb.GetAuthRequestRequest{
-				AuthRequestId: authRequestID,
-			})
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			authRequest := got.GetAuthRequest()
-			assert.NotNil(t, authRequest)
-			assert.Equal(t, authRequestID, authRequest.GetId())
-			assert.WithinRange(t, authRequest.GetCreationDate().AsTime(), now.Add(-time.Second), now.Add(time.Second))
-			assert.Contains(t, authRequest.GetScope(), "openid")
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetAuthRequest(tt.ctx, &oidc_pb.GetAuthRequestRequest{
+					AuthRequestId: authRequestID,
+				})
+				if tt.wantErr {
+					assert.Error(ttt, err)
+					return
+				}
+				assert.NoError(ttt, err)
+				authRequest := got.GetAuthRequest()
+				assert.NotNil(ttt, authRequest)
+				assert.Equal(ttt, authRequestID, authRequest.GetId())
+				assert.WithinRange(ttt, authRequest.GetCreationDate().AsTime(), now.Add(-time.Second), now.Add(time.Second))
+				assert.Contains(ttt, authRequest.GetScope(), "openid")
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -103,13 +107,11 @@ func TestServer_CreateCallback(t *testing.T) {
 	sessionResp := createSession(t, CTX, Instance.Users[integration.UserTypeOrgOwner].ID)
 
 	tests := []struct {
-		name      string
-		ctx       context.Context
-		req       *oidc_pb.CreateCallbackRequest
-		AuthError string
-		want      *oidc_pb.CreateCallbackResponse
-		wantURL   *url.URL
-		wantErr   bool
+		name    string
+		ctx     context.Context
+		req     *oidc_pb.CreateCallbackRequest
+		want    *oidc_pb.CreateCallbackResponse
+		wantErr bool
 	}{
 		{
 			name: "Not found",
@@ -632,6 +634,233 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			if tt.want != nil {
 				assert.Regexp(t, regexp.MustCompile(tt.want.CallbackUrl), got.GetCallbackUrl())
 			}
+		})
+	}
+}
+
+func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
+	project, err := Instance.CreateProject(CTX)
+	require.NoError(t, err)
+	client, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name    string
+		dep     func() (*oidc.DeviceAuthorizationResponse, error)
+		ctx     context.Context
+		want    *oidc.DeviceAuthorizationResponse
+		wantErr bool
+	}{
+		{
+			name: "Not found",
+			dep: func() (*oidc.DeviceAuthorizationResponse, error) {
+				return &oidc.DeviceAuthorizationResponse{
+					UserCode: "notFound",
+				}, nil
+			},
+			ctx:     CTX,
+			wantErr: true,
+		},
+		{
+			name: "success",
+			dep: func() (*oidc.DeviceAuthorizationResponse, error) {
+				return Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+			},
+			ctx: CTX,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			deviceAuth, err := tt.dep()
+			require.NoError(t, err)
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetDeviceAuthorizationRequest(tt.ctx, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+					UserCode: deviceAuth.UserCode,
+				})
+				if tt.wantErr {
+					assert.Error(ttt, err)
+					return
+				}
+				assert.NoError(ttt, err)
+				authRequest := got.GetDeviceAuthorizationRequest()
+				assert.NotNil(ttt, authRequest)
+				assert.NotEmpty(ttt, authRequest.GetId())
+				assert.Equal(ttt, client.GetClientId(), authRequest.GetClientId())
+				assert.Contains(ttt, authRequest.GetScope(), "openid")
+				assert.NotEmpty(ttt, authRequest.GetAppName())
+				assert.NotEmpty(ttt, authRequest.GetProjectName())
+			}, retryDuration, tick)
+		})
+	}
+}
+
+func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
+	project, err := Instance.CreateProject(CTX)
+	require.NoError(t, err)
+	client, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
+	require.NoError(t, err)
+	sessionResp := createSession(t, CTX, Instance.Users[integration.UserTypeOrgOwner].ID)
+
+	tests := []struct {
+		name      string
+		ctx       context.Context
+		req       *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest
+		AuthError string
+		want      *oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse
+		wantURL   *url.URL
+		wantErr   bool
+	}{
+		{
+			name: "Not found",
+			ctx:  CTX,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: "123",
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "session not found",
+			ctx:  CTX,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					require.NoError(t, err)
+					var id string
+					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(t, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, 5*time.Second, 100*time.Millisecond)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    "foo",
+						SessionToken: "bar",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "session token invalid",
+			ctx:  CTX,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					require.NoError(t, err)
+					var id string
+					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(collectT, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, 5*time.Second, 100*time.Millisecond)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: "bar",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "deny device authorization",
+			ctx:  CTX,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					require.NoError(t, err)
+					var id string
+					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(collectT, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, 5*time.Second, 100*time.Millisecond)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny{},
+			},
+			want:    &oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse{},
+			wantErr: false,
+		},
+		{
+			name: "authorize, no permission, error",
+			ctx:  CTX,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					require.NoError(t, err)
+					var id string
+					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(collectT, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, 5*time.Second, 100*time.Millisecond)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "authorize, with permission",
+			ctx:  CTXLoginClient,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					require.NoError(t, err)
+					var id string
+					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(collectT, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, 5*time.Second, 100*time.Millisecond)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := Client.AuthorizeOrDenyDeviceAuthorization(tt.ctx, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
 		})
 	}
 }

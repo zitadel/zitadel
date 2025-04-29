@@ -10,9 +10,9 @@ The following flow shows you the different components you need to enable SAML fo
 ![SAML Flow](/img/guides/login-ui/saml-flow.png)
 
 1. Your application makes an SAML request to your login UI
-2. The login UI proxies the request to the ZITADEL API. In the request to the ZITADEL API, a header to identify your client is needed.
+2. The login UI proxies the request to the ZITADEL API.
 3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., binding, nameID policy, etc.)
-4. Redirect to a predefined, relative URL of the login UI that includes the samlrequest ID ("/login?authRequest=")
+4. Redirect to a predefined, relative URL of the login UI that includes the samlrequest ID ("/login?authRequest="), configurable per application.
 5. Request to ZITADEL API to get all the information from the SAML request. This is optional and only needed if you like to get all the parsed information from the samlrequest-
 6. Authenticate the user in your login UI by creating and updating a session with all the checks you need.
 7. Finalize the SAML request by sending the session to the request, you will get the URL to redirect to or the body in the response
@@ -37,10 +37,10 @@ https://login.example.com/saml/v2/SSO?SAMLRequest=nJLRa9swEMb%2FFXHvjmVTY0fUhqxh
 The SAML request includes all the relevant information for the SAML standard, which includes the RelayState, the used binding and other information.
 
 You now have to proxy the SAML request from your own UI to the SSO Endpoint of ZITADEL.
-Make sure to add the user id of your login UI service/machine user as a header to the request: ```x-zitadel-login-client: <userid>```
+For more information, see [OIDC Proxy](./typescript-repo#oidc-proxy) for the necessary headers.
 
 :::note
-The user id sent in the 'x-zitadel-login-client' has to match to the PAT you are sending in the request.
+The version and the optional custom URI for the available login UI is configurable under the application settings.
 :::
 
 Read more about the [SSO Endpoint Documentation](/docs/apis/saml/endpoints#sso_endpoint)
@@ -56,7 +56,7 @@ With the ID from the redirect before you will now be able to get the information
 ```bash
 curl --request GET \
   --url https://$ZITADEL_DOMAIN/v2/saml/saml_requests/V2_224908753244265546 \
-  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Authorization: Bearer '"$TOKEN"''
 ```
 
 Response Example:
@@ -87,14 +87,14 @@ Read the following resources for more information about the different checks:
 
 ### Finalize SAML Request
 
-To finalize the SAML request and connect an existing user session with it you have to update the SAML request with the session token.
+To finalize the SAML request and connect an existing user session with it, you have to update the SAML Request with the session token.
 On the create and update user session request you will always get a session token in the response.
 
 The latest session token has to be sent to the following request:
 
 Read more about the [Finalize SAML Request Documentation](/docs/apis/resources/saml_service_v2/saml-service-create-response)
 
-Make sure that the authorization header is from the same account that you originally sent in the client id header ```x-zitadel-login-client: <userid>``` on the SSO endpoint.
+Make sure that the authorization header is from an account which is permitted to finalize the SAML Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
 curl --request POST \
   --url $ZITADEL_DOMAIN/v2/saml/saml_requests/V2_224908753244265546 \

@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: 登録
   NextButtonText: 次へ
 
+LDAP:
+  Title: ようこそ！
+  Description: LDAPのログイン情報を入力してください
+  LoginNameLabel: ログイン名
+  PasswordLabel: パスワード
+  NextButtonText: 次へ
+
 SelectAccount:
   Title: アカウントの選択
   Description: ZITADELアカウントを使用します。
@@ -198,6 +205,7 @@ PasswordChange:
   NewPasswordConfirmLabel: 新パスワードの確認
   CancelButtonText: キャンセル
   NextButtonText: 次へ
+  Footer: フッター
 
 PasswordChangeDone:
   Title: パスワードの変更完了
@@ -257,6 +265,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -300,6 +309,7 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -377,6 +387,7 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
 
 DeviceAuth:
   Title: デバイス認証
@@ -401,6 +412,7 @@ Footer:
   Tos: TOS
   PrivacyPolicy: プライバシーポリシー
   Help: ヘルプ
+  SupportEmail: サポートメール
 
 SignIn: '{{.Provider}} でサインイン'
 
@@ -415,6 +427,7 @@ Errors:
     MissingParameters: 必要なパラメーターが不足しています
   User:
     NotFound: ユーザーが見つかりません
+    AlreadyExists: ユーザーは既に存在します
     Inactive: ユーザーは非アクティブです
     NotFoundOnOrg: ユーザーは、選択した組織で見つけることができませんでした
     NotAllowedOrg: ユーザーは必要な組織のメンバーではありません
@@ -423,6 +436,33 @@ Errors:
     Invalid: 無効なユーザーデータです
     DomainNotAllowedAsUsername: このドメインはすでに予約されているため使用できません
     NotAllowedToLink: このユーザーは外部ログインプロバイダーにリンクすることを許可されていません
+    Profile:
+      NotFound: プロファイルが見つかりません
+      NotChanged: プロファイルが変更されていません
+      Empty: プロファイルが空です
+      FirstNameEmpty: 名前が空です
+      LastNameEmpty: 姓が空です
+      IDMissing: プロファイルIDが不足しています
+    Email:
+      NotFound: メールアドレスが見つかりません
+      Invalid: メールアドレスが無効です
+      AlreadyVerified: メールアドレスはすでに登録されています
+      NotChanged: メールアドレスが変更されていません
+      Empty: メールアドレスが空です
+      IDMissing: メールアドレスIDが不足しています
+    Phone:
+      NotFound: 電話番号が見つかりません
+      Invalid: 電話番号が無効です
+      AlreadyVerified: 電話番号はすでに登録されています
+      Empty: 電話番号が空です
+      NotChanged: 電話番号が変更されていません
+    Address:
+      NotFound: 住所が見つかりません
+      NotChanged: 住所が変更されていません
+    Username:
+      AlreadyExists: ユーザー名はすでに使用されています
+      Reserved: ユーザー名はすでに使用されています
+      Empty: ユーザー名が空です
     Password:
       ConfirmationWrong: 確認用パスワードが間違っています
       Empty: パスワードが空です
@@ -480,6 +520,9 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: ロックアウトポリシーが存在しません
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: 新規登録は許可されていません
   DeviceAuth:
     NotExisting: ユーザーコードが存在しません
 

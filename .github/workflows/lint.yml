@@ -6,9 +6,6 @@ on:
       node_version:
         required: true
         type: string
-      go_version:
-        required: true
-        type: string
       buf_version:
         required: true
         type: string
@@ -85,7 +82,7 @@ jobs:
     - 
       uses: actions/setup-go@v5
       with:
-        go-version: ${{ inputs.go_version }}
+        go-version-file: 'go.mod'
     - 
       uses: actions/cache/restore@v4
       timeout-minutes: 1

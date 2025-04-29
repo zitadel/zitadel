@@ -19,6 +19,7 @@ var (
 	CTX             context.Context
 	IAMOwnerCTX     context.Context
 	UserCTX         context.Context
+	LoginCTX        context.Context
 	Instance        *integration.Instance
 	Client          session.SessionServiceClient
 	User            *user.AddHumanUserResponse
@@ -37,6 +38,7 @@ func TestMain(m *testing.M) {
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
+		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		User = createFullUser(CTX)
 		DeactivatedUser = createDeactivatedUser(CTX)
 		LockedUser = createLockedUser(CTX)

@@ -3,6 +3,7 @@ package saml
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/activity"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/auth/repository"
@@ -25,7 +27,9 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -36,7 +40,8 @@ var _ provider.AuthStorage = &Storage{}
 var _ provider.UserStorage = &Storage{}
 
 const (
-	LoginClientHeader = "x-zitadel-login-client"
+	LoginClientHeader        = "x-zitadel-login-client"
+	AttributeActionLogFormat = "urn:zitadel:iam:action:%s:log"
 )
 
 type Storage struct {
@@ -59,25 +64,16 @@ type Storage struct {
 
 	defaultLoginURL   string
 	defaultLoginURLv2 string
+	contextToIssuer   func(context.Context) string
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.ActiveAppBySAMLEntityID(ctx, entityID)
+	sp, err := p.query.ActiveSAMLServiceProviderByID(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
-	return serviceprovider.NewServiceProvider(
-		app.ID,
-		&serviceprovider.Config{
-			Metadata: app.SAMLConfig.Metadata,
-		},
-		func(id string) string {
-			if strings.HasPrefix(id, command.IDPrefixV2) {
-				return p.defaultLoginURLv2 + id
-			}
-			return p.defaultLoginURL + id
-		},
-	)
+
+	return ServiceProviderFromBusiness(sp, p.defaultLoginURL, p.defaultLoginURLv2)
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
@@ -108,25 +104,49 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	// for backwards compatibility we pass the login client if set
 	headers, _ := http_utils.HeadersFromCtx(ctx)
-	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
+	loginClient := headers.Get(LoginClientHeader)
+
+	// for backwards compatibility we'll use the new login if the header is set (no matter the other configs)
+	if loginClient != "" {
 		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
 	}
-	return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
+
+	// if the instance requires the v2 login, use it no matter what the application configured
+	if authz.GetFeatures(ctx).LoginV2.Required {
+		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
+	}
+	version, err := p.query.SAMLAppLoginVersion(ctx, applicationID)
+	if err != nil {
+		return nil, err
+	}
+	switch version {
+	case domain.LoginVersion1:
+		return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
+	case domain.LoginVersion2:
+		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
+	case domain.LoginVersionUnspecified:
+		fallthrough
+	default:
+		// since we already checked for a login header, we can fall back to the v1 login
+		return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
+	}
 }
 
 func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID, loginClient string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	samlRequest := &command.SAMLRequest{
-		ApplicationID: applicationID,
-		ACSURL:        acsUrl,
-		RelayState:    relayState,
-		RequestID:     req.Id,
-		Binding:       protocolBinding,
-		Issuer:        req.Issuer.Text,
-		Destination:   req.Destination,
-		LoginClient:   loginClient,
+		ApplicationID:  applicationID,
+		ACSURL:         acsUrl,
+		RelayState:     relayState,
+		RequestID:      req.Id,
+		Binding:        protocolBinding,
+		Issuer:         req.Issuer.Text,
+		Destination:    req.Destination,
+		LoginClient:    loginClient,
+		ResponseIssuer: p.contextToIssuer(ctx),
 	}
 
 	aar, err := p.command.AddSAMLRequest(ctx, samlRequest)
@@ -366,7 +386,84 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 			return nil, err
 		}
 	}
+
+	function := exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreSAMLResponse.LocalizationKey())
+	executionTargets, err := execution.QueryExecutionTargetsForFunction(ctx, p.query, function)
+	if err != nil {
+		return nil, err
+	}
+
+	// correct time for utc
+	user.CreationDate = user.CreationDate.UTC()
+	user.ChangeDate = user.ChangeDate.UTC()
+
+	info := &ContextInfo{
+		Function:   function,
+		User:       user,
+		UserGrants: userGrants.UserGrants,
+	}
+
+	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	if err != nil {
+		return nil, err
+	}
+	contextInfoResponse, ok := resp.(*ContextInfoResponse)
+	if !ok || contextInfoResponse == nil {
+		return customAttributes, nil
+	}
+	attributeLogs := make([]string, 0)
+	for _, metadata := range contextInfoResponse.SetUserMetadata {
+		if _, err = p.command.SetUserMetadata(ctx, metadata, user.ID, user.ResourceOwner); err != nil {
+			attributeLogs = append(attributeLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
+		}
+	}
+	for _, attribute := range contextInfoResponse.AppendAttribute {
+		customAttributes = appendCustomAttribute(customAttributes, attribute.Name, attribute.NameFormat, attribute.Value)
+	}
+	if len(attributeLogs) > 0 {
+		customAttributes = appendCustomAttribute(customAttributes, fmt.Sprintf(AttributeActionLogFormat, function), "", attributeLogs)
+	}
 	return customAttributes, nil
+}
+
+type ContextInfo struct {
+	Function   string               `json:"function,omitempty"`
+	User       *query.User          `json:"user,omitempty"`
+	UserGrants []*query.UserGrant   `json:"user_grants,omitempty"`
+	Response   *ContextInfoResponse `json:"response,omitempty"`
+}
+
+type ContextInfoResponse struct {
+	SetUserMetadata []*domain.Metadata `json:"set_user_metadata,omitempty"`
+	AppendAttribute []*AppendAttribute `json:"append_attribute,omitempty"`
+}
+
+type AppendAttribute struct {
+	Name       string   `json:"name"`
+	NameFormat string   `json:"name_format"`
+	Value      []string `json:"value"`
+}
+
+func (c *ContextInfo) GetHTTPRequestBody() []byte {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func (c *ContextInfo) SetHTTPResponseBody(resp []byte) error {
+	if !json.Valid(resp) {
+		return zerrors.ThrowPreconditionFailed(nil, "ACTION-4m9s2", "Errors.Execution.ResponseIsNotValidJSON")
+	}
+	if c.Response == nil {
+		c.Response = &ContextInfoResponse{}
+	}
+	return json.Unmarshal(resp, c.Response)
+}
+
+func (c *ContextInfo) GetContent() interface{} {
+	return c.Response
 }
 
 func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (*query.UserGrants, error) {

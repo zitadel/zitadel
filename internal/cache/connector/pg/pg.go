@@ -5,12 +5,12 @@ import (
 	_ "embed"
 	"errors"
 	"log/slog"
+	"slices"
 	"strings"
 	"text/template"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-	"golang.org/x/exp/slices"
 
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -58,10 +58,8 @@ func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, purpo
 	}
 	c.logger.InfoContext(ctx, "pg cache logging enabled")
 
-	if connector.Dialect == "postgres" {
-		if err := c.createPartition(ctx); err != nil {
-			return nil, err
-		}
+	if err := c.createPartition(ctx); err != nil {
+		return nil, err
 	}
 	return c, nil
 }

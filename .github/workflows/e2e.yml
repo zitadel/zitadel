@@ -10,8 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         browser: [firefox, chrome]
-    runs-on:
-      group: zitadel-public
+    runs-on: ubuntu-latest
     steps:
       - 
         name: Checkout Repository
@@ -32,8 +31,6 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: 'image=moby/buildkit:v0.11.6'
       -
         name: Start DB and ZITADEL
         run: |

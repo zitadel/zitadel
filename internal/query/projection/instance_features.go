@@ -81,10 +81,6 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.InstanceActionsEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.InstanceImprovedPerformanceEventType,
 				Reduce: reduceInstanceSetFeature[[]feature.ImprovedPerformanceType],
 			},
@@ -114,6 +110,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 			},
 			{
 				Event:  feature_v2.InstancePermissionCheckV2,
+				Reduce: reduceInstanceSetFeature[bool],
+			},
+			{
+				Event:  feature_v2.InstanceConsoleUseV2UserApi,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{

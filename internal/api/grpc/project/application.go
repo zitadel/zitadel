@@ -85,7 +85,8 @@ func loginVersionToPb(version domain.LoginVersion, baseURI *string) *app_pb.Logi
 func AppSAMLConfigToPb(app *query.SAMLApp) app_pb.AppConfig {
 	return &app_pb.App_SamlConfig{
 		SamlConfig: &app_pb.SAMLConfig{
-			Metadata: &app_pb.SAMLConfig_MetadataXml{MetadataXml: app.Metadata},
+			Metadata:     &app_pb.SAMLConfig_MetadataXml{MetadataXml: app.Metadata},
+			LoginVersion: loginVersionToPb(app.LoginVersion, app.LoginBaseURI),
 		},
 	}
 }

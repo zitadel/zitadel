@@ -104,7 +104,7 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, e *milestone.Reache
 				Type:           e.MilestoneType,
 				ReachedDate:    e.GetReachedDate(),
 			},
-			e,
+			e.EventType,
 		).WithoutTemplate(); err != nil {
 			return err
 		}
