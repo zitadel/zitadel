@@ -60,7 +60,6 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemLegacyIntrospectionEventType,
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
-			feature_v2.SystemActionsEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
 			feature_v2.SystemOIDCSingleV1SessionTerminationEventType,
 			feature_v2.SystemDisableUserTokenEvent,
@@ -82,7 +81,8 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		return err
 	}
 	switch key {
-	case feature.KeyUnspecified:
+	case feature.KeyUnspecified,
+		feature.KeyActionsDeprecated:
 		return nil
 	case feature.KeyLoginDefaultOrg:
 		features.LoginDefaultOrg.set(level, event.Value)
@@ -94,8 +94,6 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
 		features.TokenExchange.set(level, event.Value)
-	case feature.KeyActions:
-		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
 	case feature.KeyOIDCSingleV1SessionTermination:

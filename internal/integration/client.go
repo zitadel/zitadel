@@ -803,7 +803,7 @@ func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *acti
 	require.NoError(t, err)
 }
 
-func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
+func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string) *action.SetExecutionResponse {
 	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
