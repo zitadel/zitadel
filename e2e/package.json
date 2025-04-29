@@ -24,7 +24,7 @@
     "pg": "^8.12.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
-    "uuid": "^10.0.0",
+    "uuid": "^11.1.0",
     "wait-on": "^7.2.0"
   },
   "devDependencies": {
