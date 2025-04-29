@@ -23,7 +23,6 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
-import { ExecutionTargetTypeSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { MatSelectModule } from '@angular/material/select';
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -72,7 +71,7 @@ export class ActionsTwoAddActionTargetComponent {
   }
 
   @Output() public readonly back = new EventEmitter<void>();
-  @Output() public readonly continue = new EventEmitter<MessageInitShape<typeof ExecutionTargetTypeSchema>[]>();
+  @Output() public readonly continue = new EventEmitter<string[]>();
 
   private readonly preselectedTargetIds$ = new ReplaySubject<string[]>(1);
 
@@ -222,14 +221,7 @@ export class ActionsTwoAddActionTargetComponent {
   }
 
   protected submit() {
-    const selectedTargets = this.selectedTargetIds().map((value) => ({
-      type: {
-        case: 'target' as const,
-        value,
-      },
-    }));
-
-    this.continue.emit(selectedTargets);
+    this.continue.emit(this.selectedTargetIds());
   }
 
   protected trackTarget(_: number, target: Target) {
