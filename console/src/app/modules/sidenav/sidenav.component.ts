@@ -11,6 +11,7 @@ export interface SidenavSetting {
     [PolicyComponentServiceType.ADMIN]?: string[];
   };
   showWarn?: boolean;
+  beta?: boolean;
 }
 
 @Component({
