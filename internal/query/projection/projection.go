@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/zitadel/logging"
+
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"

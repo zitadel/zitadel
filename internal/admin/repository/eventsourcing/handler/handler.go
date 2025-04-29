@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
