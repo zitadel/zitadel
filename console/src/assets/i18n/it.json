@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flussi",
         "DESCRIPTION": "Scegli un flusso di autenticazione e attiva la tua azione su un evento specifico all'interno di questo flusso."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, una nuova versione migliorata di Actions, è ora disponibile. La versione attuale è ancora accessibile, ma i futuri sviluppi si concentreranno su quella nuova, che alla fine sostituirà la versione corrente."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -528,6 +529,7 @@
     "APPLY": "Applicare"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Stai attualmente utilizzando la nuova versione Actions V2, che è in beta. La precedente Versione 1 è ancora disponibile, ma sarà dismessa in futuro. Ti preghiamo di segnalare eventuali problemi o feedback.",
     "EXECUTION": {
       "TITLE": "Azioni",
       "DESCRIPTION": "Le azioni consentono di eseguire codice personalizzato in risposta a richieste API, eventi o funzioni specifiche. Usale per estendere Zitadel, automatizzare i flussi di lavoro e integrarti con altri sistemi.",
@@ -618,6 +620,7 @@
           "restCall": "Chiamata REST",
           "restAsync": "REST Asincrono"
         },
+        "TYPES_DESCRIPTION": "Webhook, la chiamata gestisce il codice di stato ma la risposta è irrilevante\nCall, la chiamata gestisce il codice di stato e la risposta\nAsync, la chiamata non gestisce né il codice di stato né la risposta, ma può essere eseguita in parallelo con altri obiettivi",
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Inserisci l'endpoint in cui è ospitato il tuo codice. Assicurati che sia accessibile per noi!",
         "TIMEOUT": "Timeout",
@@ -631,7 +634,8 @@
       "TABLE": {
         "NAME": "Nome",
         "ENDPOINT": "Endpoint",
-        "CREATIONDATE": "Data di creazione"
+        "CREATIONDATE": "Data di creazione",
+        "REORDER": "Riordina"
       }
     }
   },
@@ -642,6 +646,7 @@
     "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
     "IAM_ADMIN_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare l'amministratore e gli utenti finali di tutte le organizzazioni",
     "IAM_END_USER_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare gli utenti finali di tutte le organizzazioni",
+    "IAM_LOGIN_CLIENT": "Ha il permesso di gestire i client di accesso",
     "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
     "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
@@ -1506,7 +1511,8 @@
       "APPEARANCE": "Aspetto",
       "OTHER": "Altro",
       "STORAGE": "Dati"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {

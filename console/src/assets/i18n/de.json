@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Wähle einen Authentifizierungsflow und löse deine Aktionen bei einem spezifischen Ereignis innerhalb dieses Flows aus."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, eine neue und verbesserte Version von Actions, ist jetzt verfügbar. Die aktuelle Version ist weiterhin zugänglich, aber unsere zukünftige Entwicklung wird sich auf die neue Version konzentrieren, die schließlich die aktuelle ersetzen wird."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Anwenden"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Sie verwenden derzeit die neuen Actions V2, die sich in der Beta-Phase befinden. Version 1 ist weiterhin verfügbar, wird jedoch in Zukunft eingestellt. Bitte melden Sie Probleme oder Feedback.",
     "EXECUTION": {
       "TITLE": "Aktionen",
       "DESCRIPTION": "Aktionen ermöglichen es Ihnen, benutzerdefinierten Code als Reaktion auf API-Anfragen, Ereignisse oder bestimmte Funktionen auszuführen. Verwenden Sie sie, um Zitadel zu erweitern, Arbeitsabläufe zu automatisieren und sich in andere Systeme zu integrieren.",
@@ -619,6 +621,7 @@
           "restCall": "REST Aufruf",
           "restAsync": "REST Asynchron"
         },
+        "TYPES_DESCRIPTION": "Webhook, der Aufruf verarbeitet den Statuscode, aber die Antwort ist irrelevant\nCall, der Aufruf verarbeitet den Statuscode und die Antwort\nAsync, der Aufruf verarbeitet weder Statuscode noch Antwort, kann aber parallel zu anderen Zielen aufgerufen werden",
         "ENDPOINT": "Endpunkt",
         "ENDPOINT_DESCRIPTION": "Geben Sie den Endpunkt ein, an dem Ihr Code gehostet wird. Stellen Sie sicher, dass er für uns zugänglich ist!",
         "TIMEOUT": "Timeout",
@@ -632,7 +635,8 @@
       "TABLE": {
         "NAME": "Name",
         "ENDPOINT": "Endpunkt",
-        "CREATIONDATE": "Erstellungsdatum"
+        "CREATIONDATE": "Erstellungsdatum",
+        "REORDER": "Verschieben"
       }
     }
   },
@@ -643,6 +647,7 @@
     "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
     "IAM_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer aller Organisationen auszugeben",
     "IAM_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer aller Organisationen auszugeben",
+    "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeclients zu verwalten",
     "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
@@ -1506,7 +1511,8 @@
       "APPEARANCE": "Erscheinungsbild",
       "OTHER": "Anderes",
       "STORAGE": "Speicher"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {

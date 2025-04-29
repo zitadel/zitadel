@@ -30,9 +30,16 @@ The information sent to the Endpoint is structured as JSON:
   "orgID": "ID of the organization related to the calling context",
   "projectID": "ID of the project related to the used application",
   "userID": "ID of the calling user",
-  "request": "full request of the call"
+  "request": {
+    "attribute": "Attribute value of full request of the call"
+  }
 }
 ```
+
+:::warning
+To marshal and unmarshal the request please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson), 
+as the request is a protocol buffer message, to avoid potential problems with the attribute names.
+:::
 
 ### Sent information Response
 
@@ -45,8 +52,303 @@ The information sent to the Endpoint is structured as JSON:
   "orgID": "ID of the organization related to the calling context",
   "projectID": "ID of the project related to the used application",
   "userID": "ID of the calling user",
-  "request": "full request of the call",
-  "response": "full response of the call"
+  "request": {
+    "attribute": "Attribute value of full request of the call"
+  },
+  "response": {
+    "attribute": "Attribute value of full response of the call"
+  }
+}
+```
+
+:::warning
+To marshal and unmarshal the request and response please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),
+as the request and response are protocol buffer messages, to avoid potential problems with the attribute names.
+:::
+
+### Sent information Function
+
+Information sent and expected back are specific to the function.
+
+#### PreUserinfo
+
+The information sent to the Endpoint is structured as JSON:
+```json
+{
+  "function": "Name of the function",
+  "userinfo": {
+    "given_name": "",
+    "family_name": "",
+    "middle_name": "",
+    "nickname": "",
+    "profile": "",
+    "picture": "",
+    ...
+    "preferred_username": "",
+    "email": "",
+    "email_verified": true,
+    "phone_number": "",
+    "phone_number_verified": true
+  },
+  "user": {
+    "id": "",
+    "creation_date": "",
+    ...
+    "human": {
+      "first_name": "",
+      "last_name": "",
+      ...
+      "email": "",
+      "is_email_verified": true,
+      "phone": "",
+      "is_phone_verified": true
+    }
+  },
+  "user_metadata": [
+    {
+      "creation_date": "",
+      "change_date": "",
+      "resource_owner": "",
+      "sequence": "",
+      "key": "",
+      "value": ""
+    }
+  ],
+  "org": {
+    "id": "ID of the organization the user belongs to",
+    "name": "Name of the organization the user belongs to",
+    "primary_domain": "Primary domain of the organization the user belongs to"
+  },
+  "user_grants": [
+    {
+      "id": "",
+      "projectGrantId": "The ID of the project grant",
+      "state": 1,
+      "creationDate": "",
+      "changeDate": "",
+      "sequence": 1,
+      "userId": "",
+      "roles": [
+        "role"
+      ],
+      "userResourceOwner": "The ID of the organization the user belongs to",
+      "userGrantResourceOwner": "The ID of the organization the user got authorization granted",
+      "userGrantResourceOwnerName": "The name of the organization the user got authorization granted",
+      "projectId": "",
+      "projectName": ""
+    }
+  ]
+}
+```
+
+The expected structure of the JSON as response:
+
+```json
+{
+  "set_user_metadata": [
+    {
+      "key": "key of metadata to be set on the user",
+      "value": "base64 value of metadata to be set on the user"
+    }
+  ],
+  "append_claims": [
+    {
+      "key": "key of claim to be set on the user",
+      "value": "value of claim to be set on the user"
+    }
+  ],
+  "append_log_claims": [
+    "Log to be appended to the log claim on the token"
+  ]
+}
+```
+
+#### PreAccessToken
+
+The information sent to the Endpoint is structured as JSON:
+
+```json
+{
+  "function": "Name of the function",
+  "userinfo": {
+    "given_name": "",
+    "family_name": "",
+    "middle_name": "",
+    "nickname": "",
+    "profile": "",
+    "picture": "",
+    ...
+    "preferred_username": "",
+    "email": "",
+    "email_verified": true/false,
+    "phone_number": "",
+    "phone_number_verified": true/false
+  },
+  "user": {
+    "id": "",
+    "creation_date": "",
+    ...
+    "human": {
+      "first_name": "",
+      "last_name": "",
+      ...
+      "email": "",
+      "is_email_verified": true,
+      "phone": "",
+      "is_phone_verified": true
+    }
+  },
+  "user_metadata": [
+    {
+      "creation_date": "",
+      "change_date": "",
+      "resource_owner": "",
+      "sequence": "",
+      "key": "",
+      "value": ""
+    }
+  ],
+  "org": {
+    "id": "ID of the organization the user belongs to",
+    "name": "Name of the organization the user belongs to",
+    "primary_domain": "Primary domain of the organization the user belongs to"
+  },
+  "user_grants": [
+    {
+      "id": "",
+      "projectGrantId": "The ID of the project grant",
+      "state": 1,
+      "creationDate": "",
+      "changeDate": "",
+      "sequence": 1,
+      "userId": "",
+      "roles": [
+        "role"
+      ],
+      "userResourceOwner": "The ID of the organization the user belongs to",
+      "userGrantResourceOwner": "The ID of the organization the user got authorization granted",
+      "userGrantResourceOwnerName": "The name of the organization the user got authorization granted",
+      "projectId": "",
+      "projectName": ""
+    }
+  ]
+}
+```
+
+The expected structure of the JSON as response:
+
+```json
+{
+  "set_user_metadata": [
+    {
+      "key": "key of metadata to be set on the user",
+      "value": "base64 value of metadata to be set on the user"
+    }
+  ],
+  "append_claims": [
+    {
+      "key": "key of claim to be set on the user",
+      "value": "value of claim to be set on the user"
+    }
+  ],
+  "append_log_claims": [
+    "Log to be appended to the log claim on the token"
+  ]
+}
+```
+
+#### PreSAMLResponse
+
+The information sent to the Endpoint is structured as JSON:
+```json
+{
+  "function": "Name of the function",
+  "userinfo": {
+    "given_name": "",
+    "family_name": "",
+    "middle_name": "",
+    "nickname": "",
+    "profile": "",
+    "picture": "",
+    ...
+    "preferred_username": "",
+    "email": "",
+    "email_verified": true,
+    "phone_number": "",
+    "phone_number_verified": true
+  },
+  "user": {
+    "id": "",
+    "creation_date": "",
+    ...
+    "human": {
+      "first_name": "",
+      "last_name": "",
+      ...
+      "email": "",
+      "is_email_verified": true,
+      "phone": "",
+      "is_phone_verified": true
+    }
+  },
+  "user_grants": [
+    {
+      "id": "",
+      "projectGrantId": "The ID of the project grant",
+      "state": 1,
+      "creationDate": "",
+      "changeDate": "",
+      "sequence": 1,
+      "userId": "",
+      "roles": [
+        "role"
+      ],
+      "userResourceOwner": "The ID of the organization the user belongs to",
+      "userGrantResourceOwner": "The ID of the organization the user got authorization granted",
+      "userGrantResourceOwnerName": "The name of the organization the user got authorization granted",
+      "projectId": "",
+      "projectName": ""
+    }
+  ]
+}
+```
+
+The expected structure of the JSON as response:
+
+```json
+{
+  "set_user_metadata": [
+    {
+      "key": "key of metadata to be set on the user",
+      "value": "base64 value of metadata to be set on the user"
+    }
+  ],
+  "append_attribute": [
+    {
+      "name": "name of the attribute to be added to the response",
+      "name_format": "name format of the attribute to be added to the response",
+      "value": "value of the attribute to be added to the response"
+    }
+  ]
+}
+```
+
+### Sent information Event
+
+The information sent to the Endpoint is structured as JSON:
+
+```json
+{
+  "aggregateID": "ID of the aggregate",
+  "aggregateType": "Type of the aggregate",
+  "resourceOwner": "Resourceowner the aggregate belongs to",
+  "instanceID": "ID of the instance the aggregate belongs to",
+  "version": "Version of the aggregate",
+  "sequence": "Sequence of the event",
+  "event_type": "Type of the event",
+  "created_at": "Time the event was created",
+  "userID": "ID of the creator of the event",
+  "event_payload": "Content of the event in JSON format"
 }
 ```
 
@@ -70,6 +372,8 @@ To ensure the integrity of request content, each call includes a 'ZITADEL-Signat
 
 Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v2/action-service-create-target),
 and can also be newly generated when a Target is [patched](/apis/resources/action_service_v2/action-service-patch-target).
+
+For an example on how to check the signature, [refer to the example](/guides/integrate/actions/testing-request-signature).
 
 ## Execution
 
@@ -169,13 +473,6 @@ The available conditions can be found under:
 - [All available Services](/apis/resources/action_service_v2/action-service-list-execution-services), for example `zitadel.user.v2.UserService`
 
 ### Condition for Functions
-
-Replace the current Actions with the following flows:
-
-- [Internal Authentication](/apis/actions/internal-authentication)
-- [External Authentication](/apis/actions/external-authentication)
-- [Complement Token](/apis/actions/complement-token)
-- [Customize SAML Response](/apis/actions/customize-samlresponse)
 
 The available conditions can be found under [all available Functions](/apis/resources/action_service_v2/action-service-list-execution-functions).
 
