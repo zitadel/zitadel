@@ -1,0 +1,5 @@
+{
+  "extends": "@zitadel/tsconfig/tsup.json",
+  "include": ["./src/**/*", "./zitadel/**/*"],
+  "exclude": ["dist", "build", "node_modules"]
+}

@@ -5,22 +5,65 @@
   "publishConfig": {
     "access": "public"
   },
-  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./v1": {
+      "types": "./dist/v1.d.ts",
+      "import": "./dist/v1.mjs",
+      "require": "./dist/v1.js"
+    },
+    "./v2": {
+      "types": "./dist/v2.d.ts",
+      "import": "./dist/v2.mjs",
+      "require": "./dist/v2.js"
+    },
+    "./v3alpha": {
+      "types": "./dist/v3alpha.d.ts",
+      "import": "./dist/v3alpha.mjs",
+      "require": "./dist/v3alpha.js"
+    },
+    "./zitadel/*": {
+      "types": "./zitadel/*.d.ts",
+      "import": "./zitadel/*.js",
+      "require": "./zitadel/*.js"
+    },
+    "./zitadel/*.js": {
+      "types": "./zitadel/*.d.ts",
+      "import": "./zitadel/*.js",
+      "require": "./zitadel/*.js"
+    }
+  },
   "files": [
+    "src/**",
     "zitadel/**",
     "validate/**",
     "google/**",
-    "protoc-gen-openapiv2/**"
+    "dist/**"
   ],
   "sideEffects": false,
   "scripts": {
     "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
-    "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate"
+    "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate",
+    "build": "tsup",
+    "test:cjs": "node test/cjs-test.cjs",
+    "test:esm": "node test/esm-test.mjs",
+    "test:legacy": "ts-node test/legacy-test.ts",
+    "test": "pnpm test:cjs && pnpm test:esm && pnpm test:legacy"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.53.0"
+    "@bufbuild/buf": "^1.53.0",
+    "tsup": "^8.0.0",
+    "ts-node": "^10.9.2",
+    "@zitadel/tsconfig": "workspace:*"
   }
 }

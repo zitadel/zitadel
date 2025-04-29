@@ -1,5 +1,6 @@
 "use server";
 
+import { ConnectError } from "@zitadel/client";
 import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { headers } from "next/headers";
@@ -54,7 +55,7 @@ export async function setMyPassword({
       },
       {},
     )
-    .catch((error) => {
+    .catch((error: ConnectError) => {
       console.log(error);
       if (error.code === 7) {
         return { error: "Session is not valid." };
