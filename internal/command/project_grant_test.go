@@ -19,16 +19,15 @@ import (
 
 func TestCommandSide_AddProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		projectGrant  *domain.ProjectGrant
-		resourceOwner string
+		ctx          context.Context
+		projectGrant *AddProjectGrant
 	}
 	type res struct {
-		want *domain.ProjectGrant
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -40,18 +39,17 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 		{
 			name: "invalid usergrant, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &AddProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
+					GrantID: "grant1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -60,20 +58,20 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 		{
 			name: "project not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &AddProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
+					GrantID:      "grant1",
 					GrantedOrgID: "grantedorg1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -82,8 +80,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 		{
 			name: "project not existing in org, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -111,13 +108,14 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &AddProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
+					GrantID:      "grant1",
 					GrantedOrgID: "grantedorg1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -126,8 +124,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 		{
 			name: "granted org not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -141,13 +138,14 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &AddProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
+					GrantID:      "grant1",
 					GrantedOrgID: "grantedorg1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -156,8 +154,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 		{
 			name: "project roles not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -177,14 +174,15 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &AddProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
+					GrantID:      "grant1",
 					GrantedOrgID: "grantedorg1",
 					RoleKeys:     []string{"key1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -193,8 +191,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 		{
 			name: "usergrant for project, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -231,17 +228,61 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &AddProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
 					GrantedOrgID: "grantedorg1",
 					RoleKeys:     []string{"key1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.ProjectGrant{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "usergrant for project, id, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("grantedorg1").Aggregate,
+								"granted org",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"key1",
+								"key",
+								"",
+							),
+						),
+					),
+					expectPush(
+						project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &AddProjectGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
@@ -249,7 +290,11 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 					GrantID:      "projectgrant1",
 					GrantedOrgID: "grantedorg1",
 					RoleKeys:     []string{"key1"},
-					State:        domain.ProjectGrantStateActive,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -257,10 +302,10 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddProjectGrant(tt.args.ctx, tt.args.projectGrant, tt.args.resourceOwner)
+			got, err := r.AddProjectGrantWithID(tt.args.ctx, tt.args.projectGrant)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -268,7 +313,8 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assert.NotEmpty(t, got.ID)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -276,16 +322,15 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 
 func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx                 context.Context
-		projectGrant        *domain.ProjectGrant
-		resourceOwner       string
+		projectGrant        *ChangeProjectGrant
 		cascadeUserGrantIDs []string
 	}
 	type res struct {
-		want *domain.ProjectGrant
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -297,18 +342,16 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "invalid projectgrant, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -317,22 +360,20 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
+					GrantID:  "projectgrant1",
+					RoleKeys: []string{"key1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -341,8 +382,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "project not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -356,14 +396,13 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
+					GrantID: "projectgrant1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -372,8 +411,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "project not existing in org, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -401,15 +439,14 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
+					GrantID:  "projectgrant1",
+					RoleKeys: []string{"key1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -418,8 +455,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "granted org not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -441,14 +477,13 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
+					GrantID: "projectgrant1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -457,8 +492,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "project roles not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -486,15 +520,14 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
+					GrantID:  "projectgrant1",
+					RoleKeys: []string{"key1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -503,8 +536,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant not changed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -540,15 +572,14 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
+					GrantID:  "projectgrant1",
+					RoleKeys: []string{"key1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -557,8 +588,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant only added roles, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -609,34 +639,25 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
-					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1", "key2"},
-				},
-				resourceOwner: "org1",
-			},
-			res: res{
-				want: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1", "key2"},
-					State:        domain.ProjectGrantStateActive,
+					GrantID:  "projectgrant1",
+					RoleKeys: []string{"key1", "key2"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
 		{
 			name: "projectgrant remove roles, usergrant not found, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -688,35 +709,26 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
-					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
-				},
-				resourceOwner:       "org1",
-				cascadeUserGrantIDs: []string{"usergrant1"},
-			},
-			res: res{
-				want: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
-					State:        domain.ProjectGrantStateActive,
+					GrantID:  "projectgrant1",
+					RoleKeys: []string{"key1"},
+				},
+				cascadeUserGrantIDs: []string{"usergrant1"},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
 		{
 			name: "projectgrant remove roles, usergrant not found, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -781,27 +793,19 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				projectGrant: &domain.ProjectGrant{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
-					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
-				},
-				resourceOwner:       "org1",
-				cascadeUserGrantIDs: []string{"usergrant1"},
-			},
-			res: res{
-				want: &domain.ProjectGrant{
+				projectGrant: &ChangeProjectGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					GrantID:      "projectgrant1",
-					GrantedOrgID: "grantedorg1",
-					RoleKeys:     []string{"key1"},
-					State:        domain.ProjectGrantStateActive,
+					GrantID:  "projectgrant1",
+					RoleKeys: []string{"key1"},
+				},
+				cascadeUserGrantIDs: []string{"usergrant1"},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -809,9 +813,9 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ChangeProjectGrant(tt.args.ctx, tt.args.projectGrant, tt.args.resourceOwner, tt.args.cascadeUserGrantIDs...)
+			got, err := r.ChangeProjectGrant(tt.args.ctx, tt.args.projectGrant, tt.args.cascadeUserGrantIDs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -819,7 +823,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -827,7 +831,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 
 func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -848,9 +852,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing projectid, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -864,9 +866,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing grantid, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -880,8 +880,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "project not existing, precondition failed error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -898,8 +897,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -925,8 +923,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant already deactivated, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -963,8 +960,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant deactivate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -1006,7 +1002,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.DeactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1024,7 +1020,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 
 func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -1045,9 +1041,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing projectid, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1061,9 +1055,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing grantid, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1077,8 +1069,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "project not existing, precondition failed error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1095,8 +1086,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -1122,8 +1112,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant not inactive, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -1156,8 +1145,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant reactivate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -1203,7 +1191,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ReactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1221,7 +1209,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 
 func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx                 context.Context
@@ -1243,9 +1231,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "missing projectid, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1259,9 +1245,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "missing grantid, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1275,8 +1259,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "project already removed, precondition failed error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -1307,8 +1290,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1325,8 +1307,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant remove, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -1359,8 +1340,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant remove, cascading usergrant not found, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -1395,8 +1375,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "projectgrant remove with cascading usergrants, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -1444,7 +1423,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.RemoveProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner, tt.args.cascadeUserGrantIDs...)
 			if tt.res.err == nil {

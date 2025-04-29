@@ -714,12 +714,40 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
-func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *project_v2beta.CreateProjectGrantResponse {
+func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string, roles ...string) *project_v2beta.CreateProjectGrantResponse {
 	resp, err := i.Client.Projectv2Beta.CreateProjectGrant(ctx, &project_v2beta.CreateProjectGrantRequest{
 		GrantedOrganizationId: grantedOrgID,
 		ProjectId:             projectID,
+		RoleKeys:              roles,
 	})
-	logging.OnError(err).Panic("create project grant")
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeleteProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.DeleteProjectGrant(ctx, &project_v2beta.DeleteProjectGrantRequest{
+		GrantedOrganizationId: grantedOrgID,
+		ProjectId:             projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeactivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeactivateProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.DeactivateProjectGrant(ctx, &project_v2beta.DeactivateProjectGrantRequest{
+		ProjectId:             projectID,
+		GrantedOrganizationId: grantedOrgID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.ActivateProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.ActivateProjectGrant(ctx, &project_v2beta.ActivateProjectGrantRequest{
+		ProjectId:             projectID,
+		GrantedOrganizationId: grantedOrgID,
+	})
+	require.NoError(t, err)
 	return resp
 }
 

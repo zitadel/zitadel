@@ -95,14 +95,14 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants.UserGrants)...)
+	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToCommand(req, authz.GetCtxData(ctx).OrgID), userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectGrantResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			grant.Sequence,
-			grant.ChangeDate,
+			grant.EventDate,
 			grant.ResourceOwner,
 		),
 	}, nil

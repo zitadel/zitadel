@@ -113,10 +113,11 @@ func AddProjectGrantRequestToCommand(req *mgmt_pb.AddProjectGrantRequest, grantI
 	}
 }
 
-func UpdateProjectGrantRequestToDomain(req *mgmt_pb.UpdateProjectGrantRequest) *domain.ProjectGrant {
-	return &domain.ProjectGrant{
+func UpdateProjectGrantRequestToCommand(req *mgmt_pb.UpdateProjectGrantRequest, resourceOwner string) *command.ChangeProjectGrant {
+	return &command.ChangeProjectGrant{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
 		GrantID:  req.GrantId,
 		RoleKeys: req.RoleKeys,

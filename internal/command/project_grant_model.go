@@ -133,22 +133,22 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ProjectAddedEvent:
-			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+			if wm.ResourceOwner != "" && e.Aggregate().ResourceOwner != wm.ResourceOwner {
 				continue
 			}
 			wm.ProjectExists = true
 		case *project.ProjectRemovedEvent:
-			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+			if wm.ResourceOwner != "" && e.Aggregate().ResourceOwner != wm.ResourceOwner {
 				continue
 			}
 			wm.ProjectExists = false
 		case *project.RoleAddedEvent:
-			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+			if wm.ResourceOwner != "" && e.Aggregate().ResourceOwner != wm.ResourceOwner {
 				continue
 			}
 			wm.ExistingRoleKeys = append(wm.ExistingRoleKeys, e.Key)
 		case *project.RoleRemovedEvent:
-			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+			if wm.ResourceOwner != "" && e.Aggregate().ResourceOwner != wm.ResourceOwner {
 				continue
 			}
 			for i, key := range wm.ExistingRoleKeys {
