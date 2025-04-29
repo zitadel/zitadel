@@ -159,7 +159,7 @@ func CreateInstancePbToSetupInstance(req *instance.CreateInstanceRequest, defaul
 func createInstancePbToAddHuman(req *instance.CreateInstanceRequest_Human, defaultHuman command.AddHuman, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
 	user := defaultHuman
 	if req.Email != nil {
-		user.Email.Address = domain.EmailAddress(req.Email.Email)
+		user.Email.Address = domain.EmailAddress(strings.TrimSpace(req.Email.Email))
 		user.Email.Verified = req.Email.IsEmailVerified
 	}
 	if req.Profile != nil {
