@@ -26,7 +26,6 @@ func TestServer_AddKey(t *testing.T) {
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
-		ctx     context.Context
 		req     *user.AddKeyRequest
 		prepare func(request *user.AddKeyRequest) error
 	}
@@ -38,7 +37,6 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add key, user not existing",
 			args: args{
-				IamCTX,
 				&user.AddKeyRequest{
 					UserId:         "notexisting",
 					ExpirationDate: expirationDate,
@@ -50,7 +48,6 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add key, ok",
 			args: args{
-				IamCTX,
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -63,7 +60,6 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add key human, not ok",
 			args: args{
-				IamCTX,
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -76,7 +72,6 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add another key, ok",
 			args: args{
-				IamCTX,
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -96,7 +91,7 @@ func TestServer_AddKey(t *testing.T) {
 			now := time.Now()
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
-			got, err := Client.AddKey(tt.args.ctx, tt.args.req)
+			got, err := Client.AddKey(CTX, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -114,7 +109,7 @@ func TestServer_AddKey(t *testing.T) {
 func TestServer_AddKey_Permission(t *testing.T) {
 	OrgCTX := CTX
 	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddKey-%s", gofakeit.AppName()), gofakeit.Email())
-	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
+	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
@@ -175,12 +170,10 @@ func TestServer_AddKey_Permission(t *testing.T) {
 }
 
 func TestServer_RemoveKey(t *testing.T) {
-	OrgCTX := CTX
 	resp := Instance.CreateUserTypeMachine(IamCTX)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
-		ctx     context.Context
 		req     *user.RemoveKeyRequest
 		prepare func(request *user.RemoveKeyRequest) error
 	}
@@ -192,12 +185,11 @@ func TestServer_RemoveKey(t *testing.T) {
 		{
 			name: "remove key, user not existing",
 			args: args{
-				OrgCTX,
 				&user.RemoveKeyRequest{
 					UserId: "notexisting",
 				},
 				func(request *user.RemoveKeyRequest) error {
-					key, err := Instance.Client.UserV2.AddKey(IamCTX, &user.AddKeyRequest{
+					key, err := Client.AddKey(IamCTX, &user.AddKeyRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -210,7 +202,6 @@ func TestServer_RemoveKey(t *testing.T) {
 		{
 			name: "remove key, not existing",
 			args: args{
-				OrgCTX,
 				&user.RemoveKeyRequest{
 					KeyId: "notexisting",
 				},
@@ -224,10 +215,9 @@ func TestServer_RemoveKey(t *testing.T) {
 		{
 			name: "remove key, ok",
 			args: args{
-				OrgCTX,
 				&user.RemoveKeyRequest{},
 				func(request *user.RemoveKeyRequest) error {
-					key, err := Instance.Client.UserV2.AddKey(IamCTX, &user.AddKeyRequest{
+					key, err := Client.AddKey(IamCTX, &user.AddKeyRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -243,7 +233,7 @@ func TestServer_RemoveKey(t *testing.T) {
 			now := time.Now()
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
-			got, err := Client.RemoveKey(tt.args.ctx, tt.args.req)
+			got, err := Client.RemoveKey(CTX, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -259,7 +249,7 @@ func TestServer_RemoveKey(t *testing.T) {
 func TestServer_RemoveKey_Permission(t *testing.T) {
 	OrgCTX := CTX
 	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemoveKey-%s", gofakeit.AppName()), gofakeit.Email())
-	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
+	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
@@ -271,7 +261,7 @@ func TestServer_RemoveKey_Permission(t *testing.T) {
 		UserId: otherOrgUser.GetId(),
 	}
 	prepare := func(request *user.RemoveKeyRequest) error {
-		key, err := Instance.Client.UserV2.AddKey(IamCTX, &user.AddKeyRequest{
+		key, err := Client.AddKey(IamCTX, &user.AddKeyRequest{
 			ExpirationDate: timestamppb.New(time.Now().Add(time.Hour * 24)),
 			UserId:         otherOrgUser.GetId(),
 		})
@@ -327,10 +317,6 @@ func TestServer_RemoveKey_Permission(t *testing.T) {
 }
 
 func TestServer_ListKeys(t *testing.T) {
-	onlySinceTestStartFilter := &user.KeysSearchFilter{Filter: &user.KeysSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
-		Timestamp: timestamppb.Now(),
-		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
-	}}}
 	OrgCTX := CTX
 	setPermissionCheckV2Flag(t, true)
 	defer setPermissionCheckV2Flag(t, false)
@@ -346,6 +332,10 @@ func TestServer_ListKeys(t *testing.T) {
 	require.NoError(t, err)
 	otherOrgUserId := otherOrgUser.GetId()
 	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
+	onlySinceTestStartFilter := &user.KeysSearchFilter{Filter: &user.KeysSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
+		Timestamp: timestamppb.Now(),
+		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
+	}}}
 	myOrgId := Instance.DefaultOrg.GetId()
 	myUserId := Instance.Users.Get(integration.UserTypeNoPermission).ID
 	expiresInADay := time.Now().Truncate(time.Hour).Add(time.Hour * 24)

@@ -22,12 +22,10 @@ import (
 )
 
 func TestServer_AddPersonalAccessToken(t *testing.T) {
-	OrgCTX := CTX
 	resp := Instance.CreateUserTypeMachine(IamCTX)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
-		ctx     context.Context
 		req     *user.AddPersonalAccessTokenRequest
 		prepare func(request *user.AddPersonalAccessTokenRequest) error
 	}
@@ -39,7 +37,6 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add pat, user not existing",
 			args: args{
-				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					UserId:         "notexisting",
 					ExpirationDate: expirationDate,
@@ -51,7 +48,6 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add pat, ok",
 			args: args{
-				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -64,7 +60,6 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add pat human, not ok",
 			args: args{
-				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -77,7 +72,6 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add another pat, ok",
 			args: args{
-				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -97,7 +91,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 			now := time.Now()
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
-			got, err := Client.AddPersonalAccessToken(tt.args.ctx, tt.args.req)
+			got, err := Client.AddPersonalAccessToken(CTX, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -115,7 +109,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
 	OrgCTX := CTX
 	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddPersonalAccessToken-%s", gofakeit.AppName()), gofakeit.Email())
-	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
+	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
@@ -176,12 +170,10 @@ func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
 }
 
 func TestServer_RemovePersonalAccessToken(t *testing.T) {
-	OrgCTX := CTX
-	resp := Instance.CreateUserTypeMachine(CTX)
+	resp := Instance.CreateUserTypeMachine(IamCTX)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
-		ctx     context.Context
 		req     *user.RemovePersonalAccessTokenRequest
 		prepare func(request *user.RemovePersonalAccessTokenRequest) error
 	}
@@ -193,12 +185,11 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 		{
 			name: "remove pat, user not existing",
 			args: args{
-				OrgCTX,
 				&user.RemovePersonalAccessTokenRequest{
 					UserId: "notexisting",
 				},
 				func(request *user.RemovePersonalAccessTokenRequest) error {
-					pat, err := Instance.Client.UserV2.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
+					pat, err := Client.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -211,7 +202,6 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 		{
 			name: "remove pat, not existing",
 			args: args{
-				OrgCTX,
 				&user.RemovePersonalAccessTokenRequest{
 					TokenId: "notexisting",
 				},
@@ -225,10 +215,9 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 		{
 			name: "remove pat, ok",
 			args: args{
-				OrgCTX,
 				&user.RemovePersonalAccessTokenRequest{},
 				func(request *user.RemovePersonalAccessTokenRequest) error {
-					pat, err := Instance.Client.UserV2.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
+					pat, err := Client.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -244,7 +233,7 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 			now := time.Now()
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
-			got, err := Client.RemovePersonalAccessToken(tt.args.ctx, tt.args.req)
+			got, err := Client.RemovePersonalAccessToken(CTX, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -259,7 +248,7 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 
 func TestServer_RemovePersonalAccessToken_Permission(t *testing.T) {
 	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemovePersonalAccessToken-%s", gofakeit.AppName()), gofakeit.Email())
-	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
+	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
@@ -271,7 +260,7 @@ func TestServer_RemovePersonalAccessToken_Permission(t *testing.T) {
 		UserId: otherOrgUser.GetId(),
 	}
 	prepare := func(request *user.RemovePersonalAccessTokenRequest) error {
-		pat, err := Instance.Client.UserV2.AddPersonalAccessToken(IamCTX, &user.AddPersonalAccessTokenRequest{
+		pat, err := Client.AddPersonalAccessToken(IamCTX, &user.AddPersonalAccessTokenRequest{
 			ExpirationDate: timestamppb.New(time.Now().Add(time.Hour * 24)),
 			UserId:         otherOrgUser.GetId(),
 		})
@@ -327,10 +316,6 @@ func TestServer_RemovePersonalAccessToken_Permission(t *testing.T) {
 }
 
 func TestServer_ListPersonalAccessTokens(t *testing.T) {
-	onlySinceTestStartFilter := &user.PersonalAccessTokensSearchFilter{Filter: &user.PersonalAccessTokensSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
-		Timestamp: timestamppb.Now(),
-		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
-	}}}
 	OrgCTX := CTX
 	setPermissionCheckV2Flag(t, true)
 	defer setPermissionCheckV2Flag(t, false)
@@ -346,6 +331,10 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 	require.NoError(t, err)
 	otherOrgUserId := otherOrgUser.GetId()
 	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
+	onlySinceTestStartFilter := &user.PersonalAccessTokensSearchFilter{Filter: &user.PersonalAccessTokensSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
+		Timestamp: timestamppb.Now(),
+		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
+	}}}
 	myOrgId := Instance.DefaultOrg.GetId()
 	myUserId := Instance.Users.Get(integration.UserTypeNoPermission).ID
 	expiresInADay := time.Now().Truncate(time.Hour).Add(time.Hour * 24)
