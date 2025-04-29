@@ -139,7 +139,7 @@ func (c *Commands) CheckPermissionUserWrite(ctx context.Context, allowSelf bool)
 		if allowSelf && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
 			return nil
 		}
-		return c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, aggregateID)
+		return c.CheckPermission(ctx, domain.PermissionUserWrite, user.AggregateType)(resourceOwner, aggregateID)
 	}
 }
 
