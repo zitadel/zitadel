@@ -278,7 +278,7 @@ func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUserV2(ctx, req.UserId, "", memberships, grants...)
+	details, err := s.command.RemoveUserV2(ctx, req.UserId, "", s.command.CheckPermissionUserDelete(ctx, true), memberships, grants...)
 	if err != nil {
 		return nil, err
 	}

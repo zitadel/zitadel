@@ -88,8 +88,10 @@ func NewUserStateWriteModel(userID, resourceOwner string) *UserV2WriteModel {
 	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState())
 }
 
-func NewUserRemoveWriteModel(userID, resourceOwner string) *UserV2WriteModel {
-	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState(), WithIDPLinks())
+func NewUserRemoveWriteModel(userID, resourceOwner string, check eventstore.PermissionCheck) *UserV2WriteModel {
+	wm := newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState(), WithIDPLinks())
+	wm.PermissionCheck = check
+	return wm
 }
 
 func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinks, metadataListWM bool) *UserV2WriteModel {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -117,59 +116,6 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
-// TODO: Move to a central place
-func (c *Commands) CheckPermission(ctx context.Context, permission string, aggregateType eventstore.AggregateType) eventstore.PermissionCheck {
-	return func(resourceOwner, aggregateID string) error {
-		// For example if a write model didn't query any events, the resource owner is probably empty.
-		// In this case, we have to query an event on the given aggregate to get the resource owner.
-		if resourceOwner == "" {
-			r := NewResourceOwnerModel(authz.GetInstance(ctx).InstanceID(), aggregateType, aggregateID)
-			err := c.eventstore.FilterToQueryReducer(ctx, r)
-			if err != nil {
-				return err
-			}
-			resourceOwner = r.resourceOwner
-		}
-		return c.checkPermission(ctx, permission, resourceOwner, aggregateID)
-	}
-}
-
-func (c *Commands) CheckPermissionUserWrite(ctx context.Context, allowSelf bool) eventstore.PermissionCheck {
-	return func(resourceOwner, aggregateID string) error {
-		if allowSelf && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
-			return nil
-		}
-		return c.CheckPermission(ctx, domain.PermissionUserWrite, user.AggregateType)(resourceOwner, aggregateID)
-	}
-}
-
-// Deprecated: use CheckPermissionUserWrite and use the returned function as PermissionCheck in eventstore.WriteModel to protect an API
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.CheckPermissionUserWrite(ctx, true)(resourceOwner, userID)
-}
-
-// Deprecated: use CheckPermission, allow self and use the returned function as PermissionCheck in eventstore.WriteModel to protect an API
-func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Deprecated: use CheckPermission, allow self and use the returned function as PermissionCheck in eventstore.WriteModel to protect an API
-func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -182,22 +128,18 @@ func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writ
 	return writeModel, nil
 }
 
-func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, check eventstore.PermissionCheck, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
 
-	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner)
+	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner, check)
 	if err != nil {
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bd4ir1mblj", "Errors.User.NotFound")
 	}
-	if err := c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
-		return nil, err
-	}
-
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
@@ -233,11 +175,11 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwner string, check eventstore.PermissionCheck) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserRemoveWriteModel(userID, resourceOwner)
+	writeModel = NewUserRemoveWriteModel(userID, resourceOwner, check)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
