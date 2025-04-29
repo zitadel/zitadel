@@ -3,4 +3,4 @@
 "@zitadel/proto": minor
 ---
 
-CJS and ESM support for @zitadel/proto
+revert CJS support
