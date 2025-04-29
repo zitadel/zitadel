@@ -163,6 +163,9 @@ Destination:
 
 # As cockroachdb first copies the data into memory this parameter is used to iterate through the events table and fetch only the given amount of events per iteration
 EventBulkSize: 10000 # ZITADEL_EVENTBULKSIZE
+# The maximum duration an auth request was last updated before it gets ignored.
+# Default is 30 days
+MaxAuthRequestAge: 720h # ZITADEL_MAXAUTHREQUESTAGE
 
 Projections:
   # Defines how many projections are allowed to run in parallel
