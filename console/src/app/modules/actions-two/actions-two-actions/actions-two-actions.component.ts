@@ -88,7 +88,6 @@ export class ActionsTwoActionsComponent {
     }
 
     try {
-      console.log(request);
       await this.actionService.setExecution(request);
       await new Promise((res) => setTimeout(res, 1000));
       this.refresh$.next(true);
