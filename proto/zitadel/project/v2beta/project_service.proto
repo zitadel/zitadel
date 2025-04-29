@@ -232,7 +232,7 @@ service ProjectService {
       responses: {
         key: "404"
         value: {
-          description: "The project to update does not exist.";
+          description: "The project to get does not exist.";
         }
       };
     };
@@ -632,7 +632,6 @@ service ProjectService {
       };
     };
   }
-
 
   // List Project Grants
   //
@@ -1214,7 +1213,7 @@ message ListProjectGrantsRequest {
   // List limitations and ordering.
   optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
   // Define the criteria to query for.
-  repeated ProjectSearchFilter filters = 3;
+  repeated ProjectGrantSearchFilter filters = 3;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"filters\":[{\"projectNameFilter\":{\"projectName\":\"MyProject\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inProjectIdsFilter\":{\"projectIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
   };

@@ -186,3 +186,95 @@ func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) project_p
 		return project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
 	}
 }
+
+func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProjectGrantsRequest) (*project_pb.ListProjectGrantsResponse, error) {
+	queries, err := s.listProjectGrantsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.SearchProjectGrants(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &project_pb.ListProjectGrantsResponse{
+		ProjectGrants: projectGrantsToPb(resp.ProjectGrants),
+		Pagination:    filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
+	}, nil
+}
+
+func (s *Server) listProjectGrantsRequestToModel(req *project_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	queries, err := projectGrantFiltersToModel(req.Filters)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
+
+func projectGrantFiltersToModel(queries []*project_pb.ProjectGrantSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, qry := range queries {
+		q[i], err = projectGrantFilterToModel(qry)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func projectGrantFilterToModel(filter *project_pb.ProjectGrantSearchFilter) (query.SearchQuery, error) {
+	switch q := filter.Filter.(type) {
+	case *project_pb.ProjectGrantSearchFilter_ProjectNameFilter:
+		return projectNameFilterToQuery(q.ProjectNameFilter)
+	case *project_pb.ProjectGrantSearchFilter_RoleKeyFilter:
+		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyFilter.Key)
+	case *project_pb.ProjectGrantSearchFilter_InProjectIdsFilter:
+		return query.NewProjectGrantProjectIDsSearchQuery(q.InProjectIdsFilter.ProjectIds)
+	case *project_pb.ProjectGrantSearchFilter_ProjectResourceOwnerFilter:
+		return query.NewProjectGrantResourceOwnerSearchQuery(q.ProjectResourceOwnerFilter.ProjectResourceOwner)
+	case *project_pb.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter:
+		return query.NewProjectGrantGrantedOrgIDSearchQuery(q.ProjectGrantResourceOwnerFilter.ProjectGrantResourceOwner)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
+	}
+}
+
+func projectGrantsToPb(projects []*query.ProjectGrant) []*project_pb.ProjectGrant {
+	p := make([]*project_pb.ProjectGrant, len(projects))
+	for i, project := range projects {
+		p[i] = projectGrantToPb(project)
+	}
+	return p
+}
+
+func projectGrantToPb(project *query.ProjectGrant) *project_pb.ProjectGrant {
+	return &project_pb.ProjectGrant{
+		OrganizationId:          project.ResourceOwner,
+		CreationDate:            timestamppb.New(project.CreationDate),
+		ChangeDate:              timestamppb.New(project.ChangeDate),
+		GrantedOrganizationId:   project.GrantedOrgID,
+		GrantedOrganizationName: project.OrgName,
+		GrantedRoleKeys:         project.GrantedRoleKeys,
+		ProjectId:               project.ProjectID,
+		ProjectName:             project.ProjectName,
+		State:                   projectGrantStateToPb(project.State),
+	}
+}
+
+func projectGrantStateToPb(state domain.ProjectGrantState) project_pb.ProjectGrantState {
+	switch state {
+	case domain.ProjectGrantStateActive:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_ACTIVE
+	case domain.ProjectGrantStateInactive:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
+	default:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
+	}
+}
