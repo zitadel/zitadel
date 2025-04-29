@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 

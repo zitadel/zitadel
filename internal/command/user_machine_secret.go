@@ -84,8 +84,8 @@ func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resou
 
 func prepareRemoveMachineSecret(a *user.Aggregate, check eventstore.PermissionCheck) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if check != nil && a.ResourceOwner == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0qp2hus", "Errors.ResourceOwnerMissing")
+		if a.ResourceOwner == "" && check == nil {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bzosjs", "Errors.User.UserIDMissing")

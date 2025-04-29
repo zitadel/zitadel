@@ -44,7 +44,7 @@ func NewPersonalAccessToken(resourceOwner string, userID string, expirationDate 
 }
 
 func (pat *PersonalAccessToken) content() error {
-	if pat.ResourceOwner == "" {
+	if pat.ResourceOwner == "" && pat.PermissionCheck == nil {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-xs0k2n", "Errors.ResourceOwnerMissing")
 	}
 	if pat.AggregateID == "" {
