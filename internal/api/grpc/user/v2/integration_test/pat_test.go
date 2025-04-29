@@ -22,7 +22,8 @@ import (
 )
 
 func TestServer_AddPersonalAccessToken(t *testing.T) {
-	resp := Instance.CreateUserTypeMachine(CTX)
+	OrgCTX := CTX
+	resp := Instance.CreateUserTypeMachine(IamCTX)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
@@ -38,7 +39,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add pat, user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					UserId:         "notexisting",
 					ExpirationDate: expirationDate,
@@ -50,7 +51,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add pat, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -63,7 +64,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add pat human, not ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -76,13 +77,13 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 		{
 			name: "add another pat, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddPersonalAccessTokenRequest{
 					ExpirationDate: expirationDate,
 				},
 				func(request *user.AddPersonalAccessTokenRequest) error {
 					request.UserId = userId
-					_, err := Client.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
+					_, err := Client.AddPersonalAccessToken(IamCTX, &user.AddPersonalAccessTokenRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -112,6 +113,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 }
 
 func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
+	OrgCTX := CTX
 	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddPersonalAccessToken-%s", gofakeit.AppName()), gofakeit.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
@@ -145,7 +147,7 @@ func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
 		},
 		{
 			name:    "org, error",
-			args:    args{CTX, request},
+			args:    args{OrgCTX, request},
 			wantErr: true,
 		},
 		{
@@ -174,6 +176,7 @@ func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
 }
 
 func TestServer_RemovePersonalAccessToken(t *testing.T) {
+	OrgCTX := CTX
 	resp := Instance.CreateUserTypeMachine(CTX)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
@@ -190,7 +193,7 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 		{
 			name: "remove pat, user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemovePersonalAccessTokenRequest{
 					UserId: "notexisting",
 				},
@@ -208,7 +211,7 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 		{
 			name: "remove pat, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemovePersonalAccessTokenRequest{
 					TokenId: "notexisting",
 				},
@@ -222,7 +225,7 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 		{
 			name: "remove pat, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemovePersonalAccessTokenRequest{},
 				func(request *user.RemovePersonalAccessTokenRequest) error {
 					pat, err := Instance.Client.UserV2.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
@@ -324,6 +327,10 @@ func TestServer_RemovePersonalAccessToken_Permission(t *testing.T) {
 }
 
 func TestServer_ListPersonalAccessTokens(t *testing.T) {
+	onlySinceTestStartFilter := &user.PersonalAccessTokensSearchFilter{Filter: &user.PersonalAccessTokensSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
+		Timestamp: timestamppb.Now(),
+		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
+	}}}
 	OrgCTX := CTX
 	setPermissionCheckV2Flag(t, true)
 	defer setPermissionCheckV2Flag(t, false)
@@ -347,12 +354,6 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 	otherOrgDataPointExpiringSoon := setupPATDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, time.Now().Truncate(time.Hour).Add(time.Hour))
 	otherOrgDataPointExpiringLate := setupPATDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay.Add(time.Hour*24*30))
 	sortingColumnExpirationDate := user.PersonalAccessTokenFieldName_PERSONAL_ACCESS_TOKEN_FIELD_NAME_EXPIRATION_DATE
-	testUnrelatedPatsFilter := &user.PersonalAccessTokensSearchFilter_ExpirationDateFilter{
-		ExpirationDateFilter: &user.TimestampFilter{
-			Timestamp: timestamppb.New(time.Now().Truncate(time.Hour).Add(time.Hour * 24 * 365)),
-			Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE,
-		},
-	}
 	awaitPersonalAccessTokens(t, otherOrgDataPointExpiringSoon.GetId(), otherOrgDataPointExpiringLate.GetId(), otherUserDataPoint.GetId(), myDataPoint.GetId())
 	type args struct {
 		ctx context.Context
@@ -368,9 +369,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.ListPersonalAccessTokensRequest{
-					Filters: []*user.PersonalAccessTokensSearchFilter{{
-						Filter: testUnrelatedPatsFilter,
-					}},
+					Filters: []*user.PersonalAccessTokensSearchFilter{onlySinceTestStartFilter},
 				},
 			},
 			want: &user.ListPersonalAccessTokensResponse{
@@ -391,9 +390,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 			args: args{
 				OrgCTX,
 				&user.ListPersonalAccessTokensRequest{
-					Filters: []*user.PersonalAccessTokensSearchFilter{{
-						Filter: testUnrelatedPatsFilter,
-					}},
+					Filters: []*user.PersonalAccessTokensSearchFilter{onlySinceTestStartFilter},
 				},
 			},
 			want: &user.ListPersonalAccessTokensResponse{
@@ -412,9 +409,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 			args: args{
 				UserCTX,
 				&user.ListPersonalAccessTokensRequest{
-					Filters: []*user.PersonalAccessTokensSearchFilter{{
-						Filter: testUnrelatedPatsFilter,
-					}},
+					Filters: []*user.PersonalAccessTokensSearchFilter{onlySinceTestStartFilter},
 				},
 			},
 			want: &user.ListPersonalAccessTokensResponse{
@@ -433,7 +428,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 				IamCTX,
 				&user.ListPersonalAccessTokensRequest{
 					Filters: []*user.PersonalAccessTokensSearchFilter{
-						{Filter: testUnrelatedPatsFilter},
+						onlySinceTestStartFilter,
 						{
 							Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{
 								TokenIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
@@ -458,7 +453,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 				IamCTX,
 				&user.ListPersonalAccessTokensRequest{
 					Filters: []*user.PersonalAccessTokensSearchFilter{
-						{Filter: testUnrelatedPatsFilter},
+						onlySinceTestStartFilter,
 						{
 							Filter: &user.PersonalAccessTokensSearchFilter_OrFilter{
 								OrFilter: &user.PersonalAccessTokensOrFilter{
@@ -489,7 +484,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 				IamCTX,
 				&user.ListPersonalAccessTokensRequest{
 					Filters: []*user.PersonalAccessTokensSearchFilter{
-						{Filter: testUnrelatedPatsFilter},
+						onlySinceTestStartFilter,
 						{
 							Filter: &user.PersonalAccessTokensSearchFilter_OrganizationIdFilter{
 								OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
@@ -518,7 +513,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 					},
 					SortingColumn: &sortingColumnExpirationDate,
 					Filters: []*user.PersonalAccessTokensSearchFilter{
-						{Filter: testUnrelatedPatsFilter},
+						onlySinceTestStartFilter,
 						{
 							Filter: &user.PersonalAccessTokensSearchFilter_OrFilter{
 								OrFilter: &user.PersonalAccessTokensOrFilter{
@@ -555,7 +550,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 						Asc:    true,
 					},
 					Filters: []*user.PersonalAccessTokensSearchFilter{
-						{Filter: testUnrelatedPatsFilter},
+						onlySinceTestStartFilter,
 					},
 				},
 			},

@@ -22,7 +22,7 @@ import (
 )
 
 func TestServer_AddKey(t *testing.T) {
-	resp := Instance.CreateUserTypeMachine(CTX)
+	resp := Instance.CreateUserTypeMachine(IamCTX)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
@@ -38,7 +38,7 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add key, user not existing",
 			args: args{
-				CTX,
+				IamCTX,
 				&user.AddKeyRequest{
 					UserId:         "notexisting",
 					ExpirationDate: expirationDate,
@@ -50,7 +50,7 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add key, ok",
 			args: args{
-				CTX,
+				IamCTX,
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -63,7 +63,7 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add key human, not ok",
 			args: args{
-				CTX,
+				IamCTX,
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
 				},
@@ -76,13 +76,13 @@ func TestServer_AddKey(t *testing.T) {
 		{
 			name: "add another key, ok",
 			args: args{
-				CTX,
+				IamCTX,
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
 				},
 				func(request *user.AddKeyRequest) error {
 					request.UserId = userId
-					_, err := Client.AddKey(CTX, &user.AddKeyRequest{
+					_, err := Client.AddKey(IamCTX, &user.AddKeyRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -175,7 +175,8 @@ func TestServer_AddKey_Permission(t *testing.T) {
 }
 
 func TestServer_RemoveKey(t *testing.T) {
-	resp := Instance.CreateUserTypeMachine(CTX)
+	OrgCTX := CTX
+	resp := Instance.CreateUserTypeMachine(IamCTX)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
@@ -191,12 +192,12 @@ func TestServer_RemoveKey(t *testing.T) {
 		{
 			name: "remove key, user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveKeyRequest{
 					UserId: "notexisting",
 				},
 				func(request *user.RemoveKeyRequest) error {
-					key, err := Instance.Client.UserV2.AddKey(CTX, &user.AddKeyRequest{
+					key, err := Instance.Client.UserV2.AddKey(IamCTX, &user.AddKeyRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -209,7 +210,7 @@ func TestServer_RemoveKey(t *testing.T) {
 		{
 			name: "remove key, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveKeyRequest{
 					KeyId: "notexisting",
 				},
@@ -223,10 +224,10 @@ func TestServer_RemoveKey(t *testing.T) {
 		{
 			name: "remove key, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveKeyRequest{},
 				func(request *user.RemoveKeyRequest) error {
-					key, err := Instance.Client.UserV2.AddKey(CTX, &user.AddKeyRequest{
+					key, err := Instance.Client.UserV2.AddKey(IamCTX, &user.AddKeyRequest{
 						ExpirationDate: expirationDate,
 						UserId:         userId,
 					})
@@ -326,6 +327,10 @@ func TestServer_RemoveKey_Permission(t *testing.T) {
 }
 
 func TestServer_ListKeys(t *testing.T) {
+	onlySinceTestStartFilter := &user.KeysSearchFilter{Filter: &user.KeysSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
+		Timestamp: timestamppb.Now(),
+		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
+	}}}
 	OrgCTX := CTX
 	setPermissionCheckV2Flag(t, true)
 	defer setPermissionCheckV2Flag(t, false)
@@ -363,7 +368,7 @@ func TestServer_ListKeys(t *testing.T) {
 			name: "list all, instance",
 			args: args{
 				IamCTX,
-				&user.ListKeysRequest{},
+				&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
 			},
 			want: &user.ListKeysResponse{
 				Result: []*user.Key{
@@ -382,7 +387,7 @@ func TestServer_ListKeys(t *testing.T) {
 			name: "list all, org",
 			args: args{
 				OrgCTX,
-				&user.ListKeysRequest{},
+				&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
 			},
 			want: &user.ListKeysResponse{
 				Result: []*user.Key{
@@ -399,7 +404,7 @@ func TestServer_ListKeys(t *testing.T) {
 			name: "list all, user",
 			args: args{
 				UserCTX,
-				&user.ListKeysRequest{},
+				&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
 			},
 			want: &user.ListKeysResponse{
 				Result: []*user.Key{
@@ -416,11 +421,14 @@ func TestServer_ListKeys(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.ListKeysRequest{
-					Filters: []*user.KeysSearchFilter{{
-						Filter: &user.KeysSearchFilter_KeyIdFilter{
-							KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
+					Filters: []*user.KeysSearchFilter{
+						onlySinceTestStartFilter,
+						{
+							Filter: &user.KeysSearchFilter_KeyIdFilter{
+								KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
+							},
 						},
-					}},
+					},
 				},
 			},
 			want: &user.ListKeysResponse{
@@ -438,16 +446,19 @@ func TestServer_ListKeys(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.ListKeysRequest{
-					Filters: []*user.KeysSearchFilter{{
-						Filter: &user.KeysSearchFilter_OrFilter{
-							OrFilter: &user.KeysOrFilter{
-								Filters: []*user.KeysSearchFilter{
-									{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id}}},
-									{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+					Filters: []*user.KeysSearchFilter{
+						onlySinceTestStartFilter,
+						{
+							Filter: &user.KeysSearchFilter_OrFilter{
+								OrFilter: &user.KeysOrFilter{
+									Filters: []*user.KeysSearchFilter{
+										{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id}}},
+										{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+									},
 								},
 							},
 						},
-					}},
+					},
 				},
 			},
 			want: &user.ListKeysResponse{
@@ -466,11 +477,14 @@ func TestServer_ListKeys(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.ListKeysRequest{
-					Filters: []*user.KeysSearchFilter{{
-						Filter: &user.KeysSearchFilter_OrganizationIdFilter{
-							OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
+					Filters: []*user.KeysSearchFilter{
+						onlySinceTestStartFilter,
+						{
+							Filter: &user.KeysSearchFilter_OrganizationIdFilter{
+								OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
+							},
 						},
-					}},
+					},
 				},
 			},
 			want: &user.ListKeysResponse{
@@ -493,16 +507,19 @@ func TestServer_ListKeys(t *testing.T) {
 						Asc: true,
 					},
 					SortingColumn: &sortingColumnExpirationDate,
-					Filters: []*user.KeysSearchFilter{{
-						Filter: &user.KeysSearchFilter_OrFilter{
-							OrFilter: &user.KeysOrFilter{
-								Filters: []*user.KeysSearchFilter{
-									{Filter: &user.KeysSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
-									{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+					Filters: []*user.KeysSearchFilter{
+						onlySinceTestStartFilter,
+						{
+							Filter: &user.KeysSearchFilter_OrFilter{
+								OrFilter: &user.KeysOrFilter{
+									Filters: []*user.KeysSearchFilter{
+										{Filter: &user.KeysSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
+										{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
+									},
 								},
 							},
 						},
-					}},
+					},
 				},
 			},
 			want: &user.ListKeysResponse{
@@ -526,6 +543,9 @@ func TestServer_ListKeys(t *testing.T) {
 						Offset: 2,
 						Limit:  2,
 						Asc:    true,
+					},
+					Filters: []*user.KeysSearchFilter{
+						onlySinceTestStartFilter,
 					},
 				},
 			},
