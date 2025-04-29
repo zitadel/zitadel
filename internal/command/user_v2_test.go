@@ -1358,7 +1358,9 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.RemoveUserV2(tt.args.ctx, tt.args.userID, "", r.CheckPermissionUserDelete(tt.args.ctx, true), tt.args.cascadingMemberships, tt.args.grantIDs...)
+			got, err := r.RemoveUserV2(tt.args.ctx, tt.args.userID, "", func(resourceOwner, aggregateID string) error {
+				return nil
+			}, tt.args.cascadingMemberships, tt.args.grantIDs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
