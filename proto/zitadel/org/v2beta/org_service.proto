@@ -7,15 +7,9 @@ import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v2beta/auth.proto";
 import "zitadel/org/v2beta/org.proto";
-// import "zitadel/user/v2beta/email.proto";
-// import "zitadel/user/v2beta/phone.proto";
-// import "zitadel/user/v2beta/idp.proto";
-// import "zitadel/user/v2beta/password.proto";
-import "zitadel/user/v2beta/user.proto";
 import "zitadel/user/v2beta/user_service.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
-import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
@@ -175,7 +169,7 @@ service OrganizationService {
 
       option (zitadel.protoc_gen_zitadel.v2.options) = {
         auth_option: {
-          permission: "org.read";
+          permission: "iam.read";
         }
         http_response: {
           success_code: 200
@@ -194,6 +188,83 @@ service OrganizationService {
         };
       };
     }
+
+    rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
+      option (google.api.http) = {
+          post: "/v2beta/organizations/_search";
+          body: "*";
+      };
+
+      option (zitadel.protoc_gen_zitadel.v2.options) = {
+        auth_option: {
+          permission: "iam.read";
+        }
+        http_response: {
+          success_code: 200
+        }
+      };
+
+      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        tags: "Organizations";
+        summary: "Search Organization";
+        description: "Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition."
+        responses: {
+          key: "200";
+          value: {
+            description: "list of organizations matching the query";
+          };
+        };
+        responses: {
+          key: "400";
+          value: {
+            description: "invalid list query";
+            schema: {
+              json_schema: {
+                ref: "#/definitions/rpcStatus";
+              };
+            };
+          };
+        };
+      };
+    }
+
+  rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
+    option (google.api.http) = {
+        delete: "/v2beta/organizations"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.write";
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Remove Organization";
+      description: "Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
+      responses: {
+        key: "200";
+        value: {
+            description: "org removed successfully";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid org";
+          schema: {
+            json_schema: {
+                ref: "#/definitions/rpcStatus";
+              };
+            };
+        };
+      };
+    };
+  }
 
 }
 
@@ -272,4 +343,50 @@ message GetOrganizationByIDRequest {
 
 message GetOrganizationByIDResponse {
   zitadel.org.v2beta.Organization organization = 1;
+}
+
+message ListOrganizationsRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            description: "Search query for lists";
+            required: ["query"]
+        };
+    };
+
+    //list limitations and ordering
+    // zitadel.v1.ListQuery query = 1;
+    zitadel.object.v2beta.ListQuery query = 1;
+    // the field the result is sorted
+    // zitadel.org.v1.OrgFieldName sorting_column = 2;
+    zitadel.org.v2beta.OrgFieldName sorting_column = 2;
+    //criteria the client is looking for
+    repeated zitadel.org.v2beta.OrgQuery queries = 3;
+}
+
+message ListOrganizationsResponse {
+    zitadel.object.v2beta.ListDetails details = 1;
+  // zitadel.org.v2beta.Organization organization = 1;
+    zitadel.org.v2beta.OrgFieldName sorting_column = 2;
+    repeated zitadel.org.v2beta.Organization result = 3;
+}
+
+message DeleteOrganizationRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message DeleteOrganizationResponse {
+  zitadel.object.v2beta.Details details = 1;
 }

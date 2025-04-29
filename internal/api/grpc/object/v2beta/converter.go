@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	// object_pb "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
@@ -34,6 +35,7 @@ func ToListDetails(response query.SearchResponse) *object.ListDetails {
 
 	return details
 }
+
 func ListQueryToQuery(query *object.ListQuery) (offset, limit uint64, asc bool) {
 	if query == nil {
 		return 0, 0, false
@@ -72,4 +74,11 @@ func TextMethodToQuery(method object.TextQueryMethod) query.TextComparison {
 	default:
 		return -1
 	}
+}
+
+func ListQueryToModel(query *object.ListQuery) (offset, limit uint64, asc bool) {
+	if query == nil {
+		return 0, 0, false
+	}
+	return query.Offset, uint64(query.Limit), query.Asc
 }

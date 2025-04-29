@@ -4,6 +4,7 @@ package org_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -41,11 +42,12 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_GetOrganizationByID(t *testing.T) {
-	orgName := gofakeit.Name()
-	orgId, err := createOrg(orgName)
+	orgs, orgsName, err := createOrgs(1)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
+	orgId := orgs[0].OrganizationId
+	orgName := orgsName[0]
 
 	tests := []struct {
 		name    string
@@ -233,11 +235,12 @@ func TestServer_CreateOrganization(t *testing.T) {
 }
 
 func TestServer_UpdateOrganization(t *testing.T) {
-	orgName := gofakeit.Name()
-	orgId, err := createOrg(orgName)
+	orgs, orgsName, err := createOrgs(1)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
+	orgId := orgs[0].OrganizationId
+	orgName := orgsName[0]
 
 	tests := []struct {
 		name    string
@@ -291,17 +294,95 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	}
 }
 
-func createOrg(orgName string) (string, error) {
-	org, err := Client.CreateOrganization(CTX,
-		&org.CreateOrganizationRequest{
-			Name: orgName,
-		},
-	)
+// TODO: finish off qyery testing in ListOrganizations
+func TestServer_ListOrganization(t *testing.T) {
+	noOfOrgs := 3
+	orgs, orgsName, err := createOrgs(noOfOrgs)
 	if err != nil {
-		return "", err
+		assert.Fail(t, "unable to create org")
 	}
 
-	return org.OrganizationId, nil
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		req     *org.ListOrganizationsRequest
+		want    []*org.Organization
+		wantErr bool
+	}{
+		{
+			name: "update org with same name",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			req:  &org.ListOrganizationsRequest{},
+			want: []*org.Organization{
+				{
+					Id:   orgs[0].OrganizationId,
+					Name: orgsName[0],
+				},
+				{
+					Id:   orgs[1].OrganizationId,
+					Name: orgsName[1],
+				},
+				{
+					Id:   orgs[2].OrganizationId,
+					Name: orgsName[2],
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(context.Background(), 10*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.ListOrganizations(tt.ctx, tt.req)
+				if tt.wantErr {
+					require.Error(t, err)
+					return
+				}
+				require.NoError(t, err)
+				// require.Equal(t, len(tt.want), len(got.Result))
+
+				// check details
+				// assert.NotZero(t, got.GetDetails().GetSequence())
+				// gotCD := got.GetDetails().GetChangeDate().AsTime()
+				// now := time.Now()
+				// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+				// assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
+
+				foundOrgs := 0
+				for _, got := range got.Result {
+					for _, org := range tt.want {
+						if org.Name == got.Name &&
+							org.Id == got.Id {
+							foundOrgs += 1
+						}
+						// require.Equal(t, org.do, got.Result[i].Name)
+					}
+				}
+				fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> foundOrgs = %+v\n", foundOrgs)
+				require.Equal(t, len(tt.want), foundOrgs)
+			}, retryDuration, tick, "timeout waiting for expected organizations being created")
+		})
+	}
+}
+
+func createOrgs(noOfOrgs int) ([]*org.CreateOrganizationResponse, []string, error) {
+	var err error
+	orgs := make([]*org.CreateOrganizationResponse, noOfOrgs)
+	orgsName := make([]string, noOfOrgs)
+	for i := range noOfOrgs {
+		orgName := gofakeit.Name()
+		orgsName[i] = orgName
+		orgs[i], err = Client.CreateOrganization(CTX,
+			&org.CreateOrganizationRequest{
+				Name: orgName,
+			},
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return orgs, orgsName, nil
 }
 
 func assertCreatedAdmin(t *testing.T, expected, got *org.CreateOrganizationResponse_CreatedAdmin) {

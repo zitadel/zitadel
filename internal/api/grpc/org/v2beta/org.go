@@ -43,6 +43,21 @@ func (s *Server) GetOrganizationByID(ctx context.Context, request *v2beta_org.Ge
 	}, nil
 }
 
+func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.ListOrganizationsRequest) (*v2beta_org.ListOrganizationsResponse, error) {
+	queries, err := listOrgRequestToModel(request)
+	if err != nil {
+		return nil, err
+	}
+	orgs, err := s.query.SearchOrgs(ctx, queries, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &v2beta_org.ListOrganizationsResponse{
+		Result:  OrgViewsToPb(orgs.Orgs),
+		Details: object.ToListDetails(orgs.SearchResponse),
+	}, nil
+}
+
 func createOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRequest) (*command.OrgSetup, error) {
 	admins, err := createOrganizationRequestAdminsToCommand(request.GetAdmins())
 	if err != nil {
