@@ -1,0 +1,64 @@
+package domain
+
+import (
+	"context"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
+)
+
+type SetEmailCommand struct {
+	UserID       string `json:"userId"`
+	Email        string `json:"email"`
+	verification Commander
+}
+
+var (
+	_ Commander      = (*SetEmailCommand)(nil)
+	_ eventer        = (*SetEmailCommand)(nil)
+	_ CreateHumanOpt = (*SetEmailCommand)(nil)
+)
+
+type SetEmailOpt interface {
+	applyOnSetEmail(*SetEmailCommand)
+}
+
+func NewSetEmailCommand(userID, email string, verificationType SetEmailOpt) *SetEmailCommand {
+	cmd := &SetEmailCommand{
+		UserID: userID,
+		Email:  email,
+	}
+	verificationType.applyOnSetEmail(cmd)
+	return cmd
+}
+
+func (cmd *SetEmailCommand) Execute(ctx context.Context, opts *CommandOpts) error {
+	close, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() { err = close(ctx, err) }()
+	// userStatement(opts.DB).Human().ByID(cmd.UserID).SetEmail(ctx, cmd.Email)
+	err = userRepo(opts.DB).Human().ByID(cmd.UserID).Exec().SetEmail(ctx, cmd.Email)
+	if err != nil {
+		return err
+	}
+
+	return opts.Invoke(ctx, cmd.verification)
+}
+
+// Events implements [eventer].
+func (cmd *SetEmailCommand) Events() []*eventstore.Event {
+	return []*eventstore.Event{
+		{
+			AggregateType: "user",
+			AggregateID:   cmd.UserID,
+			Type:          "user.email.set",
+			Payload:       cmd,
+		},
+	}
+}
+
+// applyOnCreateHuman implements [CreateHumanOpt].
+func (cmd *SetEmailCommand) applyOnCreateHuman(createUserCmd *CreateUserCommand[Human]) {
+	createUserCmd.email = cmd
+}

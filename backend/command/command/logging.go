@@ -8,21 +8,28 @@ import (
 	"github.com/zitadel/zitadel/backend/telemetry/logging"
 )
 
-type Logger struct {
+type logger struct {
 	level slog.Level
 	*logging.Logger
 	cmd Command
 }
 
-func Activity(l *logging.Logger, command Command) *Logger {
-	return &Logger{
+// Activity decorates the commands execute method with logging.
+// It logs the command name, duration, and success or failure of the command.
+func Activity(l *logging.Logger, command Command) Command {
+	return &logger{
 		Logger: l.With(slog.String("type", "activity")),
 		level:  slog.LevelInfo,
 		cmd:    command,
 	}
 }
 
-func (l *Logger) Execute(ctx context.Context) error {
+// Name implements [Command].
+func (l *logger) Name() string {
+	return l.cmd.Name()
+}
+
+func (l *logger) Execute(ctx context.Context) error {
 	start := time.Now()
 	log := l.Logger.With(slog.String("command", l.cmd.Name()))
 	log.InfoContext(ctx, "execute")

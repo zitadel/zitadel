@@ -65,7 +65,7 @@ func UpdateInstance(receiver receiver.InstanceManipulator, instance *receiver.In
 
 func (u *updateInstance) Execute(ctx context.Context) error {
 	u.Instance.Name = u.name
-	// return u.receiver.(ctx, u.Instance)
+	// return u.receiver.Update(ctx, u.Instance)
 	return nil
 }
 

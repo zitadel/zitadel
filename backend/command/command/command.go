@@ -1,6 +1,10 @@
 package command
 
-import "context"
+import (
+	"context"
+
+	"github.com/zitadel/zitadel/backend/command/receiver/cache"
+)
 
 type Command interface {
 	Execute(context.Context) error
@@ -19,4 +23,9 @@ func (b *Batch) Execute(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+type CacheableCommand[I, K comparable, V cache.Entry[I, K]] interface {
+	Command
+	Entry() V
 }

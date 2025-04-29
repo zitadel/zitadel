@@ -1,6 +1,10 @@
 package receiver
 
-import "context"
+import (
+	"context"
+
+	"github.com/zitadel/zitadel/backend/command/receiver/cache"
+)
 
 type InstanceState uint8
 
@@ -14,6 +18,31 @@ type Instance struct {
 	Name    string
 	State   InstanceState
 	Domains []*Domain
+}
+
+type InstanceIndex uint8
+
+var InstanceIndices = []InstanceIndex{
+	InstanceByID,
+	InstanceByDomain,
+}
+
+const (
+	InstanceByID InstanceIndex = iota
+	InstanceByDomain
+)
+
+var _ cache.Entry[InstanceIndex, string] = (*Instance)(nil)
+
+// Keys implements [cache.Entry].
+func (i *Instance) Keys(index InstanceIndex) (key []string) {
+	switch index {
+	case InstanceByID:
+		return []string{i.ID}
+	case InstanceByDomain:
+		return []string{i.Name}
+	}
+	return nil
 }
 
 type InstanceManipulator interface {
