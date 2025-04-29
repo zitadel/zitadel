@@ -42,8 +42,6 @@ import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { EnvironmentService } from 'src/app/services/environment.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NewFeatureService } from '../../services/new-feature.service';
-import { withLatestFromSynchronousFix } from '../../utils/withLatestFromSynchronousFix';
 @Component({
   selector: 'cnsl-instance',
   templateUrl: './instance.component.html',
@@ -106,7 +104,6 @@ export class InstanceComponent {
     private readonly envService: EnvironmentService,
     activatedRoute: ActivatedRoute,
     private readonly destroyRef: DestroyRef,
-    private readonly featureService: NewFeatureService,
   ) {
     this.loadMembers();
 
@@ -139,32 +136,7 @@ export class InstanceComponent {
   }
 
   private getSettingsList(): Observable<SidenavSetting[]> {
-    const features$ = this.getFeatures().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-
-    const actionsEnabled$ = features$.pipe(map((features) => features?.actions?.enabled));
-
-    return this.authService
-      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.admin || [])
-      .pipe(
-        withLatestFromSynchronousFix(actionsEnabled$),
-        map(([settings, actionsEnabled]) =>
-          settings
-            .filter((setting) => actionsEnabled || setting.id !== ACTIONS.id)
-            .filter((setting) => actionsEnabled || setting.id !== ACTIONS_TARGETS.id),
-        ),
-      );
-  }
-
-  private getFeatures() {
-    return defer(() => this.featureService.getInstanceFeatures()).pipe(
-      timeout(1000),
-      catchError((error) => {
-        if (!(error instanceof TimeoutError)) {
-          this.toast.showError(error);
-        }
-        return of(undefined);
-      }),
-    );
+    return this.authService.isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.admin || []);
   }
 
   public loadMembers(): void {
