@@ -260,7 +260,7 @@ func projections(
 	existingInstances := queryInstanceIDs(ctx, client)
 	for i, instance := range existingInstances {
 		instances <- instance
-		logging.WithFields("instance", instance, "index", fmt.Sprintf("%d/%d", i, len(existingInstances))).Info("queued for projection")
+		logging.WithFields("id", instance, "index", fmt.Sprintf("%d/%d", i, len(existingInstances))).Info("instance queued for projection")
 	}
 	close(instances)
 	wg.Wait()

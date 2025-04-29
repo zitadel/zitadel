@@ -48,8 +48,8 @@ func copyAuth(ctx context.Context, config *Migration) {
 func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthRequestAge time.Duration) {
 	start := time.Now()
 
-	logging.Info("creating index on auth.auth_requests.change_date to speed up copy")
-	_, err := source.ExecContext(ctx, "CREATE INDEX IF NOT EXISTS auth_requests_change_date ON auth.auth_requests (change_date)")
+	logging.Info("creating index on auth.auth_requests.change_date to speed up copy in source database")
+	_, err := source.ExecContext(ctx, "CREATE INDEX CONCURRENTLY IF NOT EXISTS auth_requests_change_date ON auth.auth_requests (change_date)")
 	logging.OnError(err).Fatal("unable to create index on auth.auth_requests.change_date")
 
 	sourceConn, err := source.Conn(ctx)
