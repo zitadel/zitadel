@@ -144,7 +144,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 		}
 		machineKey.KeyID = keyID
 		c.machineKeys = append(c.machineKeys, machineKey)
-		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize, nil))
+		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize))
 	}
 	return nil
 }

@@ -646,7 +646,7 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 		if err != nil {
 			return nil, nil, err
 		}
-		*validations = append(*validations, prepareAddUserMachineKey(machineKey, commands.machineKeySize, nil))
+		*validations = append(*validations, prepareAddUserMachineKey(machineKey, commands.machineKeySize))
 	}
 	return pat, machineKey, nil
 }

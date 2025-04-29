@@ -99,7 +99,7 @@ func (key *MachineKey) checkAggregate(ctx context.Context, filter preparation.Fi
 	return nil
 }
 
-func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey, check eventstore.PermissionCheck) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -111,7 +111,7 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey
 		machineKey.KeyID = keyID
 	}
 
-	validation := prepareAddUserMachineKey(machineKey, c.machineKeySize, check)
+	validation := prepareAddUserMachineKey(machineKey, c.machineKeySize)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey
 	}, nil
 }
 
-func prepareAddUserMachineKey(machineKey *MachineKey, keySize int, check eventstore.PermissionCheck) preparation.Validation {
+func prepareAddUserMachineKey(machineKey *MachineKey, keySize int) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := machineKey.valid(); err != nil {
 			return nil, err
@@ -144,7 +144,7 @@ func prepareAddUserMachineKey(machineKey *MachineKey, keySize int, check eventst
 					return nil, err
 				}
 			}
-			writeModel, err := getMachineKeyWriteModelByID(ctx, filter, machineKey.AggregateID, machineKey.KeyID, machineKey.ResourceOwner, check)
+			writeModel, err := getMachineKeyWriteModelByID(ctx, filter, machineKey.AggregateID, machineKey.KeyID, machineKey.ResourceOwner, machineKey.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -211,9 +211,6 @@ func getMachineKeyWriteModelByID(ctx context.Context, filter preparation.FilterT
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
-	}
-	if len(events) == 0 {
-		return writeModel, nil
 	}
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
