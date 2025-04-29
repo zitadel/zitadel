@@ -620,6 +620,7 @@
           "restCall": "Wywołanie REST",
           "restAsync": "REST Asynchroniczny"
         },
+        "TYPES_DESCRIPTION": "Webhook, wywołanie obsługuje kod stanu, ale odpowiedź jest nieistotna\nCall, wywołanie obsługuje kod stanu i odpowiedź\nAsync, wywołanie nie obsługuje ani kodu stanu, ani odpowiedzi, ale może być wywoływane równolegle z innymi celami",
         "ENDPOINT": "Punkt końcowy",
         "ENDPOINT_DESCRIPTION": "Wprowadź punkt końcowy, w którym hostowany jest Twój kod. Upewnij się, że jest dla nas dostępny!",
         "TIMEOUT": "Limit czasu",

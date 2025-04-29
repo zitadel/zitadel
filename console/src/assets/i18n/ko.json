@@ -621,6 +621,7 @@
           "restCall": "REST 호출",
           "restAsync": "REST 비동기"
         },
+        "TYPES_DESCRIPTION": "Webhook, 호출은 상태 코드를 처리하지만 응답은 중요하지 않습니다\nCall, 호출은 상태 코드와 응답을 처리합니다\nAsync, 호출은 상태 코드나 응답을 처리하지 않지만 다른 대상과 병렬로 호출할 수 있습니다",
         "ENDPOINT": "엔드포인트",
         "ENDPOINT_DESCRIPTION": "코드가 호스팅되는 엔드포인트를 입력하십시오. 우리에게 액세스할 수 있는지 확인하십시오!",
         "TIMEOUT": "시간 초과",

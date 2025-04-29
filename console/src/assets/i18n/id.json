@@ -588,6 +588,7 @@
           "restCall": "Panggilan REST",
           "restAsync": "REST Asinkron"
         },
+        "TYPES_DESCRIPTION": "Webhook, panggilan menangani kode status tetapi respons tidak relevan\nCall, panggilan menangani kode status dan respons\nAsync, panggilan tidak menangani kode status maupun respons, tetapi dapat dipanggil secara paralel dengan Target lain",
         "ENDPOINT": "Titik Akhir",
         "ENDPOINT_DESCRIPTION": "Masukkan titik akhir tempat kode Anda dihosting. Pastikan dapat diakses oleh kami!",
         "TIMEOUT": "Batas Waktu",

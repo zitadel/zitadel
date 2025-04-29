@@ -621,6 +621,7 @@
           "restCall": "Llamada REST",
           "restAsync": "REST Asíncrono"
         },
+        "TYPES_DESCRIPTION": "Webhook, la llamada maneja el código de estado pero la respuesta es irrelevante\nCall, la llamada maneja el código de estado y la respuesta\nAsync, la llamada no maneja ni el código de estado ni la respuesta, pero puede ser llamada en paralelo con otros objetivos",
         "ENDPOINT": "Punto de conexión",
         "ENDPOINT_DESCRIPTION": "Introduce el punto de conexión donde se aloja tu código. ¡Asegúrate de que sea accesible para nosotros!",
         "TIMEOUT": "Tiempo de espera",

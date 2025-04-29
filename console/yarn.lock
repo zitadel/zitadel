@@ -3452,22 +3452,22 @@
     js-yaml "^3.10.0"
     tslib "^2.4.0"
 
-"@zitadel/client@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@zitadel/client/-/client-1.1.0.tgz#6888413ae97cce96b756fe4ea5ec30668b1d963e"
-  integrity sha512-6pxYCZ+CMGo4716TCCLUTFxn2a3lpKfMb1pC9k3xnJxWJhiNJgAecvPld0OnZ9a+egQ8SgBKb4A+hL2Jny0Jrw==
+"@zitadel/client@1.2.0-sha-b8ba7bd":
+  version "1.2.0-sha-b8ba7bd"
+  resolved "https://registry.yarnpkg.com/@zitadel/client/-/client-1.2.0-sha-b8ba7bd.tgz#190935ce0d052370e04d00dfdb18d8a3542cd26e"
+  integrity sha512-nwEORjYtOrzclSDyjVU4Rcc5EHzFYPSwQc3Buu3PhGBR22SDCnAjfHNipQD9NeT/AEcvzCt9YTis1Ex/HhF9Tw==
   dependencies:
     "@bufbuild/protobuf" "^2.2.2"
     "@connectrpc/connect" "^2.0.0"
     "@connectrpc/connect-node" "^2.0.0"
     "@connectrpc/connect-web" "^2.0.0"
-    "@zitadel/proto" "1.1.0"
+    "@zitadel/proto" "1.2.0-sha-b8ba7bd"
     jose "^5.3.0"
 
-"@zitadel/proto@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@zitadel/proto/-/proto-1.1.0.tgz#099c718f673fef04f58ddc6c50e19a4c251f0a4d"
-  integrity sha512-4xQkH1SMg1nMNQU8WU7GXhr60FLT6omQf6fkDGdX0qglba5G9m21ZgOakOl5iyxzLgseloGKhsjlzV65DGPXEw==
+"@zitadel/proto@1.2.0-sha-b8ba7bd":
+  version "1.2.0-sha-b8ba7bd"
+  resolved "https://registry.yarnpkg.com/@zitadel/proto/-/proto-1.2.0-sha-b8ba7bd.tgz#99803c423bc59946438442f40fdefb64bc7d20b6"
+  integrity sha512-TIGTdRanZP+5rvySh19mEZKBiKo/BHHAzREnlg4l7tpPHjgR2XldUTZemW2uyBSId2Srih720gP/ENANHFVkpg==
   dependencies:
     "@bufbuild/protobuf" "^2.2.2"
 

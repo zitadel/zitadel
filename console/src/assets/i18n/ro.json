@@ -621,6 +621,7 @@
           "restCall": "Apel REST",
           "restAsync": "REST Asincron"
         },
+        "TYPES_DESCRIPTION": "Webhook, apelul gestionează codul de stare, dar răspunsul este irelevant\nCall, apelul gestionează codul de stare și răspunsul\nAsync, apelul nu gestionează nici codul de stare, nici răspunsul, dar poate fi apelat în paralel cu alte Ținte",
         "ENDPOINT": "Punct Final",
         "ENDPOINT_DESCRIPTION": "Introduceți punctul final unde este găzduit codul dvs. Asigurați-vă că este accesibil pentru noi!",
         "TIMEOUT": "Timeout",

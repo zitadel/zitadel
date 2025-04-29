@@ -621,6 +621,7 @@
           "restCall": "REST Aanroep",
           "restAsync": "REST Asynchroon"
         },
+        "TYPES_DESCRIPTION": "Webhook, de oproep verwerkt de statuscode maar de reactie is irrelevant\nCall, de oproep verwerkt de statuscode en de reactie\nAsync, de oproep verwerkt noch de statuscode noch de reactie, maar kan parallel aan andere doelen worden aangeroepen",
         "ENDPOINT": "Eindpunt",
         "ENDPOINT_DESCRIPTION": "Voer het eindpunt in waar uw code wordt gehost. Zorg ervoor dat het voor ons toegankelijk is!",
         "TIMEOUT": "Time-out",

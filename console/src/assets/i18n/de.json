@@ -621,6 +621,7 @@
           "restCall": "REST Aufruf",
           "restAsync": "REST Asynchron"
         },
+        "TYPES_DESCRIPTION": "Webhook, der Aufruf verarbeitet den Statuscode, aber die Antwort ist irrelevant\nCall, der Aufruf verarbeitet den Statuscode und die Antwort\nAsync, der Aufruf verarbeitet weder Statuscode noch Antwort, kann aber parallel zu anderen Zielen aufgerufen werden",
         "ENDPOINT": "Endpunkt",
         "ENDPOINT_DESCRIPTION": "Geben Sie den Endpunkt ein, an dem Ihr Code gehostet wird. Stellen Sie sicher, dass er für uns zugänglich ist!",
         "TIMEOUT": "Timeout",
