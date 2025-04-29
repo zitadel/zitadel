@@ -122,6 +122,7 @@ type SAMLProvider struct {
 	WithSignedRequest             bool
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
 	IDPOptions                    idp.Options
 }
 
