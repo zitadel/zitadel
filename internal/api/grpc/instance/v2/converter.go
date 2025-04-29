@@ -120,21 +120,21 @@ func instanceQueryToModel(searchQuery *instance.Query) (query.SearchQuery, error
 
 func CreateInstancePbToSetupInstance(req *instance.CreateInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
 	instance := defaultInstance
-	if req.InstanceName != "" {
-		instance.InstanceName = req.InstanceName
-		instance.Org.Name = req.InstanceName
+	if trimmed := strings.TrimSpace(req.InstanceName); trimmed != "" {
+		instance.InstanceName = trimmed
+		instance.Org.Name = trimmed
 	}
-	if req.CustomDomain != "" {
-		instance.CustomDomain = req.CustomDomain
+	if trimmed := strings.TrimSpace(req.CustomDomain); trimmed != "" {
+		instance.CustomDomain = trimmed
 	}
-	if req.FirstOrgName != "" {
-		instance.Org.Name = req.FirstOrgName
+	if trimmed := strings.TrimSpace(req.FirstOrgName); trimmed != "" {
+		instance.Org.Name = trimmed
 	}
 
 	if user := req.GetMachine(); user != nil {
 		defaultMachine := instance.Org.Machine
 		if defaultMachine == nil {
-			defaultMachine = new(command.AddMachine)
+			defaultMachine = &command.AddMachine{}
 		}
 
 		instance.Org.Machine = createInstancePbToAddMachine(user, *defaultMachine)
@@ -142,14 +142,14 @@ func CreateInstancePbToSetupInstance(req *instance.CreateInstanceRequest, defaul
 	} else if user := req.GetHuman(); user != nil {
 		defaultHuman := instance.Org.Human
 		if instance.Org.Human != nil {
-			defaultHuman = new(command.AddHuman)
+			defaultHuman = &command.AddHuman{}
 		}
 
 		instance.Org.Human = createInstancePbToAddHuman(user, *defaultHuman, instance.DomainPolicy.UserLoginMustBeDomain, instance.Org.Name, externalDomain)
 		instance.Org.Machine = nil
 	}
 
-	if lang := language.Make(req.DefaultLanguage); !lang.IsRoot() {
+	if lang := language.Make(strings.TrimSpace(req.DefaultLanguage)); !lang.IsRoot() {
 		instance.DefaultLanguage = lang
 	}
 
@@ -163,14 +163,14 @@ func createInstancePbToAddHuman(req *instance.CreateInstanceRequest_Human, defau
 		user.Email.Verified = req.Email.IsEmailVerified
 	}
 	if req.Profile != nil {
-		if req.Profile.FirstName != "" {
-			user.FirstName = req.Profile.FirstName
+		if firstName := strings.TrimSpace(req.Profile.FirstName); firstName != "" {
+			user.FirstName = firstName
 		}
-		if req.Profile.LastName != "" {
-			user.LastName = req.Profile.LastName
+		if lastName := strings.TrimSpace(req.Profile.LastName); lastName != "" {
+			user.LastName = lastName
 		}
-		if req.Profile.PreferredLanguage != "" {
-			lang, err := language.Parse(req.Profile.PreferredLanguage)
+		if lang := strings.TrimSpace(req.Profile.PreferredLanguage); lang != "" {
+			lang, err := language.Parse(lang)
 			if err == nil {
 				user.PreferredLanguage = lang
 			}
@@ -182,8 +182,8 @@ func createInstancePbToAddHuman(req *instance.CreateInstanceRequest_Human, defau
 		orgDomain, _ := domain.NewIAMDomainName(org, externalDomain)
 		user.Username = user.Username + "@" + orgDomain
 	}
-	if req.UserName != "" {
-		user.Username = req.UserName
+	if username := strings.TrimSpace(req.UserName); username != "" {
+		user.Username = username
 	}
 
 	if req.Password != nil {
@@ -194,19 +194,19 @@ func createInstancePbToAddHuman(req *instance.CreateInstanceRequest_Human, defau
 }
 
 func createInstancePbToAddMachine(req *instance.CreateInstanceRequest_Machine, defaultMachine command.AddMachine) (machine *command.AddMachine) {
-	machine = new(command.AddMachine)
+	machine = &command.AddMachine{}
 	if defaultMachine.Machine != nil {
 		machineCopy := *defaultMachine.Machine
 		machine.Machine = &machineCopy
 	} else {
-		machine.Machine = new(command.Machine)
+		machine.Machine = &command.Machine{}
 	}
 
-	if req.UserName != "" {
-		machine.Machine.Username = req.UserName
+	if username := strings.TrimSpace(req.UserName); username != "" {
+		machine.Machine.Username = username
 	}
-	if req.Name != "" {
-		machine.Machine.Name = req.Name
+	if name := strings.TrimSpace(req.Name); name != "" {
+		machine.Machine.Name = name
 	}
 
 	if defaultMachine.Pat != nil || req.PersonalAccessToken != nil {
