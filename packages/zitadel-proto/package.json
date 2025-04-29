@@ -49,7 +49,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "generate": "buf generate https://github.com/zitadel/zitadel.git#tag=v3.0.0-rc.1 --path ./proto/zitadel",
+    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
     "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate",
     "build": "tsup",
     "test:cjs": "node test/cjs-test.cjs",
