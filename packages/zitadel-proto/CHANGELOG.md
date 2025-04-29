@@ -1,5 +1,11 @@
 # @zitadel/proto
 
+## 1.1.0
+
+### Minor Changes
+
+- 62ad388: revert CJS support
+
 ## 1.0.4
 
 ### Patch Changes

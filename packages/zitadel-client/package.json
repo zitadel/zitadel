@@ -1,6 +1,6 @@
 {
   "name": "@zitadel/client",
-  "version": "1.0.7",
+  "version": "1.2.0",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

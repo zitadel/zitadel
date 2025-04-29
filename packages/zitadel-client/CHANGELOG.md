@@ -1,5 +1,16 @@
 # @zitadel/client
 
+## 1.1.0
+
+### Minor Changes
+
+- 62ad388: revert CJS support
+
+### Patch Changes
+
+- Updated dependencies [62ad388]
+  - @zitadel/proto@1.1.0
+
 ## 1.0.7
 
 ### Patch Changes
