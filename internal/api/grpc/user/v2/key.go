@@ -16,13 +16,14 @@ func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.Add
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.UserId,
 		},
-		ExpirationDate: req.GetExpirationDate().AsTime(),
-		Type:           domain.AuthNKeyTypeJSON,
+		ExpirationDate:  req.GetExpirationDate().AsTime(),
+		Type:            domain.AuthNKeyTypeJSON,
+		PermissionCheck: s.command.CheckPermissionUserWrite(ctx, false),
 	}
 	newMachineKey.PublicKey = req.PublicKey
 
 	pubkeySupplied := len(newMachineKey.PublicKey) > 0
-	details, err := s.command.AddUserMachineKey(ctx, newMachineKey, s.command.CheckPermissionUserWrite(ctx, false))
+	details, err := s.command.AddUserMachineKey(ctx, newMachineKey)
 	if err != nil {
 		return nil, err
 	}

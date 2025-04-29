@@ -110,7 +110,7 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 			if err := pat.checkAggregate(ctx, filter); err != nil {
 				return nil, err
 			}
-			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner)
+			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner, pat.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -156,7 +156,7 @@ func prepareRemovePersonalAccessToken(pat *PersonalAccessToken) preparation.Vali
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
-			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner)
+			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner, pat.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -182,14 +182,11 @@ func createToken(algorithm crypto.EncryptionAlgorithm, tokenID, userID string) (
 	return base64.RawURLEncoding.EncodeToString(encrypted), nil
 }
 
-func getPersonalAccessTokenWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, tokenID, resourceOwner string) (_ *PersonalAccessTokenWriteModel, err error) {
-	writeModel := NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner)
+func getPersonalAccessTokenWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, tokenID, resourceOwner string, check eventstore.PermissionCheck) (_ *PersonalAccessTokenWriteModel, err error) {
+	writeModel := NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner, check)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
-	}
-	if len(events) == 0 {
-		return writeModel, nil
 	}
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()

@@ -118,8 +118,18 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 }
 
 // TODO: Move to a central place
-func (c *Commands) CheckPermission(ctx context.Context, permission string) eventstore.PermissionCheck {
+func (c *Commands) CheckPermission(ctx context.Context, permission string, aggregateType eventstore.AggregateType) eventstore.PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
+		// For example if a write model didn't query any events, the resource owner is probably empty.
+		// In this case, we have to query an event on the given aggregate to get the resource owner.
+		if resourceOwner == "" {
+			r := NewResourceOwnerModel(authz.GetInstance(ctx).InstanceID(), aggregateType, aggregateID)
+			err := c.eventstore.FilterToQueryReducer(ctx, r)
+			if err != nil {
+				return err
+			}
+			resourceOwner = r.resourceOwner
+		}
 		return c.checkPermission(ctx, permission, resourceOwner, aggregateID)
 	}
 }

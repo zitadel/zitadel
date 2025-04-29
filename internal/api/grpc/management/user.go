@@ -770,7 +770,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	machineKey := AddMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
 	// If there is no pubkey supplied, then AddUserMachineKey will generate a new one
 	pubkeySupplied := len(machineKey.PublicKey) > 0
-	details, err := s.command.AddUserMachineKey(ctx, machineKey, nil)
+	details, err := s.command.AddUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}
