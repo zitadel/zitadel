@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Fluxos",
         "DESCRIPTION": "Escolha um fluxo de autenticação e acione sua ação em um evento específico dentro desse fluxo."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, uma nova e melhorada versão de Actions, já está disponível. A versão atual ainda é acessível, mas o nosso desenvolvimento futuro se concentrará na nova versão, que acabará por substituir a atual."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,6 +530,7 @@
     "APPLY": "Aplicar"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Você está atualmente usando a nova Actions V2, que está em versão beta. A versão anterior 1 ainda está disponível, mas será descontinuada no futuro. Por favor, reporte quaisquer problemas ou envie feedback.",
     "EXECUTION": {
       "TITLE": "Ações",
       "DESCRIPTION": "As ações permitem que você execute código personalizado em resposta a solicitações de API, eventos ou funções específicas. Use-as para estender o Zitadel, automatizar fluxos de trabalho e integrar-se a outros sistemas.",
@@ -1509,7 +1511,8 @@
       "APPEARANCE": "Aparência",
       "OTHER": "Outro",
       "STORAGE": "armazenar"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
