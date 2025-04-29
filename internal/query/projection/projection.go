@@ -2,7 +2,9 @@ package projection
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/zitadel/logging"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -90,6 +92,7 @@ var (
 )
 
 type projection interface {
+	ProjectionName() string
 	Start(ctx context.Context)
 	Init(ctx context.Context) error
 	Trigger(ctx context.Context, opts ...handler.TriggerOpt) (_ context.Context, err error)
@@ -206,21 +209,25 @@ func Start(ctx context.Context) {
 }
 
 func ProjectInstance(ctx context.Context) error {
-	for _, projection := range projections {
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting projection")
 		_, err := projection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("projection done")
 	}
 	return nil
 }
 
 func ProjectInstanceFields(ctx context.Context) error {
-	for _, fieldProjection := range fields {
+	for i, fieldProjection := range fields {
+		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("starting fields projection")
 		err := fieldProjection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
+		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("fields projection done")
 	}
 	return nil
 }
