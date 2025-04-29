@@ -101,3 +101,70 @@ func TestCreateInstance(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteInstace(t *testing.T) {
+	// Given
+	inst := integration.NewInstance(CTXWithSysAuthZ)
+
+	tt := []struct {
+		testName           string
+		inputRequest       *instance.DeleteInstanceRequest
+		inputContext       context.Context
+		expectedErrorMsg   string
+		expectedErrorCode  codes.Code
+		expectedInstanceID string
+	}{
+		{
+			testName: "when invalid context should return unauthN error",
+			inputRequest: &instance.DeleteInstanceRequest{
+				InstanceId: " ",
+			},
+			inputContext:      context.Background(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName: "when invalid input should return invalid argument error",
+			inputRequest: &instance.DeleteInstanceRequest{
+				InstanceId: " ",
+			},
+			inputContext:      CTXWithSysAuthZ,
+			expectedErrorCode: codes.InvalidArgument,
+			expectedErrorMsg:  "instance_id must not be empty (instance_id)",
+		},
+		{
+			testName: "when invalid input should return invalid argument error",
+			inputRequest: &instance.DeleteInstanceRequest{
+				InstanceId: inst.ID() + "invalid",
+			},
+			inputContext:      CTXWithSysAuthZ,
+			expectedErrorCode: codes.NotFound,
+			expectedErrorMsg:  "Instance not found (COMMA-AE3GS)",
+		},
+		{
+			testName: "when invalid input should return invalid argument error",
+			inputRequest: &instance.DeleteInstanceRequest{
+				InstanceId: inst.ID(),
+			},
+			inputContext:       CTXWithSysAuthZ,
+			expectedInstanceID: inst.ID(),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Test
+			res, err := inst.Client.InstanceV2Beta.DeleteInstance(tc.inputContext, tc.inputRequest)
+
+			// Verify
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+			if tc.expectedErrorMsg == "" {
+				require.NotNil(t, res)
+				require.NotNil(t, res.GetDetails())
+				assert.Equal(t, tc.expectedInstanceID, res.GetDetails().GetResourceOwner())
+				assert.NotEmpty(t, res.GetDetails().GetChangeDate())
+			}
+		})
+	}
+}
