@@ -1,4 +1,4 @@
-<form class="form-grid" [formGroup]="form()" (ngSubmit)="submit()">
+<form *ngIf="form$ | async as form" class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
   <p class="target-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.DESCRIPTION' | translate }}</p>
 
   <cnsl-form-field class="full-width">
@@ -8,9 +8,9 @@
       #trigger="matAutocompleteTrigger"
       #input
       type="text"
-      [formControl]="form().controls.autocomplete"
+      [formControl]="form.controls.autocomplete"
       [matAutocomplete]="autoservice"
-      (keydown.enter)="handleEnter($event); input.blur(); trigger.closePanel()"
+      (keydown.enter)="handleEnter($event, form); input.blur(); trigger.closePanel()"
     />
     <mat-autocomplete #autoservice="matAutocomplete">
       <mat-option *ngIf="targets().state === 'loading'" class="is-loading">
@@ -19,7 +19,7 @@
       <mat-option
         *ngFor="let target of selectableTargets(); trackBy: trackTarget"
         #option
-        (click)="addTarget(target); option.deselect()"
+        (click)="addTarget(target, form); option.deselect()"
         [value]="target.name"
       >
         {{ target.name }}
@@ -27,7 +27,7 @@
     </mat-autocomplete>
   </cnsl-form-field>
 
-  <table mat-table cdkDropList (cdkDropListDropped)="drop($event)" [dataSource]="dataSource" [trackBy]="trackTarget">
+  <table mat-table cdkDropList (cdkDropListDropped)="drop($event, form)" [dataSource]="dataSource" [trackBy]="trackTarget">
     <ng-container matColumnDef="order">
       <th mat-header-cell *matHeaderCellDef>Reorder</th>
       <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
@@ -48,7 +48,7 @@
             actions
             matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
             color="warn"
-            (click)="removeTarget(i)"
+            (click)="removeTarget(i, form)"
             mat-icon-button
           >
             <i class="las la-trash"></i>
@@ -65,7 +65,7 @@
       {{ 'ACTIONS.BACK' | translate }}
     </button>
     <span class="fill-space"></span>
-    <button color="primary" [disabled]="form().invalid" mat-raised-button type="submit">
+    <button color="primary" [disabled]="form.invalid" mat-raised-button type="submit">
       {{ 'ACTIONS.CONTINUE' | translate }}
     </button>
   </div>

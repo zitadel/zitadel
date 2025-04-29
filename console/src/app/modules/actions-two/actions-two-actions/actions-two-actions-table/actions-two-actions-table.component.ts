@@ -56,9 +56,9 @@ export class ActionsTwoActionsTableComponent {
 
       return executions.map((execution) => {
         const mappedTargets = execution.targets.map((target) => {
-          const targetType = targetsMap.get(target.type.value);
+          const targetType = targetsMap.get(target);
           if (!targetType) {
-            throw new Error(`Target with id ${target.type.value} not found`);
+            throw new Error(`Target with id ${target} not found`);
           }
           return targetType;
         });
