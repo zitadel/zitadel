@@ -22,7 +22,8 @@ type Migration struct {
 	Source      database.Config
 	Destination database.Config
 
-	EventBulkSize uint32
+	EventBulkSize     uint32
+	MaxAuthRequestAge time.Duration
 
 	Log     *logging.Config
 	Machine *id.Config
