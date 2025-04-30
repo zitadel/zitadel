@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const settingsService: Client<typeof SettingsService> =
     await createServiceForHost(SettingsService, serviceUrl);
 
-  const settings = settingsService
+  const settings = await settingsService
     .getSecuritySettings({})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
