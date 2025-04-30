@@ -16,6 +16,7 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import { InfoSectionType } from '../../info-section/info-section.component';
+import { ExecutionFieldName } from '@zitadel/proto/zitadel/action/v2beta/query_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -42,7 +43,7 @@ export class ActionsTwoActionsComponent {
     return this.refresh$.pipe(
       startWith(true),
       switchMap(() => {
-        return this.actionService.listExecutions({});
+        return this.actionService.listExecutions({ sortingColumn: ExecutionFieldName.ID, pagination: { asc: true } });
       }),
       map(({ result }) => result.map(correctlyTypeExecution)),
       catchError((err) => {
