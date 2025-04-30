@@ -1,5 +1,5 @@
 import createNextIntlPlugin from "next-intl/plugin";
-import { DEFAULT_CSP } from "src/lib/csp";
+import { DEFAULT_CSP } from "@/lib/csp";
 
 const withNextIntl = createNextIntlPlugin();
 
