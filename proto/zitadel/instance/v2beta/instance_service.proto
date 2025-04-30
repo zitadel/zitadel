@@ -230,6 +230,16 @@ message ListInstancesResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 2;
 }
 
+message AddCustomDomainRequest {
+  string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddCustomDomainResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message RemoveCustomDomainRequest {
+
 service InstanceService {
 
   // CreateInstance creates a new instance
@@ -384,10 +394,37 @@ service InstanceService {
       }
     };
   }
-}
+  
+  // AddCustomDomain adds a custom domain to the instance.
+  rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Adds a custom domain to the instance.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The added custom domain.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/AddCustomDomainResponse";
+            }
+          };
+        }
+      };
+    };
 
-// Add Custom Domain
-// Remove Custom Domain
+    option (google.api.http) = {
+      post: "/v2/instances/current/custom-domains"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.write"
+      }
+    };
+  }
+}
 // List Custom Domains
 // Add Trusted Domain
 // Remove Trusted Domain

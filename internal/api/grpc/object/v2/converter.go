@@ -196,3 +196,18 @@ func ToViewDetailsPb(
 	}
 	return details
 }
+
+func AddToDetailsPb(
+	sequence uint64,
+	creationDate time.Time,
+	resourceOwner string,
+) *object.Details {
+	details := &object.Details{
+		Sequence:      sequence,
+		ResourceOwner: resourceOwner,
+	}
+	if !creationDate.IsZero() {
+		details.CreationDate = timestamppb.New(creationDate)
+	}
+	return details
+}
