@@ -1,11 +1,13 @@
 package query
 
 import (
+	"cmp"
 	"context"
 	"database/sql"
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -301,13 +303,15 @@ func executionTargetsUnmarshal(data []byte) ([]*exec.Target, error) {
 	}
 
 	targets := make([]*exec.Target, len(executionTargets))
-	// position starts with 1
-	for _, item := range executionTargets {
+	slices.SortFunc(executionTargets, func(a, b *executionTarget) int {
+		return cmp.Compare(a.Position, b.Position)
+	})
+	for i, item := range executionTargets {
 		if item.Target != "" {
-			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: item.Target}
+			targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: item.Target}
 		}
 		if item.Include != "" {
-			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: item.Include}
+			targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: item.Include}
 		}
 	}
 	return targets, nil
