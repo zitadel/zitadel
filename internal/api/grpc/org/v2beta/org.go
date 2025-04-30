@@ -58,6 +58,16 @@ func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.List
 	}, nil
 }
 
+func (s *Server) DeleteOrganization(ctx context.Context, request *v2beta_org.DeleteOrganizationRequest) (*v2beta_org.DeleteOrganizationResponse, error) {
+	details, err := s.command.RemoveOrg(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &v2beta_org.DeleteOrganizationResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
 func createOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRequest) (*command.OrgSetup, error) {
 	admins, err := createOrganizationRequestAdminsToCommand(request.GetAdmins())
 	if err != nil {

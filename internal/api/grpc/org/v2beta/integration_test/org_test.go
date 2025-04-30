@@ -36,6 +36,7 @@ func TestMain(m *testing.M) {
 		Client = Instance.Client.OrgV2beta
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())
@@ -58,14 +59,14 @@ func TestServer_GetOrganizationByID(t *testing.T) {
 	}{
 		{
 			name: "get organization happy path",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &org.GetOrganizationByIDRequest{
 				Id: orgId,
 			},
 		},
 		{
 			name: "get organization that doesn't exist",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &org.GetOrganizationByIDRequest{
 				Id: "non existing organization",
 			},
@@ -250,24 +251,24 @@ func TestServer_UpdateOrganization(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "update org with same name",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
-			req: &org.UpdateOrganizationRequest{
-				Id:   orgId,
-				Name: orgName,
-			},
-		},
-		{
 			name: "update org with new name",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &org.UpdateOrganizationRequest{
 				Id:   orgId,
 				Name: "new org name",
 			},
 		},
 		{
+			name: "update org with same name",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &org.UpdateOrganizationRequest{
+				Id:   orgId,
+				Name: orgName,
+			},
+		},
+		{
 			name: "update org with no id",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &org.UpdateOrganizationRequest{
 				Id: orgId,
 				// Name: "",
@@ -299,7 +300,7 @@ func TestServer_ListOrganization(t *testing.T) {
 	noOfOrgs := 3
 	orgs, orgsName, err := createOrgs(noOfOrgs)
 	if err != nil {
-		assert.Fail(t, "unable to create org")
+		assert.Fail(t, "unable to create orgs")
 	}
 
 	tests := []struct {
@@ -310,8 +311,8 @@ func TestServer_ListOrganization(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "update org with same name",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			name: "list organizations happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req:  &org.ListOrganizationsRequest{},
 			want: []*org.Organization{
 				{
@@ -358,9 +359,66 @@ func TestServer_ListOrganization(t *testing.T) {
 						// require.Equal(t, org.do, got.Result[i].Name)
 					}
 				}
-				fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> foundOrgs = %+v\n", foundOrgs)
 				require.Equal(t, len(tt.want), foundOrgs)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
+		})
+	}
+}
+
+func TestServer_DeleteOrganization(t *testing.T) {
+	tests := []struct {
+		name          string
+		ctx           context.Context
+		createOrgFunc func() string
+		req           *org.DeleteOrganizationRequest
+		want          *org.DeleteOrganizationResponse
+		err           error
+	}{
+		{
+			name: "delete org happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			createOrgFunc: func() string {
+				orgs, _, err := createOrgs(1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+				}
+				return orgs[0].OrganizationId
+			},
+			req: &org.DeleteOrganizationRequest{},
+		},
+		{
+			name: "delete non existent org",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &org.DeleteOrganizationRequest{
+				Id: "non existent org id",
+			},
+			err: fmt.Errorf("Organisation not found"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.createOrgFunc != nil {
+				tt.req.Id = tt.createOrgFunc()
+			}
+
+			got, err := Client.DeleteOrganization(tt.ctx, tt.req)
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+				return
+			}
+			require.NoError(t, err)
+
+			// check details
+			assert.NotZero(t, got.GetDetails().GetSequence())
+			gotCD := got.GetDetails().GetChangeDate().AsTime()
+			now := time.Now()
+			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
+
+			_, err = Client.GetOrganizationByID(tt.ctx, &org.GetOrganizationByIDRequest{
+				Id: tt.req.Id,
+			})
+			require.Contains(t, err.Error(), "Organisation not found")
 		})
 	}
 }
@@ -369,6 +427,7 @@ func createOrgs(noOfOrgs int) ([]*org.CreateOrganizationResponse, []string, erro
 	var err error
 	orgs := make([]*org.CreateOrganizationResponse, noOfOrgs)
 	orgsName := make([]string, noOfOrgs)
+
 	for i := range noOfOrgs {
 		orgName := gofakeit.Name()
 		orgsName[i] = orgName
