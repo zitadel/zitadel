@@ -43,11 +43,6 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  responseHeaders.set(
-    "Content-Security-Policy",
-    `${DEFAULT_CSP} frame-ancestors 'none'`,
-  );
-
   if (securitySettings?.embeddedIframe?.enabled) {
     securitySettings.embeddedIframe.allowedOrigins;
     responseHeaders.set(
