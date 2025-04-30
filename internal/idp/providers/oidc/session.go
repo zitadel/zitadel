@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -143,17 +142,4 @@ func (u *User) GetAvatarURL() string {
 
 func (u *User) GetProfile() string {
 	return u.Profile
-}
-
-type unmarshalUser struct {
-	User *oidc.UserInfo `json:"User"`
-}
-
-func (u *User) UnmarshalJSON(data []byte) error {
-	user := &unmarshalUser{}
-	if err := json.Unmarshal(data, user); err != nil {
-		return err
-	}
-	u.UserInfo = user.User
-	return nil
 }
