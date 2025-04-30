@@ -265,6 +265,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   GenderLabel: Kön
   Female: Man
   Male: Kvinna
@@ -308,6 +309,7 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
   TosAndPrivacyLabel: Användarvillkor
   TosConfirm: Jag accepterar
   TosLinkText: Användarvillkoren
@@ -385,6 +387,7 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
 DeviceAuth:
   Title: Tillgång från hårdvaruenhet
   UserCode:

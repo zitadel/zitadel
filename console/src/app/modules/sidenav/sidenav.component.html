@@ -1,12 +1,9 @@
 <div class="sidenav-container">
   <div class="sidenav-settings-list" [ngClass]="{ indented: indented }">
     <div class="sidenav-sticky-rel">
-      <h1 *ngIf="title">{{ title }}</h1>
-      <p *ngIf="description" class="cnsl-secondary-text">{{ description }}</p>
-
       <button
-        *ngIf="currentSetting"
-        (click)="value = ''"
+        *ngIf="setting$()"
+        (click)="setting$.set(null)"
         class="sidenav-setting-list-element mob-only"
         [ngClass]="{ active: true }"
       >
@@ -14,37 +11,26 @@
         <span>{{ 'USER.SETTINGS.TITLE' | translate }}</span>
       </button>
 
-      <ng-container *ngFor="let setting of settingsList; index as i">
-        <ng-container>
-          <span
-            class="sidenav-setting-group hide-on-mobile"
-            [ngClass]="{ show: !currentSetting }"
-            *ngIf="
-              (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
-              (i === 0 && setting.groupI18nKey)
-            "
-            >{{ setting.groupI18nKey | translate }}</span
-          >
+      <ng-container *ngFor="let setting of settingsList; index as i; trackBy: trackSettings">
+        <span
+          class="sidenav-setting-group hide-on-mobile"
+          *ngIf="
+            (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
+            (i === 0 && setting.groupI18nKey)
+          "
+          >{{ setting.groupI18nKey | translate }}</span
+        >
 
-          <button
-            (click)="value = setting.id"
-            class="sidenav-setting-list-element hide-on-mobile"
-            [ngClass]="{ active: currentSetting === setting.id, show: !currentSetting }"
-            [attr.data-e2e]="'sidenav-element-' + setting.id"
-          >
-            <span>{{ setting.i18nKey | translate }}</span>
-            <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
-          </button>
-        </ng-container>
-        <ng-template #btn>
-          <button
-            (click)="value = setting.id"
-            class="sidenav-setting-list-element hide-on-mobile"
-            [ngClass]="{ active: currentSetting === setting.id, show: !currentSetting }"
-          >
-            <span>{{ setting.i18nKey | translate }}</span>
-          </button>
-        </ng-template>
+        <button
+          (click)="setting$.set(setting)"
+          class="sidenav-setting-list-element hide-on-mobile"
+          [ngClass]="{ active: setting$()?.id === setting.id }"
+          [attr.data-e2e]="'sidenav-element-' + setting.id"
+        >
+          <span>{{ setting.i18nKey | translate }}</span>
+          <span class="state" *ngIf="setting?.beta">{{ 'SETTINGS.BETA' | translate }}</span>
+          <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
+        </button>
       </ng-container>
     </div>
   </div>

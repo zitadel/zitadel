@@ -2,8 +2,6 @@ module github.com/zitadel/zitadel
 
 go 1.23.7
 
-toolchain go1.24.1
-
 require (
 	cloud.google.com/go/profiler v0.4.2
 	cloud.google.com/go/storage v1.51.0
@@ -26,6 +24,7 @@ require (
 	github.com/drone/envsubst v1.0.3
 	github.com/envoyproxy/protoc-gen-validate v1.2.1
 	github.com/fatih/color v1.18.0
+	github.com/fergusstrange/embedded-postgres v1.30.0
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-jose/go-jose/v4 v4.0.5
@@ -75,7 +74,7 @@ require (
 	github.com/zitadel/logging v0.6.2
 	github.com/zitadel/oidc/v3 v3.36.1
 	github.com/zitadel/passwap v0.7.0
-	github.com/zitadel/saml v0.3.3
+	github.com/zitadel/saml v0.3.5
 	github.com/zitadel/schema v1.3.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0
@@ -148,6 +147,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
+	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
 	github.com/zenazn/goji v1.0.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
@@ -189,7 +189,6 @@ require (
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
 	github.com/go-xmlfmt/xmlfmt v1.1.3 // indirect
-	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/golang/geo v0.0.0-20250319145452-ed1c8b99c3d7 // indirect
 	github.com/google/uuid v1.6.0
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect

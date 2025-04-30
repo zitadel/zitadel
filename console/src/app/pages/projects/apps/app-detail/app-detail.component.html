@@ -1,6 +1,6 @@
 <cnsl-top-view
   title="{{ app?.name }}"
-  [hasActions]="isZitadel === false && (['project.app.write:' + projectId, 'project.app.write'] | hasRole | async)"
+  [hasActions]="!isZitadel && (['project.app.write:' + projectId, 'project.app.write'] | hasRole | async)"
   docLink="https://zitadel.com/docs/guides/manage/console/projects"
   [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : app?.apiConfig ? 'API' : 'SAML'"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE"
@@ -10,43 +10,38 @@
   <ng-template topActions cnslHasRole [hasRole]="['project.app.write:' + projectId, 'project.app.write']">
     <div
       class="regen-secret"
-      *ngIf="isZitadel === false && this.app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')"
+      *ngIf="!isZitadel && this.app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')"
     >
       <button type="button" [disabled]="!canWrite" mat-menu-item (click)="regenerateOIDCClientSecret()">
         {{ 'APP.OIDC.REGENERATESECRET' | translate }}
       </button>
     </div>
 
-    <div class="regen-secret" *ngIf="isZitadel === false && this.app?.apiConfig && currentAuthMethod === 'BASIC'">
+    <div class="regen-secret" *ngIf="!isZitadel && this.app?.apiConfig && currentAuthMethod === 'BASIC'">
       <button [disabled]="!canWrite" mat-menu-item (click)="regenerateAPIClientSecret()">
         {{ 'APP.API.REGENERATESECRET' | translate }}
       </button>
     </div>
 
-    <button *ngIf="isZitadel === false" mat-menu-item (click)="openNameDialog()" aria-label="Edit project name">
+    <button *ngIf="!isZitadel" mat-menu-item (click)="openNameDialog()" aria-label="Edit project name">
       {{ 'ACTIONS.RENAME' | translate }}
     </button>
     <button
       mat-menu-item
-      *ngIf="isZitadel === false && app?.state !== AppState.APP_STATE_INACTIVE"
+      *ngIf="!isZitadel && app?.state !== AppState.APP_STATE_INACTIVE"
       (click)="changeState(AppState.APP_STATE_INACTIVE)"
     >
       {{ 'ACTIONS.DEACTIVATE' | translate }}
     </button>
     <button
       mat-menu-item
-      *ngIf="isZitadel === false && app?.state === AppState.APP_STATE_INACTIVE"
+      *ngIf="!isZitadel && app?.state === AppState.APP_STATE_INACTIVE"
       (click)="changeState(AppState.APP_STATE_ACTIVE)"
     >
       {{ 'ACTIONS.REACTIVATE' | translate }}
     </button>
     <ng-template cnslHasRole [hasRole]="['project.app.delete:' + projectId, 'project.app.delete']">
-      <button
-        *ngIf="isZitadel === false"
-        mat-menu-item
-        matTooltip="{{ 'APP.PAGES.DELETE' | translate }}"
-        (click)="deleteApp()"
-      >
+      <button *ngIf="!isZitadel" mat-menu-item matTooltip="{{ 'APP.PAGES.DELETE' | translate }}" (click)="deleteApp()">
         <span [style.color]="'var(--warn)'">{{ 'APP.PAGES.DELETE' | translate }}</span>
       </button>
     </ng-template>
@@ -80,8 +75,8 @@
 
   <div class="app-main-content">
     <cnsl-meta-layout>
-      <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
-        <ng-container *ngIf="currentSetting === 'configuration'">
+      <cnsl-sidenav [(setting)]="currentSetting" [settingsList]="settingsList">
+        <ng-container *ngIf="currentSetting.id === 'configuration'">
           <cnsl-card *ngIf="oidcForm && app?.oidcConfig" title=" {{ 'APP.OIDC.TITLE' | translate }}">
             <div
               class="current-auth-method"
@@ -149,10 +144,10 @@
                   </mat-checkbox>
 
                   <mat-checkbox
-                    *ngIf="loginV2"
+                    *ngIf="oidcLoginV2"
                     color="primary"
                     class="rt"
-                    [formControl]="loginV2"
+                    [formControl]="oidcLoginV2"
                     name="loginV2"
                     matTooltip="{{ 'APP.LOGINV2DESC' | translate }}"
                   >
@@ -239,6 +234,26 @@
               ></ngx-codemirror>
             </div>
 
+            <div class="saml-login-version">
+              <form [formGroup]="samlForm">
+                <mat-checkbox
+                  *ngIf="samlLoginV2"
+                  color="primary"
+                  class="rt"
+                  [formControl]="samlLoginV2"
+                  name="loginV2"
+                  matTooltip="{{ 'APP.LOGINV2DESC' | translate }}"
+                >
+                  {{ 'APP.LOGINV2.USEV2' | translate }}
+                </mat-checkbox>
+
+                <cnsl-form-field class="app-formfield">
+                  <cnsl-label>{{ 'APP.LOGINV2.BASEURL' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="loginV2BaseURL" />
+                </cnsl-form-field>
+              </form>
+            </div>
+
             <div class="btn-container">
               <button
                 class="submit-button"
@@ -254,7 +269,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'token'">
+        <ng-container *ngIf="currentSetting.id === 'token'">
           <cnsl-card *ngIf="oidcTokenForm && app?.oidcConfig" title=" {{ 'APP.OIDC.TOKENSECTIONTITLE' | translate }}">
             <form [formGroup]="oidcTokenForm" (ngSubmit)="saveOIDCApp()">
               <cnsl-form-field class="app-formfield">
@@ -335,7 +350,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'redirect-uris'">
+        <ng-container *ngIf="currentSetting.id === 'redirect-uris'">
           <cnsl-card title=" {{ 'APP.OIDC.REDIRECTSECTIONTITLE' | translate }}">
             <cnsl-info-section *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
               <div class="dev-col">
@@ -415,7 +430,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'additional-origins'">
+        <ng-container *ngIf="currentSetting.id === 'additional-origins'">
           <cnsl-card title=" {{ 'APP.ADDITIONALORIGINS' | translate }}">
             <p class="app-desc cnsl-secondary-text">{{ 'APP.ADDITIONALORIGINSDESC' | translate }}</p>
             <cnsl-additional-origins
@@ -436,7 +451,7 @@
             </div>
           </cnsl-card>
         </ng-container>
-        <ng-container *ngIf="currentSetting === 'urls'">
+        <ng-container *ngIf="currentSetting.id === 'urls'">
           <cnsl-card title=" {{ 'APP.URLS' | translate }}">
             <cnsl-info-section *ngIf="issuer$ | async as issuer">
               <div
@@ -482,7 +497,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'configuration'">
+        <ng-container *ngIf="currentSetting.id === 'configuration'">
           <cnsl-card
             *ngIf="initialAuthMethod === 'PK_JWT' && projectId && app && app.id"
             title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"

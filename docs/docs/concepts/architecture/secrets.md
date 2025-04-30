@@ -70,6 +70,7 @@ The following hash algorithms are supported:
 - bcrypt (Default)
 - md5: implementation of md5Crypt with salt and password shuffling [^2]
 - md5plain: md5 digest of a password without salt [^2]
+- md5salted: md5 digest of a salted password [^2]
 - scrypt
 - pbkdf2
 

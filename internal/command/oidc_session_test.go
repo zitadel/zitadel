@@ -138,6 +138,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(
@@ -182,6 +183,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(
@@ -234,6 +236,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(
@@ -331,6 +334,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(
@@ -465,6 +469,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(
@@ -610,6 +615,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(
@@ -748,6 +754,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								false,
+								"issuer",
 							),
 						),
 						eventFromEventPusher(

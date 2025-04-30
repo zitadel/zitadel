@@ -84,30 +84,26 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 		{
 			name: "all features set",
 			eventstore: expectEventstore(
-				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent[bool](
+				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent(
 					context.Background(), aggregate,
 					feature_v2.SystemLoginDefaultOrgEventType, true,
 				))),
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLegacyIntrospectionEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, false,
 					)),
 				),
 			),
@@ -132,45 +128,37 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Level: feature.LevelInstance,
 					Value: false,
 				},
-				Actions: FeatureSource[bool]{
-					Level: feature.LevelInstance,
-					Value: false,
-				},
 			},
 		},
 		{
 			name: "all features set, reset, set some feature, cascaded",
 			eventstore: expectEventstore(
-				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent[bool](
+				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent(
 					context.Background(), aggregate,
 					feature_v2.SystemLoginDefaultOrgEventType, true,
 				))),
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLegacyIntrospectionEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
 					)),
@@ -197,41 +185,33 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
-				Actions: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
-				},
 			},
 		},
 		{
 			name: "all features set, reset, set some feature, not cascaded",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLegacyIntrospectionEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
 					)),
@@ -255,10 +235,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
-				},
-				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},

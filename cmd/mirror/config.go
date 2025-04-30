@@ -23,7 +23,8 @@ type Migration struct {
 	Source      database.Config
 	Destination database.Config
 
-	EventBulkSize uint32
+	EventBulkSize     uint32
+	MaxAuthRequestAge time.Duration
 
 	Log     *logging.Config
 	Machine *id.Config
@@ -76,7 +77,7 @@ func mustNewConfig(v *viper.Viper, config any) {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			database.DecodeHook,
+			database.DecodeHook(true),
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 			mapstructure.TextUnmarshallerHookFunc(),

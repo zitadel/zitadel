@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration/scim"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -31,10 +33,8 @@ import (
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
-	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
@@ -43,6 +43,7 @@ import (
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	webkey_v2beta "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
 type Client struct {
@@ -60,11 +61,11 @@ type Client struct {
 	OIDCv2         oidc_pb.OIDCServiceClient
 	OrgV2beta      org_v2beta.OrganizationServiceClient
 	OrgV2          org.OrganizationServiceClient
-	ActionV3Alpha  action.ZITADELActionsClient
+	ActionV2beta   action.ActionServiceClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
-	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
+	WebKeyV2Beta   webkey_v2beta.WebKeyServiceClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
@@ -93,11 +94,11 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
 		OrgV2:          org.NewOrganizationServiceClient(cc),
-		ActionV3Alpha:  action.NewZITADELActionsClient(cc),
+		ActionV2beta:   action.NewActionServiceClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
-		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
+		WebKeyV2Beta:   webkey_v2beta.NewWebKeyServiceClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
@@ -157,6 +158,7 @@ func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserRes
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -181,6 +183,7 @@ func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHuman
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -212,7 +215,24 @@ func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *
 		TotpSecret: gu.Ptr(secret),
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
+}
+
+// TriggerUserByID makes sure the user projection gets triggered after creation.
+func (i *Instance) TriggerUserByID(ctx context.Context, users ...string) {
+	var wg sync.WaitGroup
+	wg.Add(len(users))
+	for _, user := range users {
+		go func(user string) {
+			defer wg.Done()
+			_, err := i.Client.UserV2.GetUserByID(ctx, &user_v2.GetUserByIDRequest{
+				UserId: user,
+			})
+			logging.OnError(err).Warn("get user by ID for trigger failed")
+		}(user)
+	}
+	wg.Wait()
 }
 
 func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail string) *org.AddOrganizationResponse {
@@ -238,6 +258,13 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 		},
 	})
 	logging.OnError(err).Panic("create org")
+
+	users := make([]string, len(resp.GetCreatedAdmins()))
+	for i, admin := range resp.GetCreatedAdmins() {
+		users[i] = admin.GetUserId()
+	}
+	i.TriggerUserByID(ctx, users...)
+
 	return resp
 }
 
@@ -302,6 +329,7 @@ func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email, phon
 		},
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -313,6 +341,7 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 		AccessTokenType: user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
 	})
 	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetUserId())
 	return resp
 }
 
@@ -472,6 +501,26 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 	return resp
 }
 
+func (i *Instance) AddGenericOIDCProvider(ctx context.Context, name string) *admin.AddGenericOIDCProviderResponse {
+	resp, err := i.Client.Admin.AddGenericOIDCProvider(ctx, &admin.AddGenericOIDCProviderRequest{
+		Name:         name,
+		Issuer:       "https://example.com",
+		ClientId:     "clientID",
+		ClientSecret: "clientSecret",
+		Scopes:       []string{"openid", "profile", "email"},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+		},
+		IsIdTokenMapping: false,
+	})
+	logging.OnError(err).Panic("create generic oidc idp")
+	return resp
+}
+
 func (i *Instance) AddSAMLProvider(ctx context.Context) string {
 	resp, err := i.Client.Admin.AddSAMLProvider(ctx, &admin.AddSAMLProviderRequest{
 		Name: "saml-idp",
@@ -523,6 +572,32 @@ func (i *Instance) AddSAMLPostProvider(ctx context.Context) string {
 		},
 	})
 	logging.OnError(err).Panic("create saml idp")
+	return resp.GetId()
+}
+
+func (i *Instance) AddLDAPProvider(ctx context.Context) string {
+	resp, err := i.Client.Admin.AddLDAPProvider(ctx, &admin.AddLDAPProviderRequest{
+		Name:              "ldap-idp-post",
+		Servers:           []string{"https://localhost:8000"},
+		StartTls:          false,
+		BaseDn:            "baseDn",
+		BindDn:            "admin",
+		BindPassword:      "admin",
+		UserBase:          "dn",
+		UserObjectClasses: []string{"user"},
+		UserFilters:       []string{"(objectclass=*)"},
+		Timeout:           durationpb.New(10 * time.Second),
+		Attributes: &idp.LDAPAttributes{
+			IdAttribute: "id",
+		},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	logging.OnError(err).Panic("create ldap idp")
 	return resp.GetId()
 }
 
@@ -646,47 +721,52 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 	if name == "" {
 		name = gofakeit.Name()
 	}
-	reqTarget := &action.Target{
+	req := &action.CreateTargetRequest{
 		Name:     name,
 		Endpoint: endpoint,
-		Timeout:  durationpb.New(10 * time.Second),
+		Timeout:  durationpb.New(5 * time.Second),
 	}
 	switch ty {
 	case domain.TargetTypeWebhook:
-		reqTarget.TargetType = &action.Target_RestWebhook{
-			RestWebhook: &action.SetRESTWebhook{
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.RESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeCall:
-		reqTarget.TargetType = &action.Target_RestCall{
-			RestCall: &action.SetRESTCall{
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.RESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeAsync:
-		reqTarget.TargetType = &action.Target_RestAsync{
-			RestAsync: &action.SetRESTAsync{},
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.RESTAsync{},
 		}
 	}
-	target, err := i.Client.ActionV3Alpha.CreateTarget(ctx, &action.CreateTargetRequest{Target: reqTarget})
+	target, err := i.Client.ActionV2beta.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
+func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
+	_, err := i.Client.ActionV2beta.DeleteTarget(ctx, &action.DeleteTargetRequest{
+		Id: id,
+	})
+	require.NoError(t, err)
+}
+
 func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
-	_, err := i.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
+	_, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
 }
 
-func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
-	target, err := i.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
+func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string) *action.SetExecutionResponse {
+	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
-		Execution: &action.Execution{
-			Targets: targets,
-		},
+		Targets:   targets,
 	})
 	require.NoError(t, err)
 	return target

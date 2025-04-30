@@ -35,6 +35,14 @@ export const OIDC: SidenavSetting = {
   },
 };
 
+export const WEBKEYS: SidenavSetting = {
+  id: 'webkeys',
+  i18nKey: 'SETTINGS.LIST.WEB_KEYS',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
 export const SECRETS: SidenavSetting = {
   id: 'secrets',
   i18nKey: 'SETTINGS.LIST.SECRETS',
@@ -213,4 +221,24 @@ export const BRANDING: SidenavSetting = {
     [PolicyComponentServiceType.MGMT]: ['policy.read'],
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
+};
+
+export const ACTIONS: SidenavSetting = {
+  id: 'actions',
+  i18nKey: 'SETTINGS.LIST.ACTIONS',
+  groupI18nKey: 'SETTINGS.GROUPS.ACTIONS',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['action.execution.write', 'action.target.write'],
+  },
+  beta: true,
+};
+
+export const ACTIONS_TARGETS: SidenavSetting = {
+  id: 'actions_targets',
+  i18nKey: 'SETTINGS.LIST.TARGETS',
+  groupI18nKey: 'SETTINGS.GROUPS.ACTIONS',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['action.execution.write', 'action.target.write'],
+  },
+  beta: true,
 };

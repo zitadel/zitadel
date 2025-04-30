@@ -19,8 +19,7 @@ var (
 		` projections.project_roles4.display_name,` +
 		` projections.project_roles4.group_name,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.project_roles4` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.project_roles4`
 	prepareProjectRolesCols = []string{
 		"project_id",
 		"creation_date",
@@ -175,7 +174,7 @@ func Test_ProjectRolePrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
