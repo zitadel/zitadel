@@ -9,13 +9,13 @@ import (
 
 type userColumns interface {
 	// TODO: move v4.columns to domain
-	InstanceIDColumn() column
-	OrgIDColumn() column
-	IDColumn() column
-	usernameColumn() column
-	CreatedAtColumn() column
-	UpdatedAtColumn() column
-	DeletedAtColumn() column
+	InstanceIDColumn() v4.Column
+	OrgIDColumn() v4.Column
+	IDColumn() v4.Column
+	usernameColumn() v4.Column
+	CreatedAtColumn() v4.Column
+	UpdatedAtColumn() v4.Column
+	DeletedAtColumn() v4.Column
 }
 
 type userConditions interface {
@@ -29,30 +29,35 @@ type userConditions interface {
 	DeletedAtCondition(op v4.NumberOperator, deletedAt time.Time) v4.Condition
 }
 
+type userChanges interface {
+	SetUsername(username string) v4.Change
+}
+
 type UserRepository interface {
 	userColumns
 	userConditions
+	userChanges
 	// TODO: move condition to domain
-	WithCondition(condition v4.Condition) UserRepository
-	Get(ctx context.Context) (*User, error)
-	List(ctx context.Context) ([]*User, error)
-	Create(ctx context.Context, user *User) error
-	Delete(ctx context.Context) error
+	Get(ctx context.Context, opts v4.QueryOption) (*User, error)
+	List(ctx context.Context, opts v4.QueryOption) ([]*User, error)
+	Delete(ctx context.Context, condition v4.Condition) error
 
 	Human() HumanRepository
 	Machine() MachineRepository
 }
 
 type humanColumns interface {
-	FirstNameColumn() column
-	LastNameColumn() column
-	EmailAddressColumn() column
-	EmailVerifiedAtColumn() column
-	PhoneNumberColumn() column
-	PhoneVerifiedAtColumn() column
+	userColumns
+	FirstNameColumn() v4.Column
+	LastNameColumn() v4.Column
+	EmailAddressColumn() v4.Column
+	EmailVerifiedAtColumn() v4.Column
+	PhoneNumberColumn() v4.Column
+	PhoneVerifiedAtColumn() v4.Column
 }
 
 type humanConditions interface {
+	userConditions
 	FirstNameCondition(op v4.TextOperator, firstName string) v4.Condition
 	LastNameCondition(op v4.TextOperator, lastName string) v4.Condition
 	EmailAddressCondition(op v4.TextOperator, email string) v4.Condition
@@ -63,26 +68,53 @@ type humanConditions interface {
 	PhoneVerifiedAtCondition(op v4.TextOperator, phoneVerifiedAt string) v4.Condition
 }
 
+type humanChanges interface {
+	userChanges
+	SetFirstName(firstName string) v4.Change
+	SetLastName(lastName string) v4.Change
+
+	SetEmail(address string, verified *time.Time) v4.Change
+	SetEmailAddress(email string) v4.Change
+	SetEmailVerifiedAt(emailVerifiedAt time.Time) v4.Change
+
+	SetPhone(number string, verifiedAt *time.Time) v4.Change
+	SetPhoneNumber(phoneNumber string) v4.Change
+	SetPhoneVerifiedAt(phoneVerifiedAt time.Time) v4.Change
+}
+
 type HumanRepository interface {
 	humanColumns
 	humanConditions
+	humanChanges
 
-	GetEmail(ctx context.Context) (*Email, error)
+	GetEmail(ctx context.Context, condition v4.Condition) (*Email, error)
 	// TODO: replace any with add email update columns
-	SetEmail(ctx context.Context, columns ...any) error
+	Create(ctx context.Context, user *User) error
+	Update(ctx context.Context, condition v4.Condition, changes ...v4.Change) error
 }
 
 type machineColumns interface {
-	DescriptionColumn() column
+	userColumns
+	DescriptionColumn() v4.Column
 }
 
 type machineConditions interface {
+	userConditions
 	DescriptionCondition(op v4.TextOperator, description string) v4.Condition
+}
+
+type machineChanges interface {
+	userChanges
+	SetDescription(description string) v4.Change
 }
 
 type MachineRepository interface {
 	machineColumns
 	machineConditions
+	machineChanges
+
+	Create(ctx context.Context, user *User) error
+	Update(ctx context.Context, condition v4.Condition, changes ...v4.Change) error
 }
 
 // type UserRepository interface {
@@ -169,6 +201,11 @@ type MachineRepository interface {
 
 type User struct {
 	v4.User
+}
+
+type Email struct {
+	v4.Email
+	IsVerified bool
 }
 
 // type userTraits interface {

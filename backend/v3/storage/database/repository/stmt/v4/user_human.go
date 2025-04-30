@@ -46,11 +46,11 @@ func (u *user) Human() *userHuman {
 
 const userEmailQuery = `SELECT h.email_address, h.email_verified_at FROM user_humans h`
 
-func (u *userHuman) GetEmail(ctx context.Context) (*Email, error) {
+func (u *userHuman) GetEmail(ctx context.Context, condition Condition) (*Email, error) {
 	var email Email
 
 	u.builder.WriteString(userEmailQuery)
-	u.writeCondition()
+	u.writeCondition(condition)
 
 	err := u.client.QueryRow(ctx, u.builder.String(), u.builder.args...).Scan(
 		&email.Address,
@@ -63,10 +63,10 @@ func (u *userHuman) GetEmail(ctx context.Context) (*Email, error) {
 	return &email, nil
 }
 
-func (h userHuman) Update(ctx context.Context, changes ...Change) error {
-	h.builder.WriteString(`UPDATE human_users h SET `)
+func (h userHuman) Update(ctx context.Context, condition Condition, changes ...Change) error {
+	h.builder.WriteString(`UPDATE human_users SET `)
 	Changes(changes).writeTo(&h.builder)
-	h.writeCondition()
+	h.writeCondition(condition)
 
 	stmt := h.builder.String()
 
@@ -78,7 +78,7 @@ func (h userHuman) SetFirstName(firstName string) Change {
 }
 
 func (h userHuman) FirstNameColumn() Column {
-	return column{"h.first_name"}
+	return column{"first_name"}
 }
 
 func (h userHuman) FirstNameCondition(op TextOperator, firstName string) Condition {
@@ -90,7 +90,7 @@ func (h userHuman) SetLastName(lastName string) Change {
 }
 
 func (h userHuman) LastNameColumn() Column {
-	return column{"h.last_name"}
+	return column{"last_name"}
 }
 
 func (h userHuman) LastNameCondition(op TextOperator, lastName string) Condition {
@@ -99,7 +99,7 @@ func (h userHuman) LastNameCondition(op TextOperator, lastName string) Condition
 
 func (h userHuman) EmailAddressColumn() Column {
 	return ignoreCaseCol{
-		column: column{"h.email_address"},
+		column: column{"email_address"},
 		suffix: "_lower",
 	}
 }
@@ -109,7 +109,7 @@ func (h userHuman) EmailAddressCondition(op TextOperator, email string) Conditio
 }
 
 func (h userHuman) EmailVerifiedAtColumn() Column {
-	return column{"h.email_verified_at"}
+	return column{"email_verified_at"}
 }
 
 func (h *userHuman) EmailAddressVerifiedCondition(isVerified bool) Condition {
@@ -144,7 +144,7 @@ func (h userHuman) SetEmail(address string, verified *time.Time) Change {
 }
 
 func (h userHuman) PhoneNumberColumn() Column {
-	return column{"h.phone_number"}
+	return column{"phone_number"}
 }
 
 func (h userHuman) SetPhoneNumber(number string) Change {
@@ -156,7 +156,7 @@ func (h userHuman) PhoneNumberCondition(op TextOperator, phoneNumber string) Con
 }
 
 func (h userHuman) PhoneVerifiedAtColumn() Column {
-	return column{"h.phone_verified_at"}
+	return column{"phone_verified_at"}
 }
 
 func (h userHuman) PhoneNumberVerifiedCondition(isVerified bool) Condition {
@@ -184,4 +184,20 @@ func (h userHuman) SetPhone(number string, verifiedAt *time.Time) Change {
 		h.SetPhoneNumber(number),
 		newUpdatePtrColumn(h.PhoneVerifiedAtColumn(), verifiedAt),
 	)
+}
+
+func (h userHuman) columns() Columns {
+	return append(h.user.columns(),
+		h.FirstNameColumn(),
+		h.LastNameColumn(),
+		h.EmailAddressColumn(),
+		h.EmailVerifiedAtColumn(),
+		h.PhoneNumberColumn(),
+		h.PhoneVerifiedAtColumn(),
+	)
+}
+
+func (h userHuman) writeReturning(builder *statementBuilder) {
+	builder.WriteString(" RETURNING ")
+	h.columns().writeTo(builder)
 }

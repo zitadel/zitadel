@@ -29,17 +29,13 @@ type userTrait interface {
 	Type() UserType
 }
 
-const userQuery = `SELECT u.instance_id, u.org_id, u.id, u.username, u.type, u.created_at, u.updated_at, u.deleted_at,` +
-	` h.first_name, h.last_name, h.email_address, h.email_verified_at, h.phone_number, h.phone_verified_at, m.description` +
-	` FROM users u` +
-	` LEFT JOIN user_humans h ON u.instance_id = h.instance_id AND u.org_id = h.org_id AND u.id = h.id` +
-	` LEFT JOIN user_machines m ON u.instance_id = m.instance_id AND u.org_id = m.org_id AND u.id = m.id`
+const queryUserStmt = `SELECT instance_id, org_id, id, username, type, created_at, updated_at, deleted_at,` +
+	` first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at, description` +
+	` FROM users_view`
 
 type user struct {
 	builder statementBuilder
 	client  database.QueryExecutor
-
-	condition Condition
 }
 
 func UserRepository(client database.QueryExecutor) *user {
@@ -48,20 +44,17 @@ func UserRepository(client database.QueryExecutor) *user {
 	}
 }
 
-func (u *user) WithCondition(condition Condition) *user {
-	u.condition = condition
-	return u
-}
+func (u *user) List(ctx context.Context, opts ...QueryOption) (users []*User, err error) {
+	options := new(queryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
 
-func (u *user) Get(ctx context.Context) (*User, error) {
-	u.builder.WriteString(userQuery)
-	u.writeCondition()
-	return scanUser(u.client.QueryRow(ctx, u.builder.String(), u.builder.args...))
-}
-
-func (u *user) List(ctx context.Context) (users []*User, err error) {
-	u.builder.WriteString(userQuery)
-	u.writeCondition()
+	u.builder.WriteString(queryUserStmt)
+	options.writeCondition(&u.builder)
+	options.writeOrderBy(&u.builder)
+	options.writeLimit(&u.builder)
+	options.writeOffset(&u.builder)
 
 	rows, err := u.client.Query(ctx, u.builder.String(), u.builder.args...)
 	if err != nil {
@@ -87,7 +80,23 @@ func (u *user) List(ctx context.Context) (users []*User, err error) {
 	return users, nil
 }
 
+func (u *user) Get(ctx context.Context, opts ...QueryOption) (*User, error) {
+	options := new(queryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	u.builder.WriteString(queryUserStmt)
+	options.writeCondition(&u.builder)
+	options.writeOrderBy(&u.builder)
+	options.writeLimit(&u.builder)
+	options.writeOffset(&u.builder)
+
+	return scanUser(u.client.QueryRow(ctx, u.builder.String(), u.builder.args...))
+}
+
 const (
+	// TODO: change to separate statements and tables
 	createUserCte = `WITH user AS (` +
 		`INSERT INTO users (instance_id, org_id, id, username, type) VALUES ($1, $2, $3, $4, $5)` +
 		` RETURNING *)`
@@ -111,11 +120,24 @@ func (u *user) Create(ctx context.Context, user *User) error {
 		u.builder.WriteString(createMachineStmt)
 		u.builder.appendArgs(trait.Description)
 	}
-	return u.client.QueryRow(ctx, u.builder.String(), u.builder.args...).Scan(user.CreatedAt, user.UpdatedAt)
+	return u.client.QueryRow(ctx, u.builder.String(), u.builder.args...).Scan(&user.Dates.CreatedAt, &user.Dates.UpdatedAt)
+}
+
+func (u *user) Update(ctx context.Context, condition Condition, changes ...Change) error {
+	u.builder.WriteString("UPDATE users SET ")
+	Changes(changes).writeTo(&u.builder)
+	u.writeCondition(condition)
+	return u.client.Exec(ctx, u.builder.String(), u.builder.args...)
+}
+
+func (u *user) Delete(ctx context.Context, condition Condition) error {
+	u.builder.WriteString("DELETE FROM users")
+	u.writeCondition(condition)
+	return u.client.Exec(ctx, u.builder.String(), u.builder.args...)
 }
 
 func (u *user) InstanceIDColumn() Column {
-	return column{name: "u.instance_id"}
+	return column{name: "instance_id"}
 }
 
 func (u *user) InstanceIDCondition(instanceID string) Condition {
@@ -123,7 +145,7 @@ func (u *user) InstanceIDCondition(instanceID string) Condition {
 }
 
 func (u *user) OrgIDColumn() Column {
-	return column{name: "u.org_id"}
+	return column{name: "org_id"}
 }
 
 func (u *user) OrgIDCondition(orgID string) Condition {
@@ -131,7 +153,7 @@ func (u *user) OrgIDCondition(orgID string) Condition {
 }
 
 func (u *user) IDColumn() Column {
-	return column{name: "u.id"}
+	return column{name: "id"}
 }
 
 func (u *user) IDCondition(userID string) Condition {
@@ -140,7 +162,7 @@ func (u *user) IDCondition(userID string) Condition {
 
 func (u *user) UsernameColumn() Column {
 	return ignoreCaseCol{
-		column: column{name: "u.username"},
+		column: column{name: "username"},
 		suffix: "_lower",
 	}
 }
@@ -154,7 +176,7 @@ func (u *user) UsernameCondition(op TextOperator, username string) Condition {
 }
 
 func (u *user) CreatedAtColumn() Column {
-	return column{name: "u.created_at"}
+	return column{name: "created_at"}
 }
 
 func (u *user) CreatedAtCondition(op NumberOperator, createdAt time.Time) Condition {
@@ -162,7 +184,7 @@ func (u *user) CreatedAtCondition(op NumberOperator, createdAt time.Time) Condit
 }
 
 func (u *user) UpdatedAtColumn() Column {
-	return column{name: "u.updated_at"}
+	return column{name: "updated_at"}
 }
 
 func (u *user) UpdatedAtCondition(op NumberOperator, updatedAt time.Time) Condition {
@@ -170,7 +192,7 @@ func (u *user) UpdatedAtCondition(op NumberOperator, updatedAt time.Time) Condit
 }
 
 func (u *user) DeletedAtColumn() Column {
-	return column{name: "u.deleted_at"}
+	return column{name: "deleted_at"}
 }
 
 func (u *user) DeletedCondition(isDeleted bool) Condition {
@@ -184,12 +206,24 @@ func (u *user) DeletedAtCondition(op NumberOperator, deletedAt time.Time) Condit
 	return newNumberCondition(u.DeletedAtColumn(), op, deletedAt)
 }
 
-func (u *user) writeCondition() {
-	if u.condition == nil {
+func (u *user) writeCondition(condition Condition) {
+	if condition == nil {
 		return
 	}
 	u.builder.WriteString(" WHERE ")
-	u.condition.writeTo(&u.builder)
+	condition.writeTo(&u.builder)
+}
+
+func (u user) columns() Columns {
+	return Columns{
+		u.InstanceIDColumn(),
+		u.OrgIDColumn(),
+		u.IDColumn(),
+		u.UsernameColumn(),
+		u.CreatedAtColumn(),
+		u.UpdatedAtColumn(),
+		u.DeletedAtColumn(),
+	}
 }
 
 func scanUser(scanner database.Scanner) (*User, error) {

@@ -50,6 +50,17 @@ var _ Change = Changes(nil)
 
 var _ Change = (*change[string])(nil)
 
+type Columns []Column
+
+func (m Columns) writeTo(builder *statementBuilder) {
+	for i, col := range m {
+		if i > 0 {
+			builder.WriteString(", ")
+		}
+		col.writeTo(builder)
+	}
+}
+
 type Column interface {
 	writeTo(builder *statementBuilder)
 }

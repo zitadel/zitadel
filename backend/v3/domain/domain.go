@@ -15,7 +15,7 @@ var (
 	userCodeAlgorithm crypto.EncryptionAlgorithm
 	tracer            tracing.Tracer
 
-	// userRepo     func(database.QueryExecutor) UserRepository
+	userRepo     func(database.QueryExecutor) UserRepository
 	instanceRepo func(database.QueryExecutor) InstanceRepository
 	cryptoRepo   func(database.QueryExecutor) CryptoRepository
 	orgRepo      func(database.QueryExecutor) OrgRepository
@@ -39,9 +39,9 @@ func SetTracer(t tracing.Tracer) {
 	tracer = t
 }
 
-// func SetUserRepository(repo func(database.QueryExecutor) UserRepository) {
-// 	userRepo = repo
-// }
+func SetUserRepository(repo func(database.QueryExecutor) UserRepository) {
+	userRepo = repo
+}
 
 func SetInstanceRepository(repo func(database.QueryExecutor) InstanceRepository) {
 	instanceRepo = repo

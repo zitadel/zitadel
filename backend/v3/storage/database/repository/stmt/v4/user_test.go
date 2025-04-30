@@ -11,32 +11,38 @@ import (
 func TestQueryUser(t *testing.T) {
 	t.Run("User filters", func(t *testing.T) {
 		user := v4.UserRepository(nil)
-		user.WithCondition(
-			v4.And(
-				v4.Or(
-					user.IDCondition("test"),
-					user.IDCondition("2"),
+		u, err := user.Get(context.Background(),
+			v4.WithCondition(
+				v4.And(
+					v4.Or(
+						user.IDCondition("test"),
+						user.IDCondition("2"),
+					),
+					user.UsernameCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
 				),
-				user.UsernameCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
 			),
-		).Get(context.Background())
+			v4.WithOrderBy(user.CreatedAtColumn()),
+		)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, u)
 	})
 
 	t.Run("machine and human filters", func(t *testing.T) {
 		user := v4.UserRepository(nil)
 		machine := user.Machine()
 		human := user.Human()
-		user.WithCondition(
-			v4.And(
-				user.UsernameCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
-				v4.Or(
-					machine.DescriptionCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
-					human.EmailAddressVerifiedCondition(true),
-					v4.IsNotNull(machine.DescriptionColumn()),
-				),
+		email, err := human.GetEmail(context.Background(), v4.And(
+			user.UsernameCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
+			v4.Or(
+				machine.DescriptionCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
+				human.EmailAddressVerifiedCondition(true),
+				v4.IsNotNull(machine.DescriptionColumn()),
 			),
-		)
-		human.GetEmail(context.Background())
+		))
+
+		assert.NoError(t, err)
+		assert.NotNil(t, email)
 	})
 }
 
@@ -56,10 +62,6 @@ func TestArg(t *testing.T) {
 func TestWriteUser(t *testing.T) {
 	t.Run("update user", func(t *testing.T) {
 		user := v4.UserRepository(nil)
-		user.WithCondition(user.IDCondition("test")).Human().Update(
-			context.Background(),
-			user.SetUsername("test"),
-		)
-
+		user.Update(context.Background(), user.IDCondition("test"), user.SetUsername("test"))
 	})
 }

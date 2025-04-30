@@ -59,6 +59,8 @@ CREATE TABLE users (
     -- , CONSTRAINT fk_instances FOREIGN KEY (instance_id) REFERENCES instances(id)
 ) INHERITS (org_objects);
 
+CREATE INDEX idx_users_username ON users(username);
+
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE
 ON users
@@ -74,6 +76,8 @@ CREATE TABLE human_users(
     , CONSTRAINT fk_instances FOREIGN KEY (instance_id) REFERENCES instances(id)
 ) INHERITS (users);
 
+CREATE INDEX idx_human_users_username ON human_users(username);
+
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE
 ON human_users
@@ -88,23 +92,15 @@ CREATE TABLE machine_users(
     , CONSTRAINT fk_instances FOREIGN KEY (instance_id) REFERENCES instances(id)
 ) INHERITS (users);
 
+CREATE INDEX idx_machine_users_username ON machine_users(username);
+
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE
 ON machine_users
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
-
-select u.*, hu.first_name, hu.last_name, mu.description from users u
-left join human_users hu on u.instance_id = hu.instance_id and u.org_id = hu.org_id and u.id = hu.id
-left join machine_users mu on u.instance_id = mu.instance_id and u.org_id = mu.org_id and u.id = mu.id
--- where
---     u.instance_id = 1
---     and u.org_id = 3
---     and u.id = 7
-;
-
-create view users_view as (
+CREATE VIEW users_view AS (
 SELECT 
     id
     , created_at
@@ -113,27 +109,16 @@ SELECT
     , instance_id
     , org_id
     , username
-    , first_name
-    , last_name
-    , description 
-FROM (
-(SELECT 
-    id
-    , created_at
-    , updated_at
-    , deleted_at
-    , instance_id
-    , org_id
-    , username
+    , tableoid::regclass::TEXT AS type
     , first_name
     , last_name
     , NULL AS description 
 FROM
-    human_users)
+    human_users
 
 UNION
 
-(SELECT 
+SELECT 
     id
     , created_at
     , updated_at
@@ -141,9 +126,10 @@ UNION
     , instance_id
     , org_id
     , username
+    , tableoid::regclass::TEXT AS type
     , NULL AS first_name
     , NULL AS last_name
     , description 
 FROM
-    machine_users)
-));
+    machine_users
+);

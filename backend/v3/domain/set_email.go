@@ -38,7 +38,8 @@ func (cmd *SetEmailCommand) Execute(ctx context.Context, opts *CommandOpts) erro
 	}
 	defer func() { err = close(ctx, err) }()
 	// userStatement(opts.DB).Human().ByID(cmd.UserID).SetEmail(ctx, cmd.Email)
-	err = userRepo(opts.DB).Human().ByID(cmd.UserID).Exec().SetEmail(ctx, cmd.Email)
+	repo := userRepo(opts.DB).Human()
+	err = repo.Update(ctx, repo.IDCondition(cmd.UserID), repo.SetEmailAddress(cmd.Email))
 	if err != nil {
 		return err
 	}
@@ -59,6 +60,6 @@ func (cmd *SetEmailCommand) Events() []*eventstore.Event {
 }
 
 // applyOnCreateHuman implements [CreateHumanOpt].
-func (cmd *SetEmailCommand) applyOnCreateHuman(createUserCmd *CreateUserCommand[Human]) {
+func (cmd *SetEmailCommand) applyOnCreateHuman(createUserCmd *CreateUserCommand) {
 	createUserCmd.email = cmd
 }

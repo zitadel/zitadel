@@ -2,8 +2,7 @@ package domain
 
 import (
 	"context"
-
-	v4 "github.com/zitadel/zitadel/backend/v3/storage/database/repository/stmt/v4"
+	"time"
 )
 
 type EmailVerifiedCommand struct {
@@ -27,7 +26,8 @@ var (
 
 // Execute implements [Commander]
 func (cmd *EmailVerifiedCommand) Execute(ctx context.Context, opts *CommandOpts) error {
-	return userRepo(opts.DB).Human().ByID(cmd.UserID).Exec().SetEmailVerified(ctx, cmd.Email.Address)
+	repo := userRepo(opts.DB).Human()
+	return repo.Update(ctx, repo.IDCondition(cmd.UserID), repo.SetEmailVerifiedAt(time.Time{}))
 }
 
 // applyOnSetEmail implements [SetEmailOpt]
@@ -78,8 +78,9 @@ func (cmd *SendCodeCommand) ensureEmail(ctx context.Context, opts *CommandOpts) 
 	if cmd.Email != "" {
 		return nil
 	}
-	email, err := userRepo(opts.DB).Human().ByID(cmd.UserID).Exec().GetEmail(ctx)
-	if err != nil || email.IsVerified {
+	repo := userRepo(opts.DB).Human()
+	email, err := repo.GetEmail(ctx, repo.IDCondition(cmd.UserID))
+	if err != nil || !email.VerifiedAt.IsZero() {
 		return err
 	}
 	cmd.Email = email.Address
@@ -137,10 +138,9 @@ func (cmd *ReturnCodeCommand) ensureEmail(ctx context.Context, opts *CommandOpts
 	if cmd.Email != "" {
 		return nil
 	}
-	user := v4.UserRepository(opts.DB)
-	user.WithCondition(user.IDCondition(cmd.UserID))
-	email, err := user.he.GetEmail(ctx)
-	if err != nil || email.IsVerified {
+	repo := userRepo(opts.DB).Human()
+	email, err := repo.GetEmail(ctx, repo.IDCondition(cmd.UserID))
+	if err != nil || !email.VerifiedAt.IsZero() {
 		return err
 	}
 	cmd.Email = email.Address
