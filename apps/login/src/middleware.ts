@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { DEFAULT_CSP } from "./lib/csp";
 import { getServiceUrlFromHeaders } from "./lib/service";
+import { getSecuritySettings } from "./lib/zitadel";
 
 export const config = {
   matcher: [
@@ -22,6 +24,8 @@ export async function middleware(request: NextRequest) {
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
+  const securitySettings = await getSecuritySettings({ serviceUrl });
+
   const instanceHost = `${serviceUrl}`
     .replace("https://", "")
     .replace("http://", "");
@@ -38,6 +42,20 @@ export async function middleware(request: NextRequest) {
   const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
+
+  responseHeaders.set(
+    "Content-Security-Policy",
+    `${DEFAULT_CSP} frame-ancestors 'none'`,
+  );
+
+  if (securitySettings?.embeddedIframe?.enabled) {
+    securitySettings.embeddedIframe.allowedOrigins;
+    responseHeaders.set(
+      "Content-Security-Policy",
+      `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+    );
+    responseHeaders.delete("X-Frame-Options");
+  }
 
   request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
   return NextResponse.rewrite(request.nextUrl, {

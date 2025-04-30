@@ -1,4 +1,5 @@
 import { getAllSessions } from "@/lib/cookies";
+import { DEFAULT_CSP } from "@/lib/csp";
 import { idpTypeToSlug } from "@/lib/idp";
 import { loginWithOIDCandSession } from "@/lib/oidc";
 import { loginWithSAMLandSession } from "@/lib/saml";
@@ -12,6 +13,7 @@ import {
   getAuthRequest,
   getOrgsByDomain,
   getSAMLRequest,
+  getSecuritySettings,
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
@@ -293,17 +295,32 @@ export async function GET(request: NextRequest) {
          * This means that the user should not be prompted to enter their password again.
          * Instead, the server attempts to silently authenticate the user using an existing session or other authentication mechanisms that do not require user interaction
          **/
+        const securitySettings = await getSecuritySettings({
+          serviceUrl,
+        });
+
         const selectedSession = await findValidSession({
           serviceUrl,
           sessions,
           authRequest,
         });
 
-        if (!selectedSession || !selectedSession.id) {
-          return NextResponse.json(
-            { error: "No active session found" },
-            { status: 400 },
+        const noSessionResponse = NextResponse.json(
+          { error: "No active session found" },
+          { status: 400 },
+        );
+
+        if (securitySettings?.embeddedIframe?.enabled) {
+          securitySettings.embeddedIframe.allowedOrigins;
+          noSessionResponse.headers.set(
+            "Content-Security-Policy",
+            `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
           );
+          noSessionResponse.headers.delete("X-Frame-Options");
+        }
+
+        if (!selectedSession || !selectedSession.id) {
+          return noSessionResponse;
         }
 
         const cookie = sessionCookies.find(
@@ -311,10 +328,7 @@ export async function GET(request: NextRequest) {
         );
 
         if (!cookie || !cookie.id || !cookie.token) {
-          return NextResponse.json(
-            { error: "No active session found" },
-            { status: 400 },
-          );
+          return noSessionResponse;
         }
 
         const session = {
@@ -332,7 +346,19 @@ export async function GET(request: NextRequest) {
             },
           }),
         });
-        return NextResponse.redirect(callbackUrl);
+
+        const callbackResponse = NextResponse.redirect(callbackUrl);
+
+        if (securitySettings?.embeddedIframe?.enabled) {
+          securitySettings.embeddedIframe.allowedOrigins;
+          callbackResponse.headers.set(
+            "Content-Security-Policy",
+            `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+          );
+          callbackResponse.headers.delete("X-Frame-Options");
+        }
+
+        return callbackResponse;
       } else {
         // check for loginHint, userId hint and valid sessions
         let selectedSession = await findValidSession({
