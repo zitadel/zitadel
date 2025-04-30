@@ -26,6 +26,8 @@ export async function middleware(request: NextRequest) {
 
   const securitySettings = await getSecuritySettings({ serviceUrl });
 
+  console.log(securitySettings, DEFAULT_CSP);
+
   const instanceHost = `${serviceUrl}`
     .replace("https://", "")
     .replace("http://", "");
