@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/query"
@@ -278,7 +279,9 @@ func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUserV2(ctx, req.UserId, "", memberships, grants...)
+	details, err := s.command.RemoveUserV2(ctx, req.UserId, "", func(isHuman bool) eventstore.PermissionCheck {
+		return s.command.CheckPermissionUserDelete(ctx, isHuman)
+	}, memberships, grants...)
 	if err != nil {
 		return nil, err
 	}
