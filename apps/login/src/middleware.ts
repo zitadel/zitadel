@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { DEFAULT_CSP } from "./lib/csp";
+import { DEFAULT_CSP } from "../constants/csp";
 import { getServiceUrlFromHeaders } from "./lib/service";
 import { getSecuritySettings } from "./lib/zitadel";
 

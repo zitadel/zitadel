@@ -1,5 +1,4 @@
 import { getAllSessions } from "@/lib/cookies";
-import { DEFAULT_CSP } from "@/lib/csp";
 import { idpTypeToSlug } from "@/lib/idp";
 import { loginWithOIDCandSession } from "@/lib/oidc";
 import { loginWithSAMLandSession } from "@/lib/saml";
@@ -27,6 +26,7 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { DEFAULT_CSP } from "../../../constants/csp";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
