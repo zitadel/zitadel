@@ -1080,10 +1080,25 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 	}
 }
 
+// TODO: move to a central place
+var errPermissionDenied = errors.New("permission denied")
+
+func isPermissionDenied(err error) bool {
+	return errors.Is(err, errPermissionDenied)
+}
+
+func permissionCheck(allow bool) eventstore.PermissionCheck {
+	return func(_, _ string) error {
+		if allow {
+			return nil
+		}
+		return errPermissionDenied
+	}
+}
+
 func TestCommandSide_RemoveUserV2(t *testing.T) {
 	type fields struct {
-		eventstore      func(*testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -1091,6 +1106,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			userID               string
 			cascadingMemberships []*CascadingMembership
 			grantIDs             []string
+			permissionCheck      eventstore.PermissionCheck
 		}
 	)
 	type res struct {
@@ -1106,12 +1122,12 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore:      expectEventstore(),
-				checkPermission: newMockPermissionCheckAllowed(),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "",
+				ctx:             context.Background(),
+				userID:          "",
+				permissionCheck: permissionCheck(true),
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1125,11 +1141,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				permissionCheck: permissionCheck(true),
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1166,11 +1182,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				permissionCheck: permissionCheck(true),
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1217,11 +1233,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				permissionCheck: permissionCheck(true),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1255,16 +1271,14 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				permissionCheck: permissionCheck(false),
 			},
 			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
+				err: isPermissionDenied,
 			},
 		},
 		{
@@ -1292,7 +1306,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -1339,7 +1352,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -1355,10 +1367,9 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				checkPermission: tt.fields.checkPermission,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.RemoveUserV2(tt.args.ctx, tt.args.userID, "", tt.args.cascadingMemberships, tt.args.grantIDs...)
+			got, err := r.RemoveUserV2(tt.args.ctx, tt.args.userID, "", tt.args.permissionCheck, tt.args.cascadingMemberships, tt.args.grantIDs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -323,6 +323,9 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 			"missing permission",
 			fields{
 				eventstore: expectEventstore(
+					// The write model doesn't query any events
+					expectFilter(),
+					// The permission check queries a single event to get the resource owner
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
@@ -339,6 +342,9 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 			"user does not exist",
 			fields{
 				eventstore: expectEventstore(
+					// The write model doesn't query any events
+					expectFilter(),
+					// The permission check queries a single event to get the resource owner
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
