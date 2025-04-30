@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { InfoSectionType } from '../../info-section/info-section.component';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
@@ -110,4 +111,6 @@ export class ActionsTwoActionsComponent {
       this.toast.showError(error);
     }
   }
+
+  protected readonly InfoSectionType = InfoSectionType;
 }

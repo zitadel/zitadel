@@ -29,18 +29,8 @@ message Execution {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
-  // Ordered list of targets/includes called during the execution.
-  repeated ExecutionTargetType targets = 4;
-}
-
-message ExecutionTargetType {
-  oneof type {
-    option (validate.required) = true;
-    // Unique identifier of existing target to call.
-    string target = 1;
-    // Unique identifier of existing execution to include targets of.
-    Condition include = 2;
-  }
+  // Ordered list of targets called during the execution.
+  repeated string targets = 4;
 }
 
 message Condition {
