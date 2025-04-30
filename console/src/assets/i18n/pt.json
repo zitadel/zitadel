@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "Solicitação",
         "response": "Resposta",
-        "events": "Eventos",
+        "event": "Eventos",
         "function": "Função"
       },
       "DIALOG": {
@@ -568,6 +568,7 @@
             "TITLE": "Todas",
             "DESCRIPTION": "Selecione isso se você quiser executar sua ação em cada solicitação"
           },
+          "ALL_EVENTS": "Selecione isto se quiser executar sua ação em cada evento",
           "SELECT_SERVICE": {
             "TITLE": "Selecionar Serviço",
             "DESCRIPTION": "Escolha um Serviço Zitadel para sua ação."
