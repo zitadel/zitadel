@@ -23,8 +23,6 @@ export async function middleware(request: NextRequest) {
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  console.log("defaultCSP", DEFAULT_CSP);
-
   // Call the /security route handler
   // TODO check this on cloud run deployment
   const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
@@ -38,7 +36,6 @@ export async function middleware(request: NextRequest) {
   }
 
   const { settings: securitySettings } = await securityResponse.json();
-  console.log("securitySettings", securitySettings);
 
   const instanceHost = `${serviceUrl}`
     .replace("https://", "")
@@ -67,6 +64,7 @@ export async function middleware(request: NextRequest) {
   }
 
   request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
+
   return NextResponse.rewrite(request.nextUrl, {
     request: {
       headers: requestHeaders,
