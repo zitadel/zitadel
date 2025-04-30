@@ -2,7 +2,6 @@ import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../constants/csp";
 import { getServiceUrlFromHeaders } from "./lib/service";
-import { getSecuritySettings } from "./lib/zitadel";
 
 export const config = {
   matcher: [
@@ -26,8 +25,19 @@ export async function middleware(request: NextRequest) {
 
   console.log("defaultCSP", DEFAULT_CSP);
 
-  const securitySettings = await getSecuritySettings({ serviceUrl });
+  // Call the /security route handler
+  // TODO check this on cloud run deployment
+  const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
 
+  if (!securityResponse.ok) {
+    console.error(
+      "Failed to fetch security settings:",
+      securityResponse.statusText,
+    );
+    return NextResponse.next(); // Fallback if the request fails
+  }
+
+  const { settings: securitySettings } = await securityResponse.json();
   console.log("securitySettings", securitySettings);
 
   const instanceHost = `${serviceUrl}`
