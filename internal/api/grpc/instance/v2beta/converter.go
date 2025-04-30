@@ -240,3 +240,64 @@ func createInstancePbToAddMachine(req *instance.CreateInstanceRequest_Machine, d
 
 	return machine
 }
+
+func ListCustomDomainsRequestToModel(req *instance.ListCustomDomainsRequest, defaults systemdefaults.SystemDefaults) (*query.InstanceDomainSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(defaults, req.GetPagination())
+	if err != nil {
+		return nil, err
+	}
+
+	queries, err := domainQueriesToModel(req.GetQueries())
+	if err != nil {
+		return nil, err
+	}
+
+	return &query.InstanceDomainSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: fieldNameToInstanceDomainColumn(req.GetSortingColumn()),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func fieldNameToInstanceDomainColumn(fieldName instance.DomainFieldName) query.Column {
+	switch fieldName {
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_DOMAIN:
+		return query.InstanceDomainDomainCol
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_GENERATED:
+		return query.InstanceDomainIsGeneratedCol
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_PRIMARY:
+		return query.InstanceDomainIsPrimaryCol
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE:
+		return query.InstanceDomainCreationDateCol
+	default:
+		return query.Column{}
+	}
+}
+
+func domainQueriesToModel(queries []*instance.DomainSearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = domainQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func domainQueryToModel(searchQuery *instance.DomainSearchQuery) (query.SearchQuery, error) {
+	switch q := searchQuery.Query.(type) {
+	case *instance.DomainSearchQuery_DomainQuery:
+		return query.NewInstanceDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.GetMethod()), q.DomainQuery.GetDomain())
+	case *instance.DomainSearchQuery_GeneratedQuery:
+		return query.NewInstanceDomainGeneratedSearchQuery(q.GeneratedQuery.GetGenerated())
+	case *instance.DomainSearchQuery_PrimaryQuery:
+		return query.NewInstanceDomainPrimarySearchQuery(q.PrimaryQuery.GetPrimary())
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
+	}
+}

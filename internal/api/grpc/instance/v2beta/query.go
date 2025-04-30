@@ -38,3 +38,23 @@ func (s *Server) ListInstances(ctx context.Context, req *instance.ListInstancesR
 		},
 	}, nil
 }
+
+func (s *Server) ListCustomDomains(ctx context.Context, req *instance.ListCustomDomainsRequest) (*instance.ListCustomDomainsResponse, error) {
+	queries, err := ListCustomDomainsRequestToModel(req, s.systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+
+	domains, err := s.query.SearchInstanceDomains(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+
+	return &instance.ListCustomDomainsResponse{
+		Result: DomainsToPb(domains.Domains),
+		Pagination: &filter.PaginationResponse{
+			TotalResult:  domains.Count,
+			AppliedLimit: uint64(req.GetPagination().GetLimit()),
+		},
+	}, nil
+}

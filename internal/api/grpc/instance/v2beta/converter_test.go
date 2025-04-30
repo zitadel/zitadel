@@ -403,3 +403,93 @@ func Test_CreateInstancePbToSetupInstance(t *testing.T) {
 		})
 	}
 }
+
+func Test_ListCustomDomainsRequestToModel(t *testing.T) {
+	t.Parallel()
+
+	querySearchRes, err := query.NewInstanceDomainDomainSearchQuery(query.TextEquals, "example.com")
+	require.Nil(t, err)
+
+	queryGeneratedRes, err := query.NewInstanceDomainGeneratedSearchQuery(false)
+	require.Nil(t, err)
+
+	tests := []struct {
+		name           string
+		inputRequest   *instance.ListCustomDomainsRequest
+		maxQueryLimit  uint64
+		expectedResult *query.InstanceDomainSearchQueries
+		expectedError  error
+	}{
+		{
+			name: "when query limit exceeds max query limit should return invalid argument error",
+			inputRequest: &instance.ListCustomDomainsRequest{
+				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
+				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_DOMAIN,
+				Queries: []*instance.DomainSearchQuery{
+					{
+						Query: &instance.DomainSearchQuery_DomainQuery{
+							DomainQuery: &instance.DomainQuery{
+								Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
+								Domain: "example.com",
+							},
+						},
+					},
+				},
+			},
+			maxQueryLimit: 1,
+			expectedError: zerrors.ThrowInvalidArgumentf(errors.New("given: 10, allowed: 1"), "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
+		},
+		{
+			name: "when valid request should return domain search query model",
+			inputRequest: &instance.ListCustomDomainsRequest{
+				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
+				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_PRIMARY,
+				Queries: []*instance.DomainSearchQuery{
+					{
+						Query: &instance.DomainSearchQuery_DomainQuery{
+							DomainQuery: &instance.DomainQuery{Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS, Domain: "example.com"}},
+					},
+					{
+						Query: &instance.DomainSearchQuery_GeneratedQuery{
+							GeneratedQuery: &instance.DomainGeneratedQuery{Generated: false}},
+					},
+				},
+			},
+			maxQueryLimit: 100,
+			expectedResult: &query.InstanceDomainSearchQueries{
+				SearchRequest: query.SearchRequest{Offset: 0, Limit: 10, Asc: true, SortingColumn: query.InstanceDomainIsPrimaryCol},
+				Queries: []query.SearchQuery{
+					querySearchRes,
+					queryGeneratedRes,
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name: "when invalid query should return error",
+			inputRequest: &instance.ListCustomDomainsRequest{
+				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
+				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_GENERATED,
+				Queries: []*instance.DomainSearchQuery{
+					{
+						Query: nil,
+					},
+				},
+			},
+			maxQueryLimit:  100,
+			expectedResult: nil,
+			expectedError:  zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sysDefaults := systemdefaults.SystemDefaults{MaxQueryLimit: tt.maxQueryLimit}
+
+			got, err := ListCustomDomainsRequestToModel(tt.inputRequest, sysDefaults)
+			assert.Equal(t, tt.expectedError, err)
+			assert.Equal(t, tt.expectedResult, got)
+		})
+	}
+}

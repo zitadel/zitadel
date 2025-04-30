@@ -86,3 +86,51 @@ message DomainsQuery {
         }
     ];
 }
+message DomainSearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        DomainQuery domain_query = 1;
+        DomainGeneratedQuery generated_query = 2;
+        DomainPrimaryQuery primary_query = 3;
+    }
+}
+
+message DomainQuery {
+    string domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "zitadel.com";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+message DomainGeneratedQuery {
+    bool generated = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "generated domains";
+        }
+    ];
+}
+
+message DomainPrimaryQuery {
+    bool primary = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "primary domains";
+        }
+    ];
+}
+
+enum DomainFieldName {
+    DOMAIN_FIELD_NAME_UNSPECIFIED = 0;
+    DOMAIN_FIELD_NAME_DOMAIN = 1;
+    DOMAIN_FIELD_NAME_PRIMARY = 2;
+    DOMAIN_FIELD_NAME_GENERATED = 3;
+    DOMAIN_FIELD_NAME_CREATION_DATE = 4;
+}
