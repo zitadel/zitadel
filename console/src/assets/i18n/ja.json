@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "リクエスト",
         "response": "レスポンス",
-        "events": "イベント",
+        "event": "イベント",
         "function": "関数"
       },
       "DIALOG": {
@@ -568,6 +568,7 @@
             "TITLE": "すべて",
             "DESCRIPTION": "すべてのリクエストでアクションを実行する場合は、これを選択します"
           },
+          "ALL_EVENTS": "すべてのイベントでアクションを実行する場合はこれを選択してください",
           "SELECT_SERVICE": {
             "TITLE": "サービスを選択",
             "DESCRIPTION": "アクションのZitadelサービスを選択します。"

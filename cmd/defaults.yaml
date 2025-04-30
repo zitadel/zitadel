@@ -1105,12 +1105,13 @@ DefaultInstance:
     # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
     # UserSchema: false # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
     # TokenExchange: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
-    # ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
-    #   - OrgByID
-    #   - ProjectGrant
-    #   - Project
-    #   - UserGrant
-    #   - OrgDomainVerified
+    ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
+    # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
+    #   - 1 # OrgByID
+    #   - 2 # ProjectGrant
+    #   - 3 # Project
+    #   - 4 # UserGrant
+    #   - 5 # OrgDomainVerified
     # WebKey: false # ZITADEL_DEFAULTINSTANCE_FEATURES_WEBKEY
     # DebugOIDCParentError: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
     # OIDCSingleV1SessionTermination: false # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
