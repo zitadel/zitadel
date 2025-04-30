@@ -2,7 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { ChooseAuthenticatorToLogin } from "@/components/choose-authenticator-to-login";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
   getLoginSettings,

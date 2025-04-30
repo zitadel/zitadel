@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   createCallback,
   createResponse,

@@ -1,4 +1,5 @@
-import { createServiceForHost, getServiceUrlFromHeaders } from "@/lib/service";
+import { createServiceForHost } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { Client } from "@zitadel/client";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { headers } from "next/headers";

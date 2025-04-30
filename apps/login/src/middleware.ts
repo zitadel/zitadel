@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../constants/csp";
-import { getServiceUrlFromHeaders } from "./lib/service";
+import { getServiceUrlFromHeaders } from "./lib/service-url";
 
 export const config = {
   matcher: [

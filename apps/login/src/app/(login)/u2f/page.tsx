@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginPasskey } from "@/components/login-passkey";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";

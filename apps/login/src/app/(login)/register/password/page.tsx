@@ -1,6 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetRegisterPasswordForm } from "@/components/set-register-password-form";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
   getDefaultOrg,
