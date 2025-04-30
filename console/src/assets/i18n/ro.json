@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "Cerere",
         "response": "Răspuns",
-        "events": "Evenimente",
+        "event": "Evenimente",
         "function": "Funcție"
       },
       "DIALOG": {

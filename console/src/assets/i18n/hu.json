@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "Kérés",
         "response": "Válasz",
-        "events": "Események",
+        "event": "Események",
         "function": "Függvény"
       },
       "DIALOG": {

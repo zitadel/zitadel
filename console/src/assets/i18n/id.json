@@ -504,7 +504,7 @@
       "TYPES": {
         "request": "Permintaan",
         "response": "Respons",
-        "events": "Peristiwa",
+        "event": "Peristiwa",
         "function": "Fungsi"
       },
       "DIALOG": {

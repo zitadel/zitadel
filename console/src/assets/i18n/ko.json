@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "요청",
         "response": "응답",
-        "events": "이벤트",
+        "event": "이벤트",
         "function": "함수"
       },
       "DIALOG": {

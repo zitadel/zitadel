@@ -536,7 +536,7 @@
       "TYPES": {
         "request": "Заявка",
         "response": "Отговор",
-        "events": "Събития",
+        "event": "Събития",
         "function": "Функция"
       },
       "DIALOG": {

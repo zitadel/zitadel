@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "Förfrågan",
         "response": "Svar",
-        "events": "Händelser",
+        "event": "Händelser",
         "function": "Funktion"
       },
       "DIALOG": {

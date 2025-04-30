@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "Барање",
         "response": "Одговор",
-        "events": "Настани",
+        "event": "Настани",
         "function": "Функција"
       },
       "DIALOG": {
