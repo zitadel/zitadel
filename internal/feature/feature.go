@@ -57,7 +57,8 @@ type Features struct {
 	ConsoleUseV2UserApi             bool                      `json:"console_use_v2_user_api,omitempty"`
 }
 
-//go:generate enumer -type ImprovedPerformanceType -trimprefix ImprovedPerformanceType -text
+/* Note: do not generate the stringer or enumer for this type, is it breaks existing events */
+
 type ImprovedPerformanceType int32
 
 const (
