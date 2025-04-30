@@ -147,6 +147,8 @@ Methods on a list of resources MUST be named using the following convention:
 | Remove    | Remove\<resource\> | Remove an existing resource from a list. If the resource does not exist in the list, no error SHOULD be returned. In case of an exception to this rule, the behavior MUST clearly be documented. |
 | Set       | Set\<resource\>    | Set a list of resources. This will replace the existing list with the new list.                                                                                                                  |
 
+In general, unless there is a reason for doing so, API calls which are inconsequential should not return an error (as in the case for deleting a resource that does not exist).
+
 Additionally, state changes, specific actions or operations that do not fit into the CRUD operations SHOULD be named according to the action that is performed:
 - `Activate` or `Deactivate` for enabling or disabling a resource.
 - `Verify` for verifying a resource.
