@@ -504,7 +504,7 @@
       "TYPES": {
         "request": "Permintaan",
         "response": "Respons",
-        "events": "Peristiwa",
+        "event": "Peristiwa",
         "function": "Fungsi"
       },
       "DIALOG": {
@@ -535,6 +535,7 @@
             "TITLE": "Semua",
             "DESCRIPTION": "Pilih ini jika Anda ingin menjalankan tindakan Anda pada setiap permintaan"
           },
+          "ALL_EVENTS": "Pilih ini jika Anda ingin menjalankan aksi Anda pada setiap peristiwa",
           "SELECT_SERVICE": {
             "TITLE": "Pilih Layanan",
             "DESCRIPTION": "Pilih Layanan Zitadel untuk tindakan Anda."

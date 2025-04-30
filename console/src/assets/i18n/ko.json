@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "요청",
         "response": "응답",
-        "events": "이벤트",
+        "event": "이벤트",
         "function": "함수"
       },
       "DIALOG": {
@@ -568,6 +568,7 @@
             "TITLE": "모두",
             "DESCRIPTION": "모든 요청에서 작업을 실행하려면 이것을 선택하십시오."
           },
+          "ALL_EVENTS": "모든 이벤트에서 작업을 실행하려면 이 항목을 선택하세요",
           "SELECT_SERVICE": {
             "TITLE": "서비스 선택",
             "DESCRIPTION": "작업에 대한 Zitadel 서비스를 선택하십시오."
