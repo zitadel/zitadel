@@ -16,3 +16,13 @@ func (s *Server) AddCustomDomain(ctx context.Context, req *instance.AddCustomDom
 		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
 }
+
+func (s *Server) RemoveCustomDomain(ctx context.Context, req *instance.RemoveCustomDomainRequest) (*instance.RemoveCustomDomainResponse, error) {
+	details, err := s.command.RemoveInstanceDomain(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+	return &instance.RemoveCustomDomainResponse{
+		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}

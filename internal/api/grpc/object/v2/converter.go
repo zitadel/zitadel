@@ -211,3 +211,18 @@ func AddToDetailsPb(
 	}
 	return details
 }
+
+func ChangeToDetailsPb(
+	sequence uint64,
+	changeDate time.Time,
+	resourceOwner string,
+) *object.Details {
+	details := &object.Details{
+		Sequence:      sequence,
+		ResourceOwner: resourceOwner,
+	}
+	if !changeDate.IsZero() {
+		details.ChangeDate = timestamppb.New(changeDate)
+	}
+	return details
+}

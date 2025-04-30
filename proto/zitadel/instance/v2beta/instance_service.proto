@@ -239,6 +239,12 @@ message AddCustomDomainResponse {
 }
 
 message RemoveCustomDomainRequest {
+  string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveCustomDomainResponse {
+  zitadel.object.v2.Details details = 1;
+}
 
 service InstanceService {
 
@@ -424,7 +430,37 @@ service InstanceService {
       }
     };
   }
+
+  // RemoveCustomDomain removes a custom domain from the instance.
+  rpc RemoveCustomDomain(RemoveCustomDomainRequest) returns (RemoveCustomDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Removes a custom domain from the instance.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The removed custom domain.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/RemoveCustomDomainResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2/instances/current/custom-domains/{domain}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.write"
+      }
+    };
+  }
 }
+
 // List Custom Domains
 // Add Trusted Domain
 // Remove Trusted Domain
