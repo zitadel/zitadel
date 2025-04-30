@@ -568,6 +568,7 @@
             "TITLE": "Všechny",
             "DESCRIPTION": "Vyberte tuto možnost, pokud chcete spustit akci pro každý požadavek"
           },
+          "ALL_EVENTS": "Vyberte toto, pokud chcete spustit akci při každé události",
           "SELECT_SERVICE": {
             "TITLE": "Vybrat službu",
             "DESCRIPTION": "Vyberte službu Zitadel pro svou akci."

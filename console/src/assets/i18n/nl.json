@@ -568,6 +568,7 @@
             "TITLE": "Alle",
             "DESCRIPTION": "Selecteer dit als u uw actie bij elk verzoek wilt uitvoeren"
           },
+          "ALL_EVENTS": "Selecteer dit als je je actie bij elk evenement wilt uitvoeren",
           "SELECT_SERVICE": {
             "TITLE": "Service selecteren",
             "DESCRIPTION": "Kies een Zitadel-service voor uw actie."

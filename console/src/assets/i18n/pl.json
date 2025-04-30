@@ -567,6 +567,7 @@
             "TITLE": "Wszystkie",
             "DESCRIPTION": "Wybierz tę opcję, jeśli chcesz uruchomić akcję dla każdego żądania"
           },
+          "ALL_EVENTS": "Wybierz to, jeśli chcesz uruchamiać swoją akcję przy każdym zdarzeniu",
           "SELECT_SERVICE": {
             "TITLE": "Wybierz usługę",
             "DESCRIPTION": "Wybierz usługę Zitadel dla swojej akcji."

@@ -568,6 +568,7 @@
             "TITLE": "All",
             "DESCRIPTION": "Select this if you want to run your action on every request"
           },
+          "ALL_EVENTS": "Select this if you want to run your action on every event",
           "SELECT_SERVICE": {
             "TITLE": "Select Service",
             "DESCRIPTION": "Choose a Zitadel Service for you action."

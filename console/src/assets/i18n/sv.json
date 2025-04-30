@@ -568,6 +568,7 @@
             "TITLE": "Alla",
             "DESCRIPTION": "Välj detta om du vill köra din åtgärd på varje förfrågan"
           },
+          "ALL_EVENTS": "Välj detta om du vill köra din åtgärd vid varje händelse",
           "SELECT_SERVICE": {
             "TITLE": "Välj tjänst",
             "DESCRIPTION": "Välj en Zitadel-tjänst för din åtgärd."

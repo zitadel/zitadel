@@ -568,6 +568,7 @@
             "TITLE": "Összes",
             "DESCRIPTION": "Válassza ezt, ha minden kérésnél futtatni szeretné a műveletet"
           },
+          "ALL_EVENTS": "Válaszd ezt, ha minden eseménynél futtatni szeretnéd a műveletet",
           "SELECT_SERVICE": {
             "TITLE": "Szolgáltatás kiválasztása",
             "DESCRIPTION": "Válasszon egy Zitadel szolgáltatást a művelethez."
