@@ -20,7 +20,7 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,

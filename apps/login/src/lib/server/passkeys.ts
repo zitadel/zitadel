@@ -22,7 +22,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
