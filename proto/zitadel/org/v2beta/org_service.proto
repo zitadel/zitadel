@@ -249,7 +249,7 @@ service OrganizationService {
       responses: {
         key: "200";
         value: {
-            description: "org removed successfully";
+            description: "org deleted successfully";
         };
       };
       responses: {
@@ -261,6 +261,66 @@ service OrganizationService {
                 ref: "#/definitions/rpcStatus";
               };
             };
+        };
+      };
+    };
+  }
+
+  rpc DeactivateOrganization(DeactivateOrganizationRequest) returns (DeactivateOrganizationResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/_deactivate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Deactivate Organization";
+      description: "Sets the state of my organization to deactivated. Users of this organization will not be able to log in."
+      parameters: {
+        headers: {
+          name: "x-zitadel-orgid";
+          description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+          type: STRING,
+          required: false;
+        };
+      };
+    };
+  }
+
+  rpc ReactivateOrganization(ReactivateOrganizationRequest) returns (ReactivateOrganizationResponse) {
+    option (google.api.http) = {
+        post: "/orgs/me/_reactivate"
+        body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Reactivate Organization";
+      description: "Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again."
+      parameters: {
+        headers: {
+          name: "x-zitadel-orgid";
+          description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+          type: STRING,
+          required: false;
         };
       };
     };
@@ -385,5 +445,37 @@ message DeleteOrganizationRequest {
 }
 
 message DeleteOrganizationResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+//This is an empty request
+message DeactivateOrganizationRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+      min_length: 1;
+      max_length: 200;
+    }
+  ];
+}
+
+message DeactivateOrganizationResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+//This is an empty request
+message ReactivateOrganizationRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+      min_length: 1;
+      max_length: 200;
+    }
+  ];
+}
+
+message ReactivateOrganizationResponse {
   zitadel.object.v2beta.Details details = 1;
 }

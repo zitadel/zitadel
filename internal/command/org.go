@@ -353,7 +353,7 @@ func (c *Commands) UpdateOrg(ctx context.Context, orgID, name string) (*domain.O
 		return nil, err
 	}
 	if !isOrgStateExists(orgWriteModel.State) {
-		return nil, zerrors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
+		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 	}
 	if orgWriteModel.Name == name {
 		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
@@ -388,7 +388,7 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, zerrors.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateInactive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
+		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
@@ -411,7 +411,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, zerrors.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
+		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))

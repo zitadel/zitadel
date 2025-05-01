@@ -7,6 +7,7 @@ import (
 	user "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
@@ -66,6 +67,26 @@ func (s *Server) DeleteOrganization(ctx context.Context, request *v2beta_org.Del
 	return &v2beta_org.DeleteOrganizationResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
+}
+
+func (s *Server) DeactivateOrganization(ctx context.Context, request *org.DeactivateOrganizationRequest) (*org.DeactivateOrganizationResponse, error) {
+	objectDetails, err := s.command.DeactivateOrg(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &org.DeactivateOrganizationResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) ReactivateOrganization(ctx context.Context, request *org.ReactivateOrganizationRequest) (*org.ReactivateOrganizationResponse, error) {
+	objectDetails, err := s.command.ReactivateOrg(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &org.ReactivateOrganizationResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, err
 }
 
 func createOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRequest) (*command.OrgSetup, error) {

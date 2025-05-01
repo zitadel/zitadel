@@ -32,6 +32,7 @@ message Organization {
   ];
 }
 
+// TODO rename to OrgState
 enum OrganizationState {
   ORGANIZATION_STATE_UNSPECIFIED = 0;
   ORGANIZATION_STATE_ACTIVE = 1;
@@ -80,7 +81,7 @@ message OrgDomainQuery {
 }
 
 message OrgStateQuery {
-    OrgState state = 1 [
+    OrganizationState state = 1 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "current state of the organization";
@@ -97,14 +98,3 @@ message OrgIDQuery {
     ];
 }
 
-enum OrgState {
-    ORG_STATE_UNSPECIFIED = 0;
-    ORG_STATE_ACTIVE = 1;
-    ORG_STATE_INACTIVE = 2;
-    ORG_STATE_REMOVED = 3;
-}
-
-enum OrgFieldName {
-    ORG_FIELD_NAME_UNSPECIFIED = 0;
-    ORG_FIELD_NAME_NAME = 1;
-}
