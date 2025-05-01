@@ -26,3 +26,13 @@ func (s *Server) RemoveCustomDomain(ctx context.Context, req *instance.RemoveCus
 		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
 }
+
+func (s *Server) AddTrustedDomain(ctx context.Context, req *instance.AddTrustedDomainRequest) (*instance.AddTrustedDomainResponse, error) {
+	details, err := s.command.AddTrustedDomain(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+	return &instance.AddTrustedDomainResponse{
+		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}

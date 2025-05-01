@@ -269,6 +269,22 @@ message ListCustomDomainsResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 2;
 }
 
+message AddTrustedDomainRequest {
+      string domain = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 253},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"login.example.com\"";
+            min_length: 1;
+            max_length: 253;
+        }
+    ];
+}
+
+message AddTrustedDomainResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
 service InstanceService {
 
   // CreateInstance creates a new instance
@@ -483,6 +499,7 @@ service InstanceService {
     };
   }
 
+  // ListCustomDomains lists custom domains of the instance.
   rpc ListCustomDomains(ListCustomDomainsRequest) returns (ListCustomDomainsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Lists custom domains of the instance.";
@@ -507,6 +524,36 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "system.domain.read"
+      }
+    };
+  }
+
+  // AddTrustedDomain adds a trusted domain to the instance.
+  rpc AddTrustedDomain(AddTrustedDomainRequest) returns (AddTrustedDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Adds a trusted domain to the instance.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The added trusted domain.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/AddTrustedDomainResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2/instances/current/trusted-domains"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.write"
       }
     };
   }
