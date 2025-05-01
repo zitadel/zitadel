@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flux",
         "DESCRIPTION": "Choisissez un flux d'authentification et déclenchez votre action sur un événement spécifique dans ce flux."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, une nouvelle version améliorée de Actions, est désormais disponible. La version actuelle reste accessible, mais notre développement futur se concentrera sur la nouvelle, qui finira par remplacer la version actuelle."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,13 +530,14 @@
     "APPLY": "Appliquer"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Vous utilisez actuellement la nouvelle version Actions V2, qui est en phase bêta. L'ancienne version 1 est toujours disponible mais sera arrêtée à l'avenir. Veuillez signaler tout problème ou commentaire.",
     "EXECUTION": {
       "TITLE": "Actions",
       "DESCRIPTION": "Les actions vous permettent d'exécuter du code personnalisé en réponse à des requêtes API, des événements ou des fonctions spécifiques. Utilisez-les pour étendre Zitadel, automatiser les flux de travail et vous intégrer à d'autres systèmes.",
       "TYPES": {
         "request": "Requête",
         "response": "Réponse",
-        "events": "Événements",
+        "event": "Événements",
         "function": "Fonction"
       },
       "DIALOG": {
@@ -566,6 +568,7 @@
             "TITLE": "Tous",
             "DESCRIPTION": "Sélectionnez ceci si vous souhaitez exécuter votre action sur chaque requête"
           },
+          "ALL_EVENTS": "Sélectionnez ceci si vous souhaitez exécuter votre action à chaque événement",
           "SELECT_SERVICE": {
             "TITLE": "Sélectionner un service",
             "DESCRIPTION": "Choisissez un service Zitadel pour votre action."
@@ -619,6 +622,7 @@
           "restCall": "Appel REST",
           "restAsync": "REST Asynchrone"
         },
+        "TYPES_DESCRIPTION": "Webhook, l'appel gère le code d'état mais la réponse est sans importance\nCall, l'appel gère le code d'état et la réponse\nAsync, l'appel ne gère ni le code d'état ni la réponse, mais peut être appelé en parallèle avec d'autres cibles",
         "ENDPOINT": "Point de terminaison",
         "ENDPOINT_DESCRIPTION": "Entrez le point de terminaison où votre code est hébergé. Assurez-vous qu'il nous est accessible !",
         "TIMEOUT": "Délai d'attente",
@@ -1508,7 +1512,8 @@
       "APPEARANCE": "Apparence",
       "OTHER": "Autres",
       "STORAGE": "Stockage"
-    }
+    },
+    "BETA": "BÊTA"
   },
   "SETTING": {
     "LANGUAGES": {
