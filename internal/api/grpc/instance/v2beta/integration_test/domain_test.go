@@ -238,3 +238,80 @@ func TestAddTrustedDomain(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveTrustedDomain(t *testing.T) {
+	// Given
+	inst := integration.NewInstance(CTXWithSysAuthZ)
+	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+
+	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(CTXWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: "trusted-domain.one"})
+	require.Nil(t, err)
+
+	t.Cleanup(func() {
+		_, err := inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		require.Nil(t, err)
+	})
+
+	tt := []struct {
+		testName          string
+		inputContext      context.Context
+		inputRequest      *instance.RemoveTrustedDomainRequest
+		expectedErrorMsg  string
+		expectedErrorCode codes.Code
+	}{
+		{
+			testName: "when invalid context should return unauthN error",
+			inputRequest: &instance.RemoveTrustedDomainRequest{
+				Domain: "trusted1",
+			},
+			inputContext:      context.Background(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName: "when unauthZ context should return unauthZ error",
+			inputRequest: &instance.RemoveTrustedDomainRequest{
+				Domain: "trusted1",
+			},
+			inputContext:      orgOwnerCtx,
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+		},
+		{
+			testName: "when invalid domain should return invalid argument error",
+			inputRequest: &instance.RemoveTrustedDomainRequest{
+				Domain: " ",
+			},
+			inputContext:      CTXWithSysAuthZ,
+			expectedErrorCode: codes.InvalidArgument,
+			expectedErrorMsg:  "domain must not be empty (domain)",
+		},
+		{
+			testName: "when valid request should return successful response",
+			inputRequest: &instance.RemoveTrustedDomainRequest{
+				Domain: " trusted-domain.one",
+			},
+			inputContext: CTXWithSysAuthZ,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Test
+			res, err := inst.Client.InstanceV2Beta.RemoveTrustedDomain(tc.inputContext, tc.inputRequest)
+
+			// Verify
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+			if tc.expectedErrorMsg == "" {
+				require.NotNil(t, res)
+				require.NotNil(t, res.GetDetails())
+				assert.NotEmpty(t, res.GetDetails().GetSequence())
+				assert.Empty(t, res.GetDetails().GetCreationDate())
+				assert.NotEmpty(t, res.GetDetails().GetResourceOwner())
+				assert.NotEmpty(t, res.GetDetails().GetChangeDate())
+			}
+		})
+	}
+}
