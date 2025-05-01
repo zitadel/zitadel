@@ -1090,7 +1090,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			userID               string
 			cascadingMemberships []*CascadingMembership
 			grantIDs             []string
-			permissionCheck      func(bool) eventstore.PermissionCheck
+			permissionCheck      func(bool) PermissionCheck
 		}
 	)
 	type res struct {
@@ -1111,7 +1111,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "",
-				permissionCheck: func(bool) eventstore.PermissionCheck {
+				permissionCheck: func(bool) PermissionCheck {
 					return permissionCheck(true)
 				},
 			},
@@ -1131,7 +1131,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) eventstore.PermissionCheck {
+				permissionCheck: func(bool) PermissionCheck {
 					return permissionCheck(true)
 				},
 			},
@@ -1174,7 +1174,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) eventstore.PermissionCheck {
+				permissionCheck: func(bool) PermissionCheck {
 					return permissionCheck(true)
 				},
 			},
@@ -1227,7 +1227,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) eventstore.PermissionCheck {
+				permissionCheck: func(bool) PermissionCheck {
 					return permissionCheck(true)
 				},
 			},
@@ -1267,7 +1267,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) eventstore.PermissionCheck {
+				permissionCheck: func(bool) PermissionCheck {
 					return permissionCheck(false)
 				},
 			},
@@ -1318,7 +1318,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(isHuman bool) eventstore.PermissionCheck {
+				permissionCheck: func(isHuman bool) PermissionCheck {
 					return func(resourceOwner, aggregateID string) error {
 						if isHuman {
 							return nil
@@ -1363,7 +1363,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(isHuman bool) eventstore.PermissionCheck {
+				permissionCheck: func(isHuman bool) PermissionCheck {
 					return func(resourceOwner, aggregateID string) error {
 						if isHuman {
 							return errPermissionDenied
@@ -1405,7 +1405,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) eventstore.PermissionCheck {
+				permissionCheck: func(bool) PermissionCheck {
 					return permissionCheck(true)
 				},
 			},
@@ -1454,7 +1454,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) eventstore.PermissionCheck {
+				permissionCheck: func(bool) PermissionCheck {
 					return permissionCheck(true)
 				},
 			},
