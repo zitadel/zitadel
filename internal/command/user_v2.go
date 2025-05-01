@@ -128,7 +128,7 @@ func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writ
 	return writeModel, nil
 }
 
-func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, check eventstore.PermissionCheck, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, check func(bool) PermissionCheck, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
@@ -175,14 +175,18 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwner string, check eventstore.PermissionCheck) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwner string, check func(isHuman bool) PermissionCheck) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserRemoveWriteModel(userID, resourceOwner, check)
+	writeModel = NewUserRemoveWriteModel(userID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
-	return writeModel, nil
+	if check != nil {
+		// In order to allow a conditional permission based on the user type, we need to have the reduced write model.
+		err = check(writeModel.Name == "")(writeModel.ResourceOwner, writeModel.AggregateID)
+	}
+	return writeModel, err
 }

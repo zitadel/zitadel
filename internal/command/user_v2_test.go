@@ -1080,22 +1080,6 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 	}
 }
 
-// TODO: move to a central place
-var errPermissionDenied = errors.New("permission denied")
-
-func isPermissionDenied(err error) bool {
-	return errors.Is(err, errPermissionDenied)
-}
-
-func permissionCheck(allow bool) eventstore.PermissionCheck {
-	return func(_, _ string) error {
-		if allow {
-			return nil
-		}
-		return errPermissionDenied
-	}
-}
-
 func TestCommandSide_RemoveUserV2(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
@@ -1106,7 +1090,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			userID               string
 			cascadingMemberships []*CascadingMembership
 			grantIDs             []string
-			permissionCheck      eventstore.PermissionCheck
+			permissionCheck      func(bool) PermissionCheck
 		}
 	)
 	type res struct {
@@ -1125,9 +1109,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "",
-				permissionCheck: permissionCheck(true),
+				ctx:    context.Background(),
+				userID: "",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1143,9 +1129,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				permissionCheck: permissionCheck(true),
+				ctx:    context.Background(),
+				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1184,9 +1172,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				permissionCheck: permissionCheck(true),
+				ctx:    context.Background(),
+				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1235,9 +1225,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				permissionCheck: permissionCheck(true),
+				ctx:    context.Background(),
+				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1273,9 +1265,112 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				permissionCheck: permissionCheck(false),
+				ctx:    context.Background(),
+				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(false)
+				},
+			},
+			res: res{
+				err: isPermissionDenied,
+			},
+		},
+		{
+			name: "remove user, permission based on reduced write model, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewUserRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							nil,
+							true,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+				permissionCheck: func(isHuman bool) PermissionCheck {
+					return func(resourceOwner, aggregateID string) error {
+						if isHuman {
+							return nil
+						}
+						return errPermissionDenied
+					}
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "remove user, permission based on reduced write model, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+				permissionCheck: func(isHuman bool) PermissionCheck {
+					return func(resourceOwner, aggregateID string) error {
+						if isHuman {
+							return errPermissionDenied
+						}
+						return nil
+					}
+				},
 			},
 			res: res{
 				err: isPermissionDenied,
@@ -1310,6 +1405,9 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1356,6 +1454,9 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{

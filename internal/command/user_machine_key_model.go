@@ -10,7 +10,6 @@ import (
 
 type MachineKeyWriteModel struct {
 	eventstore.WriteModel
-	PermissionCheck eventstore.PermissionCheck
 
 	KeyID          string
 	KeyType        domain.AuthNKeyType
@@ -19,12 +18,11 @@ type MachineKeyWriteModel struct {
 	State domain.MachineKeyState
 }
 
-func NewMachineKeyWriteModel(userID, keyID, resourceOwner string, permissionCheck eventstore.PermissionCheck) *MachineKeyWriteModel {
+func NewMachineKeyWriteModel(userID, keyID, resourceOwner string) *MachineKeyWriteModel {
 	return &MachineKeyWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:     userID,
-			ResourceOwner:   resourceOwner,
-			PermissionCheck: permissionCheck,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 		KeyID: keyID,
 	}

@@ -2,14 +2,21 @@ package command
 
 import (
 	"context"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) CheckPermission(ctx context.Context, permission string, aggregateType eventstore.AggregateType) eventstore.PermissionCheck {
+type PermissionCheck func(resourceOwner, aggregateID string) error
+
+func (c *Commands) NewPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
+		if aggregateID == "" {
+			return zerrors.ThrowInternal(nil, "COMMAND-ulBlS", "aggregate ID is empty")
+		}
 		// For example if a write model didn't query any events, the resource owner is probably empty.
 		// In this case, we have to query an event on the given aggregate to get the resource owner.
 		if resourceOwner == "" {
@@ -20,33 +27,36 @@ func (c *Commands) CheckPermission(ctx context.Context, permission string, aggre
 			}
 			resourceOwner = r.resourceOwner
 		}
+		if resourceOwner == "" {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-4g3xq", "Errors.ResourceOwnerMissing")
+		}
 		return c.checkPermission(ctx, permission, resourceOwner, aggregateID)
 	}
 }
 
-func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string, allowSelf bool) eventstore.PermissionCheck {
+func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string, allowSelf bool) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
 		if allowSelf && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
 			return nil
 		}
-		return c.CheckPermission(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
+		return c.NewPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
 	}
 }
 
-func (c *Commands) CheckPermissionUserWrite(ctx context.Context, allowSelf bool) eventstore.PermissionCheck {
+func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context, allowSelf bool) PermissionCheck {
 	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite, allowSelf)
 }
 
-func (c *Commands) CheckPermissionUserDelete(ctx context.Context, allowSelf bool) eventstore.PermissionCheck {
+func (c *Commands) NewPermissionCheckUserDelete(ctx context.Context, allowSelf bool) PermissionCheck {
 	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, allowSelf)
 }
 
-// Deprecated: use CheckPermissionUserWrite and set the returned PermissionCheck to the eventstore.WriteModel to safely protect an API.
+// Deprecated: use NewPermissionCheckUserWrite to protect an API.
 func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.CheckPermissionUserWrite(ctx, true)(resourceOwner, userID)
+	return c.NewPermissionCheckUserWrite(ctx, true)(resourceOwner, userID)
 }
 
-// Deprecated: use CheckPermission, allow self and use the returned function as PermissionCheck in eventstore.WriteModel to protect an API
+// Deprecated: use NewPermissionCheck to protect an API.
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
 	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil

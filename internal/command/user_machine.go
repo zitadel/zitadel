@@ -25,7 +25,7 @@ type Machine struct {
 	Name            string
 	Description     string
 	AccessTokenType domain.OIDCTokenType
-	PermissionCheck eventstore.PermissionCheck
+	PermissionCheck PermissionCheck
 }
 
 func (m *Machine) IsZero() bool {
@@ -171,10 +171,10 @@ func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Valid
 	}
 }
 
-func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer, permissionCheck eventstore.PermissionCheck) (_ *MachineWriteModel, err error) {
+func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer, permissionCheck PermissionCheck) (_ *MachineWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	writeModel := NewMachineWriteModel(userID, resourceOwner, permissionCheck)
+	writeModel := NewMachineWriteModel(userID, resourceOwner)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
@@ -184,5 +184,10 @@ func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, fil
 	}
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
+	if permissionCheck != nil {
+		if err := permissionCheck(writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+			return nil, err
+		}
+	}
 	return writeModel, err
 }

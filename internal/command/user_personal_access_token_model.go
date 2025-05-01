@@ -17,12 +17,11 @@ type PersonalAccessTokenWriteModel struct {
 	State domain.PersonalAccessTokenState
 }
 
-func NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner string, check eventstore.PermissionCheck) *PersonalAccessTokenWriteModel {
+func NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner string) *PersonalAccessTokenWriteModel {
 	return &PersonalAccessTokenWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:     userID,
-			ResourceOwner:   resourceOwner,
-			PermissionCheck: check,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 		TokenID: tokenID,
 	}
