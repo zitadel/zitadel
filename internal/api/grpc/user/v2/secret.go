@@ -11,7 +11,7 @@ import (
 
 func (s *Server) AddSecret(ctx context.Context, req *user.AddSecretRequest) (*user.AddSecretResponse, error) {
 	newSecret := &command.GenerateMachineSecret{
-		PermissionCheck: s.command.CheckPermissionUserWrite(ctx, false),
+		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx, false),
 	}
 	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, "", newSecret)
 	if err != nil {
@@ -28,7 +28,7 @@ func (s *Server) RemoveSecret(ctx context.Context, req *user.RemoveSecretRequest
 		ctx,
 		req.UserId,
 		"",
-		s.command.CheckPermissionUserWrite(ctx, false),
+		s.command.NewPermissionCheckUserWrite(ctx, false),
 	)
 	if err != nil {
 		return nil, err
