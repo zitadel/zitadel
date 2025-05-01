@@ -19,7 +19,6 @@ message ExecutionSearchFilter {
     InConditionsFilter in_conditions_filter = 1;
     ExecutionTypeFilter execution_type_filter = 2;
     TargetFilter target_filter = 3;
-    IncludeFilter include_filter = 4;
   }
 }
 
@@ -39,16 +38,6 @@ message TargetFilter {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "the id of the targets to include"
       example: "\"69629023906488334\"";
-    }
-  ];
-}
-
-message IncludeFilter {
-  // Defines the include to query for.
-  Condition include = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the id of the include"
-      example: "\"request.zitadel.session.v2.SessionService\"";
     }
   ];
 }

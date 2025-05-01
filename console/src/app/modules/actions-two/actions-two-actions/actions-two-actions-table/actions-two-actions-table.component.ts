@@ -55,13 +55,9 @@ export class ActionsTwoActionsTableComponent {
       }
 
       return executions.map((execution) => {
-        const mappedTargets = execution.targets.map((target) => {
-          const targetType = targetsMap.get(target.type.value);
-          if (!targetType) {
-            throw new Error(`Target with id ${target.type.value} not found`);
-          }
-          return targetType;
-        });
+        const mappedTargets = execution.targets
+          .map((target) => targetsMap.get(target))
+          .filter((target): target is NonNullable<typeof target> => !!target);
         return { execution, mappedTargets };
       });
     });

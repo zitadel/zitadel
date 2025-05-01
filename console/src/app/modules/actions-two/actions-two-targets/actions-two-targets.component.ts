@@ -12,6 +12,7 @@ import {
   CreateTargetRequestSchema,
   UpdateTargetRequestSchema,
 } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+import { InfoSectionType } from '../../info-section/info-section.component';
 
 @Component({
   selector: 'cnsl-actions-two-targets',
@@ -76,7 +77,8 @@ export class ActionsTwoTargetsComponent {
       if ('id' in request) {
         await this.actionService.updateTarget(request);
       } else {
-        await this.actionService.createTarget(request);
+        const resp = await this.actionService.createTarget(request);
+        console.log(`Your singing key: ${resp.signingKey}`);
       }
 
       await new Promise((res) => setTimeout(res, 1000));
@@ -86,4 +88,6 @@ export class ActionsTwoTargetsComponent {
       this.toast.showError(error);
     }
   }
+
+  protected readonly InfoSectionType = InfoSectionType;
 }
