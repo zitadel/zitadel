@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
@@ -34,5 +35,22 @@ func (s *Server) AddTrustedDomain(ctx context.Context, req *instance.AddTrustedD
 	}
 	return &instance.AddTrustedDomainResponse{
 		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) RemoveTrustedDomain(ctx context.Context, req *instance.RemoveTrustedDomainRequest) (*instance.RemoveTrustedDomainResponse, error) {
+	domain := strings.TrimSpace(req.GetDomain())
+	err := validateParam(domain, "domain")
+	if err != nil {
+		return nil, err
+	}
+
+	details, err := s.command.RemoveTrustedDomain(ctx, domain)
+	if err != nil {
+		return nil, err
+	}
+
+	return &instance.RemoveTrustedDomainResponse{
+		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
 }

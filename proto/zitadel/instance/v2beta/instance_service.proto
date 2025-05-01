@@ -285,6 +285,22 @@ message AddTrustedDomainResponse {
   zitadel.object.v2.Details details = 1;
 }
 
+message RemoveTrustedDomainRequest {
+      string domain = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 253},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"login.example.com\"";
+            min_length: 1;
+            max_length: 253;
+        }
+    ];
+}
+
+message RemoveTrustedDomainResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
 service InstanceService {
 
   // CreateInstance creates a new instance
@@ -557,8 +573,35 @@ service InstanceService {
       }
     };
   }
+
+  // RemoveTrustedDomain removes a custom domain from the instance.
+  rpc RemoveTrustedDomain(RemoveTrustedDomainRequest) returns (RemoveTrustedDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Removes a trusted domain from the instance.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The removed trusted domain.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/RemoveTrustedDomainResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2/instances/current/trusted-domains/{domain}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.delete"
+      }
+    };
+  }
 }
 
-// Add Trusted Domain
-// Remove Trusted Domain
 // List Trusted Domain
