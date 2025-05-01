@@ -301,6 +301,29 @@ message RemoveTrustedDomainResponse {
   zitadel.object.v2.Details details = 1;
 }
 
+message ListTrustedDomainsRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      description: "Search query for lists";
+      required: ["query"]
+    };
+  };
+
+  // pagination and sorting
+  zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  // the field the result is sorted
+  TrustedDomainFieldName sorting_column = 2;
+  // criterias the client is looking for
+  repeated TrustedDomainSearchQuery queries = 3;
+}
+
+message ListTrustedDomainsResponse {
+  repeated TrustedDomain result = 1;
+
+  // contains the total number of domains matching the query and the applied limit
+  zitadel.filter.v2beta.PaginationResponse pagination = 2;
+}
+
 service InstanceService {
 
   // CreateInstance creates a new instance
@@ -602,6 +625,34 @@ service InstanceService {
       }
     };
   }
-}
 
-// List Trusted Domain
+  
+  // ListTrustedDomains lists trusted domains of the instance.
+  rpc ListTrustedDomains(ListTrustedDomainsRequest) returns (ListTrustedDomainsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Lists trusted domains of the instance.";
+      tags: "Instance";
+      responses: {
+        key: "200";
+        value: {
+          description: "The list of trusted domains.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/ListTrustedDomainsResponse";
+            }
+          };
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      get: "/v2/instances/current/trusted-domains"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.read"
+      }
+    };
+  }
+}

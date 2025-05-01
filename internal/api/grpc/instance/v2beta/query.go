@@ -58,3 +58,23 @@ func (s *Server) ListCustomDomains(ctx context.Context, req *instance.ListCustom
 		},
 	}, nil
 }
+
+func (s *Server) ListTrustedDomains(ctx context.Context, req *instance.ListTrustedDomainsRequest) (*instance.ListTrustedDomainsResponse, error) {
+	queries, err := ListTrustedDomainsRequestToModel(req, s.systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+
+	domains, err := s.query.SearchInstanceTrustedDomains(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+
+	return &instance.ListTrustedDomainsResponse{
+		Result: trustedDomainsToPb(domains.Domains),
+		Pagination: &filter.PaginationResponse{
+			TotalResult:  domains.Count,
+			AppliedLimit: uint64(req.GetPagination().GetLimit()),
+		},
+	}, nil
+}

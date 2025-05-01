@@ -301,3 +301,76 @@ func domainQueryToModel(searchQuery *instance.DomainSearchQuery) (query.SearchQu
 		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
 	}
 }
+
+func ListTrustedDomainsRequestToModel(req *instance.ListTrustedDomainsRequest, defaults systemdefaults.SystemDefaults) (*query.InstanceTrustedDomainSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(defaults, req.GetPagination())
+	if err != nil {
+		return nil, err
+	}
+
+	queries, err := trustedDomainQueriesToModel(req.GetQueries())
+	if err != nil {
+		return nil, err
+	}
+
+	return &query.InstanceTrustedDomainSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: fieldNameToInstanceTrustedDomainColumn(req.GetSortingColumn()),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func trustedDomainQueriesToModel(queries []*instance.TrustedDomainSearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = trustedDomainQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func trustedDomainQueryToModel(searchQuery *instance.TrustedDomainSearchQuery) (query.SearchQuery, error) {
+	switch q := searchQuery.Query.(type) {
+	case *instance.TrustedDomainSearchQuery_DomainQuery:
+		return query.NewInstanceTrustedDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
+	}
+}
+
+func trustedDomainsToPb(domains []*query.InstanceTrustedDomain) []*instance.TrustedDomain {
+	d := make([]*instance.TrustedDomain, len(domains))
+	for i, domain := range domains {
+		d[i] = trustedDomainToPb(domain)
+	}
+	return d
+}
+
+func trustedDomainToPb(d *query.InstanceTrustedDomain) *instance.TrustedDomain {
+	return &instance.TrustedDomain{
+		Domain: d.Domain,
+		Details: object.ToViewDetailsPb(
+			d.Sequence,
+			d.CreationDate,
+			d.ChangeDate,
+			d.InstanceID,
+		),
+	}
+}
+
+func fieldNameToInstanceTrustedDomainColumn(fieldName instance.TrustedDomainFieldName) query.Column {
+	switch fieldName {
+	case instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_DOMAIN:
+		return query.InstanceTrustedDomainDomainCol
+	case instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE:
+		return query.InstanceTrustedDomainCreationDateCol
+	default:
+		return query.Column{}
+	}
+}
