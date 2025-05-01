@@ -1,6 +1,8 @@
 package instance
 
 import (
+	"strings"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -8,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
@@ -57,4 +60,11 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return instance.RegisterInstanceServiceHandler
+}
+
+func validateParam(param string, paramName string) error {
+	if strings.TrimSpace(param) == "" {
+		return zerrors.ThrowInvalidArgument(nil, paramName, paramName+" must not be empty")
+	}
+	return nil
 }
