@@ -537,7 +537,7 @@
       "TYPES": {
         "request": "Cerere",
         "response": "Răspuns",
-        "events": "Evenimente",
+        "event": "Evenimente",
         "function": "Funcție"
       },
       "DIALOG": {
@@ -568,6 +568,7 @@
             "TITLE": "Toate",
             "DESCRIPTION": "Selectați aceasta dacă doriți să rulați acțiunea la fiecare cerere"
           },
+          "ALL_EVENTS": "Selectează aceasta dacă vrei să rulezi acțiunea ta la fiecare eveniment",
           "SELECT_SERVICE": {
             "TITLE": "Selectați Serviciul",
             "DESCRIPTION": "Alegeți un Serviciu Zitadel pentru acțiunea dvs."
