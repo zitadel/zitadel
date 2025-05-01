@@ -6,6 +6,9 @@
         <mat-icon class="icon">info_outline</mat-icon>
       </a>
     </div>
+    <cnsl-info-section [type]="InfoSectionType.ALERT">
+      {{ 'DESCRIPTIONS.ACTIONS.ACTIONSTWO_NOTE' | translate }}
+    </cnsl-info-section>
     <p class="desc cnsl-secondary-text">{{ 'DESCRIPTIONS.ACTIONS.DESCRIPTION' | translate }}</p>
 
     <cnsl-info-section class="max-actions" *ngIf="maxActions"

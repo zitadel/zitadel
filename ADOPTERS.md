@@ -23,6 +23,7 @@ If you are using Zitadel, please consider adding yourself as a user with a quick
 | OpenAIP                 | [@openaip](https://github.com/openAIP)                               | Using Zitadel Cloud for everything related to user authentication. |
 | Smat.io                 | [@smatio](https://github.com/smatio) - [@lukasver](https://github.com/lukasver) | Zitadel for authentication in cloud applications while offering B2B portfolio management solutions for professional investors |
 | roclub GmbH             | [@holgerson97](https://github.com/holgerson97)                        | Roclub builds a telehealth application to enable remote MRI/CT examinations. |
+| CEEX AG                 | [@cleanenergyexchange](https://github.com/cleanenergyexchange)        | Using Zitadel cloud for our SaaS products that support the sustainabel energy transistion |
 | Organization Name       | contact@example.com                                      | Description of how they use Zitadel             |
 | Individual Name         | contact@example.com                                      | Description of how they use Zitadel             |
 
