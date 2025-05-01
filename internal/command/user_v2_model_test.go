@@ -2441,8 +2441,7 @@ func TestCommandSide_userHumanWriteModel_idpLinks(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			// TODO: Looking at the test function name: Is this the right function to test?
-			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID, "", nil)
+			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID, "")
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()

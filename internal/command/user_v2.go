@@ -132,13 +132,17 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
-
-	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner, check)
+	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bd4ir1mblj", "Errors.User.NotFound")
+	}
+	if check != nil {
+		if err = check(existingUser.Name == "")(existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
+			return nil, err
+		}
 	}
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
@@ -175,7 +179,7 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwner string, check func(isHuman bool) PermissionCheck) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -183,10 +187,6 @@ func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwn
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
-	}
-	if check != nil {
-		// In order to allow a conditional permission based on the user type, we need to have the reduced write model.
-		err = check(writeModel.Name == "")(writeModel.ResourceOwner, writeModel.AggregateID)
 	}
 	return writeModel, err
 }
