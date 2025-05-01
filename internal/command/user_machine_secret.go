@@ -11,7 +11,7 @@ import (
 )
 
 type GenerateMachineSecret struct {
-	PermissionCheck eventstore.PermissionCheck
+	PermissionCheck PermissionCheck
 	ClientSecret    string
 }
 
@@ -63,7 +63,7 @@ func (c *Commands) prepareGenerateMachineSecret(a *user.Aggregate, set *Generate
 	}
 }
 
-func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resourceOwner string, permissionCheck eventstore.PermissionCheck) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resourceOwner string, permissionCheck PermissionCheck) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
 	// nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveMachineSecret(agg, permissionCheck))
@@ -83,7 +83,7 @@ func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resou
 	}, nil
 }
 
-func prepareRemoveMachineSecret(a *user.Aggregate, check eventstore.PermissionCheck) preparation.Validation {
+func prepareRemoveMachineSecret(a *user.Aggregate, check PermissionCheck) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if a.ResourceOwner == "" && check == nil {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")

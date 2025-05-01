@@ -20,12 +20,11 @@ type MachineWriteModel struct {
 	HashedSecret    string
 }
 
-func NewMachineWriteModel(userID, resourceOwner string, permissionCheck eventstore.PermissionCheck) *MachineWriteModel {
+func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
 	return &MachineWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:     userID,
-			ResourceOwner:   resourceOwner,
-			PermissionCheck: permissionCheck,
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }

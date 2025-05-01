@@ -17,12 +17,12 @@ import (
 type AddMachineKey struct {
 	Type            domain.AuthNKeyType
 	ExpirationDate  time.Time
-	PermissionCheck eventstore.PermissionCheck
+	PermissionCheck PermissionCheck
 }
 
 type MachineKey struct {
 	models.ObjectRoot
-	PermissionCheck eventstore.PermissionCheck
+	PermissionCheck PermissionCheck
 
 	KeyID          string
 	Type           domain.AuthNKeyType
@@ -206,13 +206,18 @@ func prepareRemoveUserMachineKey(machineKey *MachineKey) preparation.Validation 
 	}
 }
 
-func getMachineKeyWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, keyID, resourceOwner string, permissionCheck eventstore.PermissionCheck) (_ *MachineKeyWriteModel, err error) {
-	writeModel := NewMachineKeyWriteModel(userID, keyID, resourceOwner, permissionCheck)
+func getMachineKeyWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, keyID, resourceOwner string, permissionCheck PermissionCheck) (_ *MachineKeyWriteModel, err error) {
+	writeModel := NewMachineKeyWriteModel(userID, keyID, resourceOwner)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
 	}
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
+	if permissionCheck != nil {
+		if err := permissionCheck(writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+			return nil, err
+		}
+	}
 	return writeModel, err
 }

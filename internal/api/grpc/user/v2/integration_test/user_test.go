@@ -2120,9 +2120,8 @@ func TestServer_DeleteUser(t *testing.T) {
 	projectResp, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
 	type args struct {
-		ctx     context.Context
 		req     *user.DeleteUserRequest
-		prepare func(request *user.DeleteUserRequest) error
+		prepare func(*testing.T, *user.DeleteUserRequest) context.Context
 	}
 	tests := []struct {
 		name    string
@@ -2133,23 +2132,21 @@ func TestServer_DeleteUser(t *testing.T) {
 		{
 			name: "remove, not existing",
 			args: args{
-				CTX,
 				&user.DeleteUserRequest{
 					UserId: "notexisting",
 				},
-				func(request *user.DeleteUserRequest) error { return nil },
+				func(*testing.T, *user.DeleteUserRequest) context.Context { return CTX },
 			},
 			wantErr: true,
 		},
 		{
 			name: "remove human, ok",
 			args: args{
-				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -2162,12 +2159,11 @@ func TestServer_DeleteUser(t *testing.T) {
 		{
 			name: "remove machine, ok",
 			args: args{
-				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -2180,15 +2176,14 @@ func TestServer_DeleteUser(t *testing.T) {
 		{
 			name: "remove dependencies, ok",
 			args: args{
-				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateOrgMembership(t, CTX, request.UserId)
-					return err
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -2198,13 +2193,70 @@ func TestServer_DeleteUser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "remove self human, ok",
+			args: args{
+				req: &user.DeleteUserRequest{},
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
+					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									GivenName:  "givenName",
+									FamilyName: "familyName",
+								},
+								Email: &user.SetHumanEmail{
+									Email:        gofakeit.Email(),
+									Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
+								},
+							},
+						},
+					})
+					require.NoError(t, err)
+					request.UserId = removeUser.Id
+					Instance.RegisterUserPasskey(CTX, removeUser.Id)
+					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, removeUser.Id)
+					return integration.WithAuthorizationToken(UserCTX, token)
+				},
+			},
+			want: &user.DeleteUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "remove self machine, error",
+			args: args{
+				req: &user.DeleteUserRequest{},
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
+					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name: gofakeit.Name(),
+							},
+						},
+					})
+					request.UserId = removeUser.Id
+					require.NoError(t, err)
+					tokenResp, err := Client.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
+						UserId:         removeUser.Id,
+						ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour)),
+					})
+					require.NoError(t, err)
+					return integration.WithAuthorizationToken(UserCTX, tokenResp.Token)
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.prepare(tt.args.req)
-			require.NoError(t, err)
-
-			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
+			ctx := tt.args.prepare(t, tt.args.req)
+			got, err := Client.DeleteUser(ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

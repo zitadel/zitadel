@@ -21,7 +21,7 @@ type AddPat struct {
 
 type PersonalAccessToken struct {
 	models.ObjectRoot
-	PermissionCheck eventstore.PermissionCheck
+	PermissionCheck PermissionCheck
 
 	ExpirationDate  time.Time
 	Scopes          []string
@@ -114,7 +114,6 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 			if err != nil {
 				return nil, err
 			}
-
 			pat.Token, err = createToken(algorithm, writeModel.TokenID, writeModel.AggregateID)
 			if err != nil {
 				return nil, err
@@ -182,13 +181,18 @@ func createToken(algorithm crypto.EncryptionAlgorithm, tokenID, userID string) (
 	return base64.RawURLEncoding.EncodeToString(encrypted), nil
 }
 
-func getPersonalAccessTokenWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, tokenID, resourceOwner string, check eventstore.PermissionCheck) (_ *PersonalAccessTokenWriteModel, err error) {
-	writeModel := NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner, check)
+func getPersonalAccessTokenWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, tokenID, resourceOwner string, check PermissionCheck) (_ *PersonalAccessTokenWriteModel, err error) {
+	writeModel := NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
 	}
 	writeModel.AppendEvents(events...)
-	err = writeModel.Reduce()
+	if err = writeModel.Reduce(); err != nil {
+		return nil, err
+	}
+	if check != nil {
+		err = check(writeModel.ResourceOwner, writeModel.AggregateID)
+	}
 	return writeModel, err
 }

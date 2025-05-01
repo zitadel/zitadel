@@ -203,8 +203,9 @@ func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-
-	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, h.command.CheckPermissionUserDelete(ctx, false), memberships, grants...)
+	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, func(isHuman bool) command.PermissionCheck {
+		return h.command.NewPermissionCheckUserDelete(ctx, isHuman)
+	}, memberships, grants...)
 	return err
 }
 
