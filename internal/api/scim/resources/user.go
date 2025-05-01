@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -204,8 +203,8 @@ func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, func(isHuman bool) eventstore.PermissionCheck {
-		return h.command.CheckPermissionUserDelete(ctx, isHuman)
+	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, func(isHuman bool) command.PermissionCheck {
+		return h.command.NewPermissionCheckUserDelete(ctx, isHuman)
 	}, memberships, grants...)
 	return err
 }

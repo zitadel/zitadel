@@ -214,7 +214,7 @@ func TestCommands_CheckPermissionUserWrite(t *testing.T) {
 			if tt.fields.domainPermissionCheck != nil {
 				c.checkPermission = tt.fields.domainPermissionCheck(t)
 			}
-			err := c.CheckPermissionUserWrite(tt.args.ctx, tt.args.allowSelf)(tt.args.resourceOwner, tt.args.aggregateID)
+			err := c.NewPermissionCheckUserWrite(tt.args.ctx, tt.args.allowSelf)(tt.args.resourceOwner, tt.args.aggregateID)
 			if tt.want.err != nil {
 				assert.True(t, tt.want.err(err))
 			}
@@ -296,7 +296,7 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 			if tt.fields.domainPermissionCheck != nil {
 				c.checkPermission = tt.fields.domainPermissionCheck(t)
 			}
-			err := c.CheckPermissionUserDelete(tt.args.ctx, tt.args.allowSelf)(tt.args.resourceOwner, tt.args.aggregateID)
+			err := c.NewPermissionCheckUserDelete(tt.args.ctx, tt.args.allowSelf)(tt.args.resourceOwner, tt.args.aggregateID)
 			if tt.want.err != nil {
 				assert.True(t, tt.want.err(err))
 			}
@@ -322,7 +322,7 @@ func isPermissionDenied(err error) bool {
 	return errors.Is(err, errPermissionDenied)
 }
 
-func permissionCheck(allow bool) eventstore.PermissionCheck {
+func permissionCheck(allow bool) PermissionCheck {
 	return func(_, _ string) error {
 		if allow {
 			return nil
