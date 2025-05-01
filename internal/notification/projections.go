@@ -2,8 +2,12 @@ package notification
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -68,11 +72,13 @@ func Start(ctx context.Context) {
 }
 
 func ProjectInstance(ctx context.Context) error {
-	for _, projection := range projections {
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting notification projection")
 		_, err := projection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("notification projection done")
 	}
 	return nil
 }
