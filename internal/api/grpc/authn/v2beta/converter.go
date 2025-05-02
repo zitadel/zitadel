@@ -9,6 +9,8 @@ func KeyTypeToDomain(t authn.KeyType) domain.AuthNKeyType {
 	switch t {
 	case authn.KeyType_KEY_TYPE_JSON:
 		return domain.AuthNKeyTypeJSON
+	case authn.KeyType_KEY_TYPE_UNSPECIFIED:
+		fallthrough
 	default:
 		return domain.AuthNKeyTypeNONE
 	}

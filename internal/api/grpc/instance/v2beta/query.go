@@ -3,9 +3,10 @@ package instance
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/emptypb"
+
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *Server) GetInstance(ctx context.Context, _ *emptypb.Empty) (*instance.GetInstanceResponse, error) {

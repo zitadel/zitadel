@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/cmd/build"
 	authn "github.com/zitadel/zitadel/internal/api/grpc/authn/v2beta"
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
@@ -15,7 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
-	"golang.org/x/text/language"
 )
 
 func InstancesToPb(instances []*query.Instance) []*instance.Instance {
@@ -90,6 +91,8 @@ func fieldNameToInstanceColumn(fieldName instance.FieldName) query.Column {
 		return query.InstanceColumnName
 	case instance.FieldName_FIELD_NAME_CREATION_DATE:
 		return query.InstanceColumnCreationDate
+	case instance.FieldName_FIELD_NAME_UNSPECIFIED:
+		fallthrough
 	default:
 		return query.Column{}
 	}
@@ -273,6 +276,8 @@ func fieldNameToInstanceDomainColumn(fieldName instance.DomainFieldName) query.C
 		return query.InstanceDomainIsPrimaryCol
 	case instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE:
 		return query.InstanceDomainCreationDateCol
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_UNSPECIFIED:
+		fallthrough
 	default:
 		return query.Column{}
 	}
@@ -370,6 +375,8 @@ func fieldNameToInstanceTrustedDomainColumn(fieldName instance.TrustedDomainFiel
 		return query.InstanceTrustedDomainDomainCol
 	case instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE:
 		return query.InstanceTrustedDomainCreationDateCol
+	case instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_UNSPECIFIED:
+		fallthrough
 	default:
 		return query.Column{}
 	}

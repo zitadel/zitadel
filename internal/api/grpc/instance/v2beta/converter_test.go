@@ -8,6 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/cmd/build"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
@@ -19,8 +22,6 @@ import (
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	"golang.org/x/text/language"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func Test_InstancesToPb(t *testing.T) {
@@ -272,7 +273,7 @@ func Test_CreateInstancePbToSetupInstance(t *testing.T) {
 							ExpirationDate: nowTS,
 						},
 						MachineKey: &instance.CreateInstanceRequest_MachineKey{
-							Type:           authn.KeyType(authn.KeyType_KEY_TYPE_JSON),
+							Type:           authn.KeyType_KEY_TYPE_JSON,
 							ExpirationDate: nowTS,
 						},
 					},
@@ -540,7 +541,7 @@ func Test_ListTrustedDomainsRequestToModel(t *testing.T) {
 			},
 			maxQueryLimit: 100,
 			expectedResult: &query.InstanceTrustedDomainSearchQueries{
-				SearchRequest: query.SearchRequest{Offset: 0, Limit: 10, Asc: true, SortingColumn: query.InstanceDomainIsPrimaryCol},
+				SearchRequest: query.SearchRequest{Offset: 0, Limit: 10, Asc: true, SortingColumn: query.InstanceTrustedDomainCreationDateCol},
 				Queries:       []query.SearchQuery{querySearchRes},
 			},
 			expectedError: nil,
