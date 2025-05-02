@@ -180,7 +180,6 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
-            "guides/manage/customize/user-schema",
             "guides/manage/user/scim2",
           ],
         },
@@ -606,6 +605,14 @@ module.exports = {
             "concepts/eventstore/implementation",
           ],
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Product Information",
+      collapsed: true,
+      items: [
+        "product/roadmap",
       ],
     },
     {

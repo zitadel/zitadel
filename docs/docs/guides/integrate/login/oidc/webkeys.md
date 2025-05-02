@@ -85,7 +85,7 @@ The same counts for [zitadel/oidc](https://github.com/zitadel/oidc) Go library.
 
 ## Web Key management
 
-ZITADEL provides a resource based [web keys API](/docs/apis/resources/webkey_service_v3).
+ZITADEL provides a resource based [web keys API](/docs/apis/resources/webkey_service_v2).
 The API allows the creation, activation, deletion and listing of web keys.
 All public keys that are stored for an instance are served on the [JWKS endpoint](#json-web-key-set).
 Applications need public keys for token verification and not all applications are capable of on-demand

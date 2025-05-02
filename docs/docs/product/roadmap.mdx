@@ -1,0 +1,232 @@
+---
+title: Zitadel Release Versions and Roadmap
+sidebar_label: Release Versions and Roadmap
+---
+
+
+## Timeline and Overview
+
+<table id="zitadel-versions">
+    <thead>
+        <tr id="zitadel-versions-year">
+            <th scope="col"></th>
+            <th scope="col" colSpan={12}>2025</th>
+            <th scope="col" colSpan={12}>2026</th>
+        </tr>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col" colSpan={3}>Q1</th>
+            <th scope="col" colSpan={3}>Q2</th>
+            <th scope="col" colSpan={3}>Q3</th>
+            <th scope="col" colSpan={3}>Q4</th>
+
+            <th scope="col" colSpan={3}>Q1</th>
+            <th scope="col" colSpan={3}>Q2</th>
+            <th scope="col" colSpan={3}>Q3</th>
+            <th scope="col" colSpan={3}>Q4</th>
+        </tr>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Jan</th>
+            <th scope="col">Feb</th>
+            <th scope="col">Mar</th>
+            <th scope="col">Apr</th>
+            <th scope="col">May</th>
+            <th scope="col">Jun</th>
+            <th scope="col">Jul</th>
+            <th scope="col">Aug</th>
+            <th scope="col">Sep</th>
+            <th scope="col">Oct</th>
+            <th scope="col">Nov</th>
+            <th scope="col">Dec</th>
+
+
+            <th scope="col">Jan</th>
+            <th scope="col">Feb</th>
+            <th scope="col">Mar</th>
+            <th scope="col">Apr</th>
+            <th scope="col">May</th>
+            <th scope="col">Jun</th>
+            <th scope="col">Jul</th>
+            <th scope="col">Aug</th>
+            <th scope="col">Sep</th>
+            <th scope="col">Oct</th>
+            <th scope="col">Nov</th>
+            <th scope="col">Dec</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <tr>
+            <td colspan={25}>Zitadel Core</td>
+        </tr>
+        <tr>
+            <th scope="row">V2.x</th>
+            <td colspan={3} class="release-ga">GA</td>
+            <td colSpan={3} class="release-stable">Stable</td>
+            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={16}></td>
+        </tr>
+        <tr>
+            <th scope="row">[v3.x](/docs/product/roadmap#v3x)</th>
+            <td colspan={3} class="release-impl">Implementation</td>
+            <td class="release-rc">RC</td>
+            <td colspan={2} class="release-ga">GA</td>
+            <td colSpan={3} class="release-stable">Stable</td>
+            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={12}></td>
+        </tr>
+        <tr>
+            <th scope="row">[v4.x](/docs/product/roadmap#v4x)</th>
+            <td colSpan={3}></td>
+            <td colSpan={3} class="release-impl">Implementation</td>
+            <td class="release-rc">RC</td>
+            <td colspan={2} class="release-ga">GA</td>
+            <td colSpan={3} class="release-stable">Stable</td>
+            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={9}></td>
+        </tr>
+        <tr>
+            <th scope="row">[v5.x](/docs/product/roadmap#v5x)</th><td colSpan={3}></td>
+            <td colSpan={3}></td>
+            <td colSpan={3} class="release-impl">Implementation</td>
+            <td class="release-rc">RC</td>
+            <td colspan={2} class="release-ga">GA</td>
+            <td colSpan={3} class="release-stable">Stable</td>
+            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={6}></td>
+        </tr>
+    </tbody>
+</table>
+
+## Zitadel Core
+
+### v3.x
+
+**Current State**: General Availability
+
+**Release**: [v3.0.0](https://github.com/zitadel/zitadel/releases/tag/v3.0.0)
+
+<details>
+    <summary>New Features</summary>
+
+    <details>
+        <summary>Actions V2</summary>
+
+    </details>
+
+
+</details>
+
+<details>
+    <summary>General Availability</summary>
+</details>
+
+<details>
+    <summary>Feature Deprecation</summary>
+</details>
+
+<details>
+    <summary>Breaking Changes</summary>
+
+    <details>
+        <summary>CockroachDB Support removed</summary>
+
+    </details>
+</details>
+
+
+### v4.x
+
+**Current State**: In Implementation
+
+<details>
+    <summary>New Features</summary>
+    <details>
+        <summary>Analytics</summary>
+
+        We provide comprehensive and insightful analytics capabilities that empower you with the information needed to understand platform usage, monitor system health, and make data-driven decisions.
+
+        <details>
+            <summary>Daily Active Users (DAU) & Monthly Active Users (MAU)</summary>
+
+            Administrators need to track user activity to understand platform usage and identify trends.
+            This feature provides basic metrics for daily and monthly active users, allowing for filtering by date range and scope (instance-wide or within a specific organization).
+            The metrics should ensure that each user is counted only once per day or month, respectively, regardless of how many actions they performed.
+            This minimal feature serves as a foundation for future expansion into more detailed analytics.
+
+            For more details track our [github issue](https://github.com/zitadel/zitadel/issues/7506).
+        </details>
+
+        <details>
+            <summary>Resource Count Metrics</summary>
+
+            To effectively manage a Zitadel instance, administrators need to understand resource utilization.
+            This feature provides metrics for resource counts, including organizations, users (with filtering options), projects, applications, and authorizations.
+            For users, we will offer filters to retrieve the total count, counts per organization, and counts by user type (human or machine).
+            These metrics will provide administrators with valuable insights into the scale and complexity of their Zitadel instance.
+
+
+            For more details track our [github issue](https://github.com/zitadel/zitadel/issues/9709).
+        </details>
+
+        <details>
+            <summary>Operational Metrics</summary>
+
+            To empower customers to better manage and optimize their Zitadel instances, we will provide access to detailed operational metrics.
+            This data will help customers identify potential issues, optimize performance, and ensure the stability of their deployments.
+            The provided data will encompass basic system information, infrastructure details, configuration settings, error reports, and the health status of various Zitadel components, accessible via a user interface or an API.
+
+
+            For more details track our [github issue](https://github.com/zitadel/zitadel/issues/9476).
+
+        </details>
+    </details>
+</details>
+
+<details>
+    <summary>General Availability</summary>
+    <details>
+        <summary>SCIM 2.0 Server - User Resource</summary>
+    </details>
+</details>
+
+<details>
+    <summary>Feature Deprecation</summary>
+</details>
+
+<details>
+    <summary>Breaking Changes</summary>
+
+    <details>
+        <summary>Hosted Login v1 will be removed</summary>
+    </details>
+
+
+    <details>
+        <summary>Zitadel APIs v1 will be removed</summary>
+    </details>
+</details>
+
+### v5.x
+
+**Current State**: Planning
+
+
+### Future Vision / Upcoming Features
+
+#### Fine Grained Authorization
+
+...
+
+#### Thread Detection
+
+...
+
+#### AI
+
+...
+
+## Login
+
+## SDKs
