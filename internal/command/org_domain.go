@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -244,6 +245,7 @@ func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.Or
 		return nil, err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
+		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> domainWriteModel.State = %+v\n", domainWriteModel.State)
 		return nil, zerrors.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
 	}
 	if !domainWriteModel.Verified {
@@ -270,6 +272,7 @@ func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDom
 		return nil, err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
+		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> domainWriteModel.State = %+v\n", domainWriteModel.State)
 		return nil, zerrors.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
 	}
 	if domainWriteModel.Primary {

@@ -570,6 +570,95 @@ service OrganizationService {
     };
   }
 
+  rpc DeleteOrganizationDomain(DeleteOrganizationDomainRequest) returns (DeleteOrganizationDomainResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/organization/domains"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Delete Domain";
+      description: "Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead."
+      parameters: {
+        headers: {
+          name: "x-zitadel-orgid";
+          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+          type: STRING,
+          required: false;
+        };
+      };
+    };
+  }
+
+  rpc GenerateOrganizationDomainValidation(GenerateOrganizationDomainValidationRequest) returns (GenerateOrganizationDomainValidationResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/organization/domains/validation/_generate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Generate Domain Verification";
+      description: "Generate a new file to be able to verify your domain with DNS or HTTP challenge."
+      parameters: {
+        headers: {
+          name: "x-zitadel-orgid";
+          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+          type: STRING,
+          required: false;
+        };
+      };
+    };
+  }
+
+  rpc VerifyOrganizationDomain(VerifyOrganizationDomainRequest) returns (VerifyOrganizationDomainResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/organization/domains/validation/_validate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Verify Domain";
+      description: "Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique."
+      parameters: {
+        headers: {
+          name: "x-zitadel-orgid";
+          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+          type: STRING,
+          required: false;
+        };
+      };
+    };
+  }
+
 }
 
 message CreateOrganizationRequest{
@@ -766,13 +855,75 @@ message AddOrganizationDomainResponse {
 }
 
 message ListOrganizationDomainsRequest {
+  string organization_id = 1;
   //list limitations and ordering
-  zitadel.object.v2beta.ListQuery query = 1;
+  zitadel.object.v2beta.ListQuery query = 2;
   //criteria the client is looking for
-  repeated DomainSearchQuery queries = 2;
+  repeated DomainSearchQuery queries = 3;
 }
 
 message ListOrganizationDomainsResponse {
   zitadel.object.v2beta.ListDetails details = 1;
   repeated Domain result = 2;
+}
+
+message DeleteOrganizationDomainRequest {
+  // TODO maybe change organization_id to just Id
+  string organization_id = 1;
+    string domain = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
+          max_length: 200;
+          example: "\"testdomain.com\"";
+      }
+    ];
+}
+
+message DeleteOrganizationDomainResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message GenerateOrganizationDomainValidationRequest {
+  string organization_id = 1;
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 200;
+        example: "\"testdomain.com\"";
+    }
+  ];
+  DomainValidationType type = 3 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message GenerateOrganizationDomainValidationResponse {
+  string token = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"ofSBHsSAVHAoTIE4Iv2gwhaYhTjcY5QX\"";
+    }
+  ];
+  string url = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"https://testdomain.com/.well-known/zitadel-challenge/ofSBHsSAVHAoTIE4Iv2gwhaYhTjcY5QX\"";
+    }
+  ];
+}
+
+message VerifyOrganizationDomainRequest {
+  string organization_id = 1;
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"testdomain.com\"";
+    }
+  ];
+}
+
+message VerifyOrganizationDomainResponse {
+  zitadel.object.v2beta.Details details = 1;
 }

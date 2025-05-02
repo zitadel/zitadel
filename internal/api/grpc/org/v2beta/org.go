@@ -3,7 +3,6 @@ package org
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
@@ -110,7 +109,7 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrgan
 	if err != nil {
 		return nil, err
 	}
-	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(authz.GetCtxData(ctx).OrgID)
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(req.OrganizationId)
 	if err != nil {
 		return nil, err
 	}
@@ -126,15 +125,40 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrgan
 	}, nil
 }
 
-// func (s *Server) RemoveOrganizagtionDomain(ctx context.Context, req *mgmt_pb.RemoveOrgDomainRequest) (*mgmt_pb.RemoveOrgDomainResponse, error) {
-// 	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &mgmt_pb.RemoveOrgDomainResponse{
-// 		Details: object.DomainToChangeDetailsPb(details),
-// 	}, err
-// }
+func (s *Server) DeleteOrganizationDomain(ctx context.Context, req *org.DeleteOrganizationDomainRequest) (*org.DeleteOrganizationDomainResponse, error) {
+	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &org.DeleteOrganizationDomainResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, err
+}
+
+func (s *Server) GenerateOrganizationDomainValidation(ctx context.Context, req *org.GenerateOrganizationDomainValidationRequest) (*org.GenerateOrganizationDomainValidationResponse, error) {
+	token, url, err := s.command.GenerateOrgDomainValidation(ctx, GenerateOrgDomainValidationRequestToDomain(ctx, req))
+	if err != nil {
+		return nil, err
+	}
+	return &org.GenerateOrganizationDomainValidationResponse{
+		Token: token,
+		Url:   url,
+	}, nil
+}
+
+func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *org.VerifyOrganizationDomainRequest) (*org.VerifyOrganizationDomainResponse, error) {
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, request), userIDs)
+	if err != nil {
+		return nil, err
+	}
+	return &org.VerifyOrganizationDomainResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}
 
 func createOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRequest) (*command.OrgSetup, error) {
 	admins, err := createOrganizationRequestAdminsToCommand(request.GetAdmins())

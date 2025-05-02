@@ -138,3 +138,25 @@ func ToViewDetailsPb(
 	}
 	return details
 }
+
+func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
+	details := &object.Details{
+		Sequence:      objectDetail.Sequence,
+		ResourceOwner: objectDetail.ResourceOwner,
+	}
+	if !objectDetail.EventDate.IsZero() {
+		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
+	}
+	return details
+}
+
+func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) domain.OrgDomainValidationType {
+	switch validationType {
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP:
+		return domain.OrgDomainValidationTypeHTTP
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS:
+		return domain.OrgDomainValidationTypeDNS
+	default:
+		return domain.OrgDomainValidationTypeUnspecified
+	}
+}
