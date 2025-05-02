@@ -5,9 +5,11 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
+  authorizeOrDenyDeviceAuthorization,
   createCallback,
   createResponse,
   getBrandingSettings,
+  getDeviceAuthorizationRequest,
   getLoginSettings,
   getSession,
 } from "@/lib/zitadel";
@@ -24,7 +26,6 @@ import { redirect } from "next/navigation";
 
 async function loadSession(
   serviceUrl: string,
-
   loginName: string,
   requestId?: string,
 ) {
@@ -61,6 +62,26 @@ async function loadSession(
       }),
     }).then(({ url }) => {
       return redirect(url);
+    });
+  } else if (requestId && requestId.startsWith("device_")) {
+    const userCode = requestId.replace("device_", "");
+
+    const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({
+      serviceUrl,
+      userCode,
+    });
+
+    if (!deviceAuthorizationRequest) {
+      throw new Error("Device authorization request not found");
+    }
+
+    return authorizeOrDenyDeviceAuthorization({
+      serviceUrl,
+      deviceAuthorizationId: deviceAuthorizationRequest?.id,
+      session: {
+        sessionId: recent.id,
+        sessionToken: recent.token,
+      },
     });
   }
 

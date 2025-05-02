@@ -127,6 +127,7 @@ export async function GET(request: NextRequest) {
         request,
       });
     } else if (requestId.startsWith("device_")) {
+      // this finishes the login process for Device Authorization
       return loginWithDeviceAndSession({
         serviceUrl,
         deviceRequest: requestId.replace("device_", ""),
@@ -509,7 +510,9 @@ export async function GET(request: NextRequest) {
         requestId: `saml_${samlRequest.id}`,
       });
     }
-  } else {
+  }
+  // Device Authorization does not need to start here as it is handled on the /device endpoint
+  else {
     return NextResponse.json(
       { error: "No authRequest nor samlRequest provided" },
       { status: 500 },

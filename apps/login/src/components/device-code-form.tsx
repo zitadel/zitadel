@@ -51,7 +51,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
     return router.push(
       `/device/consent?` +
         new URLSearchParams({
-          requestId: `device_${response.deviceAuthorizationRequest.id}`,
+          requestId: `device_${userCode}`,
           user_code: value.userCode,
         }).toString(),
     );

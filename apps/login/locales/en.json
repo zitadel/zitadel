@@ -190,7 +190,7 @@
   "device": {
     "usercode": {
       "title": "Device code",
-      "description": "Enter the code provided in the verification email.",
+      "description": "Enter the code.",
       "submit": "Continue"
     },
     "request": {
