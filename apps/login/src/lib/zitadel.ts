@@ -943,6 +943,31 @@ export async function getDeviceAuthorizationRequest({
   });
 }
 
+export async function authorizeOrDenyDeviceAuthorization({
+  serviceUrl,
+  deviceAuthorizationId,
+  session,
+}: {
+  serviceUrl: string;
+  deviceAuthorizationId: string;
+  session?: { sessionId: string; sessionToken: string };
+}) {
+  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+
+  return oidcService.authorizeOrDenyDeviceAuthorization({
+    deviceAuthorizationId,
+    decision: session
+      ? {
+          case: "session",
+          value: session,
+        }
+      : {
+          case: "deny",
+          value: {},
+        },
+  });
+}
+
 export async function createCallback({
   serviceUrl,
   req,
