@@ -307,6 +307,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: Use resource based ListCustomDomains API instead
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
@@ -323,6 +324,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: Use resource based ListTrustedDomains API instead
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
         option (google.api.http) = {
             post: "/trusted_domains/_search";
@@ -339,6 +341,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: Use resource based AddTrustedDomain API instead
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
@@ -356,6 +359,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: Use resource based RemoveTrustedDomain API instead
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             delete: "/trusted_domains/{domain}";
