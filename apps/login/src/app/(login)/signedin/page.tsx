@@ -9,7 +9,6 @@ import {
   createCallback,
   createResponse,
   getBrandingSettings,
-  getDeviceAuthorizationRequest,
   getLoginSettings,
   getSession,
 } from "@/lib/zitadel";
@@ -64,24 +63,17 @@ async function loadSession(
       return redirect(url);
     });
   } else if (requestId && requestId.startsWith("device_")) {
-    const userCode = requestId.replace("device_", "");
-
-    const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({
-      serviceUrl,
-      userCode,
-    });
-
-    if (!deviceAuthorizationRequest) {
-      throw new Error("Device authorization request not found");
-    }
+    const session = {
+      sessionId: recent.id,
+      sessionToken: recent.token,
+    };
 
     return authorizeOrDenyDeviceAuthorization({
       serviceUrl,
-      deviceAuthorizationId: deviceAuthorizationRequest?.id,
-      session: {
-        sessionId: recent.id,
-        sessionToken: recent.token,
-      },
+      deviceAuthorizationId: requestId.replace("device_", ""),
+      session,
+    }).then(() => {
+      return session;
     });
   }
 
@@ -105,7 +97,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const { loginName, requestId, organization } = searchParams;
-  const sessionFactors = await loadSession(serviceUrl, loginName, requestId);
+  // const sessionFactors = await loadSession(serviceUrl, loginName, requestId);
+
+  const sessionFactors = sessionId
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   const branding = await getBrandingSettings({
     serviceUrl,

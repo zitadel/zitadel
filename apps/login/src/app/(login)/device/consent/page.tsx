@@ -33,6 +33,8 @@ export default async function Page(props: {
     userCode,
   });
 
+  console.log(deviceAuthorizationRequest);
+
   let defaultOrganization;
   if (!organization) {
     const org: Organization | null = await getDefaultOrg({
@@ -48,19 +50,28 @@ export default async function Page(props: {
     organization: organization ?? defaultOrganization,
   });
 
+  const params = new URLSearchParams();
+
+  if (requestId) {
+    params.append("requestId", requestId);
+  }
+
+  if (organization) {
+    params.append("organization", organization);
+  }
+
   return (
     <DynamicTheme
       branding={branding}
       appName={deviceAuthorizationRequest?.appName}
     >
       <div className="flex flex-col items-center space-y-4">
-        {!userCode && (
-          <>
-            <h1>{t("usercode.title")}</h1>
-            <p className="ztdl-p">{t("usercode.description")}</p>
-            <ConsentScreen scope={deviceAuthorizationRequest?.scope} />
-          </>
-        )}
+        <h1>{t("usercode.title")}</h1>
+        <p className="ztdl-p">{t("usercode.description")}</p>
+        <ConsentScreen
+          scope={deviceAuthorizationRequest?.scope}
+          nextUrl={`/loginname?` + params}
+        />
       </div>
     </DynamicTheme>
   );

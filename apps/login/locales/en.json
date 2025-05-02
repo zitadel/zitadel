@@ -197,6 +197,11 @@
       "title": "would like to connect:",
       "description": "By clicking Allow, you allow this app and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
       "submit": "Allow"
+    },
+    "scope": {
+      "email": "Access your email address.",
+      "profile": "Access your full profile information.",
+      "offline_access": "Allow offline access to your account."
     }
   },
   "error": {
