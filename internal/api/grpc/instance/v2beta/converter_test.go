@@ -95,7 +95,7 @@ func Test_ListInstancesRequestToModel(t *testing.T) {
 			maxQueryLimit: 1,
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
-				SortingColumn: instance.FieldName_FIELD_NAME_ID,
+				SortingColumn: instance.FieldName_FIELD_NAME_ID.Enum(),
 				Queries:       []*instance.Query{{Query: &instance.Query_IdQuery{IdQuery: &instance.IdsQuery{Ids: []string{"instance1", "instance2"}}}}},
 			},
 			expectedError: zerrors.ThrowInvalidArgumentf(errors.New("given: 10, allowed: 1"), "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
@@ -104,7 +104,7 @@ func Test_ListInstancesRequestToModel(t *testing.T) {
 			testName: "when valid request should return instance search query model",
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
-				SortingColumn: instance.FieldName_FIELD_NAME_ID,
+				SortingColumn: instance.FieldName_FIELD_NAME_ID.Enum(),
 				Queries:       []*instance.Query{{Query: &instance.Query_IdQuery{IdQuery: &instance.IdsQuery{Ids: []string{"instance1", "instance2"}}}}},
 			},
 			expectedResult: &query.InstanceSearchQueries{

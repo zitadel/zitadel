@@ -71,7 +71,8 @@ message Query {
 message IdsQuery {
     repeated string ids = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "4820840938402429";
+            description: "Instance ID";
+            example: "[\"4820840938402429\",\"4820840938402422\"]"
         }
     ];
 }
@@ -80,7 +81,7 @@ message DomainsQuery {
     repeated string domains = 1  [
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            max_items: 20,
+            max_items: 20;
             example: "[\"my-instace.zitadel.cloud\", \"auth.custom.com\"]";
             description: "Return the instances that have the requested domains";
         }
@@ -100,13 +101,14 @@ message DomainQuery {
     string domain = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "zitadel.com";
+            max_length: 200;
+            example: "\"zitadel.com\"";
         }
     ];
     zitadel.object.v2.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines which text equality method is used";
+            description: "Defines which text equality method is used";
         }
     ];
 }
@@ -114,7 +116,7 @@ message DomainQuery {
 message DomainGeneratedQuery {
     bool generated = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "generated domains";
+            description: "Generated domains";
         }
     ];
 }
@@ -122,7 +124,7 @@ message DomainGeneratedQuery {
 message DomainPrimaryQuery {
     bool primary = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "primary domains";
+            description: "Primary domains";
         }
     ];
 }

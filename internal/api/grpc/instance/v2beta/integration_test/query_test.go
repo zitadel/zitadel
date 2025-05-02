@@ -98,7 +98,7 @@ func TestListInstances(t *testing.T) {
 			testName: "when valid request with filter should return paginated response",
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
-				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE,
+				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE.Enum(),
 				Queries: []*instance.Query{
 					{
 						Query: &instance.Query_IdQuery{

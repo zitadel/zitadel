@@ -66,7 +66,7 @@ func ListInstancesRequestToModel(req *instance.ListInstancesRequest, sysDefaults
 		return nil, err
 	}
 
-	queries, err := instanceQueriesToModel(req.Queries)
+	queries, err := instanceQueriesToModel(req.GetQueries())
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func ListInstancesRequestToModel(req *instance.ListInstancesRequest, sysDefaults
 			Offset:        offset,
 			Limit:         limit,
 			Asc:           asc,
-			SortingColumn: fieldNameToInstanceColumn(req.SortingColumn),
+			SortingColumn: fieldNameToInstanceColumn(req.GetSortingColumn()),
 		},
 		Queries: queries,
 	}, nil
@@ -111,11 +111,11 @@ func instanceQueriesToModel(queries []*instance.Query) (_ []query.SearchQuery, e
 }
 
 func instanceQueryToModel(searchQuery *instance.Query) (query.SearchQuery, error) {
-	switch q := searchQuery.Query.(type) {
+	switch q := searchQuery.GetQuery().(type) {
 	case *instance.Query_IdQuery:
-		return query.NewInstanceIDsListSearchQuery(q.IdQuery.Ids...)
+		return query.NewInstanceIDsListSearchQuery(q.IdQuery.GetIds()...)
 	case *instance.Query_DomainQuery:
-		return query.NewInstanceDomainsListSearchQuery(q.DomainQuery.Domains...)
+		return query.NewInstanceDomainsListSearchQuery(q.DomainQuery.GetDomains()...)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "INST-3m0se", "List.Query.Invalid")
 	}
@@ -123,14 +123,14 @@ func instanceQueryToModel(searchQuery *instance.Query) (query.SearchQuery, error
 
 func CreateInstancePbToSetupInstance(req *instance.CreateInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
 	instance := defaultInstance
-	if trimmed := strings.TrimSpace(req.InstanceName); trimmed != "" {
+	if trimmed := strings.TrimSpace(req.GetInstanceName()); trimmed != "" {
 		instance.InstanceName = trimmed
 		instance.Org.Name = trimmed
 	}
-	if trimmed := strings.TrimSpace(req.CustomDomain); trimmed != "" {
+	if trimmed := strings.TrimSpace(req.GetCustomDomain()); trimmed != "" {
 		instance.CustomDomain = trimmed
 	}
-	if trimmed := strings.TrimSpace(req.FirstOrgName); trimmed != "" {
+	if trimmed := strings.TrimSpace(req.GetFirstOrgName()); trimmed != "" {
 		instance.Org.Name = trimmed
 	}
 
@@ -152,7 +152,7 @@ func CreateInstancePbToSetupInstance(req *instance.CreateInstanceRequest, defaul
 		instance.Org.Machine = nil
 	}
 
-	if lang := language.Make(strings.TrimSpace(req.DefaultLanguage)); !lang.IsRoot() {
+	if lang := language.Make(strings.TrimSpace(req.GetDefaultLanguage())); !lang.IsRoot() {
 		instance.DefaultLanguage = lang
 	}
 
@@ -162,17 +162,17 @@ func CreateInstancePbToSetupInstance(req *instance.CreateInstanceRequest, defaul
 func createInstancePbToAddHuman(req *instance.CreateInstanceRequest_Human, defaultHuman command.AddHuman, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
 	user := defaultHuman
 	if req.Email != nil {
-		user.Email.Address = domain.EmailAddress(strings.TrimSpace(req.Email.Email))
-		user.Email.Verified = req.Email.IsEmailVerified
+		user.Email.Address = domain.EmailAddress(strings.TrimSpace(req.GetEmail().GetEmail()))
+		user.Email.Verified = req.GetEmail().GetIsEmailVerified()
 	}
-	if req.Profile != nil {
-		if firstName := strings.TrimSpace(req.Profile.FirstName); firstName != "" {
+	if req.GetProfile() != nil {
+		if firstName := strings.TrimSpace(req.GetProfile().GetFirstName()); firstName != "" {
 			user.FirstName = firstName
 		}
-		if lastName := strings.TrimSpace(req.Profile.LastName); lastName != "" {
+		if lastName := strings.TrimSpace(req.GetProfile().GetLastName()); lastName != "" {
 			user.LastName = lastName
 		}
-		if lang := strings.TrimSpace(req.Profile.PreferredLanguage); lang != "" {
+		if lang := strings.TrimSpace(req.GetProfile().GetPreferredLanguage()); lang != "" {
 			lang, err := language.Parse(lang)
 			if err == nil {
 				user.PreferredLanguage = lang
@@ -185,13 +185,13 @@ func createInstancePbToAddHuman(req *instance.CreateInstanceRequest_Human, defau
 		orgDomain, _ := domain.NewIAMDomainName(org, externalDomain)
 		user.Username = user.Username + "@" + orgDomain
 	}
-	if username := strings.TrimSpace(req.UserName); username != "" {
+	if username := strings.TrimSpace(req.GetUserName()); username != "" {
 		user.Username = username
 	}
 
-	if req.Password != nil {
-		user.Password = req.Password.Password
-		user.PasswordChangeRequired = req.Password.PasswordChangeRequired
+	if req.GetPassword() != nil {
+		user.Password = req.GetPassword().GetPassword()
+		user.PasswordChangeRequired = req.GetPassword().GetPasswordChangeRequired()
 	}
 	return &user
 }
@@ -205,37 +205,37 @@ func createInstancePbToAddMachine(req *instance.CreateInstanceRequest_Machine, d
 		machine.Machine = &command.Machine{}
 	}
 
-	if username := strings.TrimSpace(req.UserName); username != "" {
+	if username := strings.TrimSpace(req.GetUserName()); username != "" {
 		machine.Machine.Username = username
 	}
-	if name := strings.TrimSpace(req.Name); name != "" {
+	if name := strings.TrimSpace(req.GetName()); name != "" {
 		machine.Machine.Name = name
 	}
 
-	if defaultMachine.Pat != nil || req.PersonalAccessToken != nil {
+	if defaultMachine.Pat != nil || req.GetPersonalAccessToken() != nil {
 		pat := command.AddPat{
 			// Scopes are currently static and can not be overwritten
 			Scopes: []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
 		}
 		if req.GetPersonalAccessToken().GetExpirationDate().IsValid() {
-			pat.ExpirationDate = req.PersonalAccessToken.ExpirationDate.AsTime()
+			pat.ExpirationDate = req.GetPersonalAccessToken().GetExpirationDate().AsTime()
 		} else if defaultMachine.Pat != nil && !defaultMachine.Pat.ExpirationDate.IsZero() {
 			pat.ExpirationDate = defaultMachine.Pat.ExpirationDate
 		}
 		machine.Pat = &pat
 	}
 
-	if defaultMachine.MachineKey != nil || req.MachineKey != nil {
+	if defaultMachine.MachineKey != nil || req.GetMachineKey() != nil {
 		machineKey := command.AddMachineKey{}
 		if defaultMachine.MachineKey != nil {
 			machineKey = *defaultMachine.MachineKey
 		}
-		if req.MachineKey != nil {
-			if req.MachineKey.Type != 0 {
-				machineKey.Type = authn.KeyTypeToDomain(req.MachineKey.Type)
+		if req.GetMachineKey() != nil {
+			if req.GetMachineKey().GetType() != 0 {
+				machineKey.Type = authn.KeyTypeToDomain(req.GetMachineKey().GetType())
 			}
-			if req.MachineKey.ExpirationDate.IsValid() {
-				machineKey.ExpirationDate = req.MachineKey.ExpirationDate.AsTime()
+			if req.GetMachineKey().ExpirationDate.IsValid() {
+				machineKey.ExpirationDate = req.GetMachineKey().GetExpirationDate().AsTime()
 			}
 		}
 		machine.MachineKey = &machineKey
@@ -295,7 +295,7 @@ func domainQueriesToModel(queries []*instance.DomainSearchQuery) (_ []query.Sear
 }
 
 func domainQueryToModel(searchQuery *instance.DomainSearchQuery) (query.SearchQuery, error) {
-	switch q := searchQuery.Query.(type) {
+	switch q := searchQuery.GetQuery().(type) {
 	case *instance.DomainSearchQuery_DomainQuery:
 		return query.NewInstanceDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.GetMethod()), q.DomainQuery.GetDomain())
 	case *instance.DomainSearchQuery_GeneratedQuery:
@@ -341,9 +341,9 @@ func trustedDomainQueriesToModel(queries []*instance.TrustedDomainSearchQuery) (
 }
 
 func trustedDomainQueryToModel(searchQuery *instance.TrustedDomainSearchQuery) (query.SearchQuery, error) {
-	switch q := searchQuery.Query.(type) {
+	switch q := searchQuery.GetQuery().(type) {
 	case *instance.TrustedDomainSearchQuery_DomainQuery:
-		return query.NewInstanceTrustedDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+		return query.NewInstanceTrustedDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.GetMethod()), q.DomainQuery.GetDomain())
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
 	}

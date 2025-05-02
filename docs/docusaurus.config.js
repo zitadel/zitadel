@@ -364,6 +364,14 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
+          instance_v2: {
+            specPath: ".artifacts/openapi/zitadel/instance/v2beta/instance_service.swagger.json",
+            outputDir: "docs/apis/resources/instance_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
         },
       },
     ],
