@@ -1,34 +1,32 @@
 import { Cookie } from "@/lib/cookies";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { createCallback, getLoginSettings } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
 import {
-  CreateCallbackRequestSchema,
-  SessionSchema,
-} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+  authorizeOrDenyDeviceAuthorization,
+  getLoginSettings,
+} from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { NextRequest, NextResponse } from "next/server";
 import { constructUrl } from "./service";
 import { isSessionValid } from "./session";
 
-type LoginWithOIDCAndSession = {
+type LoginWithOIDCandSession = {
   serviceUrl: string;
-  authRequest: string;
+  deviceRequest: string;
   sessionId: string;
   sessions: Session[];
   sessionCookies: Cookie[];
   request: NextRequest;
 };
-export async function loginWithOIDCAndSession({
+export async function loginWithDeviceAndSession({
   serviceUrl,
-  authRequest,
+  deviceRequest,
   sessionId,
   sessions,
   sessionCookies,
   request,
-}: LoginWithOIDCAndSession) {
+}: LoginWithOIDCandSession) {
   console.log(
-    `Login with session: ${sessionId} and authRequest: ${authRequest}`,
+    `Login with session: ${sessionId} and deviceRequest: ${deviceRequest}`,
   );
 
   const selectedSession = sessions.find((s) => s.id === sessionId);
@@ -49,7 +47,7 @@ export async function loginWithOIDCAndSession({
       const command: SendLoginnameCommand = {
         loginName: selectedSession.factors.user?.loginName,
         organization: selectedSession.factors?.user?.organizationId,
-        requestId: `oidc_${authRequest}`,
+        requestId: `device_${deviceRequest}`,
       };
 
       const res = await sendLoginname(command);
@@ -72,19 +70,12 @@ export async function loginWithOIDCAndSession({
 
       // works not with _rsc request
       try {
-        const { callbackUrl } = await createCallback({
+        const authResponse = await authorizeOrDenyDeviceAuthorization({
           serviceUrl,
-          req: create(CreateCallbackRequestSchema, {
-            authRequestId: authRequest,
-            callbackKind: {
-              case: "session",
-              value: create(SessionSchema, session),
-            },
-          }),
+          deviceAuthorizationId: deviceRequest,
+          session,
         });
-        if (callbackUrl) {
-          return NextResponse.redirect(callbackUrl);
-        } else {
+        if (!authResponse) {
           return NextResponse.json(
             { error: "An error occurred!" },
             { status: 500 },

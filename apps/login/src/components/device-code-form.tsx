@@ -15,7 +15,7 @@ type Inputs = {
   userCode: string;
 };
 
-export function DeviceCodeForm() {
+export function DeviceCodeForm({ userCode }: { userCode?: string }) {
   const t = useTranslations("verify");
 
   const router = useRouter();
@@ -23,7 +23,7 @@ export function DeviceCodeForm() {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
-      userCode: "",
+      userCode: userCode || "",
     },
   });
 
@@ -36,21 +36,25 @@ export function DeviceCodeForm() {
 
     const response = await getDeviceAuthorizationRequest(value.userCode)
       .catch(() => {
-        setError("Could not verify user");
+        setError("Could not complete the request");
         return;
       })
       .finally(() => {
         setLoading(false);
       });
 
-    if (response && "error" in response && response?.error) {
-      setError(response.error);
+    if (!response || !response.deviceAuthorizationRequest?.id) {
+      setError("Could not complete the request");
       return;
     }
 
-    if (response && "redirect" in response && response?.redirect) {
-      return router.push(response?.redirect);
-    }
+    return router.push(
+      `/device/consent?` +
+        new URLSearchParams({
+          requestId: `device_${response.deviceAuthorizationRequest.id}`,
+          user_code: value.userCode,
+        }).toString(),
+    );
   }
 
   return (

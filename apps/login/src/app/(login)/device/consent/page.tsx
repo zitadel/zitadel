@@ -1,7 +1,11 @@
-import { DeviceCodeForm } from "@/components/device-code-form";
+import { ConsentScreen } from "@/components/consent";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { getServiceUrlFromHeaders } from "@/lib/service";
-import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
+import {
+  getBrandingSettings,
+  getDefaultOrg,
+  getDeviceAuthorizationRequest,
+} from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -14,10 +18,20 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "device" });
 
   const userCode = searchParams?.user_code;
+  const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
+
+  if (!userCode || !requestId) {
+    return <div>{t("error.no_user_code")}</div>;
+  }
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({
+    serviceUrl,
+    userCode,
+  });
 
   let defaultOrganization;
   if (!organization) {
@@ -35,13 +49,16 @@ export default async function Page(props: {
   });
 
   return (
-    <DynamicTheme branding={branding}>
+    <DynamicTheme
+      branding={branding}
+      appName={deviceAuthorizationRequest?.appName}
+    >
       <div className="flex flex-col items-center space-y-4">
         {!userCode && (
           <>
             <h1>{t("usercode.title")}</h1>
             <p className="ztdl-p">{t("usercode.description")}</p>
-            <DeviceCodeForm userCode={userCode}></DeviceCodeForm>
+            <ConsentScreen scope={deviceAuthorizationRequest?.scope} />
           </>
         )}
       </div>

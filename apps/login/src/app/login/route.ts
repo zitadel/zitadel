@@ -1,7 +1,8 @@
 import { getAllSessions } from "@/lib/cookies";
+import { loginWithDeviceAndSession } from "@/lib/device";
 import { idpTypeToSlug } from "@/lib/idp";
-import { loginWithOIDCandSession } from "@/lib/oidc";
-import { loginWithSAMLandSession } from "@/lib/saml";
+import { loginWithOIDCAndSession } from "@/lib/oidc";
+import { loginWithSAMLAndSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl, getServiceUrlFromHeaders } from "@/lib/service";
 import { findValidSession } from "@/lib/session";
@@ -107,7 +108,7 @@ export async function GET(request: NextRequest) {
   if (requestId && sessionId) {
     if (requestId.startsWith("oidc_")) {
       // this finishes the login process for OIDC
-      return loginWithOIDCandSession({
+      return loginWithOIDCAndSession({
         serviceUrl,
         authRequest: requestId.replace("oidc_", ""),
         sessionId,
@@ -117,9 +118,18 @@ export async function GET(request: NextRequest) {
       });
     } else if (requestId.startsWith("saml_")) {
       // this finishes the login process for SAML
-      return loginWithSAMLandSession({
+      return loginWithSAMLAndSession({
         serviceUrl,
         samlRequest: requestId.replace("saml_", ""),
+        sessionId,
+        sessions,
+        sessionCookies,
+        request,
+      });
+    } else if (requestId.startsWith("device_")) {
+      return loginWithDeviceAndSession({
+        serviceUrl,
+        deviceRequest: requestId.replace("device_", ""),
         sessionId,
         sessions,
         sessionCookies,

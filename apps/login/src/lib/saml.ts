@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { constructUrl } from "./service";
 import { isSessionValid } from "./session";
 
-type LoginWithSAMLandSession = {
+type LoginWithSAMLAndSession = {
   serviceUrl: string;
   samlRequest: string;
   sessionId: string;
@@ -17,14 +17,14 @@ type LoginWithSAMLandSession = {
   request: NextRequest;
 };
 
-export async function loginWithSAMLandSession({
+export async function loginWithSAMLAndSession({
   serviceUrl,
   samlRequest,
   sessionId,
   sessions,
   sessionCookies,
   request,
-}: LoginWithSAMLandSession) {
+}: LoginWithSAMLAndSession) {
   console.log(
     `Login with session: ${sessionId} and samlRequest: ${samlRequest}`,
   );
