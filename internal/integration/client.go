@@ -672,6 +672,23 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
+func (i *Instance) CreateIntentSession(t *testing.T, ctx context.Context, userID, intentID, intentToken string) (id, token string, start, change time.Time) {
+	createResp, err := i.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: intentToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), createResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
+}
+
 func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *mgmt.AddProjectGrantResponse {
 	resp, err := i.Client.Mgmt.AddProjectGrant(ctx, &mgmt.AddProjectGrantRequest{
 		GrantedOrgId: grantedOrgID,

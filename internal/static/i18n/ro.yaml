@@ -537,6 +537,7 @@ Errors:
         StateMissing: Parametrul de stare lipsește în cerere
         NotStarted: Intenția nu este pornită sau a fost deja terminată
         NotSucceeded: Intenția nu a reușit
+        Expired: Intenția a expirat
         TokenCreationFailed: Crearea token-ului a eșuat
         InvalidToken: Token-ul intenției este invalid
         OtherUser: Intenția este destinată altui utilizator
