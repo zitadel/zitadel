@@ -536,6 +536,7 @@ Errors:
     StateMissing: Staat parameter ontbreekt in het verzoek
     NotStarted: Intentie is niet gestart of was al beëindigd
     NotSucceeded: Intentie is niet geslaagd
+    Expired: Intentie is verlopen
     TokenCreationFailed: Token aanmaken mislukt
     InvalidToken: Intentie Token is ongeldig
     OtherUser: Intentie bedoeld voor een andere gebruiker
