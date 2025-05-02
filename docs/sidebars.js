@@ -613,6 +613,7 @@ module.exports = {
       collapsed: true,
       items: [
         "product/roadmap",
+        "product/release-cycle",
       ],
     },
     {
