@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	_ "embed"
-	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -271,9 +270,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
-		return errors.New("notifications must be set to LegacyEnabled=true when using CockroachDB")
-	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
