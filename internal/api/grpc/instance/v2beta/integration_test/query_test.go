@@ -216,3 +216,84 @@ func TestListCustomDomains(t *testing.T) {
 		})
 	}
 }
+
+func TestListTrustedDomains(t *testing.T) {
+	inst := integration.NewInstance(CTXWithSysAuthZ)
+	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	d1, d2 := "trusted-domain.one", "trusted-domain.two"
+
+	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(CTXWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d1})
+	require.Nil(t, err)
+	_, err = inst.Client.InstanceV2Beta.AddTrustedDomain(CTXWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d2})
+	require.Nil(t, err)
+
+	t.Cleanup(func() {
+		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	})
+
+	tt := []struct {
+		testName          string
+		inputRequest      *instance.ListTrustedDomainsRequest
+		inputContext      context.Context
+		expectedErrorMsg  string
+		expectedErrorCode codes.Code
+		expectedDomains   []string
+	}{
+		{
+			testName: "when invalid context should return unauthN error",
+			inputRequest: &instance.ListTrustedDomainsRequest{
+				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
+			},
+			inputContext:      context.Background(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName: "when unauthZ context should return unauthZ error",
+			inputRequest: &instance.ListTrustedDomainsRequest{
+				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
+			},
+			inputContext:      orgOwnerCtx,
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+		},
+		{
+			testName: "when valid request with filter should return paginated response",
+			inputRequest: &instance.ListTrustedDomainsRequest{
+				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE,
+				Queries: []*instance.TrustedDomainSearchQuery{
+					{
+						Query: &instance.TrustedDomainSearchQuery_DomainQuery{
+							DomainQuery: &instance.DomainQuery{Domain: "trusted", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
+						},
+					},
+				},
+			},
+			inputContext:    CTXWithSysAuthZ,
+			expectedDomains: []string{d1, d2},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Test
+			res, err := inst.Client.InstanceV2Beta.ListTrustedDomains(tc.inputContext, tc.inputRequest)
+
+			// Verify
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+			if tc.expectedErrorMsg == "" {
+				require.NotNil(t, res)
+
+				domains := []string{}
+				for _, d := range res.GetResult() {
+					domains = append(domains, d.GetDomain())
+				}
+
+				assert.Subset(t, domains, tc.expectedDomains)
+			}
+		})
+	}
+}
