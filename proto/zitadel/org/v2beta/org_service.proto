@@ -109,7 +109,7 @@ service OrganizationService {
   // Create a new organization and grant the user(s) permission to manage it
   rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organizations"
+      post: "/v2beta/organization"
       body: "*"
     };
 
@@ -136,7 +136,7 @@ service OrganizationService {
 
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
     option (google.api.http) = {
-      put: "/v2beta/organizations"
+      put: "/v2beta/organization"
       body: "*"
     };
 
@@ -162,75 +162,75 @@ service OrganizationService {
     };
   }
 
-    rpc GetOrganizationByID(GetOrganizationByIDRequest) returns (GetOrganizationByIDResponse) {
-      option (google.api.http) = {
-        get: "/v2beta/organizations"
-      };
+  rpc GetOrganizationByID(GetOrganizationByIDRequest) returns (GetOrganizationByIDResponse) {
+    option (google.api.http) = {
+      get: "/v2beta/organization"
+    };
 
-      option (zitadel.protoc_gen_zitadel.v2.options) = {
-        auth_option: {
-          permission: "iam.read";
-        }
-        http_response: {
-          success_code: 200
-        }
-      };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.read";
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
 
-      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-        tags: "Organizations";
-        summary: "Get Organization By ID";
-        description: "Returns an organization by its ID."
-        responses: {
-            key: "200";
-            value: {
-                description: "requested organization found";
-            };
-        };
-      };
-    }
-
-    rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
-      option (google.api.http) = {
-          post: "/v2beta/organizations/_search";
-          body: "*";
-      };
-
-      option (zitadel.protoc_gen_zitadel.v2.options) = {
-        auth_option: {
-          permission: "iam.read";
-        }
-        http_response: {
-          success_code: 200
-        }
-      };
-
-      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-        tags: "Organizations";
-        summary: "Search Organization";
-        description: "Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition."
-        responses: {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Get Organization By ID";
+      description: "Returns an organization by its ID."
+      responses: {
           key: "200";
           value: {
-            description: "list of organizations matching the query";
+              description: "requested organization found";
           };
+      };
+    };
+  }
+
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
+    option (google.api.http) = {
+        post: "/v2beta/organization/_search";
+        body: "*";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.read";
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Search Organization";
+      description: "Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition."
+      responses: {
+        key: "200";
+        value: {
+          description: "list of organizations matching the query";
         };
-        responses: {
-          key: "400";
-          value: {
-            description: "invalid list query";
-            schema: {
-              json_schema: {
-                ref: "#/definitions/rpcStatus";
-              };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
             };
           };
         };
       };
-    }
+    };
+  }
 
   rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
     option (google.api.http) = {
-        delete: "/v2beta/organizations"
+        delete: "/v2beta/organization"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -268,7 +268,7 @@ service OrganizationService {
 
   rpc DeactivateOrganization(DeactivateOrganizationRequest) returns (DeactivateOrganizationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/_deactivate"
+      post: "/v2beta/organization/_deactivate"
       body: "*"
     };
 
@@ -298,7 +298,7 @@ service OrganizationService {
 
   rpc ReactivateOrganization(ReactivateOrganizationRequest) returns (ReactivateOrganizationResponse) {
     option (google.api.http) = {
-        post: "/orgs/me/_reactivate"
+        post: "/v2beta/organization/_reactivate"
         body: "*"
     };
 
@@ -319,6 +319,250 @@ service OrganizationService {
         headers: {
           name: "x-zitadel-orgid";
           description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+          type: STRING,
+          required: false;
+        };
+      };
+    };
+  }
+
+  // rpc SetOrganizationMetadata(SetOrganizationMetadataRequest) returns (SetOrganizationMetadataResponse) {
+  //   option (google.api.http) = {
+  //     post: "/v2beta/organization//metadata/{key}"
+  //     body: "*"
+  //   };
+
+  //   option (zitadel.protoc_gen_zitadel.v2.options) = {
+  //     auth_option: {
+  //       permission: "org.write"
+  //     }
+  //     http_response: {
+  //       success_code: 200
+  //     }
+  //   };
+
+  //   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+  //     tags: "Organizations";
+  //     tags: "Organization Metadata";
+  //     summary: "Set Organization Metadata";
+  //     description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
+  //     parameters: {
+  //       headers: {
+  //         name: "x-zitadel-orgid";
+  //         description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+  //         type: STRING,
+  //         required: false;
+  //       };
+  //     };
+  //   };
+  // }
+
+    // rpc BulkSetOrganizationMetadata(BulkSetOrganizationMetadataRequest) returns (BulkSetOrganizationMetadataResponse) {
+    //     option (google.api.http) = {
+    //         post: "/metadata/_bulk"
+    //         body: "*"
+    //     };
+
+    //     option (zitadel.v1.auth_option) = {
+    //         permission: "org.write"
+    //     };
+
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         tags: "Organizations";
+    //         tags: "Organization Metadata";
+    //         summary: "Bulk Set Organization Metadata";
+    //         description: "This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded."
+    //         parameters: {
+    //             headers: {
+    //                 name: "x-zitadel-orgid";
+    //                 description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+    //                 type: STRING,
+    //                 required: false;
+    //             };
+    //         };
+    //     };
+    // }
+
+    // rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
+    //     option (google.api.http) = {
+    //         post: "/metadata/_search"
+    //         body: "*"
+    //     };
+
+    //     option (zitadel.v1.auth_option) = {
+    //         permission: "org.read"
+    //     };
+
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         tags: "Organizations";
+    //         tags: "Organization Metadata";
+    //         summary: "Search Organization Metadata";
+    //         description: "Get the metadata of an organization filtered by your query."
+    //         parameters: {
+    //             headers: {
+    //                 name: "x-zitadel-orgid";
+    //                 description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+    //                 type: STRING,
+    //                 required: false;
+    //             };
+    //         };
+    //     };
+    // }
+
+    // rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
+    //     option (google.api.http) = {
+    //         get: "/metadata/{key}"
+    //     };
+
+    //     option (zitadel.v1.auth_option) = {
+    //         permission: "org.read"
+    //     };
+
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         tags: "Organizations";
+    //         tags: "Organization Metadata";
+    //         summary: "Get Organization Metadata By Key";
+    //         description: "Get a metadata object from an organization by a specific key."
+    //         parameters: {
+    //             headers: {
+    //                 name: "x-zitadel-orgid";
+    //                 description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+    //                 type: STRING,
+    //                 required: false;
+    //             };
+    //         };
+    //     };
+    // }
+
+    // rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
+    //     option (google.api.http) = {
+    //         delete: "/metadata/{key}"
+    //     };
+
+    //     option (zitadel.v1.auth_option) = {
+    //         permission: "org.write"
+    //     };
+
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         tags: "Organizations";
+    //         tags: "Organization Metadata";
+    //         summary: "Delete Organization Metadata By Key";
+    //         description: "Remove a metadata object from an organization with a specific key."
+    //         parameters: {
+    //             headers: {
+    //                 name: "x-zitadel-orgid";
+    //                 description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+    //                 type: STRING,
+    //                 required: false;
+    //             };
+    //         };
+    //     };
+    // }
+
+    // rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
+    //     option (google.api.http) = {
+    //         delete: "/metadata/_bulk"
+    //         body: "*"
+    //     };
+
+    //     option (zitadel.v1.auth_option) = {
+    //         permission: "org.write"
+    //     };
+
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         tags: "Organizations";
+    //         tags: "Organization Metadata";
+    //         summary: "Bulk Delete Metadata";
+    //         description: "Remove a list of metadata objects from an organization with a list of keys."
+    //         parameters: {
+    //             headers: {
+    //                 name: "x-zitadel-orgid";
+    //                 description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+    //                 type: STRING,
+    //                 required: false;
+    //             };
+    //         };
+    //     };
+    // }
+
+    // rpc ListOrganizationDomains(ListOrganizationDomainsRequest) returns (ListOrganizationDomainsResponse) {
+    //     option (google.api.http) = {
+    //         post: "/orgs/me/domains/_search"
+    //         body: "*"
+    //     };
+
+    //     option (zitadel.v1.auth_option) = {
+    //         permission: "org.read"
+    //     };
+
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         tags: "Organizations";
+    //         summary: "Search Domains";
+    //         description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
+    //         parameters: {
+    //             headers: {
+    //                 name: "x-zitadel-orgid";
+    //                 description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+    //                 type: STRING,
+    //                 required: false;
+    //             };
+    //         };
+    //     };
+    // }
+
+  rpc AddOrganizationDomain(AddOrganizationDomainRequest) returns (AddOrganizationDomainResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/organization/domains"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Add Domain";
+      description: "Add a new domain to an organization. The domains are used to identify to which organization a user belongs."
+      parameters: {
+        headers: {
+          name: "x-zitadel-orgid";
+          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+          type: STRING,
+          required: false;
+        };
+      };
+    };
+  }
+
+  rpc ListOrganizationDomains(ListOrganizationDomainsRequest) returns (ListOrganizationDomainsResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/organization/domains/_search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.read"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Organizations";
+      summary: "Search Domains";
+      description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
+      parameters: {
+        headers: {
+          name: "x-zitadel-orgid";
+          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
           type: STRING,
           required: false;
         };
@@ -478,4 +722,57 @@ message ReactivateOrganizationRequest {
 
 message ReactivateOrganizationResponse {
   zitadel.object.v2beta.Details details = 1;
+}
+
+// message SetOrganizationMetadataRequest {
+//     string key = 1 [
+//         (validate.rules).string = {min_len: 1, max_len: 200},
+//         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+//             example: "\"key1\"";
+//             min_length: 1,
+//             max_length: 200;
+//         }
+//     ];
+//     bytes value = 2 [
+//         (validate.rules).bytes = {min_len: 1, max_len: 500000},
+//         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+//             description: "The value has to be base64 encoded.";
+//             example: "\"VGhpcyBpcyBteSB0ZXN0IHZhbHVl\"";
+//             min_length: 1,
+//             max_length: 500000;
+//         }
+//     ];
+// }
+
+// message SetOrganizationMetadataResponse {
+//     zitadel.v1.ObjectDetails details = 1;
+// }
+
+message AddOrganizationDomainRequest {
+  string organization_id = 1;
+    string domain = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
+          max_length: 200;
+          example: "\"testdomain.com\"";
+      }
+    ];
+}
+
+message AddOrganizationDomainResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message ListOrganizationDomainsRequest {
+  //list limitations and ordering
+  zitadel.object.v2beta.ListQuery query = 1;
+  //criteria the client is looking for
+  repeated DomainSearchQuery queries = 2;
+}
+
+message ListOrganizationDomainsResponse {
+  zitadel.object.v2beta.ListDetails details = 1;
+  repeated Domain result = 2;
 }

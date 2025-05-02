@@ -3,9 +3,11 @@ package org
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
@@ -89,6 +91,51 @@ func (s *Server) ReactivateOrganization(ctx context.Context, request *org.Reacti
 	}, err
 }
 
+func (s *Server) AddOrganizationDomain(ctx context.Context, request *org.AddOrganizationDomainRequest) (*org.AddOrganizationDomainResponse, error) {
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.AddOrgDomain(ctx, request.OrganizationId, request.Domain, userIDs)
+	if err != nil {
+		return nil, err
+	}
+	return &org.AddOrganizationDomainResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrganizationDomainsRequest) (*org.ListOrganizationDomainsResponse, error) {
+	queries, err := ListOrgDomainsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries.Queries = append(queries.Queries, orgIDQuery)
+
+	domains, err := s.query.SearchOrgDomains(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	return &org.ListOrganizationDomainsResponse{
+		Result:  object.DomainsToPb(domains.Domains),
+		Details: object.ToListDetails(domains.SearchResponse),
+	}, nil
+}
+
+// func (s *Server) RemoveOrganizagtionDomain(ctx context.Context, req *mgmt_pb.RemoveOrgDomainRequest) (*mgmt_pb.RemoveOrgDomainResponse, error) {
+// 	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req))
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &mgmt_pb.RemoveOrgDomainResponse{
+// 		Details: object.DomainToChangeDetailsPb(details),
+// 	}, err
+// }
+
 func createOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRequest) (*command.OrgSetup, error) {
 	admins, err := createOrganizationRequestAdminsToCommand(request.GetAdmins())
 	if err != nil {
@@ -131,4 +178,29 @@ func createOrganizationRequestAdminToCommand(admin *v2beta_org.CreateOrganizatio
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganization not implemented", a)
 	}
+}
+
+func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
+	queries := make([]query.SearchQuery, 0, 2)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, loginName)
+	if orgID != "" {
+		owner, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextNotEquals)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, owner)
+	}
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, nil)
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Users))
+	for i, user := range users.Users {
+		userIDs[i] = user.ID
+	}
+	return userIDs, nil
 }

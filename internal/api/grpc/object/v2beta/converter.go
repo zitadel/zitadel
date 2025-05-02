@@ -2,6 +2,7 @@ package object
 
 import (
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -9,7 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	// object_pb "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+
+	org_pb "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
@@ -81,4 +83,58 @@ func ListQueryToModel(query *object.ListQuery) (offset, limit uint64, asc bool) 
 		return 0, 0, false
 	}
 	return query.Offset, uint64(query.Limit), query.Asc
+}
+
+func DomainsToPb(domains []*query.Domain) []*org_pb.Domain {
+	d := make([]*org_pb.Domain, len(domains))
+	for i, domain := range domains {
+		d[i] = DomainToPb(domain)
+	}
+	return d
+}
+
+func DomainToPb(d *query.Domain) *org_pb.Domain {
+	return &org_pb.Domain{
+		OrgId:          d.OrgID,
+		DomainName:     d.Domain,
+		IsVerified:     d.IsVerified,
+		IsPrimary:      d.IsPrimary,
+		ValidationType: DomainValidationTypeFromModel(d.ValidationType),
+		Details: ToViewDetailsPb(
+			d.Sequence,
+			d.CreationDate,
+			d.ChangeDate,
+			d.OrgID,
+		),
+	}
+}
+
+func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType) org_pb.DomainValidationType {
+	switch validationType {
+	case domain.OrgDomainValidationTypeDNS:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS
+	case domain.OrgDomainValidationTypeHTTP:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP
+	default:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
+	}
+}
+
+func ToViewDetailsPb(
+	sequence uint64,
+	creationDate,
+	changeDate time.Time,
+	resourceOwner string,
+) *object.Details {
+	details := &object.Details{
+		Sequence:      sequence,
+		ResourceOwner: resourceOwner,
+	}
+	if !creationDate.IsZero() {
+		details.CreationDate = timestamppb.New(creationDate)
+	}
+	if !changeDate.IsZero() {
+		details.ChangeDate = timestamppb.New(changeDate)
+	}
+	return details
 }

@@ -53,14 +53,14 @@ func OrganizationViewToPb(org *query.Org) *org_pb.Organization {
 	}
 }
 
-func OrgStateToPb(state domain.OrgState) org_pb.OrganizationState {
+func OrgStateToPb(state domain.OrgState) org_pb.OrgState {
 	switch state {
 	case domain.OrgStateActive:
-		return org_pb.OrganizationState_ORGANIZATION_STATE_ACTIVE
+		return org_pb.OrgState_ORG_STATE_ACTIVE
 	case domain.OrgStateInactive:
-		return org_pb.OrganizationState_ORGANIZATION_STATE_INACTIVE
+		return org_pb.OrgState_ORG_STATE_INACTIVE
 	default:
-		return org_pb.OrganizationState_ORGANIZATION_STATE_UNSPECIFIED
+		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
 	}
 }
 
@@ -169,5 +169,51 @@ func OrgViewToPb(org *query.Org) *org_pb.Organization {
 			org.ChangeDate,
 			org.ResourceOwner,
 		),
+	}
+}
+
+func ListOrgDomainsRequestToModel(req *org.ListOrganizationDomainsRequest) (*query.OrgDomainSearchQueries, error) {
+	offset, limit, asc := ListQueryToModel(req.Query)
+	// queries, err := org_grpc.DomainQueriesToModel(req.Queries)
+	queries, err := DomainQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.OrgDomainSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		// SortingColumn: //TODO: sorting
+		Queries: queries,
+	}, nil
+}
+
+func ListQueryToModel(query *v2beta.ListQuery) (offset, limit uint64, asc bool) {
+	if query == nil {
+		return 0, 0, false
+	}
+	return query.Offset, uint64(query.Limit), query.Asc
+}
+
+func DomainQueriesToModel(queries []*org_pb.DomainSearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = DomainQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func DomainQueryToModel(searchQuery *org_pb.DomainSearchQuery) (query.SearchQuery, error) {
+	switch q := searchQuery.Query.(type) {
+	case *org_pb.DomainSearchQuery_DomainNameQuery:
+		// return query.NewOrgDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainNameQuery.Method), q.DomainNameQuery.Name)
+		return query.NewOrgDomainDomainSearchQuery(v2beta_object.TextMethodToQuery(q.DomainNameQuery.Method), q.DomainNameQuery.Name)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Ags89", "List.Query.Invalid")
 	}
 }
