@@ -3,6 +3,7 @@ package org
 import (
 	"context"
 
+	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
@@ -67,6 +68,41 @@ func (s *Server) DeleteOrganization(ctx context.Context, request *v2beta_org.Del
 	}
 	return &v2beta_org.DeleteOrganizationResponse{
 		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) SetOrganizationMetadata(ctx context.Context, request *v2beta_org.SetOrganizationMetadataRequest) (*v2beta_org.SetOrganizationMetadataResponse, error) {
+	result, err := s.command.BulkSetOrgMetadata(ctx, request.Id, BulkSetOrgMetadataToDomain(request)...)
+	if err != nil {
+		return nil, err
+	}
+	return &org.SetOrganizationMetadataResponse{
+		Details: object.DomainToDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) ListOrganizationMetadata(ctx context.Context, request *v2beta_org.ListOrganizationMetadataRequest) (*v2beta_org.ListOrganizationMetadataResponse, error) {
+	metadataQueries, err := ListOrgMetadataToDomain(request)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchOrgMetadata(ctx, true, request.Id, metadataQueries, false)
+	if err != nil {
+		return nil, err
+	}
+	return &v2beta_org.ListOrganizationMetadataResponse{
+		Result:  metadata.OrgMetadataListToPb(res.Metadata),
+		Details: object.ToListDetails(res.SearchResponse),
+	}, nil
+}
+
+func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *v2beta_org.DeleteOrganizationMetadataRequest) (*v2beta_org.DeleteOrganizationMetadataResponse, error) {
+	result, err := s.command.BulkRemoveOrgMetadata(ctx, request.Id, request.Keys...)
+	if err != nil {
+		return nil, err
+	}
+	return &v2beta_org.DeleteOrganizationMetadataResponse{
+		Details: object.DomainToChangeDetailsPb(result),
 	}, nil
 }
 

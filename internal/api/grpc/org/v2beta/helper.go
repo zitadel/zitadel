@@ -2,9 +2,8 @@ package org
 
 import (
 	"context"
-	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	v2beta_object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -17,8 +16,6 @@ import (
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // NOTE: most of this code is copied from `internal/api/grpc/admin/*`, as we will eventually axe the previous versons of the API,
@@ -47,7 +44,7 @@ func OrganizationViewToPb(org *query.Org) *v2beta_org.Organization {
 		State:         OrgStateToPb(org.State),
 		Name:          org.Name,
 		PrimaryDomain: org.Domain,
-		Details: ToViewDetailsPb(
+		Details: v2beta_object.ToViewDetailsPb(
 			org.Sequence,
 			org.CreationDate,
 			org.ChangeDate,
@@ -65,25 +62,6 @@ func OrgStateToPb(state domain.OrgState) v2beta_org.OrgState {
 	default:
 		return v2beta_org.OrgState_ORG_STATE_UNSPECIFIED
 	}
-}
-
-func ToViewDetailsPb(
-	sequence uint64,
-	creationDate,
-	changeDate time.Time,
-	resourceOwner string,
-) *v2beta.Details {
-	details := &v2beta.Details{
-		Sequence:      sequence,
-		ResourceOwner: resourceOwner,
-	}
-	if !creationDate.IsZero() {
-		details.CreationDate = timestamppb.New(creationDate)
-	}
-	if !changeDate.IsZero() {
-		details.ChangeDate = timestamppb.New(changeDate)
-	}
-	return details
 }
 
 func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrganizationResponse, err error) {
@@ -166,7 +144,7 @@ func OrgViewToPb(org *query.Org) *v2beta_org.Organization {
 		State:         OrgStateToPb(org.State),
 		Name:          org.Name,
 		PrimaryDomain: org.Domain,
-		Details: ToViewDetailsPb(
+		Details: v2beta_object.ToViewDetailsPb(
 			org.Sequence,
 			org.CreationDate,
 			org.ChangeDate,
@@ -243,8 +221,35 @@ func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *v2beta
 func ValidateOrgDomainRequestToDomain(ctx context.Context, req *v2beta_org.VerifyOrganizationDomainRequest) *domain.OrgDomain {
 	return &domain.OrgDomain{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: authz.GetCtxData(ctx).OrgID,
+			AggregateID: req.OrganizationId,
 		},
 		Domain: req.Domain,
 	}
+}
+
+func BulkSetOrgMetadataToDomain(req *v2beta_org.SetOrganizationMetadataRequest) []*domain.Metadata {
+	metadata := make([]*domain.Metadata, len(req.Metadata))
+	for i, data := range req.Metadata {
+		metadata[i] = &domain.Metadata{
+			Key:   data.Key,
+			Value: data.Value,
+		}
+	}
+	return metadata
+}
+
+func ListOrgMetadataToDomain(request *v2beta_org.ListOrganizationMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
+	offset, limit, asc := v2beta_object.ListQueryToModel(request.Query)
+	queries, err := metadata.OrgMetadataQueriesToQuery(request.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.OrgMetadataSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
 }

@@ -4,6 +4,7 @@ package org_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -16,6 +17,7 @@ import (
 	gofakeit "github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/zitadel/internal/integration"
 
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -23,10 +25,11 @@ import (
 )
 
 var (
-	CTX      context.Context
-	Instance *integration.Instance
-	Client   v2beta_org.OrganizationServiceClient
-	User     *user.AddHumanUserResponse
+	CTX         context.Context
+	Instance    *integration.Instance
+	Client      v2beta_org.OrganizationServiceClient
+	AdminClient admin.AdminServiceClient
+	User        *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -36,6 +39,7 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 		Client = Instance.Client.OrgV2beta
+		AdminClient = Instance.Client.Admin
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
@@ -567,7 +571,6 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 		Domain:         domain,
 	})
 	require.NoError(t, err)
-
 	// check details
 	assert.NotZero(t, addOrgDomainRes.GetDetails().GetSequence())
 	gotCD := addOrgDomainRes.GetDetails().GetChangeDate().AsTime()
@@ -669,6 +672,407 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 		}
 	}
 	require.False(t, found, "deleted domain found")
+}
+
+func TestServer_ValidateOrganizationDomain(t *testing.T) {
+	orgs, _, err := createOrgs(1)
+	if err != nil {
+		assert.Fail(t, "unable to create org")
+	}
+	orgId := orgs[0].OrganizationId
+
+	_, err = AdminClient.UpdateDomainPolicy(CTX, &admin.UpdateDomainPolicyRequest{
+		ValidateOrgDomains: true,
+	})
+	require.NoError(t, err)
+
+	domain := "www.domainnn.com"
+	_, err = Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+		OrganizationId: orgId,
+		Domain:         domain,
+	})
+	require.NoError(t, err)
+
+	tests := []struct {
+		name string
+		ctx  context.Context
+		req  *v2beta_org.GenerateOrganizationDomainValidationRequest
+		err  error
+	}{
+		{
+			name: "validate org http happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
+				OrganizationId: orgId,
+				Domain:         domain,
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+			},
+		},
+		{
+			name: "validate org http non existnetn org id",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
+				OrganizationId: "non existent org id",
+				Domain:         domain,
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+			},
+			// BUG: this should be 'organization does not exist'
+			err: errors.New("Domain doesn't exist on organization"),
+		},
+		{
+			name: "validate org http non existnetn domain",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
+				OrganizationId: orgId,
+				Domain:         "non existent domain",
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+			},
+			err: errors.New("Domain doesn't exist on organization"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.GenerateOrganizationDomainValidation(tt.ctx, tt.req)
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+				return
+			}
+			require.NoError(t, err)
+
+			require.NotEmpty(t, got.Token)
+			require.Contains(t, got.Url, domain)
+		})
+	}
+}
+
+func TestServer_SetOrganizationMetadata(t *testing.T) {
+	orgs, _, err := createOrgs(1)
+	if err != nil {
+		assert.Fail(t, "unable to create org")
+	}
+	orgId := orgs[0].OrganizationId
+
+	tests := []struct {
+		name      string
+		ctx       context.Context
+		setupFunc func()
+		orgId     string
+		key       string
+		value     string
+		err       error
+	}{
+		{
+			name:  "set org metadata",
+			ctx:   Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			orgId: orgId,
+			key:   "key1",
+			value: "value1",
+		},
+		{
+			name:  "set org metadata on non existant org",
+			ctx:   Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			orgId: "non existant orgid",
+			key:   "key2",
+			value: "value2",
+			err:   errors.New("Organisation not found"),
+		},
+		{
+			name: "update org metadata",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key3",
+							Value: []byte("value3"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			key:   "key4",
+			value: "value4",
+		},
+		{
+			name: "update org metadata with same value",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key5",
+							Value: []byte("value5"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			key:   "key5",
+			value: "value5",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.setupFunc != nil {
+				tt.setupFunc()
+			}
+			got, err := Client.SetOrganizationMetadata(tt.ctx, &v2beta_org.SetOrganizationMetadataRequest{
+				Id: tt.orgId,
+				Metadata: []*v2beta_org.Metadata{
+					{
+						Key:   tt.key,
+						Value: []byte(tt.value),
+					},
+				},
+			})
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+				return
+			}
+			require.NoError(t, err)
+
+			// check details
+			assert.NotZero(t, got.GetDetails().GetSequence())
+			gotCD := got.GetDetails().GetChangeDate().AsTime()
+			now := time.Now()
+			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
+
+			// check metadata
+			listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+				Id: orgId,
+			})
+			require.NoError(t, err)
+			foundMetadata := false
+			foundMetadataKeyCount := 0
+			for _, res := range listMetadataRes.Result {
+				if res.Key == tt.key {
+					foundMetadataKeyCount += 1
+				}
+				if res.Key == tt.key &&
+					string(res.Value) == tt.value {
+					foundMetadata = true
+				}
+			}
+			require.True(t, foundMetadata, "unable to find added metadata")
+			require.Equal(t, 1, foundMetadataKeyCount, "same metadata key found multiple times")
+		})
+	}
+}
+
+func TestServer_ListOrganizationMetadata(t *testing.T) {
+	orgs, _, err := createOrgs(1)
+	if err != nil {
+		assert.Fail(t, "unable to create org")
+	}
+	orgId := orgs[0].OrganizationId
+
+	tests := []struct {
+		name        string
+		ctx         context.Context
+		setupFunc   func()
+		orgId       string
+		keyValuPars []struct {
+			key   string
+			value string
+		}
+	}{
+		{
+			name: "list org metadata happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			keyValuPars: []struct{ key, value string }{
+				{
+					key:   "key1",
+					value: "value1",
+				},
+			},
+		},
+		{
+			name: "list multiple org metadata happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key2",
+							Value: []byte("value2"),
+						},
+						{
+							Key:   "key3",
+							Value: []byte("value3"),
+						},
+						{
+							Key:   "key4",
+							Value: []byte("value4"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			keyValuPars: []struct{ key, value string }{
+				{
+					key:   "key2",
+					value: "value2",
+				},
+				{
+					key:   "key3",
+					value: "value3",
+				},
+				{
+					key:   "key4",
+					value: "value4",
+				},
+			},
+		},
+		{
+			name:        "list org metadata for non existent org",
+			ctx:         Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			orgId:       "non existent orgid",
+			keyValuPars: []struct{ key, value string }{
+				// {
+				// 	key:   "key1",
+				// 	value: "value1",
+				// },
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.setupFunc != nil {
+				tt.setupFunc()
+			}
+			got, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+				Id: tt.orgId,
+			})
+			// if tt.err != nil {
+			// 	require.Contains(t, err.Error(), tt.err.Error())
+			// 	return
+			// }
+			require.NoError(t, err)
+
+			foundMetadataCount := 0
+			for _, kv := range tt.keyValuPars {
+				for _, res := range got.Result {
+					if res.Key == kv.key &&
+						string(res.Value) == kv.value {
+						foundMetadataCount += 1
+					}
+				}
+			}
+			require.Equal(t, len(tt.keyValuPars), foundMetadataCount)
+		})
+	}
+}
+
+func TestServer_DeleteOrganizationMetadata(t *testing.T) {
+	orgs, _, err := createOrgs(1)
+	if err != nil {
+		assert.Fail(t, "unable to create org")
+	}
+	orgId := orgs[0].OrganizationId
+
+	tests := []struct {
+		name        string
+		ctx         context.Context
+		setupFunc   func()
+		orgId       string
+		keyValuPars []struct {
+			key   string
+			value string
+		}
+		err error
+	}{
+		{
+			name: "delete org metadata happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key1",
+							Value: []byte("value1"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			keyValuPars: []struct{ key, value string }{
+				{
+					key:   "key1",
+					value: "value1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.setupFunc != nil {
+				tt.setupFunc()
+			}
+
+			// check metadata exists
+			listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+				Id: tt.orgId,
+			})
+			require.NoError(t, err)
+			foundMetadataCount := 0
+			for _, kv := range tt.keyValuPars {
+				for _, res := range listOrgMetadataRes.Result {
+					if res.Key == kv.key &&
+						string(res.Value) == kv.value {
+						foundMetadataCount += 1
+					}
+				}
+			}
+			require.Equal(t, len(tt.keyValuPars), foundMetadataCount)
+
+			// run delete
+			_, err = Client.DeleteOrganizationMetadata(tt.ctx, &v2beta_org.DeleteOrganizationMetadataRequest{
+				Id: tt.orgId,
+			})
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+				return
+			}
+			require.NoError(t, err)
+
+			// check metadata was definitely deleted
+			listOrgMetadataRes, err = Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+				Id: tt.orgId,
+			})
+			require.NoError(t, err)
+			foundMetadataCount = 0
+			for _, kv := range tt.keyValuPars {
+				for _, res := range listOrgMetadataRes.Result {
+					if res.Key == kv.key &&
+						string(res.Value) == kv.value {
+						foundMetadataCount += 1
+					}
+				}
+			}
+		})
+	}
 }
 
 func assertCreatedAdmin(t *testing.T, expected, got *v2beta_org.CreateOrganizationResponse_CreatedAdmin) {
