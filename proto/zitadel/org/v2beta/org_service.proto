@@ -569,6 +569,7 @@ service OrganizationService {
 
 }
 
+
 message CreateOrganizationRequest{
   message Admin {
     oneof user_type{
@@ -591,6 +592,22 @@ message CreateOrganizationRequest{
   repeated Admin admins = 2;
 }
 
+message CreatedAdmin {
+  string user_id = 1;
+  optional string email_code = 2;
+  optional string phone_code = 3;
+}
+message AssignedAdmin { string user_id = 1; }
+
+message OrganizationAdmin {
+  oneof OrganizationAdmin {
+    option (validate.required) = true;
+
+    CreatedAdmin created_admin = 3;
+    AssignedAdmin assigned_admin = 4;
+  }
+}
+
 message CreateOrganizationResponse{
   message CreatedAdmin {
     string user_id = 1;
@@ -600,6 +617,7 @@ message CreateOrganizationResponse{
   zitadel.object.v2beta.Details details = 1;
   string organization_id = 2;
   repeated CreatedAdmin created_admins = 3;
+  repeated OrganizationAdmin organization_admins = 4;
 }
 
 message UpdateOrganizationRequest {
