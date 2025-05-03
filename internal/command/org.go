@@ -53,7 +53,11 @@ type orgSetupCommands struct {
 
 type CreatedOrg struct {
 	ObjectDetails *domain.ObjectDetails
-	CreatedAdmins []*CreatedOrgAdmin
+	OrgAdmins     []OrgAdmin
+}
+
+type OrgAdmin interface {
+	GetID() string
 }
 
 type CreatedOrgAdmin struct {
@@ -62,6 +66,18 @@ type CreatedOrgAdmin struct {
 	PhoneCode  *string
 	PAT        *PersonalAccessToken
 	MachineKey *MachineKey
+}
+
+func (a *CreatedOrgAdmin) GetID() string {
+	return a.ID
+}
+
+type AssignedOrgAdmin struct {
+	ID string
+}
+
+func (a *AssignedOrgAdmin) GetID() string {
+	return a.ID
 }
 
 func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, userIDs ...string) (_ *CreatedOrg, err error) {
@@ -180,14 +196,15 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 			EventDate:     events[len(events)-1].CreatedAt(),
 			ResourceOwner: c.aggregate.ID,
 		},
-		CreatedAdmins: c.createdAdmins(),
+		OrgAdmins: c.createdAdmins(),
 	}, nil
 }
 
-func (c *orgSetupCommands) createdAdmins() []*CreatedOrgAdmin {
-	users := make([]*CreatedOrgAdmin, 0, len(c.admins))
+func (c *orgSetupCommands) createdAdmins() []OrgAdmin {
+	users := make([]OrgAdmin, 0, len(c.admins))
 	for _, admin := range c.admins {
 		if admin.ID != "" && admin.Human == nil {
+			users = append(users, &AssignedOrgAdmin{ID: admin.ID})
 			continue
 		}
 		if admin.Human != nil {
@@ -230,6 +247,15 @@ func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrg
 		}
 	}
 	return createdAdmin
+}
+
+func (c *Commands) SetUpOrgv2beta(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
+	orgID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.setUpOrgWithIDs(ctx, o, orgID, allowInitialMail, userIDs...)
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {

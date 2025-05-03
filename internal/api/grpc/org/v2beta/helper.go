@@ -4,6 +4,7 @@ import (
 	"context"
 
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
+	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	v2beta_object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -65,18 +66,33 @@ func OrgStateToPb(state domain.OrgState) v2beta_org.OrgState {
 }
 
 func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrganizationResponse, err error) {
-	admins := make([]*org.CreateOrganizationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
-	for i, admin := range createdOrg.CreatedAdmins {
-		admins[i] = &org.CreateOrganizationResponse_CreatedAdmin{
-			UserId:    admin.ID,
-			EmailCode: admin.EmailCode,
-			PhoneCode: admin.PhoneCode,
+	admins := make([]*org.OrganizationAdmin, len(createdOrg.OrgAdmins))
+	for i, admin := range createdOrg.OrgAdmins {
+		switch admin := admin.(type) {
+		case *command.CreatedOrgAdmin:
+			admins[i] = &org.OrganizationAdmin{
+				OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+					CreatedAdmin: &org.CreatedAdmin{
+						UserId:    admin.ID,
+						EmailCode: admin.EmailCode,
+						PhoneCode: admin.PhoneCode,
+					},
+				},
+			}
+		case *command.AssignedOrgAdmin:
+			admins[i] = &org.OrganizationAdmin{
+				OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
+					AssignedAdmin: &org.AssignedAdmin{
+						UserId: admin.ID,
+					},
+				},
+			}
 		}
 	}
 	return &org.CreateOrganizationResponse{
-		Details:        v2beta_object.DomainToDetailsPb(createdOrg.ObjectDetails),
-		OrganizationId: createdOrg.ObjectDetails.ResourceOwner,
-		CreatedAdmins:  admins,
+		Details:            object.DomainToDetailsPb(createdOrg.ObjectDetails),
+		OrganizationId:     createdOrg.ObjectDetails.ResourceOwner,
+		OrganizationAdmins: admins,
 	}, nil
 }
 

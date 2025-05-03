@@ -93,8 +93,8 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 		return nil, err
 	}
 	var userID string
-	if len(createdOrg.CreatedAdmins) == 1 {
-		userID = createdOrg.CreatedAdmins[0].ID
+	if len(createdOrg.OrgAdmins) == 1 {
+		userID = createdOrg.OrgAdmins[0].GetID()
 	}
 	return &admin_pb.SetUpOrgResponse{
 		Details: object.DomainToAddDetailsPb(createdOrg.ObjectDetails),
@@ -109,6 +109,9 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain str
 		return nil, err
 	}
 	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}}, nil)
+	if err != nil {
+		return nil, err
+	}
 	if err != nil {
 		return nil, err
 	}
