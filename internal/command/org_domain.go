@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -42,7 +41,6 @@ func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userI
 				return nil, err
 			}
 			events := []eventstore.Command{org.NewDomainAddedEvent(ctx, &a.Aggregate, addDomain)}
-			fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> domainPolicy = %+v\n", domainPolicy)
 			if !domainPolicy.ValidateOrgDomains {
 				events = append(events, org.NewDomainVerifiedEvent(ctx, &a.Aggregate, addDomain))
 				for _, userID := range userIDs {
@@ -134,9 +132,7 @@ func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claim
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> cmds[0] = %+v\n", cmds[0])
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> pushedEvents = %+v\n", pushedEvents[0])
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +244,6 @@ func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.Or
 		return nil, err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
-		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> domainWriteModel.State = %+v\n", domainWriteModel.State)
 		return nil, zerrors.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
 	}
 	if !domainWriteModel.Verified {
@@ -275,7 +270,6 @@ func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDom
 		return nil, err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
-		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> domainWriteModel.State = %+v\n", domainWriteModel.State)
 		return nil, zerrors.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
 	}
 	if domainWriteModel.Primary {
