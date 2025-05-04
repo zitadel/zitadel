@@ -127,11 +127,11 @@ func (s *Server) ReactivateOrganization(ctx context.Context, request *org.Reacti
 }
 
 func (s *Server) AddOrganizationDomain(ctx context.Context, request *org.AddOrganizationDomainRequest) (*org.AddOrganizationDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.AddOrgDomain(ctx, request.OrganizationId, request.Domain, userIDs)
+	details, err := s.command.AddOrgDomain(ctx, request.Id, request.Domain, userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrgan
 	if err != nil {
 		return nil, err
 	}
-	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(req.OrganizationId)
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func (s *Server) GenerateOrganizationDomainValidation(ctx context.Context, req *
 }
 
 func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *org.VerifyOrganizationDomainRequest) (*org.VerifyOrganizationDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.Id)
 	if err != nil {
 		return nil, err
 	}

@@ -112,7 +112,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 				},
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
-				OrganizationId: integration.NotEmpty,
+				Id: integration.NotEmpty,
 				CreatedAdmins: []*v2beta_org.CreateOrganizationResponse_CreatedAdmin{
 					{
 						UserId:    integration.NotEmpty,
@@ -183,7 +183,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 
 			// organization id must be the same as the resourceOwner
-			assert.Equal(t, got.GetDetails().GetResourceOwner(), got.GetOrganizationId())
+			assert.Equal(t, got.GetDetails().GetResourceOwner(), got.GetId())
 
 			// check the admins
 			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
@@ -200,7 +200,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 	orgName := orgsName[0]
 
 	tests := []struct {
@@ -225,6 +225,15 @@ func TestServer_UpdateOrganization(t *testing.T) {
 				Id:   orgId,
 				Name: orgName,
 			},
+		},
+		{
+			name: "update org with non existanet org id",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &v2beta_org.UpdateOrganizationRequest{
+				Id: "non existant org id",
+				// Name: "",
+			},
+			wantErr: true,
 		},
 		{
 			name: "update org with no id",
@@ -260,7 +269,7 @@ func TestServer_GetOrganizationByID(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 	orgName := orgsName[0]
 
 	tests := []struct {
@@ -322,15 +331,15 @@ func TestServer_ListOrganization(t *testing.T) {
 			req:  &v2beta_org.ListOrganizationsRequest{},
 			want: []*v2beta_org.Organization{
 				{
-					Id:   orgs[0].OrganizationId,
+					Id:   orgs[0].Id,
 					Name: orgsName[0],
 				},
 				{
-					Id:   orgs[1].OrganizationId,
+					Id:   orgs[1].Id,
 					Name: orgsName[1],
 				},
 				{
-					Id:   orgs[2].OrganizationId,
+					Id:   orgs[2].Id,
 					Name: orgsName[2],
 				},
 			},
@@ -388,7 +397,7 @@ func TestServer_DeleteOrganization(t *testing.T) {
 				if err != nil {
 					assert.Fail(t, "unable to create org")
 				}
-				return orgs[0].OrganizationId
+				return orgs[0].Id
 			},
 			req: &v2beta_org.DeleteOrganizationRequest{},
 		},
@@ -451,7 +460,7 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create orgs")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 	ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
 	// 2. check inital state of organization
@@ -561,14 +570,14 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 	ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
 	domain := "www.domain.com"
 	// 2. add domain
 	addOrgDomainRes, err := Client.AddOrganizationDomain(ctx, &v2beta_org.AddOrganizationDomainRequest{
-		OrganizationId: orgId,
-		Domain:         domain,
+		Id:     orgId,
+		Domain: domain,
 	})
 	require.NoError(t, err)
 	// check details
@@ -580,7 +589,7 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 
 	// 2. check domain is added
 	queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		OrganizationId: orgId,
+		Id: orgId,
 	})
 	require.NoError(t, err)
 	found := false
@@ -593,8 +602,8 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 
 	// 3. readd domain
 	_, err = Client.AddOrganizationDomain(ctx, &v2beta_org.AddOrganizationDomainRequest{
-		OrganizationId: orgId,
-		Domain:         domain,
+		Id:     orgId,
+		Domain: domain,
 	})
 	// TODO remove error for adding already existing domain
 	// require.NoError(t, err)
@@ -608,7 +617,7 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 
 	// 4. check domain is added
 	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		OrganizationId: orgId,
+		Id: orgId,
 	})
 	require.NoError(t, err)
 	found = false
@@ -621,8 +630,8 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 
 	// 5. delete organisation domain
 	deleteOrgDomainRes, err := Client.DeleteOrganizationDomain(ctx, &v2beta_org.DeleteOrganizationDomainRequest{
-		OrganizationId: orgId,
-		Domain:         domain,
+		Id:     orgId,
+		Domain: domain,
 	})
 	require.NoError(t, err)
 	// check details
@@ -634,7 +643,7 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 
 	// 6. check organization domain deleted
 	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		OrganizationId: orgId,
+		Id: orgId,
 	})
 	require.NoError(t, err)
 	found = false
@@ -647,8 +656,8 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 
 	// 7. redelete organisation domain
 	_, err = Client.DeleteOrganizationDomain(ctx, &v2beta_org.DeleteOrganizationDomainRequest{
-		OrganizationId: orgId,
-		Domain:         domain,
+		Id:     orgId,
+		Domain: domain,
 	})
 	// TODO remove error for deleting org domain already deleted
 	// require.NoError(t, err)
@@ -662,7 +671,7 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 
 	// 8. check organization domain deleted
 	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		OrganizationId: orgId,
+		Id: orgId,
 	})
 	require.NoError(t, err)
 	found = false
@@ -679,7 +688,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 
 	_, err = AdminClient.UpdateDomainPolicy(CTX, &admin.UpdateDomainPolicyRequest{
 		ValidateOrgDomains: true,
@@ -688,8 +697,8 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 
 	domain := "www.domainnn.com"
 	_, err = Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
-		OrganizationId: orgId,
-		Domain:         domain,
+		Id:     orgId,
+		Domain: domain,
 	})
 	require.NoError(t, err)
 
@@ -703,29 +712,51 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			name: "validate org http happy path",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				OrganizationId: orgId,
-				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Id:     orgId,
+				Domain: domain,
+				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 		},
 		{
 			name: "validate org http non existnetn org id",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				OrganizationId: "non existent org id",
-				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Id:     "non existent org id",
+				Domain: domain,
+				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
 		},
 		{
-			name: "validate org http non existnetn domain",
+			name: "validate org dns happy path",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				OrganizationId: orgId,
-				Domain:         "non existent domain",
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Id:     orgId,
+				Domain: domain,
+				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+			},
+		},
+		// TODO: "validate org dns non existnetn org id" has an consistent error message, need to investigate this
+		{
+			name: "validate org dns non existnetn org id",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
+				Id:     "non existent org id",
+				Domain: domain,
+				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+			},
+			// BUG: this should be 'organization does not exist'
+			err: errors.New("Domain doesn't exist on organization"),
+		},
+		// TODO: "validate org non existnetn domain" has an consistent error message, need to investigate this
+		{
+			name: "validate org non existnetn domain",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
+				Id:     orgId,
+				Domain: "non existent domain",
+				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			err: errors.New("Domain doesn't exist on organization"),
 		},
@@ -750,7 +781,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 
 	tests := []struct {
 		name      string
@@ -869,7 +900,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 
 	tests := []struct {
 		name        string
@@ -988,14 +1019,18 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "unable to create org")
 	}
-	orgId := orgs[0].OrganizationId
+	orgId := orgs[0].Id
 
 	tests := []struct {
-		name        string
-		ctx         context.Context
-		setupFunc   func()
-		orgId       string
-		keyValuPars []struct {
+		name             string
+		ctx              context.Context
+		setupFunc        func()
+		orgId            string
+		metadataToDelete []struct {
+			key   string
+			value string
+		}
+		metadataToRemain []struct {
 			key   string
 			value string
 		}
@@ -1017,12 +1052,131 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 				require.NoError(t, err)
 			},
 			orgId: orgId,
-			keyValuPars: []struct{ key, value string }{
+			metadataToDelete: []struct{ key, value string }{
 				{
 					key:   "key1",
 					value: "value1",
 				},
 			},
+		},
+		{
+			name: "delete multiple org metadata happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key2",
+							Value: []byte("value2"),
+						},
+						{
+							Key:   "key3",
+							Value: []byte("value3"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			metadataToDelete: []struct{ key, value string }{
+				{
+					key:   "key2",
+					value: "value2",
+				},
+				{
+					key:   "key3",
+					value: "value3",
+				},
+			},
+		},
+		{
+			name: "delete some org metadata but not all",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key4",
+							Value: []byte("value4"),
+						},
+						// key5 will not be deleted
+						{
+							Key:   "key5",
+							Value: []byte("value5"),
+						},
+						{
+							Key:   "key6",
+							Value: []byte("value6"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			metadataToDelete: []struct{ key, value string }{
+				{
+					key:   "key4",
+					value: "value4",
+				},
+				{
+					key:   "key6",
+					value: "value6",
+				},
+			},
+			metadataToRemain: []struct{ key, value string }{
+				{
+					key:   "key5",
+					value: "value5",
+				},
+			},
+		},
+		{
+			name: "delete org metadata that does not exist",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key88",
+							Value: []byte("value74"),
+						},
+						{
+							Key:   "key5888",
+							Value: []byte("value8885"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: orgId,
+			// TODO: this error message needs to be either removed or changed
+			err: errors.New("Metadata list is empty"),
+		},
+		{
+			name: "delete org metadata for org that does not exist",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			setupFunc: func() {
+				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+					Id: orgId,
+					Metadata: []*v2beta_org.Metadata{
+						{
+							Key:   "key88",
+							Value: []byte("value74"),
+						},
+						{
+							Key:   "key5888",
+							Value: []byte("value8885"),
+						},
+					},
+				})
+				require.NoError(t, err)
+			},
+			orgId: "non existant org id",
+			// TODO: this error message needs to be either removed or changed
+			err: errors.New("Metadata list is empty"),
 		},
 	}
 	for _, tt := range tests {
@@ -1037,7 +1191,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			})
 			require.NoError(t, err)
 			foundMetadataCount := 0
-			for _, kv := range tt.keyValuPars {
+			for _, kv := range tt.metadataToDelete {
 				for _, res := range listOrgMetadataRes.Result {
 					if res.Key == kv.key &&
 						string(res.Value) == kv.value {
@@ -1045,11 +1199,17 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 					}
 				}
 			}
-			require.Equal(t, len(tt.keyValuPars), foundMetadataCount)
+			require.Equal(t, len(tt.metadataToDelete), foundMetadataCount)
+
+			keys := make([]string, len(tt.metadataToDelete))
+			for i, kvp := range tt.metadataToDelete {
+				keys[i] = kvp.key
+			}
 
 			// run delete
 			_, err = Client.DeleteOrganizationMetadata(tt.ctx, &v2beta_org.DeleteOrganizationMetadataRequest{
-				Id: tt.orgId,
+				Id:   tt.orgId,
+				Keys: keys,
 			})
 			if tt.err != nil {
 				require.Contains(t, err.Error(), tt.err.Error())
@@ -1063,7 +1223,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			})
 			require.NoError(t, err)
 			foundMetadataCount = 0
-			for _, kv := range tt.keyValuPars {
+			for _, kv := range tt.metadataToDelete {
 				for _, res := range listOrgMetadataRes.Result {
 					if res.Key == kv.key &&
 						string(res.Value) == kv.value {
@@ -1071,6 +1231,23 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 					}
 				}
 			}
+			require.Equal(t, foundMetadataCount, 0)
+
+			// check metadata that should not be delted was not deleted
+			listOrgMetadataRes, err = Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+				Id: tt.orgId,
+			})
+			require.NoError(t, err)
+			foundMetadataCount = 0
+			for _, kv := range tt.metadataToRemain {
+				for _, res := range listOrgMetadataRes.Result {
+					if res.Key == kv.key &&
+						string(res.Value) == kv.value {
+						foundMetadataCount += 1
+					}
+				}
+			}
+			require.Equal(t, len(tt.metadataToRemain), foundMetadataCount)
 		})
 	}
 }

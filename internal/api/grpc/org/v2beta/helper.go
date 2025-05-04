@@ -74,9 +74,9 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrgan
 		}
 	}
 	return &org.CreateOrganizationResponse{
-		Details:        v2beta_object.DomainToDetailsPb(createdOrg.ObjectDetails),
-		OrganizationId: createdOrg.ObjectDetails.ResourceOwner,
-		CreatedAdmins:  admins,
+		Details:       v2beta_object.DomainToDetailsPb(createdOrg.ObjectDetails),
+		Id:            createdOrg.ObjectDetails.ResourceOwner,
+		CreatedAdmins: admins,
 	}, nil
 }
 
@@ -202,7 +202,7 @@ func DomainQueryToModel(searchQuery *v2beta_org.DomainSearchQuery) (query.Search
 func RemoveOrgDomainRequestToDomain(ctx context.Context, req *v2beta_org.DeleteOrganizationDomainRequest) *domain.OrgDomain {
 	return &domain.OrgDomain{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.OrganizationId,
+			AggregateID: req.Id,
 		},
 		Domain: req.Domain,
 	}
@@ -211,7 +211,7 @@ func RemoveOrgDomainRequestToDomain(ctx context.Context, req *v2beta_org.DeleteO
 func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *v2beta_org.GenerateOrganizationDomainValidationRequest) *domain.OrgDomain {
 	return &domain.OrgDomain{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.OrganizationId,
+			AggregateID: req.Id,
 		},
 		Domain:         req.Domain,
 		ValidationType: v2beta_object.DomainValidationTypeToDomain(req.Type),
@@ -221,7 +221,7 @@ func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *v2beta
 func ValidateOrgDomainRequestToDomain(ctx context.Context, req *v2beta_org.VerifyOrganizationDomainRequest) *domain.OrgDomain {
 	return &domain.OrgDomain{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.OrganizationId,
+			AggregateID: req.Id,
 		},
 		Domain: req.Domain,
 	}

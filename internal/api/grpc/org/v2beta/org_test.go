@@ -151,7 +151,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 					ChangeDate:    timestamppb.New(now),
 					ResourceOwner: "orgID",
 				},
-				OrganizationId: "orgID",
+				Id: "orgID",
 				CreatedAdmins: []*org.CreateOrganizationResponse_CreatedAdmin{
 					{
 						UserId:    "id",

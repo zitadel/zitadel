@@ -598,7 +598,16 @@ message CreateOrganizationResponse{
     optional string phone_code = 3;
   }
   zitadel.object.v2beta.Details details = 1;
-  string organization_id = 2;
+  string id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the newly created organization."
+    }
+  ];
   repeated CreatedAdmin created_admins = 3;
 }
 
@@ -722,7 +731,16 @@ message ReactivateOrganizationResponse {
 }
 
 message AddOrganizationDomainRequest {
-  string organization_id = 1;
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want to add a domain to."
+    }
+  ];
     string domain = 2 [
       (validate.rules).string = {min_len: 1, max_len: 200},
       (google.api.field_behavior) = REQUIRED,
@@ -739,7 +757,16 @@ message AddOrganizationDomainResponse {
 }
 
 message ListOrganizationDomainsRequest {
-  string organization_id = 1;
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want the domains of."
+    }
+  ];
   //list limitations and ordering
   zitadel.object.v2beta.ListQuery query = 2;
   //criteria the client is looking for
@@ -752,17 +779,25 @@ message ListOrganizationDomainsResponse {
 }
 
 message DeleteOrganizationDomainRequest {
-  // TODO maybe change organization_id to just Id
-  string organization_id = 1;
-    string domain = 2 [
-      (validate.rules).string = {min_len: 1, max_len: 200},
-      (google.api.field_behavior) = REQUIRED,
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          min_length: 1;
-          max_length: 200;
-          example: "\"testdomain.com\"";
-      }
-    ];
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want to delete."
+    }
+  ];
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 200;
+        example: "\"testdomain.com\"";
+    }
+  ];
 }
 
 message DeleteOrganizationDomainResponse {
@@ -770,7 +805,16 @@ message DeleteOrganizationDomainResponse {
 }
 
 message GenerateOrganizationDomainValidationRequest {
-  string organization_id = 1;
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want to generate a validation request for."
+    }
+  ];
   string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -797,7 +841,16 @@ message GenerateOrganizationDomainValidationResponse {
 }
 
 message VerifyOrganizationDomainRequest {
-  string organization_id = 1;
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want to veryify the domain on."
+    }
+  ];
   string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
