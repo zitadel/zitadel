@@ -98,7 +98,7 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 
 func (s *Server) UpdateOrg(ctx context.Context, req *mgmt_pb.UpdateOrgRequest) (*mgmt_pb.UpdateOrgResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	org, err := s.command.UpdateOrg(ctx, ctxData.OrgID, req.Name)
+	org, err := s.command.ChangeOrg(ctx, ctxData.OrgID, req.Name)
 	if err != nil {
 		return nil, err
 	}

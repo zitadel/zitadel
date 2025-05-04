@@ -26,7 +26,7 @@ func (s *Server) CreateOrganization(ctx context.Context, request *v2beta_org.Cre
 }
 
 func (s *Server) UpdateOrganization(ctx context.Context, request *v2beta_org.UpdateOrganizationRequest) (*v2beta_org.UpdateOrganizationResponse, error) {
-	org, err := s.command.UpdateOrg(ctx, request.Id, request.Name)
+	org, err := s.command.ChangeOrg(ctx, request.Id, request.Name)
 	if err != nil {
 		return nil, err
 	}

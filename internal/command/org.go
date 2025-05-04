@@ -342,7 +342,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 	return orgWriteModelToOrg(addedOrg), nil
 }
 
-func (c *Commands) UpdateOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
 	name = strings.TrimSpace(name)
 	if orgID == "" || name == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
@@ -353,10 +353,10 @@ func (c *Commands) UpdateOrg(ctx context.Context, orgID, name string) (*domain.O
 		return nil, err
 	}
 	if !isOrgStateExists(orgWriteModel.State) {
-		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
+		return nil, zerrors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.Name == name {
-		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
+		return nil, zerrors.ThrowPreconditionFailed(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	events := make([]eventstore.Command, 0)
@@ -388,7 +388,7 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, zerrors.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateInactive {
-		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
+		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
@@ -411,7 +411,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, zerrors.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateActive {
-		return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
+		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
