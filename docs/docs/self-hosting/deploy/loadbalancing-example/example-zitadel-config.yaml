@@ -1,7 +1,6 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
 
 ExternalSecure: true
-ExternalDomain: 127.0.0.1.sslip.io
 ExternalPort: 443
 
 # Traefik terminates TLS. Inside the Docker network, we use plain text.
