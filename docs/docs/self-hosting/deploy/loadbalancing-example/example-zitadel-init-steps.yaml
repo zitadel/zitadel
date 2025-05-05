@@ -2,10 +2,13 @@
 FirstInstance:
   PatPath: '/pat'
   Org:
-    # We want to authenticate immediately at the console without changing the password
     Human:
+      # We want to authenticate immediately at the console without changing the password
       PasswordChangeRequired: false
     Machine:
+      Roles:
+        - "IAM_OWNER"
+        - "IAM_LOGIN_CLIENT"
       Machine:
         Username: 'login-container'
         Name: 'Login Container'
