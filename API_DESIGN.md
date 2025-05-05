@@ -39,6 +39,12 @@ Please check out their style guides and concepts for more information:
 Additionally, there are some conventions that are specific to the ZITADEL API.
 These conventions are described in the following sections.
 
+### File Structure
+
+In addition to the files structure proposed by Protobuf and connectRPC, the ZITADEL API uses the following order for `Everything else` section of files:
+- `Service(s)`
+- `Messages` / `Enums`
+
 ### Versioning
 
 The services and messages are versioned using major version numbers. This means that any change within a major version number is backward compatible.
@@ -47,6 +53,13 @@ Each service is versioned independently. This means that a service can have a di
 When creating a new service, start with version `2`, as version `1` is reserved for the old context based API and services.
 
 Please check out the structure Buf style guide for more information about the folder and package structure: https://buf.build/docs/best-practices/style-guide/
+
+#### Removal and Deprecation of Message Fields
+
+When ever a message field is not supported anymore, deprecation of the field is preferred over removal.
+This prevents breaking changes and allows the client to handle the deprecation gracefully.
+The field should be marked as deprecated and the reason for the deprecation should be documented in the proto file.
+Additionally, the field should be removed in the next major version of the API.
 
 ### Explicitness
 
@@ -130,6 +143,9 @@ message IdentiyProviderLink {
 } 
 ```
 
+Return messages should only contain the fields that are required to be returned. Endpoints manipulating or deleting a resource SHOULD whenever possible only return the change or deletion date.
+
+
 #### Operations and Methods
 
 Methods on a resource MUST be named using the following convention:
@@ -156,6 +172,9 @@ Additionally, state changes, specific actions or operations that do not fit into
 - `Verify` for verifying a resource.
 - `Send` for sending a resource.
 - etc.
+
+> [!NOTE]
+> If REST endpoints are annotated in the proto file, the method name MUST be used as the HTTP verb without any underscore prefix.
 
 ## Authentication and Authorization
 
@@ -195,11 +214,10 @@ In case the permission cannot be checked by the API itself, but all requests nee
 The API uses pagination for listing resources. The client can specify a limit and an offset to retrieve a subset of the resources.
 Additionally, the client can specify sorting options to sort the resources by a specific field.
 
-Most listing methods SHOULD provide use the `ListQuery` message to allow the client to specify the limit, offset, and sorting options.
+Most listing methods SHOULD provide use the `PaginationRequest` message to allow the client to specify the limit, offset, and sorting options.
 ```protobuf
-
-// ListQuery is a general query object for lists to allow pagination and sorting.
-message ListQuery {
+message PaginationRequest {
+  // Starting point for retrieval, in combination of offset used to query a set list of objects.
   uint64 offset = 1;
   // limit is the maximum amount of objects returned. The default is set to 100
   // with a maximum of 1000 in the runtime configuration.
@@ -211,7 +229,7 @@ message ListQuery {
   bool asc = 3;
 }
 ```
-On the corresponding responses the `ListDetails` can be used to return the total count of the resources
+On the corresponding responses the `PaginationResponse` can be used to return the total count of the resources
 and allow the user to handle their offset and limit accordingly.
 
 The API MUST enforce a reasonable maximum limit for the number of resources that can be retrieved and returned in a single request.
@@ -227,6 +245,10 @@ some details about the error. See the following sections for more information ab
 The API uses status codes to indicate the status of a request. Depending on the protocol used to call the API,
 the status code is returned as an HTTP status code or as a gRPC / connectRPC status code.
 Check the possible status codes https://zitadel.com/docs/apis/statuscodes
+
+> [!NOTE]
+> REST specific status codes e.g. 201, 204, etc. previously used in ZITADEL will no longer be used.
+> The proto annotation `http_response` of the zitadel option MUST not be used anymore.
 
 ### Error Codes
 
