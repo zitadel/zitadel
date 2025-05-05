@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 54.sql
+	//go:embed 55.sql
 	addSAMLFederatedLogout string
 )
 
