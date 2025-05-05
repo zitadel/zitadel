@@ -52,7 +52,7 @@ func (s *Server) ListCustomDomains(ctx context.Context, req *instance.ListCustom
 	}
 
 	return &instance.ListCustomDomainsResponse{
-		Result: DomainsToPb(domains.Domains),
+		Domains: DomainsToPb(domains.Domains),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  domains.Count,
 			AppliedLimit: uint64(req.GetPagination().GetLimit()),
@@ -72,7 +72,7 @@ func (s *Server) ListTrustedDomains(ctx context.Context, req *instance.ListTrust
 	}
 
 	return &instance.ListTrustedDomainsResponse{
-		Result: trustedDomainsToPb(domains.Domains),
+		TrustedDomain: trustedDomainsToPb(domains.Domains),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  domains.Count,
 			AppliedLimit: uint64(req.GetPagination().GetLimit()),

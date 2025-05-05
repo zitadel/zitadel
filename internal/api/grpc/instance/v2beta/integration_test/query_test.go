@@ -207,7 +207,7 @@ func TestListCustomDomains(t *testing.T) {
 				require.NotNil(t, res)
 
 				domains := []string{}
-				for _, d := range res.GetResult() {
+				for _, d := range res.GetDomains() {
 					domains = append(domains, d.GetDomain())
 				}
 
@@ -288,7 +288,7 @@ func TestListTrustedDomains(t *testing.T) {
 				require.NotNil(t, res)
 
 				domains := []string{}
-				for _, d := range res.GetResult() {
+				for _, d := range res.GetTrustedDomain() {
 					domains = append(domains, d.GetDomain())
 				}
 

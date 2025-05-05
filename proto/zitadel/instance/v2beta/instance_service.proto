@@ -214,7 +214,7 @@ message ListCustomDomainsRequest {
 }
 
 message ListCustomDomainsResponse {
-  repeated Domain result = 1;
+  repeated Domain domains = 1;
 
   // Contains the total number of domains matching the query and the applied limit.
   zitadel.filter.v2beta.PaginationResponse pagination = 2;
@@ -272,7 +272,7 @@ message ListTrustedDomainsRequest {
 }
 
 message ListTrustedDomainsResponse {
-  repeated TrustedDomain result = 1;
+  repeated TrustedDomain trusted_domain = 1;
 
   // Contains the total number of domains matching the query and the applied limit.
   zitadel.filter.v2beta.PaginationResponse pagination = 2;
