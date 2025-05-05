@@ -3,7 +3,14 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { OrgDomainQuery, OrgNameQuery, OrgQuery, OrgState, OrgStateQuery, OrgIDQuery } from 'src/app/proto/generated/zitadel/org_pb';
+import {
+  OrgDomainQuery,
+  OrgNameQuery,
+  OrgQuery,
+  OrgState,
+  OrgStateQuery,
+  OrgIDQuery,
+} from 'src/app/proto/generated/zitadel/org_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';

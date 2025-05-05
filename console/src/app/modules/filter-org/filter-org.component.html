@@ -71,11 +71,7 @@
   </div>
 
   <div class="id-query">
-    <mat-checkbox
-      id="id"
-      class="cb"
-      [checked]="getSubFilter(SubQuery.ID)"
-      (change)="changeCheckbox(SubQuery.ID, $event)"
+    <mat-checkbox id="id" class="cb" [checked]="getSubFilter(SubQuery.ID)" (change)="changeCheckbox(SubQuery.ID, $event)"
       >{{ 'FILTER.ORGID' | translate }}
     </mat-checkbox>
     <div class="subquery" *ngIf="getSubFilter(SubQuery.ID) as idq">
