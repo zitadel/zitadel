@@ -99,6 +99,7 @@ var (
 		` projections.idp_templates6_saml.with_signed_request,` +
 		` projections.idp_templates6_saml.name_id_format,` +
 		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
+		` projections.idp_templates6_saml.federated_logout_enabled,` +
 		// ldap
 		` projections.idp_templates6_ldap2.idp_id,` +
 		` projections.idp_templates6_ldap2.servers,` +
@@ -228,6 +229,7 @@ var (
 		"with_signed_request",
 		"name_id_format",
 		"transient_mapping_attribute_name",
+		"federated_logout_enabled",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -344,6 +346,7 @@ var (
 		` projections.idp_templates6_saml.with_signed_request,` +
 		` projections.idp_templates6_saml.name_id_format,` +
 		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
+		` projections.idp_templates6_saml.federated_logout_enabled,` +
 		// ldap
 		` projections.idp_templates6_ldap2.idp_id,` +
 		` projections.idp_templates6_ldap2.servers,` +
@@ -474,6 +477,7 @@ var (
 		"with_signed_request",
 		"name_id_format",
 		"transient_mapping_attribute_name",
+		"federated_logout_enabled",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -622,6 +626,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -784,6 +789,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -928,6 +934,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1086,6 +1093,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1235,6 +1243,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1376,6 +1385,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1534,6 +1544,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1683,6 +1694,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						false,
 						domain.SAMLNameIDFormatTransient,
 						"customAttribute",
+						true,
 						// ldap config
 						nil,
 						nil,
@@ -1742,6 +1754,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					WithSignedRequest:             false,
 					NameIDFormat:                  sql.Null[domain.SAMLNameIDFormat]{V: domain.SAMLNameIDFormatTransient, Valid: true},
 					TransientMappingAttributeName: "customAttribute",
+					FederatedLogoutEnabled:        true,
 				},
 			},
 		},
@@ -1828,6 +1841,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2006,6 +2020,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -2149,6 +2164,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2336,6 +2352,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							"idp-id",
 							database.TextArray[string]{"server"},
@@ -2515,6 +2532,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -2667,6 +2685,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							"idp-id-ldap",
 							database.TextArray[string]{"server"},
@@ -2784,6 +2803,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							false,
 							domain.SAMLNameIDFormatTransient,
 							"customAttribute",
+							true,
 							// ldap config
 							nil,
 							nil,
@@ -2893,6 +2913,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							database.TextArray[string]{"profile"},
 							// saml
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3018,6 +3039,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -3127,6 +3149,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// saml
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3252,6 +3275,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -3360,6 +3384,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							WithSignedRequest:             false,
 							NameIDFormat:                  sql.Null[domain.SAMLNameIDFormat]{V: domain.SAMLNameIDFormatTransient, Valid: true},
 							TransientMappingAttributeName: "customAttribute",
+							FederatedLogoutEnabled:        true,
 						},
 					},
 					{
