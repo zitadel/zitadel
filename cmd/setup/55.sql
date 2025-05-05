@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS sessions8_user_id_idx ON projections.sessions8 (user_id);
