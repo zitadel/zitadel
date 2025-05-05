@@ -565,7 +565,7 @@ func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHuman
 }
 
 func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHumanInitialPasswordRequest) (*mgmt_pb.SetHumanInitialPasswordResponse, error) {
-	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true, s.command.NewPermissionCheckUserWrite(ctx, true))
 	if err != nil {
 		return nil, err
 	}
@@ -575,7 +575,7 @@ func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHu
 }
 
 func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPasswordRequest) (*mgmt_pb.SetHumanPasswordResponse, error) {
-	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired, s.command.NewPermissionCheckUserWrite(ctx, true))
 	if err != nil {
 		return nil, err
 	}

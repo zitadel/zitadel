@@ -51,6 +51,10 @@ func (c *Commands) NewPermissionCheckUserDelete(ctx context.Context, allowSelf b
 	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, allowSelf)
 }
 
+func (c *Commands) NewPermissionCheckUpdateUserCredentials(ctx context.Context, allowSelf bool) PermissionCheck {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite, allowSelf)
+}
+
 // Deprecated: use NewPermissionCheckUserWrite to protect an API.
 func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
 	return c.NewPermissionCheckUserWrite(ctx, true)(resourceOwner, userID)

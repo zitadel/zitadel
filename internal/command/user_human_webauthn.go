@@ -588,7 +588,7 @@ func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, 
 	return nil
 }
 
-func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, resourceOwner string, preparedEvent func(*eventstore.Aggregate) eventstore.Command) (*domain.ObjectDetails, error) {
+func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, resourceOwner string, preparedEvent func(*eventstore.Aggregate) eventstore.Command, check PermissionCheck) (*domain.ObjectDetails, error) {
 	if userID == "" || webAuthNID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6M9de", "Errors.IDMissing")
 	}
@@ -600,11 +600,11 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 	if existingWebAuthN.State == domain.MFAStateUnspecified || existingWebAuthN.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
 	}
-
-	if err := c.checkPermissionUpdateUser(ctx, existingWebAuthN.ResourceOwner, existingWebAuthN.AggregateID); err != nil {
-		return nil, err
+	if check != nil {
+		if err := check(existingWebAuthN.ResourceOwner, existingWebAuthN.AggregateID); err != nil {
+			return nil, err
+		}
 	}
-
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, preparedEvent(userAgg))
 	if err != nil {

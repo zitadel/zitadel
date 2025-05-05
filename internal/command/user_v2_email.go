@@ -15,68 +15,68 @@ import (
 
 // ChangeUserEmail sets a user's email address, generates a code
 // and triggers a notification e-mail with the default confirmation URL format.
-func (c *Commands) ChangeUserEmail(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.changeUserEmailWithCode(ctx, userID, email, alg, false, "")
+func (c *Commands) ChangeUserEmail(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, check PermissionCheck) (*domain.Email, error) {
+	return c.changeUserEmailWithCode(ctx, userID, email, alg, false, "", check)
 }
 
 // ChangeUserEmailURLTemplate sets a user's email address, generates a code
 // and triggers a notification e-mail with the confirmation URL rendered from the passed urlTmpl.
 // urlTmpl must be a valid [tmpl.Template].
-func (c *Commands) ChangeUserEmailURLTemplate(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.Email, error) {
+func (c *Commands) ChangeUserEmailURLTemplate(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, urlTmpl string, check PermissionCheck) (*domain.Email, error) {
 	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
 		return nil, err
 	}
-	return c.changeUserEmailWithCode(ctx, userID, email, alg, false, urlTmpl)
+	return c.changeUserEmailWithCode(ctx, userID, email, alg, false, urlTmpl, check)
 }
 
 // ChangeUserEmailReturnCode sets a user's email address, generates a code and does not send a notification email.
 // The generated plain text code will be set in the returned Email object.
-func (c *Commands) ChangeUserEmailReturnCode(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.changeUserEmailWithCode(ctx, userID, email, alg, true, "")
+func (c *Commands) ChangeUserEmailReturnCode(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, check PermissionCheck) (*domain.Email, error) {
+	return c.changeUserEmailWithCode(ctx, userID, email, alg, true, "", check)
 }
 
 // ResendUserEmailCode generates a new code if there is a code existing
 // and triggers a notification e-mail with the default confirmation URL format.
-func (c *Commands) ResendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.resendUserEmailCode(ctx, userID, alg, false, "")
+func (c *Commands) ResendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, check PermissionCheck) (*domain.Email, error) {
+	return c.resendUserEmailCode(ctx, userID, alg, false, "", check)
 }
 
 // ResendUserEmailCodeURLTemplate generates a new code if there is a code existing
 // and triggers a notification e-mail with the confirmation URL rendered from the passed urlTmpl.
 // urlTmpl must be a valid [tmpl.Template].
-func (c *Commands) ResendUserEmailCodeURLTemplate(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.Email, error) {
+func (c *Commands) ResendUserEmailCodeURLTemplate(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, urlTmpl string, check PermissionCheck) (*domain.Email, error) {
 	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
 		return nil, err
 	}
-	return c.resendUserEmailCode(ctx, userID, alg, false, urlTmpl)
+	return c.resendUserEmailCode(ctx, userID, alg, false, urlTmpl, check)
 }
 
 // ResendUserEmailReturnCode generates a new code if there is a code existing and does not send a notification email.
 // The generated plain text code will be set in the returned Email object.
-func (c *Commands) ResendUserEmailReturnCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.resendUserEmailCode(ctx, userID, alg, true, "")
+func (c *Commands) ResendUserEmailReturnCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, check PermissionCheck) (*domain.Email, error) {
+	return c.resendUserEmailCode(ctx, userID, alg, true, "", check)
 }
 
 // SendUserEmailCode generates a new code
 // and triggers a notification e-mail with the default confirmation URL format.
-func (c *Commands) SendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.sendUserEmailCode(ctx, userID, alg, false, "")
+func (c *Commands) SendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, check PermissionCheck) (*domain.Email, error) {
+	return c.sendUserEmailCode(ctx, userID, alg, false, "", check)
 }
 
 // SendUserEmailCodeURLTemplate generates a new code
 // and triggers a notification e-mail with the confirmation URL rendered from the passed urlTmpl.
 // urlTmpl must be a valid [tmpl.Template].
-func (c *Commands) SendUserEmailCodeURLTemplate(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.Email, error) {
+func (c *Commands) SendUserEmailCodeURLTemplate(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, urlTmpl string, check PermissionCheck) (*domain.Email, error) {
 	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
 		return nil, err
 	}
-	return c.sendUserEmailCode(ctx, userID, alg, false, urlTmpl)
+	return c.sendUserEmailCode(ctx, userID, alg, false, urlTmpl, check)
 }
 
 // SendUserEmailReturnCode generates a new code and does not send a notification email.
 // The generated plain text code will be set in the returned Email object.
-func (c *Commands) SendUserEmailReturnCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.sendUserEmailCode(ctx, userID, alg, true, "")
+func (c *Commands) SendUserEmailReturnCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, check PermissionCheck) (*domain.Email, error) {
+	return c.sendUserEmailCode(ctx, userID, alg, true, "", check)
 }
 
 // ChangeUserEmailVerified sets a user's email address and marks it is verified.
@@ -96,60 +96,62 @@ func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, email st
 	return cmd.Push(ctx)
 }
 
-func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
+func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string, check PermissionCheck) (*domain.Email, error) {
 	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.changeUserEmailWithGenerator(ctx, userID, email, gen, returnCode, urlTmpl)
+	return c.changeUserEmailWithGenerator(ctx, userID, email, gen, returnCode, urlTmpl, check)
 }
 
-func (c *Commands) resendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
+func (c *Commands) resendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string, check PermissionCheck) (*domain.Email, error) {
 	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.sendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl, true)
+	return c.sendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl, true, check)
 }
 
-func (c *Commands) sendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
+func (c *Commands) sendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string, check PermissionCheck) (*domain.Email, error) {
 	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.sendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl, false)
+	return c.sendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl, false, check)
 }
 
 // changeUserEmailWithGenerator set a user's email address.
 // returnCode controls if the plain text version of the code will be set in the return object.
 // When the plain text code is returned, no notification e-mail will be send to the user.
 // urlTmpl allows changing the target URL that is used by the e-mail and should be a validated Go template, if used.
-func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, email string, gen crypto.Generator, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	cmd, err := c.changeUserEmailWithGeneratorEvents(ctx, userID, email, gen, returnCode, urlTmpl)
+func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, email string, gen crypto.Generator, returnCode bool, urlTmpl string, check PermissionCheck) (*domain.Email, error) {
+	cmd, err := c.changeUserEmailWithGeneratorEvents(ctx, userID, email, gen, returnCode, urlTmpl, check)
 	if err != nil {
 		return nil, err
 	}
 	return cmd.Push(ctx)
 }
 
-func (c *Commands) sendUserEmailCodeWithGenerator(ctx context.Context, userID string, gen crypto.Generator, returnCode bool, urlTmpl string, existingCheck bool) (*domain.Email, error) {
-	cmd, err := c.sendUserEmailCodeWithGeneratorEvents(ctx, userID, gen, returnCode, urlTmpl, existingCheck)
+func (c *Commands) sendUserEmailCodeWithGenerator(ctx context.Context, userID string, gen crypto.Generator, returnCode bool, urlTmpl string, existingCheck bool, check PermissionCheck) (*domain.Email, error) {
+	cmd, err := c.sendUserEmailCodeWithGeneratorEvents(ctx, userID, gen, returnCode, urlTmpl, existingCheck, check)
 	if err != nil {
 		return nil, err
 	}
 	return cmd.Push(ctx)
 }
 
-func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userID, email string, gen crypto.Generator, returnCode bool, urlTmpl string) (*UserEmailEvents, error) {
+func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userID, email string, gen crypto.Generator, returnCode bool, urlTmpl string, check PermissionCheck) (*UserEmailEvents, error) {
 	cmd, err := c.NewUserEmailEvents(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
-		return nil, err
+	if check != nil {
+		if err := check(cmd.aggregate.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
 		return nil, err
@@ -160,13 +162,15 @@ func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userI
 	return cmd, nil
 }
 
-func (c *Commands) sendUserEmailCodeWithGeneratorEvents(ctx context.Context, userID string, gen crypto.Generator, returnCode bool, urlTmpl string, existingCheck bool) (*UserEmailEvents, error) {
+func (c *Commands) sendUserEmailCodeWithGeneratorEvents(ctx context.Context, userID string, gen crypto.Generator, returnCode bool, urlTmpl string, existingCheck bool, check PermissionCheck) (*UserEmailEvents, error) {
 	cmd, err := c.NewUserEmailEvents(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
-		return nil, err
+	if check != nil {
+		if err := check(cmd.aggregate.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 	if existingCheck && cmd.model.Code == nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "EMAIL-5w5ilin4yt", "Errors.User.Code.Empty")
