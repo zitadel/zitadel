@@ -12,7 +12,7 @@ export function ConsentScreen({
   const t = useTranslations();
 
   return (
-    <div className="w-full flex flex-col items-center space-y-4">
+    <div className="pt-4 w-full flex flex-col items-center space-y-4">
       <ul className="list-disc space-y-2 w-full">
         {scope?.map((s) => {
           const translationKey = `device.scope.${s}`;
@@ -20,9 +20,7 @@ export function ConsentScreen({
 
           // Check if the key itself is returned and provide a fallback
           const resolvedDescription =
-            description === translationKey
-              ? "No description available."
-              : description;
+            description === translationKey ? "" : description;
 
           return (
             <li
@@ -35,6 +33,10 @@ export function ConsentScreen({
           );
         })}
       </ul>
+
+      <p className="ztdl-p text-xs text-left">
+        {t("device.request.description")}
+      </p>
 
       <div className="mt-4 flex w-full flex-row items-center">
         <Button variant={ButtonVariants.Destructive} data-testid="deny-button">

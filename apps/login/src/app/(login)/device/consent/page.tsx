@@ -66,8 +66,10 @@ export default async function Page(props: {
       appName={deviceAuthorizationRequest?.appName}
     >
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("usercode.title")}</h1>
-        <p className="ztdl-p">{t("usercode.description")}</p>
+        <h1>
+          {t("request.title", { appName: deviceAuthorizationRequest?.appName })}
+        </h1>
+
         <ConsentScreen
           scope={deviceAuthorizationRequest?.scope}
           nextUrl={`/loginname?` + params}

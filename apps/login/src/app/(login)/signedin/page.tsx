@@ -2,8 +2,12 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
-import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
+import {
+  getMostRecentCookieWithLoginname,
+  getSessionCookieById,
+} from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   authorizeOrDenyDeviceAuthorization,
   createCallback,
@@ -88,6 +92,23 @@ async function loadSession(
   });
 }
 
+async function loadSessionById(
+  serviceUrl: string,
+  sessionId: string,
+  organization?: string,
+) {
+  const recent = await getSessionCookieById({ sessionId, organization });
+  return getSession({
+    serviceUrl,
+    sessionId: recent.id,
+    sessionToken: recent.token,
+  }).then((response) => {
+    if (response?.session) {
+      return response.session;
+    }
+  });
+}
+
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
@@ -96,12 +117,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const { loginName, requestId, organization } = searchParams;
+  const { loginName, requestId, organization, sessionId } = searchParams;
   // const sessionFactors = await loadSession(serviceUrl, loginName, requestId);
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    : await loadMostRecentSession({
+        serviceUrl,
+        sessionParams: { loginName, organization },
+      });
 
   const branding = await getBrandingSettings({
     serviceUrl,
