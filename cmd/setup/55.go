@@ -23,5 +23,5 @@ func (mig *IDPTemplate6SAMLFederatedLogout) Execute(ctx context.Context, _ event
 }
 
 func (mig *IDPTemplate6SAMLFederatedLogout) String() string {
-	return "54_idp_templates6_add_saml_federated_logout"
+	return "55_idp_templates6_add_saml_federated_logout"
 }
