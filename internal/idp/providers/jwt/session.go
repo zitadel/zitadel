@@ -57,6 +57,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	return &User{s.Tokens.IDTokenClaims}, nil
 }
 
+func (s *Session) ExpiresAt() time.Time {
+	if s.Tokens == nil || s.Tokens.IDTokenClaims == nil {
+		return time.Time{}
+	}
+	return s.Tokens.IDTokenClaims.GetExpiration()
+}
+
 func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDTokenClaims, error) {
 	logging.Debug("begin token validation")
 	// TODO: be able to specify them in the template: https://github.com/zitadel/zitadel/issues/5322
