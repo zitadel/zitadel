@@ -72,12 +72,14 @@ import (
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -503,7 +505,12 @@ func startAPIs(
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
 	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.SystemAuthZ, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
 
-	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, instanceInterceptor.Handler))
+	federatedLogoutsCache, err := connector.StartCache[federatedlogout.Index, string, *federatedlogout.FederatedLogout](ctx, []federatedlogout.Index{federatedlogout.IndexRequestID}, cache.PurposeFederatedLogout, cacheConnectors.Config.FederatedLogouts, cacheConnectors)
+	if err != nil {
+		return nil, err
+	}
+
+	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, instanceInterceptor.Handler, federatedLogoutsCache))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost, login.EndpointSAMLACS)
 	if err != nil {
@@ -524,7 +531,25 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
-	oidcServer, err := oidc.NewServer(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, limitingAccessInterceptor, config.Log.Slog(), config.SystemDefaults.SecretHasher)
+	oidcServer, err := oidc.NewServer(
+		ctx,
+		config.OIDC,
+		login.DefaultLoggedOutPath,
+		config.ExternalSecure,
+		commands,
+		queries,
+		authRepo,
+		keys.OIDC,
+		keys.OIDCKey,
+		eventstore,
+		dbClient,
+		userAgentInterceptor,
+		instanceInterceptor.Handler,
+		limitingAccessInterceptor,
+		config.Log.Slog(),
+		config.SystemDefaults.SecretHasher,
+		federatedLogoutsCache,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start oidc provider: %w", err)
 	}
@@ -573,6 +598,7 @@ func startAPIs(
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
 		cacheConnectors,
+		federatedLogoutsCache,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)

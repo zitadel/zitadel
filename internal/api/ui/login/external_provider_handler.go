@@ -3,11 +3,13 @@ package login
 import (
 	"context"
 	"errors"
+	"html/template"
 	"net/http"
 	"net/url"
 	"slices"
 	"strings"
 
+	crewjam_saml "github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -20,6 +22,7 @@ import (
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -1416,6 +1419,132 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 			},
 		}, nil,
 	)
+}
+
+type federatedLogoutData struct {
+	SessionID string `schema:"sessionID"`
+}
+
+const (
+	federatedLogoutDataSessionID = "sessionID"
+)
+
+func ExternalLogoutPath(sessionID string) string {
+	v := url.Values{}
+	v.Set(federatedLogoutDataSessionID, sessionID)
+	return HandlerPrefix + EndpointExternalLogout + "?" + v.Encode()
+}
+
+// handleExternalLogout is called when a user signed out of ZITADEL with a federated logout
+func (l *Login) handleExternalLogout(w http.ResponseWriter, r *http.Request) {
+	data := new(federatedLogoutData)
+	err := l.parser.Parse(r, data)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+
+	logoutRequest, ok := l.caches.federatedLogouts.Get(r.Context(), federatedlogout.IndexRequestID, federatedlogout.Key(authz.GetInstance(r.Context()).InstanceID(), data.SessionID))
+	if !ok || logoutRequest.State != federatedlogout.StateCreated {
+		l.renderError(w, r, nil, zerrors.ThrowNotFound(nil, "LOGIN-ADK21", "Errors.ExternalIDP.LogoutRequestNotFound"))
+		return
+	}
+
+	session, err := l.authRepo.UserSessionByID(r.Context(), data.SessionID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+
+	if session.SelectedIDPConfigID.String == "" {
+		l.renderError(w, r, nil, zerrors.ThrowNotFound(nil, "LOGIN-SDF2g", "Errors.ExternalIDP.LogoutRequestNotFound"))
+		return
+	}
+
+	identityProvider, err := l.getIDPByID(r, session.SelectedIDPConfigID.String)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	if identityProvider.Type != domain.IDPTypeSAML {
+		l.externalAuthFailed(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-ADK21", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+		return
+	}
+
+	nameID, err := l.externalUserID(r.Context(), session.UserID, identityProvider.ID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+
+	provider, err := l.samlProvider(r.Context(), identityProvider)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+
+	err = samlLogoutRequest(w, r, provider, nameID, data.SessionID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	logoutRequest.State = federatedlogout.StateRedirected
+	l.caches.federatedLogouts.Set(r.Context(), logoutRequest)
+}
+
+func samlLogoutRequest(w http.ResponseWriter, r *http.Request, provider *saml.Provider, nameID, sessionID string) error {
+	mw, err := provider.GetSP()
+	if err != nil {
+		return err
+	}
+	slo := mw.ServiceProvider.GetSLOBindingLocation(crewjam_saml.HTTPRedirectBinding)
+	if slo != "" {
+		return samlRedirectLogoutRequest(w, r, mw.ServiceProvider, slo, nameID, sessionID)
+	}
+	slo = mw.ServiceProvider.GetSLOBindingLocation(crewjam_saml.HTTPPostBinding)
+	return samlPostLogoutRequest(w, mw.ServiceProvider, slo, nameID, sessionID)
+}
+
+func samlRedirectLogoutRequest(w http.ResponseWriter, r *http.Request, sp crewjam_saml.ServiceProvider, slo, nameID, sessionID string) error {
+	lr, err := sp.MakeLogoutRequest(slo, nameID)
+	if err != nil {
+		return err
+	}
+	http.Redirect(w, r, lr.Redirect(sessionID).String(), http.StatusFound)
+	return nil
+}
+
+var (
+	samlSLOPostTemplate = template.Must(template.New("samlSLOPost").Parse(`<!DOCTYPE html><html><body>{{.Form}}</body></html>`))
+)
+
+type samlSLOPostData struct {
+	Form template.HTML
+}
+
+func samlPostLogoutRequest(w http.ResponseWriter, sp crewjam_saml.ServiceProvider, slo, nameID, sessionID string) error {
+	lr, err := sp.MakeLogoutRequest(slo, nameID)
+	if err != nil {
+		return err
+	}
+
+	return samlSLOPostTemplate.Execute(w, &samlSLOPostData{Form: template.HTML(lr.Post(sessionID))})
+}
+
+func (l *Login) externalUserID(ctx context.Context, userID, idpID string) (string, error) {
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(userID)
+	if err != nil {
+		return "", err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return "", err
+	}
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery, idpIDQuery}}, nil)
+	if err != nil || len(links.Links) != 1 {
+		return "", zerrors.ThrowPreconditionFailed(err, "LOGIN-ADK21", "Errors.User.ExternalIDP.NotFound")
+	}
+	return links.Links[0].ProvidedUserID, nil
 }
 
 // IdPError wraps an error from an external IDP to be able to distinguish it from other errors and to display it
