@@ -27,3 +27,5 @@ LogStore.Access.Stdout.Enabled: true
 
 # Skipping the MFA init step allows us to immediately authenticate at the console
 DefaultInstance.LoginPolicy.MfaInitSkipLifetime: "0s"
+# To use the login container for all applications, we require it for the whole instance
+DefaultInstance.Features.LoginV2.Required: true

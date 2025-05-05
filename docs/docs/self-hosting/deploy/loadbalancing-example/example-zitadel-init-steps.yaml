@@ -2,9 +2,8 @@
 FirstInstance:
   PatPath: '/pat'
   Org:
-    Human:
-      # We want to authenticate immediately at the console without changing the password
-      PasswordChangeRequired: false
+    # We want to authenticate immediately at the console without changing the password
+    Human.PasswordChangeRequired: false
     Machine:
       Roles:
         - "IAM_OWNER"
