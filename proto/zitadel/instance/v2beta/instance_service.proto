@@ -106,10 +106,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 message DeleteInstanceRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 253},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 253;
       example: "\"222430354126975533\"";
     }
   ];
@@ -129,10 +129,10 @@ message GetInstanceResponse {
 
 message UpdateInstanceRequest {
   string instance_name = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 253},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 253;
       description: "\"name of the instance to update\"";
       example: "\"my instance\"";
     }
@@ -168,10 +168,10 @@ message ListInstancesResponse {
 
 message AddCustomDomainRequest {
   string domain = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 253},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 253;
     }
   ];
 }
@@ -186,10 +186,10 @@ message AddCustomDomainResponse {
 
 message RemoveCustomDomainRequest {
   string domain = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 253},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 253;
     }
   ];
 }
@@ -203,13 +203,6 @@ message RemoveCustomDomainResponse {
 }
 
 message ListCustomDomainsRequest {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Search query for lists";
-      required: ["query"]
-    };
-  };
-
   // Pagination and sorting.
   zitadel.filter.v2beta.PaginationRequest pagination = 1;
 
@@ -285,8 +278,8 @@ message ListTrustedDomainsResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 2;
 }
 
-// Service to manage instances and domains.
-// The service provides methods to create, update, delete and list instances and domains.
+// Service to manage instances and their domains.
+// The service provides methods to create, update, delete and list instances and their domains.
 service InstanceService {
 
   // Delete Instance
@@ -312,9 +305,6 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "system.instance.delete"
-      }
-      http_response: {
-        success_code: 204
       }
     };
   }
@@ -357,7 +347,7 @@ service InstanceService {
       responses: {
         key: "200";
         value: {
-          description: "The updated instance.";
+          description: "The instance was successfully updated.";
         }
       };
     };
@@ -393,7 +383,8 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      post: "/v2beta/instances/_search"
+      post: "/v2beta/instances/search"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -475,7 +466,8 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      post: "/v2beta/instances/current/custom-domains/_search"
+      post: "/v2beta/instances/current/custom-domains/search"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -558,7 +550,8 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      post: "/v2beta/instances/current/trusted-domains/_search"
+      post: "/v2beta/instances/current/trusted-domains/search"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
