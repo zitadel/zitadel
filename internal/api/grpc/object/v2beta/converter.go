@@ -114,6 +114,9 @@ func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS
 	case domain.OrgDomainValidationTypeHTTP:
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP
+	case domain.OrgDomainValidationTypeUnspecified:
+		// added to please golangci-lint
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
 	default:
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
 	}
@@ -155,6 +158,9 @@ func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) do
 		return domain.OrgDomainValidationTypeHTTP
 	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS:
 		return domain.OrgDomainValidationTypeDNS
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED:
+		// added to please golangci-lint
+		return domain.OrgDomainValidationTypeUnspecified
 	default:
 		return domain.OrgDomainValidationTypeUnspecified
 	}

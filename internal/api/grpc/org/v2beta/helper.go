@@ -57,6 +57,12 @@ func OrgStateToPb(state domain.OrgState) v2beta_org.OrgState {
 		return v2beta_org.OrgState_ORG_STATE_ACTIVE
 	case domain.OrgStateInactive:
 		return v2beta_org.OrgState_ORG_STATE_INACTIVE
+	case domain.OrgStateRemoved:
+		// added to please golangci-lint
+		return v2beta_org.OrgState_ORG_STATE_REMOVED
+	case domain.OrgStateUnspecified:
+		// added to please golangci-lint
+		return v2beta_org.OrgState_ORG_STATE_UNSPECIFIED
 	default:
 		return v2beta_org.OrgState_ORG_STATE_UNSPECIFIED
 	}
@@ -118,6 +124,9 @@ func OrgStateToDomain(state v2beta_org.OrgState) domain.OrgState {
 		return domain.OrgStateActive
 	case v2beta_org.OrgState_ORG_STATE_INACTIVE:
 		return domain.OrgStateInactive
+	case v2beta_org.OrgState_ORG_STATE_REMOVED:
+		// added to please golangci-lint
+		return domain.OrgStateRemoved
 	case v2beta_org.OrgState_ORG_STATE_UNSPECIFIED:
 		fallthrough
 	default:
