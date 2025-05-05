@@ -1,6 +1,6 @@
+import { Alert, AlertType } from "@/components/alert";
 import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import {
   getMostRecentCookieWithLoginname,
@@ -118,7 +118,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const { loginName, requestId, organization, sessionId } = searchParams;
-  // const sessionFactors = await loadSession(serviceUrl, loginName, requestId);
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
@@ -148,6 +147,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         </h1>
         <p className="ztdl-p mb-6 block">{t("description")}</p>
 
+        {requestId && requestId.startsWith("device_") && (
+          <Alert type={AlertType.INFO}>
+            You can now close this window and return to the device where you
+            started the authorization process to continue.
+          </Alert>
+        )}
+
         <UserAvatar
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
           displayName={sessionFactors?.factors?.user?.displayName}
@@ -155,9 +161,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           searchParams={searchParams}
         />
 
-        {sessionFactors?.id && (
+        {/* {sessionFactors?.id && (
           <SelfServiceMenu sessionId={sessionFactors?.id} />
-        )}
+        )} */}
 
         {loginSettings?.defaultRedirectUri && (
           <div className="mt-8 flex w-full flex-row items-center">

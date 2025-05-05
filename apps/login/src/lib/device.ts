@@ -101,6 +101,8 @@ export async function loginWithDeviceAndSession({
 
           const signedinUrl = constructUrl(request, "/signedin");
 
+          signedinUrl.searchParams.set("requestId", `device_${deviceRequest}`);
+
           if (selectedSession.factors?.user?.loginName) {
             signedinUrl.searchParams.set(
               "loginName",
