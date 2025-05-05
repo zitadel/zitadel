@@ -10,12 +10,10 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-
+	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	// TODO fix below
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-
-	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 // NOTE: most of this code is copied from `internal/api/grpc/admin/*`, as we will eventually axe the previous versons of the API,
