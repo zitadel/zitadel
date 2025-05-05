@@ -78,11 +78,7 @@ func TestAddCustomDomain(t *testing.T) {
 
 			if tc.expectedErrorMsg == "" {
 				assert.NotNil(t, res)
-				assert.NotNil(t, res.GetDetails())
-				assert.NotEmpty(t, res.GetDetails().GetSequence())
-				assert.NotEmpty(t, res.GetDetails().GetCreationDate())
-				assert.NotEmpty(t, res.GetDetails().GetResourceOwner())
-				assert.Empty(t, res.GetDetails().GetChangeDate())
+				assert.NotEmpty(t, res.GetCreationDate())
 			}
 		})
 	}
@@ -155,11 +151,7 @@ func TestRemoveCustomDomain(t *testing.T) {
 
 			if tc.expectedErrorMsg == "" {
 				assert.NotNil(t, res)
-				assert.NotNil(t, res.GetDetails())
-				assert.NotEmpty(t, res.GetDetails().GetSequence())
-				assert.Empty(t, res.GetDetails().GetCreationDate())
-				assert.NotEmpty(t, res.GetDetails().GetResourceOwner())
-				assert.NotEmpty(t, res.GetDetails().GetChangeDate())
+				assert.NotEmpty(t, res.GetDeletionDate())
 			}
 		})
 	}
@@ -229,11 +221,7 @@ func TestAddTrustedDomain(t *testing.T) {
 
 			if tc.expectedErrorMsg == "" {
 				assert.NotNil(t, res)
-				assert.NotNil(t, res.GetDetails())
-				assert.NotEmpty(t, res.GetDetails().GetSequence())
-				assert.NotEmpty(t, res.GetDetails().GetCreationDate())
-				assert.NotEmpty(t, res.GetDetails().GetResourceOwner())
-				assert.Empty(t, res.GetDetails().GetChangeDate())
+				assert.NotEmpty(t, res.GetCreationDate())
 			}
 		})
 	}
@@ -306,11 +294,7 @@ func TestRemoveTrustedDomain(t *testing.T) {
 
 			if tc.expectedErrorMsg == "" {
 				require.NotNil(t, res)
-				require.NotNil(t, res.GetDetails())
-				assert.NotEmpty(t, res.GetDetails().GetSequence())
-				assert.Empty(t, res.GetDetails().GetCreationDate())
-				assert.NotEmpty(t, res.GetDetails().GetResourceOwner())
-				assert.NotEmpty(t, res.GetDetails().GetChangeDate())
+				require.NotEmpty(t, res.GetDeletionDate())
 			}
 		})
 	}

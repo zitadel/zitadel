@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
@@ -42,7 +44,7 @@ func (s *Server) DeleteInstance(ctx context.Context, request *instance.DeleteIns
 	}
 
 	return &instance.DeleteInstanceResponse{
-		Details: object.DomainToDetailsPb(obj),
+		DeletionDate: timestamppb.New(obj.EventDate),
 	}, nil
 
 }
@@ -59,6 +61,6 @@ func (s *Server) UpdateInstance(ctx context.Context, request *instance.UpdateIns
 	}
 
 	return &instance.UpdateInstanceResponse{
-		Details: object.DomainToDetailsPb(obj),
+		ChangeDate: timestamppb.New(obj.EventDate),
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/cmd/build"
 	authn "github.com/zitadel/zitadel/internal/api/grpc/authn/v2beta"
@@ -29,11 +30,12 @@ func InstancesToPb(instances []*query.Instance) []*instance.Instance {
 
 func ToProtoObject(inst *query.Instance) *instance.Instance {
 	return &instance.Instance{
-		Id:      inst.ID,
-		Name:    inst.Name,
-		Domains: DomainsToPb(inst.Domains),
-		Version: build.Version(),
-		Details: object.ToViewDetailsPb(inst.Sequence, inst.CreationDate, inst.ChangeDate, inst.ID),
+		Id:           inst.ID,
+		Name:         inst.Name,
+		Domains:      DomainsToPb(inst.Domains),
+		Version:      build.Version(),
+		ChangeDate:   timestamppb.New(inst.ChangeDate),
+		CreationDate: timestamppb.New(inst.CreationDate),
 	}
 }
 
@@ -48,15 +50,11 @@ func DomainsToPb(domains []*query.InstanceDomain) []*instance.Domain {
 
 func DomainToPb(d *query.InstanceDomain) *instance.Domain {
 	return &instance.Domain{
-		Domain:    d.Domain,
-		Primary:   d.IsPrimary,
-		Generated: d.IsGenerated,
-		Details: object.ToViewDetailsPb(
-			d.Sequence,
-			d.CreationDate,
-			d.ChangeDate,
-			d.InstanceID,
-		),
+		Domain:       d.Domain,
+		Primary:      d.IsPrimary,
+		Generated:    d.IsGenerated,
+		InstanceId:   d.InstanceID,
+		CreationDate: timestamppb.New(d.CreationDate),
 	}
 }
 
@@ -359,13 +357,9 @@ func trustedDomainsToPb(domains []*query.InstanceTrustedDomain) []*instance.Trus
 
 func trustedDomainToPb(d *query.InstanceTrustedDomain) *instance.TrustedDomain {
 	return &instance.TrustedDomain{
-		Domain: d.Domain,
-		Details: object.ToViewDetailsPb(
-			d.Sequence,
-			d.CreationDate,
-			d.ChangeDate,
-			d.InstanceID,
-		),
+		Domain:       d.Domain,
+		InstanceId:   d.InstanceID,
+		CreationDate: timestamppb.New(d.CreationDate),
 	}
 }
 

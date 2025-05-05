@@ -163,9 +163,7 @@ func TestDeleteInstace(t *testing.T) {
 			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
 			if tc.expectedErrorMsg == "" {
 				require.NotNil(t, res)
-				require.NotNil(t, res.GetDetails())
-				assert.Equal(t, tc.expectedInstanceID, res.GetDetails().GetResourceOwner())
-				assert.NotEmpty(t, res.GetDetails().GetChangeDate())
+				require.NotEmpty(t, res.GetDeletionDate())
 			}
 		})
 	}
@@ -232,9 +230,7 @@ func TestUpdateInstace(t *testing.T) {
 			if tc.expectedErrorMsg == "" {
 
 				require.NotNil(t, res)
-				require.NotNil(t, res.GetDetails())
-				assert.NotEmpty(t, res.GetDetails().GetChangeDate())
-				assert.NotEmpty(t, res.GetDetails().GetResourceOwner())
+				assert.NotEmpty(t, res.GetChangeDate())
 
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, 20*time.Second)
 				require.EventuallyWithT(t, func(tt *assert.CollectT) {

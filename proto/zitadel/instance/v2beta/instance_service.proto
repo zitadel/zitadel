@@ -232,7 +232,11 @@ message DeleteInstanceRequest {
 }
 
 message DeleteInstanceResponse {
-  zitadel.object.v2.Details details = 1;
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message GetInstanceResponse {
@@ -252,7 +256,11 @@ message UpdateInstanceRequest {
 }
 
 message UpdateInstanceResponse {
-    zitadel.object.v2.Details details = 1;
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message ListInstancesRequest {
@@ -285,7 +293,11 @@ message AddCustomDomainRequest {
 }
 
 message AddCustomDomainResponse {
-  zitadel.object.v2.Details details = 1;
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message RemoveCustomDomainRequest {
@@ -299,7 +311,11 @@ message RemoveCustomDomainRequest {
 }
 
 message RemoveCustomDomainResponse {
-  zitadel.object.v2.Details details = 1;
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message ListCustomDomainsRequest {
@@ -340,7 +356,11 @@ message AddTrustedDomainRequest {
 }
 
 message AddTrustedDomainResponse {
-  zitadel.object.v2.Details details = 1;
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message RemoveTrustedDomainRequest {
@@ -356,7 +376,11 @@ message RemoveTrustedDomainRequest {
 }
 
 message RemoveTrustedDomainResponse {
-  zitadel.object.v2.Details details = 1;
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message ListTrustedDomainsRequest {

@@ -4,7 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
@@ -14,7 +15,7 @@ func (s *Server) AddCustomDomain(ctx context.Context, req *instance.AddCustomDom
 		return nil, err
 	}
 	return &instance.AddCustomDomainResponse{
-		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		CreationDate: timestamppb.New(details.CreationDate),
 	}, nil
 }
 
@@ -24,7 +25,7 @@ func (s *Server) RemoveCustomDomain(ctx context.Context, req *instance.RemoveCus
 		return nil, err
 	}
 	return &instance.RemoveCustomDomainResponse{
-		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		DeletionDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 
@@ -34,7 +35,7 @@ func (s *Server) AddTrustedDomain(ctx context.Context, req *instance.AddTrustedD
 		return nil, err
 	}
 	return &instance.AddTrustedDomainResponse{
-		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		CreationDate: timestamppb.New(details.CreationDate),
 	}, nil
 }
 
@@ -51,6 +52,6 @@ func (s *Server) RemoveTrustedDomain(ctx context.Context, req *instance.RemoveTr
 	}
 
 	return &instance.RemoveTrustedDomainResponse{
-		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		DeletionDate: timestamppb.New(details.EventDate),
 	}, nil
 }

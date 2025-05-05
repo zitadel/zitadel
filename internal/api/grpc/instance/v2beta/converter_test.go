@@ -52,24 +52,16 @@ func Test_InstancesToPb(t *testing.T) {
 			Name: "Instance One",
 			Domains: []*instance.Domain{
 				{
-					Domain:    "example.com",
-					Primary:   true,
-					Generated: false,
-					Details: &object.Details{
-						Sequence:      1,
-						ChangeDate:    &timestamppb.Timestamp{Seconds: 124},
-						CreationDate:  &timestamppb.Timestamp{Seconds: 123},
-						ResourceOwner: "instance1",
-					},
+					Domain:       "example.com",
+					Primary:      true,
+					Generated:    false,
+					InstanceId:   "instance1",
+					CreationDate: &timestamppb.Timestamp{Seconds: 123},
 				},
 			},
-			Version: build.Version(),
-			Details: &object.Details{
-				Sequence:      1,
-				ChangeDate:    &timestamppb.Timestamp{Seconds: 124},
-				CreationDate:  &timestamppb.Timestamp{Seconds: 123},
-				ResourceOwner: "instance1",
-			},
+			Version:      build.Version(),
+			ChangeDate:   &timestamppb.Timestamp{Seconds: 124},
+			CreationDate: &timestamppb.Timestamp{Seconds: 123},
 		},
 	}
 
