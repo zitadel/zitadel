@@ -19,8 +19,9 @@ import (
 
 func TestCommandSide_AddProject(t *testing.T) {
 	type fields struct {
-		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		idGenerator     id.Generator
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx     context.Context
@@ -39,7 +40,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 		{
 			name: "invalid project, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
@@ -54,7 +56,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 		{
 			name: "project, resourceowner empty",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
@@ -72,6 +75,29 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
+			name: "project, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				project: &AddProject{
+					ObjectRoot:             models.ObjectRoot{AggregateID: "project1", ResourceOwner: "org1"},
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
 			name: "project, already exists",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -84,7 +110,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
@@ -115,7 +142,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
@@ -134,12 +162,46 @@ func TestCommandSide_AddProject(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "project, with id, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPush(
+						project.NewProjectAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project", true, true, true,
+							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				project: &AddProject{
+					ObjectRoot:             models.ObjectRoot{AggregateID: "project1", ResourceOwner: "org1"},
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				checkPermission: tt.fields.checkPermission,
 			}
 			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.AddProject(tt.args.ctx, tt.args.project)
@@ -159,7 +221,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 
 func TestCommandSide_ChangeProject(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -179,7 +242,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 		{
 			name: "invalid project, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -198,7 +262,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 		{
 			name: "invalid project empty aggregateid, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -217,6 +282,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -251,6 +317,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -279,6 +346,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -298,6 +366,39 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "no changes, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				project: &ChangeProject{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					Name:                   gu.Ptr("project"),
+					ProjectRoleAssertion:   gu.Ptr(true),
+					ProjectRoleCheck:       gu.Ptr(true),
+					HasProjectCheck:        gu.Ptr(true),
+					PrivateLabelingSetting: gu.Ptr(domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -325,6 +426,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -371,6 +473,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -396,7 +499,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ChangeProject(tt.args.ctx, tt.args.project)
 			if tt.res.err == nil {
@@ -414,7 +518,8 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 
 func TestCommandSide_DeactivateProject(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -434,7 +539,8 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 		{
 			name: "invalid project id, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -451,6 +557,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -480,6 +587,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -507,6 +615,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -534,6 +643,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -544,6 +654,30 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "project deactivate, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -563,6 +697,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -579,7 +714,8 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.DeactivateProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -597,7 +733,8 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 
 func TestCommandSide_ReactivateProject(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -617,7 +754,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 		{
 			name: "invalid project id, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -634,6 +772,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -663,6 +802,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -686,6 +826,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -695,7 +836,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 			res: res{
 				err: zerrors.IsPreconditionFailed,
 			},
-		}, {
+		},
+		{
 			name: "project reactivate, no resourceOwner, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -716,6 +858,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -726,6 +869,34 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "project reactivate, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+						eventFromEventPusher(
+							project.NewProjectDeactivatedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -749,6 +920,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -765,7 +937,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ReactivateProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -783,7 +956,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 
 func TestCommandSide_RemoveProject(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -803,7 +977,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "invalid project id, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -817,7 +992,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 		{
 			name: "invalid resourceowner, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -834,6 +1010,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -863,6 +1040,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -894,6 +1072,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 							nil),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -946,6 +1125,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1032,6 +1212,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1048,7 +1229,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1066,7 +1248,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 
 func TestCommandSide_DeleteProject(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -1085,7 +1268,8 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 		{
 			name: "invalid project id, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1102,6 +1286,7 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1131,6 +1316,7 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1161,6 +1347,7 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 							nil),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1169,6 +1356,30 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 			},
 			res: res{
 				err: nil,
+			},
+		},
+		{
+			name: "project remove, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				projectID:     "project1",
+				resourceOwner: "",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1192,6 +1403,7 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 							nil),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1242,6 +1454,7 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1326,6 +1539,7 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1340,7 +1554,8 @@ func TestCommandSide_DeleteProject(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			_, err := r.DeleteProject(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner)
 			if tt.res.err == nil {

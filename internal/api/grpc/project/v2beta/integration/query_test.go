@@ -34,6 +34,13 @@ func TestServer_GetProject(t *testing.T) {
 			name: "missing permission",
 			args: args{
 				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
+				dep: func(request *project.GetProjectRequest, response *project.GetProjectResponse) {
+					name := gofakeit.Name()
+					orgID := instance.DefaultOrg.GetId()
+					resp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
+
+					request.Id = resp.GetId()
+				},
 				req: &project.GetProjectRequest{},
 			},
 			wantErr: true,
@@ -309,15 +316,15 @@ func TestServer_ListProjects(t *testing.T) {
 					{
 						State:                  1,
 						ProjectRoleAssertion:   false,
-						ProjectAccessRequired:  false,
-						AuthorizationRequired:  true,
+						ProjectAccessRequired:  true,
+						AuthorizationRequired:  false,
 						PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 					},
 					{
 						State:                  1,
 						ProjectRoleAssertion:   false,
-						ProjectAccessRequired:  true,
-						AuthorizationRequired:  false,
+						ProjectAccessRequired:  false,
+						AuthorizationRequired:  true,
 						PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
 					},
 					{

@@ -441,8 +441,8 @@ func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name 
 	resp, err := i.Client.Projectv2Beta.CreateProject(ctx, &project_v2beta.CreateProjectRequest{
 		OrganizationId:        orgID,
 		Name:                  name,
-		AuthorizationRequired: hasProjectCheck,
-		ProjectAccessRequired: projectRoleCheck,
+		AuthorizationRequired: projectRoleCheck,
+		ProjectAccessRequired: hasProjectCheck,
 	})
 	require.NoError(t, err)
 	return resp
