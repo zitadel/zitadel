@@ -96,6 +96,18 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "same organization, error",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				request.GrantedOrganizationId = orgResp.GetOrganizationId()
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
 			name: "empty, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
@@ -398,6 +410,24 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				return creationDate, time.Time{}
+			},
+			req:              &project.DeleteProjectGrantRequest{},
+			wantDeletionDate: true,
+		},
+		{
+			name: "delete deactivated",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				instance.DeactivateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
 				return creationDate, time.Time{}
 			},
 			req:              &project.DeleteProjectGrantRequest{},

@@ -42,7 +42,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *AddProjectRo
 
 	roleWriteModel := NewProjectRoleWriteModelWithKey(projectRole.Key, projectRole.AggregateID, projectRole.ResourceOwner)
 	if roleWriteModel.ResourceOwner != projectResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Role.Invalid")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-RLB4UpqQSd", "Errors.Project.Role.Invalid")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
@@ -78,7 +78,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 			return nil, err
 		}
 		if projectRole.ResourceOwner != projectResourceOwner {
-			return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Role.Invalid")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-9ZXtdaJKJJ", "Errors.Project.Role.Invalid")
 		}
 	}
 
@@ -95,7 +95,7 @@ func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.A
 	var events []eventstore.Command
 	for _, projectRole := range projectRoles {
 		if projectRole.ResourceOwner != projectAgg.ResourceOwner {
-			return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Role.Invalid")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-4Q2WjlbHvc", "Errors.Project.Role.Invalid")
 		}
 		if !projectRole.IsValid() {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
@@ -147,7 +147,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *ChangePro
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-vv8M9", "Errors.Project.Role.NotExisting")
 	}
 	if existingRole.ResourceOwner != projectResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Role.Invalid")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-3MizLWveMf", "Errors.Project.Role.Invalid")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)

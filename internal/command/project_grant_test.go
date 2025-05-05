@@ -195,7 +195,53 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "usergrant for project, ok",
+			name: "grant for project, same resourceowner",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"granted org",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"key1",
+								"key",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "projectgrant1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &AddProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
+					},
+					GrantedOrgID: "org1",
+					RoleKeys:     []string{"key1"},
+				},
+			},
+			res: res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "grant for project, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -251,7 +297,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "usergrant for project, id, ok",
+			name: "grant for project, id, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(

@@ -151,17 +151,28 @@ func projectToPb(project *query.Project) *project_pb.Project {
 }
 
 func grantedProjectToPb(project *query.GrantedProject) *project_pb.Project {
+	var grantedOrganizationID, grantedOrganizationName *string
+	if project.GrantedOrgID != "" {
+		grantedOrganizationID = &project.GrantedOrgID
+	}
+	if project.OrgName != "" {
+		grantedOrganizationName = &project.OrgName
+	}
+
 	return &project_pb.Project{
-		Id:                     project.ProjectID,
-		OrganizationId:         project.ResourceOwner,
-		CreationDate:           timestamppb.New(project.CreationDate),
-		ChangeDate:             timestamppb.New(project.ChangeDate),
-		State:                  projectStateToPb(project.ProjectState),
-		Name:                   project.ProjectName,
-		PrivateLabelingSetting: privateLabelingSettingToPb(project.PrivateLabelingSetting),
-		ProjectAccessRequired:  project.HasProjectCheck,
-		ProjectRoleAssertion:   project.ProjectRoleAssertion,
-		AuthorizationRequired:  project.ProjectRoleCheck,
+		Id:                      project.ProjectID,
+		OrganizationId:          project.ResourceOwner,
+		CreationDate:            timestamppb.New(project.CreationDate),
+		ChangeDate:              timestamppb.New(project.ChangeDate),
+		State:                   projectStateToPb(project.ProjectState),
+		Name:                    project.ProjectName,
+		PrivateLabelingSetting:  privateLabelingSettingToPb(project.PrivateLabelingSetting),
+		ProjectAccessRequired:   project.HasProjectCheck,
+		ProjectRoleAssertion:    project.ProjectRoleAssertion,
+		AuthorizationRequired:   project.ProjectRoleCheck,
+		GrantedOrganizationId:   grantedOrganizationID,
+		GrantedOrganizationName: grantedOrganizationName,
+		GrantedState:            grantedProjectStateToPb(project.ProjectGrantState),
 	}
 }
 
@@ -173,6 +184,16 @@ func projectStateToPb(state domain.ProjectState) project_pb.ProjectState {
 		return project_pb.ProjectState_PROJECT_STATE_INACTIVE
 	default:
 		return project_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
+	}
+}
+func grantedProjectStateToPb(state domain.ProjectGrantState) project_pb.GrantedProjectState {
+	switch state {
+	case domain.ProjectGrantStateActive:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_ACTIVE
+	case domain.ProjectGrantStateInactive:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_INACTIVE
+	default:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_UNSPECIFIED
 	}
 }
 

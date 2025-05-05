@@ -27,10 +27,10 @@ type AddProjectGrant struct {
 
 func (p *AddProjectGrant) IsValid() error {
 	if p.AggregateID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.Project.Grant.Invalid")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-FYRnWEzBzV", "Errors.Project.Grant.Invalid")
 	}
 	if p.GrantedOrgID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.Project.Grant.Invalid")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-PPhHpWGRAE", "Errors.Project.Grant.Invalid")
 	}
 	return nil
 }
@@ -80,9 +80,9 @@ func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *AddProjectG
 	}
 
 	wm := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, grant.ResourceOwner)
-	// error if provided resourceowner is not equal to the resourceowner of the project
-	if projectResourceOwner != wm.ResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Grant.Invalid")
+	// error if provided resourceowner is not equal to the resourceowner of the project or the project grant is for the same organization
+	if projectResourceOwner != wm.ResourceOwner || wm.ResourceOwner == grant.GrantedOrgID {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-ckUpbvboAH", "Errors.Project.Grant.Invalid")
 	}
 	if err := c.pushAppendAndReduce(ctx,
 		wm,
@@ -125,7 +125,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *ChangeProjectG
 	}
 	// error if provided resourceowner is not equal to the resourceowner of the project
 	if existingGrant.ResourceOwner != projectResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Grant.Invalid")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-q1BhA68RBC", "Errors.Project.Grant.Invalid")
 	}
 
 	// return if there are no changes to the project grant roles
@@ -218,7 +218,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	}
 	// error if provided resourceowner is not equal to the resourceowner of the project
 	if projectResourceOwner != existingGrant.ResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "TODO")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
 	}
 	// return if project grant is already inactive
 	if existingGrant.State == domain.ProjectGrantStateInactive {
@@ -263,7 +263,7 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	}
 	// error if provided resourceowner is not equal to the resourceowner of the project
 	if projectResourceOwner != existingGrant.ResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "TODO")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-byscAarAST", "Errors.Project.Grant.Invalid")
 	}
 	// return if project grant is already active
 	if existingGrant.State == domain.ProjectGrantStateActive {

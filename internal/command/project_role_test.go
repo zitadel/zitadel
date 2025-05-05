@@ -20,9 +20,8 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx           context.Context
-		role          *AddProjectRole
-		resourceOwner string
+		ctx  context.Context
+		role *AddProjectRole
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -65,7 +64,6 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 					},
 					Key: "key1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -94,7 +92,6 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						AggregateID: "project1",
 					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -135,7 +132,6 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 					DisplayName: "key",
 					Group:       "group",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -176,7 +172,49 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 					DisplayName: "key",
 					Group:       "group",
 				},
-				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add role, resourceowner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
+					expectPush(
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+							"key",
+							"group",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				role: &AddProjectRole{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
+					},
+					Key:         "key1",
+					DisplayName: "key",
+					Group:       "group",
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -597,7 +635,9 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
