@@ -11,11 +11,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	gofakeit "github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/zitadel/internal/integration"
 
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -265,53 +265,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	}
 }
 
-func TestServer_GetOrganizationByID(t *testing.T) {
-	orgs, orgsName, err := createOrgs(1)
-	if err != nil {
-		assert.Fail(t, "unable to create org")
-	}
-	orgId := orgs[0].Id
-	orgName := orgsName[0]
-
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *v2beta_org.GetOrganizationByIDRequest
-		want    *v2beta_org.GetOrganizationByIDResponse
-		wantErr bool
-	}{
-		{
-			name: "get organization happy path",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			req: &v2beta_org.GetOrganizationByIDRequest{
-				Id: orgId,
-			},
-		},
-		{
-			name: "get organization that doesn't exist",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			req: &v2beta_org.GetOrganizationByIDRequest{
-				Id: "non existing organization",
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.GetOrganizationByID(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			require.Equal(t, orgId, got.Organization.Id)
-			require.Equal(t, orgName, got.Organization.Name)
-		})
-	}
-}
-
-// TODO: finish off qyery testing in ListOrganizations
+// // TODO: finish off qyery testing in ListOrganizations
 func TestServer_ListOrganization(t *testing.T) {
 	noOfOrgs := 3
 	orgs, orgsName, err := createOrgs(noOfOrgs)
@@ -431,10 +385,22 @@ func TestServer_DeleteOrganization(t *testing.T) {
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 
-			_, err = Client.GetOrganizationByID(tt.ctx, &v2beta_org.GetOrganizationByIDRequest{
-				Id: tt.req.Id,
+			// _, err = Client.ListOrganizations(tt.ctx, &v2beta_org.GetOrganizationByIDRequest{
+			// 	Id: tt.req.Id,
+			// })
+			listOrgRes, err := Client.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
+				Queries: []*v2beta_org.OrgQuery{
+					{
+						Query: &v2beta_org.OrgQuery_IdQuery{
+							IdQuery: &v2beta_org.OrgIDQuery{
+								Id: tt.req.Id,
+							},
+						},
+					},
+				},
 			})
-			require.Contains(t, err.Error(), "Organisation not found")
+			require.NoError(t, err)
+			require.Nil(t, listOrgRes.Result)
 		})
 	}
 }
@@ -465,11 +431,19 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 	ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
 	// 2. check inital state of organization
-	res, err := Client.GetOrganizationByID(ctx, &org.GetOrganizationByIDRequest{
-		Id: orgId,
+	listOrgRes, err := Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+		Queries: []*v2beta_org.OrgQuery{
+			{
+				Query: &v2beta_org.OrgQuery_IdQuery{
+					IdQuery: &v2beta_org.OrgIDQuery{
+						Id: orgId,
+					},
+				},
+			},
+		},
 	})
 	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, res.Organization.State)
+	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Result[0].State)
 
 	// 3. deactivate organization once
 	deactivate_res, err := Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
@@ -483,26 +457,44 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 	assert.NotEmpty(t, deactivate_res.GetDetails().GetResourceOwner())
 
 	// 4. check organization state is deactivated
-	res, err = Client.GetOrganizationByID(ctx, &v2beta_org.GetOrganizationByIDRequest{
-		Id: orgId,
+	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+		Queries: []*v2beta_org.OrgQuery{
+			{
+				Query: &v2beta_org.OrgQuery_IdQuery{
+					IdQuery: &v2beta_org.OrgIDQuery{
+						Id: orgId,
+					},
+				},
+			},
+		},
 	})
 	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, res.Organization.State)
+	require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Result[0].State)
 
-	// 5. repeat deactivate organization once
-	deactivate_res, err = Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
+	// // 5. repeat deactivate organization once
+	// deactivate_res, err = Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
+	_, err = Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
 		Id: orgId,
 	})
+	// TODO this error message needs to be reoved
 	require.Contains(t, err.Error(), "Organisation is already deactivated")
 
 	// 6. repeat check organization state is still deactivated
-	res, err = Client.GetOrganizationByID(ctx, &v2beta_org.GetOrganizationByIDRequest{
-		Id: orgId,
+	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+		Queries: []*v2beta_org.OrgQuery{
+			{
+				Query: &v2beta_org.OrgQuery_IdQuery{
+					IdQuery: &v2beta_org.OrgIDQuery{
+						Id: orgId,
+					},
+				},
+			},
+		},
 	})
 	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, res.Organization.State)
+	require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Result[0].State)
 
-	// 7. reactivate organization
+	// // 7. reactivate organization
 	reactivate_res, err := Client.ReactivateOrganization(ctx, &v2beta_org.ReactivateOrganizationRequest{
 		Id: orgId,
 	})
@@ -513,46 +505,42 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 	assert.NotEmpty(t, reactivate_res.GetDetails().GetResourceOwner())
 
-	// 8. check organization state is active
-	res, err = Client.GetOrganizationByID(ctx, &v2beta_org.GetOrganizationByIDRequest{
-		Id: orgId,
+	// // 8. check organization state is active
+	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+		Queries: []*v2beta_org.OrgQuery{
+			{
+				Query: &v2beta_org.OrgQuery_IdQuery{
+					IdQuery: &v2beta_org.OrgIDQuery{
+						Id: orgId,
+					},
+				},
+			},
+		},
 	})
 	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, res.Organization.State)
+	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Result[0].State)
 
-	// 9. repeat reactivate organization
+	// // 9. repeat reactivate organization
 	reactivate_res, err = Client.ReactivateOrganization(ctx, &v2beta_org.ReactivateOrganizationRequest{
 		Id: orgId,
 	})
+	// TODO remove this error message
 	require.Contains(t, err.Error(), "Organisation is already active")
 
-	// 10. repeat check organization state is still active
-	res, err = Client.GetOrganizationByID(ctx, &v2beta_org.GetOrganizationByIDRequest{
-		Id: orgId,
+	// // 10. repeat check organization state is still active
+	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+		Queries: []*v2beta_org.OrgQuery{
+			{
+				Query: &v2beta_org.OrgQuery_IdQuery{
+					IdQuery: &v2beta_org.OrgIDQuery{
+						Id: orgId,
+					},
+				},
+			},
+		},
 	})
 	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, res.Organization.State)
-}
-
-func createOrgs(noOfOrgs int) ([]*v2beta_org.CreateOrganizationResponse, []string, error) {
-	var err error
-	orgs := make([]*v2beta_org.CreateOrganizationResponse, noOfOrgs)
-	orgsName := make([]string, noOfOrgs)
-
-	for i := range noOfOrgs {
-		orgName := gofakeit.Name()
-		orgsName[i] = orgName
-		orgs[i], err = Client.CreateOrganization(CTX,
-			&v2beta_org.CreateOrganizationRequest{
-				Name: orgName,
-			},
-		)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
-	return orgs, orgsName, nil
+	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Result[0].State)
 }
 
 func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
@@ -730,7 +718,6 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
 			},
 		},
-		// TODO: "validate org dns non existnetn org id" has an consistent error message, need to investigate this
 		{
 			name: "validate org dns non existnetn org id",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
@@ -742,7 +729,6 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
 		},
-		// TODO: "validate org non existnetn domain" has an consistent error message, need to investigate this
 		{
 			name: "validate org non existnetn domain",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
@@ -1243,6 +1229,27 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			require.Equal(t, len(tt.metadataToRemain), foundMetadataCount)
 		})
 	}
+}
+
+func createOrgs(noOfOrgs int) ([]*v2beta_org.CreateOrganizationResponse, []string, error) {
+	var err error
+	orgs := make([]*v2beta_org.CreateOrganizationResponse, noOfOrgs)
+	orgsName := make([]string, noOfOrgs)
+
+	for i := range noOfOrgs {
+		orgName := gofakeit.Name()
+		orgsName[i] = orgName
+		orgs[i], err = Client.CreateOrganization(CTX,
+			&v2beta_org.CreateOrganizationRequest{
+				Name: orgName,
+			},
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return orgs, orgsName, nil
 }
 
 func assertCreatedAdmin(t *testing.T, expected, got *v2beta_org.CreateOrganizationResponse_CreatedAdmin) {
