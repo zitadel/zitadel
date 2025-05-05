@@ -360,7 +360,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.AddProjectGrantWithID(tt.args.ctx, tt.args.projectGrant)
+			got, err := r.AddProjectGrant(tt.args.ctx, tt.args.projectGrant)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

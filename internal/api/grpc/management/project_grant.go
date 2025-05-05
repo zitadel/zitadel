@@ -66,7 +66,7 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 
 func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGrantRequest) (*mgmt_pb.AddProjectGrantResponse, error) {
 	grant := AddProjectGrantRequestToCommand(req, "", authz.GetCtxData(ctx).OrgID)
-	details, err := s.command.AddProjectGrantWithID(ctx, grant)
+	details, err := s.command.AddProjectGrant(ctx, grant)
 	if err != nil {
 		return nil, err
 	}

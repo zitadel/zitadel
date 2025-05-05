@@ -13,7 +13,7 @@ import (
 
 func (s *Server) CreateProjectGrant(ctx context.Context, req *project_pb.CreateProjectGrantRequest) (*project_pb.CreateProjectGrantResponse, error) {
 	add := projectGrantCreateToCommand(req)
-	project, err := s.command.AddProjectGrantWithID(ctx, add)
+	project, err := s.command.AddProjectGrant(ctx, add)
 	if err != nil {
 		return nil, err
 	}

@@ -35,11 +35,14 @@ func (p *AddProjectGrant) IsValid() error {
 	return nil
 }
 
-func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// grantID from before, generated if not and import
+	if err := grant.IsValid(); err != nil {
+		return nil, err
+	}
+
 	if grant.GrantID == "" {
 		grant.GrantID, err = c.idGenerator.Next()
 		if err != nil {
@@ -47,25 +50,6 @@ func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *AddProjectG
 		}
 	}
 
-	return c.addProjectGrantWithID(ctx, grant)
-}
-
-func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	// grantID was used before, to be backward compatible we fill the grantID with the granted org ID, to guarantee uniqueness
-	if grant.GrantID == "" {
-		grant.GrantID = grant.GrantedOrgID
-	}
-
-	return c.addProjectGrantWithID(ctx, grant)
-}
-
-func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
-	if err := grant.IsValid(); err != nil {
-		return nil, err
-	}
 	if err := c.checkPermissionWriteProjectGrant(ctx, grant.ResourceOwner, grant.GrantID); err != nil {
 		return nil, err
 	}
