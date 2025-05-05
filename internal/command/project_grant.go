@@ -39,6 +39,7 @@ func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *AddProjectG
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	// grantID from before, generated if not and import
 	if grant.GrantID == "" {
 		grant.GrantID, err = c.idGenerator.Next()
 		if err != nil {
@@ -46,17 +47,22 @@ func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *AddProjectG
 		}
 	}
 
-	return c.addProjectGrantWithID(ctx, grant, grant.GrantID)
+	return c.addProjectGrantWithID(ctx, grant)
 }
 
 func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	return c.addProjectGrantWithID(ctx, grant, "")
+	// grantID was used before, to be backward compatible we fill the grantID with the granted org ID, to guarantee uniqueness
+	if grant.GrantID == "" {
+		grant.GrantID = grant.GrantedOrgID
+	}
+
+	return c.addProjectGrantWithID(ctx, grant)
 }
 
-func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *AddProjectGrant, grantID string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *AddProjectGrant) (_ *domain.ObjectDetails, err error) {
 	if err := grant.IsValid(); err != nil {
 		return nil, err
 	}
@@ -64,17 +70,25 @@ func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *AddProjectG
 		return nil, err
 	}
 
-	err = c.checkProjectGrantPreCondition(ctx, grant.AggregateID, grant.GrantedOrgID, grant.ResourceOwner, grant.RoleKeys)
+	projectResourceOwner, err := c.checkProjectGrantPreCondition(ctx, grant.AggregateID, grant.GrantedOrgID, grant.ResourceOwner, grant.RoleKeys)
 	if err != nil {
 		return nil, err
 	}
+	// if there is no resourceowner provided then use the resourceowner of the project
+	if grant.ResourceOwner == "" {
+		grant.ResourceOwner = projectResourceOwner
+	}
 
-	wm := NewProjectGrantWriteModel(grantID, grant.AggregateID, grant.ResourceOwner)
+	wm := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, grant.ResourceOwner)
+	// error if provided resourceowner is not equal to the resourceowner of the project
+	if projectResourceOwner != wm.ResourceOwner {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Grant.Invalid")
+	}
 	if err := c.pushAppendAndReduce(ctx,
 		wm,
 		project.NewGrantAddedEvent(ctx,
 			ProjectAggregateFromWriteModel(&wm.WriteModel),
-			grantID,
+			grant.GrantID,
 			grant.GrantedOrgID,
 			grant.RoleKeys),
 	); err != nil {
@@ -105,11 +119,16 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *ChangeProjectG
 	if err := c.checkPermissionWriteProjectGrant(ctx, grant.ResourceOwner, grant.GrantID); err != nil {
 		return nil, err
 	}
-	err = c.checkProjectGrantPreCondition(ctx, existingGrant.AggregateID, existingGrant.GrantedOrgID, existingGrant.ResourceOwner, grant.RoleKeys)
+	projectResourceOwner, err := c.checkProjectGrantPreCondition(ctx, existingGrant.AggregateID, existingGrant.GrantedOrgID, existingGrant.ResourceOwner, grant.RoleKeys)
 	if err != nil {
 		return nil, err
 	}
+	// error if provided resourceowner is not equal to the resourceowner of the project
+	if existingGrant.ResourceOwner != projectResourceOwner {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "Errors.Project.Grant.Invalid")
+	}
 
+	// return if there are no changes to the project grant roles
 	if reflect.DeepEqual(existingGrant.RoleKeys, grant.RoleKeys) {
 		return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 	}
@@ -188,7 +207,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
 
-	err = c.checkProjectExists(ctx, projectID, resourceOwner)
+	projectResourceOwner, err := c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -197,6 +216,15 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	if err != nil {
 		return details, err
 	}
+	// error if provided resourceowner is not equal to the resourceowner of the project
+	if projectResourceOwner != existingGrant.ResourceOwner {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "TODO")
+	}
+	// return if project grant is already inactive
+	if existingGrant.State == domain.ProjectGrantStateInactive {
+		return writeModelToObjectDetails(&existingGrant.WriteModel), nil
+	}
+	// error if project grant is neither active nor inactive
 	if existingGrant.State != domain.ProjectGrantStateActive {
 		return details, zerrors.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotActive")
 	}
@@ -224,7 +252,7 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
 
-	err = c.checkProjectExists(ctx, projectID, resourceOwner)
+	projectResourceOwner, err := c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -233,6 +261,15 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	if err != nil {
 		return details, err
 	}
+	// error if provided resourceowner is not equal to the resourceowner of the project
+	if projectResourceOwner != existingGrant.ResourceOwner {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-TODO", "TODO")
+	}
+	// return if project grant is already active
+	if existingGrant.State == domain.ProjectGrantStateActive {
+		return writeModelToObjectDetails(&existingGrant.WriteModel), nil
+	}
+	// error if project grant is neither active nor inactive
 	if existingGrant.State != domain.ProjectGrantStateInactive {
 		return details, zerrors.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotInactive")
 	}
@@ -263,7 +300,10 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if err != nil {
 		return details, err
 	}
-
+	// return if project grant does not exist, or was removed already
+	if !existingGrant.State.Exists() {
+		return writeModelToObjectDetails(&existingGrant.WriteModel), nil
+	}
 	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
@@ -315,55 +355,61 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 	return writeModel, nil
 }
 
-func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectID, grantedOrgID, resourceOwner string, roles []string) error {
+func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectID, grantedOrgID, resourceOwner string, roles []string) (string, error) {
 	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
 		return c.checkProjectGrantPreConditionOld(ctx, projectID, grantedOrgID, resourceOwner, roles)
 	}
-	existingRoleKeys, err := c.searchProjectGrantState(ctx, projectID, grantedOrgID, resourceOwner)
+	projectResourceOwner, existingRoleKeys, err := c.searchProjectGrantState(ctx, projectID, grantedOrgID, resourceOwner)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if domain.HasInvalidRoles(existingRoleKeys, roles) {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
-	return nil
+	return projectResourceOwner, nil
 }
 
-func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grantedOrgID, resourceOwner string) (existingRoleKeys []string, err error) {
+func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grantedOrgID, resourceOwner string) (_ string, existingRoleKeys []string, err error) {
+	projectStateQuery := map[eventstore.FieldType]any{
+		eventstore.FieldTypeAggregateType: project.AggregateType,
+		eventstore.FieldTypeAggregateID:   projectID,
+		eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
+		eventstore.FieldTypeObjectType:    project.ProjectSearchType,
+	}
+	grantedOrgQuery := map[eventstore.FieldType]any{
+		eventstore.FieldTypeAggregateType: org.AggregateType,
+		eventstore.FieldTypeAggregateID:   grantedOrgID,
+		eventstore.FieldTypeFieldName:     org.OrgStateSearchField,
+		eventstore.FieldTypeObjectType:    org.OrgSearchType,
+	}
+	roleQuery := map[eventstore.FieldType]any{
+		eventstore.FieldTypeAggregateType: project.AggregateType,
+		eventstore.FieldTypeAggregateID:   projectID,
+		eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,
+		eventstore.FieldTypeObjectType:    project.ProjectRoleSearchType,
+	}
+
+	// as resourceowner is not always provided, it has to be separately
+	if resourceOwner != "" {
+		projectStateQuery[eventstore.FieldTypeResourceOwner] = resourceOwner
+		roleQuery[eventstore.FieldTypeResourceOwner] = resourceOwner
+	}
+
 	results, err := c.eventstore.Search(
 		ctx,
-		// project state query
-		map[eventstore.FieldType]any{
-			eventstore.FieldTypeResourceOwner: resourceOwner,
-			eventstore.FieldTypeAggregateType: project.AggregateType,
-			eventstore.FieldTypeAggregateID:   projectID,
-			eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
-			eventstore.FieldTypeObjectType:    project.ProjectSearchType,
-		},
-		// granted org query
-		map[eventstore.FieldType]any{
-			eventstore.FieldTypeAggregateType: org.AggregateType,
-			eventstore.FieldTypeAggregateID:   grantedOrgID,
-			eventstore.FieldTypeFieldName:     org.OrgStateSearchField,
-			eventstore.FieldTypeObjectType:    org.OrgSearchType,
-		},
-		// role query
-		map[eventstore.FieldType]any{
-			eventstore.FieldTypeResourceOwner: resourceOwner,
-			eventstore.FieldTypeAggregateType: project.AggregateType,
-			eventstore.FieldTypeAggregateID:   projectID,
-			eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,
-			eventstore.FieldTypeObjectType:    project.ProjectRoleSearchType,
-		},
+		projectStateQuery,
+		grantedOrgQuery,
+		roleQuery,
 	)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	var (
-		existsProject    bool
-		existsGrantedOrg bool
+		existsProject                bool
+		existingProjectResourceOwner string
+		existsGrantedOrg             bool
 	)
 
 	for _, result := range results {
@@ -372,31 +418,32 @@ func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grant
 			var role string
 			err := result.Value.Unmarshal(&role)
 			if err != nil {
-				return nil, err
+				return "", nil, err
 			}
 			existingRoleKeys = append(existingRoleKeys, role)
 		case org.OrgSearchType:
 			var state domain.OrgState
 			err := result.Value.Unmarshal(&state)
 			if err != nil {
-				return nil, err
+				return "", nil, err
 			}
 			existsGrantedOrg = state.Valid() && state != domain.OrgStateRemoved
 		case project.ProjectSearchType:
 			var state domain.ProjectState
 			err := result.Value.Unmarshal(&state)
 			if err != nil {
-				return nil, err
+				return "", nil, err
 			}
 			existsProject = state.Valid() && state != domain.ProjectStateRemoved
+			existingProjectResourceOwner = result.Aggregate.ResourceOwner
 		}
 	}
 
 	if !existsProject {
-		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
+		return "", nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
 	}
 	if !existsGrantedOrg {
-		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+		return "", nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 	}
-	return existingRoleKeys, nil
+	return existingProjectResourceOwner, existingRoleKeys, nil
 }

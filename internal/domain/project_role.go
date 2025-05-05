@@ -20,8 +20,8 @@ const (
 	ProjectRoleStateRemoved
 )
 
-func NewProjectRole(projectID, key string) *ProjectRole {
-	return &ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: projectID}, Key: key}
+func (s ProjectRoleState) Exists() bool {
+	return s != ProjectRoleStateUnspecified && s != ProjectRoleStateRemoved
 }
 
 func (p *ProjectRole) IsValid() bool {

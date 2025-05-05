@@ -19,8 +19,9 @@ import (
 
 func TestCommandSide_AddProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		idGenerator     id.Generator
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx          context.Context
@@ -39,7 +40,8 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 		{
 			name: "invalid usergrant, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -61,6 +63,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -105,6 +108,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -135,6 +139,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -171,6 +176,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -224,7 +230,8 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "projectgrant1"),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "projectgrant1"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -279,6 +286,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -302,8 +310,9 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.AddProjectGrantWithID(tt.args.ctx, tt.args.projectGrant)
 			if tt.res.err == nil {
@@ -322,7 +331,8 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 
 func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx                 context.Context
@@ -342,7 +352,8 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 		{
 			name: "invalid projectgrant, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -363,6 +374,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -393,6 +405,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 					),
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -436,6 +449,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -474,6 +488,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -517,6 +532,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -569,6 +585,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -582,7 +599,9 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
@@ -636,6 +655,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -706,6 +726,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -790,6 +811,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -813,7 +835,8 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ChangeProjectGrant(tt.args.ctx, tt.args.projectGrant, tt.args.cascadeUserGrantIDs...)
 			if tt.res.err == nil {
@@ -831,7 +854,8 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 
 func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -852,7 +876,8 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing projectid, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -866,7 +891,8 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing grantid, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -883,6 +909,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -909,6 +936,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 					),
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -921,7 +949,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "projectgrant already deactivated, precondition error",
+			name: "projectgrant already deactivated, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -946,6 +974,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 						)),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -954,7 +983,9 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
@@ -985,6 +1016,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1002,7 +1034,8 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.DeactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1020,7 +1053,8 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 
 func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -1041,7 +1075,8 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing projectid, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1055,7 +1090,8 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 		{
 			name: "missing grantid, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1072,6 +1108,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1098,6 +1135,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 					),
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1131,6 +1169,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 						)),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1139,7 +1178,9 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
@@ -1174,6 +1215,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1191,7 +1233,8 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ReactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1209,7 +1252,8 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 
 func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx                 context.Context
@@ -1231,7 +1275,8 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "missing projectid, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1245,7 +1290,8 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 		{
 			name: "missing grantid, invalid error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1276,6 +1322,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1293,6 +1340,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1324,6 +1372,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1358,6 +1407,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:                 context.Background(),
@@ -1405,6 +1455,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:                 context.Background(),
@@ -1423,7 +1474,8 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner, tt.args.cascadeUserGrantIDs...)
 			if tt.res.err == nil {

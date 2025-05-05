@@ -90,11 +90,29 @@ func (s *Server) ActivateProjectGrant(ctx context.Context, req *project_pb.Activ
 }
 
 func (s *Server) DeleteProjectGrant(ctx context.Context, req *project_pb.DeleteProjectGrantRequest) (*project_pb.DeleteProjectGrantResponse, error) {
-	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.ProjectId)
+	userGrantIDs, err := s.userGrantsFromProjectGrant(ctx, req.ProjectId, req.GrantedOrganizationId)
 	if err != nil {
 		return nil, err
 	}
-	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantedOrganizationId)
+	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantedOrganizationId, "", userGrantIDs...)
+	if err != nil {
+		return nil, err
+	}
+	var deletionDate *timestamppb.Timestamp
+	if !details.EventDate.IsZero() {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+	return &project_pb.DeleteProjectGrantResponse{
+		DeletionDate: deletionDate,
+	}, nil
+}
+
+func (s *Server) userGrantsFromProjectGrant(ctx context.Context, projectID, grantedOrganizationID string) ([]string, error) {
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(grantedOrganizationID)
 	if err != nil {
 		return nil, err
 	}
@@ -104,18 +122,5 @@ func (s *Server) DeleteProjectGrant(ctx context.Context, req *project_pb.DeleteP
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantedOrganizationId, "", userGrantsToIDs(userGrants.UserGrants)...)
-	if err != nil {
-		return nil, err
-	}
-	var deletionDate *timestamppb.Timestamp
-	if !details.EventDate.IsZero() {
-		deletionDate = timestamppb.New(details.EventDate)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return &project_pb.DeleteProjectGrantResponse{
-		DeletionDate: deletionDate,
-	}, nil
+	return userGrantsToIDs(userGrants.UserGrants), nil
 }

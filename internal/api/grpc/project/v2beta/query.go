@@ -192,6 +192,10 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProj
 	if err != nil {
 		return nil, err
 	}
+	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	if err != nil {
+		return nil, err
+	}
 	resp, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
@@ -210,12 +214,31 @@ func (s *Server) listProjectGrantsRequestToModel(req *project_pb.ListProjectGran
 	}
 	return &query.ProjectGrantSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset: offset,
-			Limit:  limit,
-			Asc:    asc,
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: projectGrantFieldNameToSortingColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil
+}
+
+func projectGrantFieldNameToSortingColumn(field *project_pb.ProjectGrantFieldName) query.Column {
+	if field == nil {
+		return query.ProjectGrantColumnCreationDate
+	}
+	switch *field {
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_PROJECT_ID:
+		return query.ProjectGrantColumnProjectID
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_CREATION_DATE:
+		return query.ProjectGrantColumnCreationDate
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_CHANGE_DATE:
+		return query.ProjectGrantColumnChangeDate
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_UNSPECIFIED:
+		return query.ProjectGrantColumnCreationDate
+	default:
+		return query.ProjectGrantColumnCreationDate
+	}
 }
 
 func projectGrantFiltersToModel(queries []*project_pb.ProjectGrantSearchFilter) (_ []query.SearchQuery, err error) {
@@ -276,5 +299,108 @@ func projectGrantStateToPb(state domain.ProjectGrantState) project_pb.ProjectGra
 		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
 	default:
 		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
+	}
+}
+
+func (s *Server) ListProjectRoles(ctx context.Context, req *project_pb.ListProjectRolesRequest) (*project_pb.ListProjectRolesResponse, error) {
+	queries, err := s.listProjectRolesRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendProjectIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	if err != nil {
+		return nil, err
+	}
+	roles, err := s.query.SearchProjectRoles(ctx, true, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &project_pb.ListProjectRolesResponse{
+		ProjectRoles: roleViewsToPb(roles.ProjectRoles),
+		Pagination:   filter.QueryToPaginationPb(queries.SearchRequest, roles.SearchResponse),
+	}, nil
+}
+
+func (s *Server) listProjectRolesRequestToModel(req *project_pb.ListProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	queries, err := roleQueriesToModel(req.Filters)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectRoleSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: projectRoleFieldNameToSortingColumn(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func projectRoleFieldNameToSortingColumn(field *project_pb.ProjectRoleFieldName) query.Column {
+	if field == nil {
+		return query.ProjectRoleColumnCreationDate
+	}
+	switch *field {
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_KEY:
+		return query.ProjectRoleColumnKey
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_CREATION_DATE:
+		return query.ProjectRoleColumnCreationDate
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_CHANGE_DATE:
+		return query.ProjectRoleColumnChangeDate
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_UNSPECIFIED:
+		return query.ProjectRoleColumnCreationDate
+	default:
+		return query.ProjectRoleColumnCreationDate
+	}
+}
+
+func roleQueriesToModel(queries []*project_pb.ProjectRoleSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = roleQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func roleQueryToModel(apiQuery *project_pb.ProjectRoleSearchFilter) (query.SearchQuery, error) {
+	switch q := apiQuery.Filter.(type) {
+	case *project_pb.ProjectRoleSearchFilter_RoleKeyFilter:
+		return query.NewProjectRoleKeySearchQuery(filter.TextMethodPbToQuery(q.RoleKeyFilter.Method), q.RoleKeyFilter.Key)
+	case *project_pb.ProjectRoleSearchFilter_DisplayNameFilter:
+		return query.NewProjectRoleDisplayNameSearchQuery(filter.TextMethodPbToQuery(q.DisplayNameFilter.Method), q.DisplayNameFilter.DisplayName)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
+	}
+}
+
+func roleViewsToPb(roles []*query.ProjectRole) []*project_pb.ProjectRole {
+	o := make([]*project_pb.ProjectRole, len(roles))
+	for i, org := range roles {
+		o[i] = roleViewToPb(org)
+	}
+	return o
+}
+
+func roleViewToPb(role *query.ProjectRole) *project_pb.ProjectRole {
+	return &project_pb.ProjectRole{
+		ProjectId:    role.ProjectID,
+		Key:          role.Key,
+		CreationDate: timestamppb.New(role.CreationDate),
+		ChangeDate:   timestamppb.New(role.ChangeDate),
+		DisplayName:  role.DisplayName,
+		Group:        role.Group,
 	}
 }

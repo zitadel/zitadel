@@ -6,13 +6,10 @@ import (
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
-	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
@@ -93,18 +90,12 @@ func projectUpdateToCommand(req *project_pb.UpdateProjectRequest) *command.Chang
 }
 
 func (s *Server) DeleteProject(ctx context.Context, req *project_pb.DeleteProjectRequest) (*project_pb.DeleteProjectResponse, error) {
-	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: []query.SearchQuery{projectQuery},
-	}, true)
+	userGrantIDs, err := s.userGrantsFromProject(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	deletedAt, err := s.command.DeleteProject(ctx, req.Id, "", userGrantsToIDs(grants.UserGrants)...)
+	deletedAt, err := s.command.DeleteProject(ctx, req.Id, "", userGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
@@ -115,6 +106,20 @@ func (s *Server) DeleteProject(ctx context.Context, req *project_pb.DeleteProjec
 	return &project_pb.DeleteProjectResponse{
 		DeletionDate: deletionDate,
 	}, nil
+}
+
+func (s *Server) userGrantsFromProject(ctx context.Context, projectID string) ([]string, error) {
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery},
+	}, false)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantsToIDs(userGrants.UserGrants), nil
 }
 
 func (s *Server) DeactivateProject(ctx context.Context, req *project_pb.DeactivateProjectRequest) (*project_pb.DeactivateProjectResponse, error) {
@@ -142,26 +147,6 @@ func (s *Server) ActivateProject(ctx context.Context, req *project_pb.ActivatePr
 	}
 	return &project_pb.ActivateProjectResponse{
 		ChangeDate: changeDate,
-	}, nil
-}
-
-func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRequest) (*mgmt_pb.RemoveProjectResponse, error) {
-	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: []query.SearchQuery{projectQuery},
-	}, true)
-	if err != nil {
-		return nil, err
-	}
-	details, err := s.command.RemoveProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants.UserGrants)...)
-	if err != nil {
-		return nil, err
-	}
-	return &mgmt_pb.RemoveProjectResponse{
-		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 

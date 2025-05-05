@@ -441,8 +441,8 @@ func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name 
 	resp, err := i.Client.Projectv2Beta.CreateProject(ctx, &project_v2beta.CreateProjectRequest{
 		OrganizationId:        orgID,
 		Name:                  name,
-		AuthorizationRequired: hasProjectCheck,
-		ProjectAccessRequired: projectRoleCheck,
+		AuthorizationRequired: projectRoleCheck,
+		ProjectAccessRequired: hasProjectCheck,
 	})
 	require.NoError(t, err)
 	return resp
@@ -467,6 +467,31 @@ func (i *Instance) DeactivateProject(ctx context.Context, t *testing.T, projectI
 func (i *Instance) ActivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.ActivateProjectResponse {
 	resp, err := i.Client.Projectv2Beta.ActivateProject(ctx, &project_v2beta.ActivateProjectRequest{
 		Id: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) AddProjectRole(ctx context.Context, t *testing.T, projectID, roleKey, displayName, group string) *project_v2beta.AddProjectRoleResponse {
+	var groupP *string
+	if group != "" {
+		groupP = &group
+	}
+
+	resp, err := i.Client.Projectv2Beta.AddProjectRole(ctx, &project_v2beta.AddProjectRoleRequest{
+		ProjectId:   projectID,
+		RoleKey:     roleKey,
+		DisplayName: displayName,
+		Group:       groupP,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) RemoveProjectRole(ctx context.Context, t *testing.T, projectID, roleKey string) *project_v2beta.RemoveProjectRoleResponse {
+	resp, err := i.Client.Projectv2Beta.RemoveProjectRole(ctx, &project_v2beta.RemoveProjectRoleRequest{
+		ProjectId: projectID,
+		RoleKey:   roleKey,
 	})
 	require.NoError(t, err)
 	return resp

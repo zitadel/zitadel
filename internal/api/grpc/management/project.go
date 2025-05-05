@@ -264,21 +264,21 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, req *mgmt_pb.AddProjectRoleRequest) (*mgmt_pb.AddProjectRoleResponse, error) {
-	role, err := s.command.AddProjectRole(ctx, AddProjectRoleRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	role, err := s.command.AddProjectRole(ctx, AddProjectRoleRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectRoleResponse{
 		Details: object_grpc.AddToDetailsPb(
 			role.Sequence,
-			role.ChangeDate,
+			role.EventDate,
 			role.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) BulkAddProjectRoles(ctx context.Context, req *mgmt_pb.BulkAddProjectRolesRequest) (*mgmt_pb.BulkAddProjectRolesResponse, error) {
-	details, err := s.command.BulkAddProjectRole(ctx, req.ProjectId, authz.GetCtxData(ctx).OrgID, BulkAddProjectRolesRequestToDomain(req))
+	details, err := s.command.BulkAddProjectRole(ctx, req.ProjectId, authz.GetCtxData(ctx).OrgID, BulkAddProjectRolesRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
@@ -288,14 +288,14 @@ func (s *Server) BulkAddProjectRoles(ctx context.Context, req *mgmt_pb.BulkAddPr
 }
 
 func (s *Server) UpdateProjectRole(ctx context.Context, req *mgmt_pb.UpdateProjectRoleRequest) (*mgmt_pb.UpdateProjectRoleResponse, error) {
-	role, err := s.command.ChangeProjectRole(ctx, UpdateProjectRoleRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	role, err := s.command.ChangeProjectRole(ctx, UpdateProjectRoleRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectRoleResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			role.Sequence,
-			role.ChangeDate,
+			role.EventDate,
 			role.ResourceOwner,
 		),
 	}, nil

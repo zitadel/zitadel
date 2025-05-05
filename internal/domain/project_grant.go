@@ -26,6 +26,10 @@ func (s ProjectGrantState) Valid() bool {
 	return s > ProjectGrantStateUnspecified && s < projectGrantStateMax
 }
 
+func (s ProjectGrantState) Exists() bool {
+	return s != ProjectGrantStateUnspecified && s != ProjectGrantStateRemoved
+}
+
 func (p *ProjectGrant) IsValid() bool {
 	return p.GrantedOrgID != ""
 }

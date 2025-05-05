@@ -143,14 +143,14 @@ func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryRedu
 	return project, nil
 }
 
-func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resourceOwner string) (*eventstore.Aggregate, domain.ProjectState, error) {
-	result, err := c.projectState(ctx, projectID, resourceOwner)
+func (c *Commands) projectAggregateByID(ctx context.Context, projectID string) (*eventstore.Aggregate, domain.ProjectState, error) {
+	result, err := c.projectState(ctx, projectID)
 	if err != nil {
 		return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-NDQoF", "Errors.Project.NotFound")
 	}
 	if len(result) == 0 {
 		_ = projection.ProjectGrantFields.Trigger(ctx)
-		result, err = c.projectState(ctx, projectID, resourceOwner)
+		result, err = c.projectState(ctx, projectID)
 		if err != nil || len(result) == 0 {
 			return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-U1nza", "Errors.Project.NotFound")
 		}
@@ -164,7 +164,7 @@ func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resource
 	return &result[0].Aggregate, state, nil
 }
 
-func (c *Commands) projectState(ctx context.Context, projectID, resourceOwner string) ([]*eventstore.SearchResult, error) {
+func (c *Commands) projectState(ctx context.Context, projectID string) ([]*eventstore.SearchResult, error) {
 	return c.eventstore.Search(
 		ctx,
 		map[eventstore.FieldType]any{
@@ -172,12 +172,11 @@ func (c *Commands) projectState(ctx context.Context, projectID, resourceOwner st
 			eventstore.FieldTypeObjectID:       projectID,
 			eventstore.FieldTypeObjectRevision: project.ProjectObjectRevision,
 			eventstore.FieldTypeFieldName:      project.ProjectStateSearchField,
-			eventstore.FieldTypeResourceOwner:  resourceOwner,
 		},
 	)
 }
 
-func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOwner string) (err error) {
+func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOwner string) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -185,11 +184,11 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 		return c.checkProjectExistsOld(ctx, projectID, resourceOwner)
 	}
 
-	_, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
+	agg, state, err := c.projectAggregateByID(ctx, projectID)
 	if err != nil || !state.Valid() {
-		return zerrors.ThrowPreconditionFailed(err, "COMMA-VCnwD", "Errors.Project.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(err, "COMMA-VCnwD", "Errors.Project.NotFound")
 	}
-	return nil
+	return agg.ResourceOwner, nil
 }
 
 type ChangeProject struct {
@@ -256,7 +255,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 		return c.deactivateProjectOld(ctx, projectID, resourceOwner)
 	}
 
-	projectAgg, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
+	projectAgg, state, err := c.projectAggregateByID(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +291,7 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 		return c.reactivateProjectOld(ctx, projectID, resourceOwner)
 	}
 
-	projectAgg, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
+	projectAgg, state, err := c.projectAggregateByID(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}

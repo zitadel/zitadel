@@ -58,6 +58,29 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "project not existing",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				request.ProjectId = "something"
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "org not existing",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				request.GrantedOrganizationId = "something"
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
 			name: "already existing, error",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
@@ -78,6 +101,42 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
 				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+			},
+			req: &project.CreateProjectGrantRequest{},
+			want: want{
+				creationDate: true,
+			},
+		},
+		{
+			name: "with roles, not existing",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				roles := []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+				request.RoleKeys = roles
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "with roles, ok",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				roles := []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+				for _, role := range roles {
+					instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), role, role, "")
+				}
+
+				request.RoleKeys = roles
 
 				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
@@ -201,6 +260,9 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 
 				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+				for _, role := range roles {
+					instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), role, role, "")
+				}
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId(), roles...)
 				request.RoleKeys = roles
@@ -213,6 +275,24 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 				change:     true,
 				changeDate: true,
 			},
+		},
+		{
+			name: "change roles, not existing",
+			prepare: func(request *project.UpdateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				request.RoleKeys = []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+			},
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &project.UpdateProjectGrantRequest{},
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -436,7 +516,10 @@ func TestServer_DeactivateProjectGrant(t *testing.T) {
 				ctx: iamOwnerCtx,
 				req: &project.DeactivateProjectGrantRequest{},
 			},
-			wantErr: true,
+			want: want{
+				change:     false,
+				changeDate: true,
+			},
 		},
 		{
 			name: "change, ok",
@@ -555,7 +638,10 @@ func TestServer_ActivateProjectGrant(t *testing.T) {
 				ctx: iamOwnerCtx,
 				req: &project.ActivateProjectGrantRequest{},
 			},
-			wantErr: true,
+			want: want{
+				change:     false,
+				changeDate: true,
+			},
 		},
 		{
 			name: "change, ok",

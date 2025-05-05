@@ -369,7 +369,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectID2, _ := createOIDCApplication(ctx, t, true, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID2, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID2, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
@@ -384,7 +384,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
@@ -405,9 +405,9 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
-				projectGrantResp := Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
+				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
@@ -542,9 +542,9 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
-				projectGrantResp := Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
+				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
@@ -562,7 +562,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
@@ -604,7 +604,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectID, clientID := createOIDCApplication(ctx, t, false, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
