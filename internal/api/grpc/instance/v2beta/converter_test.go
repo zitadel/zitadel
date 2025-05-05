@@ -7,18 +7,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/cmd/build"
-	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	authn "github.com/zitadel/zitadel/pkg/grpc/authn/v2beta"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -222,177 +216,6 @@ func Test_instanceQueryToModel(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.want, got)
 			}
-		})
-	}
-}
-
-func Test_CreateInstancePbToSetupInstance(t *testing.T) {
-	t.Parallel()
-
-	nowTS := timestamppb.Now()
-	tests := []struct {
-		name            string
-		req             *instance.CreateInstanceRequest
-		defaultInstance command.InstanceSetup
-		externalDomain  string
-		want            *command.InstanceSetup
-	}{
-		{
-			name: "Set instance name, custom domain and organization name",
-			req: &instance.CreateInstanceRequest{
-				InstanceName: " TestInstance",
-				CustomDomain: "test.com ",
-				FirstOrgName: " org ",
-			},
-			defaultInstance: command.InstanceSetup{},
-			externalDomain:  "external.com",
-			want: &command.InstanceSetup{
-				InstanceName: "TestInstance",
-				CustomDomain: "test.com",
-				Org: command.InstanceOrgSetup{
-					Name: "org",
-				},
-			},
-		},
-		{
-			name: "Set machine user with PAT",
-			req: &instance.CreateInstanceRequest{
-				Owner: &instance.CreateInstanceRequest_Machine_{
-					Machine: &instance.CreateInstanceRequest_Machine{
-						UserName: "machine-user",
-						Name:     "Machine Name",
-						PersonalAccessToken: &instance.CreateInstanceRequest_PersonalAccessToken{
-							ExpirationDate: nowTS,
-						},
-						MachineKey: &instance.CreateInstanceRequest_MachineKey{
-							Type:           authn.KeyType_KEY_TYPE_JSON,
-							ExpirationDate: nowTS,
-						},
-					},
-				},
-			},
-			defaultInstance: command.InstanceSetup{
-				Org: command.InstanceOrgSetup{},
-			},
-			externalDomain: "external.com",
-			want: &command.InstanceSetup{
-				Org: command.InstanceOrgSetup{
-					Machine: &command.AddMachine{
-						Machine: &command.Machine{
-							Username: "machine-user",
-							Name:     "Machine Name",
-						},
-						Pat: &command.AddPat{
-							ExpirationDate: nowTS.AsTime(),
-							Scopes:         []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
-						},
-						MachineKey: &command.AddMachineKey{
-							Type:           domain.AuthNKeyTypeJSON,
-							ExpirationDate: nowTS.AsTime(),
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "Set machine user with default machine PAT",
-			req: &instance.CreateInstanceRequest{
-				Owner: &instance.CreateInstanceRequest_Machine_{
-					Machine: &instance.CreateInstanceRequest_Machine{
-						UserName:            "machine-user",
-						Name:                "Machine Name",
-						PersonalAccessToken: &instance.CreateInstanceRequest_PersonalAccessToken{},
-						MachineKey:          &instance.CreateInstanceRequest_MachineKey{},
-					},
-				},
-			},
-			defaultInstance: command.InstanceSetup{
-				Org: command.InstanceOrgSetup{
-					Machine: &command.AddMachine{
-						Pat: &command.AddPat{
-							ExpirationDate: nowTS.AsTime(),
-						},
-						MachineKey: &command.AddMachineKey{
-							Type:           domain.AuthNKeyTypeJSON,
-							ExpirationDate: nowTS.AsTime(),
-						},
-					},
-				},
-			},
-			externalDomain: "external.com",
-			want: &command.InstanceSetup{
-				Org: command.InstanceOrgSetup{
-					Machine: &command.AddMachine{
-						Machine: &command.Machine{
-							Username: "machine-user",
-							Name:     "Machine Name",
-						},
-						Pat: &command.AddPat{
-							ExpirationDate: nowTS.AsTime(),
-							Scopes:         []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
-						},
-						MachineKey: &command.AddMachineKey{
-							Type:           domain.AuthNKeyTypeJSON,
-							ExpirationDate: nowTS.AsTime(),
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "Set human user",
-			req: &instance.CreateInstanceRequest{
-				Owner: &instance.CreateInstanceRequest_Human_{
-					Human: &instance.CreateInstanceRequest_Human{
-						UserName: "human-user ",
-						Email: &instance.CreateInstanceRequest_Email{
-							Email: "john.doe@example.com",
-						},
-						Profile: &instance.CreateInstanceRequest_Profile{
-							FirstName:         "John ",
-							LastName:          " Doe",
-							PreferredLanguage: "it ",
-						},
-						Password: &instance.CreateInstanceRequest_Password{},
-					},
-				},
-			},
-			defaultInstance: command.InstanceSetup{
-				Org: command.InstanceOrgSetup{Human: &command.AddHuman{}},
-			},
-			externalDomain: "external.com",
-			want: &command.InstanceSetup{
-				Org: command.InstanceOrgSetup{
-					Human: &command.AddHuman{
-						Username:  "human-user",
-						FirstName: "John",
-						LastName:  "Doe",
-						Email: command.Email{
-							Address: "john.doe@example.com",
-						},
-						PreferredLanguage: language.Italian,
-					},
-				},
-			},
-		},
-		{
-			name: "Set default language",
-			req: &instance.CreateInstanceRequest{
-				DefaultLanguage: " en   ",
-			},
-			defaultInstance: command.InstanceSetup{},
-			externalDomain:  "external.com",
-			want: &command.InstanceSetup{
-				DefaultLanguage: language.English,
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			got := CreateInstancePbToSetupInstance(tt.req, tt.defaultInstance, tt.externalDomain)
-			assert.Equal(t, tt.want, got)
 		})
 	}
 }

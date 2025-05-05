@@ -6,31 +6,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
-
-func (s *Server) CreateInstance(ctx context.Context, req *instance.CreateInstanceRequest) (*instance.CreateInstanceResponse, error) {
-	id, pat, key, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
-	if err != nil {
-		return nil, err
-	}
-
-	var machineKey []byte
-	if key != nil {
-		machineKey, err = key.Detail()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return &instance.CreateInstanceResponse{
-		Pat:        pat,
-		MachineKey: machineKey,
-		InstanceId: id,
-		Details:    object.DomainToDetailsPb(details),
-	}, nil
-}
 
 func (s *Server) DeleteInstance(ctx context.Context, request *instance.DeleteInstanceRequest) (*instance.DeleteInstanceResponse, error) {
 	instanceID := strings.TrimSpace(request.GetInstanceId())
