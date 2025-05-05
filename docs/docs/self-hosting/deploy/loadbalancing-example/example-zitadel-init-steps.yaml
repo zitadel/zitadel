@@ -6,7 +6,6 @@ FirstInstance:
     Human.PasswordChangeRequired: false
     Machine:
       Roles:
-        - "IAM_OWNER"
         - "IAM_LOGIN_CLIENT"
       Machine:
         Username: 'login-container'
