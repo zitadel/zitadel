@@ -36,16 +36,6 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *v2beta_org.Upd
 	}, nil
 }
 
-func (s *Server) GetOrganizationByID(ctx context.Context, request *v2beta_org.GetOrganizationByIDRequest) (*v2beta_org.GetOrganizationByIDResponse, error) {
-	org, err := s.query.OrgByID(ctx, true, request.Id)
-	if err != nil {
-		return nil, err
-	}
-	return &v2beta_org.GetOrganizationByIDResponse{
-		Organization: OrganizationViewToPb(org),
-	}, nil
-}
-
 func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.ListOrganizationsRequest) (*v2beta_org.ListOrganizationsResponse, error) {
 	queries, err := listOrgRequestToModel(request)
 	if err != nil {

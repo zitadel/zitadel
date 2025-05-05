@@ -2119,6 +2119,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use CreateOrganization [/v2beta/organization] API instead
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
         option (google.api.http) = {
             post: "/orgs"
@@ -2144,6 +2145,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use UpdateOrganization [/v2beta/organization] API instead
     rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
         option (google.api.http) = {
             put: "/orgs/me"
@@ -2169,6 +2171,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use DeactivateOrganization [/v2beta/organization/_deactivate] API instead
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_deactivate"
@@ -2194,6 +2197,7 @@ service ManagementService {
         };
     }
 
+    // Reprecated: use ReactivateOrganization [/v2beta/organization/_reactivate] API instead
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_reactivate"
@@ -2219,6 +2223,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use ListOrganization [/v2beta/organization] API instead
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/me"
@@ -2243,6 +2248,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use SetOrganizationMetadata [/v2beta/organization/metadata] API instead
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/{key}"
@@ -2269,6 +2275,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use SetOrganizationMetadata [/v2beta/organization/metadata] API instead
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/_bulk"
@@ -2295,6 +2302,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use ListOrganizationMetadata [/v2beta/organization/metadata/_search] API instead
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/_search"
@@ -2321,6 +2329,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use ListOrganizationMetadata [/v2beta/organization/metadata/_search] API instead
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
         option (google.api.http) = {
             get: "/metadata/{key}"
@@ -2346,6 +2355,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use DeleteOrganizationMetadata [/v2beta/organization/metadata] API instead
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
         option (google.api.http) = {
             delete: "/metadata/{key}"
@@ -2397,31 +2407,7 @@ service ManagementService {
         };
     }
 
-    rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
-        option (google.api.http) = {
-            post: "/orgs/me/domains/_search"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "org.read"
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Organizations";
-            summary: "Search Domains";
-            description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
-            parameters: {
-                headers: {
-                    name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
-                    type: STRING,
-                    required: false;
-                };
-            };
-        };
-    }
-
+    // Deprecated: use AddOrganizationDomain [/v2beta/organization/domain] API instead
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains"
@@ -2447,6 +2433,33 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use ListOrganizationDomains [/v2beta/organization/domain/_search] API instead
+    rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            summary: "Search Domains";
+            description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    // Deprecated: use DeleteOrganizationDomain [/v2beta/organization/domain] API instead
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/domains/{domain}"
@@ -2471,6 +2484,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use GenerateOrganizationDomainValidation [/v2beta/organization/domains/validation/_generate] API instead
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_generate"
@@ -2496,6 +2510,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use VerifyOrganizationDomain [/v2beta/organization/domains/validation/_verify] API instead
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_validate"

@@ -1237,6 +1237,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use ListOrganization [/v2beta/organization/_search] API instead
     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search";
@@ -1305,6 +1306,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use ListOrganization [/v2beta/organization] API instead
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}"

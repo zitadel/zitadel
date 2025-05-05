@@ -163,33 +163,6 @@ service OrganizationService {
     };
   }
 
-  rpc GetOrganizationByID(GetOrganizationByIDRequest) returns (GetOrganizationByIDResponse) {
-    option (google.api.http) = {
-      get: "/v2beta/organization"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "iam.read";
-      }
-      http_response: {
-        success_code: 200
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Get Organization By ID";
-      description: "Returns an organization by its ID."
-      responses: {
-          key: "200";
-          value: {
-              description: "requested organization found";
-          };
-      };
-    };
-  }
-
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
         post: "/v2beta/organization/_search";
@@ -479,7 +452,7 @@ service OrganizationService {
 
   rpc VerifyOrganizationDomain(VerifyOrganizationDomainRequest) returns (VerifyOrganizationDomainResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization/domains/validation/_validate"
+      post: "/v2beta/organization/domains/validation/_verify"
       body: "*"
     };
 
@@ -636,23 +609,6 @@ message UpdateOrganizationRequest {
 
 message UpdateOrganizationResponse {
   zitadel.object.v2beta.Details details = 1;
-}
-
-message GetOrganizationByIDRequest {
-  string id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want to get."
-    }
-  ];
-}
-
-message GetOrganizationByIDResponse {
-  zitadel.org.v2beta.Organization organization = 1;
 }
 
 message ListOrganizationsRequest {
