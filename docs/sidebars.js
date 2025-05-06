@@ -792,7 +792,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Organization beta",
+              label: "Organization (Beta)",
               link: {
                 type: "generated-index",
                 title: "Organization Service beta API",
