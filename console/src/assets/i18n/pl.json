@@ -692,6 +692,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nazwa Użytkownika",
     "ORGNAME": "Nazwa Organizacji",
+    "ORGID": "ID Organizacji",
     "PRIMARYDOMAIN": "Domena podstawowa",
     "PROJECTNAME": "Nazwa Projektu",
     "RESOURCEOWNER": "Właściciel Zasobu",

@@ -1980,6 +1980,7 @@
       "ACTIVATE": "Aktifkan Proyek",
       "DELETE": "Hapus Proyek",
       "ORGNAME": "Nama Organisasi",
+      "ORGID": "ID Organisasi",
       "ORGDOMAIN": "Domain Organisasi",
       "STATE": "Status",
       "TYPE": "Jenis",

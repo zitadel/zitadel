@@ -2148,6 +2148,7 @@
       "ACTIVATE": "Activați proiectul",
       "DELETE": "Ștergeți proiectul",
       "ORGNAME": "Nume organizație",
+      "ORGID": "ID organizație",
       "ORGDOMAIN": "Domeniu organizație",
       "STATE": "Stare",
       "TYPE": "Tip",
