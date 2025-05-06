@@ -272,6 +272,12 @@ func TestServer_ListOrganization(t *testing.T) {
 		assert.Fail(t, "unable to create orgs")
 	}
 
+	// deactivat org[1]
+	_, err = Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
+		Id: orgs[1].Id,
+	})
+	require.NoError(t, err)
+
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -280,7 +286,7 @@ func TestServer_ListOrganization(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list organizations happy path",
+			name: "list organizations happy path, no filter",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			want: []*v2beta_org.Organization{
 				{
@@ -294,6 +300,80 @@ func TestServer_ListOrganization(t *testing.T) {
 				{
 					Id:   orgs[2].Id,
 					Name: orgsName[2],
+				},
+			},
+		},
+		{
+			name: "list organizations by id happy path",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &v2beta_org.OrgQuery_IdQuery{
+						IdQuery: &v2beta_org.OrgIDQuery{
+							Id: orgs[1].Id,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[1].Id,
+					Name: orgsName[1],
+				},
+			},
+		},
+		{
+			name: "list organizations by state active",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &v2beta_org.OrgQuery_StateQuery{
+						StateQuery: &v2beta_org.OrgStateQuery{
+							State: v2beta_org.OrgState_ORG_STATE_ACTIVE,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[0].Id,
+					Name: orgsName[0],
+				},
+				{
+					Id:   orgs[2].Id,
+					Name: orgsName[2],
+				},
+			},
+		},
+		{
+			name: "list organizations by state inactive",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &v2beta_org.OrgQuery_StateQuery{
+						StateQuery: &v2beta_org.OrgStateQuery{
+							State: v2beta_org.OrgState_ORG_STATE_INACTIVE,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[1].Id,
+					Name: orgsName[1],
+				},
+			},
+		},
+		{
+			name: "list organizations by id bad id",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &v2beta_org.OrgQuery_IdQuery{
+						IdQuery: &v2beta_org.OrgIDQuery{
+							Id: "bad id",
+						},
+					},
 				},
 			},
 		},
