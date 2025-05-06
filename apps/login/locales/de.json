@@ -204,7 +204,7 @@
       "deny": "Ablehnen"
     },
     "scope": {
-      "openid": "Überprüfen Sie Ihre Identität.",
+      "openid": "Überprüfen Ihrer Identität.",
       "email": "Zugriff auf Ihre E-Mail-Adresse.",
       "profile": "Zugriff auf Ihre vollständigen Profilinformationen.",
       "offline_access": "Erlauben Sie den Offline-Zugriff auf Ihr Konto."
