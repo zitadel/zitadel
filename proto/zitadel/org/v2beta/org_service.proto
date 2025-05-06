@@ -469,7 +469,12 @@ message UpdateOrganizationRequest {
 }
 
 message UpdateOrganizationResponse {
-  zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the update to the organization.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message ListOrganizationsRequest {
@@ -512,7 +517,12 @@ message DeleteOrganizationRequest {
 }
 
 message DeleteOrganizationResponse {
-  zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the deletion of the organization.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message DeactivateOrganizationRequest {
@@ -527,7 +537,12 @@ message DeactivateOrganizationRequest {
 }
 
 message DeactivateOrganizationResponse {
-  zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the deactivation of the organization.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message ReactivateOrganizationRequest {
@@ -542,7 +557,12 @@ message ReactivateOrganizationRequest {
 }
 
 message ReactivateOrganizationResponse {
-  zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the reactivation of the organization.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message AddOrganizationDomainRequest {
@@ -617,6 +637,12 @@ message DeleteOrganizationDomainRequest {
 
 message DeleteOrganizationDomainResponse {
   zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the deletion of the organization domain.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message GenerateOrganizationDomainValidationRequest {
@@ -677,7 +703,12 @@ message VerifyOrganizationDomainRequest {
 }
 
 message VerifyOrganizationDomainResponse {
-  zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the verification of the organization domain.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message Metadata {
@@ -696,7 +727,12 @@ message SetOrganizationMetadataRequest{
 }
 
 message SetOrganizationMetadataResponse{
-  zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the update of the organization metadata.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
 
 message ListOrganizationMetadataRequest {
@@ -720,5 +756,10 @@ message DeleteOrganizationMetadataRequest {
 }
 
 message DeleteOrganizationMetadataResponse{
-    zitadel.object.v2beta.Details details = 1;
+  //  The timestamp of the deletiion of the organization metadata.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
