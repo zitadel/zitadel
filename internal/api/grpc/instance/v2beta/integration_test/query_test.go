@@ -5,7 +5,9 @@ package instance_test
 import (
 	"context"
 	"testing"
+	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -18,8 +20,19 @@ import (
 )
 
 func TestGetInstance(t *testing.T) {
-	inst := integration.NewInstance(CTXWithSysAuthZ)
+	t.Parallel()
+
+	// Given
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+
+	t.Cleanup(func() {
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	})
 
 	tt := []struct {
 		testName           string
@@ -38,7 +51,7 @@ func TestGetInstance(t *testing.T) {
 		},
 		{
 			testName:           "when request succeeds should return matching instance",
-			inputContext:       CTXWithSysAuthZ,
+			inputContext:       ctxWithSysAuthZ,
 			expectedInstanceID: inst.ID(),
 		},
 	}
@@ -56,15 +69,23 @@ func TestGetInstance(t *testing.T) {
 }
 
 func TestListInstances(t *testing.T) {
+	t.Parallel()
+
 	// Given
-	inst := integration.NewInstance(CTXWithSysAuthZ)
-	inst2 := integration.NewInstance(CTXWithSysAuthZ)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+	inst2 := integration.NewInstance(ctxWithSysAuthZ)
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
 	})
 
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+
 	tt := []struct {
 		testName          string
 		inputRequest      *instance.ListInstancesRequest
@@ -106,7 +127,7 @@ func TestListInstances(t *testing.T) {
 					},
 				},
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedInstances: []string{inst.ID()},
 		},
 	}
@@ -134,19 +155,27 @@ func TestListInstances(t *testing.T) {
 }
 
 func TestListCustomDomains(t *testing.T) {
-	inst := integration.NewInstance(CTXWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
-	d1, d2 := "custom-domain.one", "custom-domain.two"
+	t.Parallel()
 
-	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(CTXWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: d1})
+	// Given
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+
+	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	d1, d2 := "custom."+gofakeit.DomainName(), "custom."+gofakeit.DomainName()
+
+	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: d1})
 	require.Nil(t, err)
-	_, err = inst.Client.InstanceV2Beta.AddCustomDomain(CTXWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: d2})
+	_, err = inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: d2})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.RemoveCustomDomain(CTXWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d1})
-		inst.Client.InstanceV2Beta.RemoveCustomDomain(CTXWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d2})
-		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d1})
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d2})
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
 	tt := []struct {
@@ -191,7 +220,7 @@ func TestListCustomDomains(t *testing.T) {
 					},
 				},
 			},
-			inputContext:    CTXWithSysAuthZ,
+			inputContext:    ctxWithSysAuthZ,
 			expectedDomains: []string{d1, d2},
 		},
 	}
@@ -216,17 +245,27 @@ func TestListCustomDomains(t *testing.T) {
 }
 
 func TestListTrustedDomains(t *testing.T) {
-	inst := integration.NewInstance(CTXWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
-	d1, d2 := "trusted-domain.one", "trusted-domain.two"
+	t.Parallel()
 
-	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(CTXWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d1})
+	// Given
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+
+	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	d1, d2 := "trusted."+gofakeit.DomainName(), "trusted."+gofakeit.DomainName()
+
+	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d1})
 	require.Nil(t, err)
-	_, err = inst.Client.InstanceV2Beta.AddTrustedDomain(CTXWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d2})
+	_, err = inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d2})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: d1})
+		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: d2})
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
 	tt := []struct {
@@ -268,7 +307,7 @@ func TestListTrustedDomains(t *testing.T) {
 					},
 				},
 			},
-			inputContext:    CTXWithSysAuthZ,
+			inputContext:    ctxWithSysAuthZ,
 			expectedDomains: []string{d1, d2},
 		},
 	}

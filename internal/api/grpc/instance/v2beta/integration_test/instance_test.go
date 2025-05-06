@@ -17,8 +17,19 @@ import (
 )
 
 func TestDeleteInstace(t *testing.T) {
+	t.Parallel()
+
 	// Given
-	inst := integration.NewInstance(CTXWithSysAuthZ)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+
+	t.Cleanup(func() {
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	})
 
 	tt := []struct {
 		testName           string
@@ -42,7 +53,7 @@ func TestDeleteInstace(t *testing.T) {
 			inputRequest: &instance.DeleteInstanceRequest{
 				InstanceId: " ",
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
 			expectedErrorMsg:  "instance_id must not be empty (instance_id)",
 		},
@@ -51,7 +62,7 @@ func TestDeleteInstace(t *testing.T) {
 			inputRequest: &instance.DeleteInstanceRequest{
 				InstanceId: inst.ID() + "invalid",
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.NotFound,
 			expectedErrorMsg:  "Instance not found (COMMA-AE3GS)",
 		},
@@ -60,7 +71,7 @@ func TestDeleteInstace(t *testing.T) {
 			inputRequest: &instance.DeleteInstanceRequest{
 				InstanceId: inst.ID(),
 			},
-			inputContext:       CTXWithSysAuthZ,
+			inputContext:       ctxWithSysAuthZ,
 			expectedInstanceID: inst.ID(),
 		},
 	}
@@ -82,9 +93,21 @@ func TestDeleteInstace(t *testing.T) {
 }
 
 func TestUpdateInstace(t *testing.T) {
+	t.Parallel()
+
 	// Given
-	inst := integration.NewInstance(CTXWithSysAuthZ)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+
+	t.Cleanup(func() {
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	})
 
 	tt := []struct {
 		testName          string
@@ -117,7 +140,7 @@ func TestUpdateInstace(t *testing.T) {
 			inputRequest: &instance.UpdateInstanceRequest{
 				InstanceName: " ",
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
 			expectedErrorMsg:  "instance_name must not be empty (instance_name)",
 		},
@@ -126,7 +149,7 @@ func TestUpdateInstace(t *testing.T) {
 			inputRequest: &instance.UpdateInstanceRequest{
 				InstanceName: "an-updated-name",
 			},
-			inputContext:    CTXWithSysAuthZ,
+			inputContext:    ctxWithSysAuthZ,
 			expectedNewName: "an-updated-name",
 		},
 	}

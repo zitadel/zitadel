@@ -4,8 +4,11 @@ package instance_test
 
 import (
 	"context"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -15,13 +18,19 @@ import (
 )
 
 func TestAddCustomDomain(t *testing.T) {
+	t.Parallel()
+
 	// Given
-	inst := integration.NewInstance(CTXWithSysAuthZ)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		require.Nil(t, err)
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
 	tt := []struct {
@@ -34,7 +43,7 @@ func TestAddCustomDomain(t *testing.T) {
 		{
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.AddCustomDomainRequest{
-				Domain: "custom1",
+				Domain: gofakeit.DomainName(),
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
@@ -43,7 +52,7 @@ func TestAddCustomDomain(t *testing.T) {
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.AddCustomDomainRequest{
-				Domain: "custom1",
+				Domain: gofakeit.DomainName(),
 			},
 			inputContext:      orgOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
@@ -54,21 +63,27 @@ func TestAddCustomDomain(t *testing.T) {
 			inputRequest: &instance.AddCustomDomainRequest{
 				Domain: " ",
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
 			expectedErrorMsg:  "Errors.Invalid.Argument (INST-28nlD)",
 		},
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.AddCustomDomainRequest{
-				Domain: " custom-domain.one",
+				Domain: " " + gofakeit.DomainName(),
 			},
-			inputContext: CTXWithSysAuthZ,
+			inputContext: ctxWithSysAuthZ,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
+			t.Cleanup(func() {
+				if tc.expectedErrorMsg == "" {
+					inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: strings.TrimSpace(tc.inputRequest.Domain)})
+				}
+			})
+
 			// Test
 			res, err := inst.Client.InstanceV2Beta.AddCustomDomain(tc.inputContext, tc.inputRequest)
 
@@ -85,16 +100,24 @@ func TestAddCustomDomain(t *testing.T) {
 }
 
 func TestRemoveCustomDomain(t *testing.T) {
+	t.Parallel()
+
 	// Given
-	inst := integration.NewInstance(CTXWithSysAuthZ)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 
-	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(CTXWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: "custom-domain.one"})
+	customDomain := gofakeit.DomainName()
+
+	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: customDomain})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		require.Nil(t, err)
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: customDomain})
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
 	tt := []struct {
@@ -127,16 +150,16 @@ func TestRemoveCustomDomain(t *testing.T) {
 			inputRequest: &instance.RemoveCustomDomainRequest{
 				Domain: " ",
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
 			expectedErrorMsg:  "Errors.Invalid.Argument (INST-39nls)",
 		},
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.RemoveCustomDomainRequest{
-				Domain: " custom-domain.one",
+				Domain: " " + customDomain,
 			},
-			inputContext: CTXWithSysAuthZ,
+			inputContext: ctxWithSysAuthZ,
 		},
 	}
 
@@ -158,13 +181,18 @@ func TestRemoveCustomDomain(t *testing.T) {
 }
 
 func TestAddTrustedDomain(t *testing.T) {
+	t.Parallel()
+
 	// Given
-	inst := integration.NewInstance(CTXWithSysAuthZ)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		require.Nil(t, err)
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
 	tt := []struct {
@@ -197,21 +225,27 @@ func TestAddTrustedDomain(t *testing.T) {
 			inputRequest: &instance.AddTrustedDomainRequest{
 				Domain: " ",
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
 			expectedErrorMsg:  "Errors.Invalid.Argument (COMMA-Stk21)",
 		},
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.AddTrustedDomainRequest{
-				Domain: " trusted-domain.one",
+				Domain: " " + gofakeit.DomainName(),
 			},
-			inputContext: CTXWithSysAuthZ,
+			inputContext: ctxWithSysAuthZ,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
+			t.Cleanup(func() {
+				if tc.expectedErrorMsg == "" {
+					inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: strings.TrimSpace(tc.inputRequest.Domain)})
+				}
+			})
+
 			// Test
 			res, err := inst.Client.InstanceV2Beta.AddTrustedDomain(tc.inputContext, tc.inputRequest)
 
@@ -228,16 +262,24 @@ func TestAddTrustedDomain(t *testing.T) {
 }
 
 func TestRemoveTrustedDomain(t *testing.T) {
+	t.Parallel()
+
 	// Given
-	inst := integration.NewInstance(CTXWithSysAuthZ)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 
-	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(CTXWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: "trusted-domain.one"})
+	trustedDomain := gofakeit.DomainName()
+
+	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: trustedDomain})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		require.Nil(t, err)
+		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: trustedDomain})
+		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
 	tt := []struct {
@@ -270,16 +312,16 @@ func TestRemoveTrustedDomain(t *testing.T) {
 			inputRequest: &instance.RemoveTrustedDomainRequest{
 				Domain: " ",
 			},
-			inputContext:      CTXWithSysAuthZ,
+			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
 			expectedErrorMsg:  "domain must not be empty (domain)",
 		},
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.RemoveTrustedDomainRequest{
-				Domain: " trusted-domain.one",
+				Domain: " " + trustedDomain,
 			},
-			inputContext: CTXWithSysAuthZ,
+			inputContext: ctxWithSysAuthZ,
 		},
 	}
 
