@@ -61,7 +61,6 @@ export function ConsentScreen({
                 key={s}
                 className="grid grid-cols-4 w-full text-sm flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light py-2 px-4 rounded-md transition-all"
               >
-                <strong className="col-span-1">{s}</strong>
                 <span className="col-span-3">{resolvedDescription}</span>
               </li>
             );
