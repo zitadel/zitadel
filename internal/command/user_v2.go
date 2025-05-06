@@ -132,6 +132,7 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
+
 	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -139,9 +140,10 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if !isUserStateExists(existingUser.UserState) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bd4ir1mblj", "Errors.User.NotFound")
 	}
-	if err = c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
+	if err := c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 		return nil, err
 	}
+
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
@@ -186,5 +188,5 @@ func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwn
 	if err != nil {
 		return nil, err
 	}
-	return writeModel, err
+	return writeModel, nil
 }
