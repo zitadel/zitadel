@@ -28,7 +28,7 @@ func (c *Commands) newPermissionCheck(ctx context.Context, permission string, ag
 			resourceOwner = r.resourceOwner
 		}
 		if resourceOwner == "" {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-4g3xq", "Errors.ResourceOwnerMissing")
+			return zerrors.ThrowNotFound(nil, "COMMAND-4g3xq", "Errors.NotFound")
 		}
 		return c.checkPermission(ctx, permission, resourceOwner, aggregateID)
 	}

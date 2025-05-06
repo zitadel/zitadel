@@ -104,7 +104,7 @@ func TestCommands_CheckPermission(t *testing.T) {
 				aggregateID:   "aggregateID",
 			},
 			want: want{
-				err: zerrors.IsPreconditionFailed,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

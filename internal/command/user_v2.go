@@ -128,7 +128,6 @@ func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writ
 	return writeModel, nil
 }
 
-// RemoveUserV2 allows self-deletion for human users but not for machine users.
 func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
