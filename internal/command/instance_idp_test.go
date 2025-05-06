@@ -5437,6 +5437,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 							false,
 							nil,
 							"",
+							false,
 							idp.Options{},
 						),
 					),
@@ -5478,6 +5479,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 							true,
 							gu.Ptr(domain.SAMLNameIDFormatTransient),
 							"customAttribute",
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -5500,6 +5502,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
 					TransientMappingAttributeName: "customAttribute",
+					FederatedLogoutEnabled:        true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -5665,6 +5668,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 								false,
 								nil,
 								"",
+								false,
 								idp.Options{},
 							)),
 					),
@@ -5703,6 +5707,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 								false,
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								idp.Options{},
 							)),
 					),
@@ -5718,6 +5723,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 									idp.ChangeSAMLWithSignedRequest(true),
 									idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
 									idp.ChangeSAMLTransientMappingAttributeName("customAttribute"),
+									idp.ChangeSAMLFederatedLogoutEnabled(true),
 									idp.ChangeSAMLOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -5742,6 +5748,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
 					TransientMappingAttributeName: "customAttribute",
+					FederatedLogoutEnabled:        true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -5845,6 +5852,7 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 								false,
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								idp.Options{},
 							)),
 					),

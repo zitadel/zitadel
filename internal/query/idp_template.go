@@ -165,6 +165,7 @@ type SAMLIDPTemplate struct {
 	WithSignedRequest             bool
 	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
 }
 
 var (
@@ -724,6 +725,10 @@ var (
 		name:  projection.SAMLTransientMappingAttributeName,
 		table: samlIdpTemplateTable,
 	}
+	SAMLFederatedLogoutEnabledCol = Column{
+		name:  projection.SAMLFederatedLogoutEnabled,
+		table: samlIdpTemplateTable,
+	}
 )
 
 // IDPTemplateByID searches for the requested id with permission check if necessary
@@ -948,6 +953,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			SAMLWithSignedRequestCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
+			SAMLFederatedLogoutEnabledCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -1067,6 +1073,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			samlWithSignedRequest := sql.NullBool{}
 			samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 			samlTransientMappingAttributeName := sql.NullString{}
+			samlFederatedLogoutEnabled := sql.NullBool{}
 
 			ldapID := sql.NullString{}
 			ldapServers := database.TextArray[string]{}
@@ -1184,6 +1191,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&samlWithSignedRequest,
 				&samlNameIDFormat,
 				&samlTransientMappingAttributeName,
+				&samlFederatedLogoutEnabled,
 				// ldap
 				&ldapID,
 				&ldapServers,
@@ -1323,6 +1331,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					WithSignedRequest:             samlWithSignedRequest.Bool,
 					NameIDFormat:                  samlNameIDFormat,
 					TransientMappingAttributeName: samlTransientMappingAttributeName.String,
+					FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,
 				}
 			}
 			if ldapID.Valid {
@@ -1456,6 +1465,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			SAMLWithSignedRequestCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
+			SAMLFederatedLogoutEnabledCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -1580,6 +1590,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				samlWithSignedRequest := sql.NullBool{}
 				samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 				samlTransientMappingAttributeName := sql.NullString{}
+				samlFederatedLogoutEnabled := sql.NullBool{}
 
 				ldapID := sql.NullString{}
 				ldapServers := database.TextArray[string]{}
@@ -1697,6 +1708,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&samlWithSignedRequest,
 					&samlNameIDFormat,
 					&samlTransientMappingAttributeName,
+					&samlFederatedLogoutEnabled,
 					// ldap
 					&ldapID,
 					&ldapServers,
@@ -1835,6 +1847,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						WithSignedRequest:             samlWithSignedRequest.Bool,
 						NameIDFormat:                  samlNameIDFormat,
 						TransientMappingAttributeName: samlTransientMappingAttributeName.String,
+						FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,
 					}
 				}
 				if ldapID.Valid {

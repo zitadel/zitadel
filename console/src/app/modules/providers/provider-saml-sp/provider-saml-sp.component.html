@@ -82,13 +82,22 @@
 
           <cnsl-info-section>
             <div>
-              <p class="transient-info-desc">{{ 'IDP.SAML.TRANSIENTMAPPINGATTRIBUTENAME_DESC' | translate }}</p>
+              <p class="option-desc">{{ 'IDP.SAML.TRANSIENTMAPPINGATTRIBUTENAME_DESC' | translate }}</p>
             </div>
 
             <cnsl-form-field class="formfield">
               <cnsl-label>{{ 'IDP.SAML.TRANSIENTMAPPINGATTRIBUTENAME' | translate }}</cnsl-label>
               <input cnslInput formControlName="transientMappingAttributeName" />
             </cnsl-form-field>
+          </cnsl-info-section>
+
+          <cnsl-info-section>
+            <div>
+              <p class="option-desc">{{ 'IDP.FEDERATEDLOGOUTENABLED_DESC' | translate }}</p>
+              <mat-checkbox formControlName="federatedLogoutEnabled">{{
+                'IDP.FEDERATEDLOGOUTENABLED' | translate
+              }}</mat-checkbox>
+            </div>
           </cnsl-info-section>
         </div>
 

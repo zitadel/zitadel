@@ -479,6 +479,9 @@ message SAMLConfig {
     // Optional name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 5;
+    // Boolean weather federated logout is enabled. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 6;
 }
 
 message AzureADConfig {
