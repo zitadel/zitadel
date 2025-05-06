@@ -166,7 +166,11 @@
   "signedin": {
     "title": "Willkommen {user}!",
     "description": "Sie sind angemeldet.",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "error": {
+      "title": "Fehler",
+      "description": "Ein Fehler ist aufgetreten."
+    }
   },
   "verify": {
     "userIdMissing": "Keine Benutzer-ID angegeben!",

@@ -166,7 +166,11 @@
   "signedin": {
     "title": "欢迎 {user}！",
     "description": "您已登录。",
-    "continue": "继续"
+    "continue": "继续",
+    "error": {
+      "title": "错误",
+      "description": "登录时发生错误。"
+    }
   },
   "verify": {
     "userIdMissing": "未提供用户 ID！",

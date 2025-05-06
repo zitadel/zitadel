@@ -1,6 +1,6 @@
 "use client";
 
-import { denyDeviceAuthorization } from "@/lib/server/oidc";
+import { completeDeviceAuthorization } from "@/lib/server/device";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,9 @@ export function ConsentScreen({
 
   async function denyDeviceAuth() {
     setLoading(true);
-    const response = await denyDeviceAuthorization(deviceAuthorizationRequestId)
+    const response = await completeDeviceAuthorization(
+      deviceAuthorizationRequestId,
+    )
       .catch(() => {
         setError("Could not register user");
         return;

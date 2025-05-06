@@ -36,7 +36,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
 
     const response = await getDeviceAuthorizationRequest(value.userCode)
       .catch(() => {
-        setError("Could not complete the request");
+        setError("Could not continue the request");
         return;
       })
       .finally(() => {
@@ -44,7 +44,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
       });
 
     if (!response || !response.deviceAuthorizationRequest?.id) {
-      setError("Could not complete the request");
+      setError("Could not continue the request");
       return;
     }
 

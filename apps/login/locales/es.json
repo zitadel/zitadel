@@ -166,7 +166,11 @@
   "signedin": {
     "title": "¡Bienvenido {user}!",
     "description": "Has iniciado sesión.",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "error": {
+      "title": "Error",
+      "description": "Ocurrió un error al iniciar sesión."
+    }
   },
   "verify": {
     "userIdMissing": "¡No se proporcionó userId!",

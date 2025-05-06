@@ -166,7 +166,11 @@
   "signedin": {
     "title": "Witaj {user}!",
     "description": "Jesteś zalogowany.",
-    "continue": "Kontynuuj"
+    "continue": "Kontynuuj",
+    "error": {
+      "title": "Błąd",
+      "description": "Nie można załadować danych. Sprawdź połączenie z internetem lub spróbuj ponownie później."
+    }
   },
   "verify": {
     "userIdMissing": "Nie podano identyfikatora użytkownika!",

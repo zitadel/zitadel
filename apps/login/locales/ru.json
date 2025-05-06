@@ -166,7 +166,11 @@
   "signedin": {
     "title": "Добро пожаловать, {user}!",
     "description": "Вы вошли в систему.",
-    "continue": "Продолжить"
+    "continue": "Продолжить",
+    "error": {
+      "title": "Ошибка",
+      "description": "Не удалось войти в систему. Проверьте свои данные и попробуйте снова."
+    }
   },
   "verify": {
     "userIdMissing": "Не указан userId!",
