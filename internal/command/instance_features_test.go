@@ -150,24 +150,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "set Actions",
-			eventstore: expectEventstore(
-				expectFilter(),
-				expectPush(
-					feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, true,
-					),
-				),
-			),
-			args: args{ctx, &InstanceFeatures{
-				Actions: gu.Ptr(true),
-			}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "instance1",
-			},
-		},
-		{
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(),
@@ -206,10 +188,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceActionsEventType, true,
-					),
-					feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
 						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, true,
 					),
 				),
@@ -219,7 +197,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
-				Actions:                         gu.Ptr(true),
 				OIDCSingleV1SessionTermination:  gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{

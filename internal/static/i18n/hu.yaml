@@ -536,6 +536,7 @@ Errors:
     StateMissing: A kérésből hiányzik a State paraméter
     NotStarted: Az intent nem indult el, vagy már befejeződött
     NotSucceeded: Az intent nem sikerült
+    Expired: A kérésből lejárt
     TokenCreationFailed: A token létrehozása nem sikerült
     InvalidToken: Az Intent Token érvénytelen
     OtherUser: Az intent egy másik felhasználónak szól

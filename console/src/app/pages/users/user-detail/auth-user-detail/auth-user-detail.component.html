@@ -1,18 +1,11 @@
 <ng-container *ngIf="user$ | async as userQuery">
-  <cnsl-top-view
-    title="{{ userName$ | async }}"
-    sub="{{ user(userQuery)?.preferredLoginName }}"
+  <cnsl-top-view title="{{ userName$ | async }}" sub="{{ user(userQuery)?.preferredLoginName }}"
     [isActive]="user(userQuery)?.state === UserState.ACTIVE"
     [isInactive]="user(userQuery)?.state === UserState.INACTIVE"
     stateTooltip="{{ 'USER.STATE.' + user(userQuery)?.state | translate }}"
-    [hasBackButton]="['org.read'] | hasRole | async"
-  >
-    <cnsl-info-row
-      topContent
-      *ngIf="user(userQuery) as user"
-      [user]="user"
-      [loginPolicy]="(loginPolicy$ | async) ?? undefined"
-    ></cnsl-info-row>
+    [hasBackButton]="['org.read'] | hasRole | async">
+    <cnsl-info-row topContent *ngIf="user(userQuery) as user" [user]="user"
+      [loginPolicy]="(loginPolicy$ | async) ?? undefined"></cnsl-info-row>
   </cnsl-top-view>
 
   <div *ngIf="(user$ | async)?.state === 'loading'" class="max-width-container">
@@ -23,58 +16,29 @@
 
   <div class="max-width-container">
     <cnsl-meta-layout *ngIf="user(userQuery) as user">
-      <cnsl-sidenav
-        *ngIf="currentSetting$ | async as currentSetting"
-        [ngModel]="currentSetting"
-        (ngModelChange)="goToSetting($event)"
-        [settingsList]="settingsList"
-        queryParam="id"
-      >
-        <ng-container *ngIf="currentSetting === 'general' && humanUser(userQuery) as humanUser">
-          <cnsl-card
-            *ngIf="humanUser.type.value.profile as profile"
-            class="app-card"
-            title="{{ 'USER.PROFILE.TITLE' | translate }}"
-          >
-            <cnsl-detail-form
-              [preferredLoginName]="user.preferredLoginName"
-              [disabled]="false"
-              [genders]="genders"
-              [languages]="(langSvc.supported$ | async) || []"
-              [username]="user.username"
-              [profile]="profile"
-              [showEditImage]="true"
-              (changedLanguage)="changedLanguage($event)"
-              (changeUsernameClicked)="changeUsername(user)"
-              (submitData)="saveProfile(user, $event)"
-              (avatarChanged)="refreshChanges$.emit()"
-            >
+      <cnsl-sidenav *ngIf="currentSetting$ | async as currentSetting" [ngModel]="currentSetting"
+        (ngModelChange)="goToSetting($event)" [settingsList]="settingsList">
+        <ng-container *ngIf="currentSetting$().id === 'general' && humanUser(userQuery) as humanUser">
+          <cnsl-card *ngIf="humanUser.type.value.profile as profile" class="app-card"
+            title="{{ 'USER.PROFILE.TITLE' | translate }}">
+            <cnsl-detail-form [preferredLoginName]="user.preferredLoginName" [disabled]="false" [genders]="genders"
+              [languages]="(langSvc.supported$ | async) || []" [username]="user.username" [profile]="profile"
+              [showEditImage]="true" (changedLanguage)="changedLanguage($event)"
+              (changeUsernameClicked)="changeUsername(user)" (submitData)="saveProfile(user, $event)"
+              (avatarChanged)="refreshChanges$.emit()">
             </cnsl-detail-form>
           </cnsl-card>
 
-          <cnsl-card
-            title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
-            description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}"
-          >
-            <button
-              class="icon-button"
-              card-actions
-              mat-icon-button
-              (click)="refreshChanges$.emit()"
-              matTooltip="{{ 'ACTIONS.REFRESH' | translate }}"
-            >
+          <cnsl-card title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
+            description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
+            <button class="icon-button" card-actions mat-icon-button (click)="refreshChanges$.emit()"
+              matTooltip="{{ 'ACTIONS.REFRESH' | translate }}">
               <mat-icon class="icon">refresh</mat-icon>
             </button>
-            <cnsl-contact
-              [human]="humanUser.type.value"
-              [username]="user.preferredLoginName"
-              [canWrite]="true"
-              (editType)="openEditDialog(humanUser, $event)"
-              (enteredPhoneCode)="enteredPhoneCode($event)"
-              (deletedPhone)="deletePhone(user)"
-              (resendEmailVerification)="resendEmailVerification(user)"
-              (resendPhoneVerification)="resendPhoneVerification(user)"
-            >
+            <cnsl-contact [human]="humanUser.type.value" [username]="user.preferredLoginName" [canWrite]="true"
+              (editType)="openEditDialog(humanUser, $event)" (enteredPhoneCode)="enteredPhoneCode($event)"
+              (deletedPhone)="deletePhone(user)" (resendEmailVerification)="resendEmailVerification(user)"
+              (resendPhoneVerification)="resendPhoneVerification(user)">
             </cnsl-contact>
           </cnsl-card>
 
@@ -91,11 +55,11 @@
           </ng-template>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'idp'">
+        <ng-container *ngIf="currentSetting$().id === 'idp'">
           <cnsl-external-idps [userId]="user.userId" [service]="grpcAuthService"></cnsl-external-idps>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'security'">
+        <ng-container *ngIf="currentSetting$().id === 'security'">
           <cnsl-card *ngIf="humanUser(userQuery) as humanUser" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
             <div class="contact-method-col">
               <div class="contact-method-row">
@@ -107,12 +71,8 @@
                 </div>
 
                 <div class="right">
-                  <a
-                    matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
-                    [routerLink]="['password']"
-                    [queryParams]="{ username: humanUser.preferredLoginName }"
-                    mat-icon-button
-                  >
+                  <a matTooltip="{{ 'USER.PASSWORD.SET' | translate }}" [routerLink]="['password']"
+                    [queryParams]="{ username: humanUser.preferredLoginName }" mat-icon-button>
                     <i class="las la-pen"></i>
                   </a>
                 </div>
@@ -123,16 +83,13 @@
           <cnsl-auth-passwordless #mfaComponent></cnsl-auth-passwordless>
 
           <cnsl-auth-user-mfa
-            [phoneVerified]="humanUser(userQuery)?.type?.value?.phone?.isVerified ?? false"
-          ></cnsl-auth-user-mfa>
+            [phoneVerified]="humanUser(userQuery)?.type?.value?.phone?.isVerified ?? false"></cnsl-auth-user-mfa>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'grants'">
-          <cnsl-card title="{{ 'GRANTS.USER.TITLE' | translate }}" description="{{ 'GRANTS.USER.DESCRIPTION' | translate }}">
-            <cnsl-user-grants
-              [userId]="user.userId"
-              [context]="USERGRANTCONTEXT"
-              [displayedColumns]="[
+        <ng-container *ngIf="currentSetting$().id === 'grants'">
+          <cnsl-card title="{{ 'GRANTS.USER.TITLE' | translate }}"
+            description="{{ 'GRANTS.USER.DESCRIPTION' | translate }}">
+            <cnsl-user-grants [userId]="user.userId" [context]="USERGRANTCONTEXT" [displayedColumns]="[
                 'org',
                 'projectId',
                 'type',
@@ -141,45 +98,33 @@
                 'state',
                 'roleNamesList',
                 'actions',
-              ]"
-              [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
-              [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
-            >
+              ]" [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
+              [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false">
             </cnsl-user-grants>
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'memberships'">
-          <cnsl-card
-            title="{{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
-            description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}"
-          >
+        <ng-container *ngIf="currentSetting$().id === 'memberships'">
+          <cnsl-card title="{{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
+            description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
             <cnsl-memberships-table></cnsl-memberships-table>
           </cnsl-card>
         </ng-container>
 
         <ng-container *ngIf="currentSetting === 'groups'">
-          <cnsl-card
-            *ngIf="user.userId"
-            title="{{ 'USER.GROUPS.TITLE' | translate }}">
-            <cnsl-user-groups [userId]="user.userId"
-              [canWrite$]="['user.write$'] | hasRole"
-              [canDelete$]="['user.delete$'] | hasRole"
-            >
+          <cnsl-card *ngIf="user.userId" title="{{ 'USER.GROUPS.TITLE' | translate }}">
+            <cnsl-user-groups [userId]="user.userId" [canWrite$]="['user.write$'] | hasRole"
+              [canDelete$]="['user.delete$'] | hasRole">
             </cnsl-user-groups>
           </cnsl-card>
         </ng-container>
 
         <ng-container *ngIf="currentSetting === 'metadata' && (metadata$ | async) as metadataQuery">
-          <cnsl-metadata
-            *ngIf="metadataQuery.state !== 'error'"
-            [metadata]="metadataQuery.value"
+          <cnsl-metadata *ngIf="metadataQuery.state !== 'error'" [metadata]="metadataQuery.value"
             [description]="'DESCRIPTIONS.USERS.SELF.METADATA' | translate"
             [disabled]="(['user.write:' + user.userId, 'user.write'] | hasRole | async) === false"
-            (editClicked)="editMetadata(user, metadataQuery.value)"
-            (refresh)="refreshMetadata$.next(true)"
-            [loading]="metadataQuery.state === 'loading'"
-          ></cnsl-metadata>
+            (editClicked)="editMetadata(user, metadataQuery.value)" (refresh)="refreshMetadata$.next(true)"
+            [loading]="metadataQuery.state === 'loading'"></cnsl-metadata>
         </ng-container>
       </cnsl-sidenav>
 

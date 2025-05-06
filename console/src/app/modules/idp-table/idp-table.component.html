@@ -1,7 +1,6 @@
 <cnsl-refresh-table
   [loading]="loading$ | async"
   (refreshed)="refreshPage()"
-  [dataSize]="dataSource.data.length"
   [emitRefreshOnPreviousRoutes]="['/instance/idp/create']"
   [timestamp]="idpResult?.details?.viewTimestamp"
   [selection]="selection"

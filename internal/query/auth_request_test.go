@@ -24,7 +24,6 @@ import (
 func TestQueries_AuthRequestByID(t *testing.T) {
 	expQuery := regexp.QuoteMeta(fmt.Sprintf(
 		authRequestByIDQuery,
-		asOfSystemTime,
 	))
 
 	cols := []string{
@@ -207,8 +206,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			execMock(t, tt.expect, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 					checkPermission: tt.permissionCheck,
 				}

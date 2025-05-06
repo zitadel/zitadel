@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -77,7 +76,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectMembersQuery(ctx, q.client)
+	query, scan := prepareProjectMembersQuery()
 	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -129,7 +128,34 @@ func (q *Queries) ProjectGroupMembers(ctx context.Context, queries *ProjectMembe
 	return members, err
 }
 
-func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func (q *Queries) ProjectGroupMembers(ctx context.Context, queries *ProjectMembersQuery) (members *GroupMembers, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareProjectGroupMembersQuery(ctx, q.client)
+	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-S9auT", "Errors.Query.InvalidRequest")
+	}
+
+	currentSequence, err := q.latestState(ctx, projectMemberTable)
+	if err != nil {
+		return nil, err
+	}
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		members, err = scan(rows)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-cq0pj", "Errors.Internal")
+	}
+
+	members.State = currentSequence
+	return members, err
+}
+func prepareProjectMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
 			ProjectMemberCreationDate.identifier(),
 			ProjectMemberChangeDate.identifier(),
@@ -151,7 +177,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			LeftJoin(join(HumanUserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(UserIDCol, ProjectMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -224,8 +250,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			}, nil
 		}
 }
-
-func prepareProjectGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
+func prepareProjectGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
 	return sq.Select(
 			ProjectMemberCreationDate.identifier(),
 			ProjectMemberChangeDate.identifier(),
@@ -237,7 +262,7 @@ func prepareProjectGroupMembersQuery(ctx context.Context, db prepareDatabase) (s
 			GroupColumnDescription.identifier(),
 			countColumn.identifier(),
 		).From(projectMemberTable.identifier()).
-			LeftJoin(join(GroupColumnID, ProjectMemberGroupID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(GroupColumnID, ProjectMemberGroupID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*GroupMembers, error) {
 			members := make([]*GroupMember, 0)

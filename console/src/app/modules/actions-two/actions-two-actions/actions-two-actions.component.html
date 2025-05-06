@@ -1,0 +1,17 @@
+<h2>{{ 'ACTIONSTWO.EXECUTION.TITLE' | translate }}</h2>
+<cnsl-info-section [type]="InfoSectionType.ALERT">
+  {{ 'ACTIONSTWO.BETA_NOTE' | translate }}
+</cnsl-info-section>
+<p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DESCRIPTION' | translate }}</p>
+
+<cnsl-actions-two-actions-table
+  (refresh)="refresh$.next(true)"
+  (delete)="deleteExecution($event)"
+  (selected)="openDialog($event)"
+  [executions]="executions$ | async"
+  [targets]="targets$ | async"
+>
+  <button color="primary" mat-raised-button (click)="openDialog()">
+    {{ 'ACTIONS.CREATE' | translate }}
+  </button>
+</cnsl-actions-two-actions-table>

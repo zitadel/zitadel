@@ -3,7 +3,7 @@ package command
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -882,7 +882,7 @@ func newTestClient(httpStatus int, metadata []byte) *http.Client {
 	fn := roundTripperFunc(func(req *http.Request) *http.Response {
 		return &http.Response{
 			StatusCode: httpStatus,
-			Body:       ioutil.NopCloser(bytes.NewBuffer(metadata)),
+			Body:       io.NopCloser(bytes.NewBuffer(metadata)),
 			Header:     make(http.Header), //must be non-nil value
 		}
 	})

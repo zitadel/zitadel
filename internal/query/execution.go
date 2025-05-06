@@ -1,11 +1,13 @@
 package query
 
 import (
+	"cmp"
 	"context"
 	"database/sql"
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -101,8 +103,8 @@ func (q *Queries) SearchExecutions(ctx context.Context, queries *ExecutionSearch
 	eq := sq.Eq{
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareExecutionsQuery(ctx, q.client)
-	return genericRowsQueryWithState[*Executions](ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	query, scan := prepareExecutionsQuery()
+	return genericRowsQueryWithState(ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *Execution, err error) {
@@ -110,8 +112,8 @@ func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *E
 		ExecutionColumnID.identifier():         id,
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareExecutionQuery(ctx, q.client)
-	return genericRowQuery[*Execution](ctx, q.client, query.Where(eq), scan)
+	query, scan := prepareExecutionQuery()
+	return genericRowQuery(ctx, q.client, query.Where(eq), scan)
 }
 
 func NewExecutionInIDsSearchQuery(values []string) (SearchQuery, error) {
@@ -219,7 +221,7 @@ func (q *Queries) TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string
 	return execution, err
 }
 
-func prepareExecutionQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
+func prepareExecutionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
@@ -235,7 +237,7 @@ func prepareExecutionQuery(context.Context, prepareDatabase) (sq.SelectBuilder, 
 		scanExecution
 }
 
-func prepareExecutionsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
+func prepareExecutionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
@@ -301,13 +303,15 @@ func executionTargetsUnmarshal(data []byte) ([]*exec.Target, error) {
 	}
 
 	targets := make([]*exec.Target, len(executionTargets))
-	// position starts with 1
-	for _, item := range executionTargets {
+	slices.SortFunc(executionTargets, func(a, b *executionTarget) int {
+		return cmp.Compare(a.Position, b.Position)
+	})
+	for i, item := range executionTargets {
 		if item.Target != "" {
-			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: item.Target}
+			targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: item.Target}
 		}
 		if item.Include != "" {
-			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: item.Include}
+			targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: item.Include}
 		}
 	}
 	return targets, nil

@@ -1,0 +1,116 @@
+<form *ngIf="form$ | async as form" [formGroup]="form.form" class="form-grid" (ngSubmit)="submit(form)">
+  <ng-container *ngIf="form.case === 'request' || form.case === 'response'">
+    <p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.REQ_RESP_DESCRIPTION' | translate }}</p>
+
+    <div class="emailVerified">
+      <mat-checkbox [formControl]="form.form.controls.all">
+        <div class="execution-condition-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL.DESCRIPTION' | translate
+          }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_SERVICE.DESCRIPTION' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        type="text"
+        placeholder=""
+        [formControl]="form.form.controls.service"
+        [matAutocomplete]="autoservice"
+      />
+
+      <mat-autocomplete #autoservice="matAutocomplete">
+        <mat-option *ngIf="(executionServices$ | async) === null" class="is-loading">
+          <mat-spinner diameter="30"></mat-spinner>
+        </mat-option>
+        <mat-option *ngFor="let service of executionServices$ | async" [value]="service">
+          <span>{{ service }}</span>
+        </mat-option>
+      </mat-autocomplete>
+    </cnsl-form-field>
+
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_METHOD.TITLE' | translate }}</p>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" [formControl]="form.form.controls.method" [matAutocomplete]="automethod" />
+
+      <mat-autocomplete #automethod="matAutocomplete">
+        <mat-option *ngIf="(executionMethods$ | async) === null" class="is-loading">
+          <mat-spinner diameter="30"></mat-spinner>
+        </mat-option>
+        <mat-option *ngFor="let method of executionMethods$ | async" [value]="method">
+          <span>{{ method }}</span>
+        </mat-option>
+      </mat-autocomplete>
+    </cnsl-form-field>
+  </ng-container>
+
+  <ng-container *ngIf="form.case === 'function'">
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        type="text"
+        placeholder=""
+        [formControl]="form.form.controls.name"
+        [matAutocomplete]="autofunctionname"
+      />
+
+      <mat-autocomplete #autofunctionname="matAutocomplete">
+        <mat-option *ngIf="(executionFunctions$ | async) === null" class="is-loading">
+          <mat-spinner diameter="30"></mat-spinner>
+        </mat-option>
+        <mat-option *ngFor="let function of executionFunctions$ | async" [value]="function">
+          <span>{{ function }}</span>
+        </mat-option>
+      </mat-autocomplete>
+
+      <span class="name-hint cnsl-secondary-text" cnslHint>{{
+        'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.FUNCTIONNAME.DESCRIPTION' | translate
+      }}</span>
+    </cnsl-form-field>
+  </ng-container>
+
+  <ng-container *ngIf="form.case === 'event'">
+    <div class="emailVerified">
+      <mat-checkbox [formControl]="form.form.controls.all">
+        <div class="execution-condition-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.ALL_EVENTS' | translate
+          }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_GROUP.TITLE' | translate }}</p>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_GROUP.DESCRIPTION' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.group" />
+    </cnsl-form-field>
+
+    <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_EVENT.TITLE' | translate }}</p>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_EVENT.DESCRIPTION' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.event" />
+    </cnsl-form-field>
+  </ng-container>
+
+  <div class="actions">
+    <button mat-stroked-button (click)="back.emit()">
+      {{ 'ACTIONS.BACK' | translate }}
+    </button>
+    <button [disabled]="form.form.invalid" color="primary" mat-raised-button type="submit">
+      {{ 'ACTIONS.CONTINUE' | translate }}
+    </button>
+  </div>
+</form>

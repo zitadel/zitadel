@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
@@ -54,28 +57,28 @@ func (e *mockExecutionTarget) GetSigningKey() string {
 	return e.SigningKey
 }
 
-type mockContentRequest struct {
-	Content string
-}
-
-func newMockContentRequest(content string) *mockContentRequest {
-	return &mockContentRequest{
-		Content: content,
+func newMockContentRequest(content string) proto.Message {
+	return &structpb.Struct{
+		Fields: map[string]*structpb.Value{
+			"content": {
+				Kind: &structpb.Value_StringValue{StringValue: content},
+			},
+		},
 	}
 }
 
 func newMockContextInfoRequest(fullMethod, request string) *ContextInfoRequest {
 	return &ContextInfoRequest{
 		FullMethod: fullMethod,
-		Request:    newMockContentRequest(request),
+		Request:    Message{Message: newMockContentRequest(request)},
 	}
 }
 
 func newMockContextInfoResponse(fullMethod, request, response string) *ContextInfoResponse {
 	return &ContextInfoResponse{
 		FullMethod: fullMethod,
-		Request:    newMockContentRequest(request),
-		Response:   newMockContentRequest(response),
+		Request:    Message{Message: newMockContentRequest(request)},
+		Response:   Message{Message: newMockContentRequest(response)},
 	}
 }
 
@@ -591,7 +594,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.res.want, resp)
+			assert.EqualExportedValues(t, tt.res.want, resp)
 
 			for _, closeF := range closeFuncs {
 				closeF()
@@ -632,7 +635,7 @@ func testServerCall(
 		time.Sleep(sleep)
 
 		w.Header().Set("Content-Type", "application/json")
-		resp, err := json.Marshal(respBody)
+		resp, err := protojson.Marshal(respBody.(proto.Message))
 		if err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
@@ -723,7 +726,8 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 						statusCode: http.StatusOK,
 					},
 				},
-				req: []byte{},
+				req:  newMockContentRequest(""),
+				resp: newMockContentRequest(""),
 			},
 			res{
 				wantErr: true,
@@ -790,7 +794,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.res.want, resp)
+			assert.EqualExportedValues(t, tt.res.want, resp)
 
 			for _, closeF := range closeFuncs {
 				closeF()

@@ -2,7 +2,6 @@
   [showSelectionActionButton]="showSelectionActionButton"
   *ngIf="projectId"
   (refreshed)="refreshPage()"
-  [dataSize]="dataSource.totalResult"
   [emitRefreshOnPreviousRoutes]="['/projects/' + projectId + '/roles/create']"
   [selection]="selection"
   [loading]="dataSource.loading$ | async"
