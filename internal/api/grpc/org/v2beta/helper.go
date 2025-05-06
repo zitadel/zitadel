@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+
 	// TODO fix below
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
@@ -138,6 +139,8 @@ func FieldNameToOrgColumn(fieldName v2beta_org.OrgFieldName) query.Column {
 	switch fieldName {
 	case v2beta_org.OrgFieldName_ORG_FIELD_NAME_NAME:
 		return query.OrgColumnName
+	case v2beta_org.OrgFieldName_ORG_FIELD_NAME_CREATION_DATE:
+		return query.OrgColumnCreationDate
 	case v2beta_org.OrgFieldName_ORG_FIELD_NAME_UNSPECIFIED:
 		return query.Column{}
 	default:

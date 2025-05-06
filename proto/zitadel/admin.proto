@@ -1272,6 +1272,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use CreateOrganization [/v2beta/organization] API instead
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/_setup";

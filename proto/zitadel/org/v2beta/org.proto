@@ -42,6 +42,7 @@ enum OrgState {
 enum OrgFieldName {
     ORG_FIELD_NAME_UNSPECIFIED = 0;
     ORG_FIELD_NAME_NAME = 1;
+    ORG_FIELD_NAME_CREATION_DATE = 2;
 }
 
 message OrgQuery {
@@ -73,7 +74,7 @@ message OrgDomainQuery {
     string domain = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"citadel.cloud\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
     zitadel.object.v2beta.TextQueryMethod method = 2 [

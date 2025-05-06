@@ -2197,7 +2197,7 @@ service ManagementService {
         };
     }
 
-    // Reprecated: use ReactivateOrganization [/v2beta/organization/_reactivate] API instead
+    // Deprecated: use ReactivateOrganization [/v2beta/organization/_reactivate] API instead
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_reactivate"
