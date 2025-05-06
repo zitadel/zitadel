@@ -122,7 +122,7 @@ type addUserHumanOption func(context.Context, *AddHuman) error
 
 func (c *Commands) AddUserHumanWithResourceOwnerExistenceCheck() addUserHumanOption {
 	return func(ctx context.Context, human *AddHuman) error {
-		return c.CheckOrgExists(ctx, human.Details.ResourceOwner)
+		return c.checkOrgExists(ctx, human.Details.ResourceOwner)
 	}
 }
 
