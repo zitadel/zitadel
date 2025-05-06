@@ -140,8 +140,7 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if !isUserStateExists(existingUser.UserState) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bd4ir1mblj", "Errors.User.NotFound")
 	}
-	isHuman := existingUser.Name == ""
-	if err = c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID, isHuman); err != nil {
+	if err = c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 		return nil, err
 	}
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)

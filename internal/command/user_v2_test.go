@@ -3,13 +3,13 @@ package command
 import (
 	"context"
 	"errors"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -1344,7 +1344,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			},
 		},
 		{
-			name: "remove self human, ok",
+			name: "remove self, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1391,32 +1391,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
-			},
-		},
-		{
-			name: "remove self machine, error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(ctx,
-								&user.NewAggregate(ctxUserID, "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckNotAllowed(),
-			},
-			args: args{
-				userID: ctxUserID,
-			},
-			res: res{
-				err: zerrors.IsPermissionDenied,
 			},
 		},
 	}

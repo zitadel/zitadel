@@ -34,25 +34,25 @@ func (c *Commands) newPermissionCheck(ctx context.Context, permission string, ag
 	}
 }
 
-func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string, allowSelf bool) PermissionCheck {
+func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
-		if allowSelf && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
+		if aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
 			return nil
 		}
 		return c.newPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
 	}
 }
 
-func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context, allowSelf bool) PermissionCheck {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite, allowSelf)
+func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context) PermissionCheck {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite)
 }
 
-func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string, allowSelf bool) error {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, allowSelf)(resourceOwner, userID)
+func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete)(resourceOwner, userID)
 }
 
 func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.NewPermissionCheckUserWrite(ctx, true)(resourceOwner, userID)
+	return c.NewPermissionCheckUserWrite(ctx)(resourceOwner, userID)
 }
 
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {

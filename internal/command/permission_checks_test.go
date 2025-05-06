@@ -147,14 +147,10 @@ func TestCommands_CheckPermissionUserWrite(t *testing.T) {
 	type args struct {
 		ctx                        context.Context
 		resourceOwner, aggregateID string
-		allowSelf                  bool
 	}
 	type want struct {
 		err func(error) bool
 	}
-	ctx := authz.SetCtxData(context.Background(), authz.CtxData{
-		UserID: "aggregateID",
-	})
 	tests := []struct {
 		name   string
 		fields fields
@@ -162,44 +158,28 @@ func TestCommands_CheckPermissionUserWrite(t *testing.T) {
 		want   want
 	}{
 		{
-			name: "allow self and matches, no permission check",
+			name: "self, no permission check",
 			args: args{
-				ctx:           ctx,
+				ctx: authz.SetCtxData(context.Background(), authz.CtxData{
+					UserID: "aggregateID",
+				}),
 				resourceOwner: "resourceOwner",
 				aggregateID:   "aggregateID",
-				allowSelf:     true,
 			},
 		},
 		{
-			name: "allow self and doesn't match, permission check",
+			name: "not self, permission check",
 			fields: fields{
 				domainPermissionCheck: mockDomainPermissionCheck(
-					ctx,
+					context.Background(),
 					"user.write",
 					"resourceOwner",
 					"foreignAggregateID"),
 			},
 			args: args{
-				ctx:           ctx,
+				ctx:           context.Background(),
 				resourceOwner: "resourceOwner",
 				aggregateID:   "foreignAggregateID",
-				allowSelf:     true,
-			},
-		},
-		{
-			name: "disallow self, permission check",
-			fields: fields{
-				domainPermissionCheck: mockDomainPermissionCheck(
-					ctx,
-					"user.write",
-					"resourceOwner",
-					"aggregateID"),
-			},
-			args: args{
-				ctx:           ctx,
-				resourceOwner: "resourceOwner",
-				aggregateID:   "aggregateID",
-				allowSelf:     false,
 			},
 		},
 	}
@@ -214,7 +194,7 @@ func TestCommands_CheckPermissionUserWrite(t *testing.T) {
 			if tt.fields.domainPermissionCheck != nil {
 				c.checkPermission = tt.fields.domainPermissionCheck(t)
 			}
-			err := c.NewPermissionCheckUserWrite(tt.args.ctx, tt.args.allowSelf)(tt.args.resourceOwner, tt.args.aggregateID)
+			err := c.NewPermissionCheckUserWrite(tt.args.ctx)(tt.args.resourceOwner, tt.args.aggregateID)
 			if tt.want.err != nil {
 				assert.True(t, tt.want.err(err))
 			}
@@ -229,12 +209,11 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 	type args struct {
 		ctx                        context.Context
 		resourceOwner, aggregateID string
-		allowSelf                  bool
 	}
 	type want struct {
 		err func(error) bool
 	}
-	ctx := authz.SetCtxData(context.Background(), authz.CtxData{
+	userCtx := authz.SetCtxData(context.Background(), authz.CtxData{
 		UserID: "aggregateID",
 	})
 	tests := []struct {
@@ -244,44 +223,26 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 		want   want
 	}{
 		{
-			name: "allow self and matches, no permission check",
+			name: "self, no permission check",
 			args: args{
-				ctx:           ctx,
+				ctx:           userCtx,
 				resourceOwner: "resourceOwner",
 				aggregateID:   "aggregateID",
-				allowSelf:     true,
 			},
 		},
 		{
-			name: "allow self and doesn't match, permission check",
+			name: "not self, permission check",
 			fields: fields{
 				domainPermissionCheck: mockDomainPermissionCheck(
-					ctx,
+					context.Background(),
 					"user.delete",
 					"resourceOwner",
 					"foreignAggregateID"),
 			},
 			args: args{
-				ctx:           ctx,
+				ctx:           context.Background(),
 				resourceOwner: "resourceOwner",
 				aggregateID:   "foreignAggregateID",
-				allowSelf:     true,
-			},
-		},
-		{
-			name: "disallow self, permission check",
-			fields: fields{
-				domainPermissionCheck: mockDomainPermissionCheck(
-					ctx,
-					"user.delete",
-					"resourceOwner",
-					"aggregateID"),
-			},
-			args: args{
-				ctx:           ctx,
-				resourceOwner: "resourceOwner",
-				aggregateID:   "aggregateID",
-				allowSelf:     false,
 			},
 		},
 	}
@@ -296,7 +257,7 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 			if tt.fields.domainPermissionCheck != nil {
 				c.checkPermission = tt.fields.domainPermissionCheck(t)
 			}
-			err := c.checkPermissionDeleteUser(tt.args.ctx, tt.args.resourceOwner, tt.args.aggregateID, tt.args.allowSelf)
+			err := c.checkPermissionDeleteUser(tt.args.ctx, tt.args.resourceOwner, tt.args.aggregateID)
 			if tt.want.err != nil {
 				assert.True(t, tt.want.err(err))
 			}
