@@ -1,5 +1,17 @@
 # @zitadel/client
 
+## 1.2.0
+
+### Minor Changes
+
+- 62ad388: revert CJS support
+
+## 1.1.0
+
+### Minor Changes
+
+- 9692297: add CJS and ESM support
+
 ## 1.0.7
 
 ### Patch Changes
