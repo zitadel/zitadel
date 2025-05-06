@@ -952,10 +952,6 @@ export async function authorizeOrDenyDeviceAuthorization({
   deviceAuthorizationId: string;
   session?: { sessionId: string; sessionToken: string };
 }) {
-  console.log("authorizeOrDenyDeviceAuthorization");
-
-  console.log("session", session);
-
   const oidcService = await createServiceForHost(OIDCService, serviceUrl);
 
   return oidcService.authorizeOrDenyDeviceAuthorization({

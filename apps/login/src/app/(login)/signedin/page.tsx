@@ -112,10 +112,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </Alert>
         )}
 
-        {/* {sessionFactors?.id && (
-          <SelfServiceMenu sessionId={sessionFactors?.id} />
-        )} */}
-
         {loginSettings?.defaultRedirectUri && (
           <div className="mt-8 flex w-full flex-row items-center">
             <span className="flex-grow"></span>
