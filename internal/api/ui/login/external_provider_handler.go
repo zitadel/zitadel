@@ -1445,7 +1445,7 @@ func (l *Login) handleExternalLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logoutRequest, ok := l.caches.federatedLogouts.Get(r.Context(), federatedlogout.IndexRequestID, federatedlogout.Key(authz.GetInstance(r.Context()).InstanceID(), data.SessionID))
-	if !ok || logoutRequest.State != federatedlogout.StateCreated {
+	if !ok || logoutRequest.State != federatedlogout.StateCreated || logoutRequest.FingerPrintID != authz.GetCtxData(r.Context()).AgentID {
 		l.renderError(w, r, nil, zerrors.ThrowNotFound(nil, "LOGIN-ADK21", "Errors.ExternalIDP.LogoutRequestNotFound"))
 		return
 	}

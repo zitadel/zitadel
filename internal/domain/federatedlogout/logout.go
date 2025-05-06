@@ -9,6 +9,7 @@ const (
 
 type FederatedLogout struct {
 	InstanceID            string
+	FingerPrintID         string
 	SessionID             string
 	IDPID                 string
 	UserID                string
