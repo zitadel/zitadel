@@ -45,7 +45,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *AddProjectRo
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-RLB4UpqQSd", "Errors.Project.Role.Invalid")
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &roleWriteModel.WriteModel)
 	events, err := c.addProjectRoles(ctx, projectAgg, projectRole)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 	}
 
 	roleWriteModel := NewProjectRoleWriteModel(projectID, resourceOwner)
-	projectAgg := ProjectAggregateFromWriteModel(&roleWriteModel.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &roleWriteModel.WriteModel)
 	events, err := c.addProjectRoles(ctx, projectAgg, projectRoles...)
 	if err != nil {
 		return details, err
@@ -150,7 +150,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *ChangePro
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-3MizLWveMf", "Errors.Project.Role.Invalid")
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingRole.WriteModel)
 
 	changeEvent, changed, err := existingRole.NewProjectRoleChangedEvent(ctx, projectAgg, projectRole.Key, projectRole.DisplayName, projectRole.Group)
 	if err != nil {
@@ -178,7 +178,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 	if err := c.checkPermissionDeleteProjectRole(ctx, existingRole.ResourceOwner, existingRole.Key); err != nil {
 		return nil, err
 	}
-	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingRole.WriteModel)
 	events := []eventstore.Command{
 		project.NewRoleRemovedEvent(ctx, projectAgg, key),
 	}

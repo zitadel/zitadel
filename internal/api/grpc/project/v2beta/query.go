@@ -192,6 +192,8 @@ func grantedProjectStateToPb(state domain.ProjectGrantState) project_pb.GrantedP
 		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_ACTIVE
 	case domain.ProjectGrantStateInactive:
 		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_INACTIVE
+	case domain.ProjectGrantStateUnspecified, domain.ProjectGrantStateRemoved:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_UNSPECIFIED
 	default:
 		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_UNSPECIFIED
 	}
@@ -229,6 +231,9 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProj
 
 func (s *Server) listProjectGrantsRequestToModel(req *project_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := projectGrantFiltersToModel(req.Filters)
 	if err != nil {
 		return nil, err
@@ -318,6 +323,8 @@ func projectGrantStateToPb(state domain.ProjectGrantState) project_pb.ProjectGra
 		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_ACTIVE
 	case domain.ProjectGrantStateInactive:
 		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
+	case domain.ProjectGrantStateUnspecified, domain.ProjectGrantStateRemoved:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
 	default:
 		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
 	}
@@ -352,6 +359,9 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *project_pb.ListProje
 
 func (s *Server) listProjectRolesRequestToModel(req *project_pb.ListProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := roleQueriesToModel(req.Filters)
 	if err != nil {
 		return nil, err

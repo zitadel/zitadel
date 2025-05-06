@@ -71,7 +71,7 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) 
 	if err := c.pushAppendAndReduce(ctx,
 		wm,
 		project.NewGrantAddedEvent(ctx,
-			ProjectAggregateFromWriteModel(&wm.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &wm.WriteModel),
 			grant.GrantID,
 			grant.GrantedOrgID,
 			grant.RoleKeys),
@@ -119,7 +119,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *ChangeProjectG
 
 	events := []eventstore.Command{
 		project.NewGrantChangedEvent(ctx,
-			ProjectAggregateFromWriteModel(&existingGrant.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
 			existingGrant.GrantID,
 			grant.RoleKeys,
 		),
@@ -217,7 +217,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
 		project.NewGrantDeactivateEvent(ctx,
-			ProjectAggregateFromWriteModel(&existingGrant.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
 			grantID,
 		),
 	)
@@ -262,7 +262,7 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
 		project.NewGrantReactivatedEvent(ctx,
-			ProjectAggregateFromWriteModel(&existingGrant.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
 			grantID,
 		),
 	)
@@ -293,7 +293,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	}
 	events := make([]eventstore.Command, 0)
 	events = append(events, project.NewGrantRemovedEvent(ctx,
-		ProjectAggregateFromWriteModel(&existingGrant.WriteModel),
+		ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
 		grantID,
 		existingGrant.GrantedOrgID,
 	),
