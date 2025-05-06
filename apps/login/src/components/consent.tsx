@@ -59,9 +59,9 @@ export function ConsentScreen({
             return (
               <li
                 key={s}
-                className="grid grid-cols-4 w-full text-sm flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light py-2 px-4 rounded-md transition-all"
+                className="w-full text-sm flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light py-2 px-4 rounded-md transition-all"
               >
-                <span className="col-span-3">{resolvedDescription}</span>
+                <span>{resolvedDescription}</span>
               </li>
             );
           })}
