@@ -199,7 +199,8 @@
     },
     "request": {
       "title": "{appName} 想要连接：",
-      "description": "点击“允许”即表示您允许此应用程序和 Zitadel 根据其各自的服务条款和隐私政策使用您的信息。您可以随时撤销此访问权限。",
+      "description": "{appName} 将访问：",
+      "disclaimer": "点击“允许”即表示您允许此应用程序和 Zitadel 根据其各自的服务条款和隐私政策使用您的信息。您可以随时撤销此访问权限。",
       "submit": "允许",
       "deny": "拒绝"
     },

@@ -68,7 +68,7 @@ export function ConsentScreen({
       </ul>
 
       <p className="ztdl-p text-xs text-left">
-        {t("device.request.description", { appName: appName })}
+        {t("device.request.disclaimer", { appName: appName })}
       </p>
 
       {error && (

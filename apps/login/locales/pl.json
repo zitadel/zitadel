@@ -199,7 +199,8 @@
     },
     "request": {
       "title": "{appName} chce się połączyć:",
-      "description": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "description": "{appName} będzie miało dostęp do:",
+      "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
       "submit": "Zezwól",
       "deny": "Odmów"
     },

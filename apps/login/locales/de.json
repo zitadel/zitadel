@@ -199,6 +199,7 @@
     },
     "request": {
       "title": "{appName} möchte eine Verbindung herstellen:",
+      "disclaimer": "{appName} hat Zugriff auf:",
       "description": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
       "submit": "Zulassen",
       "deny": "Ablehnen"

@@ -69,6 +69,8 @@ export default async function Page(props: {
           {t("request.title", { appName: deviceAuthorizationRequest?.appName })}
         </h1>
 
+        <p className="ztdl-p">{t("request.description")}</p>
+
         <ConsentScreen
           deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
           scope={deviceAuthorizationRequest.scope}
