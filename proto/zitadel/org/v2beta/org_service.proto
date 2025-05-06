@@ -515,7 +515,6 @@ message DeleteOrganizationResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-//This is an empty request
 message DeactivateOrganizationRequest {
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -531,7 +530,6 @@ message DeactivateOrganizationResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-//This is an empty request
 message ReactivateOrganizationRequest {
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
