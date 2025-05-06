@@ -43,27 +43,30 @@ export function ConsentScreen({
     }
   }
 
+  console.log("scope", scope);
   return (
     <div className="pt-4 w-full flex flex-col items-center space-y-4">
       <ul className="list-disc space-y-2 w-full">
-        {scope?.map((s) => {
-          const translationKey = `device.scope.${s}`;
-          const description = t(translationKey, null);
+        {scope
+          ?.filter((s) => !!s)
+          .map((s) => {
+            const translationKey = `device.scope.${s}`;
+            const description = t(translationKey, null);
 
-          // Check if the key itself is returned and provide a fallback
-          const resolvedDescription =
-            description === translationKey ? "" : description;
+            // Check if the key itself is returned and provide a fallback
+            const resolvedDescription =
+              description === translationKey ? "" : description;
 
-          return (
-            <li
-              key={s}
-              className="grid grid-cols-4 w-full text-sm flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light py-2 px-4 rounded-md transition-all"
-            >
-              <strong className="col-span-1">{s}</strong>
-              <span className="col-span-3">{resolvedDescription}</span>
-            </li>
-          );
-        })}
+            return (
+              <li
+                key={s}
+                className="grid grid-cols-4 w-full text-sm flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light py-2 px-4 rounded-md transition-all"
+              >
+                <strong className="col-span-1">{s}</strong>
+                <span className="col-span-3">{resolvedDescription}</span>
+              </li>
+            );
+          })}
       </ul>
 
       <p className="ztdl-p text-xs text-left">
