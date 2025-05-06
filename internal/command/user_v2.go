@@ -128,7 +128,8 @@ func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writ
 	return writeModel, nil
 }
 
-func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, check func(bool) PermissionCheck, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+// RemoveUserV2 allows self-deletion for human users but not for machine users.
+func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
@@ -139,10 +140,9 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if !isUserStateExists(existingUser.UserState) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bd4ir1mblj", "Errors.User.NotFound")
 	}
-	if check != nil {
-		if err = check(existingUser.Name == "")(existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
-			return nil, err
-		}
+	isHuman := existingUser.Name == ""
+	if err = c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID, isHuman); err != nil {
+		return nil, err
 	}
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {

@@ -47,16 +47,14 @@ func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context, allowSelf bo
 	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite, allowSelf)
 }
 
-func (c *Commands) NewPermissionCheckUserDelete(ctx context.Context, allowSelf bool) PermissionCheck {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, allowSelf)
+func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string, allowSelf bool) error {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, allowSelf)(resourceOwner, userID)
 }
 
-// Deprecated: use NewPermissionCheckUserWrite to protect an API.
 func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
 	return c.NewPermissionCheckUserWrite(ctx, true)(resourceOwner, userID)
 }
 
-// Deprecated: use NewPermissionCheck to protect an API.
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
 	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil

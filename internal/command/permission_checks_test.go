@@ -296,7 +296,7 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 			if tt.fields.domainPermissionCheck != nil {
 				c.checkPermission = tt.fields.domainPermissionCheck(t)
 			}
-			err := c.NewPermissionCheckUserDelete(tt.args.ctx, tt.args.allowSelf)(tt.args.resourceOwner, tt.args.aggregateID)
+			err := c.checkPermissionDeleteUser(tt.args.ctx, tt.args.resourceOwner, tt.args.aggregateID, tt.args.allowSelf)
 			if tt.want.err != nil {
 				assert.True(t, tt.want.err(err))
 			}
@@ -313,20 +313,5 @@ func mockDomainPermissionCheck(expectCtx context.Context, expectPermission, expe
 			assert.Equal(t, expectResourceID, resourceID)
 			return nil
 		}
-	}
-}
-
-var errPermissionDenied = errors.New("permission denied")
-
-func isPermissionDenied(err error) bool {
-	return errors.Is(err, errPermissionDenied)
-}
-
-func permissionCheck(allow bool) PermissionCheck {
-	return func(_, _ string) error {
-		if allow {
-			return nil
-		}
-		return errPermissionDenied
 	}
 }

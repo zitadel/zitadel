@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"testing"
 	"time"
 
@@ -1081,16 +1082,17 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 }
 
 func TestCommandSide_RemoveUserV2(t *testing.T) {
+	ctxUserID := "ctxUserID"
+	ctx := authz.SetCtxData(context.Background(), authz.CtxData{UserID: ctxUserID})
 	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type (
 		args struct {
-			ctx                  context.Context
 			userID               string
 			cascadingMemberships []*CascadingMembership
 			grantIDs             []string
-			permissionCheck      func(bool) PermissionCheck
 		}
 	)
 	type res struct {
@@ -1106,14 +1108,11 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "",
-				permissionCheck: func(bool) PermissionCheck {
-					return permissionCheck(true)
-				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1127,13 +1126,10 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) PermissionCheck {
-					return permissionCheck(true)
-				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1147,7 +1143,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
+							user.NewHumanAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
 								"firstname",
@@ -1161,7 +1157,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewUserRemovedEvent(context.Background(),
+							user.NewUserRemovedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
 								nil,
@@ -1170,13 +1166,10 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) PermissionCheck {
-					return permissionCheck(true)
-				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1190,7 +1183,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
+							user.NewHumanAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
 								"firstname",
@@ -1206,7 +1199,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
@@ -1215,7 +1208,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewUserRemovedEvent(context.Background(),
+						user.NewUserRemovedEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"username",
 							nil,
@@ -1223,13 +1216,10 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) PermissionCheck {
-					return permissionCheck(true)
-				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1243,7 +1233,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
+							user.NewHumanAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
 								"firstname",
@@ -1257,123 +1247,19 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+							user.NewHumanInitializedCheckSucceededEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) PermissionCheck {
-					return permissionCheck(false)
-				},
 			},
 			res: res{
-				err: isPermissionDenied,
-			},
-		},
-		{
-			name: "remove user, permission based on reduced write model, ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectPush(
-						user.NewUserRemovedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"username",
-							nil,
-							true,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-				permissionCheck: func(isHuman bool) PermissionCheck {
-					return func(resourceOwner, aggregateID string) error {
-						if isHuman {
-							return nil
-						}
-						return errPermissionDenied
-					}
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "remove user, permission based on reduced write model, error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-				permissionCheck: func(isHuman bool) PermissionCheck {
-					return func(resourceOwner, aggregateID string) error {
-						if isHuman {
-							return errPermissionDenied
-						}
-						return nil
-					}
-				},
-			},
-			res: res{
-				err: isPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1382,7 +1268,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
+							user.NewMachineAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
 								"name",
@@ -1392,7 +1278,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewUserRemovedEvent(context.Background(),
+							user.NewUserRemovedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
 								nil,
@@ -1403,11 +1289,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) PermissionCheck {
-					return permissionCheck(true)
-				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1421,7 +1303,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
+							user.NewMachineAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
 								"name",
@@ -1433,7 +1315,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
@@ -1442,7 +1324,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewUserRemovedEvent(context.Background(),
+						user.NewUserRemovedEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"username",
 							nil,
@@ -1450,13 +1332,10 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
-				permissionCheck: func(bool) PermissionCheck {
-					return permissionCheck(true)
-				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1464,13 +1343,91 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "remove self human, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(ctx,
+								&user.NewAggregate(ctxUserID, "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(ctx,
+								&user.NewAggregate(ctxUserID, "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewUserRemovedEvent(ctx,
+							&user.NewAggregate(ctxUserID, "org1").Aggregate,
+							"username",
+							nil,
+							true,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID: ctxUserID,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "remove self machine, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(ctx,
+								&user.NewAggregate(ctxUserID, "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID: ctxUserID,
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.RemoveUserV2(tt.args.ctx, tt.args.userID, "", tt.args.permissionCheck, tt.args.cascadingMemberships, tt.args.grantIDs...)
+
+			got, err := r.RemoveUserV2(ctx, tt.args.userID, "", tt.args.cascadingMemberships, tt.args.grantIDs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
