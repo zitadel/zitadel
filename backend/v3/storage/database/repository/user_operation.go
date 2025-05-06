@@ -31,17 +31,17 @@ var _ domain.UserOperation = (*userOperation)(nil)
 
 func UserIDQuery(id string) domain.UserClause {
 	return textClause[string]{
-		clause: clause[domain.TextOperation]{
+		clause: clause[database.TextOperation]{
 			field: userFields[domain.UserFieldID],
-			op:    domain.TextOperationEqual,
+			op:    database.TextOperationEqual,
 		},
 		value: id,
 	}
 }
 
-func HumanEmailQuery(op domain.TextOperation, email string) domain.UserClause {
+func HumanEmailQuery(op database.TextOperation, email string) domain.UserClause {
 	return textClause[string]{
-		clause: clause[domain.TextOperation]{
+		clause: clause[database.TextOperation]{
 			field: userFields[domain.UserHumanFieldEmail],
 			op:    op,
 		},
@@ -49,9 +49,9 @@ func HumanEmailQuery(op domain.TextOperation, email string) domain.UserClause {
 	}
 }
 
-func HumanEmailVerifiedQuery(op domain.BoolOperation) domain.UserClause {
-	return boolClause[domain.BoolOperation]{
-		clause: clause[domain.BoolOperation]{
+func HumanEmailVerifiedQuery(op database.BoolOperation) domain.UserClause {
+	return boolClause[database.BoolOperation]{
+		clause: clause[database.BoolOperation]{
 			field: userFields[domain.UserHumanFieldEmailVerified],
 			op:    op,
 		},

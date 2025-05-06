@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v4 "github.com/zitadel/zitadel/backend/v3/storage/database/repository/stmt/v4"
 )
 
@@ -12,16 +13,16 @@ func TestQueryUser(t *testing.T) {
 	t.Run("User filters", func(t *testing.T) {
 		user := v4.UserRepository(nil)
 		u, err := user.Get(context.Background(),
-			v4.WithCondition(
-				v4.And(
-					v4.Or(
+			database.WithCondition(
+				database.And(
+					database.Or(
 						user.IDCondition("test"),
 						user.IDCondition("2"),
 					),
-					user.UsernameCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
+					user.UsernameCondition(database.TextOperationStartsWithIgnoreCase, "test"),
 				),
 			),
-			v4.WithOrderBy(user.CreatedAtColumn()),
+			database.WithOrderBy(user.CreatedAtColumn()),
 		)
 
 		assert.NoError(t, err)
@@ -32,12 +33,12 @@ func TestQueryUser(t *testing.T) {
 		user := v4.UserRepository(nil)
 		machine := user.Machine()
 		human := user.Human()
-		email, err := human.GetEmail(context.Background(), v4.And(
-			user.UsernameCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
-			v4.Or(
-				machine.DescriptionCondition(v4.TextOperatorStartsWithIgnoreCase, "test"),
-				human.EmailAddressVerifiedCondition(true),
-				v4.IsNotNull(machine.DescriptionColumn()),
+		email, err := human.GetEmail(context.Background(), database.And(
+			user.UsernameCondition(database.TextOperationStartsWithIgnoreCase, "test"),
+			database.Or(
+				machine.DescriptionCondition(database.TextOperationStartsWithIgnoreCase, "test"),
+				human.EmailVerifiedCondition(true),
+				database.IsNotNull(machine.DescriptionColumn()),
 			),
 		))
 
@@ -62,6 +63,6 @@ func TestArg(t *testing.T) {
 func TestWriteUser(t *testing.T) {
 	t.Run("update user", func(t *testing.T) {
 		user := v4.UserRepository(nil)
-		user.Update(context.Background(), user.IDCondition("test"), user.SetUsername("test"))
+		user.Human().Update(context.Background(), user.IDCondition("test"), user.SetUsername("test"))
 	})
 }

@@ -14,7 +14,7 @@ func NewEmailVerifiedCommand(userID string, isVerified bool) *EmailVerifiedComma
 	return &EmailVerifiedCommand{
 		UserID: userID,
 		Email: &Email{
-			IsVerified: isVerified,
+			VerifiedAt: time.Time{},
 		},
 	}
 }

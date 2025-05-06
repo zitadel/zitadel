@@ -3,58 +3,33 @@ package v4
 import (
 	"context"
 	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type Human struct {
-	FirstName string
-	LastName  string
-	Email     *Email
-	Phone     *Phone
-}
-
-const UserTypeHuman UserType = "human"
-
-func (Human) userTrait() {}
-
-func (h Human) Type() UserType {
-	return UserTypeHuman
-}
-
-var _ userTrait = (*Human)(nil)
-
-type Email struct {
-	Address string
-	Verification
-}
-
-type Phone struct {
-	Number string
-	Verification
-}
-
-type Verification struct {
-	VerifiedAt time.Time
-}
+// -------------------------------------------------------------
+// repository
+// -------------------------------------------------------------
 
 type userHuman struct {
 	*user
 }
 
-func (u *user) Human() *userHuman {
-	return &userHuman{user: u}
-}
+var _ domain.HumanRepository = (*userHuman)(nil)
 
 const userEmailQuery = `SELECT h.email_address, h.email_verified_at FROM user_humans h`
 
-func (u *userHuman) GetEmail(ctx context.Context, condition Condition) (*Email, error) {
-	var email Email
+// GetEmail implements [domain.HumanRepository].
+func (u *userHuman) GetEmail(ctx context.Context, condition database.Condition) (*domain.Email, error) {
+	var email domain.Email
 
 	u.builder.WriteString(userEmailQuery)
 	u.writeCondition(condition)
 
-	err := u.client.QueryRow(ctx, u.builder.String(), u.builder.args...).Scan(
+	err := u.client.QueryRow(ctx, u.builder.String(), u.builder.Args()...).Scan(
 		&email.Address,
-		&email.Verification.VerifiedAt,
+		&email.VerifiedAt,
 	)
 
 	if err != nil {
@@ -63,130 +38,158 @@ func (u *userHuman) GetEmail(ctx context.Context, condition Condition) (*Email, 
 	return &email, nil
 }
 
-func (h userHuman) Update(ctx context.Context, condition Condition, changes ...Change) error {
+// Update implements [domain.HumanRepository].
+func (h userHuman) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
 	h.builder.WriteString(`UPDATE human_users SET `)
-	Changes(changes).writeTo(&h.builder)
+	database.Changes(changes).Write(&h.builder)
 	h.writeCondition(condition)
 
 	stmt := h.builder.String()
 
-	return h.client.Exec(ctx, stmt, h.builder.args...)
+	return h.client.Exec(ctx, stmt, h.builder.Args()...)
 }
 
-func (h userHuman) SetFirstName(firstName string) Change {
-	return newChange(h.FirstNameColumn(), firstName)
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
+
+// SetFirstName implements [domain.humanChanges].
+func (h userHuman) SetFirstName(firstName string) database.Change {
+	return database.NewChange(h.FirstNameColumn(), firstName)
 }
 
-func (h userHuman) FirstNameColumn() Column {
-	return column{"first_name"}
+// SetLastName implements [domain.humanChanges].
+func (h userHuman) SetLastName(lastName string) database.Change {
+	return database.NewChange(h.LastNameColumn(), lastName)
 }
 
-func (h userHuman) FirstNameCondition(op TextOperator, firstName string) Condition {
-	return newTextCondition(h.FirstNameColumn(), op, firstName)
-}
-
-func (h userHuman) SetLastName(lastName string) Change {
-	return newChange(h.LastNameColumn(), lastName)
-}
-
-func (h userHuman) LastNameColumn() Column {
-	return column{"last_name"}
-}
-
-func (h userHuman) LastNameCondition(op TextOperator, lastName string) Condition {
-	return newTextCondition(h.LastNameColumn(), op, lastName)
-}
-
-func (h userHuman) EmailAddressColumn() Column {
-	return ignoreCaseCol{
-		column: column{"email_address"},
-		suffix: "_lower",
-	}
-}
-
-func (h userHuman) EmailAddressCondition(op TextOperator, email string) Condition {
-	return newTextCondition(h.EmailAddressColumn(), op, email)
-}
-
-func (h userHuman) EmailVerifiedAtColumn() Column {
-	return column{"email_verified_at"}
-}
-
-func (h *userHuman) EmailAddressVerifiedCondition(isVerified bool) Condition {
-	if isVerified {
-		return IsNotNull(h.EmailVerifiedAtColumn())
-	}
-	return IsNull(h.EmailVerifiedAtColumn())
-}
-
-func (h userHuman) EmailVerifiedAtCondition(op TextOperator, emailVerifiedAt string) Condition {
-	return newTextCondition(h.EmailVerifiedAtColumn(), op, emailVerifiedAt)
-}
-
-func (h userHuman) SetEmailAddress(address string) Change {
-	return newChange(h.EmailAddressColumn(), address)
-}
-
-// SetEmailVerified sets the verified column of the email
-// if at is zero the statement uses the database timestamp
-func (h userHuman) SetEmailVerified(at time.Time) Change {
-	if at.IsZero() {
-		return newChange(h.EmailVerifiedAtColumn(), nowDBInstruction)
-	}
-	return newChange(h.EmailVerifiedAtColumn(), at)
-}
-
-func (h userHuman) SetEmail(address string, verified *time.Time) Change {
-	return newChanges(
+// SetEmail implements [domain.humanChanges].
+func (h userHuman) SetEmail(address string, verified *time.Time) database.Change {
+	return database.NewChanges(
 		h.SetEmailAddress(address),
-		newUpdatePtrColumn(h.EmailVerifiedAtColumn(), verified),
+		database.NewChangePtr(h.EmailVerifiedAtColumn(), verified),
 	)
 }
 
-func (h userHuman) PhoneNumberColumn() Column {
-	return column{"phone_number"}
+// SetEmailAddress implements [domain.humanChanges].
+func (h userHuman) SetEmailAddress(address string) database.Change {
+	return database.NewChange(h.EmailAddressColumn(), address)
 }
 
-func (h userHuman) SetPhoneNumber(number string) Change {
-	return newChange(h.PhoneNumberColumn(), number)
-}
-
-func (h userHuman) PhoneNumberCondition(op TextOperator, phoneNumber string) Condition {
-	return newTextCondition(h.PhoneNumberColumn(), op, phoneNumber)
-}
-
-func (h userHuman) PhoneVerifiedAtColumn() Column {
-	return column{"phone_verified_at"}
-}
-
-func (h userHuman) PhoneNumberVerifiedCondition(isVerified bool) Condition {
-	if isVerified {
-		return IsNotNull(h.PhoneVerifiedAtColumn())
-	}
-	return IsNull(h.PhoneVerifiedAtColumn())
-}
-
-// SetPhoneVerified sets the verified column of the phone
-// if at is zero the statement uses the database timestamp
-func (h userHuman) SetPhoneVerified(at time.Time) Change {
+// SetEmailVerifiedAt implements [domain.humanChanges].
+func (h userHuman) SetEmailVerifiedAt(at time.Time) database.Change {
 	if at.IsZero() {
-		return newChange(h.PhoneVerifiedAtColumn(), nowDBInstruction)
+		return database.NewChange(h.EmailVerifiedAtColumn(), database.NowInstruction)
 	}
-	return newChange(h.PhoneVerifiedAtColumn(), at)
+	return database.NewChange(h.EmailVerifiedAtColumn(), at)
 }
 
-func (h userHuman) PhoneVerifiedAtCondition(op TextOperator, phoneVerifiedAt string) Condition {
-	return newTextCondition(h.PhoneVerifiedAtColumn(), op, phoneVerifiedAt)
-}
-
-func (h userHuman) SetPhone(number string, verifiedAt *time.Time) Change {
-	return newChanges(
+// SetPhone implements [domain.humanChanges].
+func (h userHuman) SetPhone(number string, verifiedAt *time.Time) database.Change {
+	return database.NewChanges(
 		h.SetPhoneNumber(number),
-		newUpdatePtrColumn(h.PhoneVerifiedAtColumn(), verifiedAt),
+		database.NewChangePtr(h.PhoneVerifiedAtColumn(), verifiedAt),
 	)
 }
 
-func (h userHuman) columns() Columns {
+// SetPhoneNumber implements [domain.humanChanges].
+func (h userHuman) SetPhoneNumber(number string) database.Change {
+	return database.NewChange(h.PhoneNumberColumn(), number)
+}
+
+// SetPhoneVerifiedAt implements [domain.humanChanges].
+func (h userHuman) SetPhoneVerifiedAt(at time.Time) database.Change {
+	if at.IsZero() {
+		return database.NewChange(h.PhoneVerifiedAtColumn(), database.NowInstruction)
+	}
+	return database.NewChange(h.PhoneVerifiedAtColumn(), at)
+}
+
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
+
+// FirstNameCondition implements [domain.humanConditions].
+func (h userHuman) FirstNameCondition(op database.TextOperation, firstName string) database.Condition {
+	return database.NewTextCondition(h.FirstNameColumn(), op, firstName)
+}
+
+// LastNameCondition implements [domain.humanConditions].
+func (h userHuman) LastNameCondition(op database.TextOperation, lastName string) database.Condition {
+	return database.NewTextCondition(h.LastNameColumn(), op, lastName)
+}
+
+// EmailAddressCondition implements [domain.humanConditions].
+func (h userHuman) EmailAddressCondition(op database.TextOperation, email string) database.Condition {
+	return database.NewTextCondition(h.EmailAddressColumn(), op, email)
+}
+
+// EmailVerifiedCondition implements [domain.humanConditions].
+func (h *userHuman) EmailVerifiedCondition(isVerified bool) database.Condition {
+	if isVerified {
+		return database.IsNotNull(h.EmailVerifiedAtColumn())
+	}
+	return database.IsNull(h.EmailVerifiedAtColumn())
+}
+
+// EmailVerifiedAtCondition implements [domain.humanConditions].
+func (h userHuman) EmailVerifiedAtCondition(op database.NumberOperation, verifiedAt time.Time) database.Condition {
+	return database.NewNumberCondition(h.EmailVerifiedAtColumn(), op, verifiedAt)
+}
+
+// PhoneNumberCondition implements [domain.humanConditions].
+func (h userHuman) PhoneNumberCondition(op database.TextOperation, phoneNumber string) database.Condition {
+	return database.NewTextCondition(h.PhoneNumberColumn(), op, phoneNumber)
+}
+
+// PhoneVerifiedCondition implements [domain.humanConditions].
+func (h userHuman) PhoneVerifiedCondition(isVerified bool) database.Condition {
+	if isVerified {
+		return database.IsNotNull(h.PhoneVerifiedAtColumn())
+	}
+	return database.IsNull(h.PhoneVerifiedAtColumn())
+}
+
+// PhoneVerifiedAtCondition implements [domain.humanConditions].
+func (h userHuman) PhoneVerifiedAtCondition(op database.NumberOperation, verifiedAt time.Time) database.Condition {
+	return database.NewNumberCondition(h.PhoneVerifiedAtColumn(), op, verifiedAt)
+}
+
+// -------------------------------------------------------------
+// columns
+// -------------------------------------------------------------
+
+// FirstNameColumn implements [domain.humanColumns].
+func (h userHuman) FirstNameColumn() database.Column {
+	return database.NewColumn("first_name")
+}
+
+// LastNameColumn implements [domain.humanColumns].
+func (h userHuman) LastNameColumn() database.Column {
+	return database.NewColumn("last_name")
+}
+
+// EmailAddressColumn implements [domain.humanColumns].
+func (h userHuman) EmailAddressColumn() database.Column {
+	return database.NewIgnoreCaseColumn("email_address", "_lower")
+}
+
+// EmailVerifiedAtColumn implements [domain.humanColumns].
+func (h userHuman) EmailVerifiedAtColumn() database.Column {
+	return database.NewColumn("email_verified_at")
+}
+
+// PhoneNumberColumn implements [domain.humanColumns].
+func (h userHuman) PhoneNumberColumn() database.Column {
+	return database.NewColumn("phone_number")
+}
+
+// PhoneVerifiedAtColumn implements [domain.humanColumns].
+func (h userHuman) PhoneVerifiedAtColumn() database.Column {
+	return database.NewColumn("phone_verified_at")
+}
+
+func (h userHuman) columns() database.Columns {
 	return append(h.user.columns(),
 		h.FirstNameColumn(),
 		h.LastNameColumn(),
@@ -197,7 +200,7 @@ func (h userHuman) columns() Columns {
 	)
 }
 
-func (h userHuman) writeReturning(builder *statementBuilder) {
+func (h userHuman) writeReturning(builder *database.StatementBuilder) {
 	builder.WriteString(" RETURNING ")
-	h.columns().writeTo(builder)
+	h.columns().Write(builder)
 }

@@ -4,7 +4,6 @@ type Org struct {
 	InstanceID string
 	ID         string
 	Name       string
-	Dates
 }
 
 type GetOrg struct{}

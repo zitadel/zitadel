@@ -1,15 +1,15 @@
-package v4
+package database
 
 type Condition interface {
-	writeTo(builder *statementBuilder)
+	Write(builder *StatementBuilder)
 }
 
 type and struct {
 	conditions []Condition
 }
 
-// writeTo implements [Condition].
-func (a *and) writeTo(builder *statementBuilder) {
+// Write implements [Condition].
+func (a *and) Write(builder *StatementBuilder) {
 	if len(a.conditions) > 1 {
 		builder.WriteString("(")
 		defer builder.WriteString(")")
@@ -18,7 +18,7 @@ func (a *and) writeTo(builder *statementBuilder) {
 		if i > 0 {
 			builder.WriteString(" AND ")
 		}
-		condition.writeTo(builder)
+		condition.(Condition).Write(builder)
 	}
 }
 
@@ -32,8 +32,8 @@ type or struct {
 	conditions []Condition
 }
 
-// writeTo implements [Condition].
-func (o *or) writeTo(builder *statementBuilder) {
+// Write implements [Condition].
+func (o *or) Write(builder *StatementBuilder) {
 	if len(o.conditions) > 1 {
 		builder.WriteString("(")
 		defer builder.WriteString(")")
@@ -42,7 +42,7 @@ func (o *or) writeTo(builder *statementBuilder) {
 		if i > 0 {
 			builder.WriteString(" OR ")
 		}
-		condition.writeTo(builder)
+		condition.(Condition).Write(builder)
 	}
 }
 
@@ -56,9 +56,9 @@ type isNull struct {
 	column Column
 }
 
-// writeTo implements [Condition].
-func (i *isNull) writeTo(builder *statementBuilder) {
-	i.column.writeTo(builder)
+// Write implements [Condition].
+func (i *isNull) Write(builder *StatementBuilder) {
+	i.column.Write(builder)
 	builder.WriteString(" IS NULL")
 }
 
@@ -72,40 +72,40 @@ type isNotNull struct {
 	column Column
 }
 
-// writeTo implements [Condition].
-func (i *isNotNull) writeTo(builder *statementBuilder) {
-	i.column.writeTo(builder)
+// Write implements [Condition].
+func (i *isNotNull) Write(builder *StatementBuilder) {
+	i.column.Write(builder)
 	builder.WriteString(" IS NOT NULL")
 }
 
 func IsNotNull(column Column) *isNotNull {
-	return &isNotNull{column: column}
+	return &isNotNull{column: column.(Column)}
 }
 
 var _ Condition = (*isNotNull)(nil)
 
-type valueCondition func(builder *statementBuilder)
+type valueCondition func(builder *StatementBuilder)
 
-func newTextCondition[V Text](col Column, op TextOperator, value V) Condition {
-	return valueCondition(func(builder *statementBuilder) {
+func NewTextCondition[V Text](col Column, op TextOperation, value V) Condition {
+	return valueCondition(func(builder *StatementBuilder) {
 		writeTextOperation(builder, col, op, value)
 	})
 }
 
-func newNumberCondition[V Number](col Column, op NumberOperator, value V) Condition {
-	return valueCondition(func(builder *statementBuilder) {
+func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condition {
+	return valueCondition(func(builder *StatementBuilder) {
 		writeNumberOperation(builder, col, op, value)
 	})
 }
 
-func newBooleanCondition[V Boolean](col Column, value V) Condition {
-	return valueCondition(func(builder *statementBuilder) {
+func NewBooleanCondition[V Boolean](col Column, value V) Condition {
+	return valueCondition(func(builder *StatementBuilder) {
 		writeBooleanOperation(builder, col, value)
 	})
 }
 
-// writeTo implements [Condition].
-func (c valueCondition) writeTo(builder *statementBuilder) {
+// Write implements [Condition].
+func (c valueCondition) Write(builder *StatementBuilder) {
 	c(builder)
 }
 

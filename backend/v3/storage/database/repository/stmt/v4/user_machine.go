@@ -1,72 +1,64 @@
 package v4
 
-import "context"
+import (
+	"context"
 
-type Machine struct {
-	Description string
-}
-
-func (Machine) userTrait() {}
-
-func (m Machine) Type() UserType {
-	return UserTypeMachine
-}
-
-const UserTypeMachine UserType = "machine"
-
-var _ userTrait = (*Machine)(nil)
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+)
 
 type userMachine struct {
 	*user
 }
 
-func (u *user) Machine() *userMachine {
-	return &userMachine{user: u}
-}
+var _ domain.MachineRepository = (*userMachine)(nil)
 
-func (m userMachine) Update(ctx context.Context, condition Condition, changes ...Change) ([]*Machine, error) {
+// -------------------------------------------------------------
+// repository
+// -------------------------------------------------------------
+
+// Update implements [domain.MachineRepository].
+func (m userMachine) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (err error) {
 	m.builder.WriteString("UPDATE user_machines SET ")
-	Changes(changes).writeTo(&m.builder)
+	database.Changes(changes).Write(&m.builder)
 	m.writeCondition(condition)
 	m.writeReturning()
 
-	var machines []*Machine
-	rows, err := m.client.Query(ctx, m.builder.String(), m.builder.args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		machine := new(Machine)
-		if err := rows.Scan(&machine.Description); err != nil {
-			return nil, err
-		}
-		machines = append(machines, machine)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return machines, nil
+	return m.client.Exec(ctx, m.builder.String(), m.builder.Args()...)
 }
 
-func (userMachine) DescriptionColumn() Column {
-	return column{"description"}
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
+
+// SetDescription implements [domain.machineChanges].
+func (m userMachine) SetDescription(description string) database.Change {
+	return database.NewChange(m.DescriptionColumn(), description)
 }
 
-func (m userMachine) SetDescription(description string) Change {
-	return newChange(m.DescriptionColumn(), description)
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
+
+// DescriptionCondition implements [domain.machineConditions].
+func (m userMachine) DescriptionCondition(op database.TextOperation, description string) database.Condition {
+	return database.NewTextCondition(m.DescriptionColumn(), op, description)
 }
 
-func (m userMachine) DescriptionCondition(op TextOperator, description string) Condition {
-	return newTextCondition(m.DescriptionColumn(), op, description)
+// -------------------------------------------------------------
+// columns
+// -------------------------------------------------------------
+
+// DescriptionColumn implements [domain.machineColumns].
+func (m userMachine) DescriptionColumn() database.Column {
+	return database.NewColumn("description")
 }
 
-func (m userMachine) columns() Columns {
+func (m userMachine) columns() database.Columns {
 	return append(m.user.columns(), m.DescriptionColumn())
 }
 
 func (m *userMachine) writeReturning() {
 	m.builder.WriteString(" RETURNING ")
-	m.columns().writeTo(&m.builder)
+	m.columns().Write(&m.builder)
 }

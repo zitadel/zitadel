@@ -3,7 +3,6 @@ package domain
 import (
 	"context"
 
-	v4 "github.com/zitadel/zitadel/backend/v3/storage/database/repository/stmt/v4"
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
@@ -20,10 +19,8 @@ var (
 func NewCreateHumanCommand(username string, opts ...CreateHumanOpt) *CreateUserCommand {
 	cmd := &CreateUserCommand{
 		user: &User{
-			User: v4.User{
-				Username: username,
-				Traits:   &v4.Human{},
-			},
+			Username: username,
+			Traits:   &Human{},
 		},
 	}
 

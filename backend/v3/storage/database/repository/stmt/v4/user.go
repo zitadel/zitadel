@@ -4,59 +4,55 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
-
-type Dates struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-}
-
-type User struct {
-	InstanceID string
-	OrgID      string
-	ID         string
-	Username   string
-	Traits     userTrait
-	Dates
-}
-
-type UserType string
-
-type userTrait interface {
-	userTrait()
-	Type() UserType
-}
 
 const queryUserStmt = `SELECT instance_id, org_id, id, username, type, created_at, updated_at, deleted_at,` +
 	` first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at, description` +
 	` FROM users_view`
 
 type user struct {
-	builder statementBuilder
+	builder database.StatementBuilder
 	client  database.QueryExecutor
 }
 
-func UserRepository(client database.QueryExecutor) *user {
+func UserRepository(client database.QueryExecutor) domain.UserRepository {
 	return &user{
 		client: client,
 	}
 }
 
-func (u *user) List(ctx context.Context, opts ...QueryOption) (users []*User, err error) {
-	options := new(queryOpts)
+var _ domain.UserRepository = (*user)(nil)
+
+// -------------------------------------------------------------
+// repository
+// -------------------------------------------------------------
+
+// Human implements [domain.UserRepository].
+func (u *user) Human() domain.HumanRepository {
+	return &userHuman{user: u}
+}
+
+// Machine implements [domain.UserRepository].
+func (u *user) Machine() domain.MachineRepository {
+	return &userMachine{user: u}
+}
+
+// List implements [domain.UserRepository].
+func (u *user) List(ctx context.Context, opts ...database.QueryOption) (users []*domain.User, err error) {
+	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
 	}
 
 	u.builder.WriteString(queryUserStmt)
-	options.writeCondition(&u.builder)
-	options.writeOrderBy(&u.builder)
-	options.writeLimit(&u.builder)
-	options.writeOffset(&u.builder)
+	options.WriteCondition(&u.builder)
+	options.WriteOrderBy(&u.builder)
+	options.WriteLimit(&u.builder)
+	options.WriteOffset(&u.builder)
 
-	rows, err := u.client.Query(ctx, u.builder.String(), u.builder.args...)
+	rows, err := u.client.Query(ctx, u.builder.String(), u.builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,142 +76,157 @@ func (u *user) List(ctx context.Context, opts ...QueryOption) (users []*User, er
 	return users, nil
 }
 
-func (u *user) Get(ctx context.Context, opts ...QueryOption) (*User, error) {
-	options := new(queryOpts)
+// Get implements [domain.UserRepository].
+func (u *user) Get(ctx context.Context, opts ...database.QueryOption) (*domain.User, error) {
+	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
 	}
 
 	u.builder.WriteString(queryUserStmt)
-	options.writeCondition(&u.builder)
-	options.writeOrderBy(&u.builder)
-	options.writeLimit(&u.builder)
-	options.writeOffset(&u.builder)
+	options.WriteCondition(&u.builder)
+	options.WriteOrderBy(&u.builder)
+	options.WriteLimit(&u.builder)
+	options.WriteOffset(&u.builder)
 
-	return scanUser(u.client.QueryRow(ctx, u.builder.String(), u.builder.args...))
+	return scanUser(u.client.QueryRow(ctx, u.builder.String(), u.builder.Args()...))
 }
 
 const (
-	// TODO: change to separate statements and tables
-	createUserCte = `WITH user AS (` +
-		`INSERT INTO users (instance_id, org_id, id, username, type) VALUES ($1, $2, $3, $4, $5)` +
-		` RETURNING *)`
-	createHumanStmt = createUserCte + ` INSERT INTO user_humans h (instance_id, org_id, user_id, first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at)` +
-		` SELECT u.instance_id, u.org_id, u.id, $6, $7, $8, $9, $10, $11` +
-		` FROM user u` +
-		` RETURNING u.created_at, u.updated_at, u.deleted_at`
-	createMachineStmt = createUserCte + ` INSERT INTO user_machines (instance_id, org_id, user_id, description)` +
-		` SELECT u.instance_id, u.org_id, u.id, $6` +
-		` FROM user u` +
-		` RETURNING u.created_at, u.updated_at`
+	createHumanStmt = `INSERT INTO human_users (instance_id, org_id, user_id, username, first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at)` +
+		` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)` +
+		` RETURNING created_at, updated_at`
+	createMachineStmt = `INSERT INTO user_machines (instance_id, org_id, user_id, username, description)` +
+		` VALUES ($1, $2, $3, $4, $5)` +
+		` RETURNING created_at, updated_at`
 )
 
-func (u *user) Create(ctx context.Context, user *User) error {
-	u.builder.appendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.Traits.Type())
+// Create implements [domain.UserRepository].
+func (u *user) Create(ctx context.Context, user *domain.User) error {
+	u.builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.Traits.Type())
 	switch trait := user.Traits.(type) {
-	case *Human:
+	case *domain.Human:
 		u.builder.WriteString(createHumanStmt)
-		u.builder.appendArgs(trait.FirstName, trait.LastName, trait.Email.Address, trait.Email.VerifiedAt, trait.Phone.Number, trait.Phone.VerifiedAt)
-	case *Machine:
+		u.builder.AppendArgs(trait.FirstName, trait.LastName, trait.Email.Address, trait.Email.VerifiedAt, trait.Phone.Number, trait.Phone.VerifiedAt)
+	case *domain.Machine:
 		u.builder.WriteString(createMachineStmt)
-		u.builder.appendArgs(trait.Description)
+		u.builder.AppendArgs(trait.Description)
 	}
-	return u.client.QueryRow(ctx, u.builder.String(), u.builder.args...).Scan(&user.Dates.CreatedAt, &user.Dates.UpdatedAt)
+	return u.client.QueryRow(ctx, u.builder.String(), u.builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
 }
 
-func (u *user) Update(ctx context.Context, condition Condition, changes ...Change) error {
-	u.builder.WriteString("UPDATE users SET ")
-	Changes(changes).writeTo(&u.builder)
-	u.writeCondition(condition)
-	return u.client.Exec(ctx, u.builder.String(), u.builder.args...)
-}
-
-func (u *user) Delete(ctx context.Context, condition Condition) error {
+// Delete implements [domain.UserRepository].
+func (u *user) Delete(ctx context.Context, condition database.Condition) error {
 	u.builder.WriteString("DELETE FROM users")
 	u.writeCondition(condition)
-	return u.client.Exec(ctx, u.builder.String(), u.builder.args...)
+	return u.client.Exec(ctx, u.builder.String(), u.builder.Args()...)
 }
 
-func (u *user) InstanceIDColumn() Column {
-	return column{name: "instance_id"}
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
+
+// SetUsername implements [domain.userChanges].
+func (u user) SetUsername(username string) database.Change {
+	return database.NewChange(u.UsernameColumn(), username)
 }
 
-func (u *user) InstanceIDCondition(instanceID string) Condition {
-	return newTextCondition(u.InstanceIDColumn(), TextOperatorEqual, instanceID)
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
+
+// InstanceIDCondition implements [domain.userConditions].
+func (u user) InstanceIDCondition(instanceID string) database.Condition {
+	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-func (u *user) OrgIDColumn() Column {
-	return column{name: "org_id"}
+// OrgIDCondition implements [domain.userConditions].
+func (u user) OrgIDCondition(orgID string) database.Condition {
+	return database.NewTextCondition(u.OrgIDColumn(), database.TextOperationEqual, orgID)
 }
 
-func (u *user) OrgIDCondition(orgID string) Condition {
-	return newTextCondition(u.OrgIDColumn(), TextOperatorEqual, orgID)
+// IDCondition implements [domain.userConditions].
+func (u user) IDCondition(userID string) database.Condition {
+	return database.NewTextCondition(u.IDColumn(), database.TextOperationEqual, userID)
 }
 
-func (u *user) IDColumn() Column {
-	return column{name: "id"}
+// UsernameCondition implements [domain.userConditions].
+func (u user) UsernameCondition(op database.TextOperation, username string) database.Condition {
+	return database.NewTextCondition(u.UsernameColumn(), op, username)
 }
 
-func (u *user) IDCondition(userID string) Condition {
-	return newTextCondition(u.IDColumn(), TextOperatorEqual, userID)
+// CreatedAtCondition implements [domain.userConditions].
+func (u user) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
+	return database.NewNumberCondition(u.CreatedAtColumn(), op, createdAt)
 }
 
-func (u *user) UsernameColumn() Column {
-	return ignoreCaseCol{
-		column: column{name: "username"},
-		suffix: "_lower",
-	}
+// UpdatedAtCondition implements [domain.userConditions].
+func (u user) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
+	return database.NewNumberCondition(u.UpdatedAtColumn(), op, updatedAt)
 }
 
-func (u user) SetUsername(username string) Change {
-	return newChange(u.UsernameColumn(), username)
-}
-
-func (u *user) UsernameCondition(op TextOperator, username string) Condition {
-	return newTextCondition(u.UsernameColumn(), op, username)
-}
-
-func (u *user) CreatedAtColumn() Column {
-	return column{name: "created_at"}
-}
-
-func (u *user) CreatedAtCondition(op NumberOperator, createdAt time.Time) Condition {
-	return newNumberCondition(u.CreatedAtColumn(), op, createdAt)
-}
-
-func (u *user) UpdatedAtColumn() Column {
-	return column{name: "updated_at"}
-}
-
-func (u *user) UpdatedAtCondition(op NumberOperator, updatedAt time.Time) Condition {
-	return newNumberCondition(u.UpdatedAtColumn(), op, updatedAt)
-}
-
-func (u *user) DeletedAtColumn() Column {
-	return column{name: "deleted_at"}
-}
-
-func (u *user) DeletedCondition(isDeleted bool) Condition {
+// DeletedCondition implements [domain.userConditions].
+func (u user) DeletedCondition(isDeleted bool) database.Condition {
 	if isDeleted {
-		return IsNotNull(u.DeletedAtColumn())
+		return database.IsNotNull(u.DeletedAtColumn())
 	}
-	return IsNull(u.DeletedAtColumn())
+	return database.IsNull(u.DeletedAtColumn())
 }
 
-func (u *user) DeletedAtCondition(op NumberOperator, deletedAt time.Time) Condition {
-	return newNumberCondition(u.DeletedAtColumn(), op, deletedAt)
+// DeletedAtCondition implements [domain.userConditions].
+func (u user) DeletedAtCondition(op database.NumberOperation, deletedAt time.Time) database.Condition {
+	return database.NewNumberCondition(u.DeletedAtColumn(), op, deletedAt)
 }
 
-func (u *user) writeCondition(condition Condition) {
+// -------------------------------------------------------------
+// columns
+// -------------------------------------------------------------
+
+// InstanceIDColumn implements [domain.userColumns].
+func (user) InstanceIDColumn() database.Column {
+	return database.NewColumn("instance_id")
+}
+
+// OrgIDColumn implements [domain.userColumns].
+func (user) OrgIDColumn() database.Column {
+	return database.NewColumn("org_id")
+}
+
+// IDColumn implements [domain.userColumns].
+func (user) IDColumn() database.Column {
+	return database.NewColumn("id")
+}
+
+// UsernameColumn implements [domain.userColumns].
+func (user) UsernameColumn() database.Column {
+	return database.NewIgnoreCaseColumn("username", "_lower")
+}
+
+// FirstNameColumn implements [domain.userColumns].
+func (user) CreatedAtColumn() database.Column {
+	return database.NewColumn("created_at")
+}
+
+// UpdatedAtColumn implements [domain.userColumns].
+func (user) UpdatedAtColumn() database.Column {
+	return database.NewColumn("updated_at")
+}
+
+// DeletedAtColumn implements [domain.userColumns].
+func (user) DeletedAtColumn() database.Column {
+	return database.NewColumn("deleted_at")
+}
+
+func (u *user) writeCondition(condition database.Condition) {
 	if condition == nil {
 		return
 	}
 	u.builder.WriteString(" WHERE ")
-	condition.writeTo(&u.builder)
+	condition.Write(&u.builder)
 }
 
-func (u user) columns() Columns {
-	return Columns{
+func (u user) columns() database.Columns {
+	return database.Columns{
 		u.InstanceIDColumn(),
 		u.OrgIDColumn(),
 		u.IDColumn(),
@@ -226,14 +237,14 @@ func (u user) columns() Columns {
 	}
 }
 
-func scanUser(scanner database.Scanner) (*User, error) {
+func scanUser(scanner database.Scanner) (*domain.User, error) {
 	var (
-		user    User
-		human   Human
-		email   Email
-		phone   Phone
-		machine Machine
-		typ     UserType
+		user    domain.User
+		human   domain.Human
+		email   domain.Email
+		phone   domain.Phone
+		machine domain.Machine
+		typ     domain.UserType
 	)
 	err := scanner.Scan(
 		&user.InstanceID,
@@ -241,9 +252,9 @@ func scanUser(scanner database.Scanner) (*User, error) {
 		&user.ID,
 		&user.Username,
 		&typ,
-		&user.Dates.CreatedAt,
-		&user.Dates.UpdatedAt,
-		&user.Dates.DeletedAt,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.DeletedAt,
 		&human.FirstName,
 		&human.LastName,
 		&email.Address,
@@ -257,7 +268,7 @@ func scanUser(scanner database.Scanner) (*User, error) {
 	}
 
 	switch typ {
-	case UserTypeHuman:
+	case domain.UserTypeHuman:
 		if email.Address != "" {
 			human.Email = &email
 		}
@@ -265,7 +276,7 @@ func scanUser(scanner database.Scanner) (*User, error) {
 			human.Phone = &phone
 		}
 		user.Traits = &human
-	case UserTypeMachine:
+	case domain.UserTypeMachine:
 		user.Traits = &machine
 	}
 
