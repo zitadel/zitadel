@@ -150,7 +150,6 @@ type Steps struct {
 	s51IDPTemplate6RootCA                   *IDPTemplate6RootCA
 	s52IDPTemplate6LDAP2                    *IDPTemplate6LDAP2
 	s53InitPermittedOrgsFunction            *InitPermittedOrgsFunction53
-	s55CreateSessions8UserIDIndex           *CreateSessions8UserIDIndex
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
