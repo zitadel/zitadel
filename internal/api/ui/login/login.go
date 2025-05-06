@@ -109,8 +109,10 @@ func csp() *middleware.CSP {
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
 	csp.ScriptSrc = csp.ScriptSrc.AddNonce().
-		AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE="). // SAML POST ACS
-		AddHash("sha256", "4Su6mBWzEIFnH4pAGMOuaeBrstwJN4Z3pq/s1Kn4/KQ=") // SAML POST SLO
+		// SAML POST ACS
+		AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=").
+		// SAML POST SLO
+		AddHash("sha256", "4Su6mBWzEIFnH4pAGMOuaeBrstwJN4Z3pq/s1Kn4/KQ=")
 	return &csp
 }
 
