@@ -156,6 +156,12 @@ service InstanceService {
     option (google.api.http) = {
       get: "/v2beta/instances/{instance_id}"
     };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.read"
+      }
+    };
   }
 
   // Update Instance
@@ -183,7 +189,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.instance.write"
+        permission: "iam.write"
       }
     };
   }
@@ -213,7 +219,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.instance.read"
+        permission: "iam.read"
       }
     };
   }
@@ -243,7 +249,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.domain.write"
+        permission: "iam.write"
       }
     };
   }
@@ -272,7 +278,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.domain.delete"
+        permission: "iam.write"
       }
     };
   }
@@ -295,6 +301,12 @@ service InstanceService {
     option (google.api.http) = {
       post: "/v2beta/instances/{instance_id}/custom-domains/search"
       body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.read"
+      }
     };
   }
 
@@ -323,7 +335,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.domain.write"
+        permission: "iam.write"
       }
     };
   }
@@ -352,7 +364,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.domain.delete"
+        permission: "iam.write"
       }
     };
   }
@@ -383,7 +395,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "system.domain.read"
+        permission: "iam.read"
       }
     };
   }

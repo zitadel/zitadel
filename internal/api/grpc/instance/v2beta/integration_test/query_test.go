@@ -37,16 +37,20 @@ func TestGetInstance(t *testing.T) {
 		testName           string
 		inputContext       context.Context
 		expectedInstanceID string
+		expectedErrorMsg   string
+		expectedErrorCode  codes.Code
 	}{
 		{
-			testName:           "when unauthN context should instance",
-			inputContext:       context.Background(),
-			expectedInstanceID: inst.ID(),
+			testName:          "when unauthN context should return unauthN error",
+			inputContext:      context.Background(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
 		},
 		{
-			testName:           "when unauthZ context should return instance",
-			inputContext:       orgOwnerCtx,
-			expectedInstanceID: inst.ID(),
+			testName:          "when unauthZ context should return unauthZ error",
+			inputContext:      orgOwnerCtx,
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 		},
 		{
 			testName:           "when request succeeds should return matching instance",
@@ -61,8 +65,13 @@ func TestGetInstance(t *testing.T) {
 			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: inst.ID()})
 
 			// Verify
-			require.NoError(t, err)
-			assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+			if tc.expectedErrorMsg == "" {
+				require.NoError(t, err)
+				assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
+			}
 		})
 	}
 }
@@ -178,21 +187,24 @@ func TestListCustomDomains(t *testing.T) {
 	})
 
 	tt := []struct {
-		testName        string
-		inputRequest    *instance.ListCustomDomainsRequest
-		inputContext    context.Context
-		expectedDomains []string
+		testName          string
+		inputRequest      *instance.ListCustomDomainsRequest
+		inputContext      context.Context
+		expectedErrorMsg  string
+		expectedErrorCode codes.Code
+		expectedDomains   []string
 	}{
 		{
-			testName: "when invalid context should paginated empty response",
+			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.ListCustomDomainsRequest{
 				InstanceId: inst.ID(),
 				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
 			},
-			inputContext: context.Background(),
-		},
+			inputContext:      context.Background(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing"},
 		{
-			testName: "when unauthZ context should return paginated response",
+			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.ListCustomDomainsRequest{
 				InstanceId:    inst.ID(),
 				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
@@ -205,8 +217,9 @@ func TestListCustomDomains(t *testing.T) {
 					},
 				},
 			},
-			inputContext:    orgOwnerCtx,
-			expectedDomains: []string{d1, d2},
+			inputContext:      orgOwnerCtx,
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 		},
 		{
 			testName: "when valid request with filter should return paginated response",
@@ -233,15 +246,17 @@ func TestListCustomDomains(t *testing.T) {
 			res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
 
 			// Verify
-			require.NotNil(t, res)
-			require.NoError(t, err)
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
 
-			domains := []string{}
-			for _, d := range res.GetDomains() {
-				domains = append(domains, d.GetDomain())
+			if tc.expectedErrorMsg == "" {
+				domains := []string{}
+				for _, d := range res.GetDomains() {
+					domains = append(domains, d.GetDomain())
+				}
+
+				assert.Subset(t, domains, tc.expectedDomains)
 			}
-
-			assert.Subset(t, domains, tc.expectedDomains)
 		})
 	}
 }
