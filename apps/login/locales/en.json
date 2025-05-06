@@ -205,8 +205,8 @@
     },
     "scope": {
       "openid": "Verify your identity.",
-      "email": "Access to your email address.",
-      "profile": "Access to your full profile information.",
+      "email": "View your email address.",
+      "profile": "View your full profile information.",
       "offline_access": "Allow offline access to your account."
     }
   },
