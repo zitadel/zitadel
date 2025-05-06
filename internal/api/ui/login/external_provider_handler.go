@@ -1450,40 +1450,19 @@ func (l *Login) handleExternalLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := l.authRepo.UserSessionByID(r.Context(), data.SessionID)
+	provider, err := l.externalLogoutProvider(r, logoutRequest.IDPID)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
 	}
 
-	if session.SelectedIDPConfigID.String == "" {
-		l.renderError(w, r, nil, zerrors.ThrowNotFound(nil, "LOGIN-SDF2g", "Errors.ExternalIDP.LogoutRequestNotFound"))
-		return
-	}
-
-	identityProvider, err := l.getIDPByID(r, session.SelectedIDPConfigID.String)
-	if err != nil {
-		l.renderError(w, r, nil, err)
-		return
-	}
-	if identityProvider.Type != domain.IDPTypeSAML {
-		l.externalAuthFailed(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-ADK21", "Errors.ExternalIDP.IDPTypeNotImplemented"))
-		return
-	}
-
-	nameID, err := l.externalUserID(r.Context(), session.UserID, identityProvider.ID)
+	nameID, err := l.externalUserID(r.Context(), logoutRequest.UserID, logoutRequest.IDPID)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
 	}
 
-	provider, err := l.samlProvider(r.Context(), identityProvider)
-	if err != nil {
-		l.renderError(w, r, nil, err)
-		return
-	}
-
-	err = samlLogoutRequest(w, r, provider, nameID, data.SessionID)
+	err = samlLogoutRequest(w, r, provider, nameID, logoutRequest.SessionID)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
@@ -1492,11 +1471,24 @@ func (l *Login) handleExternalLogout(w http.ResponseWriter, r *http.Request) {
 	l.caches.federatedLogouts.Set(r.Context(), logoutRequest)
 }
 
+func (l *Login) externalLogoutProvider(r *http.Request, providerID string) (*saml.Provider, error) {
+	identityProvider, err := l.getIDPByID(r, providerID)
+	if err != nil {
+		return nil, err
+	}
+	if identityProvider.Type != domain.IDPTypeSAML {
+		return nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-ADK21", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	return l.samlProvider(r.Context(), identityProvider)
+}
+
 func samlLogoutRequest(w http.ResponseWriter, r *http.Request, provider *saml.Provider, nameID, sessionID string) error {
 	mw, err := provider.GetSP()
 	if err != nil {
 		return err
 	}
+	// We ignore the configured binding and only check the available SLO endpoints from the metadata.
+	// For example, Azure documents that only redirect binding is possible and also only provides a redirect SLO in the metadata.
 	slo := mw.ServiceProvider.GetSLOBindingLocation(crewjam_saml.HTTPRedirectBinding)
 	if slo != "" {
 		return samlRedirectLogoutRequest(w, r, mw.ServiceProvider, slo, nameID, sessionID)

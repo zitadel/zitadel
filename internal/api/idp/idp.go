@@ -380,8 +380,7 @@ func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	_, ok := provider.(*saml2.Provider)
-	if !ok {
+	if _, ok = provider.(*saml2.Provider); !ok {
 		err := zerrors.ThrowInvalidArgument(nil, "SAML-ui9wyux0hp", "Errors.Intent.IDPInvalid")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

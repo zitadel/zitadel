@@ -359,6 +359,8 @@ func (o *OPStorage) federatedLogout(ctx context.Context, sessionID string, postL
 	o.federateLogoutCache.Set(ctx, &federatedlogout.FederatedLogout{
 		InstanceID:            authz.GetInstance(ctx).InstanceID(),
 		SessionID:             sessionID,
+		IDPID:                 session.SelectedIDPConfigID.String,
+		UserID:                session.UserID,
 		PostLogoutRedirectURI: postLogoutRedirectURI,
 		State:                 federatedlogout.StateCreated,
 	})
