@@ -328,12 +328,6 @@ service InstanceService {
     option (google.api.http) = {
       get: "/v2beta/instances/current"
     };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "system.instance.read"
-      }
-    };
   }
 
   // Update Instance
@@ -468,12 +462,6 @@ service InstanceService {
     option (google.api.http) = {
       post: "/v2beta/instances/current/custom-domains/search"
       body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "system.domain.read"
-      }
     };
   }
 

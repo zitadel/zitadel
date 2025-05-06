@@ -20,24 +20,21 @@ import (
 func TestGetInstance(t *testing.T) {
 	inst := integration.NewInstance(CTXWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+
 	tt := []struct {
 		testName           string
 		inputContext       context.Context
-		expectedErrorMsg   string
-		expectedErrorCode  codes.Code
 		expectedInstanceID string
 	}{
 		{
-			testName:          "when invalid context should return unauthN error",
-			inputContext:      context.Background(),
-			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing",
+			testName:           "when unauthN context should instance",
+			inputContext:       context.Background(),
+			expectedInstanceID: inst.ID(),
 		},
 		{
-			testName:          "when unauthZ context should return unauthZ error",
-			inputContext:      orgOwnerCtx,
-			expectedErrorCode: codes.PermissionDenied,
-			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+			testName:           "when unauthZ context should return instance",
+			inputContext:       orgOwnerCtx,
+			expectedInstanceID: inst.ID(),
 		},
 		{
 			testName:           "when request succeeds should return matching instance",
@@ -52,12 +49,8 @@ func TestGetInstance(t *testing.T) {
 			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &emptypb.Empty{})
 
 			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
-
-			if tc.expectedErrorMsg == "" {
-				assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
-			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
 		})
 	}
 }
@@ -66,6 +59,10 @@ func TestListInstances(t *testing.T) {
 	// Given
 	inst := integration.NewInstance(CTXWithSysAuthZ)
 	inst2 := integration.NewInstance(CTXWithSysAuthZ)
+	t.Cleanup(func() {
+		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+	})
 
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 	tt := []struct {
@@ -147,34 +144,39 @@ func TestListCustomDomains(t *testing.T) {
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(CTXWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d1})
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(CTXWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d2})
 		inst.Client.InstanceV2Beta.DeleteInstance(CTXWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
 	tt := []struct {
-		testName          string
-		inputRequest      *instance.ListCustomDomainsRequest
-		inputContext      context.Context
-		expectedErrorMsg  string
-		expectedErrorCode codes.Code
-		expectedDomains   []string
+		testName        string
+		inputRequest    *instance.ListCustomDomainsRequest
+		inputContext    context.Context
+		expectedDomains []string
 	}{
 		{
-			testName: "when invalid context should return unauthN error",
+			testName: "when invalid context should paginated empty response",
 			inputRequest: &instance.ListCustomDomainsRequest{
 				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
 			},
-			inputContext:      context.Background(),
-			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing",
+			inputContext: context.Background(),
 		},
 		{
-			testName: "when unauthZ context should return unauthZ error",
+			testName: "when unauthZ context should return paginated response",
 			inputRequest: &instance.ListCustomDomainsRequest{
-				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
+				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
+				Queries: []*instance.DomainSearchQuery{
+					{
+						Query: &instance.DomainSearchQuery_DomainQuery{
+							DomainQuery: &instance.DomainQuery{Domain: "custom", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
+						},
+					},
+				},
 			},
-			inputContext:      orgOwnerCtx,
-			expectedErrorCode: codes.PermissionDenied,
-			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+			inputContext:    orgOwnerCtx,
+			expectedDomains: []string{d1, d2},
 		},
 		{
 			testName: "when valid request with filter should return paginated response",
@@ -200,19 +202,15 @@ func TestListCustomDomains(t *testing.T) {
 			res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
 
 			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+			require.NotNil(t, res)
+			require.NoError(t, err)
 
-			if tc.expectedErrorMsg == "" {
-				require.NotNil(t, res)
-
-				domains := []string{}
-				for _, d := range res.GetDomains() {
-					domains = append(domains, d.GetDomain())
-				}
-
-				assert.Subset(t, domains, tc.expectedDomains)
+			domains := []string{}
+			for _, d := range res.GetDomains() {
+				domains = append(domains, d.GetDomain())
 			}
+
+			assert.Subset(t, domains, tc.expectedDomains)
 		})
 	}
 }
