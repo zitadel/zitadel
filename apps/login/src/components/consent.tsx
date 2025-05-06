@@ -43,7 +43,6 @@ export function ConsentScreen({
     }
   }
 
-  console.log("scope", scope);
   return (
     <div className="pt-4 w-full flex flex-col items-center space-y-4">
       <ul className="list-disc space-y-2 w-full">
