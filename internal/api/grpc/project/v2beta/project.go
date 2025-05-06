@@ -6,13 +6,10 @@ import (
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
-	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
@@ -56,6 +53,8 @@ func privateLabelingSettingToDomain(setting project_pb.PrivateLabelingSetting) d
 		return domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy
 	case project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY:
 		return domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy
+	case project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED:
+		return domain.PrivateLabelingSettingUnspecified
 	default:
 		return domain.PrivateLabelingSettingUnspecified
 	}
@@ -142,26 +141,6 @@ func (s *Server) ActivateProject(ctx context.Context, req *project_pb.ActivatePr
 	}
 	return &project_pb.ActivateProjectResponse{
 		ChangeDate: changeDate,
-	}, nil
-}
-
-func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRequest) (*mgmt_pb.RemoveProjectResponse, error) {
-	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: []query.SearchQuery{projectQuery},
-	}, true)
-	if err != nil {
-		return nil, err
-	}
-	details, err := s.command.RemoveProject(ctx, req.Id, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants.UserGrants)...)
-	if err != nil {
-		return nil, err
-	}
-	return &mgmt_pb.RemoveProjectResponse{
-		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 

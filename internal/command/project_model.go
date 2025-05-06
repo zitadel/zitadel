@@ -127,6 +127,10 @@ func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggre
 	return eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion)
 }
 
+func ProjectAggregateFromWriteModelWithCTX(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return project.AggregateFromWriteModel(ctx, wm)
+}
+
 func hasProjectState(check domain.ProjectState, states ...domain.ProjectState) bool {
 	for _, state := range states {
 		if check == state {

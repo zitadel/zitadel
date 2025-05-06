@@ -67,8 +67,7 @@ func (c *Commands) AddProject(ctx context.Context, add *AddProject) (_ *domain.O
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(
 			ctx,
-			//nolint: contextcheck
-			ProjectAggregateFromWriteModel(&wm.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &wm.WriteModel),
 			add.Name,
 			add.ProjectRoleAssertion,
 			add.ProjectRoleCheck,
@@ -228,10 +227,9 @@ func (c *Commands) ChangeProject(ctx context.Context, change *ChangeProject) (_ 
 		return nil, err
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&existing.WriteModel)
 	changedEvent := existing.NewChangedEvent(
 		ctx,
-		projectAgg,
+		ProjectAggregateFromWriteModelWithCTX(ctx, &existing.WriteModel),
 		change.Name,
 		change.ProjectRoleAssertion,
 		change.ProjectRoleCheck,
@@ -343,15 +341,18 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	events := []eventstore.Command{
-		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name, uniqueConstraints),
+		project.NewProjectRemovedEvent(ctx,
+			ProjectAggregateFromWriteModelWithCTX(ctx, &existingProject.WriteModel),
+			existingProject.Name,
+			uniqueConstraints,
+		),
 	}
 
 	for _, grantID := range cascadingUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
+			logging.WithFields("id", "COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
 		events = append(events, event)
@@ -394,12 +395,16 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
 	}
 	events := []eventstore.Command{
-		project.NewProjectRemovedEvent(ctx, ProjectAggregateFromWriteModel(&existing.WriteModel), existing.Name, uniqueConstraints),
+		project.NewProjectRemovedEvent(ctx,
+			ProjectAggregateFromWriteModelWithCTX(ctx, &existing.WriteModel),
+			existing.Name,
+			uniqueConstraints,
+		),
 	}
 	for _, grantID := range cascadingUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
+			logging.WithFields("id", "COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
 		events = append(events, event)
