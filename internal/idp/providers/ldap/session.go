@@ -194,7 +194,7 @@ func trySearchAndUserBind(
 	searchQuery := queriesAndToSearchQuery(
 		objectClassesToSearchQuery(objectClasses),
 		queriesOrToSearchQuery(
-			userFiltersToSearchQuery(userFilters, username),
+			userFiltersToSearchQuery(userFilters, username)...,
 		),
 	)
 
@@ -261,12 +261,12 @@ func objectClassesToSearchQuery(classes []string) string {
 	return searchQuery
 }
 
-func userFiltersToSearchQuery(filters []string, username string) string {
-	searchQuery := ""
-	for _, filter := range filters {
-		searchQuery += "(" + filter + "=" + ldap.EscapeFilter(username) + ")"
+func userFiltersToSearchQuery(filters []string, username string) []string {
+	searchQueries := make([]string, len(filters))
+	for i, filter := range filters {
+		searchQueries[i] = "(" + filter + "=" + ldap.EscapeFilter(username) + ")"
 	}
-	return searchQuery
+	return searchQueries
 }
 
 func mapLDAPEntryToUser(
