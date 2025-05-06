@@ -10,6 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
+var _ idp.Session = (*Session)(nil)
+
 // Session extends the [oidc.Session] with the formValues returned from the callback.
 // This enables to parse the user (name and email), which Apple only returns as form params on registration
 type Session struct {
