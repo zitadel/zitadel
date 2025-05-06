@@ -92,10 +92,9 @@ func TestDeleteInstace(t *testing.T) {
 }
 
 func TestUpdateInstace(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 
 	// Given
-
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
 
@@ -119,6 +118,7 @@ func TestUpdateInstace(t *testing.T) {
 		{
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.UpdateInstanceRequest{
+				InstanceId:   inst.ID(),
 				InstanceName: " ",
 			},
 			inputContext:      context.Background(),
@@ -128,6 +128,7 @@ func TestUpdateInstace(t *testing.T) {
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.UpdateInstanceRequest{
+				InstanceId:   inst.ID(),
 				InstanceName: " ",
 			},
 			inputContext:      orgOwnerCtx,
@@ -137,6 +138,7 @@ func TestUpdateInstace(t *testing.T) {
 		{
 			testName: "when invalid input should return invalid argument error",
 			inputRequest: &instance.UpdateInstanceRequest{
+				InstanceId:   inst.ID(),
 				InstanceName: " ",
 			},
 			inputContext:      ctxWithSysAuthZ,
@@ -146,6 +148,7 @@ func TestUpdateInstace(t *testing.T) {
 		{
 			testName: "when update succeeds should change instance name",
 			inputRequest: &instance.UpdateInstanceRequest{
+				InstanceId:   inst.ID(),
 				InstanceName: "an-updated-name",
 			},
 			inputContext:    ctxWithSysAuthZ,
@@ -168,7 +171,7 @@ func TestUpdateInstace(t *testing.T) {
 
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, 20*time.Second)
 				require.EventuallyWithT(t, func(tt *assert.CollectT) {
-					retrievedInstance, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{})
+					retrievedInstance, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: inst.ID()})
 					require.Nil(tt, err)
 					assert.Equal(tt, tc.expectedNewName, retrievedInstance.GetInstance().GetName())
 				}, retryDuration, tick, "timeout waiting for expected execution result")

@@ -139,7 +139,7 @@ service InstanceService {
   //
   // Returns the instance in the current context.
   //
-  // Please note that the instance ID passed in the input message is currently NOT used.
+  // The instace_id in the input message will be used in the future.
   //
   // Required permissions:
   //   - `system.instance.read`
@@ -154,13 +154,15 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      get: "/v2beta/instances/current"
+      get: "/v2beta/instances/{instance_id}"
     };
   }
 
   // Update Instance
   //
-  // Updates the current instance with the given name.
+  // Updates instance in context with the given name.
+  //
+  // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
   //   - `system.instance.write`
@@ -175,7 +177,7 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      put: "/v2beta/instances/current"
+      put: "/v2beta/instances/{instance_id}"
       body: "*"
     };
 
@@ -218,7 +220,9 @@ service InstanceService {
   
   // Add Custom Domain
   //
-  // Adds a custom domain to the instance.
+  // Adds a custom domain to the instance in context.
+  //
+  // The instance_id in the input message will be used in the future
   //
   // Required permissions:
   //   - `system.domain.write`
@@ -233,7 +237,7 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      post: "/v2beta/instances/current/custom-domains"
+      post: "/v2beta/instances/{instance_id}/custom-domains"
       body: "*"
     };
 
@@ -248,6 +252,8 @@ service InstanceService {
   //
   // Removes a custom domain from the instance.
   //
+  // The instance_id in the input message will be used in the future.
+  //
   // Required permissions:
   //  - `system.domain.delete`
   rpc RemoveCustomDomain(RemoveCustomDomainRequest) returns (RemoveCustomDomainResponse) {
@@ -261,7 +267,7 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      delete: "/v2beta/instances/current/custom-domains/{domain}"
+      delete: "/v2beta/instances/{instance_id}/custom-domains/{domain}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -274,6 +280,8 @@ service InstanceService {
   // List Custom Domains
   //
   // Lists custom domains of the instance.
+  //
+  // The instance_id in the input message will be used in the future.
   rpc ListCustomDomains(ListCustomDomainsRequest) returns (ListCustomDomainsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -285,7 +293,7 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      post: "/v2beta/instances/current/custom-domains/search"
+      post: "/v2beta/instances/{instance_id}/custom-domains/search"
       body: "*"
     };
   }
@@ -293,6 +301,8 @@ service InstanceService {
   // Add Trusted Domain
   //
   // Adds a trusted domain to the instance.
+  //
+  // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
   //   - `system.domain.write`
@@ -307,7 +317,7 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      post: "/v2beta/instances/current/trusted-domains"
+      post: "/v2beta/instances/{instance_id}/trusted-domains"
       body: "*"
     };
 
@@ -322,6 +332,8 @@ service InstanceService {
   //
   // Removes a trusted domain from the instance.
   //
+  // The instance_id in the input message will be used in the future.
+  //
   // Required permissions:
   //   - `system.domain.delete`
   rpc RemoveTrustedDomain(RemoveTrustedDomainRequest) returns (RemoveTrustedDomainResponse) {
@@ -335,7 +347,7 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      delete: "/v2beta/instances/current/trusted-domains/{domain}"
+      delete: "/v2beta/instances/{instance_id}/trusted-domains/{domain}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -350,6 +362,8 @@ service InstanceService {
   //
   // Lists trusted domains of the instance.
   //
+  // The instance_id in the input message will be used in the future.
+  //
   // Required permissions:
   //   - `system.domain.read`
   rpc ListTrustedDomains(ListTrustedDomainsRequest) returns (ListTrustedDomainsResponse) {
@@ -363,7 +377,7 @@ service InstanceService {
     };
 
     option (google.api.http) = {
-      post: "/v2beta/instances/current/trusted-domains/search"
+      post: "/v2beta/instances/{instance_id}/trusted-domains/search"
       body: "*"
     };
 
@@ -410,7 +424,16 @@ message GetInstanceResponse {
 }
 
 message UpdateInstanceRequest {
-  string instance_name = 1 [
+  // used only to identify the instance to change.
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string instance_name = 2 [
     (validate.rules).string = {min_len: 1, max_len: 253},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
@@ -449,7 +472,15 @@ message ListInstancesResponse {
 }
 
 message AddCustomDomainRequest {
-  string domain = 1 [
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 253},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
@@ -467,7 +498,15 @@ message AddCustomDomainResponse {
 }
 
 message RemoveCustomDomainRequest {
-  string domain = 1 [
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 253},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
@@ -485,14 +524,23 @@ message RemoveCustomDomainResponse {
 }
 
 message ListCustomDomainsRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
   // Pagination and sorting.
-  zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  zitadel.filter.v2beta.PaginationRequest pagination = 2;
 
   // The field the result is sorted by.
-  DomainFieldName sorting_column = 2;
+  DomainFieldName sorting_column = 3;
 
   // Criterias the client is looking for.
-  repeated DomainSearchQuery queries = 3;
+  repeated DomainSearchQuery queries = 4;
 }
 
 message ListCustomDomainsResponse {
@@ -503,15 +551,23 @@ message ListCustomDomainsResponse {
 }
 
 message AddTrustedDomainRequest {
-      string domain = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 253},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"login.example.com\"";
-            min_length: 1;
-            max_length: 253;
-        }
-    ];
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"login.example.com\"";
+        min_length: 1;
+        max_length: 253;
+    }
+  ];
 }
 
 message AddTrustedDomainResponse {
@@ -523,15 +579,23 @@ message AddTrustedDomainResponse {
 }
 
 message RemoveTrustedDomainRequest {
-      string domain = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 253},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"login.example.com\"";
-            min_length: 1;
-            max_length: 253;
-        }
-    ];
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"login.example.com\"";
+        min_length: 1;
+        max_length: 253;
+    }
+  ];
 }
 
 message RemoveTrustedDomainResponse {
@@ -543,14 +607,23 @@ message RemoveTrustedDomainResponse {
 }
 
 message ListTrustedDomainsRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
   // Pagination and sorting.
-  zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  zitadel.filter.v2beta.PaginationRequest pagination = 2;
 
   // The field the result is sorted by.
-  TrustedDomainFieldName sorting_column = 2;
+  TrustedDomainFieldName sorting_column = 3;
   
   // Criterias the client is looking for.
-  repeated TrustedDomainSearchQuery queries = 3;
+  repeated TrustedDomainSearchQuery queries = 4;
 }
 
 message ListTrustedDomainsResponse {

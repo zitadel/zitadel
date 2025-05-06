@@ -58,7 +58,7 @@ func TestGetInstance(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Test
-			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{})
+			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: inst.ID()})
 
 			// Verify
 			require.NoError(t, err)
@@ -166,14 +166,14 @@ func TestListCustomDomains(t *testing.T) {
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 	d1, d2 := "custom."+gofakeit.DomainName(), "custom."+gofakeit.DomainName()
 
-	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: d1})
+	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
-	_, err = inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: d2})
+	_, err = inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: d2})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d1})
-		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: d2})
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: inst.ID(), Domain: d1})
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: inst.ID(), Domain: d2})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
@@ -186,6 +186,7 @@ func TestListCustomDomains(t *testing.T) {
 		{
 			testName: "when invalid context should paginated empty response",
 			inputRequest: &instance.ListCustomDomainsRequest{
+				InstanceId: inst.ID(),
 				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
 			},
 			inputContext: context.Background(),
@@ -193,6 +194,7 @@ func TestListCustomDomains(t *testing.T) {
 		{
 			testName: "when unauthZ context should return paginated response",
 			inputRequest: &instance.ListCustomDomainsRequest{
+				InstanceId:    inst.ID(),
 				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
 				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
 				Queries: []*instance.DomainSearchQuery{
@@ -209,6 +211,7 @@ func TestListCustomDomains(t *testing.T) {
 		{
 			testName: "when valid request with filter should return paginated response",
 			inputRequest: &instance.ListCustomDomainsRequest{
+				InstanceId:    inst.ID(),
 				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
 				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
 				Queries: []*instance.DomainSearchQuery{
@@ -256,14 +259,14 @@ func TestListTrustedDomains(t *testing.T) {
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 	d1, d2 := "trusted."+gofakeit.DomainName(), "trusted."+gofakeit.DomainName()
 
-	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d1})
+	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
-	_, err = inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: d2})
+	_, err = inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: d2})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: d1})
-		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: d2})
+		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), Domain: d1})
+		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), Domain: d2})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
@@ -278,6 +281,7 @@ func TestListTrustedDomains(t *testing.T) {
 		{
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.ListTrustedDomainsRequest{
+				InstanceId: inst.ID(),
 				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
 			},
 			inputContext:      context.Background(),
@@ -287,6 +291,7 @@ func TestListTrustedDomains(t *testing.T) {
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.ListTrustedDomainsRequest{
+				InstanceId: inst.ID(),
 				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
 			},
 			inputContext:      orgOwnerCtx,
@@ -296,6 +301,7 @@ func TestListTrustedDomains(t *testing.T) {
 		{
 			testName: "when valid request with filter should return paginated response",
 			inputRequest: &instance.ListTrustedDomainsRequest{
+				InstanceId:    inst.ID(),
 				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
 				SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE,
 				Queries: []*instance.TrustedDomainSearchQuery{

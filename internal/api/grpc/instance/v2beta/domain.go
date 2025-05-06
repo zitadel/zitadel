@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) AddCustomDomain(ctx context.Context, req *instance.AddCustomDomainRequest) (*instance.AddCustomDomainResponse, error) {
-	details, err := s.command.AddInstanceDomain(ctx, req.Domain)
+	details, err := s.command.AddInstanceDomain(ctx, req.GetDomain())
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (s *Server) AddCustomDomain(ctx context.Context, req *instance.AddCustomDom
 }
 
 func (s *Server) RemoveCustomDomain(ctx context.Context, req *instance.RemoveCustomDomainRequest) (*instance.RemoveCustomDomainResponse, error) {
-	details, err := s.command.RemoveInstanceDomain(ctx, req.Domain)
+	details, err := s.command.RemoveInstanceDomain(ctx, req.GetDomain())
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (s *Server) RemoveCustomDomain(ctx context.Context, req *instance.RemoveCus
 }
 
 func (s *Server) AddTrustedDomain(ctx context.Context, req *instance.AddTrustedDomainRequest) (*instance.AddTrustedDomainResponse, error) {
-	details, err := s.command.AddTrustedDomain(ctx, req.Domain)
+	details, err := s.command.AddTrustedDomain(ctx, req.GetDomain())
 	if err != nil {
 		return nil, err
 	}

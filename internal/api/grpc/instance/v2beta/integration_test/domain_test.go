@@ -43,7 +43,8 @@ func TestAddCustomDomain(t *testing.T) {
 		{
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.AddCustomDomainRequest{
-				Domain: gofakeit.DomainName(),
+				InstanceId: inst.ID(),
+				Domain:     gofakeit.DomainName(),
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
@@ -52,7 +53,8 @@ func TestAddCustomDomain(t *testing.T) {
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.AddCustomDomainRequest{
-				Domain: gofakeit.DomainName(),
+				InstanceId: inst.ID(),
+				Domain:     gofakeit.DomainName(),
 			},
 			inputContext:      orgOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
@@ -61,7 +63,8 @@ func TestAddCustomDomain(t *testing.T) {
 		{
 			testName: "when invalid domain should return invalid argument error",
 			inputRequest: &instance.AddCustomDomainRequest{
-				Domain: " ",
+				InstanceId: inst.ID(),
+				Domain:     " ",
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
@@ -70,7 +73,8 @@ func TestAddCustomDomain(t *testing.T) {
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.AddCustomDomainRequest{
-				Domain: " " + gofakeit.DomainName(),
+				InstanceId: inst.ID(),
+				Domain:     " " + gofakeit.DomainName(),
 			},
 			inputContext: ctxWithSysAuthZ,
 		},
@@ -112,11 +116,11 @@ func TestRemoveCustomDomain(t *testing.T) {
 
 	customDomain := gofakeit.DomainName()
 
-	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{Domain: customDomain})
+	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: customDomain})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{Domain: customDomain})
+		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: inst.ID(), Domain: customDomain})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
@@ -130,7 +134,8 @@ func TestRemoveCustomDomain(t *testing.T) {
 		{
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.RemoveCustomDomainRequest{
-				Domain: "custom1",
+				InstanceId: inst.ID(),
+				Domain:     "custom1",
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
@@ -139,7 +144,8 @@ func TestRemoveCustomDomain(t *testing.T) {
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.RemoveCustomDomainRequest{
-				Domain: "custom1",
+				InstanceId: inst.ID(),
+				Domain:     "custom1",
 			},
 			inputContext:      orgOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
@@ -148,7 +154,8 @@ func TestRemoveCustomDomain(t *testing.T) {
 		{
 			testName: "when invalid domain should return invalid argument error",
 			inputRequest: &instance.RemoveCustomDomainRequest{
-				Domain: " ",
+				InstanceId: inst.ID(),
+				Domain:     " ",
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
@@ -157,7 +164,8 @@ func TestRemoveCustomDomain(t *testing.T) {
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.RemoveCustomDomainRequest{
-				Domain: " " + customDomain,
+				InstanceId: inst.ID(),
+				Domain:     " " + customDomain,
 			},
 			inputContext: ctxWithSysAuthZ,
 		},
@@ -205,7 +213,8 @@ func TestAddTrustedDomain(t *testing.T) {
 		{
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.AddTrustedDomainRequest{
-				Domain: "trusted1",
+				InstanceId: inst.ID(),
+				Domain:     "trusted1",
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
@@ -214,7 +223,8 @@ func TestAddTrustedDomain(t *testing.T) {
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.AddTrustedDomainRequest{
-				Domain: "trusted1",
+				InstanceId: inst.ID(),
+				Domain:     "trusted1",
 			},
 			inputContext:      orgOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
@@ -223,7 +233,8 @@ func TestAddTrustedDomain(t *testing.T) {
 		{
 			testName: "when invalid domain should return invalid argument error",
 			inputRequest: &instance.AddTrustedDomainRequest{
-				Domain: " ",
+				InstanceId: inst.ID(),
+				Domain:     " ",
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
@@ -232,7 +243,8 @@ func TestAddTrustedDomain(t *testing.T) {
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.AddTrustedDomainRequest{
-				Domain: " " + gofakeit.DomainName(),
+				InstanceId: inst.ID(),
+				Domain:     " " + gofakeit.DomainName(),
 			},
 			inputContext: ctxWithSysAuthZ,
 		},
@@ -274,11 +286,11 @@ func TestRemoveTrustedDomain(t *testing.T) {
 
 	trustedDomain := gofakeit.DomainName()
 
-	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{Domain: trustedDomain})
+	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: trustedDomain})
+		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
@@ -292,7 +304,8 @@ func TestRemoveTrustedDomain(t *testing.T) {
 		{
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.RemoveTrustedDomainRequest{
-				Domain: "trusted1",
+				InstanceId: inst.ID(),
+				Domain:     "trusted1",
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
@@ -301,7 +314,8 @@ func TestRemoveTrustedDomain(t *testing.T) {
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.RemoveTrustedDomainRequest{
-				Domain: "trusted1",
+				InstanceId: inst.ID(),
+				Domain:     "trusted1",
 			},
 			inputContext:      orgOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
@@ -310,7 +324,8 @@ func TestRemoveTrustedDomain(t *testing.T) {
 		{
 			testName: "when invalid domain should return invalid argument error",
 			inputRequest: &instance.RemoveTrustedDomainRequest{
-				Domain: " ",
+				InstanceId: inst.ID(),
+				Domain:     " ",
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
@@ -319,7 +334,8 @@ func TestRemoveTrustedDomain(t *testing.T) {
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.RemoveTrustedDomainRequest{
-				Domain: " " + trustedDomain,
+				InstanceId: inst.ID(),
+				Domain:     " " + trustedDomain,
 			},
 			inputContext: ctxWithSysAuthZ,
 		},
