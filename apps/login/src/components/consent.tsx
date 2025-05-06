@@ -1,15 +1,43 @@
+import { denyDeviceAuthorization } from "@/lib/server/oidc";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Alert } from "./alert";
 import { Button, ButtonVariants } from "./button";
+import { Spinner } from "./spinner";
 
 export function ConsentScreen({
   scope,
   nextUrl,
+  deviceAuthorizationRequestId,
 }: {
   scope?: string[];
   nextUrl: string;
+  deviceAuthorizationRequestId: string;
 }) {
   const t = useTranslations();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const router = useRouter();
+
+  async function denyDeviceAuth() {
+    setLoading(true);
+    const response = await denyDeviceAuthorization(deviceAuthorizationRequestId)
+      .catch(() => {
+        setError("Could not register user");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    if (response && "redirect" in response && response.redirect) {
+      return router.push("/device");
+    }
+
+    return response;
+  }
 
   return (
     <div className="pt-4 w-full flex flex-col items-center space-y-4">
@@ -38,9 +66,22 @@ export function ConsentScreen({
         {t("device.request.description")}
       </p>
 
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
+
       <div className="mt-4 flex w-full flex-row items-center">
-        <Button variant={ButtonVariants.Destructive} data-testid="deny-button">
-          Deny
+        <Button
+          onClick={() => {
+            denyDeviceAuth();
+          }}
+          variant={ButtonVariants.Destructive}
+          data-testid="deny-button"
+        >
+          {loading && <Spinner className="h-5 w-5 mr-2" />}
+          {t("device.request.deny")}
         </Button>
         <span className="flex-grow"></span>
 
@@ -51,7 +92,7 @@ export function ConsentScreen({
             className="self-end"
             variant={ButtonVariants.Primary}
           >
-            continue
+            {t("device.request.submit")}
           </Button>
         </Link>
       </div>

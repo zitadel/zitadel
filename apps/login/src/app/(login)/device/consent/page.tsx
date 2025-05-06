@@ -33,7 +33,9 @@ export default async function Page(props: {
     userCode,
   });
 
-  console.log(deviceAuthorizationRequest);
+  if (!deviceAuthorizationRequest) {
+    return <div>{t("error.noDeviceRequest")}</div>;
+  }
 
   let defaultOrganization;
   if (!organization) {
@@ -71,7 +73,8 @@ export default async function Page(props: {
         </h1>
 
         <ConsentScreen
-          scope={deviceAuthorizationRequest?.scope}
+          deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
+          scope={deviceAuthorizationRequest.scope}
           nextUrl={`/loginname?` + params}
         />
       </div>

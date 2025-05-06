@@ -187,7 +187,26 @@
     "allSetup": "Już skonfigurowałeś metodę uwierzytelniania!",
     "linkWithIDP": "lub połącz z dostawcą tożsamości"
   },
+  "device": {
+    "usercode": {
+      "title": "Kod urządzenia",
+      "description": "Wprowadź kod.",
+      "submit": "Kontynuuj"
+    },
+    "request": {
+      "title": "{appName} chce się połączyć:",
+      "description": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "submit": "Zezwól",
+      "deny": "Odmów"
+    },
+    "scope": {
+      "email": "Uzyskaj dostęp do swojego adresu e-mail.",
+      "profile": "Uzyskaj dostęp do pełnych informacji o swoim profilu.",
+      "offline_access": "Zezwól na dostęp offline do swojego konta."
+    }
+  },
   "error": {
+    "noDeviceRequest": "Nie znaleziono żądania urządzenia.",
     "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",

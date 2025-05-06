@@ -196,7 +196,8 @@
     "request": {
       "title": "{appName} would like to connect:",
       "description": "By clicking Allow, you allow this app and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
-      "submit": "Allow"
+      "submit": "Allow",
+      "deny": "Deny"
     },
     "scope": {
       "email": "Access your email address.",
@@ -205,6 +206,7 @@
     }
   },
   "error": {
+    "noDeviceRequest": "No device request found.",
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
     "sessionExpired": "Your current session has expired. Please login again.",
     "failedLoading": "Failed to load data. Please try again.",
