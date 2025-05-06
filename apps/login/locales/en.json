@@ -198,7 +198,7 @@
       "submit": "Continue"
     },
     "request": {
-      "title": "{appName} would like to connect:",
+      "title": "{appName} would like to connect",
       "description": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
       "submit": "Allow",
       "deny": "Deny"
