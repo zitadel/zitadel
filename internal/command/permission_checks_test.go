@@ -132,7 +132,7 @@ func TestCommands_CheckPermission(t *testing.T) {
 			if tt.fields.eventstore != nil {
 				c.eventstore = tt.fields.eventstore(t)
 			}
-			err := c.NewPermissionCheck(tt.args.ctx, tt.args.permission, tt.args.aggregateType)(tt.args.resourceOwner, tt.args.aggregateID)
+			err := c.newPermissionCheck(tt.args.ctx, tt.args.permission, tt.args.aggregateType)(tt.args.resourceOwner, tt.args.aggregateID)
 			if tt.want.err != nil {
 				assert.True(t, tt.want.err(err))
 			}

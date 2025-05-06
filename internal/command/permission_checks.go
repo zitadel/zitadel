@@ -12,7 +12,7 @@ import (
 
 type PermissionCheck func(resourceOwner, aggregateID string) error
 
-func (c *Commands) NewPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
+func (c *Commands) newPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
 		if aggregateID == "" {
 			return zerrors.ThrowInternal(nil, "COMMAND-ulBlS", "aggregate ID is empty")
@@ -39,7 +39,7 @@ func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string,
 		if allowSelf && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
 			return nil
 		}
-		return c.NewPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
+		return c.newPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
 	}
 }
 
