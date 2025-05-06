@@ -28,7 +28,7 @@ var (
 	}
 )
 
-func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password string, oneTime bool, check PermissionCheck) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if userID == "" {
@@ -45,7 +45,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		"", // current api implementations never provide an encoded password
 		"",
 		oneTime,
-		c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner, check),
+		c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner),
 	)
 }
 
@@ -110,9 +110,9 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 type setPasswordVerification func(ctx context.Context) (newEncodedPassword string, err error)
 
 // setPasswordWithPermission returns a permission check as [setPasswordVerification] implementation
-func (c *Commands) setPasswordWithPermission(userID, orgID string, check PermissionCheck) setPasswordVerification {
+func (c *Commands) setPasswordWithPermission(userID, orgID string) setPasswordVerification {
 	return func(ctx context.Context) (_ string, err error) {
-		return "", check(orgID, userID)
+		return "", c.checkPermissionUpdateUser(ctx, orgID, userID)
 	}
 }
 

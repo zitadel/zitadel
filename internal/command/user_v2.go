@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) LockUserV2(ctx context.Context, userID string, check PermissionCheck) (*domain.ObjectDetails, error) {
+func (c *Commands) LockUserV2(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-agz3eczifm", "Errors.User.UserIDMissing")
 	}
@@ -27,21 +27,22 @@ func (c *Commands) LockUserV2(ctx context.Context, userID string, check Permissi
 	if !hasUserState(existingHuman.UserState, domain.UserStateActive, domain.UserStateInitial) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lgws8wtsqf", "Errors.User.ShouldBeActiveOrInitial")
 	}
-	if check != nil {
-		if err := check(existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
-			return nil, err
-		}
+
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+		return nil, err
 	}
+
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserLockedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
-func (c *Commands) UnlockUserV2(ctx context.Context, userID string, check PermissionCheck) (*domain.ObjectDetails, error) {
+func (c *Commands) UnlockUserV2(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-a9ld4xckax", "Errors.User.UserIDMissing")
 	}
+
 	existingHuman, err := c.userStateWriteModel(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -52,18 +53,17 @@ func (c *Commands) UnlockUserV2(ctx context.Context, userID string, check Permis
 	if !hasUserState(existingHuman.UserState, domain.UserStateLocked) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-olb9vb0oca", "Errors.User.NotLocked")
 	}
-	if check != nil {
-		if err := check(existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+		return nil, err
 	}
+
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserUnlockedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
-func (c *Commands) DeactivateUserV2(ctx context.Context, userID string, check PermissionCheck) (*domain.ObjectDetails, error) {
+func (c *Commands) DeactivateUserV2(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-78iiirat8y", "Errors.User.UserIDMissing")
 	}
@@ -81,18 +81,17 @@ func (c *Commands) DeactivateUserV2(ctx context.Context, userID string, check Pe
 	if isUserStateInactive(existingHuman.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5gunjw0cd7", "Errors.User.AlreadyInactive")
 	}
-	if check != nil {
-		if err := check(existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+		return nil, err
 	}
+
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
-func (c *Commands) ReactivateUserV2(ctx context.Context, userID string, check PermissionCheck) (*domain.ObjectDetails, error) {
+func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0nx1ie38fw", "Errors.User.UserIDMissing")
 	}
@@ -107,11 +106,10 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string, check Pe
 	if !isUserStateInactive(existingHuman.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-s5qqcz97hf", "Errors.User.NotInactive")
 	}
-	if check != nil {
-		if err := check(existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+		return nil, err
 	}
+
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserReactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
 		return nil, err
 	}
@@ -142,7 +140,7 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bd4ir1mblj", "Errors.User.NotFound")
 	}
 	if check != nil {
-		if err = check(existingUser.Name == "")(existingUser.WriteModel.ResourceOwner, existingUser.WriteModel.AggregateID); err != nil {
+		if err = check(existingUser.Name == "")(existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 			return nil, err
 		}
 	}

@@ -65,7 +65,7 @@ func (s *Server) VerifyMyAuthFactorOTP(ctx context.Context, req *auth_pb.VerifyM
 
 func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPRequest) (*auth_pb.RemoveMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanRemoveTOTP(ctx, ctxData.UserID, ctxData.ResourceOwner, nil)
+	objectDetails, err := s.command.HumanRemoveTOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyA
 
 func (s *Server) AddMyAuthFactorOTPSMS(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPSMSRequest) (*auth_pb.AddMyAuthFactorOTPSMSResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	details, err := s.command.AddHumanOTPSMS(ctx, ctxData.UserID, ctxData.ResourceOwner, nil)
+	details, err := s.command.AddHumanOTPSMS(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (s *Server) AddMyAuthFactorOTPSMS(ctx context.Context, _ *auth_pb.AddMyAuth
 
 func (s *Server) RemoveMyAuthFactorOTPSMS(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPSMSRequest) (*auth_pb.RemoveMyAuthFactorOTPSMSResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	details, err := s.command.RemoveHumanOTPSMS(ctx, ctxData.UserID, ctxData.ResourceOwner, nil)
+	details, err := s.command.RemoveHumanOTPSMS(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

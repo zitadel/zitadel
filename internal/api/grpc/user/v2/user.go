@@ -133,7 +133,7 @@ func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserR
 }
 
 func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *user.LockUserResponse, err error) {
-	details, err := s.command.LockUserV2(ctx, req.UserId, s.command.NewPermissionCheckUserWrite(ctx, false))
+	details, err := s.command.LockUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *us
 }
 
 func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_ *user.UnlockUserResponse, err error) {
-	details, err := s.command.UnlockUserV2(ctx, req.UserId, s.command.NewPermissionCheckUserWrite(ctx, false))
+	details, err := s.command.UnlockUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
-	details, err := s.command.DeactivateUserV2(ctx, req.UserId, s.command.NewPermissionCheckUserWrite(ctx, false))
+	details, err := s.command.DeactivateUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserReq
 }
 
 func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserRequest) (_ *user.ReactivateUserResponse, err error) {
-	details, err := s.command.ReactivateUserV2(ctx, req.UserId, s.command.NewPermissionCheckUserWrite(ctx, false))
+	details, err := s.command.ReactivateUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -484,28 +484,3 @@ func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInit
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
-<<<<<<< Updated upstream
-=======
-
-func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
-	switch userType := req.GetUserType().(type) {
-	case *user.CreateUserRequest_Human_:
-		return s.createUserTypeHuman(ctx, userType.Human, req.OrganizationId, req.Username, req.UserId)
-	case *user.CreateUserRequest_Machine_:
-		return s.createUserTypeMachine(ctx, userType.Machine, req.OrganizationId, req.GetUsername(), req.GetUserId())
-	default:
-		return nil, zerrors.ThrowInternal(nil, "", "user type is not implemented")
-	}
-}
-
-func (s *Server) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
-	switch userType := req.GetUserType().(type) {
-	case *user.UpdateUserRequest_Human_:
-		return s.updateUserTypeHuman(ctx, userType.Human, req.UserId, req.Username, s.command.NewPermissionCheckUserWrite(ctx, false))
-	case *user.UpdateUserRequest_Machine_:
-		return s.updateUserTypeMachine(ctx, userType.Machine, req.UserId, req.Username, s.command.NewPermissionCheckUserWrite(ctx, false))
-	default:
-		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
-	}
-}
->>>>>>> Stashed changes

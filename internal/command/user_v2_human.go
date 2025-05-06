@@ -260,7 +260,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	return nil
 }
 
-func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg crypto.EncryptionAlgorithm, check PermissionCheck) (err error) {
+func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg crypto.EncryptionAlgorithm) (err error) {
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -281,8 +281,8 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		return err
 	}
 
-	if human.Changed() && check != nil {
-		if err := check(existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if human.Changed() {
+		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
 			return err
 		}
 	}
