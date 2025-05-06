@@ -18,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	v2beta_object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -274,15 +275,13 @@ func TestServer_ListOrganization(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		req     *v2beta_org.ListOrganizationsRequest
-		query   *v2beta_org.OrgQuery
+		query   []*v2beta_org.OrgQuery
 		want    []*v2beta_org.Organization
 		wantErr bool
 	}{
 		{
 			name: "list organizations happy path",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			req:  &v2beta_org.ListOrganizationsRequest{},
 			want: []*v2beta_org.Organization{
 				{
 					Id:   orgs[0].Id,
@@ -299,21 +298,147 @@ func TestServer_ListOrganization(t *testing.T) {
 			},
 		},
 		{
-			name: "list organizations happy path",
+			name: "list organizations specify org name equals",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			req:  &v2beta_org.ListOrganizationsRequest{},
-			want: []*v2beta_org.Organization{
+			query: []*v2beta_org.OrgQuery{
 				{
-					Id:   orgs[0].Id,
-					Name: orgsName[0],
+					Query: &v2beta_org.OrgQuery_NameQuery{
+						NameQuery: &v2beta_org.OrgNameQuery{
+							Name:   orgsName[1],
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
+						},
+					},
 				},
+			},
+			want: []*v2beta_org.Organization{
 				{
 					Id:   orgs[1].Id,
 					Name: orgsName[1],
 				},
+			},
+		},
+		{
+			name: "list organizations specify org name contains",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
 				{
-					Id:   orgs[2].Id,
-					Name: orgsName[2],
+					Query: &v2beta_org.OrgQuery_NameQuery{
+						NameQuery: &v2beta_org.OrgNameQuery{
+							Name: func() string {
+								return orgsName[1][1 : len(orgsName[1])-2]
+							}(),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[1].Id,
+					Name: orgsName[1],
+				},
+			},
+		},
+		{
+			name: "list organizations specify org name contains IGNORE CASE",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &v2beta_org.OrgQuery_NameQuery{
+						NameQuery: &v2beta_org.OrgNameQuery{
+							Name: func() string {
+								return strings.ToUpper(orgsName[1][1 : len(orgsName[1])-2])
+							}(),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[1].Id,
+					Name: orgsName[1],
+				},
+			},
+		},
+		{
+			name: "list organizations specify domain name equals",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &org.OrgQuery_DomainQuery{
+						DomainQuery: &org.OrgDomainQuery{
+							Domain: func() string {
+								listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
+									Queries: []*v2beta_org.OrgQuery{
+										{
+											Query: &v2beta_org.OrgQuery_IdQuery{
+												IdQuery: &v2beta_org.OrgIDQuery{
+													Id: orgs[1].Id,
+												},
+											},
+										},
+									},
+								})
+								require.NoError(t, err)
+								domain := listOrgRes.Result[0].PrimaryDomain
+								return domain
+							}(),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[1].Id,
+					Name: orgsName[1],
+				},
+			},
+		},
+		{
+			name: "list organizations specify domain name contains",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &org.OrgQuery_DomainQuery{
+						DomainQuery: &org.OrgDomainQuery{
+							Domain: func() string {
+								domain := strings.ToLower(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
+								return domain
+							}(),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[1].Id,
+					Name: orgsName[1],
+				},
+			},
+		},
+		{
+			name: "list organizations specify org name contains IGNORE CASE",
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
+			query: []*v2beta_org.OrgQuery{
+				{
+					Query: &org.OrgQuery_DomainQuery{
+						DomainQuery: &org.OrgDomainQuery{
+							Domain: func() string {
+								domain := strings.ToUpper(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
+								return domain
+							}(),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
+						},
+					},
+				},
+			},
+			want: []*v2beta_org.Organization{
+				{
+					Id:   orgs[1].Id,
+					Name: orgsName[1],
 				},
 			},
 		},
@@ -323,7 +448,7 @@ func TestServer_ListOrganization(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(context.Background(), 10*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := Client.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
-					Queries: tt.req.Queries,
+					Queries: tt.query,
 				})
 
 				if tt.wantErr {
@@ -331,13 +456,6 @@ func TestServer_ListOrganization(t *testing.T) {
 					return
 				}
 				require.NoError(t, err)
-
-				// check details
-				// assert.NotZero(t, got.GetDetails().GetSequence())
-				// gotCD := got.GetDetails().GetChangeDate().AsTime()
-				// now := time.Now()
-				// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-				// assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 
 				foundOrgs := 0
 				for _, got := range got.Result {
