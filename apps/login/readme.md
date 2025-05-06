@@ -373,7 +373,7 @@ On all pages, where the current user is shown, you can jump to this page. This w
 
 ### /signedin
 
-This is a success page which shows a completed login flow for a user, which did navigate to the login without a OIDC auth requrest.
+This is a success page which shows a completed login flow for a user, which did navigate to the login without a OIDC auth requrest. From here device authorization flows are completed. It checks if the requestId param of starts with `device_` and then executes the `authorizeOrDenyDeviceAuthorization` command.
 
 <img src="./screenshots/signedin.png" alt="/signedin" width="400px" />
 
