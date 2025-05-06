@@ -7,7 +7,7 @@ import (
 	meta_pb "github.com/zitadel/zitadel/pkg/grpc/metadata/v2beta"
 )
 
-// code in thsi file is copied from internal/api/grpc/metadata/metadata.go
+// code in this file is copied from internal/api/grpc/metadata/metadata.go
 
 func OrgMetadataListToPb(dataList []*query.OrgMetadata) []*meta_pb.Metadata {
 	mds := make([]*meta_pb.Metadata, len(dataList))

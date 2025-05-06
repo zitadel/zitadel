@@ -107,10 +107,15 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service OrganizationService {
 
-  // Create a new organization and grant the user(s) permission to manage it
+  // Create Organization
+  //
+  // Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER.
+  //
+  // Required permission:
+  //   - `org.create`
   rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization"
+      post: "/v2beta/organizations"
       body: "*"
     };
 
@@ -118,26 +123,18 @@ service OrganizationService {
       auth_option: {
         permission: "org.create"
       }
-      http_response: {
-        success_code: 201
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create an Organization";
-      description: "Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER."
-      responses: {
-        key: "200"
-        value: {
-          description: "OK";
-        }
-      };
     };
   }
 
+  // Update Organization
+  //
+  // Change the name of the organization.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
     option (google.api.http) = {
-      put: "/v2beta/organization"
+      put: "/v2beta/organizations"
       body: "*"
     };
 
@@ -145,27 +142,18 @@ service OrganizationService {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 200
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Update Organization";
-      description: "Change the name of the organization."
-      responses: {
-        key: "200"
-        value: {
-          description: "OK";
-        }
-      };
     };
   }
 
+  // List Organizations
+  //
+  // Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition.
+  //
+  // Required permission:
+  //   - `iam.read`
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
-        post: "/v2beta/organization/_search";
+        post: "/v2beta/organizations/_search";
         body: "*";
     };
 
@@ -173,76 +161,59 @@ service OrganizationService {
       auth_option: {
         permission: "iam.read";
       }
-      http_response: {
-        success_code: 200
-      }
     };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Search Organization";
-      description: "Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition."
-      responses: {
-        key: "200";
-        value: {
-          description: "list of organizations matching the query";
-        };
-      };
-      responses: {
-        key: "400";
-        value: {
-          description: "invalid list query";
-          schema: {
-            json_schema: {
-              ref: "#/definitions/rpcStatus";
-            };
-          };
-        };
-      };
-    };
+      // responses: {
+      //   key: "400";
+      //   value: {
+      //     description: "invalid list query";
+      //     schema: {
+      //       json_schema: {
+      //         ref: "#/definitions/rpcStatus";
+      //       };
+      //     };
+      //   };
+      // };
   }
 
+  // Delete Organization
+  //
+  // Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
     option (google.api.http) = {
-        delete: "/v2beta/organization"
+        delete: "/v2beta/organizations"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "iam.write";
-      }
-      http_response: {
-        success_code: 200
+        permission: "org.write";
       }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Deletes Organization";
-      description: "Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
-      responses: {
-        key: "200";
-        value: {
-            description: "org deleted successfully";
-        };
-      };
-      responses: {
-        key: "400";
-        value: {
-          description: "invalid org";
-          schema: {
-            json_schema: {
-                ref: "#/definitions/rpcStatus";
-              };
-            };
-        };
-      };
-    };
+      // responses: {
+      //   key: "400";
+      //   value: {
+      //     description: "invalid org";
+      //     schema: {
+      //       json_schema: {
+      //           ref: "#/definitions/rpcStatus";
+      //         };
+      //       };
+      //   };
+      // };
   }
 
+  // Set Organization Metadata
+  //
+  // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc SetOrganizationMetadata(SetOrganizationMetadataRequest) returns (SetOrganizationMetadataResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization/metadata"
+      post: "/v2beta/organizations/metadata"
       body: "*"
     };
 
@@ -250,90 +221,56 @@ service OrganizationService {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 200
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      tags: "Organization Metadata";
-      summary: "Set Organization Metadata";
-      description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
     };
   }
 
+  // List Organization Metadata
+  //
+  // List metadata of an organization filtered by query.
+  //
+  // Required permission:
+  //   - `org.read`
   rpc ListOrganizationMetadata(ListOrganizationMetadataRequest) returns (ListOrganizationMetadataResponse ) {
     option (google.api.http) = {
-        post: "/v2beta/organization/metadata/_search"
+        post: "/v2beta/organizations/metadata/_search"
         body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = { auth_option: {
         permission: "org.read"
       }
-      http_response: {
-        success_code: 200
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      tags: "Organization Metadata";
-      summary: "Search Organization Metadata";
-      description: "List metadata of an organization filtered by your query."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // Delete Organization Metadata
+  //
+  // Delete metadata objects from an organization with a specific key.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc DeleteOrganizationMetadata(DeleteOrganizationMetadataRequest) returns (DeleteOrganizationMetadataResponse) {
       option (google.api.http) = {
-          delete: "/v2beta/organization/metadata"
+          delete: "/v2beta/organizations/metadata"
       };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 200
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      tags: "Organization Metadata";
-      summary: "Delete Organization Metadata By Key";
-      description: "Delete metadata object from an organization with a specific key."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // Add Organization Domain
+  //
+  // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc AddOrganizationDomain(AddOrganizationDomainRequest) returns (AddOrganizationDomainResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization/domains"
+      post: "/v2beta/organizations/domains"
       body: "*"
     };
 
@@ -341,29 +278,19 @@ service OrganizationService {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 201
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Add Domain";
-      description: "Add a new domain to an organization. The domains are used to identify to which organization a user belongs."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // List Organization Domains
+  //
+  // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs. 
+  //
+  // Required permission:
+  //   - `org.read`
   rpc ListOrganizationDomains(ListOrganizationDomainsRequest) returns (ListOrganizationDomainsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization/domains/_search"
+      post: "/v2beta/organizations/domains/_search"
       body: "*"
     };
 
@@ -371,58 +298,38 @@ service OrganizationService {
       auth_option: {
         permission: "org.read"
       }
-      http_response: {
-        success_code: 201
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Search Domains";
-      description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // Delete Organization Domain
+  //
+  // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc DeleteOrganizationDomain(DeleteOrganizationDomainRequest) returns (DeleteOrganizationDomainResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/organization/domains"
+      delete: "/v2beta/organizations/domains"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 200
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Delete Domain";
-      description: "Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // Generate Organization Domain Validation
+  //
+  // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc GenerateOrganizationDomainValidation(GenerateOrganizationDomainValidationRequest) returns (GenerateOrganizationDomainValidationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization/domains/validation/_generate"
+      post: "/v2beta/organizations/domains/validation/_generate"
       body: "*"
     };
 
@@ -430,29 +337,19 @@ service OrganizationService {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 201
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Generate Domain Verification";
-      description: "Generate a new file to be able to verify your domain with DNS or HTTP challenge."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // Verify Organization Domain
+  //
+  // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc VerifyOrganizationDomain(VerifyOrganizationDomainRequest) returns (VerifyOrganizationDomainResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization/domains/validation/_verify"
+      post: "/v2beta/organizations/domains/validation/_verify"
       body: "*"
     };
 
@@ -460,29 +357,19 @@ service OrganizationService {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 200
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Verify Domain";
-      description: "Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // Deactivate Organization
+  //
+  // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc DeactivateOrganization(DeactivateOrganizationRequest) returns (DeactivateOrganizationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organization/_deactivate"
+      post: "/v2beta/organizations/_deactivate"
       body: "*"
     };
 
@@ -490,29 +377,19 @@ service OrganizationService {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 200
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Deactivate Organization";
-      description: "Sets the state of my organization to deactivated. Users of this organization will not be able to log in."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
+  // Reactivate Organization
+  //
+  // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
+  //
+  // Required permission:
+  //   - `org.write`
   rpc ReactivateOrganization(ReactivateOrganizationRequest) returns (ReactivateOrganizationResponse) {
     option (google.api.http) = {
-        post: "/v2beta/organization/_reactivate"
+        post: "/v2beta/organizations/_reactivate"
         body: "*"
     };
 
@@ -520,24 +397,8 @@ service OrganizationService {
       auth_option: {
         permission: "org.write"
       }
-      http_response: {
-        success_code: 200
-      }
     };
 
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Organizations";
-      summary: "Reactivate Organization";
-      description: "Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again."
-      parameters: {
-        headers: {
-          name: "x-zitadel-orgid";
-          description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
-          type: STRING,
-          required: false;
-        };
-      };
-    };
   }
 
 }
