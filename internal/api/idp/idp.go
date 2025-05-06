@@ -369,7 +369,8 @@ func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
 
 	logoutState, ok := h.caches.federatedLogouts.Get(ctx, federatedlogout.IndexRequestID, federatedlogout.Key(authz.GetInstance(ctx).InstanceID(), data.RelayState))
 	if !ok || logoutState.State != federatedlogout.StateRedirected {
-		http.Error(w, "", http.StatusBadRequest)
+		err := zerrors.ThrowNotFound(nil, "SAML-3uor2", "Errors.Intent.NotFound")
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -389,7 +390,8 @@ func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
 	// We could also parse and validate the response here, but for example Azure does not sign it and thus would already fail.
 	// Also we can't really act on it if it fails.
 
-	h.caches.federatedLogouts.Delete(ctx, federatedlogout.IndexRequestID, data.RelayState)
+	err = h.caches.federatedLogouts.Delete(ctx, federatedlogout.IndexRequestID, federatedlogout.Key(logoutState.InstanceID, logoutState.SessionID))
+	logging.WithFields("instanceID", logoutState.InstanceID, "sessionID", logoutState.SessionID).OnError(err).Error("could not delete federated logout")
 	http.Redirect(w, r, logoutState.PostLogoutRedirectURI, http.StatusFound)
 }
 
