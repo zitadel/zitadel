@@ -63,10 +63,7 @@ export default async function Page(props: {
   }
 
   return (
-    <DynamicTheme
-      branding={branding}
-      appName={deviceAuthorizationRequest?.appName}
-    >
+    <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>
           {t("request.title", { appName: deviceAuthorizationRequest?.appName })}

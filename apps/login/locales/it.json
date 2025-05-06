@@ -200,6 +200,7 @@
       "deny": "Nega"
     },
     "scope": {
+      "openid": "Verifica la tua identità.",
       "email": "Accedi al tuo indirizzo email.",
       "profile": "Accedi alle informazioni complete del tuo profilo.",
       "offline_access": "Consenti l'accesso offline al tuo account."

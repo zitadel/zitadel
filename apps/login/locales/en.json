@@ -190,7 +190,7 @@
   "device": {
     "usercode": {
       "title": "Device code",
-      "description": "Enter the code.",
+      "description": "Enter the code displayed on your app or device.",
       "submit": "Continue"
     },
     "request": {
@@ -200,8 +200,9 @@
       "deny": "Deny"
     },
     "scope": {
-      "email": "Access your email address.",
-      "profile": "Access your full profile information.",
+      "openid": "Verify your identity.",
+      "email": "Access to your email address.",
+      "profile": "Access to your full profile information.",
       "offline_access": "Allow offline access to your account."
     }
   },

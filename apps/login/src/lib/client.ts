@@ -7,8 +7,8 @@ type FinishFlowCommand =
 
 function goToSignedInPage(
   props:
-    | { sessionId: string; organization?: string }
-    | { organization?: string; loginName: string },
+    | { sessionId: string; organization?: string; requestId?: string }
+    | { organization?: string; loginName: string; requestId?: string },
 ) {
   const params = new URLSearchParams({});
 
@@ -22,6 +22,11 @@ function goToSignedInPage(
 
   if (props.organization) {
     params.append("organization", props.organization);
+  }
+
+  // required to show conditional UI for device flow
+  if (props.requestId) {
+    params.append("requestId", props.requestId);
   }
 
   return `/signedin?` + params;

@@ -200,6 +200,7 @@
       "deny": "Odmów"
     },
     "scope": {
+      "openid": "Zweryfikuj swoją tożsamość.",
       "email": "Uzyskaj dostęp do swojego adresu e-mail.",
       "profile": "Uzyskaj dostęp do pełnych informacji o swoim profilu.",
       "offline_access": "Zezwól na dostęp offline do swojego konta."

@@ -1,3 +1,5 @@
+"use client";
+
 import { denyDeviceAuthorization } from "@/lib/server/oidc";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -32,11 +34,9 @@ export function ConsentScreen({
         setLoading(false);
       });
 
-    if (response && "redirect" in response && response.redirect) {
+    if (response) {
       return router.push("/device");
     }
-
-    return response;
   }
 
   return (
@@ -77,7 +77,7 @@ export function ConsentScreen({
           onClick={() => {
             denyDeviceAuth();
           }}
-          variant={ButtonVariants.Destructive}
+          variant={ButtonVariants.Secondary}
           data-testid="deny-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
