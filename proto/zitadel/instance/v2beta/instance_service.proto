@@ -139,9 +139,11 @@ service InstanceService {
   //
   // Returns the instance in the current context.
   //
+  // Please note that the instance ID passed in the input message is currently NOT used.
+  //
   // Required permissions:
   //   - `system.instance.read`
-  rpc GetInstance(google.protobuf.Empty) returns (GetInstanceResponse) {
+  rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
         key: "200";
@@ -388,6 +390,17 @@ message DeleteInstanceResponse {
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GetInstanceRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"222430354126975533\"";
     }
   ];
 }

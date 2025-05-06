@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func TestGetInstance(t *testing.T) {
@@ -59,7 +58,7 @@ func TestGetInstance(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Test
-			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &emptypb.Empty{})
+			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{})
 
 			// Verify
 			require.NoError(t, err)

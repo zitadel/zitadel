@@ -13,7 +13,6 @@ import (
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func TestDeleteInstace(t *testing.T) {
@@ -93,7 +92,7 @@ func TestDeleteInstace(t *testing.T) {
 }
 
 func TestUpdateInstace(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	// Given
 
@@ -169,7 +168,7 @@ func TestUpdateInstace(t *testing.T) {
 
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, 20*time.Second)
 				require.EventuallyWithT(t, func(tt *assert.CollectT) {
-					retrievedInstance, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &emptypb.Empty{})
+					retrievedInstance, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{})
 					require.Nil(tt, err)
 					assert.Equal(tt, tc.expectedNewName, retrievedInstance.GetInstance().GetName())
 				}, retryDuration, tick, "timeout waiting for expected execution result")
