@@ -195,7 +195,7 @@
     },
     "request": {
       "title": "{appName} desea conectarse:",
-      "description": "Al hacer clic en Permitir, autorizas a esta aplicación y a Zitadel a usar tu información de acuerdo con sus respectivos términos de servicio y políticas de privacidad. Puedes revocar este acceso en cualquier momento.",
+      "description": "Al hacer clic en Permitir, autorizas a {appName} y a Zitadel a usar tu información de acuerdo con sus respectivos términos de servicio y políticas de privacidad. Puedes revocar este acceso en cualquier momento.",
       "submit": "Permitir",
       "deny": "Denegar"
     },

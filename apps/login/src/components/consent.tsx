@@ -13,10 +13,12 @@ export function ConsentScreen({
   scope,
   nextUrl,
   deviceAuthorizationRequestId,
+  appName,
 }: {
   scope?: string[];
   nextUrl: string;
   deviceAuthorizationRequestId: string;
+  appName?: string;
 }) {
   const t = useTranslations();
   const [loading, setLoading] = useState<boolean>(false);
@@ -63,7 +65,7 @@ export function ConsentScreen({
       </ul>
 
       <p className="ztdl-p text-xs text-left">
-        {t("device.request.description")}
+        {t("device.request.description", { appName: appName })}
       </p>
 
       {error && (

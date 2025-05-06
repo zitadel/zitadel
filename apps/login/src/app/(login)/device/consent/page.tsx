@@ -72,6 +72,7 @@ export default async function Page(props: {
         <ConsentScreen
           deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
           scope={deviceAuthorizationRequest.scope}
+          appName={deviceAuthorizationRequest?.appName}
           nextUrl={`/loginname?` + params}
         />
       </div>
