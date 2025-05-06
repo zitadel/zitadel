@@ -212,7 +212,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s51IDPTemplate6RootCA = &IDPTemplate6RootCA{dbClient: dbClient}
 	steps.s52IDPTemplate6LDAP2 = &IDPTemplate6LDAP2{dbClient: dbClient}
 	steps.s53InitPermittedOrgsFunction = &InitPermittedOrgsFunction53{dbClient: dbClient}
-	steps.s54IDPTemplate6SAMLFederatedLogout = &IDPTemplate6SAMLFederatedLogout{dbClient: dbClient}
+	steps.s54InstancePositionIndex = &InstancePositionIndex{dbClient: dbClient}
+	steps.s55IDPTemplate6SAMLFederatedLogout = &IDPTemplate6SAMLFederatedLogout{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -255,7 +256,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s51IDPTemplate6RootCA,
 		steps.s52IDPTemplate6LDAP2,
 		steps.s53InitPermittedOrgsFunction,
-		steps.s54IDPTemplate6SAMLFederatedLogout,
+		steps.s54InstancePositionIndex,
+		steps.s55IDPTemplate6SAMLFederatedLogout,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
