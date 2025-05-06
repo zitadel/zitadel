@@ -1,5 +1,4 @@
 import { getAllSessions } from "@/lib/cookies";
-import { loginWithDeviceAndSession } from "@/lib/device";
 import { idpTypeToSlug } from "@/lib/idp";
 import { loginWithOIDCAndSession } from "@/lib/oidc";
 import { loginWithSAMLAndSession } from "@/lib/saml";
@@ -121,16 +120,6 @@ export async function GET(request: NextRequest) {
       return loginWithSAMLAndSession({
         serviceUrl,
         samlRequest: requestId.replace("saml_", ""),
-        sessionId,
-        sessions,
-        sessionCookies,
-        request,
-      });
-    } else if (requestId.startsWith("device_")) {
-      // this finishes the login process for Device Authorization
-      return loginWithDeviceAndSession({
-        serviceUrl,
-        deviceRequest: requestId.replace("device_", ""),
         sessionId,
         sessions,
         sessionCookies,

@@ -207,6 +207,7 @@
     }
   },
   "error": {
+    "noUserCode": "Nie podano kodu użytkownika!",
     "noDeviceRequest": "Nie znaleziono żądania urządzenia.",
     "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",

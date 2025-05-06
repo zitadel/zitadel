@@ -207,6 +207,7 @@
     }
   },
   "error": {
+    "noUserCode": "Kein Benutzercode angegeben!",
     "noDeviceRequest": " Es wurde keine Geräteanforderung gefunden. Bitte überprüfen Sie die URL.",
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
     "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",

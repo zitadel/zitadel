@@ -207,6 +207,7 @@
     }
   },
   "error": {
+    "noUserCode": "未提供用户代码！",
     "noDeviceRequest": "没有找到设备请求。",
     "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
     "sessionExpired": "当前会话已过期，请重新登录。",

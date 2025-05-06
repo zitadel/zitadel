@@ -207,6 +207,7 @@
     }
   },
   "error": {
+    "noUserCode": "Nessun codice utente fornito!",
     "noDeviceRequest": "Nessuna richiesta di dispositivo trovata.",
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
     "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",

@@ -207,6 +207,7 @@
     }
   },
   "error": {
+    "noUserCode": "No user code provided!",
     "noDeviceRequest": "No device request found.",
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
     "sessionExpired": "Your current session has expired. Please login again.",

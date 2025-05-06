@@ -22,7 +22,7 @@ export default async function Page(props: {
   const organization = searchParams?.organization;
 
   if (!userCode || !requestId) {
-    return <div>{t("error.no_user_code")}</div>;
+    return <div>{t("error.noUserCode")}</div>;
   }
 
   const _headers = await headers();
