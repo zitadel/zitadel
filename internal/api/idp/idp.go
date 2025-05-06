@@ -15,10 +15,13 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -44,6 +47,7 @@ const (
 	metadataPath    = idpPrefix + "/saml/metadata"
 	acsPath         = idpPrefix + "/saml/acs"
 	certificatePath = idpPrefix + "/saml/certificate"
+	sloPath         = idpPrefix + "/saml/slo"
 
 	paramIntentID         = "id"
 	paramToken            = "token"
@@ -62,6 +66,7 @@ type Handler struct {
 	callbackURL         func(ctx context.Context) string
 	samlRootURL         func(ctx context.Context, idpID string) string
 	loginSAMLRootURL    func(ctx context.Context) string
+	caches              *Caches
 }
 
 type externalIDPCallbackData struct {
@@ -104,6 +109,7 @@ func NewHandler(
 	queries *query.Queries,
 	encryptionAlgorithm crypto.EncryptionAlgorithm,
 	instanceInterceptor func(next http.Handler) http.Handler,
+	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 ) http.Handler {
 	h := &Handler{
 		commands:            commands,
@@ -113,6 +119,7 @@ func NewHandler(
 		callbackURL:         CallbackURL(),
 		samlRootURL:         SAMLRootURL(),
 		loginSAMLRootURL:    LoginSAMLRootURL(),
+		caches:              &Caches{federatedLogouts: federatedLogoutCache},
 	}
 
 	router := mux.NewRouter()
@@ -121,7 +128,12 @@ func NewHandler(
 	router.HandleFunc(metadataPath, h.handleMetadata)
 	router.HandleFunc(certificatePath, h.handleCertificate)
 	router.HandleFunc(acsPath, h.handleACS)
+	router.HandleFunc(sloPath, h.handleSLO)
 	return router
+}
+
+type Caches struct {
+	federatedLogouts cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
 }
 
 func parseSAMLRequest(r *http.Request) *externalSAMLIDPCallbackData {
@@ -349,6 +361,38 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
+func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	data := parseSAMLRequest(r)
+
+	logoutState, ok := h.caches.federatedLogouts.Get(ctx, federatedlogout.IndexRequestID, federatedlogout.Key(authz.GetInstance(ctx).InstanceID(), data.RelayState))
+	if !ok || logoutState.State != federatedlogout.StateRedirected {
+		err := zerrors.ThrowNotFound(nil, "SAML-3uor2", "Errors.Intent.NotFound")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// For the moment we just make sure the callback matches the IDP it was started on / intended for.
+
+	provider, err := h.getProvider(ctx, data.IDPID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if _, ok = provider.(*saml2.Provider); !ok {
+		err := zerrors.ThrowInvalidArgument(nil, "SAML-ui9wyux0hp", "Errors.Intent.IDPInvalid")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// We could also parse and validate the response here, but for example Azure does not sign it and thus would already fail.
+	// Also we can't really act on it if it fails.
+
+	err = h.caches.federatedLogouts.Delete(ctx, federatedlogout.IndexRequestID, federatedlogout.Key(logoutState.InstanceID, logoutState.SessionID))
+	logging.WithFields("instanceID", logoutState.InstanceID, "sessionID", logoutState.SessionID).OnError(err).Error("could not delete federated logout")
+	http.Redirect(w, r, logoutState.PostLogoutRedirectURI, http.StatusFound)
 }
 
 func (h *Handler) tryMigrateExternalUser(ctx context.Context, idpID string, idpUser idp.User, idpSession idp.Session) (userID string, err error) {

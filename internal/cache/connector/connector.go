@@ -23,6 +23,7 @@ type CachesConfig struct {
 	Milestones       *cache.Config
 	Organization     *cache.Config
 	IdPFormCallbacks *cache.Config
+	FederatedLogouts *cache.Config
 }
 
 type Connectors struct {

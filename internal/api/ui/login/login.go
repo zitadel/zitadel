@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
@@ -60,25 +61,20 @@ const (
 	DefaultLoggedOutPath = HandlerPrefix + EndpointLogoutDone
 )
 
-func CreateLogin(config Config,
+func CreateLogin(
+	config Config,
 	command *command.Commands,
 	query *query.Queries,
 	authRepo *eventsourcing.EsRepository,
 	staticStorage static.Storage,
 	consolePath string,
-	oidcAuthCallbackURL func(context.Context, string) string,
-	samlAuthCallbackURL func(context.Context, string) string,
+	oidcAuthCallbackURL, samlAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
-	userAgentCookie,
-	issuerInterceptor,
-	oidcInstanceHandler,
-	samlInstanceHandler,
-	assetCache,
-	accessHandler mux.MiddlewareFunc,
-	userCodeAlg crypto.EncryptionAlgorithm,
-	idpConfigAlg crypto.EncryptionAlgorithm,
+	userAgentCookie, issuerInterceptor, oidcInstanceHandler, samlInstanceHandler, assetCache, accessHandler mux.MiddlewareFunc,
+	userCodeAlg, idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
 	cacheConnectors connector.Connectors,
+	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -101,7 +97,7 @@ func CreateLogin(config Config,
 	login.parser = form.NewParser()
 
 	var err error
-	login.caches, err = startCaches(context.Background(), cacheConnectors)
+	login.caches, err = startCaches(context.Background(), cacheConnectors, federateLogoutCache)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +108,11 @@ func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
-	csp.ScriptSrc = csp.ScriptSrc.AddNonce().AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=")
+	csp.ScriptSrc = csp.ScriptSrc.AddNonce().
+		// SAML POST ACS
+		AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=").
+		// SAML POST SLO
+		AddHash("sha256", "4Su6mBWzEIFnH4pAGMOuaeBrstwJN4Z3pq/s1Kn4/KQ=")
 	return &csp
 }
 
@@ -215,14 +215,16 @@ func (l *Login) baseURL(ctx context.Context) string {
 
 type Caches struct {
 	idpFormCallbacks cache.Cache[idpFormCallbackIndex, string, *idpFormCallback]
+	federatedLogouts cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
 }
 
-func startCaches(background context.Context, connectors connector.Connectors) (_ *Caches, err error) {
+func startCaches(background context.Context, connectors connector.Connectors, federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]) (_ *Caches, err error) {
 	caches := new(Caches)
 	caches.idpFormCallbacks, err = connector.StartCache[idpFormCallbackIndex, string, *idpFormCallback](background, []idpFormCallbackIndex{idpFormCallbackIndexRequestID}, cache.PurposeIdPFormCallback, connectors.Config.IdPFormCallbacks, connectors)
 	if err != nil {
 		return nil, err
 	}
+	caches.federatedLogouts = federateLogoutCache
 	return caches, nil
 }
 
