@@ -95,7 +95,7 @@ However, it is possible to provide the `organization_id` as a filter to retrieve
 ##### Context information in Responses
 
 When the action of creation, update or deletion of a resource was successful, the returned response has to include the time of the operation and the generated identifiers.
-This is achieved through the addition of a timestamp attribute with the included information of the operation, and the generated information like identifiers.
+This is achieved through the addition of a timestamp attribute with the operation as a prefix, and the generated information as separate attributes.
 
 ```protobuf
 message SetExecutionResponse {
