@@ -243,14 +243,14 @@
         {{ 'APP.PAGES.DETAIL.STATE.' + app.state | translate }}
       </p>
     </div>
-    <div class="info-wrapper" *ngIf="app?.apiConfig?.authMethodType !== undefined">
+    <div class="info-wrapper" *ngIf="app?.apiConfig?.authMethodType">
       <p class="info-row-title">{{ 'APP.AUTHMETHOD' | translate }}</p>
       <p class="info-row-desc">
         {{ 'APP.API.AUTHMETHOD.' + app.apiConfig?.authMethodType | translate }}
       </p>
     </div>
 
-    <div class="info-wrapper" *ngIf="app?.oidcConfig?.authMethodType !== undefined">
+    <div class="info-wrapper" *ngIf="app?.oidcConfig?.authMethodType">
       <p class="info-row-title">{{ 'APP.AUTHMETHOD' | translate }}</p>
       <p class="info-row-desc">
         {{ 'APP.OIDC.AUTHMETHOD.' + app.oidcConfig?.authMethodType | translate }}
