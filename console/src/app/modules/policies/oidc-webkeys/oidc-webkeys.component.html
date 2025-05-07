@@ -16,4 +16,4 @@
   </button>
 </cnsl-oidc-webkeys-table>
 <cnsl-oidc-webkeys-create [loading]="createLoading()" (ngSubmit)="createWebKey($event)" />
-<cnsl-oidc-webkeys-inactive-table [InactiveWebKeys]="inactiveWebKeys$ | async" />
+<cnsl-oidc-webkeys-inactive-table [inactiveWebKeys]="inactiveWebKeys$ | async" />
