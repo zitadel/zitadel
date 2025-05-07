@@ -2,7 +2,7 @@
 
 import { getDeviceAuthorizationRequest as zitadelGetDeviceAuthorizationRequest } from "@/lib/zitadel";
 import { headers } from "next/headers";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 
 export async function getDeviceAuthorizationRequest(userCode: string) {
   const _headers = await headers();
