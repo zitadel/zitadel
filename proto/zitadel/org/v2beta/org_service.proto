@@ -14,12 +14,13 @@ import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2beta;org";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "User Service";
+    title: "Organization Service (Beta)";
     version: "2.0-beta";
     description: "This API is intended to manage organizations in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
@@ -105,7 +106,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service OrganizationService {
+service OrganizationServiceV2beta {
 
   // Create Organization
   //
@@ -636,7 +637,6 @@ message DeleteOrganizationDomainRequest {
 }
 
 message DeleteOrganizationDomainResponse {
-  zitadel.object.v2beta.Details details = 1;
   //  The timestamp of the deletion of the organization domain.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

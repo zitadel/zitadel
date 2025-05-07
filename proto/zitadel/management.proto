@@ -2134,6 +2134,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Create Organization";
             description: "Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2160,6 +2161,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Update Organization";
             description: "Change the name of the organization."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2186,6 +2188,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Deactivate Organization";
             description: "Sets the state of my organization to deactivated. Users of this organization will not be able to log in."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2212,6 +2215,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Reactivate Organization";
             description: "Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2237,6 +2241,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Delete Organization";
             description: "Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2264,6 +2269,7 @@ service ManagementService {
             tags: "Organization Metadata";
             summary: "Set Organization Metadata";
             description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2291,6 +2297,7 @@ service ManagementService {
             tags: "Organization Metadata";
             summary: "Bulk Set Organization Metadata";
             description: "This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2318,6 +2325,7 @@ service ManagementService {
             tags: "Organization Metadata";
             summary: "Search Organization Metadata";
             description: "Get the metadata of an organization filtered by your query."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2344,6 +2352,7 @@ service ManagementService {
             tags: "Organization Metadata";
             summary: "Get Organization Metadata By Key";
             description: "Get a metadata object from an organization by a specific key."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2370,6 +2379,7 @@ service ManagementService {
             tags: "Organization Metadata";
             summary: "Delete Organization Metadata By Key";
             description: "Remove a metadata object from an organization with a specific key."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2422,6 +2432,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Add Domain";
             description: "Add a new domain to an organization. The domains are used to identify to which organization a user belongs."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2448,6 +2459,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Search Domains";
             description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2473,6 +2485,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Remove Domain";
             description: "Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2499,6 +2512,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Generate Domain Verification";
             description: "Generate a new file to be able to verify your domain with DNS or HTTP challenge."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2525,6 +2539,7 @@ service ManagementService {
             tags: "Organizations";
             summary: "Verify Domain";
             description: "Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique."
+            deprecated: true
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";

@@ -1257,7 +1257,8 @@ service AdminService {
                 value: {
                     description: "list of organizations matching the query";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
@@ -1292,7 +1293,8 @@ service AdminService {
                 value: {
                     description: "org, user and user membership were created successfully";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
@@ -1325,7 +1327,8 @@ service AdminService {
                 value: {
                     description: "org removed successfully";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
