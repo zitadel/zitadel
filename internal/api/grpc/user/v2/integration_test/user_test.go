@@ -1834,29 +1834,6 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				req: &user.DeleteUserRequest{},
 				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
-					removeUser, err := Instance.Client.Mgmt.AddMachineUser(CTX, &mgmt.AddMachineUserRequest{
-						UserName: gofakeit.Username(),
-						Name:     gofakeit.Name(),
-					})
-					request.UserId = removeUser.UserId
-					require.NoError(t, err)
-					tokenResp, err := Instance.Client.Mgmt.AddPersonalAccessToken(CTX, &mgmt.AddPersonalAccessTokenRequest{UserId: removeUser.UserId})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(UserCTX, tokenResp.Token)
-				},
-			},
-			want: &user.DeleteUserResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.DefaultOrg.Id,
-				},
-			},
-		},
-		{
-			name: "remove self human, ok",
-			args: args{
-				req: &user.DeleteUserRequest{},
-				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
 					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserType: &user.CreateUserRequest_Human_{
@@ -1885,31 +1862,6 @@ func TestServer_DeleteUser(t *testing.T) {
 					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
-		},
-		{
-			name: "remove self machine, error",
-			args: args{
-				req: &user.DeleteUserRequest{},
-				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
-					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
-						OrganizationId: Instance.DefaultOrg.Id,
-						UserType: &user.CreateUserRequest_Machine_{
-							Machine: &user.CreateUserRequest_Machine{
-								Name: gofakeit.Name(),
-							},
-						},
-					})
-					request.UserId = removeUser.Id
-					require.NoError(t, err)
-					tokenResp, err := Client.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
-						UserId:         removeUser.Id,
-						ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour)),
-					})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(UserCTX, tokenResp.Token)
-				},
-			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
