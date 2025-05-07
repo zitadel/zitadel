@@ -71,7 +71,11 @@ export default async function Page(props: {
           })}
         </h1>
 
-        <p className="ztdl-p">{t("device.request.description")}</p>
+        <p className="ztdl-p">
+          {t("device.request.description", {
+            appName: deviceAuthorizationRequest?.appName,
+          })}
+        </p>
 
         <ConsentScreen
           deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
