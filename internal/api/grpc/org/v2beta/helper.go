@@ -3,6 +3,10 @@ package org
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	// TODO fix below
+	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	v2beta_object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
@@ -12,10 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	"google.golang.org/protobuf/types/known/timestamppb"
-
-	// TODO fix below
-	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )

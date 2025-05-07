@@ -3,6 +3,8 @@ package org
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
@@ -12,7 +14,6 @@ import (
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *Server) CreateOrganization(ctx context.Context, request *v2beta_org.CreateOrganizationRequest) (*v2beta_org.CreateOrganizationResponse, error) {
