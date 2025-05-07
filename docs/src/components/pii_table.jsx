@@ -61,7 +61,9 @@ export function PiiTable() {
       type: "Analytics data",
       examples: [
         'Usage metrics',
-        'Milestones, Goals, Events',
+        'User behavior',
+        'User journeys (eg, Milestones)',
+        'Telemetry data',
         'Client-side anonymized session replay',
       ],
       subjects: "Customers who use our services."
