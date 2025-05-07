@@ -2150,6 +2150,7 @@
       "ACTIVATE": "Aktywuj projekt",
       "DELETE": "Usuń projekt",
       "ORGNAME": "Nazwa organizacji",
+      "ORGID": "ID organizacji",
       "ORGDOMAIN": "Domena organizacji",
       "STATE": "Status",
       "TYPE": "Typ",
