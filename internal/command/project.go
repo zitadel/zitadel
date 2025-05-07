@@ -123,10 +123,6 @@ func AddProjectCommand(
 	}
 }
 
-func (c *Commands) checkPermissionUpdateProject(ctx context.Context, resourceOwner, projectID string) error {
-	return c.checkPermission(ctx, domain.PermissionProjectWrite, resourceOwner, projectID)
-}
-
 func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, resourceOwner string) (project *ProjectWriteModel, err error) {
 	project = NewProjectWriteModel(projectID, resourceOwner)
 	events, err := filter(ctx, project.Query())
@@ -414,10 +410,6 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 		return time.Time{}, err
 	}
 	return existing.WriteModel.ChangeDate, nil
-}
-
-func (c *Commands) checkPermissionDeleteProject(ctx context.Context, resourceOwner, projectID string) error {
-	return c.checkPermission(ctx, domain.PermissionProjectDelete, resourceOwner, projectID)
 }
 
 func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (_ *ProjectWriteModel, err error) {
