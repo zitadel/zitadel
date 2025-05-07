@@ -15,13 +15,20 @@ import { AuthInterceptor, AuthInterceptorProvider, NewConnectWebAuthInterceptor 
 import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
-import { StorageService } from './storage.service';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
-import { createFeatureServiceClient, createUserServiceClient } from '@zitadel/client/v2';
+import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
+// @ts-ignore
+import { createClientFor } from '@zitadel/client';
+
+import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+
+const createWebKeyServiceClient = createClientFor(WebKeyService);
+const createActionServiceClient = createClientFor(ActionService);
 
 @Injectable({
   providedIn: 'root',
@@ -32,15 +39,17 @@ export class GrpcService {
   public admin!: AdminServiceClient;
   public user!: UserServiceClient;
   public userNew!: ReturnType<typeof createUserServiceClient>;
+  public session!: ReturnType<typeof createSessionServiceClient>;
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
+  public actionNew!: ReturnType<typeof createActionServiceClient>;
+  public webKey!: ReturnType<typeof createWebKeyServiceClient>;
 
   constructor(
     private readonly envService: EnvironmentService,
     private readonly platformLocation: PlatformLocation,
     private readonly authenticationService: AuthenticationService,
-    private readonly storageService: StorageService,
     private readonly translate: TranslateService,
     private readonly exhaustedService: ExhaustedService,
     private readonly authInterceptor: AuthInterceptor,
@@ -105,9 +114,12 @@ export class GrpcService {
           ],
         });
         this.userNew = createUserServiceClient(transport);
+        this.session = createSessionServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);
+        this.actionNew = createActionServiceClient(transport);
+        this.webKey = createWebKeyServiceClient(transport);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',

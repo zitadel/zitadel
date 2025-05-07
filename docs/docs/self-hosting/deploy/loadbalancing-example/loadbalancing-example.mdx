@@ -1,5 +1,5 @@
 ---
-title: A ZITADEL Load Balancing Example
+title: A Zitadel Load Balancing Example
 ---
 
 import CodeBlock from '@theme/CodeBlock';
@@ -8,16 +8,16 @@ import ExampleTraefikSource from '!!raw-loader!./example-traefik.yaml'
 import ExampleZITADELConfigSource from '!!raw-loader!./example-zitadel-config.yaml'
 import ExampleZITADELSecretsSource from '!!raw-loader!./example-zitadel-secrets.yaml'
 import ExampleZITADELInitStepsSource from '!!raw-loader!./example-zitadel-init-steps.yaml'
-import NoteInstanceNotFound from '../troubleshooting/_note_instance_not_found.mdx';
 
-With this example configuration, you create a near production environment for ZITADEL with [Docker Compose](https://docs.docker.com/compose/).
-
-The stack consists of three long-running containers:
-- A [Traefik](https://doc.traefik.io/traefik/) reverse proxy with upstream HTTP/2 enabled, issuing a self-signed TLS certificate.
-- A secure ZITADEL container configured for a custom domain. As we terminate TLS with Traefik, we configure ZITADEL for `--tlsMode external`.
+The stack consists of four long-running containers and a couple of short-lived containers:
+- A [Traefik](https://doc.traefik.io/traefik/) reverse proxy container with upstream HTTP/2 enabled, issuing a self-signed TLS certificate.
+- A Login container that is accessible via Traefik at `/ui/v2/login`
+- A Zitadel container that is accessible via Traefik at all other paths than `/ui/v2/login`.
 - An insecure [PostgreSQL](https://www.postgresql.org/docs/current/index.html).
 
-The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
+The Traefik container and the login container call the Zitadel container via the internal Docker network at `h2c://zitadel:8080`
+
+The setup is tested against Docker version 28.0.4 and Docker Compose version v2.34.0
 
 By executing the commands below, you will download the following files:
 
@@ -60,26 +60,15 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosti
 
 # A single ZITADEL instance always needs the same 32 bytes long masterkey
 # Generate one to a file if you haven't done so already and pass it as environment variable
-tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-masterkey
+LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
 export ZITADEL_MASTERKEY="$(cat ./zitadel-masterkey)"
 
 # Run the database and application containers
-docker compose up --detach
+docker compose up --detach --wait
 ```
 
-Make `127.0.0.1` available at `my.domain`. For example, this can be achieved with an entry `127.0.0.1 my.domain` in the `/etc/hosts` file.
-
-Open your favorite internet browser at [https://my.domain/ui/console/](https://my.domain/ui/console/).
-You can safely proceed, if your browser warns you about the insecure self-signed TLS certificate.
-This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
-- **username**: *root@<span></span>my-org.my.domain*
-- **password**: *RootPassword1!*
+Open your favorite internet browser at https://127.0.0.1.sslip.io/ui/console?login_hint=zitadel-admin@zitadel.127.0.0.1.sslip.io.
+Your browser warns you about the insecure self-signed TLS certificate. As 127.0.0.1.sslip.io resolves to your localhost, you can safely proceed.
+Use the password *Password1!* to log in.
 
 Read more about [the login process](/guides/integrate/login/oidc/login-users).
-
-<NoteInstanceNotFound/>
-
-## Troubleshooting
-
-You can connect to cockroach like this: `docker exec -it loadbalancing-example-my-cockroach-db-1 cockroach sql --host my-cockroach-db --certs-dir /cockroach/certs/`
-For example, to show all login names: `docker exec -it loadbalancing-example-my-cockroach-db-1 cockroach sql --database zitadel --host my-cockroach-db --certs-dir /cockroach/certs/ --execute "select * from projections.login_names3"`

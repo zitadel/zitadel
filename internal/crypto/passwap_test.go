@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/passwap/argon2"
 	"github.com/zitadel/passwap/bcrypt"
 	"github.com/zitadel/passwap/md5"
+	"github.com/zitadel/passwap/md5salted"
 	"github.com/zitadel/passwap/pbkdf2"
 	"github.com/zitadel/passwap/scrypt"
 )
@@ -76,6 +77,7 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 					HashNameArgon2,
 					HashNameBcrypt,
 					HashNameMd5,
+					HashNameMd5Salted,
 					HashNameScrypt,
 					"foobar",
 				},
@@ -123,6 +125,24 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid md5plain",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameMd5Plain,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid md5salted",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameMd5Salted,
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "invalid argon2",
 			fields: fields{
 				Hasher: HasherConfig{
@@ -160,9 +180,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"threads": 4,
 					},
 				},
-				Verifiers: []HashName{HashNameBcrypt, HashNameMd5, HashNameScrypt},
+				Verifiers: []HashName{HashNameBcrypt, HashNameMd5, HashNameScrypt, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{argon2.Prefix, bcrypt.Prefix, md5.Prefix, scrypt.Prefix, scrypt.Prefix_Linux},
+			wantPrefixes: []string{argon2.Prefix, bcrypt.Prefix, md5.Prefix, scrypt.Prefix, scrypt.Prefix_Linux, md5salted.Prefix},
 		},
 		{
 			name: "argon2id, error",
@@ -188,9 +208,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"threads": 4,
 					},
 				},
-				Verifiers: []HashName{HashNameBcrypt, HashNameMd5, HashNameScrypt},
+				Verifiers: []HashName{HashNameBcrypt, HashNameMd5, HashNameScrypt, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{argon2.Prefix, bcrypt.Prefix, md5.Prefix, scrypt.Prefix, scrypt.Prefix_Linux},
+			wantPrefixes: []string{argon2.Prefix, bcrypt.Prefix, md5.Prefix, scrypt.Prefix, scrypt.Prefix_Linux, md5salted.Prefix},
 		},
 		{
 			name: "bcrypt, error",
@@ -213,9 +233,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"cost": 3,
 					},
 				},
-				Verifiers: []HashName{HashNameArgon2, HashNameMd5, HashNameScrypt},
+				Verifiers: []HashName{HashNameArgon2, HashNameMd5, HashNameScrypt, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{bcrypt.Prefix, argon2.Prefix, md5.Prefix, scrypt.Prefix, scrypt.Prefix_Linux},
+			wantPrefixes: []string{bcrypt.Prefix, argon2.Prefix, md5.Prefix, scrypt.Prefix, scrypt.Prefix_Linux, md5salted.Prefix},
 		},
 		{
 			name: "scrypt, error",
@@ -238,9 +258,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"cost": 3,
 					},
 				},
-				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{scrypt.Prefix, scrypt.Prefix_Linux, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+			wantPrefixes: []string{scrypt.Prefix, scrypt.Prefix_Linux, argon2.Prefix, bcrypt.Prefix, md5.Prefix, md5salted.Prefix},
 		},
 		{
 			name: "pbkdf2, parse error",
@@ -277,9 +297,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"Hash":   HashModeSHA1,
 					},
 				},
-				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix, md5salted.Prefix},
 		},
 		{
 			name: "pbkdf2, sha224",
@@ -291,9 +311,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"Hash":   HashModeSHA224,
 					},
 				},
-				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix, md5salted.Prefix},
 		},
 		{
 			name: "pbkdf2, sha256",
@@ -305,9 +325,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"Hash":   HashModeSHA256,
 					},
 				},
-				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix, md5salted.Prefix},
 		},
 		{
 			name: "pbkdf2, sha384",
@@ -319,9 +339,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"Hash":   HashModeSHA384,
 					},
 				},
-				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix, md5salted.Prefix},
 		},
 		{
 			name: "pbkdf2, sha512",
@@ -333,9 +353,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 						"Hash":   HashModeSHA512,
 					},
 				},
-				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted},
 			},
-			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix, md5salted.Prefix},
 		},
 	}
 	for _, tt := range tests {

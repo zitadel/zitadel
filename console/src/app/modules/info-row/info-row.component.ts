@@ -66,14 +66,11 @@ export class InfoRowComponent {
   }
 
   public get changeDate() {
-    return this?.user?.details?.changeDate;
+    return this.user?.details?.changeDate;
   }
 
   public get creationDate() {
-    if (!this.user) {
-      return undefined;
-    }
-    return '$typeName' in this.user ? undefined : this.user.details?.creationDate;
+    return this.user?.details?.creationDate;
   }
 
   private getEmail(user: User.AsObject | UserV2 | UserV1) {

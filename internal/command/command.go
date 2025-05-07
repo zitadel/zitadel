@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -79,6 +81,7 @@ type Commands struct {
 	publicKeyLifetime       time.Duration
 	certificateLifetime     time.Duration
 	defaultSecretGenerators *SecretGenerators
+	maxIdPIntentLifetime    time.Duration
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	webKeyGenerator                func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
@@ -150,6 +153,7 @@ func StartCommands(
 		privateKeyLifetime:              defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:               defaults.KeyConfig.PublicKeyLifetime,
 		certificateLifetime:             defaults.KeyConfig.CertificateLifetime,
+		maxIdPIntentLifetime:            defaults.MaxIdPIntentLifetime,
 		idpConfigEncryption:             idpConfigEncryption,
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
@@ -177,10 +181,15 @@ func StartCommands(
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
 		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
-		// always true for now until we can check with an eventlist
-		EventExisting: func(event string) bool { return true },
-		// always true for now until we can check with an eventlist
-		EventGroupExisting:     func(group string) bool { return true },
+		EventExisting: func(value string) bool {
+			return slices.Contains(es.EventTypes(), value)
+		},
+		EventGroupExisting: func(group string) bool {
+			return slices.ContainsFunc(es.EventTypes(), func(value string) bool {
+				return strings.HasPrefix(value, group)
+			},
+			)
+		},
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
 		ActionFunctionExisting: domain.ActionFunctionExists(),
@@ -216,33 +225,6 @@ func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer
 		return err
 	}
 	return AppendAndReduce(object, events...)
-}
-
-// pushChunked pushes the commands in chunks of size to the eventstore.
-// This can be used to reduce the amount of events in a single transaction.
-// When an error occurs, the events that have been pushed so far will be returned.
-//
-// Warning: chunks are pushed in separate transactions.
-// Successful pushes will not be rolled back if a later chunk fails.
-// Only use this function when the caller is able to handle partial success
-// and is able to consolidate the state on errors.
-func (c *Commands) pushChunked(ctx context.Context, size uint16, cmds ...eventstore.Command) (_ []eventstore.Event, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	events := make([]eventstore.Event, 0, len(cmds))
-	for i := 0; i < len(cmds); i += int(size) {
-		end := i + int(size)
-		if end > len(cmds) {
-			end = len(cmds)
-		}
-		chunk, err := c.eventstore.Push(ctx, cmds[i:end]...)
-		if err != nil {
-			return events, err
-		}
-		events = append(events, chunk...)
-	}
-	return events, nil
 }
 
 type AppendReducerDetails interface {

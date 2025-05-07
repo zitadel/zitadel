@@ -13,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -61,7 +62,7 @@ func Test_Call(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				timeout:    time.Second,
-				sleep:      time.Second,
+				sleep:      2 * time.Second,
 				method:     http.MethodPost,
 				body:       []byte("{\"request\": \"values\"}"),
 				respBody:   []byte("{\"response\": \"values\"}"),
@@ -149,8 +150,8 @@ func Test_CallTarget(t *testing.T) {
 				info: requestContextInfo1,
 				server: &callTestServer{
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respondBody: []byte("{\"request\":\"content2\"}"),
+					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					respondBody: []byte("{\"content\":\"request2\"}"),
 					timeout:     time.Second,
 					statusCode:  http.StatusInternalServerError,
 				},
@@ -170,8 +171,8 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respondBody: []byte("{\"request\":\"content2\"}"),
+					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusInternalServerError,
 				},
 				target: &mockTarget{
@@ -191,8 +192,8 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respondBody: []byte("{\"request\":\"content2\"}"),
+					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 				},
 				target: &mockTarget{
@@ -212,8 +213,8 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respondBody: []byte("{\"request\":\"content2\"}"),
+					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 					signingKey:  "signingkey",
 				},
@@ -235,8 +236,8 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respondBody: []byte("{\"request\":\"content2\"}"),
+					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusInternalServerError,
 				},
 				target: &mockTarget{
@@ -256,8 +257,8 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respondBody: []byte("{\"request\":\"content2\"}"),
+					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 				},
 				target: &mockTarget{
@@ -266,7 +267,7 @@ func Test_CallTarget(t *testing.T) {
 				},
 			},
 			res{
-				body: []byte("{\"request\":\"content2\"}"),
+				body: []byte("{\"content\":\"request2\"}"),
 			},
 		},
 		{
@@ -277,8 +278,8 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respondBody: []byte("{\"request\":\"content2\"}"),
+					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 					signingKey:  "signingkey",
 				},
@@ -289,7 +290,7 @@ func Test_CallTarget(t *testing.T) {
 				},
 			},
 			res{
-				body: []byte("{\"request\":\"content2\"}"),
+				body: []byte("{\"content\":\"request2\"}"),
 			},
 		},
 	}
@@ -576,13 +577,13 @@ func testCallTargets(ctx context.Context,
 }
 
 var requestContextInfo1 = &middleware.ContextInfoRequest{
-	Request: &request{
-		Request: "content1",
-	},
+	Request: middleware.Message{Message: &structpb.Struct{
+		Fields: map[string]*structpb.Value{"content": structpb.NewStringValue("request1")},
+	}},
 }
 
-var requestContextInfoBody1 = []byte("{\"request\":{\"request\":\"content1\"}}")
-var requestContextInfoBody2 = []byte("{\"request\":{\"request\":\"content2\"}}")
+var requestContextInfoBody1 = []byte("{\"request\":{\"content\":\"request1\"}}")
+var requestContextInfoBody2 = []byte("{\"request\":{\"content\":\"request2\"}}")
 
 type request struct {
 	Request string `json:"request"`
