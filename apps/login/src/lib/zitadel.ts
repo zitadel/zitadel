@@ -929,6 +929,45 @@ export async function getAuthRequest({
   });
 }
 
+export async function getDeviceAuthorizationRequest({
+  serviceUrl,
+  userCode,
+}: {
+  serviceUrl: string;
+  userCode: string;
+}) {
+  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+
+  return oidcService.getDeviceAuthorizationRequest({
+    userCode,
+  });
+}
+
+export async function authorizeOrDenyDeviceAuthorization({
+  serviceUrl,
+  deviceAuthorizationId,
+  session,
+}: {
+  serviceUrl: string;
+  deviceAuthorizationId: string;
+  session?: { sessionId: string; sessionToken: string };
+}) {
+  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+
+  return oidcService.authorizeOrDenyDeviceAuthorization({
+    deviceAuthorizationId,
+    decision: session
+      ? {
+          case: "session",
+          value: session,
+        }
+      : {
+          case: "deny",
+          value: {},
+        },
+  });
+}
+
 export async function createCallback({
   serviceUrl,
   req,
