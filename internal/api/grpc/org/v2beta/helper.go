@@ -171,6 +171,9 @@ func OrgViewToPb(org *query.Org) *v2beta_org.Organization {
 
 func ListOrgDomainsRequestToModel(systemDefaults systemdefaults.SystemDefaults, request *org.ListOrganizationDomainsRequest) (*query.OrgDomainSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := DomainQueriesToModel(request.Filter)
 	if err != nil {
 		return nil, err
@@ -255,6 +258,9 @@ func BulkSetOrgMetadataToDomain(req *v2beta_org.SetOrganizationMetadataRequest) 
 
 func ListOrgMetadataToDomain(systemDefaults systemdefaults.SystemDefaults, request *v2beta_org.ListOrganizationMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := metadata.OrgMetadataQueriesToQuery(request.Filter)
 	if err != nil {
 		return nil, err
