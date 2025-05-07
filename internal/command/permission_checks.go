@@ -15,7 +15,7 @@ type PermissionCheck func(resourceOwner, aggregateID string) error
 func (c *Commands) newPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
 		if aggregateID == "" {
-			return zerrors.ThrowInternal(nil, "COMMAND-ulBlS", "aggregate ID is empty")
+			return zerrors.ThrowInternal(nil, "COMMAND-ulBlS", "Errors.IDMissing")
 		}
 		// For example if a write model didn't query any events, the resource owner is probably empty.
 		// In this case, we have to query an event on the given aggregate to get the resource owner.
