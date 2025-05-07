@@ -6,6 +6,7 @@ import (
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	v2beta_object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -14,6 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	// TODO fix below
+	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
@@ -21,9 +23,12 @@ import (
 // NOTE: most of this code is copied from `internal/api/grpc/admin/*`, as we will eventually axe the previous versons of the API,
 // we will have code duplication until then
 
-func listOrgRequestToModel(request *v2beta_org.ListOrganizationsRequest) (*query.OrgSearchQueries, error) {
-	offset, limit, asc := v2beta_object.ListQueryToModel(request.Query)
-	queries, err := OrgQueriesToModel(request.Queries)
+func listOrgRequestToModel(systemDefaults systemdefaults.SystemDefaults, request *v2beta_org.ListOrganizationsRequest) (*query.OrgSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)
+	if err != nil {
+		return nil, err
+	}
+	queries, err := OrgQueriesToModel(request.Filter)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +99,7 @@ func OrgViewsToPb(orgs []*query.Org) []*v2beta_org.Organization {
 	return o
 }
 
-func OrgQueriesToModel(queries []*v2beta_org.OrgQuery) (_ []query.SearchQuery, err error) {
+func OrgQueriesToModel(queries []*v2beta_org.OrgQueryFilter) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = OrgQueryToModel(query)
@@ -105,15 +110,15 @@ func OrgQueriesToModel(queries []*v2beta_org.OrgQuery) (_ []query.SearchQuery, e
 	return q, nil
 }
 
-func OrgQueryToModel(apiQuery *v2beta_org.OrgQuery) (query.SearchQuery, error) {
+func OrgQueryToModel(apiQuery *v2beta_org.OrgQueryFilter) (query.SearchQuery, error) {
 	switch q := apiQuery.Query.(type) {
-	case *v2beta_org.OrgQuery_DomainQuery:
+	case *v2beta_org.OrgQueryFilter_DomainQuery:
 		return query.NewOrgVerifiedDomainSearchQuery(v2beta_object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
-	case *v2beta_org.OrgQuery_NameQuery:
+	case *v2beta_org.OrgQueryFilter_NameQuery:
 		return query.NewOrgNameSearchQuery(v2beta_object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
-	case *v2beta_org.OrgQuery_StateQuery:
+	case *v2beta_org.OrgQueryFilter_StateQuery:
 		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
-	case *v2beta_org.OrgQuery_IdQuery:
+	case *v2beta_org.OrgQueryFilter_IdQuery:
 		return query.NewOrgIDSearchQuery(q.IdQuery.Id)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
@@ -164,10 +169,9 @@ func OrgViewToPb(org *query.Org) *v2beta_org.Organization {
 	}
 }
 
-func ListOrgDomainsRequestToModel(req *org.ListOrganizationDomainsRequest) (*query.OrgDomainSearchQueries, error) {
-	offset, limit, asc := ListQueryToModel(req.Query)
-	// queries, err := org_grpc.DomainQueriesToModel(req.Queries)
-	queries, err := DomainQueriesToModel(req.Queries)
+func ListOrgDomainsRequestToModel(systemDefaults systemdefaults.SystemDefaults, request *org.ListOrganizationDomainsRequest) (*query.OrgDomainSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)
+	queries, err := DomainQueriesToModel(request.Filter)
 	if err != nil {
 		return nil, err
 	}
@@ -249,9 +253,9 @@ func BulkSetOrgMetadataToDomain(req *v2beta_org.SetOrganizationMetadataRequest) 
 	return metadata
 }
 
-func ListOrgMetadataToDomain(request *v2beta_org.ListOrganizationMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
-	offset, limit, asc := v2beta_object.ListQueryToModel(request.Query)
-	queries, err := metadata.OrgMetadataQueriesToQuery(request.Queries)
+func ListOrgMetadataToDomain(systemDefaults systemdefaults.SystemDefaults, request *v2beta_org.ListOrganizationMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)
+	queries, err := metadata.OrgMetadataQueriesToQuery(request.Filter)
 	if err != nil {
 		return nil, err
 	}

@@ -45,7 +45,7 @@ enum OrgFieldName {
     ORG_FIELD_NAME_CREATION_DATE = 2;
 }
 
-message OrgQuery {
+message OrgQueryFilter {
     oneof query {
         option (validate.required) = true;
 

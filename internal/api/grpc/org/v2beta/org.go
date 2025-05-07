@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -38,7 +39,7 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *v2beta_org.Upd
 }
 
 func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.ListOrganizationsRequest) (*v2beta_org.ListOrganizationsResponse, error) {
-	queries, err := listOrgRequestToModel(request)
+	queries, err := listOrgRequestToModel(s.systemDefaults, request)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +48,11 @@ func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.List
 		return nil, err
 	}
 	return &v2beta_org.ListOrganizationsResponse{
-		Result:  OrgViewsToPb(orgs.Orgs),
-		Details: object.ToListDetails(orgs.SearchResponse),
+		Result: OrgViewsToPb(orgs.Orgs),
+		Pagination: &filter.PaginationResponse{
+			TotalResult:  orgs.Count,
+			AppliedLimit: uint64(request.GetPagination().GetLimit()),
+		},
 	}, nil
 }
 
@@ -73,7 +77,7 @@ func (s *Server) SetOrganizationMetadata(ctx context.Context, request *v2beta_or
 }
 
 func (s *Server) ListOrganizationMetadata(ctx context.Context, request *v2beta_org.ListOrganizationMetadataRequest) (*v2beta_org.ListOrganizationMetadataResponse, error) {
-	metadataQueries, err := ListOrgMetadataToDomain(request)
+	metadataQueries, err := ListOrgMetadataToDomain(s.systemDefaults, request)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +86,11 @@ func (s *Server) ListOrganizationMetadata(ctx context.Context, request *v2beta_o
 		return nil, err
 	}
 	return &v2beta_org.ListOrganizationMetadataResponse{
-		Result:  metadata.OrgMetadataListToPb(res.Metadata),
-		Details: object.ToListDetails(res.SearchResponse),
+		Result: metadata.OrgMetadataListToPb(res.Metadata),
+		Pagination: &filter.PaginationResponse{
+			TotalResult:  res.Count,
+			AppliedLimit: uint64(request.GetPagination().GetLimit()),
+		},
 	}, nil
 }
 
@@ -132,7 +139,7 @@ func (s *Server) AddOrganizationDomain(ctx context.Context, request *org.AddOrga
 }
 
 func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrganizationDomainsRequest) (*org.ListOrganizationDomainsResponse, error) {
-	queries, err := ListOrgDomainsRequestToModel(req)
+	queries, err := ListOrgDomainsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +154,11 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrgan
 		return nil, err
 	}
 	return &org.ListOrganizationDomainsResponse{
-		Result:  object.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(domains.SearchResponse),
+		Result: object.DomainsToPb(domains.Domains),
+		Pagination: &filter.PaginationResponse{
+			TotalResult:  domains.Count,
+			AppliedLimit: uint64(req.GetPagination().GetLimit()),
+		},
 	}, nil
 }
 

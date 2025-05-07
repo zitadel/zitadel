@@ -276,7 +276,7 @@ func TestServer_ListOrganization(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		query   []*v2beta_org.OrgQuery
+		query   []*v2beta_org.OrgQueryFilter
 		want    []*v2beta_org.Organization
 		wantErr bool
 	}{
@@ -301,9 +301,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by id happy path",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &v2beta_org.OrgQuery_IdQuery{
+					Query: &v2beta_org.OrgQueryFilter_IdQuery{
 						IdQuery: &v2beta_org.OrgIDQuery{
 							Id: orgs[1].Id,
 						},
@@ -320,9 +320,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by state active",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &v2beta_org.OrgQuery_StateQuery{
+					Query: &v2beta_org.OrgQueryFilter_StateQuery{
 						StateQuery: &v2beta_org.OrgStateQuery{
 							State: v2beta_org.OrgState_ORG_STATE_ACTIVE,
 						},
@@ -343,9 +343,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by state inactive",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &v2beta_org.OrgQuery_StateQuery{
+					Query: &v2beta_org.OrgQueryFilter_StateQuery{
 						StateQuery: &v2beta_org.OrgStateQuery{
 							State: v2beta_org.OrgState_ORG_STATE_INACTIVE,
 						},
@@ -362,9 +362,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by id bad id",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &v2beta_org.OrgQuery_IdQuery{
+					Query: &v2beta_org.OrgQueryFilter_IdQuery{
 						IdQuery: &v2beta_org.OrgIDQuery{
 							Id: "bad id",
 						},
@@ -375,9 +375,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name equals",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &v2beta_org.OrgQuery_NameQuery{
+					Query: &v2beta_org.OrgQueryFilter_NameQuery{
 						NameQuery: &v2beta_org.OrgNameQuery{
 							Name:   orgsName[1],
 							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
@@ -395,9 +395,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name contains",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &v2beta_org.OrgQuery_NameQuery{
+					Query: &v2beta_org.OrgQueryFilter_NameQuery{
 						NameQuery: &v2beta_org.OrgNameQuery{
 							Name: func() string {
 								return orgsName[1][1 : len(orgsName[1])-2]
@@ -417,9 +417,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name contains IGNORE CASE",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &v2beta_org.OrgQuery_NameQuery{
+					Query: &v2beta_org.OrgQueryFilter_NameQuery{
 						NameQuery: &v2beta_org.OrgNameQuery{
 							Name: func() string {
 								return strings.ToUpper(orgsName[1][1 : len(orgsName[1])-2])
@@ -439,15 +439,15 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify domain name equals",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &org.OrgQuery_DomainQuery{
+					Query: &org.OrgQueryFilter_DomainQuery{
 						DomainQuery: &org.OrgDomainQuery{
 							Domain: func() string {
 								listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
-									Queries: []*v2beta_org.OrgQuery{
+									Filter: []*v2beta_org.OrgQueryFilter{
 										{
-											Query: &v2beta_org.OrgQuery_IdQuery{
+											Query: &v2beta_org.OrgQueryFilter_IdQuery{
 												IdQuery: &v2beta_org.OrgIDQuery{
 													Id: orgs[1].Id,
 												},
@@ -474,9 +474,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify domain name contains",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &org.OrgQuery_DomainQuery{
+					Query: &org.OrgQueryFilter_DomainQuery{
 						DomainQuery: &org.OrgDomainQuery{
 							Domain: func() string {
 								domain := strings.ToLower(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
@@ -497,9 +497,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name contains IGNORE CASE",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQuery{
+			query: []*v2beta_org.OrgQueryFilter{
 				{
-					Query: &org.OrgQuery_DomainQuery{
+					Query: &org.OrgQueryFilter_DomainQuery{
 						DomainQuery: &org.OrgDomainQuery{
 							Domain: func() string {
 								domain := strings.ToUpper(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
@@ -523,7 +523,7 @@ func TestServer_ListOrganization(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(context.Background(), 10*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := Client.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
-					Queries: tt.query,
+					Filter: tt.query,
 				})
 
 				if tt.wantErr {
@@ -596,9 +596,9 @@ func TestServer_DeleteOrganization(t *testing.T) {
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 			listOrgRes, err := Client.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
-				Queries: []*v2beta_org.OrgQuery{
+				Filter: []*v2beta_org.OrgQueryFilter{
 					{
-						Query: &v2beta_org.OrgQuery_IdQuery{
+						Query: &v2beta_org.OrgQueryFilter_IdQuery{
 							IdQuery: &v2beta_org.OrgIDQuery{
 								Id: tt.req.Id,
 							},
@@ -639,9 +639,9 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 
 	// 2. check inital state of organization
 	listOrgRes, err := Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		Queries: []*v2beta_org.OrgQuery{
+		Filter: []*v2beta_org.OrgQueryFilter{
 			{
-				Query: &v2beta_org.OrgQuery_IdQuery{
+				Query: &v2beta_org.OrgQueryFilter_IdQuery{
 					IdQuery: &v2beta_org.OrgIDQuery{
 						Id: orgId,
 					},
@@ -663,9 +663,9 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 
 	// 4. check organization state is deactivated
 	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		Queries: []*v2beta_org.OrgQuery{
+		Filter: []*v2beta_org.OrgQueryFilter{
 			{
-				Query: &v2beta_org.OrgQuery_IdQuery{
+				Query: &v2beta_org.OrgQueryFilter_IdQuery{
 					IdQuery: &v2beta_org.OrgIDQuery{
 						Id: orgId,
 					},
@@ -686,9 +686,9 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 
 	// 6. repeat check organization state is still deactivated
 	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		Queries: []*v2beta_org.OrgQuery{
+		Filter: []*v2beta_org.OrgQueryFilter{
 			{
-				Query: &v2beta_org.OrgQuery_IdQuery{
+				Query: &v2beta_org.OrgQueryFilter_IdQuery{
 					IdQuery: &v2beta_org.OrgIDQuery{
 						Id: orgId,
 					},
@@ -710,9 +710,9 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 
 	// 8. check organization state is active
 	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		Queries: []*v2beta_org.OrgQuery{
+		Filter: []*v2beta_org.OrgQueryFilter{
 			{
-				Query: &v2beta_org.OrgQuery_IdQuery{
+				Query: &v2beta_org.OrgQueryFilter_IdQuery{
 					IdQuery: &v2beta_org.OrgIDQuery{
 						Id: orgId,
 					},
@@ -732,9 +732,9 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 
 	// 10. repeat check organization state is still active
 	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		Queries: []*v2beta_org.OrgQuery{
+		Filter: []*v2beta_org.OrgQueryFilter{
 			{
-				Query: &v2beta_org.OrgQuery_IdQuery{
+				Query: &v2beta_org.OrgQueryFilter_IdQuery{
 					IdQuery: &v2beta_org.OrgIDQuery{
 						Id: orgId,
 					},
