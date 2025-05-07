@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
@@ -105,6 +106,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		}
 	}
 	return userMapper, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.Assertion == nil || s.Assertion.Conditions == nil {
+		return time.Time{}
+	}
+	return s.Assertion.Conditions.NotOnOrAfter
 }
 
 func (s *Session) transientMappingID() (string, error) {

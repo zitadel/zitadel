@@ -274,7 +274,7 @@ func (c *Commands) getOrg(ctx context.Context, orgID string) (*domain.Org, error
 	return orgWriteModelToOrg(writeModel), nil
 }
 
-func (c *Commands) CheckOrgExists(ctx context.Context, orgID string) error {
+func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
 		return err

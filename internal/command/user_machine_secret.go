@@ -65,7 +65,7 @@ func (c *Commands) prepareGenerateMachineSecret(a *user.Aggregate, set *Generate
 
 func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resourceOwner string, permissionCheck PermissionCheck) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	// nolint:staticcheck
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveMachineSecret(agg, permissionCheck))
 	if err != nil {
 		return nil, err

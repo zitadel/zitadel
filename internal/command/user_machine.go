@@ -81,7 +81,7 @@ func AddMachineWithUsernameToIDFallback() addMachineOption {
 
 func (c *Commands) AddMachineWithResourceOwnerExistenceCheck() addMachineOption {
 	return func(ctx context.Context, m *Machine) error {
-		return c.CheckOrgExists(ctx, m.ObjectRoot.ResourceOwner)
+		return c.checkOrgExists(ctx, m.ObjectRoot.ResourceOwner)
 	}
 }
 
