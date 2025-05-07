@@ -15,7 +15,7 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "device" });
+  const t = await getTranslations({ locale });
 
   const userCode = searchParams?.user_code;
   const requestId = searchParams?.requestId;
@@ -66,10 +66,12 @@ export default async function Page(props: {
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>
-          {t("request.title", { appName: deviceAuthorizationRequest?.appName })}
+          {t("device.request.title", {
+            appName: deviceAuthorizationRequest?.appName,
+          })}
         </h1>
 
-        <p className="ztdl-p">{t("request.description")}</p>
+        <p className="ztdl-p">{t("device.request.description")}</p>
 
         <ConsentScreen
           deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
