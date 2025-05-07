@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Przepływy",
         "DESCRIPTION": "Wybierz przepływ uwierzytelniania i wywołaj swoją akcję przy określonym zdarzeniu w tym przepływie."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, nowa, ulepszona wersja Actions, jest już dostępna. Obecna wersja jest nadal dostępna, ale przyszły rozwój będzie skoncentrowany na nowej wersji, która ostatecznie zastąpi obecną."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -528,13 +529,14 @@
     "APPLY": "Stosować"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Obecnie korzystasz z nowej wersji Actions V2, która jest w fazie beta. Poprzednia wersja 1 jest nadal dostępna, ale w przyszłości zostanie wycofana. Prosimy o zgłaszanie wszelkich problemów lub opinii.",
     "EXECUTION": {
       "TITLE": "Akcje",
       "DESCRIPTION": "Akcje umożliwiają uruchamianie niestandardowego kodu w odpowiedzi na żądania API, zdarzenia lub określone funkcje. Użyj ich, aby rozszerzyć Zitadel, zautomatyzować przepływy pracy i zintegrować się z innymi systemami.",
       "TYPES": {
         "request": "Żądanie",
         "response": "Odpowiedź",
-        "events": "Zdarzenia",
+        "event": "Zdarzenia",
         "function": "Funkcja"
       },
       "DIALOG": {
@@ -565,6 +567,7 @@
             "TITLE": "Wszystkie",
             "DESCRIPTION": "Wybierz tę opcję, jeśli chcesz uruchomić akcję dla każdego żądania"
           },
+          "ALL_EVENTS": "Wybierz to, jeśli chcesz uruchamiać swoją akcję przy każdym zdarzeniu",
           "SELECT_SERVICE": {
             "TITLE": "Wybierz usługę",
             "DESCRIPTION": "Wybierz usługę Zitadel dla swojej akcji."
@@ -618,6 +621,7 @@
           "restCall": "Wywołanie REST",
           "restAsync": "REST Asynchroniczny"
         },
+        "TYPES_DESCRIPTION": "Webhook, wywołanie obsługuje kod stanu, ale odpowiedź jest nieistotna\nCall, wywołanie obsługuje kod stanu i odpowiedź\nAsync, wywołanie nie obsługuje ani kodu stanu, ani odpowiedzi, ale może być wywoływane równolegle z innymi celami",
         "ENDPOINT": "Punkt końcowy",
         "ENDPOINT_DESCRIPTION": "Wprowadź punkt końcowy, w którym hostowany jest Twój kod. Upewnij się, że jest dla nas dostępny!",
         "TIMEOUT": "Limit czasu",
@@ -1507,7 +1511,8 @@
       "APPEARANCE": "Wygląd",
       "OTHER": "Inne",
       "STORAGE": "składowanie"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {

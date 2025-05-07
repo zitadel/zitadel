@@ -18,6 +18,11 @@ Note that this guide assumes that ZITADEL is running on the same machine as the 
 In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
 :::
 
+:::warning
+To marshal and unmarshal the request please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),
+as the request is a protocol buffer message, to avoid potential problems with the attribute names.
+:::
+
 ## Start example target
 
 To test the actions feature, you need to create a target that will be called when an API endpoint is called.
@@ -37,10 +42,28 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type contextRequest struct {
-	Request *user.AddHumanUserRequest `json:"request"`
+	Request *addHumanUserRequestWrapper `json:"request"`
+}
+
+// addHumanUserRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type addHumanUserRequestWrapper struct {
+	user.AddHumanUserRequest
+}
+
+func (r *addHumanUserRequestWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *addHumanUserRequestWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
 }
 
 // call HandleFunc to read the request body, manipulate the content and return the manipulated request

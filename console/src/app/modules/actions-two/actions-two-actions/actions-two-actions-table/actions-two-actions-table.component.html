@@ -24,8 +24,8 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TARGET' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
           <div class="target-key">
-            <cnsl-project-role-chip *ngFor="let target of row.mappedTargets; trackBy: trackTarget" [roleName]="target.name"
-              >{{ target.name }}
+            <cnsl-project-role-chip *ngFor="let target of row.mappedTargets; trackBy: trackTarget" [roleName]="target.name">
+              {{ target.name }}
             </cnsl-project-role-chip>
           </div>
         </td>
