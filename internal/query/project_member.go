@@ -104,7 +104,7 @@ func (q *Queries) ProjectGroupMembers(ctx context.Context, queries *ProjectMembe
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectGroupMembersQuery(ctx, q.client)
+	query, scan := prepareProjectGroupMembersQuery()
 	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -128,33 +128,6 @@ func (q *Queries) ProjectGroupMembers(ctx context.Context, queries *ProjectMembe
 	return members, err
 }
 
-func (q *Queries) ProjectGroupMembers(ctx context.Context, queries *ProjectMembersQuery) (members *GroupMembers, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	query, scan := prepareProjectGroupMembersQuery(ctx, q.client)
-	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-S9auT", "Errors.Query.InvalidRequest")
-	}
-
-	currentSequence, err := q.latestState(ctx, projectMemberTable)
-	if err != nil {
-		return nil, err
-	}
-
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		members, err = scan(rows)
-		return err
-	}, stmt, args...)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-cq0pj", "Errors.Internal")
-	}
-
-	members.State = currentSequence
-	return members, err
-}
 func prepareProjectMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
 			ProjectMemberCreationDate.identifier(),

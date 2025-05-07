@@ -74,7 +74,7 @@ func (s *Server) ListGroupGrantChanges(ctx context.Context, req *mgmt_pb.ListGro
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
+		// AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
@@ -111,7 +111,7 @@ func (s *Server) ListGroupChanges(ctx context.Context, req *mgmt_pb.ListGroupCha
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
+		// AllowTimeTravel().
 		Limit(limit).
 		AwaitOpenTransactions().
 		OrderDesc().

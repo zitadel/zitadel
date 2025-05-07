@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -98,7 +97,7 @@ func (q *Queries) GroupByID(ctx context.Context, shouldTriggerBulk bool, id stri
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareGroupQuery(ctx, q.client)
+	stmt, scan := prepareGroupQuery()
 	eq := sq.Eq{
 		GroupColumnID.identifier():         id,
 		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -119,7 +118,7 @@ func (q *Queries) SearchGroups(ctx context.Context, queries *GroupSearchQueries)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareGroupsQuery(ctx, q.client)
+	query, scan := prepareGroupsQuery()
 	eq := sq.Eq{GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -182,7 +181,7 @@ func (q *GroupSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func prepareGroupQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
+func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
 	return sq.Select(
 			GroupColumnID.identifier(),
 			GroupColumnCreationDate.identifier(),
@@ -192,7 +191,7 @@ func prepareGroupQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			GroupColumnSequence.identifier(),
 			GroupColumnName.identifier(),
 			GroupColumnDescription.identifier()).
-			From(groupsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(groupsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Group, error) {
 			g := new(Group)
@@ -216,7 +215,7 @@ func prepareGroupQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 		}
 }
 
-func prepareGroupsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
+func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 	return sq.Select(
 			GroupColumnID.identifier(),
 			GroupColumnCreationDate.identifier(),
@@ -227,7 +226,7 @@ func prepareGroupsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			GroupColumnName.identifier(),
 			GroupColumnDescription.identifier(),
 			countColumn.identifier()).
-			From(groupsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(groupsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Groups, error) {
 			groups := make([]*Group, 0)
@@ -275,7 +274,7 @@ func (q *Queries) GroupByUserID(ctx context.Context, shouldTriggerBulk bool, id 
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareUserGroupsQuery(ctx, q.client)
+	stmt, scan := prepareUserGroupsQuery()
 	eq := sq.Eq{
 		GroupMemberUserID.identifier():     id,
 		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -295,7 +294,7 @@ func (q *Queries) GroupByUserID(ctx context.Context, shouldTriggerBulk bool, id 
 	return groups, err
 }
 
-func prepareUserGroupsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
+func prepareUserGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 	return sq.Select(
 			GroupColumnID.identifier(),
 			GroupColumnCreationDate.identifier(),
@@ -309,7 +308,7 @@ func prepareUserGroupsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			GroupMemberUserID.identifier(),
 			countColumn.identifier()).
 			From(groupsTable.identifier()).
-			LeftJoin(join(GroupMemberGroupID, GroupColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(GroupMemberGroupID, GroupColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Groups, error) {
 			groups := make([]*Group, 0)

@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from 'src/app/guards/auth.guard';
-import { RoleGuard } from 'src/app/guards/role.guard';
-import { UserGuard } from 'src/app/guards/user.guard';
+import { authGuard } from 'src/app/guards/auth.guard';
+import { roleGuard } from 'src/app/guards/role-guard';
 
 import { GroupDetailComponent } from './group-detail/group-detail/group-detail.component';
 import { GroupListComponent } from './group-list/group-list.component';
@@ -18,7 +17,7 @@ const routes: Routes = [
   {
     path: 'create',
     loadChildren: () => import('./group-create/group-create.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['user.write'],
     },
@@ -26,7 +25,7 @@ const routes: Routes = [
   {
     path: ':id',
     component: GroupDetailComponent,
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['user.read'],
       animation: 'HomePage',
@@ -38,4 +37,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class GroupsRoutingModule {}
+export class GroupsRoutingModule { }

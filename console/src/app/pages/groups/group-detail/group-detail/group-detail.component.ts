@@ -199,7 +199,7 @@ export class GroupDetailComponent implements OnInit {
   }
 
   public openAddMember(): void {
-    const dialogRef = this.dialog.open(GroupMemberCreateDialogComponent, {width: '400px'});
+    const dialogRef = this.dialog.open(GroupMemberCreateDialogComponent, { width: '400px' });
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const users: User.AsObject[] = resp.users;

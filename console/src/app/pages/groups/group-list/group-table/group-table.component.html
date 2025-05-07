@@ -1,36 +1,19 @@
-<cnsl-refresh-table
-  [loading]="loading$ | async"
-  (refreshed)="refreshPage()"
-  [dataSize]="totalResult"
-  [hideRefresh]="true"
-  [timestamp]="viewTimestamp"
-  [selection]="selection"
-  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
-  [showBorder]="true"
->
+<cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [hideRefresh]="true"
+  [timestamp]="viewTimestamp" [selection]="selection" [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
+  [showBorder]="true">
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
-    <button
-      (click)="deactivateSelectedGroups()"
-      class="bg-state inactive"
-      mat-raised-button
-      *ngIf="selection.hasValue() && multipleDeactivatePossible"
-      [disabled]="(canWrite$ | async) === false"
-      color="primary"
-    >
+    <button (click)="deactivateSelectedGroups()" class="bg-state inactive" mat-raised-button
+      *ngIf="selection.hasValue() && multipleDeactivatePossible" [disabled]="(canWrite$ | async) === false"
+      color="primary">
       <div class="cnsl-action-button">
         <span class="">{{ 'USER.TABLE.DEACTIVATE' | translate }}</span>
         <cnsl-action-keys (actionTriggered)="deactivateSelectedGroups()" [type]="ActionKeysType.DEACTIVATE">
         </cnsl-action-keys>
       </div>
     </button>
-    <button
-      (click)="reactivateSelectedGroups()"
-      class="bg-state active margin-left"
-      mat-raised-button
-      *ngIf="selection.hasValue() && multipleActivatePossible"
-      [disabled]="(canWrite$ | async) === false"
-      color="primary"
-    >
+    <button (click)="reactivateSelectedGroups()" class="bg-state active margin-left" mat-raised-button
+      *ngIf="selection.hasValue() && multipleActivatePossible" [disabled]="(canWrite$ | async) === false"
+      color="primary">
       <div class="cnsl-action-button">
         <span class="">{{ 'USER.TABLE.ACTIVATE' | translate }}</span>
         <cnsl-action-keys (actionTriggered)="reactivateSelectedGroups()" [type]="ActionKeysType.REACTIVATE">
@@ -38,28 +21,15 @@
       </div>
     </button>
   </ng-template>
-  <cnsl-filter-group
-      actions
-      *ngIf="!selection.hasValue()"
-      (filterChanged)="applySearchQuery($any($event))"
-      (filterOpen)="filterOpen = $event"
-    ></cnsl-filter-group>
+  <cnsl-filter-group actions *ngIf="!selection.hasValue()" (filterChanged)="applySearchQuery($any($event))"
+    (filterOpen)="filterOpen = $event"></cnsl-filter-group>
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
-    <button
-      (click)="gotoRouterLink(['/groups/create'])"
-      color="primary"
-      mat-raised-button
-      [disabled]="(canWrite$ | async) === false"
-      *ngIf="!selection.hasValue()"
-      data-e2e="create-user-button"
-    >
+    <button (click)="gotoRouterLink(['/groups/create'])" color="primary" mat-raised-button
+      [disabled]="(canWrite$ | async) === false" *ngIf="!selection.hasValue()" data-e2e="create-user-button">
       <div class="cnsl-action-button">
         <mat-icon class="icon">add</mat-icon>
         <span>{{ 'ACTIONS.NEW' | translate }}</span>
-        <cnsl-action-keys
-          *ngIf="!filterOpen"
-          (actionTriggered)="gotoRouterLink(['/groups', 'create'])"
-        >
+        <cnsl-action-keys *ngIf="!filterOpen" (actionTriggered)="gotoRouterLink(['/groups', 'create'])">
         </cnsl-action-keys>
       </div>
     </button>
@@ -70,14 +40,9 @@
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <div class="selection">
-            <mat-checkbox
-              class="checkbox"
-              [disabled]="(canWrite$ | async) === false"
-              color="primary"
-              (change)="$event ? masterToggle() : null"
-              [checked]="selection.hasValue() && isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()"
-            >
+            <mat-checkbox class="checkbox" [disabled]="(canWrite$ | async) === false" color="primary"
+              (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
               <cnsl-avatar class="hidden" [isMachine]="true">
                 <i class="las la-robot"></i>
               </cnsl-avatar>
@@ -86,14 +51,9 @@
         </th>
         <td mat-cell *matCellDef="let user">
           <div class="selection">
-            <mat-checkbox
-              class="checkbox"
-              [disabled]="(canWrite$ | async) === false"
-              color="primary"
-              (click)="$event.stopPropagation()"
-              (change)="$event ? selection.toggle(user) : null"
-              [checked]="selection.isSelected(user)"
-            >
+            <mat-checkbox class="checkbox" [disabled]="(canWrite$ | async) === false" color="primary"
+              (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(user) : null"
+              [checked]="selection.isSelected(user)">
               <ng-template #cog>
                 <cnsl-avatar [forColor]="user?.preferredLoginName" [isMachine]="true">
                   <i class="las la-robot"></i>
@@ -105,11 +65,7 @@
       </ng-container>
 
       <ng-container matColumnDef="name">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          mat-sort-header
-        >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'GROUP.CREATE.NAME' | translate }}
         </th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/groups', user.id] : null">
@@ -120,13 +76,10 @@
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.DATA.STATE' | translate }}</th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/groups', user.id] : null">
-          <span
-            class="state"
-            [ngClass]="{
+          <span class="state" [ngClass]="{
               active: user.state === GroupState.GROUP_STATE_ACTIVE,
               inactive: user.state === GroupState.GROUP_STATE_INACTIVE,
-            }"
-          >
+            }">
             {{ 'USER.DATA.STATE' + user.state | translate }}
           </span>
         </td>
@@ -150,19 +103,12 @@
         <th mat-header-cell *matHeaderCellDef class="group-tr-actions"></th>
         <td mat-cell *matCellDef="let user" class="group-tr-actions">
           <cnsl-table-actions>
-            <button
-              actions
-              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-              color="warn"
-              (click)="deleteGroup(user)"
-              [disabled]="(canWrite$ | async) === false || (canDelete$ | async) === false"
-              [attr.data-e2e]="
+            <button actions matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" color="warn" (click)="deleteGroup(user)"
+              [disabled]="(canWrite$ | async) === false || (canDelete$ | async) === false" [attr.data-e2e]="
                 (canWrite$ | async) === false || (canDelete$ | async) === false
                   ? 'disabled-delete-button'
                   : 'enabled-delete-button'
-              "
-              mat-icon-button
-            >
+              " mat-icon-button>
               <i class="las la-trash"></i>
             </button>
           </cnsl-table-actions>
@@ -170,11 +116,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumnsHuman"></tr>
-      <tr
-        class="highlight pointer"
-        mat-row
-        *matRowDef="let user; columns: displayedColumnsHuman"
-      ></tr>
+      <tr class="highlight pointer" mat-row *matRowDef="let user; columns: displayedColumnsHuman"></tr>
     </table>
   </div>
 
@@ -182,14 +124,7 @@
     <i class="las la-exclamation"></i>
     <span>{{ 'USER.TABLE.EMPTY' | translate }}</span>
   </div>
-  <cnsl-paginator
-    #paginator
-    class="paginator"
-    [timestamp]="viewTimestamp"
-    [length]="totalResult || 0"
-    [pageSize]="INITIAL_PAGE_SIZE"
-    [timestamp]="viewTimestamp"
-    [pageSizeOptions]="[10, 20, 50, 100]"
-    (page)="changePage($event)"
-  ></cnsl-paginator>
+  <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0"
+    [pageSize]="INITIAL_PAGE_SIZE" [timestamp]="viewTimestamp" [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="changePage($event)"></cnsl-paginator>
 </cnsl-refresh-table>

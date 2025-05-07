@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -92,7 +91,7 @@ func (q *Queries) GroupMembers(ctx context.Context, queries *GroupMembersQuery) 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareGroupMembersQuery(ctx, q.client)
+	query, scan := prepareGroupMembersQuery()
 	eq := sq.Eq{GroupMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -116,7 +115,7 @@ func (q *Queries) GroupMembers(ctx context.Context, queries *GroupMembersQuery) 
 	return groupMembers, err
 }
 
-func prepareGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
+func prepareGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
 	return sq.Select(
 			GroupMemberCreationDate.identifier(),
 			GroupMemberChangeDate.identifier(),
@@ -138,7 +137,7 @@ func prepareGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(HumanUserIDCol, GroupMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, GroupMemberUserID)).
 			LeftJoin(join(UserIDCol, GroupMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, GroupMemberUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LoginNameUserIDCol, GroupMemberUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

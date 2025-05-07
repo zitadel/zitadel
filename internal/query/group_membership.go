@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -173,7 +172,7 @@ func (q *Queries) GroupMemberships(ctx context.Context, queries *MembershipSearc
 		wg.Wait()
 	}
 
-	query, queryArgs, scan := prepareGroupMembershipsQuery(ctx, q.client, queries)
+	query, queryArgs, scan := prepareGroupMembershipsQuery(queries)
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -216,7 +215,7 @@ func getGroupMembershipFromQuery(queries *MembershipSearchQuery) (string, []inte
 		args
 }
 
-func prepareGroupMembershipsQuery(ctx context.Context, db prepareDatabase, queries *MembershipSearchQuery) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*GroupMemberships, error)) {
+func prepareGroupMembershipsQuery(queries *MembershipSearchQuery) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*GroupMemberships, error)) {
 	query, args := getGroupMembershipFromQuery(queries)
 	return sq.Select(
 			membershipGroupID.identifier(),
@@ -239,7 +238,7 @@ func prepareGroupMembershipsQuery(ctx context.Context, db prepareDatabase, queri
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
 			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
-			LeftJoin(join(InstanceColumnID, membershipInstanceID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(InstanceColumnID, membershipInstanceID)).
 			PlaceholderFormat(sq.Dollar),
 		args,
 		func(rows *sql.Rows) (*GroupMemberships, error) {

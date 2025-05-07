@@ -16,8 +16,8 @@
 
   <div class="max-width-container">
     <cnsl-meta-layout *ngIf="user(userQuery) as user">
-      <cnsl-sidenav *ngIf="currentSetting$ | async as currentSetting" [ngModel]="currentSetting"
-        (ngModelChange)="goToSetting($event)" [settingsList]="settingsList">
+      <cnsl-sidenav [setting]="currentSetting$()" (settingChange)="currentSetting$.set($event)"
+        [settingsList]="settingsList">
         <ng-container *ngIf="currentSetting$().id === 'general' && humanUser(userQuery) as humanUser">
           <cnsl-card *ngIf="humanUser.type.value.profile as profile" class="app-card"
             title="{{ 'USER.PROFILE.TITLE' | translate }}">
@@ -111,7 +111,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'groups'">
+        <ng-container *ngIf="currentSetting$().id === 'groups'">
           <cnsl-card *ngIf="user.userId" title="{{ 'USER.GROUPS.TITLE' | translate }}">
             <cnsl-user-groups [userId]="user.userId" [canWrite$]="['user.write$'] | hasRole"
               [canDelete$]="['user.delete$'] | hasRole">
@@ -119,7 +119,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'metadata' && (metadata$ | async) as metadataQuery">
+        <ng-container *ngIf="currentSetting$().id === 'metadata' && (metadata$ | async) as metadataQuery">
           <cnsl-metadata *ngIf="metadataQuery.state !== 'error'" [metadata]="metadataQuery.value"
             [description]="'DESCRIPTIONS.USERS.SELF.METADATA' | translate"
             [disabled]="(['user.write:' + user.userId, 'user.write'] | hasRole | async) === false"

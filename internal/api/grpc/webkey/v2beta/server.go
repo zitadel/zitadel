@@ -20,7 +20,6 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 ) *Server {
-	return &Server{
 		command: command,
 		query:   query,
 	}

@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -255,7 +254,7 @@ func (q *Queries) GroupGrant(ctx context.Context, shouldTriggerBulk bool, querie
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareGroupGrantQuery(ctx, q.client)
+	query, scan := prepareGroupGrantQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -283,7 +282,7 @@ func (q *Queries) GroupGrants(ctx context.Context, queries *GroupGrantsQueries, 
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareGroupGrantsQuery(ctx, q.client)
+	query, scan := prepareGroupGrantsQuery()
 	eq := sq.Eq{GroupGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -307,7 +306,7 @@ func (q *Queries) GroupGrants(ctx context.Context, queries *GroupGrantsQueries, 
 	return grants, nil
 }
 
-func prepareGroupGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*GroupGrant, error)) {
+func prepareGroupGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*GroupGrant, error)) {
 	return sq.Select(
 			GroupGrantID.identifier(),
 			GroupGrantCreationDate.identifier(),
@@ -336,7 +335,7 @@ func prepareGroupGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			LeftJoin(join(GroupColumnID, GroupGrantGroupID)).
 			LeftJoin(join(OrgColumnID, GroupGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, GroupGrantProjectID)).
-			LeftJoin(join(GrantedOrgColumnId, GroupColumnResourceOwner) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(GrantedOrgColumnId, GroupColumnResourceOwner)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*GroupGrant, error) {
 			g := new(GroupGrant)
@@ -399,7 +398,7 @@ func prepareGroupGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		}
 }
 
-func prepareGroupGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*GroupGrants, error)) {
+func prepareGroupGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupGrants, error)) {
 	return sq.Select(
 			GroupGrantID.identifier(),
 			GroupGrantCreationDate.identifier(),
@@ -430,7 +429,7 @@ func prepareGroupGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			LeftJoin(join(GroupColumnID, GroupGrantGroupID)).
 			LeftJoin(join(OrgColumnID, GroupGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, GroupGrantProjectID)).
-			LeftJoin(join(GrantedOrgColumnId, GroupColumnResourceOwner) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(GrantedOrgColumnId, GroupColumnResourceOwner)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*GroupGrants, error) {
 			groupGrants := make([]*GroupGrant, 0)

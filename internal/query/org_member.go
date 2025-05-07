@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -105,7 +104,7 @@ func (q *Queries) OrgGroupMembers(ctx context.Context, queries *OrgMembersQuery)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareOrgGroupMembersQuery(ctx, q.client)
+	query, scan := prepareOrgGroupMembersQuery()
 	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -225,7 +224,7 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 		}
 }
 
-func prepareOrgGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
+func prepareOrgGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
 	return sq.Select(
 			OrgMemberCreationDate.identifier(),
 			OrgMemberChangeDate.identifier(),
@@ -237,7 +236,7 @@ func prepareOrgGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OrgMemberRoles.identifier(),
 			countColumn.identifier(),
 		).From(orgMemberTable.identifier()).
-			LeftJoin(join(GroupColumnID, OrgMemberGroupID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(GroupColumnID, OrgMemberGroupID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*GroupMembers, error) {
 			members := make([]*GroupMember, 0)

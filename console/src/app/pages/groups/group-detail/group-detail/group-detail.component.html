@@ -1,29 +1,18 @@
-<cnsl-top-view
-  *ngIf="group"
-  title="{{ group.name }}"
-  sub="{{ group.description }}"
+<cnsl-top-view *ngIf="group" title="{{ group.name }}" sub="{{ group.description }}"
   [isActive]="group.state === GroupState.GROUP_STATE_ACTIVE"
   [isInactive]="group.state === GroupState.GROUP_STATE_INACTIVE"
-  stateTooltip="{{ 'USER.STATE.' + group.state | translate }}"
-  (backClicked)="navigateBack()"
-  [hasActions]="['user.write$', 'user.write:' + group.id] | hasRole | async"
->
+  stateTooltip="{{ 'USER.STATE.' + group.state | translate }}" (backClicked)="navigateBack()"
+  [hasActions]="['user.write$', 'user.write:' + group.id] | hasRole | async">
   <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:' + group.id]">
     <button mat-menu-item (click)="openNameDialog()" aria-label="Edit group name">
       {{ 'ACTIONS.RENAME' | translate }}
     </button>
-    <button
-      mat-menu-item
-      *ngIf="group?.state === GroupState.GROUP_STATE_ACTIVE"
-      (click)="changeState(GroupState.GROUP_STATE_INACTIVE)"
-    >
+    <button mat-menu-item *ngIf="group?.state === GroupState.GROUP_STATE_ACTIVE"
+      (click)="changeState(GroupState.GROUP_STATE_INACTIVE)">
       {{ 'USER.PAGES.DEACTIVATE' | translate }}
     </button>
-    <button
-      mat-menu-item
-      *ngIf="group?.state === GroupState.GROUP_STATE_INACTIVE"
-      (click)="changeState(GroupState.GROUP_STATE_ACTIVE)"
-    >
+    <button mat-menu-item *ngIf="group?.state === GroupState.GROUP_STATE_INACTIVE"
+      (click)="changeState(GroupState.GROUP_STATE_ACTIVE)">
       {{ 'USER.PAGES.REACTIVATE' | translate }}
     </button>
     <ng-template cnslHasRole [hasRole]="['user.delete$', 'user.delete:' + group.id]">
@@ -47,44 +36,30 @@
 
 <div class="max-width-container" *ngIf="group && (['user.write$', 'user.write:' + group.id] | hasRole) as canWrite$">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" queryParam="id">
-      <div *ngIf="error" class="max-width-container">
-        <p>{{ error }}</p>
-      </div>
-      <div class="max-width-container">
-        <span *ngIf="!loading && !group">{{ 'GROUP.PAGES.NOUSER' | translate }}</span>
-        <cnsl-group-members-table
-          [ngStyle]="{ display: currentSetting === 'members' ? 'block' : 'none' }"
-          [dataSource]="dataSource"
-          [factoryLoadFunc]="changePageFactory"
-          [refreshTrigger]="changePage"
-          [canWrite]="['group.member.write$'] | hasRole | async"
-          [canDelete]="['group.member.delete$'] | hasRole | async"
-          (deleteMember)="removeGroupMember($event)"
-        >
-          <ng-template
-            cnslHasRole
-            writeactions
-            [hasRole]="['group.member.write']"
-          >
-            <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
-              <mat-icon class="icon">add</mat-icon>
-              <span>{{ 'ACTIONS.NEW' | translate }}</span>
-              <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
-            </button>
-          </ng-template>
-        </cnsl-group-members-table>
-        <cnsl-group-grants
-            [ngStyle]="{ display: currentSetting === 'grants' ? 'block' : 'none' }"
-            [groupId]="group.id"
-            [context]="GROUPGRANTCONTEXT"
-            [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'state', 'roleNamesList', 'actions']"
-            [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
-            [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
-          >
-          </cnsl-group-grants>
-      </div>
-    </cnsl-sidenav>
+    <div *ngIf="error" class="max-width-container">
+      <p>{{ error }}</p>
+    </div>
+    <div class="max-width-container">
+      <span *ngIf="!loading && !group">{{ 'GROUP.PAGES.NOUSER' | translate }}</span>
+      <cnsl-group-members-table [ngStyle]="{ display: currentSetting === 'members' ? 'block' : 'none' }"
+        [dataSource]="dataSource" [factoryLoadFunc]="changePageFactory" [refreshTrigger]="changePage"
+        [canWrite]="['group.member.write$'] | hasRole | async" [canDelete]="['group.member.delete$'] | hasRole | async"
+        (deleteMember)="removeGroupMember($event)">
+        <ng-template cnslHasRole writeactions [hasRole]="['group.member.write']">
+          <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
+            <mat-icon class="icon">add</mat-icon>
+            <span>{{ 'ACTIONS.NEW' | translate }}</span>
+            <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+          </button>
+        </ng-template>
+      </cnsl-group-members-table>
+      <cnsl-group-grants [ngStyle]="{ display: currentSetting === 'grants' ? 'block' : 'none' }" [groupId]="group.id"
+        [context]="GROUPGRANTCONTEXT"
+        [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'state', 'roleNamesList', 'actions']"
+        [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
+        [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false">
+      </cnsl-group-grants>
+    </div>
     <div metainfo>
       <cnsl-changes *ngIf="group" [changeType]="ChangeType.GROUP" [id]="group.id"></cnsl-changes>
     </div>

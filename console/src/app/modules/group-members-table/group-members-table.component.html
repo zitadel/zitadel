@@ -1,11 +1,5 @@
-<cnsl-refresh-table
-  *ngIf="dataSource"
-  (refreshed)="changePage()"
-  [dataSize]="dataSource.totalResult"
-  [timestamp]="dataSource.viewTimestamp"
-  [selection]="selection"
-  [loading]="dataSource.loading$ | async"
->
+<cnsl-refresh-table *ngIf="dataSource" (refreshed)="changePage()" [timestamp]="dataSource.viewTimestamp"
+  [selection]="selection" [loading]="dataSource.loading$ | async">
   <ng-container actions *ngIf="selection.hasValue()">
     <ng-content select="[selectactions]"></ng-content>
   </ng-container>
@@ -19,34 +13,19 @@
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <div class="selection">
-            <mat-checkbox
-              [disabled]="!canWrite"
-              color="primary"
-              (change)="$event ? masterToggle() : null"
+            <mat-checkbox [disabled]="!canWrite" color="primary" (change)="$event ? masterToggle() : null"
               [checked]="selection.hasValue() && isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()"
-            >
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
             </mat-checkbox>
           </div>
         </th>
         <td mat-cell *matCellDef="let row">
           <div class="selection">
-            <mat-checkbox
-              [disabled]="!canWrite"
-              color="primary"
-              (click)="$event.stopPropagation()"
-              (change)="$event ? selection.toggle(row) : null"
-              [checked]="selection.isSelected(row)"
-            >
-              <cnsl-avatar
-                *ngIf="row?.userType === UserType.TYPE_HUMAN; else cog"
-                class="avatar"
-                [name]="row.displayName"
-                [avatarUrl]="row.avatarUrl || ''"
-                [avatarUrl]="row.avatarUrl || ''"
-                [forColor]="row?.preferredLoginName"
-                [size]="32"
-              >
+            <mat-checkbox [disabled]="!canWrite" color="primary" (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+              <cnsl-avatar *ngIf="row?.userType === UserType.TYPE_HUMAN; else cog" class="avatar"
+                [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''" [avatarUrl]="row.avatarUrl || ''"
+                [forColor]="row?.preferredLoginName" [size]="32">
               </cnsl-avatar>
               <ng-template #cog>
                 <cnsl-avatar [forColor]="row.preferredLoginName" [isMachine]="true">
@@ -90,15 +69,9 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let member" class="member-action-tr">
           <cnsl-table-actions [hasActions]="true">
-            <button
-              actions
-              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-              color="warn"
-              (click)="$event.stopPropagation(); triggerDeleteMember(member)"
-              mat-icon-button
-              [disabled]="canDelete === false"
-              data-e2e="remove-member-button"
-            >
+            <button actions matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" color="warn"
+              (click)="$event.stopPropagation(); triggerDeleteMember(member)" mat-icon-button
+              [disabled]="canDelete === false" data-e2e="remove-member-button">
               <i class="las la-trash"></i>
             </button>
 
@@ -110,24 +83,12 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr
-        class="highlight"
-        [ngClass]="{ pointer: canWrite }"
-        (click)="canWrite ? addRole(member) : null"
-        mat-row
-        *matRowDef="let member; columns: displayedColumns"
-      ></tr>
+      <tr class="highlight" [ngClass]="{ pointer: canWrite }" (click)="canWrite ? addRole(member) : null" mat-row
+        *matRowDef="let member; columns: displayedColumns"></tr>
     </table>
   </div>
-  <cnsl-paginator
-    *ngIf="dataSource"
-    class="paginator"
-    #paginator
-    [timestamp]="dataSource.viewTimestamp"
-    [pageSize]="INITIALPAGESIZE"
-    [length]="dataSource.totalResult"
-    [pageSizeOptions]="[25, 50, 100, 250]"
-    (page)="changePage($event)"
-  >
+  <cnsl-paginator *ngIf="dataSource" class="paginator" #paginator [timestamp]="dataSource.viewTimestamp"
+    [pageSize]="INITIALPAGESIZE" [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]"
+    (page)="changePage($event)">
   </cnsl-paginator>
 </cnsl-refresh-table>

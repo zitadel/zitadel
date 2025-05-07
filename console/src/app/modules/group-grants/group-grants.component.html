@@ -1,20 +1,8 @@
-<cnsl-refresh-table
-  [loading]="dataSource.loading$ | async"
-  (refreshed)="changePage()"
-  [hideRefresh]="true"
-  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
-  [timestamp]="dataSource.viewTimestamp"
-  [dataSize]="dataSource.totalResult"
-  [selection]="selection"
->
-  <button
-    color="warn"
-    matTooltip="{{ 'GRANTS.DELETE' | translate }}"
-    mat-raised-button
-    actions
-    (click)="deleteGrantSelection()"
-    *ngIf="selection.hasValue() && disableDelete === false"
-  >
+<cnsl-refresh-table [loading]="dataSource.loading$ | async" (refreshed)="changePage()" [hideRefresh]="true"
+  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource.viewTimestamp"
+  [selection]="selection">
+  <button color="warn" matTooltip="{{ 'GRANTS.DELETE' | translate }}" mat-raised-button actions
+    (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete === false">
     <div class="cnsl-action-button">
       <i class="las la-trash"></i>
       <span>{{ 'ACTIONS.DELETE' | translate }}</span>
@@ -22,21 +10,11 @@
     </div>
   </button>
 
-  <cnsl-filter-group-grants
-    actions
-    *ngIf="!selection.hasValue()"
-    (filterChanged)="applySearchQuery($any($event))"
-    (filterOpen)="filterOpen = $event"
-  ></cnsl-filter-group-grants>
+  <cnsl-filter-group-grants actions *ngIf="!selection.hasValue()" (filterChanged)="applySearchQuery($any($event))"
+    (filterOpen)="filterOpen = $event"></cnsl-filter-group-grants>
 
-  <a
-    actions
-    *ngIf="disableWrite === false && selection.hasValue() === false && routerLink"
-    matTooltip="{{ 'GRANTS.ADD' | translate }}"
-    color="primary"
-    mat-raised-button
-    [routerLink]="routerLink"
-  >
+  <a actions *ngIf="disableWrite === false && selection.hasValue() === false && routerLink"
+    matTooltip="{{ 'GRANTS.ADD' | translate }}" color="primary" mat-raised-button [routerLink]="routerLink">
     <div class="cnsl-action-button">
       <mat-icon class="icon">add</mat-icon>
       <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
@@ -49,24 +27,16 @@
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <div class="selection">
-            <mat-checkbox
-              [disabled]="disableWrite"
-              color="primary"
-              (change)="$event ? masterToggle() : null"
+            <mat-checkbox [disabled]="disableWrite" color="primary" (change)="$event ? masterToggle() : null"
               [checked]="selection.hasValue() && isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()"
-            >
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
             </mat-checkbox>
           </div>
         </th>
         <td mat-cell *matCellDef="let row">
           <div class="selection">
-            <mat-checkbox
-              color="primary"
-              (click)="$event.stopPropagation()"
-              (change)="$event ? selection.toggle(row) : null"
-              [checked]="selection.isSelected(row)"
-            >
+            <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
             </mat-checkbox>
           </div>
         </td>
@@ -97,14 +67,16 @@
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          <span class="no-break">{{ grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+          <span class="no-break">{{ grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
+            }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          <span class="no-break">{{ grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+          <span class="no-break">{{ grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
+            }}</span>
         </td>
       </ng-container>
 
@@ -114,8 +86,7 @@
         </th>
         <td mat-cell *matCellDef="let grant; let i = index" class="role-data">
           <div class="flex-row">
-            <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.roleKeysList"
-              >{{ role }}
+            <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.roleKeysList">{{ role }}
             </cnsl-project-role-chip>
           </div>
         </td>
@@ -124,13 +95,10 @@
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.STATE' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          <span
-            class="state"
-            [ngClass]="{
+          <span class="state" [ngClass]="{
               active: grant.state === GroupGrantState.GROUP_GRANT_STATE_ACTIVE,
               inactive: grant.state === GroupGrantState.GROUP_GRANT_STATE_INACTIVE,
-            }"
-          >
+            }">
             {{ 'USER.DATA.STATE' + grant.state | translate }}
           </span>
         </td>
@@ -140,14 +108,8 @@
         <th mat-header-cell *matHeaderCellDef class="user-tr-actions"></th>
         <td mat-cell class="user-tr-actions" *matCellDef="let grant; let i = index">
           <cnsl-table-actions>
-            <button
-              actions
-              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-              color="warn"
-              [disabled]="disableDelete"
-              (click)="deleteGrant($event, grant)"
-              mat-icon-button
-            >
+            <button actions matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" color="warn" [disabled]="disableDelete"
+              (click)="deleteGrant($event, grant)" mat-icon-button>
               <i class="las la-trash"></i>
             </button>
           </cnsl-table-actions>
@@ -155,27 +117,16 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr
-        (click)="!disableWrite ? openEditDialog(grant) : null"
-        [ngClass]="{ 'highlight pointer': !disableWrite }"
-        mat-row
-        *matRowDef="let grant; columns: displayedColumns"
-      ></tr>
+      <tr (click)="!disableWrite ? openEditDialog(grant) : null" [ngClass]="{ 'highlight pointer': !disableWrite }"
+        mat-row *matRowDef="let grant; columns: displayedColumns"></tr>
     </table>
   </div>
   <div *ngIf="(dataSource.loading$ | async) === false && !dataSource?.totalResult" class="no-content-row">
     <i class="las la-exclamation"></i>
     <span>{{ 'GRANTS.EMPTY' | translate }}</span>
   </div>
-  <cnsl-paginator
-    class="paginator"
-    #paginator
-    [timestamp]="dataSource.viewTimestamp"
-    [length]="dataSource.totalResult"
-    [pageSize]="INITIAL_PAGE_SIZE"
-    [length]="dataSource.totalResult"
-    [pageSizeOptions]="[2, 3, 25, 50, 100, 250]"
-    (page)="changePage($event)"
-  >
+  <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource.viewTimestamp" [length]="dataSource.totalResult"
+    [pageSize]="INITIAL_PAGE_SIZE" [length]="dataSource.totalResult" [pageSizeOptions]="[2, 3, 25, 50, 100, 250]"
+    (page)="changePage($event)">
   </cnsl-paginator>
 </cnsl-refresh-table>

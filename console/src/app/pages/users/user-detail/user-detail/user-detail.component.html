@@ -183,7 +183,7 @@
               </cnsl-card>
             </ng-container>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'groups'">
+            <ng-container *ngIf="currentSetting$().id === 'groups'">
               <cnsl-card *ngIf="user.userId" title="{{ 'USER.GROUPS.TITLE' | translate }}">
                 <cnsl-user-groups [userId]="user.userId" [canWrite$]="['user.write$'] | hasRole"
                   [canDelete$]="['user.delete$'] | hasRole">
@@ -191,7 +191,7 @@
               </cnsl-card>
             </ng-container>
 
-            <ng-container *ngIf="(currentSetting$ | async) === 'groups'">
+            <ng-container *ngIf="currentSetting$().id === 'groups'">
               <cnsl-card *ngIf="user.userId" title="{{ 'USER.GROUPS.TITLE' | translate }}">
                 <cnsl-user-groups [userId]="user.userId" [canWrite$]="['user.write$'] | hasRole"
                   [canDelete$]="['user.delete$'] | hasRole">
