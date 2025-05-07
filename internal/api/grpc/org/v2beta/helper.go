@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	// TODO fix below
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
@@ -79,7 +80,7 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrgan
 		}
 	}
 	return &org.CreateOrganizationResponse{
-		Details:       v2beta_object.DomainToDetailsPb(createdOrg.ObjectDetails),
+		CreatedDate:   timestamppb.New(createdOrg.ObjectDetails.EventDate),
 		Id:            createdOrg.ObjectDetails.ResourceOwner,
 		CreatedAdmins: admins,
 	}, nil

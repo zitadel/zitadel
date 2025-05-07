@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *Server) CreateOrganization(ctx context.Context, request *v2beta_org.CreateOrganizationRequest) (*v2beta_org.CreateOrganizationResponse, error) {
@@ -32,7 +33,7 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *v2beta_org.Upd
 	}
 
 	return &v2beta_org.UpdateOrganizationResponse{
-		Details: object.DomainToDetailsPb(org),
+		ChangeDate: timestamppb.New(org.EventDate),
 	}, nil
 }
 
@@ -57,7 +58,7 @@ func (s *Server) DeleteOrganization(ctx context.Context, request *v2beta_org.Del
 		return nil, err
 	}
 	return &v2beta_org.DeleteOrganizationResponse{
-		Details: object.DomainToDetailsPb(details),
+		ChangeDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 
@@ -67,7 +68,7 @@ func (s *Server) SetOrganizationMetadata(ctx context.Context, request *v2beta_or
 		return nil, err
 	}
 	return &org.SetOrganizationMetadataResponse{
-		Details: object.DomainToDetailsPb(result),
+		ChangeDate: timestamppb.New(result.EventDate),
 	}, nil
 }
 
@@ -92,7 +93,7 @@ func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *v2beta
 		return nil, err
 	}
 	return &v2beta_org.DeleteOrganizationMetadataResponse{
-		Details: object.DomainToChangeDetailsPb(result),
+		ChangeDate: timestamppb.New(result.EventDate),
 	}, nil
 }
 
@@ -102,7 +103,7 @@ func (s *Server) DeactivateOrganization(ctx context.Context, request *org.Deacti
 		return nil, err
 	}
 	return &org.DeactivateOrganizationResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		ChangeDate: timestamppb.New(objectDetails.EventDate),
 	}, nil
 }
 
@@ -112,7 +113,7 @@ func (s *Server) ReactivateOrganization(ctx context.Context, request *org.Reacti
 		return nil, err
 	}
 	return &org.ReactivateOrganizationResponse{
-		Details: object.DomainToDetailsPb(objectDetails),
+		ChangeDate: timestamppb.New(objectDetails.EventDate),
 	}, err
 }
 
@@ -126,7 +127,7 @@ func (s *Server) AddOrganizationDomain(ctx context.Context, request *org.AddOrga
 		return nil, err
 	}
 	return &org.AddOrganizationDomainResponse{
-		Details: object.DomainToDetailsPb(details),
+		CreatedDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 
@@ -157,7 +158,7 @@ func (s *Server) DeleteOrganizationDomain(ctx context.Context, req *org.DeleteOr
 		return nil, err
 	}
 	return &org.DeleteOrganizationDomainResponse{
-		Details: object.DomainToDetailsPb(details),
+		ChangeDate: timestamppb.New(details.EventDate),
 	}, err
 }
 
@@ -182,7 +183,7 @@ func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *org.Veri
 		return nil, err
 	}
 	return &org.VerifyOrganizationDomainResponse{
-		Details: object.DomainToChangeDetailsPb(details),
+		ChangeDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 

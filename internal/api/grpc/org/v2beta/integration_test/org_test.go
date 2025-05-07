@@ -177,14 +177,11 @@ func TestServer_CreateOrganization(t *testing.T) {
 			require.NoError(t, err)
 
 			// check details
-			assert.NotZero(t, got.GetDetails().GetSequence())
-			gotCD := got.GetDetails().GetChangeDate().AsTime()
+			gotCD := got.GetCreatedDate().AsTime()
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 
 			// organization id must be the same as the resourceOwner
-			assert.Equal(t, got.GetDetails().GetResourceOwner(), got.GetId())
 
 			// check the admins
 			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
@@ -256,11 +253,9 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			require.NoError(t, err)
 
 			// check details
-			assert.NotZero(t, got.GetDetails().GetSequence())
-			gotCD := got.GetDetails().GetChangeDate().AsTime()
+			gotCD := got.GetChangeDate().AsTime()
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 		})
 	}
 }
@@ -596,11 +591,9 @@ func TestServer_DeleteOrganization(t *testing.T) {
 			require.NoError(t, err)
 
 			// check details
-			assert.NotZero(t, got.GetDetails().GetSequence())
-			gotCD := got.GetDetails().GetChangeDate().AsTime()
+			gotCD := got.GetChangeDate().AsTime()
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 
 			listOrgRes, err := Client.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
 				Queries: []*v2beta_org.OrgQuery{
@@ -664,11 +657,9 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 		Id: orgId,
 	})
 	require.NoError(t, err)
-	assert.NotZero(t, deactivate_res.GetDetails().GetSequence())
-	gotCD := deactivate_res.GetDetails().GetChangeDate().AsTime()
+	gotCD := deactivate_res.GetChangeDate().AsTime()
 	now := time.Now()
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-	assert.NotEmpty(t, deactivate_res.GetDetails().GetResourceOwner())
 
 	// 4. check organization state is deactivated
 	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
@@ -713,11 +704,9 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 		Id: orgId,
 	})
 	require.NoError(t, err)
-	assert.NotZero(t, reactivate_res.GetDetails().GetSequence())
-	gotCD = reactivate_res.GetDetails().GetChangeDate().AsTime()
+	gotCD = reactivate_res.GetChangeDate().AsTime()
 	now = time.Now()
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-	assert.NotEmpty(t, reactivate_res.GetDetails().GetResourceOwner())
 
 	// 8. check organization state is active
 	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
@@ -774,11 +763,9 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 	})
 	require.NoError(t, err)
 	// check details
-	assert.NotZero(t, addOrgDomainRes.GetDetails().GetSequence())
-	gotCD := addOrgDomainRes.GetDetails().GetChangeDate().AsTime()
+	gotCD := addOrgDomainRes.GetCreatedDate().AsTime()
 	now := time.Now()
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-	assert.NotEmpty(t, addOrgDomainRes.GetDetails().GetResourceOwner())
 
 	// 2. check domain is added
 	queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
@@ -802,11 +789,9 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 	// require.NoError(t, err)
 	require.Contains(t, err.Error(), "Errors.Already.Exists")
 	// check details
-	// assert.NotZero(t, addOrgDomainRes.GetDetails().GetSequence())
 	// gotCD = addOrgDomainRes.GetDetails().GetChangeDate().AsTime()
 	// now = time.Now()
 	// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-	// assert.NotEmpty(t, addOrgDomainRes.GetDetails().GetResourceOwner())
 
 	// 4. check domain is added
 	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
@@ -828,11 +813,9 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 	})
 	require.NoError(t, err)
 	// check details
-	assert.NotZero(t, deleteOrgDomainRes.GetDetails().GetSequence())
-	gotCD = deleteOrgDomainRes.GetDetails().GetChangeDate().AsTime()
+	gotCD = deleteOrgDomainRes.GetChangeDate().AsTime()
 	now = time.Now()
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-	assert.NotEmpty(t, deleteOrgDomainRes.GetDetails().GetResourceOwner())
 
 	// 6. check organization domain deleted
 	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
@@ -856,11 +839,9 @@ func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
 	// require.NoError(t, err)
 	require.Contains(t, err.Error(), "Domain doesn't exist on organization")
 	// check details
-	// assert.NotZero(t, deleteOrgDomainRes.GetDetails().GetSequence())
 	// gotCD = deleteOrgDomainRes.GetDetails().GetChangeDate().AsTime()
 	// now = time.Now()
 	// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-	// assert.NotEmpty(t, deleteOrgDomainRes.GetDetails().GetResourceOwner())
 
 	// 8. check organization domain deleted
 	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
@@ -1060,11 +1041,9 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 			require.NoError(t, err)
 
 			// check details
-			assert.NotZero(t, got.GetDetails().GetSequence())
-			gotCD := got.GetDetails().GetChangeDate().AsTime()
+			gotCD := got.GetChangeDate().AsTime()
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 
 			// check metadata
 			listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
