@@ -15,7 +15,6 @@ var (
 
 type ExecutionHandlerStart struct {
 	dbClient *database.DB
-	esClient *eventstore.Eventstore
 }
 
 func (mig *ExecutionHandlerStart) Execute(ctx context.Context, e eventstore.Event) error {
