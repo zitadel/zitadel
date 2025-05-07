@@ -166,7 +166,11 @@
   "signedin": {
     "title": "Welcome {user}!",
     "description": "You are signed in.",
-    "continue": "Continue"
+    "continue": "Continue",
+    "error": {
+      "title": "Error",
+      "description": "An error occurred while trying to sign in."
+    }
   },
   "verify": {
     "userIdMissing": "No userId provided!",
@@ -187,7 +191,29 @@
     "allSetup": "You have already setup an authenticator!",
     "linkWithIDP": "or link with an Identity Provider"
   },
+  "device": {
+    "usercode": {
+      "title": "Device code",
+      "description": "Enter the code displayed on your app or device.",
+      "submit": "Continue"
+    },
+    "request": {
+      "title": "{appName} would like to connect",
+      "description": "{appName} will have access to:",
+      "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
+      "submit": "Allow",
+      "deny": "Deny"
+    },
+    "scope": {
+      "openid": "Verify your identity.",
+      "email": "View your email address.",
+      "profile": "View your full profile information.",
+      "offline_access": "Allow offline access to your account."
+    }
+  },
   "error": {
+    "noUserCode": "No user code provided!",
+    "noDeviceRequest": "No device request found.",
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
     "sessionExpired": "Your current session has expired. Please login again.",
     "failedLoading": "Failed to load data. Please try again.",

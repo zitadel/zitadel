@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { constructUrl } from "./service-url";
 import { isSessionValid } from "./session";
 
-type LoginWithOIDCandSession = {
+type LoginWithOIDCAndSession = {
   serviceUrl: string;
   authRequest: string;
   sessionId: string;
@@ -19,14 +19,14 @@ type LoginWithOIDCandSession = {
   sessionCookies: Cookie[];
   request: NextRequest;
 };
-export async function loginWithOIDCandSession({
+export async function loginWithOIDCAndSession({
   serviceUrl,
   authRequest,
   sessionId,
   sessions,
   sessionCookies,
   request,
-}: LoginWithOIDCandSession) {
+}: LoginWithOIDCAndSession) {
   console.log(
     `Login with session: ${sessionId} and authRequest: ${authRequest}`,
   );
