@@ -1,6 +1,6 @@
 import { DeviceCodeForm } from "@/components/device-code-form";
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
