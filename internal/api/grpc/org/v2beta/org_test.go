@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
@@ -146,12 +145,8 @@ func Test_createdOrganizationToPb(t *testing.T) {
 				},
 			},
 			want: &org.CreateOrganizationResponse{
-				Details: &object.Details{
-					Sequence:      1,
-					ChangeDate:    timestamppb.New(now),
-					ResourceOwner: "orgID",
-				},
-				Id: "orgID",
+				CreatedDate: timestamppb.New(now),
+				Id:          "orgID",
 				CreatedAdmins: []*org.CreateOrganizationResponse_CreatedAdmin{
 					{
 						UserId:    "id",
