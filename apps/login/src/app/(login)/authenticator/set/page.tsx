@@ -5,7 +5,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getActiveIdentityProviders,
@@ -33,8 +33,8 @@ export default async function Page(props: {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionWithData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
   async function getAuthMethodsAndUser(
     serviceUrl: string,
@@ -67,7 +67,6 @@ export default async function Page(props: {
   }
 
   async function loadSessionByLoginname(
-    host: string,
     loginName?: string,
     organization?: string,
   ) {
@@ -82,11 +81,7 @@ export default async function Page(props: {
     });
   }
 
-  async function loadSessionById(
-    host: string,
-    sessionId: string,
-    organization?: string,
-  ) {
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,

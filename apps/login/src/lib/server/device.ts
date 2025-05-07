@@ -2,7 +2,7 @@
 
 import { authorizeOrDenyDeviceAuthorization } from "@/lib/zitadel";
 import { headers } from "next/headers";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 
 export async function completeDeviceAuthorization(
   deviceAuthorizationId: string,

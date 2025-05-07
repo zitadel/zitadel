@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getServiceUrlFromHeaders } from "./lib/service";
+import { DEFAULT_CSP } from "../constants/csp";
+import { getServiceUrlFromHeaders } from "./lib/service-url";
 
 export const config = {
   matcher: [
@@ -22,6 +23,20 @@ export async function middleware(request: NextRequest) {
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
+  // Call the /security route handler
+  // TODO check this on cloud run deployment
+  const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
+
+  if (!securityResponse.ok) {
+    console.error(
+      "Failed to fetch security settings:",
+      securityResponse.statusText,
+    );
+    return NextResponse.next(); // Fallback if the request fails
+  }
+
+  const { settings: securitySettings } = await securityResponse.json();
+
   const instanceHost = `${serviceUrl}`
     .replace("https://", "")
     .replace("http://", "");
@@ -39,7 +54,17 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
+  if (securitySettings?.embeddedIframe?.enabled) {
+    securitySettings.embeddedIframe.allowedOrigins;
+    responseHeaders.set(
+      "Content-Security-Policy",
+      `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+    );
+    responseHeaders.delete("X-Frame-Options");
+  }
+
   request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
+
   return NextResponse.rewrite(request.nextUrl, {
     request: {
       headers: requestHeaders,

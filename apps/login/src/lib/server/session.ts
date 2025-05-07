@@ -4,6 +4,7 @@ import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   deleteSession,
   getLoginSettings,
+  getSecuritySettings,
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
@@ -19,7 +20,7 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -209,8 +210,11 @@ export async function clearSession(options: ClearSessionOptions) {
     sessionToken: session.token,
   });
 
+  const securitySettings = await getSecuritySettings({ serviceUrl });
+  const sameSite = securitySettings?.embeddedIframe?.enabled ? "none" : true;
+
   if (deletedSession) {
-    return removeSessionFromCookie(session);
+    return removeSessionFromCookie({ session, sameSite });
   }
 }
 
@@ -230,9 +234,12 @@ export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
     sessionToken: sessionCookie.token,
   });
 
+  const securitySettings = await getSecuritySettings({ serviceUrl });
+  const sameSite = securitySettings?.embeddedIframe?.enabled ? "none" : true;
+
   if (!deleteResponse) {
     throw new Error("Could not delete session");
   }
 
-  return removeSessionFromCookie(sessionCookie);
+  return removeSessionFromCookie({ session: sessionCookie, sameSite });
 }

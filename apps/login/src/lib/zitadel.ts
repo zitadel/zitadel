@@ -92,6 +92,21 @@ export async function getLoginSettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
+export async function getSecuritySettings({
+  serviceUrl,
+}: {
+  serviceUrl: string;
+}) {
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, serviceUrl);
+
+  const callback = settingsService
+    .getSecuritySettings({})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
 export async function getLockoutSettings({
   serviceUrl,
   orgId,

@@ -6,7 +6,7 @@ import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getSessionCookieById } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 
 type RegisterU2FCommand = {
   sessionId: string;

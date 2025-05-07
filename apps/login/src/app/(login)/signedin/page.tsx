@@ -7,7 +7,7 @@ import {
   getSessionCookieById,
 } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,

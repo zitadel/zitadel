@@ -5,7 +5,7 @@ import { create } from "@zitadel/client";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { NextRequest, NextResponse } from "next/server";
-import { constructUrl } from "./service";
+import { constructUrl } from "./service-url";
 import { isSessionValid } from "./session";
 
 type LoginWithSAMLAndSession = {

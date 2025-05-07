@@ -13,7 +13,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 import { getLoginSettings } from "../zitadel";
 
 export type SetOTPCommand = {

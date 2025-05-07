@@ -8,6 +8,13 @@
   },
   {
     "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetSecuritySettings",
+    "out": {
+      "data": {}
+    }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
     "method": "GetLegalAndSupportSettings",
     "out": {
       "data": {
