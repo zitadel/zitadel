@@ -73,11 +73,11 @@ func (c *Commands) ResendInviteCode(ctx context.Context, userID, resourceOwner, 
 	if err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingCode.ResourceOwner, userID); err != nil {
-		return nil, err
-	}
 	if !existingCode.UserState.Exists() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-H3b2a", "Errors.User.NotFound")
+	}
+	if err := c.checkPermissionUpdateUser(ctx, existingCode.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if !existingCode.CreationAllowed() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Gg42s", "Errors.User.AlreadyInitialised")
