@@ -12,10 +12,10 @@ import (
 
 type PermissionCheck func(resourceOwner, aggregateID string) error
 
-func (c *Commands) NewPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
+func (c *Commands) newPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
 		if aggregateID == "" {
-			return zerrors.ThrowInternal(nil, "COMMAND-ulBlS", "aggregate ID is empty")
+			return zerrors.ThrowInternal(nil, "COMMAND-ulBlS", "Errors.IDMissing")
 		}
 		// For example if a write model didn't query any events, the resource owner is probably empty.
 		// In this case, we have to query an event on the given aggregate to get the resource owner.
@@ -28,41 +28,33 @@ func (c *Commands) NewPermissionCheck(ctx context.Context, permission string, ag
 			resourceOwner = r.resourceOwner
 		}
 		if resourceOwner == "" {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-4g3xq", "Errors.ResourceOwnerMissing")
+			return zerrors.ThrowNotFound(nil, "COMMAND-4g3xq", "Errors.NotFound")
 		}
 		return c.checkPermission(ctx, permission, resourceOwner, aggregateID)
 	}
 }
 
-func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string, allowSelf bool) PermissionCheck {
+func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
-		if allowSelf && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
+		if aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
 			return nil
 		}
-		return c.NewPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
+		return c.newPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
 	}
 }
 
-func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context, allowSelf bool) PermissionCheck {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite, allowSelf)
+func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context) PermissionCheck {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite)
 }
 
-func (c *Commands) NewPermissionCheckUserDelete(ctx context.Context, allowSelf bool) PermissionCheck {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, allowSelf)
+func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete)(resourceOwner, userID)
 }
 
-// Deprecated: use NewPermissionCheckUserWrite to protect an API.
 func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.NewPermissionCheckUserWrite(ctx, true)(resourceOwner, userID)
+	return c.NewPermissionCheckUserWrite(ctx)(resourceOwner, userID)
 }
 
-// Deprecated: use NewPermissionCheck to protect an API.
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite)(resourceOwner, userID)
 }
