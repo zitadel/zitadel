@@ -44,7 +44,7 @@ export class ActionTwoAddTargetDialogComponent {
       ActionTwoAddTargetDialogComponent,
       MessageInitShape<typeof CreateTargetRequestSchema | typeof UpdateTargetRequestSchema>
     >,
-    @Inject(MAT_DIALOG_DATA) private readonly data: { target?: Target },
+    @Inject(MAT_DIALOG_DATA) public readonly data: { target?: Target },
   ) {
     this.targetForm = this.buildTargetForm();
 
