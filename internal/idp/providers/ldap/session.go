@@ -133,7 +133,6 @@ func tryBind(
 		username,
 		password,
 		timeout,
-		rootCA,
 	)
 }
 
@@ -189,7 +188,6 @@ func trySearchAndUserBind(
 	username string,
 	password string,
 	timeout time.Duration,
-	rootCA []byte,
 ) (*ldap.Entry, error) {
 	searchQuery := queriesAndToSearchQuery(
 		objectClassesToSearchQuery(objectClasses),
