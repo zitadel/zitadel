@@ -580,7 +580,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
 
-	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, redirectURIImplicit, loginV2)
+	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
 
 	type want struct {
@@ -893,7 +893,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
 
-	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, redirectURIImplicit, loginV2)
+	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
 
 	type want struct {
@@ -1255,10 +1255,9 @@ func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding stri
 }
 
 func createSAMLApplication(ctx context.Context, t *testing.T, instance *integration.Instance, idpMetadata *saml.EntityDescriptor, binding string, projectRoleCheck, hasProjectCheck bool) (string, string, *samlsp.Middleware) {
-	project, err := instance.CreateProjectWithPermissionCheck(ctx, projectRoleCheck, hasProjectCheck)
-	require.NoError(t, err)
+	project := instance.CreateProject(ctx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), projectRoleCheck, hasProjectCheck)
 	rootURL, sp := createSAMLSP(t, idpMetadata, binding)
-	_, err = instance.CreateSAMLClient(ctx, project.GetId(), sp)
+	_, err := instance.CreateSAMLClient(ctx, project.GetId(), sp)
 	require.NoError(t, err)
 	return project.GetId(), rootURL, sp
 }
