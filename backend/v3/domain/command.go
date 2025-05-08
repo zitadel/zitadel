@@ -2,12 +2,14 @@ package domain
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
+	fmt.Stringer
 }
 
 type Invoker interface {
@@ -93,13 +95,28 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 	}
 }
 
-type noopInvoker struct {
-	next Invoker
+type commandBatch struct {
+	Commands []Commander
 }
 
-func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) error {
-	if i.next != nil {
-		return i.next.Invoke(ctx, command, opts)
+func BatchCommands(cmds ...Commander) *commandBatch {
+	return &commandBatch{
+		Commands: cmds,
 	}
-	return command.Execute(ctx, opts)
 }
+
+// String implements [Commander].
+func (cmd *commandBatch) String() string {
+	return "commandBatch"
+}
+
+func (b *commandBatch) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+	for _, cmd := range b.Commands {
+		if err = opts.Invoke(ctx, cmd); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+var _ Commander = (*commandBatch)(nil)

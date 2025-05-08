@@ -31,6 +31,11 @@ func NewSetEmailCommand(userID, email string, verificationType SetEmailOpt) *Set
 	return cmd
 }
 
+// String implements [Commander].
+func (cmd *SetEmailCommand) String() string {
+	return "SetEmailCommand"
+}
+
 func (cmd *SetEmailCommand) Execute(ctx context.Context, opts *CommandOpts) error {
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {

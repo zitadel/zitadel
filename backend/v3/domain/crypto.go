@@ -15,6 +15,11 @@ type CryptoRepository interface {
 	GetEncryptionConfig(ctx context.Context) (*crypto.GeneratorConfig, error)
 }
 
+// String implements [Commander].
+func (cmd *generateCodeCommand) String() string {
+	return "generateCodeCommand"
+}
+
 func (cmd *generateCodeCommand) Execute(ctx context.Context, opts *CommandOpts) error {
 	config, err := cryptoRepo(opts.DB).GetEncryptionConfig(ctx)
 	if err != nil {
@@ -24,3 +29,5 @@ func (cmd *generateCodeCommand) Execute(ctx context.Context, opts *CommandOpts) 
 	cmd.value, cmd.code, err = crypto.NewCode(generator)
 	return err
 }
+
+var _ Commander = (*generateCodeCommand)(nil)

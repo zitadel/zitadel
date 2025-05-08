@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -25,12 +26,14 @@ func OrgRepository(client database.QueryExecutor) domain.OrgRepository {
 
 // Create implements [domain.OrgRepository].
 func (o *org) Create(ctx context.Context, org *domain.Org) error {
-	panic("unimplemented")
+	org.CreatedAt = time.Now()
+	org.UpdatedAt = org.CreatedAt
+	return nil
 }
 
 // Delete implements [domain.OrgRepository].
 func (o *org) Delete(ctx context.Context, condition database.Condition) error {
-	panic("unimplemented")
+	return nil
 }
 
 // Get implements [domain.OrgRepository].

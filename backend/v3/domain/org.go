@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/cache"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -23,6 +24,23 @@ type Org struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
+type orgCacheIndex uint8
+
+const (
+	orgCacheIndexUndefined orgCacheIndex = iota
+	orgCacheIndexID
+)
+
+// Keys implements [cache.Entry].
+func (o *Org) Keys(index orgCacheIndex) (key []string) {
+	if index == orgCacheIndexID {
+		return []string{o.ID}
+	}
+	return nil
+}
+
+var _ cache.Entry[orgCacheIndex, string] = (*Org)(nil)
 
 type orgColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.

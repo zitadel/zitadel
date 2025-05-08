@@ -19,6 +19,11 @@ func NewAddOrgCommand(name string, admins ...*AddMemberCommand) *AddOrgCommand {
 	}
 }
 
+// String implements [Commander].
+func (cmd *AddOrgCommand) String() string {
+	return "AddOrgCommand"
+}
+
 // Execute implements Commander.
 func (cmd *AddOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	if len(cmd.Admins) == 0 {
@@ -47,6 +52,11 @@ func (cmd *AddOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 			return err
 		}
 	}
+
+	orgCache.Set(ctx, &Org{
+		ID:   cmd.ID,
+		Name: cmd.Name,
+	})
 
 	return nil
 }
@@ -80,6 +90,18 @@ type AddMemberCommand struct {
 	orgID  string
 	UserID string   `json:"userId"`
 	Roles  []string `json:"roles"`
+}
+
+func NewAddMemberCommand(userID string, roles ...string) *AddMemberCommand {
+	return &AddMemberCommand{
+		UserID: userID,
+		Roles:  roles,
+	}
+}
+
+// String implements [Commander].
+func (cmd *AddMemberCommand) String() string {
+	return "AddMemberCommand"
 }
 
 // Execute implements Commander.

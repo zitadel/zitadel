@@ -12,17 +12,17 @@ type orgMember struct {
 
 // AddMember implements [domain.MemberRepository].
 func (o *orgMember) AddMember(ctx context.Context, orgID string, userID string, roles []string) error {
-	panic("unimplemented")
+	return nil
 }
 
 // RemoveMember implements [domain.MemberRepository].
 func (o *orgMember) RemoveMember(ctx context.Context, orgID string, userID string) error {
-	panic("unimplemented")
+	return nil
 }
 
 // SetMemberRoles implements [domain.MemberRepository].
 func (o *orgMember) SetMemberRoles(ctx context.Context, orgID string, userID string, roles []string) error {
-	panic("unimplemented")
+	return nil
 }
 
 var _ domain.MemberRepository = (*orgMember)(nil)

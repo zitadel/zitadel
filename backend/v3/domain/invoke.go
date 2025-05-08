@@ -7,12 +7,11 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
-var defaultInvoker = newEventStoreInvoker(newTraceInvoker(nil))
-
 func Invoke(ctx context.Context, cmd Commander) error {
-	invoker := newEventStoreInvoker(newTraceInvoker(nil))
+	invoker := newEventStoreInvoker(newLoggingInvoker(newTraceInvoker(nil)))
 	opts := &CommandOpts{
 		Invoker: invoker.collector,
+		DB:      pool,
 	}
 	return invoker.Invoke(ctx, cmd, opts)
 }
@@ -60,14 +59,9 @@ func (i *eventCollector) Invoke(ctx context.Context, command Commander, opts *Co
 		i.events = append(i.events, e.Events()...)
 	}
 	if i.next != nil {
-		err = i.next.Invoke(ctx, command, opts)
-	} else {
-		err = command.Execute(ctx, opts)
+		return i.next.Invoke(ctx, command, opts)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return command.Execute(ctx, opts)
 }
 
 type traceInvoker struct {
@@ -80,15 +74,71 @@ func newTraceInvoker(next Invoker) *traceInvoker {
 
 func (i *traceInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
 	ctx, span := tracer.Start(ctx, fmt.Sprintf("%T", command))
-	defer span.End()
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+		}
+		span.End()
+	}()
+
+	if i.next != nil {
+		return i.next.Invoke(ctx, command, opts)
+	}
+	return command.Execute(ctx, opts)
+}
+
+type loggingInvoker struct {
+	next Invoker
+}
+
+func newLoggingInvoker(next Invoker) *loggingInvoker {
+	return &loggingInvoker{next: next}
+}
+
+func (i *loggingInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
+	logger.InfoContext(ctx, "Invoking command", "command", command.String())
 
 	if i.next != nil {
 		err = i.next.Invoke(ctx, command, opts)
 	} else {
 		err = command.Execute(ctx, opts)
 	}
+
 	if err != nil {
-		span.RecordError(err)
+		logger.ErrorContext(ctx, "Command invocation failed", "command", command.String(), "error", err)
+		return err
+	}
+	logger.InfoContext(ctx, "Command invocation succeeded", "command", command.String())
+	return nil
+}
+
+type noopInvoker struct {
+	next Invoker
+}
+
+func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) error {
+	if i.next != nil {
+		return i.next.Invoke(ctx, command, opts)
+	}
+	return command.Execute(ctx, opts)
+}
+
+type cacheInvoker struct {
+	next Invoker
+}
+
+type cacher interface {
+	Cache(opts *CommandOpts)
+}
+
+func (i *cacheInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
+	if c, ok := command.(cacher); ok {
+		c.Cache(opts)
+	}
+	if i.next != nil {
+		err = i.next.Invoke(ctx, command, opts)
+	} else {
+		err = command.Execute(ctx, opts)
 	}
 	return err
 }

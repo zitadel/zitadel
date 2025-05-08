@@ -19,6 +19,11 @@ func NewEmailVerifiedCommand(userID string, isVerified bool) *EmailVerifiedComma
 	}
 }
 
+// String implements [Commander].
+func (cmd *EmailVerifiedCommand) String() string {
+	return "EmailVerifiedCommand"
+}
+
 var (
 	_ Commander   = (*EmailVerifiedCommand)(nil)
 	_ SetEmailOpt = (*EmailVerifiedCommand)(nil)
@@ -55,6 +60,11 @@ func NewSendCodeCommand(userID string, urlTemplate *string) *SendCodeCommand {
 		generator:   &generateCodeCommand{},
 		URLTemplate: urlTemplate,
 	}
+}
+
+// String implements [Commander].
+func (cmd *SendCodeCommand) String() string {
+	return "SendCodeCommand"
 }
 
 // Execute implements [Commander]
@@ -120,6 +130,11 @@ func NewReturnCodeCommand(userID string) *ReturnCodeCommand {
 		UserID:    userID,
 		generator: &generateCodeCommand{},
 	}
+}
+
+// String implements [Commander].
+func (cmd *ReturnCodeCommand) String() string {
+	return "ReturnCodeCommand"
 }
 
 // Execute implements [Commander]

@@ -30,9 +30,21 @@ func NewCreateHumanCommand(username string, opts ...CreateHumanOpt) *CreateUserC
 	return cmd
 }
 
+// String implements [Commander].
+func (cmd *CreateUserCommand) String() string {
+	return "CreateUserCommand"
+}
+
 // Events implements [eventer].
 func (c *CreateUserCommand) Events() []*eventstore.Event {
-	panic("unimplemented")
+	return []*eventstore.Event{
+		{
+			AggregateType: "user",
+			AggregateID:   c.user.ID,
+			Type:          "user.added",
+			Payload:       c.user,
+		},
+	}
 }
 
 // Execute implements [Commander].

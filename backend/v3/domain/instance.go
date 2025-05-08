@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/cache"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -15,11 +16,22 @@ type Instance struct {
 	DeletedAt time.Time `json:"-"`
 }
 
+type instanceCacheIndex uint8
+
+const (
+	instanceCacheIndexUndefined instanceCacheIndex = iota
+	instanceCacheIndexID
+)
+
 // Keys implements the [cache.Entry].
-func (i *Instance) Keys(index string) (key []string) {
-	// TODO: Return the correct keys for the instance cache, e.g., i.ID, i.Domain
-	return []string{}
+func (i *Instance) Keys(index instanceCacheIndex) (key []string) {
+	if index == instanceCacheIndexID {
+		return []string{i.ID}
+	}
+	return nil
 }
+
+var _ cache.Entry[instanceCacheIndex, string] = (*Instance)(nil)
 
 type instanceColumns interface {
 	// IDColumn returns the column for the id field.
