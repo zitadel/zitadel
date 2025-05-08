@@ -653,7 +653,7 @@ SystemDefaults:
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
     Hasher:
-      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
@@ -664,10 +664,11 @@ SystemDefaults:
       Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
       # Threads takes effect for the algorithms argon2i and argon2id
       Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
-      # Rounds takes effect for the algorithm pbkdf2
+      # Rounds takes effect for the algorithm pbkdf2 and sha2
       Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
-      # Hash takes effect for the algorithm pbkdf2
-      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      # Hash takes effect for the algorithm pbkdf2 and sha2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
+      # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
@@ -689,6 +690,8 @@ SystemDefaults:
     #   - "md5"      # md5Crypt with salt and password shuffling.
     #   - "md5plain" # md5 digest of a password without salt
     #   - "md5salted" # md5 digest of a salted password
+    #   - "phpass"
+    #   - "sha2" # crypt(3) SHA-256 and SHA-512
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:

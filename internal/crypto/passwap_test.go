@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/passwap/md5salted"
 	"github.com/zitadel/passwap/pbkdf2"
 	"github.com/zitadel/passwap/scrypt"
+	"github.com/zitadel/passwap/sha2"
 )
 
 func TestPasswordHasher_EncodingSupported(t *testing.T) {
@@ -78,7 +79,9 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 					HashNameBcrypt,
 					HashNameMd5,
 					HashNameMd5Salted,
+					HashNamePHPass,
 					HashNameScrypt,
+					HashNameSha2,
 					"foobar",
 				},
 				Hasher: HasherConfig{
@@ -138,6 +141,15 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 			fields: fields{
 				Hasher: HasherConfig{
 					Algorithm: HashNameMd5Salted,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid phpass",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePHPass,
 				},
 			},
 			wantErr: true,
@@ -356,6 +368,59 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted},
 			},
 			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix, md5salted.Prefix},
+		},
+		{
+			name: "sha2, parse error",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameSha2,
+					Params: map[string]any{
+						"cost": "bar",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "pbkdf2, hash mode error",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameSha2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   "foo",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "sha2, sha256",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameSha2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   HashModeSHA256,
+					},
+				},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain},
+			},
+			wantPrefixes: []string{sha2.Sha256Identifier, sha2.Sha512Identifier, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+		},
+		{
+			name: "sha2, sha512",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameSha2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   HashModeSHA512,
+					},
+				},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5, HashNameMd5Plain},
+			},
+			wantPrefixes: []string{sha2.Sha256Identifier, sha2.Sha512Identifier, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
 		},
 	}
 	for _, tt := range tests {
@@ -720,6 +785,96 @@ func TestHasherConfig_pbkdf2Params(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantP, gotP)
 			assert.Equal(t, tt.wantHash, gotHash)
+		})
+	}
+}
+
+func TestHasherConfig_sha2Params(t *testing.T) {
+	type fields struct {
+		Params map[string]any
+	}
+	tests := []struct {
+		name       string
+		fields     fields
+		want512    bool
+		wantRounds int
+		wantErr    bool
+	}{
+		{
+			name: "decode error",
+			fields: fields{
+				Params: map[string]any{
+					"foo": "bar",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "sha1",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha1",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "sha224",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha224",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "sha256",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 5000,
+					"Hash":   "sha256",
+				},
+			},
+			want512:    false,
+			wantRounds: 5000,
+		},
+		{
+			name: "sha384",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha384",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "sha512",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 15000,
+					"Hash":   "sha512",
+				},
+			},
+			want512:    true,
+			wantRounds: 15000,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &HasherConfig{
+				Params: tt.fields.Params,
+			}
+			got512, gotRounds, err := c.sha2Params()
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want512, got512)
+			assert.Equal(t, tt.wantRounds, gotRounds)
 		})
 	}
 }
