@@ -191,14 +191,6 @@
               </cnsl-card>
             </ng-container>
 
-            <ng-container *ngIf="currentSetting$().id === 'groups'">
-              <cnsl-card *ngIf="user.userId" title="{{ 'USER.GROUPS.TITLE' | translate }}">
-                <cnsl-user-groups [userId]="user.userId" [canWrite$]="['user.write$'] | hasRole"
-                  [canDelete$]="['user.delete$'] | hasRole">
-                </cnsl-user-groups>
-              </cnsl-card>
-            </ng-container>
-
             <ng-container *ngIf="currentSetting$().id === 'metadata' && (metadata$ | async) as metadataQuery">
               <cnsl-metadata *ngIf="user.userId && metadataQuery.state !== 'error'" [metadata]="metadataQuery.value"
                 [description]="

@@ -1,11 +1,13 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { PageEvent } from '@angular/material/paginator';
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { take } from 'rxjs/operators';
+import { take, filter, map, startWith } from 'rxjs/operators';
+import { Observable, of, shareReplay } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
@@ -20,6 +22,9 @@ import { LanguagesService } from '../../../../services/languages.service';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 import { GroupMemberCreateDialogComponent } from 'src/app/modules/add-group-member-dialog/group-member-create-dialog.component';
 import { GroupMembersDataSource } from './group-members-datasource';
+
+const MEMBERS: SidenavSetting = { id: 'members', i18nKey: 'GROUP.SETTINGS.MEMBERS' };
+const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'GROUP.SETTINGS.GROUPGRANTS' };
 
 @Component({
   selector: 'cnsl-group-detail',
@@ -36,11 +41,8 @@ export class GroupDetailComponent implements OnInit {
   public ChangeType: any = ChangeType;
 
   public changePage: EventEmitter<void> = new EventEmitter();
-  public settingsList: SidenavSetting[] = [
-    { id: 'members', i18nKey: 'GROUP.SETTINGS.MEMBERS' },
-    { id: 'grants', i18nKey: 'GROUP.SETTINGS.GROUPGRANTS' },
-  ];
-  public currentSetting: string | undefined = this.settingsList[0].id;
+  public currentSetting$ = signal<SidenavSetting>(MEMBERS);
+  public settingsList$: Observable<SidenavSetting[]> = of([]);
   public GROUPGRANTCONTEXT: GroupGrantContext = GroupGrantContext.GROUP;
 
   public error: string = '';
@@ -62,13 +64,8 @@ export class GroupDetailComponent implements OnInit {
     private mediaMatcher: MediaMatcher,
     public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
+    private readonly destroyRef: DestroyRef,
   ) {
-    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
-      const { key } = params;
-      if (key) {
-        this.currentSetting = key;
-      }
-    });
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
         type: BreadcrumbType.ORG,
@@ -80,8 +77,15 @@ export class GroupDetailComponent implements OnInit {
       this.groupId = params['id'];
       this.loadMembers();
     });
+
+    this.settingsList$ = this.getSettingsList$().pipe(
+      shareReplay({ refCount: true, bufferSize: 1 })
+    );
   }
 
+  private getSettingsList$(): Observable<SidenavSetting[]> {
+    return of([MEMBERS, GRANTS]);
+  }
 
   refreshGroup(): void {
     this.changePage.emit();
@@ -106,7 +110,16 @@ export class GroupDetailComponent implements OnInit {
 
   public ngOnInit(): void {
     const groupId = this.route.snapshot.paramMap.get('id');
+    const param = this.route.snapshot.queryParamMap.get('id');
     this.refreshGroup();
+    this.settingsList$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((settings) => settings.find(({ id }) => id === param)),
+        filter(Boolean),
+        take(1),
+      )
+      .subscribe((setting) => this.currentSetting$.set(setting));
   }
 
   public changeState(newState: GroupState): void {
