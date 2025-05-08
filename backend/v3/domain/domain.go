@@ -11,6 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 )
 
+// The variables could also be moved to a struct.
+// I just started with the singleton pattern and kept it like this.
 var (
 	pool              database.Pool
 	userCodeAlgorithm crypto.EncryptionAlgorithm

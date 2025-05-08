@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
 )
 
+// These tests give an overview of how to use the domain package.
 func TestExample(t *testing.T) {
 	ctx := context.Background()
 

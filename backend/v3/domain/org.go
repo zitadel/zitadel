@@ -15,6 +15,7 @@ const (
 	OrgStateInactive
 )
 
+// Org is used by all other packages to represent an organization.
 type Org struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
@@ -42,6 +43,7 @@ func (o *Org) Keys(index orgCacheIndex) (key []string) {
 
 var _ cache.Entry[orgCacheIndex, string] = (*Org)(nil)
 
+// orgColumns define all the columns of the org table.
 type orgColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
 	InstanceIDColumn() database.Column
@@ -59,6 +61,7 @@ type orgColumns interface {
 	DeletedAtColumn() database.Column
 }
 
+// orgConditions define all the conditions for the org table.
 type orgConditions interface {
 	// InstanceIDCondition returns an equal filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
@@ -70,6 +73,7 @@ type orgConditions interface {
 	StateCondition(op database.NumberOperation, state OrgState) database.Condition
 }
 
+// orgChanges define all the changes for the org table.
 type orgChanges interface {
 	// SetName sets the name column.
 	SetName(name string) database.Change
@@ -77,12 +81,14 @@ type orgChanges interface {
 	SetState(state OrgState) database.Change
 }
 
+// OrgRepository is the interface for the org repository.
+// It is used to interact with the org table in the database.
 type OrgRepository interface {
 	orgColumns
 	orgConditions
 	orgChanges
 
-	// Member returns the admin repository.
+	// Member returns the member repository.
 	Member() MemberRepository
 	// Domain returns the domain repository.
 	Domain() DomainRepository
@@ -99,19 +105,14 @@ type OrgRepository interface {
 	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
 }
 
-type OrgOperation interface {
-	MemberRepository
-	DomainRepository
-	Update(ctx context.Context, org *Org) error
-	Delete(ctx context.Context) error
-}
-
+// MemberRepository is a sub repository of the org repository and maybe the instance repository.
 type MemberRepository interface {
 	AddMember(ctx context.Context, orgID, userID string, roles []string) error
 	SetMemberRoles(ctx context.Context, orgID, userID string, roles []string) error
 	RemoveMember(ctx context.Context, orgID, userID string) error
 }
 
+// DomainRepository is a sub repository of the org repository and maybe the instance repository.
 type DomainRepository interface {
 	AddDomain(ctx context.Context, domain string) error
 	SetDomainVerified(ctx context.Context, domain string) error

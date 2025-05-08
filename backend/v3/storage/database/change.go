@@ -1,5 +1,7 @@
 package database
 
+// Change represents a change to a column in a database table.
+// Its written in the SET clause of an UPDATE statement.
 type Change interface {
 	Write(builder *StatementBuilder)
 }

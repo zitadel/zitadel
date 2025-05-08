@@ -6,6 +6,10 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
+// CreateUserCommand adds a new user including the email verification for humans.
+// In the future it might make sense to separate the command into two commands:
+// - CreateHumanCommand: creates a new human user
+// - CreateMachineCommand: creates a new machine user
 type CreateUserCommand struct {
 	user  *User
 	email *SetEmailCommand
@@ -16,6 +20,7 @@ var (
 	_ eventer   = (*CreateUserCommand)(nil)
 )
 
+// opts heavily reduces the complexity for email verification because each type of verification is a simple option which implements the [Commander] interface.
 func NewCreateHumanCommand(username string, opts ...CreateHumanOpt) *CreateUserCommand {
 	cmd := &CreateUserCommand{
 		user: &User{

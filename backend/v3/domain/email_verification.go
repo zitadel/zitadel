@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// EmailVerifiedCommand verifies an email address for a user.
 type EmailVerifiedCommand struct {
 	UserID string `json:"userId"`
 	Email  *Email `json:"email"`
@@ -42,6 +43,8 @@ func (cmd *EmailVerifiedCommand) applyOnSetEmail(setEmailCmd *SetEmailCommand) {
 	setEmailCmd.verification = cmd
 }
 
+// SendCodeCommand sends a verification code to the user's email address.
+// If the URLTemplate is not set it will use the default of the organization / instance.
 type SendCodeCommand struct {
 	UserID      string  `json:"userId"`
 	Email       string  `json:"email"`
@@ -113,6 +116,8 @@ func (cmd *SendCodeCommand) applyOnSetEmail(setEmailCmd *SetEmailCommand) {
 	setEmailCmd.verification = cmd
 }
 
+// ReturnCodeCommand creates the code and returns it to the caller.
+// The caller gets the code by calling the Code field after the command got executed.
 type ReturnCodeCommand struct {
 	UserID    string `json:"userId"`
 	Email     string `json:"email"`

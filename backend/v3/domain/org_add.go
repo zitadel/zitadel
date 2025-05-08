@@ -6,6 +6,8 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
+// AddOrgCommand adds a new organization.
+// I'm unsure if we should add the Admins here or if this should be a separate command.
 type AddOrgCommand struct {
 	ID     string              `json:"id"`
 	Name   string              `json:"name"`
@@ -86,6 +88,8 @@ func (cmd *AddOrgCommand) ensureID() (err error) {
 	return err
 }
 
+// AddMemberCommand adds a new member to an organization.
+// I'm not sure if we should make it more generic to also use it for instances.
 type AddMemberCommand struct {
 	orgID  string
 	UserID string   `json:"userId"`

@@ -18,6 +18,7 @@ type Text interface {
 	~string | ~[]byte
 }
 
+// TextOperation are operations that can be performed on text values.
 type TextOperation uint8
 
 const (
@@ -89,6 +90,7 @@ type Number interface {
 	constraints.Integer | constraints.Float | constraints.Complex | time.Time | time.Duration
 }
 
+// NumberOperation are operations that can be performed on number values.
 type NumberOperation uint8
 
 const (
@@ -125,6 +127,7 @@ type Boolean interface {
 	~bool
 }
 
+// BooleanOperation are operations that can be performed on boolean values.
 type BooleanOperation uint8
 
 const (

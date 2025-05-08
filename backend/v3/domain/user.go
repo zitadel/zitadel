@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+// userColumns define all the columns of the user table.
 type userColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
 	InstanceIDColumn() database.Column
@@ -24,6 +25,7 @@ type userColumns interface {
 	DeletedAtColumn() database.Column
 }
 
+// userConditions define all the conditions for the user table.
 type userConditions interface {
 	// InstanceIDCondition returns an equal filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
@@ -43,11 +45,13 @@ type userConditions interface {
 	DeletedAtCondition(op database.NumberOperation, deletedAt time.Time) database.Condition
 }
 
+// userChanges define all the changes for the user table.
 type userChanges interface {
 	// SetUsername sets the username column.
 	SetUsername(username string) database.Change
 }
 
+// UserRepository is the interface for the user repository.
 type UserRepository interface {
 	userColumns
 	userConditions
@@ -66,6 +70,7 @@ type UserRepository interface {
 	Machine() MachineRepository
 }
 
+// humanColumns define all the columns of the human table which inherits the user table.
 type humanColumns interface {
 	userColumns
 	// FirstNameColumn returns the column for the first name field.
@@ -82,6 +87,7 @@ type humanColumns interface {
 	PhoneVerifiedAtColumn() database.Column
 }
 
+// humanConditions define all the conditions for the human table which inherits the user table.
 type humanConditions interface {
 	userConditions
 	// FirstNameCondition returns a filter on the first name field.
@@ -103,6 +109,7 @@ type humanConditions interface {
 	PhoneVerifiedAtCondition(op database.NumberOperation, phoneVerifiedAt time.Time) database.Condition
 }
 
+// humanChanges define all the changes for the human table which inherits the user table.
 type humanChanges interface {
 	userChanges
 	// SetFirstName sets the first name field of the human.
@@ -129,6 +136,7 @@ type humanChanges interface {
 	SetPhoneVerifiedAt(at time.Time) database.Change
 }
 
+// HumanRepository is the interface for the human repository it inherits the user repository.
 type HumanRepository interface {
 	humanColumns
 	humanConditions
@@ -140,24 +148,28 @@ type HumanRepository interface {
 	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
 }
 
+// machineColumns define all the columns of the machine table which inherits the user table.
 type machineColumns interface {
 	userColumns
 	// DescriptionColumn returns the column for the description field.
 	DescriptionColumn() database.Column
 }
 
+// machineConditions define all the conditions for the machine table which inherits the user table.
 type machineConditions interface {
 	userConditions
 	// DescriptionCondition returns a filter on the description field.
 	DescriptionCondition(op database.TextOperation, description string) database.Condition
 }
 
+// machineChanges define all the changes for the machine table which inherits the user table.
 type machineChanges interface {
 	userChanges
 	// SetDescription sets the description field of the machine.
 	SetDescription(description string) database.Change
 }
 
+// MachineRepository is the interface for the machine repository it inherits the user repository.
 type MachineRepository interface {
 	// Update updates machine users based on the given condition and changes.
 	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
@@ -167,6 +179,7 @@ type MachineRepository interface {
 	machineChanges
 }
 
+// UserTraits is implemented by [Human] and [Machine].
 type UserTraits interface {
 	Type() UserType
 }

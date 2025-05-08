@@ -12,6 +12,7 @@ func (m Columns) Write(builder *StatementBuilder) {
 	}
 }
 
+// Column represents a column in a database table.
 type Column interface {
 	Write(builder *StatementBuilder)
 }
@@ -31,6 +32,8 @@ func (c column) Write(builder *StatementBuilder) {
 
 var _ Column = (*column)(nil)
 
+// ignoreCaseColumn represents two database columns, one for the
+// original value and one for the lower case value.
 type ignoreCaseColumn interface {
 	Column
 	WriteIgnoreCase(builder *StatementBuilder)

@@ -6,6 +6,10 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
+// SetEmailCommand sets the email address of a user.
+// If allows verification as a sub command.
+// The verification command is executed after the email address is set.
+// The verification command is executed in the same transaction as the email address update.
 type SetEmailCommand struct {
 	UserID       string `json:"userId"`
 	Email        string `json:"email"`

@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/otel/trace/noop"
 )
 
+// Tracer is a wrapper around the OpenTelemetry Tracer interface.
 type Tracer struct {
 	trace.Tracer
 }

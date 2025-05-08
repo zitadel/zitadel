@@ -7,15 +7,22 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+// Commander is the all it needs to implement the command pattern.
+// It is the interface all manipulations need to implement.
+// If possible it should also be used for queries. We will find out if this is possible in the future.
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
 	fmt.Stringer
 }
 
+// Invoker is part of the command pattern.
+// It is the interface that is used to execute commands.
 type Invoker interface {
 	Invoke(ctx context.Context, command Commander, opts *CommandOpts) error
 }
 
+// CommandOpts are passed to each command
+// the provide common fields used by commands like the database client.
 type CommandOpts struct {
 	DB      database.QueryExecutor
 	Invoker Invoker
@@ -95,6 +102,8 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 	}
 }
 
+// commandBatch is a batch of commands.
+// It uses the [Invoker] provided by the opts to execute each command.
 type commandBatch struct {
 	Commands []Commander
 }

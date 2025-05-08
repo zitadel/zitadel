@@ -1,5 +1,7 @@
 package database
 
+// Condition represents a SQL condition.
+// Its written after the WHERE keyword in a SQL statement.
 type Condition interface {
 	Write(builder *StatementBuilder)
 }
@@ -22,6 +24,7 @@ func (a *and) Write(builder *StatementBuilder) {
 	}
 }
 
+// And combines multiple conditions with AND.
 func And(conditions ...Condition) *and {
 	return &and{conditions: conditions}
 }
@@ -46,6 +49,7 @@ func (o *or) Write(builder *StatementBuilder) {
 	}
 }
 
+// Or combines multiple conditions with OR.
 func Or(conditions ...Condition) *or {
 	return &or{conditions: conditions}
 }
@@ -62,6 +66,7 @@ func (i *isNull) Write(builder *StatementBuilder) {
 	builder.WriteString(" IS NULL")
 }
 
+// IsNull creates a condition that checks if a column is NULL.
 func IsNull(column Column) *isNull {
 	return &isNull{column: column}
 }
@@ -78,6 +83,7 @@ func (i *isNotNull) Write(builder *StatementBuilder) {
 	builder.WriteString(" IS NOT NULL")
 }
 
+// IsNotNull creates a condition that checks if a column is NOT NULL.
 func IsNotNull(column Column) *isNotNull {
 	return &isNotNull{column: column.(Column)}
 }
@@ -86,18 +92,21 @@ var _ Condition = (*isNotNull)(nil)
 
 type valueCondition func(builder *StatementBuilder)
 
+// NewTextCondition creates a condition that compares a text column with a value.
 func NewTextCondition[V Text](col Column, op TextOperation, value V) Condition {
 	return valueCondition(func(builder *StatementBuilder) {
 		writeTextOperation(builder, col, op, value)
 	})
 }
 
+// NewDateCondition creates a condition that compares a numeric column with a value.
 func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condition {
 	return valueCondition(func(builder *StatementBuilder) {
 		writeNumberOperation(builder, col, op, value)
 	})
 }
 
+// NewDateCondition creates a condition that compares a boolean column with a value.
 func NewBooleanCondition[V Boolean](col Column, value V) Condition {
 	return valueCondition(func(builder *StatementBuilder) {
 		writeBooleanOperation(builder, col, value)

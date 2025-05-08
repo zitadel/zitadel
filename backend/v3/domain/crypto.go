@@ -11,6 +11,10 @@ type generateCodeCommand struct {
 	value *crypto.CryptoValue
 }
 
+// I didn't update this repository to the solution proposed please view one of the following interfaces for correct usage:
+// - [UserRepository]
+// - [InstanceRepository]
+// - [OrgRepository]
 type CryptoRepository interface {
 	GetEncryptionConfig(ctx context.Context) (*crypto.GeneratorConfig, error)
 }

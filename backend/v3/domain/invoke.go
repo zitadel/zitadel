@@ -7,6 +7,10 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
+// Invoke provides a way to execute commands within the domain package.
+// It uses a chain of responsibility pattern to handle the command execution.
+// The default chain includes logging, tracing, and event publishing.
+// If you want to invoke multiple commands in a single transaction, you can use the [commandBatch].
 func Invoke(ctx context.Context, cmd Commander) error {
 	invoker := newEventStoreInvoker(newLoggingInvoker(newTraceInvoker(nil)))
 	opts := &CommandOpts{
@@ -16,6 +20,8 @@ func Invoke(ctx context.Context, cmd Commander) error {
 	return invoker.Invoke(ctx, cmd, opts)
 }
 
+// eventStoreInvoker checks if the command implements the [eventer] interface.
+// If it does, it collects the events and publishes them to the event store.
 type eventStoreInvoker struct {
 	collector *eventCollector
 }
@@ -38,6 +44,7 @@ func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts 
 	return nil
 }
 
+// eventCollector collects events from all commands. The [eventStoreInvoker] pushes the collected events after all commands are executed.
 type eventCollector struct {
 	next   Invoker
 	events []*eventstore.Event
@@ -64,6 +71,7 @@ func (i *eventCollector) Invoke(ctx context.Context, command Commander, opts *Co
 	return command.Execute(ctx, opts)
 }
 
+// traceInvoker decorates each command with tracing.
 type traceInvoker struct {
 	next Invoker
 }
@@ -87,6 +95,8 @@ func (i *traceInvoker) Invoke(ctx context.Context, command Commander, opts *Comm
 	return command.Execute(ctx, opts)
 }
 
+// loggingInvoker decorates each command with logging.
+// It is an example implementation and logs the command name at the beginning and success or failure after the command got executed.
 type loggingInvoker struct {
 	next Invoker
 }
@@ -123,6 +133,10 @@ func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *Comma
 	return command.Execute(ctx, opts)
 }
 
+// cacheInvoker could be used in the future to do the caching.
+// My goal would be to have two interfaces:
+// - cacheSetter: which caches an object
+// - cacheGetter: which gets an object from the cache, this should also skip the command execution
 type cacheInvoker struct {
 	next Invoker
 }

@@ -33,6 +33,7 @@ func (i *Instance) Keys(index instanceCacheIndex) (key []string) {
 
 var _ cache.Entry[instanceCacheIndex, string] = (*Instance)(nil)
 
+// instanceColumns define all the columns of the instance table.
 type instanceColumns interface {
 	// IDColumn returns the column for the id field.
 	IDColumn() database.Column
@@ -46,6 +47,7 @@ type instanceColumns interface {
 	DeletedAtColumn() database.Column
 }
 
+// instanceConditions define all the conditions for the instance table.
 type instanceConditions interface {
 	// IDCondition returns an equal filter on the id field.
 	IDCondition(instanceID string) database.Condition
@@ -53,16 +55,19 @@ type instanceConditions interface {
 	NameCondition(op database.TextOperation, name string) database.Condition
 }
 
+// instanceChanges define all the changes for the instance table.
 type instanceChanges interface {
 	// SetName sets the name column.
 	SetName(name string) database.Change
 }
 
+// InstanceRepository is the interface for the instance repository.
 type InstanceRepository interface {
 	instanceColumns
 	instanceConditions
 	instanceChanges
 
+	// Member returns the member repository which is a sub repository of the instance repository.
 	Member() MemberRepository
 
 	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
