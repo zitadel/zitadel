@@ -2,15 +2,17 @@ package domain
 
 import (
 	"context"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
 type AddOrgCommand struct {
-	ID     string            `json:"id"`
-	Name   string            `json:"name"`
-	Admins []AddAdminCommand `json:"admins"`
+	ID     string              `json:"id"`
+	Name   string              `json:"name"`
+	Admins []*AddMemberCommand `json:"admins"`
 }
 
-func NewAddOrgCommand(name string, admins ...AddAdminCommand) *AddOrgCommand {
+func NewAddOrgCommand(name string, admins ...*AddMemberCommand) *AddOrgCommand {
 	return &AddOrgCommand{
 		Name:   name,
 		Admins: admins,
@@ -39,11 +41,31 @@ func (cmd *AddOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 		return err
 	}
 
+	for _, admin := range cmd.Admins {
+		admin.orgID = cmd.ID
+		if err = opts.Invoke(ctx, admin); err != nil {
+			return err
+		}
+	}
+
 	return nil
+}
+
+// Events implements [eventer].
+func (cmd *AddOrgCommand) Events() []*eventstore.Event {
+	return []*eventstore.Event{
+		{
+			AggregateType: "org",
+			AggregateID:   cmd.ID,
+			Type:          "org.added",
+			Payload:       cmd,
+		},
+	}
 }
 
 var (
 	_ Commander = (*AddOrgCommand)(nil)
+	_ eventer   = (*AddOrgCommand)(nil)
 )
 
 func (cmd *AddOrgCommand) ensureID() (err error) {
@@ -54,21 +76,36 @@ func (cmd *AddOrgCommand) ensureID() (err error) {
 	return err
 }
 
-type AddAdminCommand struct {
+type AddMemberCommand struct {
+	orgID  string
 	UserID string   `json:"userId"`
 	Roles  []string `json:"roles"`
 }
 
 // Execute implements Commander.
-func (a *AddAdminCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+func (a *AddMemberCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return err
 	}
 	defer func() { err = close(ctx, err) }()
-	return nil
+
+	return orgRepo(opts.DB).Member().AddMember(ctx, a.orgID, a.UserID, a.Roles)
+}
+
+// Events implements [eventer].
+func (a *AddMemberCommand) Events() []*eventstore.Event {
+	return []*eventstore.Event{
+		{
+			AggregateType: "org",
+			AggregateID:   a.UserID,
+			Type:          "member.added",
+			Payload:       a,
+		},
+	}
 }
 
 var (
-	_ Commander = (*AddAdminCommand)(nil)
+	_ Commander = (*AddMemberCommand)(nil)
+	_ eventer   = (*AddMemberCommand)(nil)
 )

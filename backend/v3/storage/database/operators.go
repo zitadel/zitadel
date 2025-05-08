@@ -49,7 +49,7 @@ func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOp
 	case TextOperationEqual, TextOperationNotEqual:
 		col.Write(builder)
 		builder.WriteString(textOperations[op])
-		builder.WriteString(builder.AppendArg(value))
+		builder.WriteArg(value)
 	case TextOperationEqualIgnoreCase, TextOperationNotEqualIgnoreCase:
 		if ignoreCaseCol, ok := col.(ignoreCaseColumn); ok {
 			ignoreCaseCol.WriteIgnoreCase(builder)
@@ -60,12 +60,12 @@ func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOp
 		}
 		builder.WriteString(textOperations[op])
 		builder.WriteString("LOWER(")
-		builder.WriteString(builder.AppendArg(value))
+		builder.WriteArg(value)
 		builder.WriteString(")")
 	case TextOperationStartsWith:
 		col.Write(builder)
 		builder.WriteString(textOperations[op])
-		builder.WriteString(builder.AppendArg(value))
+		builder.WriteArg(value)
 		builder.WriteString(" || '%'")
 	case TextOperationStartsWithIgnoreCase:
 		if ignoreCaseCol, ok := col.(ignoreCaseColumn); ok {
@@ -77,7 +77,7 @@ func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOp
 		}
 		builder.WriteString(textOperations[op])
 		builder.WriteString("LOWER(")
-		builder.WriteString(builder.AppendArg(value))
+		builder.WriteArg(value)
 		builder.WriteString(")")
 		builder.WriteString(" || '%'")
 	default:
@@ -118,7 +118,7 @@ var numberOperations = map[NumberOperation]string{
 func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value T) {
 	col.Write(builder)
 	builder.WriteString(numberOperations[op])
-	builder.WriteString(builder.AppendArg(value))
+	builder.WriteArg(value)
 }
 
 type Boolean interface {
@@ -135,5 +135,5 @@ const (
 func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value T) {
 	col.Write(builder)
 	builder.WriteString(" IS ")
-	builder.WriteString(builder.AppendArg(value))
+	builder.WriteArg(value)
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 
-	"github.com/zitadel/zitadel/backend/storage/database"
-	"github.com/zitadel/zitadel/backend/storage/database/dialect/postgres"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 )
 
 type Hook struct {

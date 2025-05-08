@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
 type Instance struct {
@@ -19,16 +21,43 @@ func (i *Instance) Keys(index string) (key []string) {
 	return []string{}
 }
 
-type InstanceRepository interface {
-	ByID(ctx context.Context, id string) (*Instance, error)
-	Create(ctx context.Context, instance *Instance) error
-	On(id string) InstanceOperation
+type instanceColumns interface {
+	// IDColumn returns the column for the id field.
+	IDColumn() database.Column
+	// NameColumn returns the column for the name field.
+	NameColumn() database.Column
+	// CreatedAtColumn returns the column for the created at field.
+	CreatedAtColumn() database.Column
+	// UpdatedAtColumn returns the column for the updated at field.
+	UpdatedAtColumn() database.Column
+	// DeletedAtColumn returns the column for the deleted at field.
+	DeletedAtColumn() database.Column
 }
 
-type InstanceOperation interface {
-	AdminRepository
-	Update(ctx context.Context, instance *Instance) error
-	Delete(ctx context.Context) error
+type instanceConditions interface {
+	// IDCondition returns an equal filter on the id field.
+	IDCondition(instanceID string) database.Condition
+	// NameCondition returns a filter on the name field.
+	NameCondition(op database.TextOperation, name string) database.Condition
+}
+
+type instanceChanges interface {
+	// SetName sets the name column.
+	SetName(name string) database.Change
+}
+
+type InstanceRepository interface {
+	instanceColumns
+	instanceConditions
+	instanceChanges
+
+	Member() MemberRepository
+
+	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
+
+	Create(ctx context.Context, instance *Instance) error
+	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
+	Delete(ctx context.Context, condition database.Condition) error
 }
 
 type CreateInstance struct {
