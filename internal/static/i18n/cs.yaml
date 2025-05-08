@@ -534,6 +534,7 @@ Errors:
     StateMissing: V požadavku chybí parametr stavu
     NotStarted: Záměr nebyl zahájen nebo již byl ukončen
     NotSucceeded: Záměr nebyl úspěšný
+    Expired: Záměr vypršel
     TokenCreationFailed: Vytvoření tokenu selhalo
     InvalidToken: Token záměru je neplatný
     OtherUser: Záměr určený pro jiného uživatele

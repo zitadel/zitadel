@@ -2678,6 +2678,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 GetProject.
    rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{id}"
@@ -2691,7 +2692,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Get Project By ID";
-            description: "Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
+            description: "Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 GetProject."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2728,6 +2730,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 ListProjects.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
         option (google.api.http) = {
             post: "/projects/_search"
@@ -2741,7 +2744,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Search Project";
-            description: "Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
+            description: "Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 ListProjects."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2753,6 +2757,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 ListProject.
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
         option (google.api.http) = {
             post: "/granted_projects/_search"
@@ -2766,7 +2771,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Search Granted Project";
-            description: "Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
+            description: "Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 ListProjects."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2828,6 +2834,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 CreateProject.
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
@@ -2841,7 +2848,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Create Project";
-            description: "Create a new project. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
+            description: "Create a new project. A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 CreateProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2853,6 +2861,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 UpdateProject.
     rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
         option (google.api.http) = {
             put: "/projects/{id}"
@@ -2867,7 +2876,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Update Project";
-            description: "Update a project and its settings. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
+            description: "Update a project and its settings. A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 UpdateProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2879,6 +2889,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 DeactivateProject.
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_deactivate"
@@ -2893,7 +2904,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Deactivate Project";
-            description: "Set the state of a project to deactivated. Request returns an error if the project is already deactivated."
+            deprecated: true;
+            description: "Set the state of a project to deactivated. Request returns an error if the project is already deactivated.\n\nDeprecated: please use user service v2 DeactivateProject."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2905,6 +2917,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 ActivateProject.
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_reactivate"
@@ -2919,7 +2932,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Reactivate Project";
-            description: "Set the state of a project to active. Request returns an error if the project is not deactivated."
+            deprecated: true;
+            description: "Set the state of a project to active. Request returns an error if the project is not deactivated.\n\nDeprecated: please use user service v2 ActivateProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2931,6 +2945,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use project service v2 DeleteProject.
     rpc RemoveProject(RemoveProjectRequest) returns (RemoveProjectResponse) {
         option (google.api.http) = {
             delete: "/projects/{id}"
@@ -2944,7 +2959,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Remove Project";
-            description: "Project and all its sub-resources like project grants, applications, roles and user grants will be removed."
+            deprecated: true;
+            description: "Project and all its sub-resources like project grants, applications, roles and user grants will be removed.\n\nDeprecated: please use user service v2 DeleteProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -9209,7 +9225,7 @@ message AddOrgMemberRequest {
     repeated string roles = 2  [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"ORG_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -9222,7 +9238,7 @@ message UpdateOrgMemberRequest {
     repeated string roles = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"IAM_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -9643,7 +9659,7 @@ message AddProjectMemberRequest {
     repeated string roles = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -9658,7 +9674,7 @@ message UpdateProjectMemberRequest {
     repeated string roles = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -10313,7 +10329,7 @@ message AddProjectGrantMemberRequest {
     repeated string roles = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_GRANT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -10337,7 +10353,7 @@ message UpdateProjectGrantMemberRequest {
     repeated string roles = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_GRANT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }

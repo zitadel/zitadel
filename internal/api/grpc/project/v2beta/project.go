@@ -53,6 +53,8 @@ func privateLabelingSettingToDomain(setting project_pb.PrivateLabelingSetting) d
 		return domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy
 	case project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY:
 		return domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy
+	case project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED:
+		return domain.PrivateLabelingSettingUnspecified
 	default:
 		return domain.PrivateLabelingSettingUnspecified
 	}

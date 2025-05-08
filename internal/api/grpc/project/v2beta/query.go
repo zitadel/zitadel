@@ -44,6 +44,9 @@ func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsR
 
 func (s *Server) listProjectRequestToModel(req *project_pb.ListProjectsRequest) (*query.ProjectAndGrantedProjectSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := projectFiltersToQuery(req.Filters)
 	if err != nil {
 		return nil, err
@@ -182,6 +185,8 @@ func projectStateToPb(state domain.ProjectState) project_pb.ProjectState {
 		return project_pb.ProjectState_PROJECT_STATE_ACTIVE
 	case domain.ProjectStateInactive:
 		return project_pb.ProjectState_PROJECT_STATE_INACTIVE
+	case domain.ProjectStateUnspecified, domain.ProjectStateRemoved:
+		return project_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
 	default:
 		return project_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
 	}
@@ -205,6 +210,8 @@ func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) project_p
 		return project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY
 	case domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy:
 		return project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY
+	case domain.PrivateLabelingSettingUnspecified:
+		return project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
 	default:
 		return project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
 	}

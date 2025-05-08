@@ -26,8 +26,16 @@ export class PosthogService implements OnDestroy {
           maskAllInputs: true,
           maskTextSelector: '*',
         },
+        disable_session_recording: true,
         enable_heatmaps: true,
         persistence: 'memory',
+        loaded: (posthog) => {
+          posthog.onFeatureFlags((flags) => {
+            if (posthog.isFeatureEnabled('session_recording')) {
+              posthog.startSessionRecording();
+            }
+          });
+        },
       });
     }
   }

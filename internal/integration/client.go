@@ -739,6 +739,23 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
+func (i *Instance) CreateIntentSession(t *testing.T, ctx context.Context, userID, intentID, intentToken string) (id, token string, start, change time.Time) {
+	createResp, err := i.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: intentToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), createResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
+}
+
 func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string, roles ...string) *project_v2beta.CreateProjectGrantResponse {
 	resp, err := i.Client.Projectv2Beta.CreateProjectGrant(ctx, &project_v2beta.CreateProjectGrantRequest{
 		GrantedOrganizationId: grantedOrgID,
@@ -858,7 +875,7 @@ func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *acti
 	require.NoError(t, err)
 }
 
-func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
+func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string) *action.SetExecutionResponse {
 	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
