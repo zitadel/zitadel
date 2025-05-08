@@ -20,12 +20,21 @@ const (
 	ProjectRoleStateRemoved
 )
 
-func NewProjectRole(projectID, key string) *ProjectRole {
-	return &ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: projectID}, Key: key}
+func (s ProjectRoleState) Exists() bool {
+	return s != ProjectRoleStateUnspecified && s != ProjectRoleStateRemoved
 }
 
 func (p *ProjectRole) IsValid() bool {
 	return p.AggregateID != "" && p.Key != ""
+}
+
+func HasInvalidRoles(validRoles, roles []string) bool {
+	for _, roleKey := range roles {
+		if !containsRoleKey(roleKey, validRoles) {
+			return true
+		}
+	}
+	return false
 }
 
 func containsRoleKey(roleKey string, validRoles []string) bool {

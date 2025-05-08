@@ -80,6 +80,18 @@ type ProjectRoleSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func (q *ProjectRoleSearchQueries) AppendPermissionQueries(permissions []string) error {
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetAllPermissionCtxIDs(permissions)
+		query, err := NewProjectRoleKeysSearchQuery(ids)
+		if err != nil {
+			return err
+		}
+		q.Queries = append(q.Queries, query)
+	}
+	return nil
+}
+
 func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

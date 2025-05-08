@@ -202,6 +202,14 @@ func NewProjectGrantProjectIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnProjectID, value, TextEquals)
 }
 
+func NewProjectGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(ProjectGrantColumnProjectID, list, ListIn)
+}
+
 func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
 	list := make([]interface{}, len(values))
 	for i, value := range values {

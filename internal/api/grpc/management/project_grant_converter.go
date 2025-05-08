@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -100,20 +101,23 @@ func AllProjectGrantQueryToModel(apiQuery *proj_pb.AllProjectGrantQuery) (query.
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
 }
-func AddProjectGrantRequestToDomain(req *mgmt_pb.AddProjectGrantRequest) *domain.ProjectGrant {
-	return &domain.ProjectGrant{
+func AddProjectGrantRequestToCommand(req *mgmt_pb.AddProjectGrantRequest, grantID string, resourceOwner string) *command.AddProjectGrant {
+	return &command.AddProjectGrant{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
+		GrantID:      grantID,
 		GrantedOrgID: req.GrantedOrgId,
 		RoleKeys:     req.RoleKeys,
 	}
 }
 
-func UpdateProjectGrantRequestToDomain(req *mgmt_pb.UpdateProjectGrantRequest) *domain.ProjectGrant {
-	return &domain.ProjectGrant{
+func UpdateProjectGrantRequestToCommand(req *mgmt_pb.UpdateProjectGrantRequest, resourceOwner string) *command.ChangeProjectGrant {
+	return &command.ChangeProjectGrant{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
 		GrantID:  req.GrantId,
 		RoleKeys: req.RoleKeys,
