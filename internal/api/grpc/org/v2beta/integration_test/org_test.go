@@ -114,7 +114,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
 				Id: integration.NotEmpty,
-				CreatedAdmins: []*v2beta_org.CreateOrganizationResponse_CreatedAdmin{
+				CreatedAdmins: []*v2beta_org.CreatedAdmin{
 					{
 						UserId:    integration.NotEmpty,
 						EmailCode: gu.Ptr(integration.NotEmpty),
@@ -158,7 +158,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 				},
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
-				CreatedAdmins: []*v2beta_org.CreateOrganizationResponse_CreatedAdmin{
+				CreatedAdmins: []*v2beta_org.CreatedAdmin{
 					// a single admin is expected, because the first provided already exists
 					{
 						UserId: integration.NotEmpty,
@@ -1436,7 +1436,7 @@ func createOrgs(noOfOrgs int) ([]*v2beta_org.CreateOrganizationResponse, []strin
 	return orgs, orgsName, nil
 }
 
-func assertCreatedAdmin(t *testing.T, expected, got *v2beta_org.CreateOrganizationResponse_CreatedAdmin) {
+func assertCreatedAdmin(t *testing.T, expected, got *v2beta_org.CreatedAdmin) {
 	if expected.GetUserId() != "" {
 		assert.NotEmpty(t, got.GetUserId())
 	} else {
