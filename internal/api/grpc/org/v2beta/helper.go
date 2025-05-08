@@ -76,9 +76,9 @@ func OrgStateToPb(state domain.OrgState) v2beta_org.OrgState {
 }
 
 func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrganizationResponse, err error) {
-	admins := make([]*org.CreateOrganizationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
+	admins := make([]*org.CreatedAdmin, len(createdOrg.CreatedAdmins))
 	for i, admin := range createdOrg.CreatedAdmins {
-		admins[i] = &org.CreateOrganizationResponse_CreatedAdmin{
+		admins[i] = &org.CreatedAdmin{
 			UserId:    admin.ID,
 			EmailCode: admin.EmailCode,
 			PhoneCode: admin.PhoneCode,

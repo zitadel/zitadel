@@ -99,12 +99,6 @@ func DomainToPb(d *query.Domain) *org_pb.Domain {
 		IsVerified:     d.IsVerified,
 		IsPrimary:      d.IsPrimary,
 		ValidationType: DomainValidationTypeFromModel(d.ValidationType),
-		Details: ToViewDetailsPb(
-			d.Sequence,
-			d.CreationDate,
-			d.ChangeDate,
-			d.OrgID,
-		),
 	}
 }
 
