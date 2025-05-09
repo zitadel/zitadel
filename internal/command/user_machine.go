@@ -79,7 +79,7 @@ func AddMachineWithUsernameToIDFallback() addMachineOption {
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...addMachineOption) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine, check PermissionCheck, options ...addMachineOption) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -97,8 +97,10 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...
 			return nil, err
 		}
 	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, machine.ResourceOwner, machine.AggregateID); err != nil {
-		return nil, err
+	if check != nil {
+		if err = check(machine.ResourceOwner, machine.AggregateID); err != nil {
+			return nil, err
+		}
 	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
