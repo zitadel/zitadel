@@ -24,6 +24,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 	type args struct {
 		ctx     context.Context
 		machine *Machine
+		check   PermissionCheck
 		options func(*Commands) []addMachineOption
 	}
 	type res struct {
@@ -344,52 +345,15 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			},
 		},
 		{
-			name: "with resource owner existence check, org does not exist",
+			name: "with succeeding permission check, ok",
 			fields: fields{
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "aggregateID"),
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				machine: &Machine{
-					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "org1",
-					},
-					Name: "name",
-				},
-				options: func(commands *Commands) []addMachineOption {
-					return []addMachineOption{
-						commands.AddMachineWithResourceOwnerExistenceCheck(),
-					}
-				},
-			},
-			res: res{
-				err: zerrors.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "with resource owner existence check, org exists",
-			fields: fields{
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "aggregateID"),
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(
-								context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"orgname",
-							),
-						),
-					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("aggregateID", "org1").Aggregate,
+								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
 								true,
@@ -398,15 +362,16 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
-							&user.NewAggregate("aggregateID", "org1").Aggregate,
+							&user.NewAggregate("user1", "org1").Aggregate,
 							"username",
 							"name",
-							"",
+							"description",
 							true,
 							domain.OIDCTokenTypeBearer,
 						),
 					),
 				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -414,19 +379,44 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
-					Name:     "name",
-					Username: "username",
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
 				},
-				options: func(commands *Commands) []addMachineOption {
-					return []addMachineOption{
-						commands.AddMachineWithResourceOwnerExistenceCheck(),
-					}
+				check: func(resourceOwner, aggregateID string) error {
+					return nil
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "with failing permission check, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+				},
+				check: func(resourceOwner, aggregateID string) error {
+					return zerrors.ThrowPermissionDenied(nil, "", "")
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 	}
@@ -441,7 +431,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			if tt.args.options != nil {
 				options = tt.args.options(r)
 			}
-			got, err := r.AddMachine(tt.args.ctx, tt.args.machine, options...)
+			got, err := r.AddMachine(tt.args.ctx, tt.args.machine, tt.args.check, options...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
