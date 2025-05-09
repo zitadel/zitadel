@@ -48,7 +48,6 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 		ctx             context.Context
 		orgID           string
 		human           *AddHuman
-		options         func(commands *Commands) []addUserHumanOption
 		secretGenerator crypto.Generator
 		allowInitMail   bool
 		codeAlg         crypto.EncryptionAlgorithm
@@ -2043,117 +2042,6 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				wantID: "user1",
 			},
 		},
-		{
-			name: "with resource owner existence check, org does not exist",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &AddHuman{
-					Username:  "username",
-					Password:  "password",
-					FirstName: "firstname",
-					LastName:  "lastname",
-					Email: Email{
-						Address:  "email@test.ch",
-						Verified: true,
-					},
-					PreferredLanguage:      language.English,
-					PasswordChangeRequired: true,
-				},
-				allowInitMail: true,
-				options: func(commands *Commands) []addUserHumanOption {
-					return []addUserHumanOption{
-						commands.AddUserHumanWithResourceOwnerExistenceCheck(),
-					}
-				},
-			},
-			res: res{
-				err: zerrors.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "with resource owner existence check, org exists",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(
-								context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"orgname",
-							),
-						),
-					),
-					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
-							),
-						),
-					),
-					expectPush(
-						newAddHumanEvent("$plain$x$password", true, true, "", language.English),
-						user.NewHumanEmailVerifiedEvent(context.Background(),
-							&userAgg.Aggregate,
-						),
-					),
-				),
-				checkPermission:    newMockPermissionCheckAllowed(),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &AddHuman{
-					Username:  "username",
-					Password:  "password",
-					FirstName: "firstname",
-					LastName:  "lastname",
-					Email: Email{
-						Address:  "email@test.ch",
-						Verified: true,
-					},
-					PreferredLanguage:      language.English,
-					PasswordChangeRequired: true,
-				},
-				secretGenerator: GetMockSecretGenerator(t),
-				allowInitMail:   true,
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				options: func(commands *Commands) []addUserHumanOption {
-					return []addUserHumanOption{
-						commands.AddUserHumanWithResourceOwnerExistenceCheck(),
-					}
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-				wantID: "user1",
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -2172,11 +2060,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					},
 				},
 			}
-			var options []addUserHumanOption
-			if tt.args.options != nil {
-				options = tt.args.options(r)
-			}
-			err := r.AddUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.codeAlg, options...)
+			err := r.AddUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.codeAlg)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
