@@ -1,8 +1,0 @@
-database:
-    postgres: host=localhost user=zitadel password= dbname=zitadel sslmode=disable test=test
-step001:
-    databasename: qwer
-    username: asdf
-step002:
-    databasename: yuio
-    username: hjkl
