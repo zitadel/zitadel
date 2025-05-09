@@ -1,0 +1,16 @@
+{
+  "name": "@zitadel/client-generator",
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": {
+    "@netlify/framework-info": "^9.8.10",
+    "axios": "^0.24.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.1",
+    "envfile": "^7.1.0",
+    "open": "^10.0.3"
+  },
+  "bin": {
+    "client-generator": "./bin.js"
+  }
+}
