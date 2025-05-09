@@ -76,6 +76,7 @@ var (
 			{
 				Value:   "bjensen@example.com",
 				Primary: true,
+				Type:    "work",
 			},
 		},
 		Addresses: []*resources.ScimAddress{
@@ -391,6 +392,7 @@ func TestCreateUser_metadata(t *testing.T) {
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:locale", "en-US")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:ims", `[{"value":"someaimhandle","type":"aim"},{"value":"twitterhandle","type":"X"}]`)
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:roles", `[{"value":"my-role-1","display":"Rolle 1","type":"main-role","primary":true},{"value":"my-role-2","display":"Rolle 2","type":"secondary-role"}]`)
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:emails", `[{"value":"bjensen@example.com","type":"work","primary":true}]`)
 	}, retryDuration, tick)
 }
 
