@@ -88,7 +88,7 @@ func main() {
 	}
 
 	// Write the response to stdout, to be picked up by protoc
-	fmt.Fprintf(os.Stdout, string(out))
+	fmt.Fprint(os.Stdout, string(out))
 }
 
 func loadTemplate(templateData []byte) *template.Template {
