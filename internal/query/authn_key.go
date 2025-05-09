@@ -142,6 +142,10 @@ const (
 	JoinFilterUserMachine
 )
 
+// SearchAuthNKeys returns machine or app keys, depending on the join filter.
+// If permissionCheck is nil, the keys are not filtered.
+// If permissionCheck is not nil and the PermissionCheckV2 feature flag is false, the returned keys are filtered in-memory by the given permission check.
+// If permissionCheck is not nil and the PermissionCheckV2 feature flag is true, the returned keys are filtered in the database.
 func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries, filter JoinFilter, permissionCheck domain.PermissionCheck) (authNKeys *AuthNKeys, err error) {
 	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
 	keys, err := q.searchAuthNKeys(ctx, queries, filter, permissionCheckV2)

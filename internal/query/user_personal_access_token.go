@@ -133,6 +133,10 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	return pat, nil
 }
 
+// SearchPersonalAccessTokens returns personal access token resources.
+// If permissionCheck is nil, the PATs are not filtered.
+// If permissionCheck is not nil and the PermissionCheckV2 feature flag is false, the returned PATs are filtered in-memory by the given permission check.
+// If permissionCheck is not nil and the PermissionCheckV2 feature flag is true, the returned PATs are filtered in the database.
 func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool, permissionCheck domain.PermissionCheck) (authNKeys *PersonalAccessTokens, err error) {
 	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
 	keys, err := q.searchPersonalAccessTokens(ctx, withOwnerRemoved, queries, permissionCheckV2)
