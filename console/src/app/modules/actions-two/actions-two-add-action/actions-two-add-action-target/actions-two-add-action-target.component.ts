@@ -1,10 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  EventEmitter,
+  Input,
+  Output,
+  signal,
+  Signal,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, catchError, defer, map, of, shareReplay, ReplaySubject, combineLatestWith } from 'rxjs';
+import { ObservedValueOf, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -13,15 +23,17 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
-import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
-import { Condition, ExecutionTargetTypeSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { MatSelectModule } from '@angular/material/select';
-import { atLeastOneFieldValidator } from 'src/app/modules/form-field/validators/validators';
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
-
-export type TargetInit = NonNullable<
-  NonNullable<MessageInitShape<typeof SetExecutionRequestSchema>['targets']>
->[number]['type'];
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { map, startWith } from 'rxjs/operators';
+import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/type-safe-cell-def.module';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { minArrayLengthValidator } from '../../../form-field/validators/validators';
+import { ProjectRoleChipModule } from '../../../project-role-chip/project-role-chip.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TableActionsModule } from '../../../table-actions/table-actions.module';
 
 @Component({
   standalone: true,
@@ -42,114 +54,177 @@ export type TargetInit = NonNullable<
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSelectModule,
+    MatTableModule,
+    TypeSafeCellDefModule,
+    CdkDrag,
+    CdkDropList,
+    ProjectRoleChipModule,
+    MatTooltipModule,
+    TableActionsModule,
   ],
 })
 export class ActionsTwoAddActionTargetComponent {
-  protected readonly targetForm = this.buildActionTargetForm();
-
-  @Output() public readonly back = new EventEmitter<void>();
-  @Output() public readonly continue = new EventEmitter<MessageInitShape<typeof ExecutionTargetTypeSchema>[]>();
   @Input() public hideBackButton = false;
-  @Input() set selectedCondition(selectedCondition: Condition | undefined) {
-    this.selectedCondition$.next(selectedCondition);
+  @Input()
+  public set preselectedTargetIds(preselectedTargetIds: string[]) {
+    this.preselectedTargetIds$.next(preselectedTargetIds);
   }
 
-  private readonly selectedCondition$ = new ReplaySubject<Condition | undefined>(1);
+  @Output() public readonly back = new EventEmitter<void>();
+  @Output() public readonly continue = new EventEmitter<string[]>();
 
-  protected readonly executionTargets$: Observable<Target[]>;
-  protected readonly executionConditions$: Observable<Condition[]>;
+  private readonly preselectedTargetIds$ = new ReplaySubject<string[]>(1);
+
+  protected readonly form$: ReturnType<typeof this.buildForm>;
+
+  protected readonly targets: ReturnType<typeof this.listTargets>;
+  private readonly selectedTargetIds: Signal<string[]>;
+  protected readonly selectableTargets: Signal<Target[]>;
+  protected readonly dataSource: MatTableDataSource<Target>;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly actionService: ActionService,
     private readonly toast: ToastService,
   ) {
-    this.executionTargets$ = this.listExecutionTargets().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.executionConditions$ = this.listExecutionConditions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.form$ = this.buildForm().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.targets = this.listTargets();
+
+    this.selectedTargetIds = this.getSelectedTargetIds(this.form$);
+    this.selectableTargets = this.getSelectableTargets(this.targets, this.selectedTargetIds, this.form$);
+    this.dataSource = this.getDataSource(this.targets, this.selectedTargetIds);
   }
 
-  private buildActionTargetForm() {
-    return this.fb.group(
-      {
-        target: new FormControl<Target | null>(null, { validators: [] }),
-        executionConditions: new FormControl<Condition[]>([], { validators: [] }),
-      },
-      {
-        validators: atLeastOneFieldValidator(['target', 'executionConditions']),
-      },
-    );
-  }
-
-  private listExecutionTargets() {
-    return defer(() => this.actionService.listTargets({})).pipe(
-      map(({ result }) => result.filter(this.targetHasDetailsAndConfig)),
-      catchError((error) => {
-        this.toast.showError(error);
-        return of([]);
+  private buildForm() {
+    return this.preselectedTargetIds$.pipe(
+      startWith([] as string[]),
+      map((preselectedTargetIds) => {
+        return this.fb.group({
+          autocomplete: new FormControl('', { nonNullable: true }),
+          selectedTargetIds: new FormControl(preselectedTargetIds, {
+            nonNullable: true,
+            validators: [minArrayLengthValidator(1)],
+          }),
+        });
       }),
     );
   }
 
-  private listExecutionConditions(): Observable<Condition[]> {
-    const selectedConditionJson$ = this.selectedCondition$.pipe(map((c) => JSON.stringify(c)));
+  private listTargets() {
+    const targetsSignal = signal({ state: 'loading' as 'loading' | 'loaded', targets: new Map<string, Target>() });
 
-    return defer(() => this.actionService.listExecutions({})).pipe(
-      combineLatestWith(selectedConditionJson$),
-      map(([executions, selectedConditionJson]) =>
-        executions.result.map((e) => e?.condition).filter(this.conditionIsDefinedAndNotCurrentOne(selectedConditionJson)),
-      ),
+    this.actionService
+      .listTargets({})
+      .then(({ result }) => {
+        const targets = result.reduce((acc, target) => {
+          acc.set(target.id, target);
+          return acc;
+        }, new Map<string, Target>());
 
-      catchError((error) => {
+        targetsSignal.set({ state: 'loaded', targets });
+      })
+      .catch((error) => {
         this.toast.showError(error);
-        return of([]);
+      });
+
+    return computed(targetsSignal);
+  }
+
+  private getSelectedTargetIds(form$: typeof this.form$) {
+    const selectedTargetIds$ = form$.pipe(
+      switchMap(({ controls: { selectedTargetIds } }) => {
+        return selectedTargetIds.valueChanges.pipe(startWith(selectedTargetIds.value));
       }),
     );
+    return toSignal(selectedTargetIds$, { requireSync: true });
   }
 
-  private conditionIsDefinedAndNotCurrentOne(selectedConditionJson?: string) {
-    return (condition?: Condition): condition is Condition => {
-      if (!condition) {
-        // condition is undefined so it is not of type Condition
-        return false;
+  private getSelectableTargets(targets: typeof this.targets, selectedTargetIds: Signal<string[]>, form$: typeof this.form$) {
+    const autocomplete$ = form$.pipe(
+      switchMap(({ controls: { autocomplete } }) => {
+        return autocomplete.valueChanges.pipe(startWith(autocomplete.value));
+      }),
+    );
+    const autocompleteSignal = toSignal(autocomplete$, { requireSync: true });
+
+    const unselectedTargets = computed(() => {
+      const targetsCopy = new Map(targets().targets);
+      for (const selectedTargetId of selectedTargetIds()) {
+        targetsCopy.delete(selectedTargetId);
       }
-      if (!selectedConditionJson) {
-        // condition is defined, and we don't have a selectedCondition so we can return all conditions
-        return true;
-      }
-      // we only return conditions that are not the same as the selectedCondition
-      return JSON.stringify(condition) !== selectedConditionJson;
-    };
+      return Array.from(targetsCopy.values());
+    });
+
+    return computed(() => {
+      const autocomplete = autocompleteSignal().toLowerCase();
+      return unselectedTargets().filter(({ name }) => name.toLowerCase().includes(autocomplete));
+    });
   }
 
-  private targetHasDetailsAndConfig(target: Target): target is Target {
-    return !!target.id && !!target.id;
+  private getDataSource(targetsSignal: typeof this.targets, selectedTargetIdsSignal: Signal<string[]>) {
+    const selectedTargets = computed(() => {
+      // get this out of the loop so angular can track this dependency
+      // even if targets is empty
+      const { targets, state } = targetsSignal();
+      const selectedTargetIds = selectedTargetIdsSignal();
+
+      if (state === 'loading') {
+        return [];
+      }
+
+      return selectedTargetIds.map((id) => {
+        const target = targets.get(id);
+        if (!target) {
+          throw new Error(`Target with id ${id} not found`);
+        }
+        return target;
+      });
+    });
+
+    const dataSource = new MatTableDataSource<Target>(selectedTargets());
+    effect(() => {
+      dataSource.data = selectedTargets();
+    });
+
+    return dataSource;
+  }
+
+  protected addTarget(target: Target, form: ObservedValueOf<typeof this.form$>) {
+    const { selectedTargetIds } = form.controls;
+    selectedTargetIds.setValue([target.id, ...selectedTargetIds.value]);
+    form.controls.autocomplete.setValue('');
+  }
+
+  protected removeTarget(index: number, form: ObservedValueOf<typeof this.form$>) {
+    const { selectedTargetIds } = form.controls;
+    const data = [...selectedTargetIds.value];
+    data.splice(index, 1);
+    selectedTargetIds.setValue(data);
+  }
+
+  protected drop(event: CdkDragDrop<undefined>, form: ObservedValueOf<typeof this.form$>) {
+    const { selectedTargetIds } = form.controls;
+
+    const data = [...selectedTargetIds.value];
+    moveItemInArray(data, event.previousIndex, event.currentIndex);
+    selectedTargetIds.setValue(data);
+  }
+
+  protected handleEnter(event: Event, form: ObservedValueOf<typeof this.form$>) {
+    const selectableTargets = this.selectableTargets();
+    if (selectableTargets.length !== 1) {
+      return;
+    }
+
+    event.preventDefault();
+    this.addTarget(selectableTargets[0], form);
   }
 
   protected submit() {
-    const { target, executionConditions } = this.targetForm.getRawValue();
+    this.continue.emit(this.selectedTargetIds());
+  }
 
-    let valueToEmit: MessageInitShape<typeof ExecutionTargetTypeSchema>[] = target
-      ? [
-          {
-            type: {
-              case: 'target',
-              value: target.id,
-            },
-          },
-        ]
-      : [];
-
-    const includeConditions: MessageInitShape<typeof ExecutionTargetTypeSchema>[] = executionConditions
-      ? executionConditions.map((condition) => ({
-          type: {
-            case: 'include',
-            value: condition,
-          },
-        }))
-      : [];
-
-    valueToEmit = [...valueToEmit, ...includeConditions];
-
-    this.continue.emit(valueToEmit);
+  protected trackTarget(_: number, target: Target) {
+    return target.id;
   }
 }
