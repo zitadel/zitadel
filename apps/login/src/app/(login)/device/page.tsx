@@ -37,13 +37,9 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        {!userCode && (
-          <>
-            <h1>{t("usercode.title")}</h1>
-            <p className="ztdl-p">{t("usercode.description")}</p>
-            <DeviceCodeForm userCode={userCode}></DeviceCodeForm>
-          </>
-        )}
+        <h1>{t("usercode.title")}</h1>
+        <p className="ztdl-p">{t("usercode.description")}</p>
+        <DeviceCodeForm userCode={userCode}></DeviceCodeForm>
       </div>
     </DynamicTheme>
   );
