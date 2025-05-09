@@ -49,7 +49,6 @@ func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUs
 		newHuman,
 		false,
 		s.userCodeAlg,
-		s.command.AddUserHumanWithResourceOwnerExistenceCheck(),
 	); err != nil {
 		return nil, err
 	}

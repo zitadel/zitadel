@@ -118,15 +118,7 @@ func (h *ChangeHuman) Changed() bool {
 	return false
 }
 
-type addUserHumanOption func(context.Context, *AddHuman) error
-
-func (c *Commands) AddUserHumanWithResourceOwnerExistenceCheck() addUserHumanOption {
-	return func(ctx context.Context, human *AddHuman) error {
-		return c.checkOrgExists(ctx, human.Details.ResourceOwner)
-	}
-}
-
-func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm, options ...addUserHumanOption) (err error) {
+func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
 	if resourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-095xh8fll1", "Errors.Internal")
 	}
@@ -134,11 +126,6 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		human.Details = &domain.ObjectDetails{}
 	}
 	human.Details.ResourceOwner = resourceOwner
-	for _, option := range options {
-		if err := option(ctx, human); err != nil {
-			return err
-		}
-	}
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -149,7 +136,12 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			return err
 		}
 	}
-
+	// check for permission to create user on resourceOwner
+	if !human.Register {
+		if err := c.checkPermissionUpdateUser(ctx, resourceOwner, human.ID); err != nil {
+			return err
+		}
+	}
 	// only check if user is already existing
 	existingHuman, err := c.userExistsWriteModel(
 		ctx,
@@ -160,12 +152,6 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	}
 	if isUserStateExists(existingHuman.UserState) {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
-	}
-	// check for permission to create user on resourceOwner
-	if !human.Register {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, human.ID); err != nil {
-			return err
-		}
 	}
 	// add resourceowner for the events with the aggregate
 	existingHuman.ResourceOwner = resourceOwner
