@@ -631,7 +631,7 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
-			name: "org does not exist",
+			name: "org does not exist human, error",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				email := username + "@example.com"
@@ -650,6 +650,27 @@ func TestServer_CreateUser(t *testing.T) {
 									Email: &user.SetHumanEmail{
 										Email: email,
 									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "org does not exist machine, error",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: "does not exist",
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: gofakeit.Name(),
 								},
 							},
 						},
