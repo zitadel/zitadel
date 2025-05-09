@@ -79,12 +79,6 @@ func AddMachineWithUsernameToIDFallback() addMachineOption {
 	}
 }
 
-func (c *Commands) AddMachineWithResourceOwnerExistenceCheck() addMachineOption {
-	return func(ctx context.Context, m *Machine) error {
-		return c.checkOrgExists(ctx, m.ObjectRoot.ResourceOwner)
-	}
-}
-
 func (c *Commands) AddMachine(ctx context.Context, machine *Machine, options ...addMachineOption) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

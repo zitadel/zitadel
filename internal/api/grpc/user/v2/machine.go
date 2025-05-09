@@ -26,7 +26,6 @@ func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.Crea
 		ctx,
 		cmd,
 		command.AddMachineWithUsernameToIDFallback(),
-		s.command.AddMachineWithResourceOwnerExistenceCheck(),
 	)
 	if err != nil {
 		return nil, err
