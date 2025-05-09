@@ -1085,14 +1085,14 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 	ctxUserID := "ctxUserID"
 	ctx := authz.SetCtxData(context.Background(), authz.CtxData{UserID: ctxUserID})
 	type fields struct {
-		eventstore      func(*testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
 			userID               string
 			cascadingMemberships []*CascadingMembership
 			grantIDs             []string
+			permissionCheck      func(bool) PermissionCheck
 		}
 	)
 	type res struct {
@@ -1108,11 +1108,13 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore:      expectEventstore(),
-				checkPermission: newMockPermissionCheckAllowed(),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				userID: "",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1126,10 +1128,12 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1166,10 +1170,12 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1216,10 +1222,12 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1253,13 +1261,63 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(false)
+				},
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "remove user, permission based on reduced write model, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+				permissionCheck: func(isHuman bool) PermissionCheck {
+					return func(resourceOwner, aggregateID string) error {
+						if isHuman {
+							return errPermissionDenied
+						}
+						return nil
+					}
+				},
+			},
+			res: res{
+				err: isPermissionDenied,
 			},
 		},
 		{
@@ -1290,6 +1348,9 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			},
 			args: args{
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				err: func(err error) bool {
@@ -1332,10 +1393,12 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID: "user1",
+				permissionCheck: func(bool) PermissionCheck {
+					return permissionCheck(true)
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1397,8 +1460,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				checkPermission: tt.fields.checkPermission,
+				eventstore: tt.fields.eventstore(t),
 			}
 
 			got, err := r.RemoveUserV2(ctx, tt.args.userID, "", tt.args.cascadingMemberships, tt.args.grantIDs...)
