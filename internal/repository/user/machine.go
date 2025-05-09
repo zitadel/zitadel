@@ -88,10 +88,7 @@ func NewMachineChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	changes []MachineChanges,
-) (*MachineChangedEvent, error) {
-	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "USER-3M9fs", "Errors.NoChangesFound")
-	}
+) *MachineChangedEvent {
 	changeEvent := &MachineChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -102,7 +99,7 @@ func NewMachineChangedEvent(
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent, nil
+	return changeEvent
 }
 
 type MachineChanges func(event *MachineChangedEvent)

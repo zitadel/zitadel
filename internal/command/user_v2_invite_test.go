@@ -353,6 +353,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 			"user does not exist",
 			fields{
 				eventstore: expectEventstore(
+					// The write model doesn't query any events
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),

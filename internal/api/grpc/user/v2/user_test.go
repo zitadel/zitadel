@@ -407,3 +407,7 @@ func Test_authMethodTypeToPb(t *testing.T) {
 		})
 	}
 }
+
+func ptr[T any](v T) *T {
+	return &v
+}

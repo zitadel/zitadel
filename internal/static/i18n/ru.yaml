@@ -116,6 +116,7 @@ Errors:
       AlreadyVerified: Телефон уже подтверждён
       Empty: Телефон пуст
       NotChanged: Телефон не менялся
+      VerifyingRemovalIsNotSupported: Удаление телефона не поддерживается
     Address:
       NotFound: Адрес не найден
       NotChanged: Адрес не изменён

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telepon sudah diverifikasi
       Empty: Telepon kosong
       NotChanged: Telepon tidak berubah
+      VerifyingRemovalIsNotSupported: Verifikasi penghapusan tidak didukung
     Address:
       NotFound: Alamat tidak ditemukan
       NotChanged: Alamat tidak berubah

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Телефонскиот број веќе е верифициран
       Empty: Телефонскиот број е празен
       NotChanged: Телефонскиот број не е променет
+      VerifyingRemovalIsNotSupported: Отстранувањето на верификацијата не е поддржано
     Address:
       NotFound: Адресата не е пронајдена
       NotChanged: Адресата не е променета
