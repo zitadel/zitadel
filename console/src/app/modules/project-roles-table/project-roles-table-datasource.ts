@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { Role, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 /**
@@ -22,12 +22,12 @@ export class ProjectRolesDataSource extends DataSource<Role.AsObject> {
     super();
   }
 
-  public loadRoles(projectId: string, grantId: string, pageIndex: number, pageSize: number, sortDirection?: string): void {
+  public loadRoles(projectId: string, grantId: string, pageIndex: number, pageSize: number, sortDirection?: string, searchQueries?: RoleQuery[]): void {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
     if (grantId && projectId) {
-      from(this.mgmtService.listGrantedProjectRoles(projectId, grantId, pageSize, offset))
+      from(this.mgmtService.listGrantedProjectRoles(projectId, grantId, pageSize, offset, searchQueries))
         .pipe(
           map((resp) => {
             if (resp.details?.totalResult !== undefined) {
@@ -45,7 +45,7 @@ export class ProjectRolesDataSource extends DataSource<Role.AsObject> {
           this.rolesSubject.next(roles);
         });
     } else if (projectId) {
-      from(this.mgmtService.listProjectRoles(projectId, pageSize, offset))
+      from(this.mgmtService.listProjectRoles(projectId, pageSize, offset, searchQueries))
         .pipe(
           map((resp) => {
             if (resp.details?.totalResult !== undefined) {

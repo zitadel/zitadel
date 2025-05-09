@@ -1,0 +1,141 @@
+@mixin search-user-autocomplete-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: map-get($primary, 500);
+  $lighter-primary-color: map-get($primary, 300);
+  $darker-primary-color: map-get($primary, 700);
+
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $secondary-text: map-get($foreground, secondary-text);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  $link-hover-color: if($is-dark-theme, map-get($primary, 200), $primary-color);
+  $link-color: if($is-dark-theme, $lighter-primary-color, $primary-color);
+
+  .user-autocomplete-found {
+    margin: 0.5rem 0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
+    max-width: 500px;
+    box-sizing: border-box;
+
+    .add-user-row {
+      margin-left: -4px;
+    }
+
+    .found-user-row {
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 0;
+
+      button {
+        visibility: hidden;
+      }
+
+      &:hover {
+        button {
+          visibility: visible;
+        }
+      }
+    }
+
+    .found-label {
+      font-size: 14px;
+    }
+
+    .user-name-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .smaller {
+        font-size: 13px;
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .search-group-dl-btn {
+      transition: color 0.2s ease;
+
+      &:not(:hover) {
+        color: $secondary-text;
+      }
+    }
+  }
+
+  .user-autocomplete-target-desc {
+    font-size: 14px;
+    display: block;
+    margin-top: 0.5rem;
+
+    a {
+      color: $link-color;
+      transition: color 0.2s ease;
+
+      &:hover {
+        cursor: pointer;
+        color: $link-hover-color;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.user-create-form-field {
+  flex: 1;
+
+  &.more-space {
+    margin-bottom: 1rem;
+  }
+}
+
+.line {
+  display: flex;
+  max-width: 500px;
+
+  button {
+    margin-top: 30px;
+  }
+}
+
+.sm-dlt {
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.circle {
+  margin-right: 0.5rem;
+}
+
+input {
+  max-width: 500px;
+  display: block;
+}
+
+.user-option {
+  display: flex;
+  align-items: center;
+
+  .user-option-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+
+    span {
+      line-height: normal;
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .smaller {
+      font-size: 13px;
+    }
+  }
+}

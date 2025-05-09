@@ -1,6 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { take } from 'rxjs/operators';
 import { Subject, takeUntil } from 'rxjs';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -22,13 +23,20 @@ export class GrantsComponent implements OnDestroy {
   public UserGrantContext: any = UserGrantContext;
   public isZitadel: boolean = false;
   public destroy$: Subject<void> = new Subject();
+  public listType: any = 'default';
 
   constructor(
     public translate: TranslateService,
     activatedRoute: ActivatedRoute,
     private mgmtService: ManagementService,
     private breadcrumbService: BreadcrumbService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {
+    activatedRoute.queryParams.pipe(take(1)).subscribe((params) => {
+      const { listType } = params as Params;
+      this.listType = listType || 'default';
+    });
     activatedRoute.data.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const { context } = params;
       this.grantContext = context;
@@ -69,5 +77,18 @@ export class GrantsComponent implements OnDestroy {
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+
+  public setType(listType: any): void {
+    this.listType = listType;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        listType: listType,
+      },
+      replaceUrl: true,
+      skipLocationChange: false,
+    });
   }
 }

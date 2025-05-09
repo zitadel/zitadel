@@ -10,6 +10,11 @@
     color: $warn-color;
   }
 
+  .auth-toggle-group {
+    display: flex;
+    margin: 0;
+  }
+
   .section-h2 {
     font-weight: 400;
     font-size: 16px;

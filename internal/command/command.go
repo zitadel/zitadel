@@ -28,6 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -99,6 +100,8 @@ type Commands struct {
 	// These instance's milestones never need to be invalidated,
 	// so the query and cache overhead can completely eliminated.
 	milestonesCompleted sync.Map
+
+	query *query.Queries
 }
 
 func StartCommands(
