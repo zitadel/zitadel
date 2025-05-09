@@ -1,0 +1,1 @@
+CREATE USER IF NOT EXISTS {{ .Username}};
