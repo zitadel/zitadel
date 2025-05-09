@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,11 +12,20 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func patsCheckPermission(ctx context.Context, tokens *PersonalAccessTokens, permissionCheck domain.PermissionCheck) {
+	tokens.PersonalAccessTokens = slices.DeleteFunc(tokens.PersonalAccessTokens,
+		func(token *PersonalAccessToken) bool {
+			return userCheckPermission(ctx, token.ResourceOwner, token.UserID, permissionCheck) != nil
+		},
+	)
+}
 
 var (
 	personalAccessTokensTable = table{
@@ -123,18 +133,36 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	return pat, nil
 }
 
-func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool) (personalAccessTokens *PersonalAccessTokens, err error) {
+// SearchPersonalAccessTokens returns personal access token resources.
+// If permissionCheck is nil, the PATs are not filtered.
+// If permissionCheck is not nil and the PermissionCheckV2 feature flag is false, the returned PATs are filtered in-memory by the given permission check.
+// If permissionCheck is not nil and the PermissionCheckV2 feature flag is true, the returned PATs are filtered in the database.
+func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool, permissionCheck domain.PermissionCheck) (authNKeys *PersonalAccessTokens, err error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	keys, err := q.searchPersonalAccessTokens(ctx, withOwnerRemoved, queries, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		patsCheckPermission(ctx, keys, permissionCheck)
+	}
+	return keys, nil
+}
+
+func (q *Queries) searchPersonalAccessTokens(ctx context.Context, withOwnerRemoved bool, queries *PersonalAccessTokenSearchQueries, permissionCheckV2 bool) (personalAccessTokens *PersonalAccessTokens, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := preparePersonalAccessTokensQuery()
+	query = queries.toQuery(query)
+	query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, PersonalAccessTokenColumnResourceOwner, PersonalAccessTokenColumnUserID)
 	eq := sq.Eq{
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		eq[PersonalAccessTokenColumnOwnerRemoved.identifier()] = false
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-Hjw2w", "Errors.Query.InvalidRequest")
 	}
@@ -158,6 +186,22 @@ func NewPersonalAccessTokenResourceOwnerSearchQuery(value string) (SearchQuery, 
 
 func NewPersonalAccessTokenUserIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(PersonalAccessTokenColumnUserID, value, TextEquals)
+}
+
+func NewPersonalAccessTokenIDQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(PersonalAccessTokenColumnID, id, TextEquals)
+}
+
+func NewPersonalAccessTokenCreationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(PersonalAccessTokenColumnCreationDate, ts, compare)
+}
+
+func NewPersonalAccessTokenChangedDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(PersonalAccessTokenColumnChangeDate, ts, compare)
+}
+
+func NewPersonalAccessTokenExpirationDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(PersonalAccessTokenColumnExpiration, ts, compare)
 }
 
 func (r *PersonalAccessTokenSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Mobilnr redan verifierad
       Empty: Mobilnr är tom
       NotChanged: Mobilnr ändrades inte
+      VerifyingRemovalIsNotSupported: Verifiering av borttagning stöds inte
     Address:
       NotFound: Adress hittades inte
       NotChanged: Adress ändrades inte

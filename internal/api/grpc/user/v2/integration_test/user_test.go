@@ -1834,44 +1834,25 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				req: &user.DeleteUserRequest{},
 				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
-					removeUser, err := Instance.Client.Mgmt.AddMachineUser(CTX, &mgmt.AddMachineUserRequest{
-						UserName: gofakeit.Username(),
-						Name:     gofakeit.Name(),
-					})
-					request.UserId = removeUser.UserId
-					require.NoError(t, err)
-					tokenResp, err := Instance.Client.Mgmt.AddPersonalAccessToken(CTX, &mgmt.AddPersonalAccessTokenRequest{UserId: removeUser.UserId})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(UserCTX, tokenResp.Token)
-				},
-			},
-			want: &user.DeleteUserResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.DefaultOrg.Id,
-				},
-			},
-		},
-		{
-			name: "remove self human, ok",
-			args: args{
-				req: &user.DeleteUserRequest{},
-				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
-					removeUser, err := Client.AddHumanUser(CTX, &user.AddHumanUserRequest{
-						Organization: &object.Organization{Org: &object.Organization_OrgId{OrgId: Instance.DefaultOrg.Id}},
-						Profile: &user.SetHumanProfile{
-							GivenName:  "givenName",
-							FamilyName: "familyName",
-						},
-						Email: &user.SetHumanEmail{
-							Email:        gofakeit.Email(),
-							Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
+					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									GivenName:  "givenName",
+									FamilyName: "familyName",
+								},
+								Email: &user.SetHumanEmail{
+									Email:        gofakeit.Email(),
+									Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
+								},
+							},
 						},
 					})
 					require.NoError(t, err)
-					request.UserId = removeUser.UserId
-					Instance.RegisterUserPasskey(CTX, removeUser.UserId)
-					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, removeUser.UserId)
+					request.UserId = removeUser.Id
+					Instance.RegisterUserPasskey(CTX, removeUser.Id)
+					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, removeUser.Id)
 					return integration.WithAuthorizationToken(UserCTX, token)
 				},
 			},
@@ -1881,24 +1862,6 @@ func TestServer_DeleteUser(t *testing.T) {
 					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
-		},
-		{
-			name: "remove self machine, error",
-			args: args{
-				req: &user.DeleteUserRequest{},
-				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
-					removeUser, err := Instance.Client.Mgmt.AddMachineUser(CTX, &mgmt.AddMachineUserRequest{
-						UserName: gofakeit.Username(),
-						Name:     gofakeit.Name(),
-					})
-					request.UserId = removeUser.UserId
-					require.NoError(t, err)
-					tokenResp, err := Instance.Client.Mgmt.AddPersonalAccessToken(CTX, &mgmt.AddPersonalAccessTokenRequest{UserId: removeUser.UserId})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(UserCTX, tokenResp.Token)
-				},
-			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -3519,7 +3482,6 @@ func TestServer_HumanMFAInitSkipped(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
-
 			got, err := Client.HumanMFAInitSkipped(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)

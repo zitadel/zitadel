@@ -302,9 +302,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 		{
 			name: "add human (with initial code), no permission",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
@@ -326,9 +324,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
