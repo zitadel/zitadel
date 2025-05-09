@@ -133,7 +133,6 @@ func tryBind(
 		username,
 		password,
 		timeout,
-		rootCA,
 	)
 }
 
@@ -189,12 +188,11 @@ func trySearchAndUserBind(
 	username string,
 	password string,
 	timeout time.Duration,
-	rootCA []byte,
 ) (*ldap.Entry, error) {
 	searchQuery := queriesAndToSearchQuery(
 		objectClassesToSearchQuery(objectClasses),
 		queriesOrToSearchQuery(
-			userFiltersToSearchQuery(userFilters, username),
+			userFiltersToSearchQuery(userFilters, username)...,
 		),
 	)
 
@@ -261,12 +259,12 @@ func objectClassesToSearchQuery(classes []string) string {
 	return searchQuery
 }
 
-func userFiltersToSearchQuery(filters []string, username string) string {
-	searchQuery := ""
-	for _, filter := range filters {
-		searchQuery += "(" + filter + "=" + ldap.EscapeFilter(username) + ")"
+func userFiltersToSearchQuery(filters []string, username string) []string {
+	searchQueries := make([]string, len(filters))
+	for i, filter := range filters {
+		searchQueries[i] = "(" + filter + "=" + ldap.EscapeFilter(username) + ")"
 	}
-	return searchQuery
+	return searchQueries
 }
 
 func mapLDAPEntryToUser(
