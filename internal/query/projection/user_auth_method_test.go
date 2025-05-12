@@ -529,6 +529,34 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name:   "reduceUserRemoved",
+			reduce: (&userAuthMethodProjection{}).reduceUserRemoved,
+			args: args{
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						nil,
+					), user.UserRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (instance_id = $1) AND (resource_owner = $2) AND (user_id = $3)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"ro-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:   "org reduceOwnerRemoved",
 			reduce: (&userAuthMethodProjection{}).reduceOwnerRemoved,
 			args: args{
