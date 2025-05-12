@@ -166,6 +166,20 @@ enum ProjectFieldName {
   PROJECT_FIELD_NAME_NAME = 4;
 }
 
+enum ProjectGrantFieldName {
+  PROJECT_GRANT_FIELD_NAME_UNSPECIFIED = 0;
+  PROJECT_GRANT_FIELD_NAME_PROJECT_ID = 1;
+  PROJECT_GRANT_FIELD_NAME_CREATION_DATE = 2;
+  PROJECT_GRANT_FIELD_NAME_CHANGE_DATE = 3;
+}
+
+enum ProjectRoleFieldName {
+  PROJECT_ROLE_FIELD_NAME_UNSPECIFIED = 0;
+  PROJECT_ROLE_FIELD_NAME_KEY = 1;
+  PROJECT_ROLE_FIELD_NAME_CREATION_DATE = 2;
+  PROJECT_ROLE_FIELD_NAME_CHANGE_DATE = 3;
+}
+
 message ProjectSearchFilter {
   oneof filter {
     option (validate.required) = true;
@@ -259,43 +273,49 @@ message GrantedOrganizationIDFilter {
 }
 
 message ProjectRole {
+  // ID of the project.
+  string project_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629026806489455\"";
+    }
+  ];
   // Key of the project role.
-  string key = 1 [
+  string key = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"role.super.man\""
     }
   ];
   // The timestamp of the project role creation.
-  google.protobuf.Timestamp creation_date = 2 [
+  google.protobuf.Timestamp creation_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
   // The timestamp of the last change to the project role.
-  google.protobuf.Timestamp change_date = 3 [
+  google.protobuf.Timestamp change_date = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
   // Display name of the project role.
-  string display_name = 4 [
+  string display_name = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"Super man\""
     }
   ];
   // Group of the project role.
-  string group = 5 [
+  string group = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"people\""
     }
   ];
 }
 
-message ProjectRoleFilter {
-  oneof query {
+message ProjectRoleSearchFilter {
+  oneof filter {
     option (validate.required) = true;
 
-    ProjectRoleKeyFilter key_filter = 1;
+    ProjectRoleKeyFilter role_key_filter = 1;
     ProjectRoleDisplayNameFilter display_name_filter = 2;
   }
 }

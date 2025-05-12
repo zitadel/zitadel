@@ -79,7 +79,7 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Project.App.AlreadyExisting")
 	}
 
-	if err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
+	if _, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
 		return nil, err
 	}
 	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
@@ -90,7 +90,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Project.App.Invalid")
 	}
 
-	if err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
+	if _, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
 		return nil, err
 	}
 	if !apiApp.IsValid() {
