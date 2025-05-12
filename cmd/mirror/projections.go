@@ -247,7 +247,7 @@ func projections(
 		}
 	}()
 
-	for range config.Projections.ConcurrentInstances {
+	for i := 0; i < int(config.Projections.ConcurrentInstances); i++ {
 		go execProjections(ctx, es, instances, failedInstances, &wg)
 	}
 
