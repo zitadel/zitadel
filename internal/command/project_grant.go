@@ -81,10 +81,6 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) 
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) checkPermissionWriteProjectGrant(ctx context.Context, resourceOwner, projectGrantID string) error {
-	return c.checkPermission(ctx, domain.PermissionProjectGrantWrite, resourceOwner, projectGrantID)
-}
-
 type ChangeProjectGrant struct {
 	es_models.ObjectRoot
 
