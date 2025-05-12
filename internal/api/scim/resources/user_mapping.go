@@ -384,7 +384,7 @@ func (h *UsersHandler) mapAndValidateMetadata(ctx context.Context, user *ScimUse
 	}
 
 	if err := extractJsonMetadata(ctx, md, metadata.KeyEmails, &user.Emails); err != nil {
-		logging.OnError(err).Warn("Could not deserialize scim roles metadata")
+		logging.OnError(err).Warn("Could not deserialize scim emails metadata")
 	}
 }
 

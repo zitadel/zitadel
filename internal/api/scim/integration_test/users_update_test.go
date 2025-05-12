@@ -138,6 +138,14 @@ func TestUpdateUser(t *testing.T) {
 				ProfileUrl:  test.Must(schemas.ParseHTTPURL("http://login.example.com/bjensen")),
 				Emails: []*resources.ScimEmail{
 					{
+						Value: "bjensen@example.com",
+						Type:  "work",
+					},
+					{
+						Value: "babs@jensen.org",
+						Type:  "home",
+					},
+					{
 						Value:   "babs@example.com",
 						Primary: true,
 						Type:    "home",

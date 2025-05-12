@@ -85,7 +85,6 @@ func TestReplaceUser(t *testing.T) {
 					{
 						Value:   "bjensen-replaced-full@example.com",
 						Primary: true,
-						Type:    "work-updated",
 					},
 				},
 				Addresses: []*resources.ScimAddress{
@@ -304,7 +303,14 @@ func TestReplaceUser_removeOldMetadata(t *testing.T) {
 			Id: createdUser.ID,
 		})
 		require.NoError(tt, err)
-		require.Equal(tt, 0, len(md.Result))
+		require.Equal(tt, 1, len(md.Result))
+
+		mdMap := make(map[string]string)
+		for i := range md.Result {
+			mdMap[md.Result[i].Key] = string(md.Result[i].Value)
+		}
+
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:emails", "[{\"value\":\"user1@example.com\",\"primary\":true}]")
 	}, retryDuration, tick)
 
 	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
