@@ -257,7 +257,7 @@ func projections(
 	}()
 
 	for i := 0; i < int(config.Projections.ConcurrentInstances); i++ {
-		go execProjections(ctx, instances, failedInstances, &wg)
+		go execProjections(ctx, es, instances, failedInstances, &wg)
 	}
 
 	existingInstances := queryInstanceIDs(ctx, client)
@@ -273,7 +273,7 @@ func projections(
 	logging.WithFields("took", time.Since(start)).Info("projections executed")
 }
 
-func execProjections(ctx context.Context, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {
+func execProjections(ctx context.Context, es *eventstore.Eventstore, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {
 	for instance := range instances {
 		logging.WithFields("instance", instance).Info("starting projections")
 		ctx = internal_authz.WithInstanceID(ctx, instance)
@@ -299,7 +299,7 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			continue
 		}
 
-		err = notification.ProjectInstance(ctx)
+		err = notification.SetCurrentState(ctx, es)
 		if err != nil {
 			logging.WithFields("instance", instance).OnError(err).Info("trigger notification failed")
 			failedInstances <- instance
