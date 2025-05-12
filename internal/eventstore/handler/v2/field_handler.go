@@ -126,6 +126,11 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, nil
 	}
 
+	if config.minPosition > 0 {
+		currentState.position = config.minPosition
+		currentState.offset = 0
+	}
+
 	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
 	if err != nil {
 		return additionalIteration, err
@@ -146,7 +151,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 }
 
 func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
+	events, err := h.es.Filter(ctx, h.EventQuery(currentState).SetTx(tx))
 	if err != nil || len(events) == 0 {
 		h.log().OnError(err).Debug("filter eventstore failed")
 		return nil, false, err
