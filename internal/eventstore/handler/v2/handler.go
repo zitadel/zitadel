@@ -386,6 +386,7 @@ func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
 type triggerConfig struct {
 	awaitRunning bool
 	maxPosition  float64
+	minPosition  float64
 }
 
 type TriggerOpt func(conf *triggerConfig)
@@ -399,6 +400,12 @@ func WithAwaitRunning() TriggerOpt {
 func WithMaxPosition(position float64) TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.maxPosition = position
+	}
+}
+
+func WithMinPosition(position float64) TriggerOpt {
+	return func(conf *triggerConfig) {
+		conf.minPosition = position
 	}
 }
 
@@ -514,6 +521,11 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, nil
 	}
 
+	if config.minPosition > 0 {
+		currentState.position = config.minPosition
+		currentState.offset = 0
+	}
+
 	var statements []*Statement
 	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
 	if err != nil {
@@ -569,7 +581,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
+	events, err := h.es.Filter(ctx, h.EventQuery(currentState).SetTx(tx))
 	if err != nil {
 		h.log().WithError(err).Debug("filter eventstore failed")
 		return nil, false, err
@@ -661,7 +673,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 	return nil
 }
 
-func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {
+func (h *Handler) EventQuery(currentState *state) *eventstore.SearchQueryBuilder {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		Limit(uint64(h.bulkLimit)).
