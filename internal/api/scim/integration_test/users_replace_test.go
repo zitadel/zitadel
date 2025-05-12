@@ -286,6 +286,7 @@ func TestReplaceUser(t *testing.T) {
 			}, retryDuration, tick)
 		})
 	}
+
 }
 
 func TestReplaceUser_removeOldMetadata(t *testing.T) {
