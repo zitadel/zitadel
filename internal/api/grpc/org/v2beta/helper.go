@@ -28,7 +28,7 @@ func listOrgRequestToModel(systemDefaults systemdefaults.SystemDefaults, request
 	if err != nil {
 		return nil, err
 	}
-	queries, err := OrgQueriesToModel(request.Filter)
+	queries, err := OrgQueriesToModel(request.OrganizationSearchFilter)
 	if err != nil {
 		return nil, err
 	}

@@ -49,7 +49,7 @@ func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.List
 		return nil, err
 	}
 	return &v2beta_org.ListOrganizationsResponse{
-		Result: OrgViewsToPb(orgs.Orgs),
+		Organizations: OrgViewsToPb(orgs.Orgs),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  orgs.Count,
 			AppliedLimit: uint64(request.GetPagination().GetLimit()),
@@ -68,12 +68,12 @@ func (s *Server) DeleteOrganization(ctx context.Context, request *v2beta_org.Del
 }
 
 func (s *Server) SetOrganizationMetadata(ctx context.Context, request *v2beta_org.SetOrganizationMetadataRequest) (*v2beta_org.SetOrganizationMetadataResponse, error) {
-	result, err := s.command.BulkSetOrgMetadata(ctx, request.Id, BulkSetOrgMetadataToDomain(request)...)
+	result, err := s.command.BulkSetOrgMetadata(ctx, request.OrganizationId, BulkSetOrgMetadataToDomain(request)...)
 	if err != nil {
 		return nil, err
 	}
 	return &org.SetOrganizationMetadataResponse{
-		ChangeDate: timestamppb.New(result.EventDate),
+		SetDate: timestamppb.New(result.EventDate),
 	}, nil
 }
 
@@ -101,7 +101,7 @@ func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *v2beta
 		return nil, err
 	}
 	return &v2beta_org.DeleteOrganizationMetadataResponse{
-		ChangeDate: timestamppb.New(result.EventDate),
+		DeletionDate: timestamppb.New(result.EventDate),
 	}, nil
 }
 
@@ -115,12 +115,12 @@ func (s *Server) DeactivateOrganization(ctx context.Context, request *org.Deacti
 	}, nil
 }
 
-func (s *Server) ReactivateOrganization(ctx context.Context, request *org.ReactivateOrganizationRequest) (*org.ReactivateOrganizationResponse, error) {
+func (s *Server) ActivateOrganization(ctx context.Context, request *org.ActivateOrganizationRequest) (*org.ActivateOrganizationResponse, error) {
 	objectDetails, err := s.command.ReactivateOrg(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &org.ReactivateOrganizationResponse{
+	return &org.ActivateOrganizationResponse{
 		ChangeDate: timestamppb.New(objectDetails.EventDate),
 	}, err
 }
@@ -169,7 +169,7 @@ func (s *Server) DeleteOrganizationDomain(ctx context.Context, req *org.DeleteOr
 		return nil, err
 	}
 	return &org.DeleteOrganizationDomainResponse{
-		ChangeDate: timestamppb.New(details.EventDate),
+		DeletionDate: timestamppb.New(details.EventDate),
 	}, err
 }
 

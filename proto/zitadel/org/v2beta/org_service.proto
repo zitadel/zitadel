@@ -383,15 +383,15 @@ service OrganizationService {
 
   }
 
-  // Reactivate Organization
+  // Activate Organization
   //
   // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
   //
   // Required permission:
   //   - `org.write`
-  rpc ReactivateOrganization(ReactivateOrganizationRequest) returns (ReactivateOrganizationResponse) {
+  rpc ActivateOrganization(ActivateOrganizationRequest) returns (ActivateOrganizationResponse) {
     option (google.api.http) = {
-        post: "/v2beta/organizations/_reactivate"
+        post: "/v2beta/organizations/_activate"
         body: "*"
     };
 
@@ -468,7 +468,6 @@ message UpdateOrganizationRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want to update."
     }
   ];
 
@@ -494,27 +493,20 @@ message UpdateOrganizationResponse {
 }
 
 message ListOrganizationsRequest {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      description: "Search query for lists";
-      required: ["query"]
-    };
-  };
-
   // List limitations and ordering.
   optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
   // the field the result is sorted
   zitadel.org.v2beta.OrgFieldName sorting_column = 2;
   // Define the criteria to query for.
   // repeated ProjectRoleFilter filters = 4;
-  repeated zitadel.org.v2beta.OrgQueryFilter filter = 3;
+  repeated zitadel.org.v2beta.OrgQueryFilter OrganizationSearchFilter = 3;
 }
 
 message ListOrganizationsResponse {
   // Pagination of the Organizations results
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
   // The Organizations requested
-  repeated zitadel.org.v2beta.Organization result = 2;
+  repeated zitadel.org.v2beta.Organization organizations = 2;
 }
 
 message DeleteOrganizationRequest {
@@ -565,8 +557,8 @@ message DeactivateOrganizationResponse {
   ];
 }
 
-message ReactivateOrganizationRequest {
-  // Organization Id for the Organization to be reactivated
+message ActivateOrganizationRequest {
+  // Organization Id for the Organization to be activated
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -577,8 +569,8 @@ message ReactivateOrganizationRequest {
   ];
 }
 
-message ReactivateOrganizationResponse {
-  //  The timestamp of the reactivation of the organization.
+message ActivateOrganizationResponse {
+  //  The timestamp of the activation of the organization.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -669,7 +661,7 @@ message DeleteOrganizationDomainRequest {
 
 message DeleteOrganizationDomainResponse {
   //  The timestamp of the deletion of the organization domain.
-  google.protobuf.Timestamp change_date = 1 [
+  google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
@@ -685,7 +677,6 @@ message GenerateOrganizationDomainValidationRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want to generate a validation request for."
     }
   ];
   // The domain which to be deleted.
@@ -755,7 +746,7 @@ message Metadata {
   bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
 message SetOrganizationMetadataRequest{
-  string id = 1;
+  string organization_id = 1;
   repeated Metadata metadata = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       title: "Medata (Key/Value)"
@@ -767,7 +758,7 @@ message SetOrganizationMetadataRequest{
 
 message SetOrganizationMetadataResponse{
   //  The timestamp of the update of the organization metadata.
-  google.protobuf.Timestamp change_date = 1 [
+  google.protobuf.Timestamp set_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
@@ -808,7 +799,7 @@ message DeleteOrganizationMetadataRequest {
 
 message DeleteOrganizationMetadataResponse{
   //  The timestamp of the deletiion of the organization metadata.
-  google.protobuf.Timestamp change_date = 1 [
+  google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
