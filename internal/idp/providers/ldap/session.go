@@ -216,7 +216,12 @@ func trySearchAndUserBind(
 
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
-	if err = conn.Bind(user.DN, password); err != nil {
+	userDN, err := ldap.ParseDN(user.DN)
+	if err != nil {
+		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user parse DN failed")
+		return nil, err
+	}
+	if err = conn.Bind(userDN.String(), password); err != nil {
 		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user bind failed")
 		return nil, ErrFailedLogin
 	}
@@ -262,7 +267,7 @@ func objectClassesToSearchQuery(classes []string) string {
 func userFiltersToSearchQuery(filters []string, username string) []string {
 	searchQueries := make([]string, len(filters))
 	for i, filter := range filters {
-		searchQueries[i] = "(" + filter + "=" + ldap.EscapeFilter(username) + ")"
+		searchQueries[i] = "(" + filter + "=" + username + ")"
 	}
 	return searchQueries
 }
