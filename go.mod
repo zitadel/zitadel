@@ -8,6 +8,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.27.0
+	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/alecthomas/participle/v2 v2.1.4
@@ -48,6 +49,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/k3a/html2text v1.2.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
+	github.com/manifoldco/promptui v0.9.0
 	github.com/minio/minio-go/v7 v7.0.88
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/gamut v0.3.1
@@ -110,6 +112,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
+	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect

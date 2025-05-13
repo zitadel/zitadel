@@ -54,7 +54,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		stateQuery = currentStateAwaitStmt
 	}
 
-	row := tx.QueryRow(stateQuery, currentState.instanceID, h.projection.Name())
+	row := tx.QueryRowContext(ctx, stateQuery, currentState.instanceID, h.projection.Name())
 	err = row.Scan(
 		aggregateID,
 		aggregateType,
