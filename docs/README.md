@@ -6,6 +6,8 @@ This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern 
 
 To add a new site to the already existing structure simply save the `md` file into the corresponding folder and append the sites id int the file `sidebars.js`.
 
+If you are introducing new APIs (gRPC), you need to add a new entry to `docusaurus.config.js` under the `plugins` section.
+
 ## Installation
 
 Install dependencies with
