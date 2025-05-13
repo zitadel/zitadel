@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -278,7 +279,7 @@ func eventDataFilter(query *eventstore.SearchQuery) *Filter {
 }
 
 func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
-	if pos := query.GetPositionAfter(); pos != 0 {
+	if pos := query.GetPositionAfter(); !pos.Equal(decimal.Decimal{}) {
 		return NewFilter(FieldPosition, pos, OperationGreater)
 	}
 	return nil
