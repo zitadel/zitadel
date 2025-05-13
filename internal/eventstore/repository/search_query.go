@@ -233,7 +233,7 @@ func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuer
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if builder.GetPositionAfter() == 0 {
+	if builder.GetPositionAfter().IsZero() {
 		return nil
 	}
 	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreater)
