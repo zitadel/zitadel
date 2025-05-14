@@ -99,7 +99,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.WithFields("from", previousMigration.Position.String(), "to", maxPosition.String()).Info("start event migration")
 
 	nextPos := make(chan bool, 1)
-	pos := make(chan float64, 1)
+	pos := make(chan decimal.Decimal, 1)
 	errs := make(chan error, 3)
 
 	go func() {
@@ -150,7 +150,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	go func() {
 		defer close(pos)
 		for range nextPos {
-			var position float64
+			var position decimal.Decimal
 			err := dest.QueryRowContext(
 				ctx,
 				func(row *sql.Row) error {
