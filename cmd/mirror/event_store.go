@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/shopspring/decimal"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -97,7 +98,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.WithFields("from", previousMigration.Position, "to", maxPosition).Info("start event migration")
 
 	nextPos := make(chan bool, 1)
-	pos := make(chan float64, 1)
+	pos := make(chan decimal.Decimal, 1)
 	errs := make(chan error, 3)
 
 	go func() {
@@ -148,7 +149,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	go func() {
 		defer close(pos)
 		for range nextPos {
-			var position float64
+			var position decimal.Decimal
 			err := dest.QueryRowContext(
 				ctx,
 				func(row *sql.Row) error {
@@ -183,7 +184,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
 }
 
-func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position float64, errs <-chan error) {
+func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position decimal.Decimal, errs <-chan error) {
 	joinedErrs := make([]error, 0, len(errs))
 	for err := range errs {
 		joinedErrs = append(joinedErrs, err)
