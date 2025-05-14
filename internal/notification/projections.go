@@ -75,7 +75,7 @@ func SetCurrentState(ctx context.Context, es *eventstore.Eventstore) error {
 	if len(projections) == 0 {
 		return nil
 	}
-	position, err := es.LatestSequence(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).InstanceID(authz.GetInstance(ctx).InstanceID()).OrderDesc().Limit(1))
+	position, err := es.LatestPosition(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).InstanceID(authz.GetInstance(ctx).InstanceID()).OrderDesc().Limit(1))
 	if err != nil {
 		return err
 	}
