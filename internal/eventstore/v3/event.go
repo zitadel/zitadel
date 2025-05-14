@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -42,7 +43,7 @@ type event struct {
 	command   *command
 	createdAt time.Time
 	sequence  uint64
-	position  float64
+	position  decimal.Decimal
 }
 
 // TODO: remove on v3
@@ -152,8 +153,8 @@ func (e *event) Sequence() uint64 {
 	return e.sequence
 }
 
-// Sequence implements [eventstore.Event]
-func (e *event) Position() float64 {
+// Position implements [eventstore.Event]
+func (e *event) Position() decimal.Decimal {
 	return e.position
 }
 
