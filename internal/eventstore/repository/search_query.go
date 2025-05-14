@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
