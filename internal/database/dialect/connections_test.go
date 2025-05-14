@@ -169,6 +169,7 @@ func TestNewConnectionConfig(t *testing.T) {
 			want: &ConnectionConfig{
 				MaxOpenConns: 1,
 				MaxIdleConns: 1,
+				AfterConnect: afterConnectFuncs,
 			},
 		},
 		{
@@ -183,6 +184,7 @@ func TestNewConnectionConfig(t *testing.T) {
 			want: &ConnectionConfig{
 				MaxOpenConns: 1,
 				MaxIdleConns: 1,
+				AfterConnect: afterConnectFuncs,
 			},
 		},
 		{
@@ -197,6 +199,7 @@ func TestNewConnectionConfig(t *testing.T) {
 			want: &ConnectionConfig{
 				MaxOpenConns: 1,
 				MaxIdleConns: 1,
+				AfterConnect: afterConnectFuncs,
 			},
 		},
 		{
@@ -211,6 +214,7 @@ func TestNewConnectionConfig(t *testing.T) {
 			want: &ConnectionConfig{
 				MaxOpenConns: 6,
 				MaxIdleConns: 3,
+				AfterConnect: afterConnectFuncs,
 			},
 		},
 		{
@@ -225,6 +229,7 @@ func TestNewConnectionConfig(t *testing.T) {
 			want: &ConnectionConfig{
 				MaxOpenConns: 2,
 				MaxIdleConns: 1,
+				AfterConnect: afterConnectFuncs,
 			},
 		},
 		{
@@ -239,6 +244,7 @@ func TestNewConnectionConfig(t *testing.T) {
 			want: &ConnectionConfig{
 				MaxOpenConns: 2,
 				MaxIdleConns: 1,
+				AfterConnect: afterConnectFuncs,
 			},
 		},
 	}

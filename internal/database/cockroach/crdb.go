@@ -75,10 +75,16 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, *pgxpool.Pool, error) {
-	dialect.RegisterAfterConnect(func(ctx context.Context, c *pgx.Conn) error {
+	dialect.RegisterAfterConnect(func(ctx context.Context, conn *pgx.Conn) error {
 		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
 		// This is needed to fill the fields table of the eventstore during eventstore.Push.
-		_, err := c.Exec(ctx, "SET enable_multiple_modifications_of_table = on")
+
+		// This modification is only needed on crdb so we check if the connection is crdb
+		// postgres doesn't have parameter so we check if the parameter is empty
+		if conn.PgConn().ParameterStatus("crdb_version") == "" {
+			return nil
+		}
+		_, err := conn.Exec(ctx, "SET enable_multiple_modifications_of_table = on")
 		return err
 	})
 	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
