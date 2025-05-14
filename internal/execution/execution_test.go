@@ -59,7 +59,7 @@ func Test_Call(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				timeout:    time.Second,
-				sleep:      time.Second,
+				sleep:      2 * time.Second,
 				method:     http.MethodPost,
 				body:       []byte("{\"request\": \"values\"}"),
 				respBody:   []byte("{\"response\": \"values\"}"),
