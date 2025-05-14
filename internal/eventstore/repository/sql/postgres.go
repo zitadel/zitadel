@@ -2,12 +2,12 @@ package sql
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"regexp"
 	"strconv"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -55,11 +55,11 @@ func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventsto
 	return err
 }
 
-// LatestSequence returns the latest sequence found by the search query
-func (db *Postgres) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
-	var position sql.NullFloat64
+// LatestPosition returns the latest position found by the search query
+func (db *Postgres) LatestPosition(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (decimal.Decimal, error) {
+	var position decimal.Decimal
 	err := query(ctx, db, searchQuery, &position, false)
-	return position.Float64, err
+	return position, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
@@ -126,7 +126,7 @@ func (db *Postgres) eventQuery(useV1 bool) string {
 		" FROM eventstore.events2"
 }
 
-func (db *Postgres) maxSequenceQuery(useV1 bool) string {
+func (db *Postgres) maxPositionQuery(useV1 bool) string {
 	if useV1 {
 		return `SELECT event_sequence FROM eventstore.events`
 	}
@@ -207,6 +207,8 @@ func (db *Postgres) operation(operation repository.Operation) string {
 		return "="
 	case repository.OperationGreater:
 		return ">"
+	case repository.OperationGreaterOrEquals:
+		return ">="
 	case repository.OperationLess:
 		return "<"
 	case repository.OperationJSONContains:

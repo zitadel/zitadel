@@ -7,10 +7,12 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -111,36 +113,36 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max column",
 			args: args{
-				columns: eventstore.ColumnsMaxSequence,
-				dest:    new(sql.NullFloat64),
+				columns: eventstore.ColumnsMaxPosition,
+				dest:    new(decimal.Decimal),
 				useV1:   true,
 			},
 			res: res{
 				query:    `SELECT event_sequence FROM eventstore.events`,
-				expected: sql.NullFloat64{Float64: 43, Valid: true},
+				expected: decimal.NewFromInt(42),
 			},
 			fields: fields{
-				dbRow: []interface{}{sql.NullFloat64{Float64: 43, Valid: true}},
+				dbRow: []interface{}{decimal.NewNullDecimal(decimal.NewFromInt(42))},
 			},
 		},
 		{
 			name: "max column v2",
 			args: args{
-				columns: eventstore.ColumnsMaxSequence,
-				dest:    new(sql.NullFloat64),
+				columns: eventstore.ColumnsMaxPosition,
+				dest:    new(decimal.Decimal),
 			},
 			res: res{
 				query:    `SELECT "position" FROM eventstore.events2`,
-				expected: sql.NullFloat64{Float64: 43, Valid: true},
+				expected: decimal.NewFromInt(42),
 			},
 			fields: fields{
-				dbRow: []interface{}{sql.NullFloat64{Float64: 43, Valid: true}},
+				dbRow: []interface{}{decimal.NewNullDecimal(decimal.NewFromInt(42))},
 			},
 		},
 		{
 			name: "max sequence wrong dest type",
 			args: args{
-				columns: eventstore.ColumnsMaxSequence,
+				columns: eventstore.ColumnsMaxPosition,
 				dest:    new(uint64),
 			},
 			res: res{
@@ -180,11 +182,11 @@ func Test_prepareColumns(t *testing.T) {
 			res: res{
 				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 42, Data: nil, Version: "v1"},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: decimal.NewFromInt(42), Data: nil, Version: "v1"},
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.NullFloat64{Float64: 42, Valid: true}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NewNullDecimal(decimal.NewFromInt(42)), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
 			},
 		},
 		{
@@ -199,11 +201,11 @@ func Test_prepareColumns(t *testing.T) {
 			res: res{
 				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 0, Data: nil, Version: "v1"},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: decimal.Decimal{}, Data: nil, Version: "v1"},
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.NullFloat64{Float64: 0, Valid: false}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NullDecimal{}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
 			},
 		},
 		{
@@ -901,7 +903,7 @@ func Test_query_events_mocked(t *testing.T) {
 					InstanceID("instanceID").
 					OrderDesc().
 					Limit(5).
-					PositionAfter(123.456).
+					PositionAtLeast(decimal.NewFromFloat(123.456)).
 					AddQuery().
 					AggregateTypes("notify").
 					EventTypes("notify.foo.bar").
@@ -914,8 +916,8 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY event_sequence DESC LIMIT $9`),
-					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), 123.456, eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", 123.456, uint64(5)},
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" >= $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" >= $8) ORDER BY event_sequence DESC LIMIT $9`),
+					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), decimal.NewFromFloat(123.456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", decimal.NewFromFloat(123.456), uint64(5)},
 				),
 			},
 			res: res{
@@ -930,7 +932,7 @@ func Test_query_events_mocked(t *testing.T) {
 					InstanceID("instanceID").
 					OrderDesc().
 					Limit(5).
-					PositionAfter(123.456).
+					PositionAtLeast(decimal.NewFromFloat(123.456)).
 					AddQuery().
 					AggregateTypes("notify").
 					EventTypes("notify.foo.bar").
@@ -943,8 +945,8 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`),
-					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), 123.456, eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", 123.456, uint64(5)},
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" >= $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" >= $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`),
+					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), decimal.NewFromFloat(123.456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", decimal.NewFromFloat(123.456), uint64(5)},
 				),
 			},
 			res: res{
@@ -986,6 +988,10 @@ func Test_query_events_mocked(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.fields.mock != nil {
 				client.DB.DB = tt.fields.mock.client
+			}
+
+			if strings.HasPrefix(tt.name, "aggregate / event type, position and exclusion") {
+				t.Log("hodor")
 			}
 
 			err := query(context.Background(), client, tt.args.query, tt.args.dest, tt.args.useV1)

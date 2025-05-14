@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/shopspring/decimal"
 )
 
 var (
@@ -86,7 +88,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						State: State{
 							EventCreatedAt: testNow,
 							LastRun:        testNow,
-							Position:       20211108,
+							Position:       decimal.NewFromInt(20211108),
 							AggregateID:    "agg-id",
 							AggregateType:  "agg-type",
 							Sequence:       20211108,
@@ -133,7 +135,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						ProjectionName: "projection-name",
 						State: State{
 							EventCreatedAt: testNow,
-							Position:       20211108,
+							Position:       decimal.NewFromInt(20211108),
 							LastRun:        testNow,
 							AggregateID:    "agg-id",
 							AggregateType:  "agg-type",
@@ -144,7 +146,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						ProjectionName: "projection-name2",
 						State: State{
 							EventCreatedAt: testNow,
-							Position:       20211108,
+							Position:       decimal.NewFromInt(20211108),
 							LastRun:        testNow,
 							AggregateID:    "agg-id",
 							AggregateType:  "agg-type",
