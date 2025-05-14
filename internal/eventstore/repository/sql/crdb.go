@@ -414,6 +414,8 @@ func (db *CRDB) operation(operation repository.Operation) string {
 		return "="
 	case repository.OperationGreater:
 		return ">"
+	case repository.OperationGreaterOrEquals:
+		return ">="
 	case repository.OperationLess:
 		return "<"
 	case repository.OperationJSONContains:

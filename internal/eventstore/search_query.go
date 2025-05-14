@@ -25,7 +25,7 @@ type SearchQueryBuilder struct {
 	queries               []*SearchQuery
 	tx                    *sql.Tx
 	allowTimeTravel       bool
-	positionAfter         decimal.Decimal
+	positionAtLeast       decimal.Decimal
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -76,8 +76,8 @@ func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
 	return b.allowTimeTravel
 }
 
-func (b SearchQueryBuilder) GetPositionAfter() decimal.Decimal {
-	return b.positionAfter
+func (b SearchQueryBuilder) GetPositionAtLeast() decimal.Decimal {
+	return b.positionAtLeast
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -273,9 +273,9 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 	return builder
 }
 
-// PositionAfter filters for events which happened after the specified time
-func (builder *SearchQueryBuilder) PositionAfter(position decimal.Decimal) *SearchQueryBuilder {
-	builder.positionAfter = position
+// PositionAtLeast filters for events which happened after the specified time
+func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *SearchQueryBuilder {
+	builder.positionAtLeast = position
 	return builder
 }
 
