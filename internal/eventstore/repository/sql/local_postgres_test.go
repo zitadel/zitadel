@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"os"
 	"testing"
-	"time"
 
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
@@ -29,8 +30,11 @@ func TestMain(m *testing.M) {
 
 		connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
 		logging.OnError(err).Fatal("unable to parse db url")
+		connConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			pgxdecimal.Register(conn.TypeMap())
+			return new_es.RegisterEventstoreTypes(ctx, conn)
+		}
 
-		connConfig.AfterConnect = new_es.RegisterEventstoreTypes
 		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
 		logging.OnError(err).Fatal("unable to create db pool")
 
@@ -77,8 +81,6 @@ func initDB(ctx context.Context, db *database.DB) error {
 }
 
 type testDB struct{}
-
-func (_ *testDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
 
 func (*testDB) DatabaseName() string { return "db" }
 

@@ -2,12 +2,13 @@ package eventstore_test
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"os"
 	"testing"
 	"time"
 
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
@@ -36,17 +37,23 @@ func TestMain(m *testing.M) {
 		testClient = &database.DB{
 			Database: new(testDB),
 		}
-
 		connConfig, err := pgxpool.ParseConfig(config.GetConnectionURL())
 		logging.OnError(err).Fatal("unable to parse db url")
 
-		connConfig.AfterConnect = new_es.RegisterEventstoreTypes
+		connConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			pgxdecimal.Register(conn.TypeMap())
+			return new_es.RegisterEventstoreTypes(ctx, conn)
+		}
+
 		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
 		logging.OnError(err).Fatal("unable to create db pool")
 
 		testClient.DB = stdlib.OpenDBFromPool(pool)
 		err = testClient.Ping()
 		logging.OnError(err).Fatal("unable to ping db")
+		defer func() {
+			logging.OnError(testClient.Close()).Error("unable to close db")
+		}()
 
 		v2 := &es_sql.Postgres{DB: testClient}
 		queriers["v2(inmemory)"] = v2
@@ -62,10 +69,6 @@ func TestMain(m *testing.M) {
 			pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
 			clients["v3(singlenode)"] = localDB
 		}
-
-		defer func() {
-			logging.OnError(testClient.Close()).Error("unable to close db")
-		}()
 
 		err = initDB(context.Background(), &database.DB{DB: testClient.DB, Database: &postgres.Config{Database: "zitadel"}})
 		logging.OnError(err).Fatal("migrations failed")
@@ -101,10 +104,15 @@ func initDB(ctx context.Context, db *database.DB) error {
 }
 
 func connectLocalhost() (*database.DB, error) {
-	client, err := sql.Open("pgx", "postgresql://postgres@localhost:5432/postgres?sslmode=disable")
+	config, err := pgxpool.ParseConfig("postgresql://root@localhost:26257/defaultdb?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		return nil, err
+	}
+	client := stdlib.OpenDBFromPool(pool)
 	if err = client.Ping(); err != nil {
 		return nil, err
 	}
