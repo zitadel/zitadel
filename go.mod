@@ -41,7 +41,8 @@ require (
 	github.com/h2non/gock v1.2.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/improbable-eng/grpc-web v0.15.0
-	github.com/jackc/pgx/v5 v5.7.0
+	github.com/jackc/pgx-shopspring-decimal v0.0.0-20220624020537-1d36b5a1853e
+	github.com/jackc/pgx/v5 v5.7.4
 	github.com/jarcoal/jpath v0.0.0-20140328210829-f76b8b2dbf52
 	github.com/jinzhu/gorm v1.9.16
 	github.com/k3a/html2text v1.2.1
@@ -58,6 +59,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
+	github.com/shopspring/decimal v1.4.0
 	github.com/sony/gobreaker/v2 v2.0.0
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/cobra v1.8.1
@@ -114,7 +116,7 @@ require (
 	github.com/google/go-tpm v0.9.0 // indirect
 	github.com/google/pprof v0.0.0-20240528025155-186aa0362fba // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
-	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
