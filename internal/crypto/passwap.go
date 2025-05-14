@@ -174,7 +174,7 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 		return c.sha2()
 	case "":
 		return nil, nil, fmt.Errorf("missing hasher algorithm")
-	case HashNameArgon2, HashNameMd5:
+	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass:
 		fallthrough
 	default:
 		return nil, nil, fmt.Errorf("invalid algorithm %q", c.Algorithm)
@@ -327,6 +327,8 @@ func (c *HasherConfig) sha2Params() (use512 bool, rounds int, err error) {
 		use512 = false
 	case HashModeSHA512:
 		use512 = true
+	case HashModeSHA1, HashModeSHA224, HashModeSHA384:
+		fallthrough
 	default:
 		return false, 0, fmt.Errorf("cannot use %s with sha2", dst.Hash)
 	}
