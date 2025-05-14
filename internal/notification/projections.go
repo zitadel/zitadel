@@ -71,27 +71,7 @@ func SetCurrentState(ctx context.Context, es *eventstore.Eventstore) error {
 	if len(projections) == 0 {
 		return nil
 	}
-	position, err := es.LatestSequence(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).InstanceID(authz.GetInstance(ctx).InstanceID()).OrderDesc().Limit(1))
-	if err != nil {
-		return err
-	}
-
-	for i, projection := range projections {
-		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("set current state of notification projection")
-		_, err = projection.Trigger(ctx, handler.WithMinPosition(position))
-		if err != nil {
-			return err
-		}
-		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("current state of notification projection set")
-	}
-	return nil
-}
-
-func SetCurrentState(ctx context.Context, es *eventstore.Eventstore) error {
-	if len(projections) == 0 {
-		return nil
-	}
-	position, err := es.LatestSequence(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).InstanceID(authz.GetInstance(ctx).InstanceID()).OrderDesc().Limit(1))
+	position, err := es.LatestPosition(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).InstanceID(authz.GetInstance(ctx).InstanceID()).OrderDesc().Limit(1))
 	if err != nil {
 		return err
 	}
