@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -23,7 +25,7 @@ type SearchQueryBuilder struct {
 	queries               []*SearchQuery
 	tx                    *sql.Tx
 	allowTimeTravel       bool
-	positionAfter         float64
+	positionAtLeast       decimal.Decimal
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -74,8 +76,8 @@ func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
 	return b.allowTimeTravel
 }
 
-func (b SearchQueryBuilder) GetPositionAfter() float64 {
-	return b.positionAfter
+func (b SearchQueryBuilder) GetPositionAtLeast() decimal.Decimal {
+	return b.positionAtLeast
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -107,7 +109,7 @@ type SearchQuery struct {
 	aggregateIDs   []string
 	eventTypes     []EventType
 	eventData      map[string]interface{}
-	positionAfter  float64
+	positionAfter  decimal.Decimal
 }
 
 func (q SearchQuery) GetAggregateTypes() []AggregateType {
@@ -126,7 +128,7 @@ func (q SearchQuery) GetEventData() map[string]interface{} {
 	return q.eventData
 }
 
-func (q SearchQuery) GetPositionAfter() float64 {
+func (q SearchQuery) GetPositionAfter() decimal.Decimal {
 	return q.positionAfter
 }
 
@@ -136,8 +138,8 @@ type Columns int8
 const (
 	//ColumnsEvent represents all fields of an event
 	ColumnsEvent = iota + 1
-	// ColumnsMaxSequence represents the latest sequence of the filtered events
-	ColumnsMaxSequence
+	// ColumnsMaxPosition represents the latest sequence of the filtered events
+	ColumnsMaxPosition
 	// ColumnsInstanceIDs represents the instance ids of the filtered events
 	ColumnsInstanceIDs
 
@@ -271,9 +273,9 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 	return builder
 }
 
-// PositionAfter filters for events which happened after the specified time
-func (builder *SearchQueryBuilder) PositionAfter(position float64) *SearchQueryBuilder {
-	builder.positionAfter = position
+// PositionAtLeast filters for events which happened after the specified time
+func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *SearchQueryBuilder {
+	builder.positionAtLeast = position
 	return builder
 }
 
@@ -349,7 +351,7 @@ func (query *SearchQuery) EventData(data map[string]interface{}) *SearchQuery {
 	return query
 }
 
-func (query *SearchQuery) PositionAfter(position float64) *SearchQuery {
+func (query *SearchQuery) PositionAfter(position decimal.Decimal) *SearchQuery {
 	query.positionAfter = position
 	return query
 }

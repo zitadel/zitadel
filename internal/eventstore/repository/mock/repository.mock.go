@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	decimal "github.com/shopspring/decimal"
 	database "github.com/zitadel/zitadel/internal/database"
 	eventstore "github.com/zitadel/zitadel/internal/eventstore"
 	gomock "go.uber.org/mock/gomock"
@@ -98,19 +99,19 @@ func (mr *MockQuerierMockRecorder) InstanceIDs(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDs", reflect.TypeOf((*MockQuerier)(nil).InstanceIDs), arg0, arg1)
 }
 
-// LatestSequence mocks base method.
-func (m *MockQuerier) LatestSequence(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder) (float64, error) {
+// LatestPosition mocks base method.
+func (m *MockQuerier) LatestPosition(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder) (decimal.Decimal, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LatestSequence", arg0, arg1)
-	ret0, _ := ret[0].(float64)
+	ret := m.ctrl.Call(m, "LatestPosition", arg0, arg1)
+	ret0, _ := ret[0].(decimal.Decimal)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// LatestSequence indicates an expected call of LatestSequence.
-func (mr *MockQuerierMockRecorder) LatestSequence(arg0, arg1 any) *gomock.Call {
+// LatestPosition indicates an expected call of LatestPosition.
+func (mr *MockQuerierMockRecorder) LatestPosition(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LatestSequence", reflect.TypeOf((*MockQuerier)(nil).LatestSequence), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LatestPosition", reflect.TypeOf((*MockQuerier)(nil).LatestPosition), arg0, arg1)
 }
 
 // MockPusher is a mock of Pusher interface.
