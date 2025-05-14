@@ -371,7 +371,7 @@ func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, pos
 }
 
 func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position decimal.Decimal) (bool, error) {
-	maxSequence, err := o.getMaxKeySequence(ctx)
+	maxSequence, err := o.getMaxKeyPosition(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
@@ -413,7 +413,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), algorithm)
 }
 
-func (o *OPStorage) getMaxKeySequence(ctx context.Context) (decimal.Decimal, error) {
+func (o *OPStorage) getMaxKeyPosition(ctx context.Context) (decimal.Decimal, error) {
 	return o.eventstore.LatestPosition(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).

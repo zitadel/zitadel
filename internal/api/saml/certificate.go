@@ -105,7 +105,7 @@ func (p *Storage) refreshCertificate(
 }
 
 func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position decimal.Decimal) (bool, error) {
-	maxSequence, err := p.getMaxKeySequence(ctx)
+	maxSequence, err := p.getMaxKeyPosition(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
@@ -152,7 +152,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage cr
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (decimal.Decimal, error) {
+func (p *Storage) getMaxKeyPosition(ctx context.Context) (decimal.Decimal, error) {
 	return p.eventstore.LatestPosition(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).

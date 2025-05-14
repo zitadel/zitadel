@@ -96,7 +96,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	maxPosition, err := writeMigrationStart(ctx, sourceES, migrationID, dest.DatabaseName())
 	logging.OnError(err).Fatal("unable to write migration started event")
 
-	logging.WithFields("from", previousMigration.Position.String(), "to", maxPosition.String()).Info("start event migration")
+	logging.WithFields("from", previousMigration.Position, "to", maxPosition).Info("start event migration")
 
 	nextPos := make(chan bool, 1)
 	pos := make(chan decimal.Decimal, 1)
