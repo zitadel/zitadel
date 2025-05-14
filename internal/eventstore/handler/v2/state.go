@@ -7,6 +7,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -14,7 +16,7 @@ import (
 
 type state struct {
 	instanceID     string
-	position       float64
+	position       decimal.Decimal
 	eventTimestamp time.Time
 	aggregateType  eventstore.AggregateType
 	aggregateID    string
@@ -45,7 +47,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		aggregateType = new(sql.NullString)
 		sequence      = new(sql.NullInt64)
 		timestamp     = new(sql.NullTime)
-		position      = new(sql.NullFloat64)
+		position      = new(decimal.NullDecimal)
 		offset        = new(sql.NullInt64)
 	)
 
@@ -75,7 +77,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
 	currentState.sequence = uint64(sequence.Int64)
 	currentState.eventTimestamp = timestamp.Time
-	currentState.position = position.Float64
+	currentState.position = position.Decimal
 	// psql does not provide unsigned numbers so we work around it
 	currentState.offset = uint32(offset.Int64)
 	return currentState, nil
