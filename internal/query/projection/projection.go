@@ -211,6 +211,18 @@ func ProjectInstance(ctx context.Context) error {
 	return nil
 }
 
+func ProjectInstanceFields(ctx context.Context) error {
+	for i, fieldProjection := range fields {
+		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("starting fields projection")
+		err := fieldProjection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("fields projection done")
+	}
+	return nil
+}
+
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
