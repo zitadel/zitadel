@@ -98,6 +98,7 @@ type projection interface {
 
 var (
 	projections []projection
+	fields      []*handler.FieldHandler
 )
 
 func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) error {
@@ -176,6 +177,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
 
 	newProjectionsList()
+	newFieldsList()
 	return nil
 }
 
@@ -234,6 +236,17 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	}
 
 	return config
+}
+
+// we know this is ugly, but we need to have a singleton slice of all projections
+// and are only able to initialize it after all projections are created
+// as setup and start currently create them individually, we make sure we get the right one
+// will be refactored when changing to new id based projections
+func newFieldsList() {
+	fields = []*handler.FieldHandler{
+		ProjectGrantFields,
+		OrgDomainVerifiedFields,
+	}
 }
 
 // we know this is ugly, but we need to have a singleton slice of all projections
