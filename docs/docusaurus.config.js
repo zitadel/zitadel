@@ -380,5 +380,8 @@ module.exports = {
       };
     },
   ],
-  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  markdown: {
+    mermaid: true,
+  },
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs", '@docusaurus/theme-mermaid'],
 };
