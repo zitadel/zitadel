@@ -34,6 +34,10 @@ var userMapper = func(info *openid.UserInfo) idp.User {
 	return &User{oidc.DefaultMapper(info)}
 }
 
+func InitUser() idp.User {
+	return &User{oidc.InitUser()}
+}
+
 // User is a representation of the authenticated Google and implements the [idp.User] interface
 // by wrapping an [idp.User] (implemented by [oidc.User]). It overwrites the [GetPreferredUsername] to use the `email` claim.
 type User struct {

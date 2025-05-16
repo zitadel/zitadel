@@ -60,6 +60,10 @@ func NewUser(info *openid.UserInfo, names userNamesFormValue) *User {
 	return &User{User: user}
 }
 
+func InitUser() idp.User {
+	return &User{User: oidc.InitUser()}
+}
+
 // User extends the [oidc.User] by returning the email as preferred_username, since Apple does not return the latter.
 type User struct {
 	*oidc.User

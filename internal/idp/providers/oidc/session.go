@@ -96,6 +96,10 @@ func NewUser(info *oidc.UserInfo) *User {
 	return &User{UserInfo: info}
 }
 
+func InitUser() *User {
+	return &User{UserInfo: &oidc.UserInfo{}}
+}
+
 type User struct {
 	*oidc.UserInfo
 }
