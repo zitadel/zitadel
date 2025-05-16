@@ -61,9 +61,8 @@ sidebar_label: Release Versions and Roadmap
             <td colspan={25}>Zitadel Core</td>
         </tr>
         <tr>
-            <th scope="row">V2.x</th>
-            <td colspan={3} class="release-ga">GA</td>
-            <td colSpan={3} class="release-stable">Stable</td>
+            <th scope="row">[v2.x](/docs/product/roadmap#v2x)</th>
+            <td colspan={6} class="release-stable">GA / Stable </td>
             <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
             <td colSpan={16}></td>
         </tr>
@@ -71,8 +70,7 @@ sidebar_label: Release Versions and Roadmap
             <th scope="row">[v3.x](/docs/product/roadmap#v3x)</th>
             <td colspan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
-            <td colspan={2} class="release-ga">GA</td>
-            <td colSpan={3} class="release-stable">Stable</td>
+            <td colspan={5} class="release-stable">GA / Stable </td>
             <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
             <td colSpan={12}></td>
         </tr>
@@ -81,8 +79,7 @@ sidebar_label: Release Versions and Roadmap
             <td colSpan={3}></td>
             <td colSpan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
-            <td colspan={2} class="release-ga">GA</td>
-            <td colSpan={3} class="release-stable">Stable</td>
+            <td colspan={5} class="release-stable">GA / Stable </td>
             <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
             <td colSpan={9}></td>
         </tr>
@@ -91,8 +88,7 @@ sidebar_label: Release Versions and Roadmap
             <td colSpan={3}></td>
             <td colSpan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
-            <td colspan={2} class="release-ga">GA</td>
-            <td colSpan={3} class="release-stable">Stable</td>
+            <td colspan={5} class="release-stable">GA / Stable </td>
             <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
             <td colSpan={6}></td>
         </tr>
@@ -100,13 +96,147 @@ sidebar_label: Release Versions and Roadmap
 </table>
 
 For more detailed description about the different stages and the release cycle check out the following Page: [Release Cycle](/docs/product/release-cycle)
+
 ## Zitadel Core
+
+
+<table id="zitadel-versions">
+    <thead>
+    <tr>
+        <th scope="col">25-Q1</th>
+        <th scope="col">25-Q2</th>
+        <th scope="col">25-Q3</th>
+        <th scope="col">25-Q4</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan={4}>Zitadel Core</td>
+        </tr>
+        <tr>
+            <td scope="row">
+                [v2.x](/docs/product/roadmap#v2x)
+            </td>
+            <td scope="row">
+                [v3.x](/docs/product/roadmap#v3x)
+                <ul>
+                    <li>
+                        Actions V2
+                    </li>
+                    <li>
+                        Removed CockroachDB Support
+                    </li>
+                    <li>
+                        License Change
+                    </li>
+                </ul>
+            </td>
+            <td scope="row">
+                [v4.x](/docs/product/roadmap#v4x)
+                <ul>
+                    <li>Resource API</li>
+                </ul>
+
+            </td>
+            <td scope="row">
+                [v5.x](/docs/product/roadmap#v5x)
+                <ul>
+                    <li>Analytics</li>
+                    <li>User Groups</li>
+                    <li>User Uniqueness on Instance Level</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td colspan={4}>Zitadel Login v2</td>
+        </tr>
+        <tr>
+            <td scope="row">
+
+            </td>
+            <td scope="row">
+                <ul>
+                    <li>
+                        Initial Release
+                    </li>
+                    <li>
+                        All standard authentication methods
+                    </li>
+                    <li>
+                        OIDC & SAML
+                    </li>
+                </ul>
+            </td>
+            <td scope="row">
+                <ul>
+                    <li>
+                        Device Authorization Flow
+                    </li>
+                    <li>
+                        LDAP IDP
+                    </li>
+                    <li>
+                        JWT IDP
+                    </li>
+                    <li>
+                        Custom Login UI Texts
+                    </li>
+                </ul>
+            </td>
+            <td scope="row">
+            </td>
+        </tr>
+        <tr>
+            <td colspan={4}>Zitadel SDKs</td>
+        </tr>
+        <tr>
+            <td scope="row">
+
+            </td>
+            <td scope="row">
+
+            </td>
+            <td scope="row">
+                <ul>
+                    <li>
+                        Initial Version of PHP SDK
+                    </li>
+                    <li>
+                        Initial Version of Java SDK
+                    </li>
+                    <li>
+                        Initial Version of Ruby SDK
+                    </li>
+                    <li>
+                        Initial Version of Python SDK
+                    </li>
+                </ul>
+            </td>
+            <td scope="row">
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+### v2.x
+
+**Current State**: General Availability / Stable
+
+**Release**: [v2.x](https://github.com/zitadel/zitadel/releases?q=v2.&expanded=true)
 
 ### v3.x
 
-**Current State**: General Availability
+ZITADEL v3 is here, bringing key changes designed to empower your identity management experience.
+This release transitions our licensing to AGPLv3, reinforcing our commitment to open and collaborative development.
+We've streamlined our database support by removing CockroachDB.
+Excitingly, v3 introduces the foundational elements for Actions V2, opening up a world of possibilities for tailoring and extending ZITADEL to perfectly fit your unique use cases.
 
-**Release**: [v3.0.0](https://github.com/zitadel/zitadel/releases/tag/v3.0.0)
+**Current State**: General Availability / Stable
+
+**Release**: [v3.x](https://github.com/zitadel/zitadel/releases?q=v3.&expanded=true)
+
+**Blog**: [Zitadel v3: AGPL License, Streamlined Releases, and Platform Updates](https://zitadel.com/blog/zitadel-v3-announcement)
+
 
 <details>
     <summary>New Features</summary>
@@ -114,17 +244,20 @@ For more detailed description about the different stages and the release cycle c
     <details>
         <summary>Actions V2</summary>
 
+        Zitadel Actions V2 empowers you to customize Zitadel's workflows by executing your own logic at specific points. You define external Endpoints containing your code and configure Targets and Executions within Zitadel to trigger them based on various conditions and events.
+
+        Why we built it: To provide greater flexibility and control, allowing you to implement custom business rules, automate tasks, enrich user data, control access, and integrate with other systems seamlessly. Actions V2 enables you to tailor Zitadel precisely to your unique needs.
+
+        Read more in our [documentation](https://zitadel.com/docs/concepts/features/actions_v2)
     </details>
 
+    <details>
+        <summary>License Change Apache 2.0 to AGPL3</summary>
 
-</details>
+        Zitadel is switching to the AGPL 3.0 license to ensure the project's sustainability and encourage community contributions from commercial users, while keeping the core free and open source.
 
-<details>
-    <summary>General Availability</summary>
-</details>
-
-<details>
-    <summary>Feature Deprecation</summary>
+        Read more about our [decision](https://zitadel.com/blog/apache-to-agpl)
+    </details>
 </details>
 
 <details>
@@ -132,6 +265,19 @@ For more detailed description about the different stages and the release cycle c
 
     <details>
         <summary>CockroachDB Support removed</summary>
+
+        After careful consideration, we have made the decision to discontinue support for CockroachDB in Zitadel v3 and beyond.
+        While CockroachDB is an excellent distributed SQL database, supporting multiple database backends has increased our maintenance burden and complicated our testing matrix.
+        Check out our [migration guide](https://zitadel.com/docs/self-hosting/manage/cli/mirror) to migrate from CockroachDB to PostgreSQL.
+
+        More details can be found [here](https://github.com/zitadel/zitadel/issues/9414)
+    </details>
+
+    <details>
+        <summary>Actions API v3 alpha removed</summary>
+
+        With the current release we have published the Actions V2 API as a beta version, and got rid of the previously published alpha API.
+        Check out the [new API](http://localhost:3000/docs/apis/resources/action_service_v2)
 
     </details>
 </details>
@@ -190,10 +336,18 @@ For more detailed description about the different stages and the release cycle c
     <details>
         <summary>SCIM 2.0 Server - User Resource</summary>
     </details>
+
+    <details>
+        <summary>Actions V2</summary>
+    </details>
 </details>
 
 <details>
     <summary>Feature Deprecation</summary>
+
+    <details>
+        <summary>Actions V1</summary>
+    </details>
 </details>
 
 <details>

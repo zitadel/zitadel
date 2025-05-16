@@ -614,6 +614,11 @@ module.exports = {
       items: [
         "product/roadmap",
         "product/release-cycle",
+        {
+          type: "link",
+          label: "Changelog",
+          href: "https://zitadel.com/changelog",
+        },
       ],
     },
     {
