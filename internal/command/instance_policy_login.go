@@ -242,7 +242,12 @@ func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginP
 				policy.ExternalLoginCheckLifetime,
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
-				policy.MultiFactorCheckLifetime)
+				policy.MultiFactorCheckLifetime,
+				policy.EnableRegistrationCaptcha,
+				policy.EnableLoginCaptcha,
+				policy.CaptchaType,
+				policy.CaptchaSiteKey,
+				policy.CaptchaSecretKey)
 			if !hasChanged {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
 			}
@@ -270,6 +275,11 @@ func prepareAddDefaultLoginPolicy(
 	mfaInitSkipLifetime time.Duration,
 	secondFactorCheckLifetime time.Duration,
 	multiFactorCheckLifetime time.Duration,
+	enableRegistrationCaptcha bool,
+	enableLoginCaptcha bool,
+	captchaType domain.CaptchaType,
+	captchaSiteKey string,
+	captchaSecretKey string,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -304,6 +314,11 @@ func prepareAddDefaultLoginPolicy(
 					mfaInitSkipLifetime,
 					secondFactorCheckLifetime,
 					multiFactorCheckLifetime,
+					enableRegistrationCaptcha,
+					enableLoginCaptcha,
+					captchaType,
+					captchaSiteKey,
+					captchaSecretKey,
 				),
 			}, nil
 		}, nil

@@ -981,6 +981,11 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		MultiFactorCheckLifetime:   time.Duration(policy.MultiFactorCheckLifetime),
 		DisableLoginWithEmail:      policy.DisableLoginWithEmail,
 		DisableLoginWithPhone:      policy.DisableLoginWithPhone,
+		EnableRegistrationCaptcha:  policy.EnableRegistrationCaptcha,
+		EnableLoginCaptcha:         policy.EnableLoginCaptcha,
+		CaptchaType:                policy.CaptchaType,
+		CaptchaSiteKey:             policy.CaptchaSiteKey,
+		CaptchaSecretKey:           policy.CaptchaSecretKey,
 	}
 }
 
