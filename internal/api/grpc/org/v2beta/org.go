@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+	"errors"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -44,7 +45,7 @@ func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.List
 	if err != nil {
 		return nil, err
 	}
-	orgs, err := s.query.SearchOrgs(ctx, queries, nil)
+	orgs, err := s.query.SearchOrgs(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -60,10 +61,14 @@ func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.List
 func (s *Server) DeleteOrganization(ctx context.Context, request *v2beta_org.DeleteOrganizationRequest) (*v2beta_org.DeleteOrganizationResponse, error) {
 	details, err := s.command.RemoveOrg(ctx, request.Id)
 	if err != nil {
+		var notFoundError *zerrors.NotFoundError
+		if errors.As(err, &notFoundError) {
+			return &v2beta_org.DeleteOrganizationResponse{}, nil
+		}
 		return nil, err
 	}
 	return &v2beta_org.DeleteOrganizationResponse{
-		ChangeDate: timestamppb.New(details.EventDate),
+		DeletionDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 
@@ -82,7 +87,7 @@ func (s *Server) ListOrganizationMetadata(ctx context.Context, request *v2beta_o
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchOrgMetadata(ctx, true, request.Id, metadataQueries, false)
+	res, err := s.query.SearchOrgMetadata(ctx, true, request.OrganizationId, metadataQueries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +101,7 @@ func (s *Server) ListOrganizationMetadata(ctx context.Context, request *v2beta_o
 }
 
 func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *v2beta_org.DeleteOrganizationMetadataRequest) (*v2beta_org.DeleteOrganizationMetadataResponse, error) {
-	result, err := s.command.BulkRemoveOrgMetadata(ctx, request.Id, request.Keys...)
+	result, err := s.command.BulkRemoveOrgMetadata(ctx, request.OrganizationId, request.Keys...)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +140,7 @@ func (s *Server) AddOrganizationDomain(ctx context.Context, request *org.AddOrga
 		return nil, err
 	}
 	return &org.AddOrganizationDomainResponse{
-		CreatedDate: timestamppb.New(details.EventDate),
+		CreationDate: timestamppb.New(details.EventDate),
 	}, nil
 }
 
@@ -185,7 +190,7 @@ func (s *Server) GenerateOrganizationDomainValidation(ctx context.Context, req *
 }
 
 func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *org.VerifyOrganizationDomainRequest) (*org.VerifyOrganizationDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.Id)
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
 	if err != nil {
 		return nil, err
 	}

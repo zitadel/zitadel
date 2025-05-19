@@ -28,7 +28,7 @@ func listOrgRequestToModel(systemDefaults systemdefaults.SystemDefaults, request
 	if err != nil {
 		return nil, err
 	}
-	queries, err := OrgQueriesToModel(request.OrganizationSearchFilter)
+	queries, err := OrgQueriesToModel(request.Filter)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrgan
 		}
 	}
 	return &org.CreateOrganizationResponse{
-		CreatedDate:   timestamppb.New(createdOrg.ObjectDetails.EventDate),
+		CreationDate:  timestamppb.New(createdOrg.ObjectDetails.EventDate),
 		Id:            createdOrg.ObjectDetails.ResourceOwner,
 		CreatedAdmins: admins,
 	}, nil
@@ -99,7 +99,7 @@ func OrgViewsToPb(orgs []*query.Org) []*v2beta_org.Organization {
 	return o
 }
 
-func OrgQueriesToModel(queries []*v2beta_org.OrgQueryFilter) (_ []query.SearchQuery, err error) {
+func OrgQueriesToModel(queries []*v2beta_org.OrganizationSearchFilter) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = OrgQueryToModel(query)
@@ -110,15 +110,20 @@ func OrgQueriesToModel(queries []*v2beta_org.OrgQueryFilter) (_ []query.SearchQu
 	return q, nil
 }
 
-func OrgQueryToModel(apiQuery *v2beta_org.OrgQueryFilter) (query.SearchQuery, error) {
+//	*OrganizationSearchFilter_NameQuery
+//	*OrganizationSearchFilter_DomainQuery
+//	*OrganizationSearchFilter_StateQuery
+//	*OrganizationSearchFilter_IdQuery
+
+func OrgQueryToModel(apiQuery *v2beta_org.OrganizationSearchFilter) (query.SearchQuery, error) {
 	switch q := apiQuery.Query.(type) {
-	case *v2beta_org.OrgQueryFilter_DomainQuery:
+	case *v2beta_org.OrganizationSearchFilter_DomainQuery:
 		return query.NewOrgVerifiedDomainSearchQuery(v2beta_object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
-	case *v2beta_org.OrgQueryFilter_NameQuery:
+	case *v2beta_org.OrganizationSearchFilter_NameQuery:
 		return query.NewOrgNameSearchQuery(v2beta_object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
-	case *v2beta_org.OrgQueryFilter_StateQuery:
+	case *v2beta_org.OrganizationSearchFilter_StateQuery:
 		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
-	case *v2beta_org.OrgQueryFilter_IdQuery:
+	case *v2beta_org.OrganizationSearchFilter_IdQuery:
 		return query.NewOrgIDSearchQuery(q.IdQuery.Id)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
@@ -229,7 +234,7 @@ func RemoveOrgDomainRequestToDomain(ctx context.Context, req *v2beta_org.DeleteO
 func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *v2beta_org.GenerateOrganizationDomainValidationRequest) *domain.OrgDomain {
 	return &domain.OrgDomain{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.Id,
+			AggregateID: req.OrganizationId,
 		},
 		Domain:         req.Domain,
 		ValidationType: v2beta_object.DomainValidationTypeToDomain(req.Type),
@@ -239,7 +244,7 @@ func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *v2beta
 func ValidateOrgDomainRequestToDomain(ctx context.Context, req *v2beta_org.VerifyOrganizationDomainRequest) *domain.OrgDomain {
 	return &domain.OrgDomain{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.Id,
+			AggregateID: req.OrganizationId,
 		},
 		Domain: req.Domain,
 	}
