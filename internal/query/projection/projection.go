@@ -261,6 +261,7 @@ func newFieldsList() {
 	fields = []*handler.FieldHandler{
 		ProjectGrantFields,
 		OrgDomainVerifiedFields,
+		InstanceDomainFields,
 	}
 }
 
