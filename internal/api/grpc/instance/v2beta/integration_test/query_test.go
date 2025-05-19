@@ -4,6 +4,7 @@ package instance_test
 
 import (
 	"context"
+	"slices"
 	"testing"
 	"time"
 
@@ -85,11 +86,23 @@ func TestListInstances(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
+	instances := make([]*integration.Instance, 2)
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	inst2 := integration.NewInstance(ctxWithSysAuthZ)
+	instances[0], instances[1] = inst, inst2
+
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+	})
+
+	// Sort in descending order
+	slices.SortFunc(instances, func(i1, i2 *integration.Instance) int {
+		res := i1.Instance.Details.CreationDate.AsTime().Compare(i2.Instance.Details.CreationDate.AsTime())
+		if res == 0 {
+			return res
+		}
+		return -res
 	})
 
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
@@ -136,7 +149,7 @@ func TestListInstances(t *testing.T) {
 				},
 			},
 			inputContext:      ctxWithSysAuthZ,
-			expectedInstances: []string{inst.ID()},
+			expectedInstances: []string{inst2.ID(), inst.ID()},
 		},
 	}
 
@@ -152,11 +165,11 @@ func TestListInstances(t *testing.T) {
 			if tc.expectedErrorMsg == "" {
 				require.NotNil(t, res)
 
-				instaceIDs := []string{}
-				for _, i := range res.GetInstances() {
-					instaceIDs = append(instaceIDs, i.GetId())
+				require.Len(t, res.GetInstances(), len(tc.expectedInstances))
+
+				for i, ins := range res.GetInstances() {
+					assert.Equal(t, tc.expectedInstances[i], ins.GetId())
 				}
-				assert.Subset(t, instaceIDs, tc.expectedInstances)
 			}
 		})
 	}
