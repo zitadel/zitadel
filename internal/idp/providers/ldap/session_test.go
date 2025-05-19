@@ -49,31 +49,31 @@ func TestProvider_userFiltersToSearchQuery(t *testing.T) {
 		name     string
 		fields   []string
 		username string
-		want     string
+		want     []string
 	}{
 		{
 			name:     "zero",
 			fields:   []string{},
 			username: "user",
-			want:     "",
+			want:     []string{},
 		},
 		{
 			name:     "one",
 			fields:   []string{"test"},
 			username: "user",
-			want:     "(test=user)",
+			want:     []string{"(test=user)"},
 		},
 		{
 			name:     "three",
 			fields:   []string{"test1", "test2", "test3"},
 			username: "user",
-			want:     "(test1=user)(test2=user)(test3=user)",
+			want:     []string{"(test1=user)", "(test2=user)", "(test3=user)"},
 		},
 		{
 			name:     "five",
 			fields:   []string{"test1", "test2", "test3", "test4", "test5"},
 			username: "user",
-			want:     "(test1=user)(test2=user)(test3=user)(test4=user)(test5=user)",
+			want:     []string{"(test1=user)", "(test2=user)", "(test3=user)", "(test4=user)", "(test5=user)"},
 		},
 	}
 	for _, tt := range tests {
