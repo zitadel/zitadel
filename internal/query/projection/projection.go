@@ -262,7 +262,6 @@ func newFieldsList() {
 		ProjectGrantFields,
 		OrgDomainVerifiedFields,
 		InstanceDomainFields,
-		MembershipFields,
 	}
 }
 
