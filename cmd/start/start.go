@@ -304,7 +304,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	execution.Register(
 		ctx,
-		config.Projections.Customizations["executions"],
+		config.Projections.Customizations["execution_handler"],
 		config.Executions,
 		queries,
 		eventstoreClient.EventTypes(),

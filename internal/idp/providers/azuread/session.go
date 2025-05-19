@@ -3,6 +3,7 @@ package azuread
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"
@@ -11,6 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
+
+var _ idp.Session = (*Session)(nil)
 
 // Session extends the [oauth.Session] to be able to handle the id_token and to implement the [idp.SessionSupportsMigration] functionality
 type Session struct {
@@ -77,6 +80,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	}
 	s.oauth().Tokens.IDToken = idToken
 	return user, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.OAuthSession == nil {
+		return time.Time{}
+	}
+	return s.OAuthSession.ExpiresAt()
 }
 
 // Tokens returns the [oidc.Tokens] of the underlying [oauth.Session].

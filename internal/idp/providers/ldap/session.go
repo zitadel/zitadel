@@ -96,6 +96,10 @@ func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 	)
 }
 
+func (s *Session) ExpiresAt() time.Time {
+	return time.Time{} // falls back to the default expiration time
+}
+
 func tryBind(
 	server string,
 	startTLS bool,
@@ -129,7 +133,6 @@ func tryBind(
 		username,
 		password,
 		timeout,
-		rootCA,
 	)
 }
 
@@ -185,12 +188,11 @@ func trySearchAndUserBind(
 	username string,
 	password string,
 	timeout time.Duration,
-	rootCA []byte,
 ) (*ldap.Entry, error) {
 	searchQuery := queriesAndToSearchQuery(
 		objectClassesToSearchQuery(objectClasses),
 		queriesOrToSearchQuery(
-			userFiltersToSearchQuery(userFilters, username),
+			userFiltersToSearchQuery(userFilters, username)...,
 		),
 	)
 
@@ -214,7 +216,12 @@ func trySearchAndUserBind(
 
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
-	if err = conn.Bind(user.DN, password); err != nil {
+	userDN, err := ldap.ParseDN(user.DN)
+	if err != nil {
+		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user parse DN failed")
+		return nil, err
+	}
+	if err = conn.Bind(userDN.String(), password); err != nil {
 		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user bind failed")
 		return nil, ErrFailedLogin
 	}
@@ -257,12 +264,12 @@ func objectClassesToSearchQuery(classes []string) string {
 	return searchQuery
 }
 
-func userFiltersToSearchQuery(filters []string, username string) string {
-	searchQuery := ""
-	for _, filter := range filters {
-		searchQuery += "(" + filter + "=" + ldap.EscapeFilter(username) + ")"
+func userFiltersToSearchQuery(filters []string, username string) []string {
+	searchQueries := make([]string, len(filters))
+	for i, filter := range filters {
+		searchQueries[i] = "(" + filter + "=" + username + ")"
 	}
-	return searchQuery
+	return searchQueries
 }
 
 func mapLDAPEntryToUser(

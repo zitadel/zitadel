@@ -563,7 +563,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.delete"
+        permission: "authenticated"
       }
     };
 

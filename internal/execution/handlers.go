@@ -84,6 +84,9 @@ func (u *eventHandler) Reducers() []handler.AggregateReducer {
 	return aggReducers
 }
 
+// FilterGlobalEvents implements [handler.GlobalProjection]
+func (u *eventHandler) FilterGlobalEvents() {}
+
 func groupsFromEventType(s string) []string {
 	parts := strings.Split(s, ".")
 	groups := make([]string, len(parts))
