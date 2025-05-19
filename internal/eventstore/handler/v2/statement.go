@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 
@@ -83,7 +82,7 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 type Statement struct {
 	Aggregate    *eventstore.Aggregate
 	Sequence     uint64
-	Position     decimal.Decimal
+	Position     float64
 	CreationDate time.Time
 
 	offset uint32

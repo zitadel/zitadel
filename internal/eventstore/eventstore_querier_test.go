@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -133,7 +131,7 @@ func TestCRDB_Filter(t *testing.T) {
 	}
 }
 
-func TestCRDB_LatestPosition(t *testing.T) {
+func TestCRDB_LatestSequence(t *testing.T) {
 	type args struct {
 		searchQuery *eventstore.SearchQueryBuilder
 	}
@@ -141,7 +139,7 @@ func TestCRDB_LatestPosition(t *testing.T) {
 		existingEvents []eventstore.Command
 	}
 	type res struct {
-		position decimal.Decimal
+		sequence float64
 	}
 	tests := []struct {
 		name    string
@@ -153,7 +151,7 @@ func TestCRDB_LatestPosition(t *testing.T) {
 		{
 			name: "aggregate type filter no sequence",
 			args: args{
-				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 					AddQuery().
 					AggregateTypes("not found").
 					Builder(),
@@ -170,7 +168,7 @@ func TestCRDB_LatestPosition(t *testing.T) {
 		{
 			name: "aggregate type filter sequence",
 			args: args{
-				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 					AddQuery().
 					AggregateTypes(eventstore.AggregateType(t.Name())).
 					Builder(),
@@ -204,12 +202,12 @@ func TestCRDB_LatestPosition(t *testing.T) {
 					return
 				}
 
-				position, err := db.LatestPosition(context.Background(), tt.args.searchQuery)
+				sequence, err := db.LatestSequence(context.Background(), tt.args.searchQuery)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
 				}
-				if tt.res.position.GreaterThan(position) {
-					t.Errorf("CRDB.query() expected sequence: %v got %v", tt.res.position, position)
+				if tt.res.sequence > sequence {
+					t.Errorf("CRDB.query() expected sequence: %v got %v", tt.res.sequence, sequence)
 				}
 			})
 		}

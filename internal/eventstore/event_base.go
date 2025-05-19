@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -26,7 +25,7 @@ type BaseEvent struct {
 	Agg *Aggregate
 
 	Seq                           uint64
-	Pos                           decimal.Decimal
+	Pos                           float64
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
@@ -39,7 +38,7 @@ type BaseEvent struct {
 }
 
 // Position implements Event.
-func (e *BaseEvent) Position() decimal.Decimal {
+func (e *BaseEvent) Position() float64 {
 	return e.Pos
 }
 

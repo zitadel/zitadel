@@ -11,7 +11,6 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/jonboulle/clockwork"
 	"github.com/muhlemmer/gu"
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
@@ -351,14 +350,14 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 	if len(keys.Keys) > 0 {
 		return PrivateKeyToSigningKey(SelectSigningKey(keys.Keys), o.encAlg)
 	}
-	var position decimal.Decimal
+	var position float64
 	if keys.State != nil {
 		position = keys.State.Position
 	}
 	return nil, o.refreshSigningKey(ctx, position)
 }
 
-func (o *OPStorage) refreshSigningKey(ctx context.Context, position decimal.Decimal) error {
+func (o *OPStorage) refreshSigningKey(ctx context.Context, position float64) error {
 	ok, err := o.ensureIsLatestKey(ctx, position)
 	if err != nil || !ok {
 		return zerrors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
@@ -370,12 +369,12 @@ func (o *OPStorage) refreshSigningKey(ctx context.Context, position decimal.Deci
 	return zerrors.ThrowInternal(nil, "OIDC-Df1bh", "")
 }
 
-func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position decimal.Decimal) (bool, error) {
-	maxSequence, err := o.getMaxKeyPosition(ctx)
+func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bool, error) {
+	maxSequence, err := o.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return position.GreaterThanOrEqual(maxSequence), nil
+	return position >= maxSequence, nil
 }
 
 func PrivateKeyToSigningKey(key query.PrivateKey, algorithm crypto.EncryptionAlgorithm) (_ op.SigningKey, err error) {
@@ -413,9 +412,9 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context) error {
 	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), "RS256")
 }
 
-func (o *OPStorage) getMaxKeyPosition(ctx context.Context) (decimal.Decimal, error) {
-	return o.eventstore.LatestPosition(ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
+func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
+	return o.eventstore.LatestSequence(ctx,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AwaitOpenTransactions().
 			AllowTimeTravel().

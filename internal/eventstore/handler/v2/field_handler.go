@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/shopspring/decimal"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -127,13 +126,8 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
+	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
 		return false, nil
-	}
-
-	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		currentState.position = config.minPosition
-		currentState.offset = 0
 	}
 
 	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
@@ -165,7 +159,7 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 
 	idx, offset := skipPreviouslyReducedEvents(events, currentState)
 
-	if currentState.position.Equal(events[len(events)-1].Position()) {
+	if currentState.position == events[len(events)-1].Position() {
 		offset += currentState.offset
 	}
 	currentState.position = events[len(events)-1].Position()
@@ -195,9 +189,9 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 }
 
 func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) (index int, offset uint32) {
-	var position decimal.Decimal
+	var position float64
 	for i, event := range events {
-		if !event.Position().Equal(position) {
+		if event.Position() != position {
 			offset = 0
 			position = event.Position()
 		}

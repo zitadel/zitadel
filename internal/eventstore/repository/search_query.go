@@ -3,8 +3,6 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -59,8 +57,6 @@ const (
 	OperationJSONContains
 	//OperationNotIn checks if a stored value does not match one of the passed value list
 	OperationNotIn
-
-	OperationGreaterOrEquals
 
 	operationCount
 )
@@ -256,10 +252,10 @@ func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuer
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if builder.GetPositionAtLeast().IsZero() {
+	if builder.GetPositionAfter() == 0 {
 		return nil
 	}
-	query.Position = NewFilter(FieldPosition, builder.GetPositionAtLeast(), OperationGreaterOrEquals)
+	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreater)
 	return query.Position
 }
 
@@ -301,7 +297,7 @@ func eventDataFilter(query *eventstore.SearchQuery) *Filter {
 }
 
 func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
-	if pos := query.GetPositionAfter(); !pos.Equal(decimal.Decimal{}) {
+	if pos := query.GetPositionAfter(); pos != 0 {
 		return NewFilter(FieldPosition, pos, OperationGreater)
 	}
 	return nil
