@@ -36,6 +36,7 @@ func (p *LastSuccessfulMirror) Filter() *eventstore.Filter {
 		),
 		eventstore.FilterPagination(
 			eventstore.Descending(),
+			eventstore.Limit(1),
 		),
 	)
 }
