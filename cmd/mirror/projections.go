@@ -120,7 +120,11 @@ func projections(
 	logging.OnError(err).Fatal("unable create static storage")
 
 	config.Eventstore.Querier = old_es.NewCRDB(client)
-	config.Eventstore.Pusher = new_es.NewEventstore(client)
+
+	newES := new_es.NewEventstore(client)
+	config.Eventstore.Pusher = newES
+	config.Eventstore.Searcher = newES
+
 	es := eventstore.NewEventstore(config.Eventstore)
 	esV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(client, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
