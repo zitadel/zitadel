@@ -175,7 +175,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			require.NoError(t, err)
 
 			// check details
-			gotCD := got.GetCreatedDate().AsTime()
+			gotCD := got.GetCreationDate().AsTime()
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
@@ -195,6 +195,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	orgs, orgsName, err := createOrgs(CTX, Client, 1)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
+		return
 	}
 	orgId := orgs[0].Id
 	orgName := orgsName[0]
@@ -281,7 +282,7 @@ func TestServer_ListOrganization(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		query   []*v2beta_org.OrgQueryFilter
+		query   []*v2beta_org.OrganizationSearchFilter
 		want    []*v2beta_org.Organization
 		wantErr bool
 	}{
@@ -310,9 +311,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by id happy path",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &v2beta_org.OrgQueryFilter_IdQuery{
+					Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
 						IdQuery: &v2beta_org.OrgIDQuery{
 							Id: orgs[1].Id,
 						},
@@ -329,9 +330,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by state active",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &v2beta_org.OrgQueryFilter_StateQuery{
+					Query: &v2beta_org.OrganizationSearchFilter_StateQuery{
 						StateQuery: &v2beta_org.OrgStateQuery{
 							State: v2beta_org.OrgState_ORG_STATE_ACTIVE,
 						},
@@ -356,9 +357,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by state inactive",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &v2beta_org.OrgQueryFilter_StateQuery{
+					Query: &v2beta_org.OrganizationSearchFilter_StateQuery{
 						StateQuery: &v2beta_org.OrgStateQuery{
 							State: v2beta_org.OrgState_ORG_STATE_INACTIVE,
 						},
@@ -375,9 +376,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations by id bad id",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &v2beta_org.OrgQueryFilter_IdQuery{
+					Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
 						IdQuery: &v2beta_org.OrgIDQuery{
 							Id: "bad id",
 						},
@@ -388,9 +389,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name equals",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &v2beta_org.OrgQueryFilter_NameQuery{
+					Query: &v2beta_org.OrganizationSearchFilter_NameQuery{
 						NameQuery: &v2beta_org.OrgNameQuery{
 							Name:   orgsName[1],
 							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
@@ -408,9 +409,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name contains",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &v2beta_org.OrgQueryFilter_NameQuery{
+					Query: &v2beta_org.OrganizationSearchFilter_NameQuery{
 						NameQuery: &v2beta_org.OrgNameQuery{
 							Name: func() string {
 								return orgsName[1][1 : len(orgsName[1])-2]
@@ -430,9 +431,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name contains IGNORE CASE",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &v2beta_org.OrgQueryFilter_NameQuery{
+					Query: &v2beta_org.OrganizationSearchFilter_NameQuery{
 						NameQuery: &v2beta_org.OrgNameQuery{
 							Name: func() string {
 								return strings.ToUpper(orgsName[1][1 : len(orgsName[1])-2])
@@ -452,15 +453,15 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify domain name equals",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &org.OrgQueryFilter_DomainQuery{
+					Query: &org.OrganizationSearchFilter_DomainQuery{
 						DomainQuery: &org.OrgDomainQuery{
 							Domain: func() string {
 								listOrgRes, err := listOrgClient.ListOrganizations(listOrgIAmOwnerCtx, &v2beta_org.ListOrganizationsRequest{
-									OrganizationSearchFilter: []*v2beta_org.OrgQueryFilter{
+									Filter: []*v2beta_org.OrganizationSearchFilter{
 										{
-											Query: &v2beta_org.OrgQueryFilter_IdQuery{
+											Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
 												IdQuery: &v2beta_org.OrgIDQuery{
 													Id: orgs[1].Id,
 												},
@@ -487,9 +488,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify domain name contains",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &org.OrgQueryFilter_DomainQuery{
+					Query: &org.OrganizationSearchFilter_DomainQuery{
 						DomainQuery: &org.OrgDomainQuery{
 							Domain: func() string {
 								domain := strings.ToLower(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
@@ -510,9 +511,9 @@ func TestServer_ListOrganization(t *testing.T) {
 		{
 			name: "list organizations specify org name contains IGNORE CASE",
 			ctx:  ListOrgIinstance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
-			query: []*v2beta_org.OrgQueryFilter{
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Query: &org.OrgQueryFilter_DomainQuery{
+					Query: &org.OrganizationSearchFilter_DomainQuery{
 						DomainQuery: &org.OrgDomainQuery{
 							Domain: func() string {
 								domain := strings.ToUpper(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
@@ -536,7 +537,7 @@ func TestServer_ListOrganization(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(context.Background(), 10*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
-					OrganizationSearchFilter: tt.query,
+					Filter: tt.query,
 				})
 
 				if tt.wantErr {
@@ -593,6 +594,7 @@ func TestServer_DeleteOrganization(t *testing.T) {
 				orgs, _, err := createOrgs(CTX, Client, 1)
 				if err != nil {
 					assert.Fail(t, "unable to create org")
+					return ""
 				}
 				return orgs[0].Id
 			},
@@ -605,6 +607,7 @@ func TestServer_DeleteOrganization(t *testing.T) {
 				orgs, _, err := createOrgs(CTX, Client, 1)
 				if err != nil {
 					assert.Fail(t, "unable to create org")
+					return ""
 				}
 				// delete org
 				_, err = Client.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{Id: orgs[0].Id})
@@ -638,16 +641,16 @@ func TestServer_DeleteOrganization(t *testing.T) {
 			require.NoError(t, err)
 
 			// check details
-			gotCD := got.GetChangeDate().AsTime()
+			gotCD := got.GetDeletionDate().AsTime()
 			if !tt.dontCheckTime {
 				now := time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 			}
 
 			listOrgRes, err := Client.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
-				OrganizationSearchFilter: []*v2beta_org.OrgQueryFilter{
+				Filter: []*v2beta_org.OrganizationSearchFilter{
 					{
-						Query: &v2beta_org.OrgQueryFilter_IdQuery{
+						Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
 							IdQuery: &v2beta_org.OrgIDQuery{
 								Id: tt.req.Id,
 							},
@@ -678,238 +681,363 @@ func TestServer_DeactivateReactivateNonExistentOrganization(t *testing.T) {
 }
 
 func TestServer_DeactivateReactivateOrganization(t *testing.T) {
-	// 1. create organization
-	orgs, _, err := createOrgs(CTX, Client, 1)
-	if err != nil {
-		assert.Fail(t, "unable to create orgs")
+	tests := []struct {
+		name     string
+		testFunc func()
+	}{
+		{
+			name: "deactivate active org, then deactivate again",
+			testFunc: func() {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create orgs")
+					return
+				}
+				orgId := orgs[0].Id
+				ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+
+				// 2. check inital state of organization
+				listOrgRes, err := Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					Filter: []*v2beta_org.OrganizationSearchFilter{
+						{
+							Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
+								IdQuery: &v2beta_org.OrgIDQuery{
+									Id: orgId,
+								},
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+				require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+
+				// 3. deactivate organization once
+				deactivate_res, err := Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				gotCD := deactivate_res.GetChangeDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 4. check organization state is deactivated
+				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					Filter: []*v2beta_org.OrganizationSearchFilter{
+						{
+							Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
+								IdQuery: &v2beta_org.OrgIDQuery{
+									Id: orgId,
+								},
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+				require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+
+				// 5. repeat deactivate organization once
+				_, err = Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
+					Id: orgId,
+				})
+				// TODO this error message needs to be reoved
+				require.Contains(t, err.Error(), "Organisation is already deactivated")
+
+				// 6. repeat check organization state is still deactivated
+				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					Filter: []*v2beta_org.OrganizationSearchFilter{
+						{
+							Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
+								IdQuery: &v2beta_org.OrgIDQuery{
+									Id: orgId,
+								},
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+				require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+			},
+		},
+		{
+			name: "re-activate active org, then re-activate again",
+			testFunc: func() {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create orgs")
+					return
+				}
+				orgId := orgs[0].Id
+				ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+
+				// 2. check inital state of organization
+				listOrgRes, err := Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					Filter: []*v2beta_org.OrganizationSearchFilter{
+						{
+							Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
+								IdQuery: &v2beta_org.OrgIDQuery{
+									Id: orgId,
+								},
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+				// require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+				require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+
+				// 3. deactivate organization once
+				deactivate_res, err := Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				gotCD := deactivate_res.GetChangeDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 4. check organization state is deactivated
+				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					Filter: []*v2beta_org.OrganizationSearchFilter{
+						{
+							Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
+								IdQuery: &v2beta_org.OrgIDQuery{
+									Id: orgId,
+								},
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+				require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+
+				// 5. reactivate organization
+				reactivate_res, err := Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				gotCD = reactivate_res.GetChangeDate().AsTime()
+				now = time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 6. check organization state is active
+				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					Filter: []*v2beta_org.OrganizationSearchFilter{
+						{
+							Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
+								IdQuery: &v2beta_org.OrgIDQuery{
+									Id: orgId,
+								},
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+				require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+
+				// 7. repeat reactivate organization
+				reactivate_res, err = Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
+					Id: orgId,
+				})
+				// TODO remove this error message
+				require.Contains(t, err.Error(), "Organisation is already active")
+
+				// 8. repeat check organization state is still active
+				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					Filter: []*v2beta_org.OrganizationSearchFilter{
+						{
+							Query: &v2beta_org.OrganizationSearchFilter_IdQuery{
+								IdQuery: &v2beta_org.OrgIDQuery{
+									Id: orgId,
+								},
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+				require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+			},
+		},
 	}
-	orgId := orgs[0].Id
-	ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
-	// 2. check inital state of organization
-	listOrgRes, err := Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		OrganizationSearchFilter: []*v2beta_org.OrgQueryFilter{
-			{
-				Query: &v2beta_org.OrgQueryFilter_IdQuery{
-					IdQuery: &v2beta_org.OrgIDQuery{
-						Id: orgId,
-					},
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
-
-	// 3. deactivate organization once
-	deactivate_res, err := Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
-		Id: orgId,
-	})
-	require.NoError(t, err)
-	gotCD := deactivate_res.GetChangeDate().AsTime()
-	now := time.Now()
-	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-	// 4. check organization state is deactivated
-	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		OrganizationSearchFilter: []*v2beta_org.OrgQueryFilter{
-			{
-				Query: &v2beta_org.OrgQueryFilter_IdQuery{
-					IdQuery: &v2beta_org.OrgIDQuery{
-						Id: orgId,
-					},
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
-
-	// 5. repeat deactivate organization once
-	// deactivate_res, err = Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
-	_, err = Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
-		Id: orgId,
-	})
-	// TODO this error message needs to be reoved
-	require.Contains(t, err.Error(), "Organisation is already deactivated")
-
-	// 6. repeat check organization state is still deactivated
-	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		OrganizationSearchFilter: []*v2beta_org.OrgQueryFilter{
-			{
-				Query: &v2beta_org.OrgQueryFilter_IdQuery{
-					IdQuery: &v2beta_org.OrgIDQuery{
-						Id: orgId,
-					},
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
-
-	// 7. reactivate organization
-	reactivate_res, err := Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
-		Id: orgId,
-	})
-	require.NoError(t, err)
-	gotCD = reactivate_res.GetChangeDate().AsTime()
-	now = time.Now()
-	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-	// 8. check organization state is active
-	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		OrganizationSearchFilter: []*v2beta_org.OrgQueryFilter{
-			{
-				Query: &v2beta_org.OrgQueryFilter_IdQuery{
-					IdQuery: &v2beta_org.OrgIDQuery{
-						Id: orgId,
-					},
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
-
-	// 9. repeat reactivate organization
-	reactivate_res, err = Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
-		Id: orgId,
-	})
-	// TODO remove this error message
-	require.Contains(t, err.Error(), "Organisation is already active")
-
-	// 10. repeat check organization state is still active
-	listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-		OrganizationSearchFilter: []*v2beta_org.OrgQueryFilter{
-			{
-				Query: &v2beta_org.OrgQueryFilter_IdQuery{
-					IdQuery: &v2beta_org.OrgIDQuery{
-						Id: orgId,
-					},
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.testFunc()
+		})
+	}
 }
 
-func TestServer_AddOListDeleterganizationDomain(t *testing.T) {
-	// 1. create organization
-	orgs, _, err := createOrgs(CTX, Client, 1)
-	if err != nil {
-		assert.Fail(t, "unable to create org")
+func TestServer_AddListDeletOerganizationDomain(t *testing.T) {
+	tests := []struct {
+		name     string
+		testFunc func()
+	}{
+		{
+			name: "add org domain, re-add org domain",
+			testFunc: func() {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return
+				}
+				orgId := orgs[0].Id
+				ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+
+				domain := "www.domain.com"
+				// 2. add domain
+				addOrgDomainRes, err := Client.AddOrganizationDomain(ctx, &v2beta_org.AddOrganizationDomainRequest{
+					Id:     orgId,
+					Domain: domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 2. check domain is added
+				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				found := false
+				for _, res := range queryRes.Result {
+					if res.DomainName == domain {
+						found = true
+					}
+				}
+				require.True(t, found, "unable to find added domain")
+
+				// 3. re-add domain
+				_, err = Client.AddOrganizationDomain(ctx, &v2beta_org.AddOrganizationDomainRequest{
+					Id:     orgId,
+					Domain: domain,
+				})
+				// TODO remove error for adding already existing domain
+				// require.NoError(t, err)
+				require.Contains(t, err.Error(), "Errors.Already.Exists")
+				// check details
+				// gotCD = addOrgDomainRes.GetDetails().GetChangeDate().AsTime()
+				// now = time.Now()
+				// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 4. check domain is added
+				queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				found = false
+				for _, res := range queryRes.Result {
+					if res.DomainName == domain {
+						found = true
+					}
+				}
+				require.True(t, found, "unable to find added domain")
+			},
+		},
+		{
+			name: "add org domain, delete org domain, re-delete org domain",
+			testFunc: func() {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return
+				}
+				orgId := orgs[0].Id
+				ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+
+				domain := "www.domain2.com"
+				// 2. add domain
+				addOrgDomainRes, err := Client.AddOrganizationDomain(ctx, &v2beta_org.AddOrganizationDomainRequest{
+					Id:     orgId,
+					Domain: domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 2. check domain is added
+				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				found := false
+				for _, res := range queryRes.Result {
+					if res.DomainName == domain {
+						found = true
+					}
+				}
+				require.True(t, found, "unable to find added domain")
+
+				// 3. delete organisation domain
+				deleteOrgDomainRes, err := Client.DeleteOrganizationDomain(ctx, &v2beta_org.DeleteOrganizationDomainRequest{
+					Id:     orgId,
+					Domain: domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD = deleteOrgDomainRes.GetDeletionDate().AsTime()
+				now = time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 4. check organization domain deleted
+				queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				found = false
+				for _, res := range queryRes.Result {
+					if res.DomainName == domain {
+						found = true
+					}
+				}
+				require.False(t, found, "deleted domain found")
+
+				// 5. redelete organisation domain
+				_, err = Client.DeleteOrganizationDomain(ctx, &v2beta_org.DeleteOrganizationDomainRequest{
+					Id:     orgId,
+					Domain: domain,
+				})
+				// TODO remove error for deleting org domain already deleted
+				// require.NoError(t, err)
+				require.Contains(t, err.Error(), "Domain doesn't exist on organization")
+				// check details
+				// gotCD = deleteOrgDomainRes.GetDetails().GetChangeDate().AsTime()
+				// now = time.Now()
+				// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// 6. check organization domain deleted
+				queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+					Id: orgId,
+				})
+				require.NoError(t, err)
+				found = false
+				for _, res := range queryRes.Result {
+					if res.DomainName == domain {
+						found = true
+					}
+				}
+				require.False(t, found, "deleted domain found")
+			},
+		},
 	}
-	orgId := orgs[0].Id
-	ctx := Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
-	domain := "www.domain.com"
-	// 2. add domain
-	addOrgDomainRes, err := Client.AddOrganizationDomain(ctx, &v2beta_org.AddOrganizationDomainRequest{
-		Id:     orgId,
-		Domain: domain,
-	})
-	require.NoError(t, err)
-	// check details
-	gotCD := addOrgDomainRes.GetCreatedDate().AsTime()
-	now := time.Now()
-	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-	// 2. check domain is added
-	queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		Id: orgId,
-	})
-	require.NoError(t, err)
-	found := false
-	for _, res := range queryRes.Result {
-		if res.DomainName == domain {
-			found = true
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.testFunc()
+		})
 	}
-	require.True(t, found, "unable to find added domain")
-
-	// 3. readd domain
-	_, err = Client.AddOrganizationDomain(ctx, &v2beta_org.AddOrganizationDomainRequest{
-		Id:     orgId,
-		Domain: domain,
-	})
-	// TODO remove error for adding already existing domain
-	// require.NoError(t, err)
-	require.Contains(t, err.Error(), "Errors.Already.Exists")
-	// check details
-	// gotCD = addOrgDomainRes.GetDetails().GetChangeDate().AsTime()
-	// now = time.Now()
-	// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-	// 4. check domain is added
-	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		Id: orgId,
-	})
-	require.NoError(t, err)
-	found = false
-	for _, res := range queryRes.Result {
-		if res.DomainName == domain {
-			found = true
-		}
-	}
-	require.True(t, found, "unable to find added domain")
-
-	// 5. delete organisation domain
-	deleteOrgDomainRes, err := Client.DeleteOrganizationDomain(ctx, &v2beta_org.DeleteOrganizationDomainRequest{
-		Id:     orgId,
-		Domain: domain,
-	})
-	require.NoError(t, err)
-	// check details
-	gotCD = deleteOrgDomainRes.GetDeletionDate().AsTime()
-	now = time.Now()
-	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-	// 6. check organization domain deleted
-	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		Id: orgId,
-	})
-	require.NoError(t, err)
-	found = false
-	for _, res := range queryRes.Result {
-		if res.DomainName == domain {
-			found = true
-		}
-	}
-	require.False(t, found, "deleted domain found")
-
-	// 7. redelete organisation domain
-	_, err = Client.DeleteOrganizationDomain(ctx, &v2beta_org.DeleteOrganizationDomainRequest{
-		Id:     orgId,
-		Domain: domain,
-	})
-	// TODO remove error for deleting org domain already deleted
-	// require.NoError(t, err)
-	require.Contains(t, err.Error(), "Domain doesn't exist on organization")
-	// check details
-	// gotCD = deleteOrgDomainRes.GetDetails().GetChangeDate().AsTime()
-	// now = time.Now()
-	// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-	// 8. check organization domain deleted
-	queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-		Id: orgId,
-	})
-	require.NoError(t, err)
-	found = false
-	for _, res := range queryRes.Result {
-		if res.DomainName == domain {
-			found = true
-		}
-	}
-	require.False(t, found, "deleted domain found")
 }
 
 func TestServer_ValidateOrganizationDomain(t *testing.T) {
 	orgs, _, err := createOrgs(CTX, Client, 1)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
+		return
 	}
 	orgId := orgs[0].Id
 
@@ -937,18 +1065,18 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			name: "validate org http happy path",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				Id:     orgId,
-				Domain: domain,
-				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				OrganizationId: orgId,
+				Domain:         domain,
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 		},
 		{
 			name: "validate org http non existnetn org id",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				Id:     "non existent org id",
-				Domain: domain,
-				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				OrganizationId: "non existent org id",
+				Domain:         domain,
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
@@ -957,18 +1085,18 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			name: "validate org dns happy path",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				Id:     orgId,
-				Domain: domain,
-				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+				OrganizationId: orgId,
+				Domain:         domain,
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
 			},
 		},
 		{
 			name: "validate org dns non existnetn org id",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				Id:     "non existent org id",
-				Domain: domain,
-				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+				OrganizationId: "non existent org id",
+				Domain:         domain,
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
 			},
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
@@ -977,9 +1105,9 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			name: "validate org non existnetn domain",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
-				Id:     orgId,
-				Domain: "non existent domain",
-				Type:   org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				OrganizationId: orgId,
+				Domain:         "non existent domain",
+				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			err: errors.New("Domain doesn't exist on organization"),
 		},
@@ -1003,6 +1131,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 	orgs, _, err := createOrgs(CTX, Client, 1)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
+		return
 	}
 	orgId := orgs[0].Id
 
@@ -1096,7 +1225,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 
 			// check metadata
 			listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				Id: orgId,
+				OrganizationId: orgId,
 			})
 			require.NoError(t, err)
 			foundMetadata := false
@@ -1120,6 +1249,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 	orgs, _, err := createOrgs(CTX, Client, 1)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
+		return
 	}
 	orgId := orgs[0].Id
 
@@ -1208,7 +1338,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 				tt.setupFunc()
 			}
 			got, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				Id: tt.orgId,
+				OrganizationId: tt.orgId,
 			})
 			require.NoError(t, err)
 
@@ -1230,6 +1360,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 	orgs, _, err := createOrgs(CTX, Client, 1)
 	if err != nil {
 		assert.Fail(t, "unable to create org")
+		return
 	}
 	orgId := orgs[0].Id
 
@@ -1399,7 +1530,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 
 			// check metadata exists
 			listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				Id: tt.orgId,
+				OrganizationId: tt.orgId,
 			})
 			require.NoError(t, err)
 			foundMetadataCount := 0
@@ -1431,7 +1562,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 
 			// check metadata was definitely deleted
 			listOrgMetadataRes, err = Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				Id: tt.orgId,
+				OrganizationId: tt.orgId,
 			})
 			require.NoError(t, err)
 			foundMetadataCount = 0
@@ -1447,7 +1578,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 
 			// check metadata that should not be delted was not deleted
 			listOrgMetadataRes, err = Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				Id: tt.orgId,
+				OrganizationId: tt.orgId,
 			})
 			require.NoError(t, err)
 			foundMetadataCount = 0
