@@ -3,7 +3,7 @@ package instance
 import (
 	"context"
 
-	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
@@ -30,11 +30,8 @@ func (s *Server) ListInstances(ctx context.Context, req *instance.ListInstancesR
 	}
 
 	return &instance.ListInstancesResponse{
-		Instances: InstancesToPb(instances.Instances),
-		Pagination: &filter.PaginationResponse{
-			TotalResult:  instances.Count,
-			AppliedLimit: uint64(req.GetPagination().GetLimit()),
-		},
+		Instances:  InstancesToPb(instances.Instances),
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, instances.SearchResponse),
 	}, nil
 }
 
@@ -50,11 +47,8 @@ func (s *Server) ListCustomDomains(ctx context.Context, req *instance.ListCustom
 	}
 
 	return &instance.ListCustomDomainsResponse{
-		Domains: DomainsToPb(domains.Domains),
-		Pagination: &filter.PaginationResponse{
-			TotalResult:  domains.Count,
-			AppliedLimit: uint64(req.GetPagination().GetLimit()),
-		},
+		Domains:    DomainsToPb(domains.Domains),
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, domains.SearchResponse),
 	}, nil
 }
 
@@ -71,9 +65,6 @@ func (s *Server) ListTrustedDomains(ctx context.Context, req *instance.ListTrust
 
 	return &instance.ListTrustedDomainsResponse{
 		TrustedDomain: trustedDomainsToPb(domains.Domains),
-		Pagination: &filter.PaginationResponse{
-			TotalResult:  domains.Count,
-			AppliedLimit: uint64(req.GetPagination().GetLimit()),
-		},
+		Pagination:    filter.QueryToPaginationPb(queries.SearchRequest, domains.SearchResponse),
 	}, nil
 }
