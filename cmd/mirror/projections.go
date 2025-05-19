@@ -296,13 +296,6 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			continue
 		}
 
-		err = projection.ProjectInstanceFields(ctx)
-		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger fields failed")
-			failedInstances <- instance
-			continue
-		}
-
 		err = auth_handler.ProjectInstance(ctx)
 		if err != nil {
 			logging.WithFields("instance", instance).WithError(err).Info("trigger auth handler failed")

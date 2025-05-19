@@ -233,18 +233,6 @@ func ProjectInstanceFields(ctx context.Context) error {
 	return nil
 }
 
-func ProjectInstanceFields(ctx context.Context) error {
-	for i, fieldProjection := range fields {
-		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("starting fields projection")
-		err := fieldProjection.Trigger(ctx)
-		if err != nil {
-			return err
-		}
-		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("fields projection done")
-	}
-	return nil
-}
-
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
@@ -269,16 +257,6 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	return config
 }
 
-func newFieldsList() {
-	fields = []*handler.FieldHandler{
-		ProjectGrantFields,
-		OrgDomainVerifiedFields,
-		InstanceDomainFields,
-		MembershipFields,
-		PermissionFields,
-	}
-}
-
 // we know this is ugly, but we need to have a singleton slice of all projections
 // and are only able to initialize it after all projections are created
 // as setup and start currently create them individually, we make sure we get the right one
@@ -287,6 +265,9 @@ func newFieldsList() {
 	fields = []*handler.FieldHandler{
 		ProjectGrantFields,
 		OrgDomainVerifiedFields,
+		InstanceDomainFields,
+		MembershipFields,
+		PermissionFields,
 	}
 }
 
