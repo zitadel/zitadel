@@ -45,8 +45,10 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import crypto from "crypto";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { getUserAgent } from "./fingerprint";
+import { cookies } from "next/headers";
+import { getFingerprintId, getUserAgent } from "./fingerprint";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -1198,6 +1200,25 @@ export async function setUserPassword({
       !(authmethods.authMethodTypes.length === 0) &&
       user.state !== UserState.INITIAL
     ) {
+      // check if a verification was done earlier
+
+      const cookiesList = await cookies();
+
+      const userAgentId = await getFingerprintId();
+
+      const verificationCheck = crypto
+        .createHash("sha256")
+        .update(`${user.userId}:${userAgentId}`)
+        .digest("hex");
+
+      await cookiesList.set({
+        name: "verificationCheck",
+        value: verificationCheck,
+        httpOnly: true,
+        path: "/",
+        maxAge: 300, // 5 minutes
+      });
+
       return { error: "Provide a code to set a password" };
     }
   }

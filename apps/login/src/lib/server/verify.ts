@@ -12,13 +12,16 @@ import {
   verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
+import crypto from "crypto";
+
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
+import { getFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
@@ -193,6 +196,26 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
     }
+
+    // set hash of userId and userAgentId to prevent replay attacks, TODO: check on the /authenticator/set page
+
+    const cookiesList = await cookies();
+
+    const userAgentId = await getFingerprintId();
+
+    const verificationCheck = crypto
+      .createHash("sha256")
+      .update(`${user.userId}:${userAgentId}`)
+      .digest("hex");
+
+    await cookiesList.set({
+      name: "verificationCheck",
+      value: verificationCheck,
+      httpOnly: true,
+      path: "/",
+      maxAge: 300, // 5 minutes
+    });
+
     return { redirect: `/authenticator/set?${params}` };
   }
 
