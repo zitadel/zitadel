@@ -42,7 +42,6 @@ func TestMain(m *testing.M) {
 
 		err = testClient.Ping()
 		logging.OnError(err).Fatal("unable to ping db")
-
 		defer func() {
 			logging.OnError(testClient.Close()).Error("unable to close db")
 		}()
