@@ -31,7 +31,8 @@ async function setSessionHttpOnlyCookie<T>(
     value: JSON.stringify(sessions),
     httpOnly: true,
     path: "/",
-    sameSite,
+    sameSite: process.env.NODE_ENV === "production" ? sameSite : "lax",
+    secure: process.env.NODE_ENV === "production",
   });
 }
 
