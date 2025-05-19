@@ -8,6 +8,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/shopspring/decimal"
 	"github.com/spf13/cobra"
@@ -176,6 +177,10 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM STDIN")
 		eventCount = tag.RowsAffected()
 		if err != nil {
+			pgErr := new(pgconn.PgError)
+			errors.As(err, &pgErr)
+
+			logging.WithError(err).WithField("pg_err_details", pgErr.Detail).Error("unable to copy events into destination")
 			return zerrors.ThrowUnknown(err, "MIGRA-DTHi7", "unable to copy events into destination")
 		}
 
