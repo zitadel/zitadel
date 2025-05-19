@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
