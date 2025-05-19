@@ -402,10 +402,10 @@ service InstanceService {
 
 message DeleteInstanceRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
@@ -421,10 +421,10 @@ message DeleteInstanceResponse {
 
 message GetInstanceRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
@@ -437,18 +437,18 @@ message GetInstanceResponse {
 message UpdateInstanceRequest {
   // used only to identify the instance to change.
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
   string instance_name = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       description: "\"name of the instance to update\"";
       example: "\"my instance\"";
     }
@@ -484,10 +484,10 @@ message ListInstancesResponse {
 
 message AddCustomDomainRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
@@ -510,10 +510,10 @@ message AddCustomDomainResponse {
 
 message RemoveCustomDomainRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
@@ -536,10 +536,10 @@ message RemoveCustomDomainResponse {
 
 message ListCustomDomainsRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
@@ -563,10 +563,10 @@ message ListCustomDomainsResponse {
 
 message AddTrustedDomainRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
@@ -591,10 +591,10 @@ message AddTrustedDomainResponse {
 
 message RemoveTrustedDomainRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
@@ -619,10 +619,10 @@ message RemoveTrustedDomainResponse {
 
 message ListTrustedDomainsRequest {
   string instance_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 253},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 253;
+      max_length: 200;
       example: "\"222430354126975533\"";
     }
   ];
