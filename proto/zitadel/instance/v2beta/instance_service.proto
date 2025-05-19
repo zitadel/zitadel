@@ -141,7 +141,7 @@ service InstanceService {
   // The instace_id in the input message will be used in the future.
   //
   // Required permissions:
-  //   - `system.instance.read`
+  //   - `iam.read`
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -170,7 +170,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
-  //   - `system.instance.write`
+  //   - `iam.write`
   rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -200,7 +200,7 @@ service InstanceService {
   // The request is paginated and returns 100 results by default.
   //
   // Required permissions:
-  //  - `system.instance.read`
+  //  - `iam.read`
   rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -230,7 +230,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future
   //
   // Required permissions:
-  //   - `system.domain.write`
+  //   - `iam.write`
   rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -260,7 +260,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
-  //  - `system.domain.delete`
+  //  - `iam.write`
   rpc RemoveCustomDomain(RemoveCustomDomainRequest) returns (RemoveCustomDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -287,6 +287,9 @@ service InstanceService {
   // Lists custom domains of the instance.
   //
   // The instance_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //  - `iam.read`
   rpc ListCustomDomains(ListCustomDomainsRequest) returns (ListCustomDomainsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -316,7 +319,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
-  //   - `system.domain.write`
+  //  - `iam.write`
   rpc AddTrustedDomain(AddTrustedDomainRequest) returns (AddTrustedDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -346,7 +349,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
-  //   - `system.domain.delete`
+  //  - `iam.write`
   rpc RemoveTrustedDomain(RemoveTrustedDomainRequest) returns (RemoveTrustedDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -376,7 +379,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
-  //   - `system.domain.read`
+  //   - `iam.read`
   rpc ListTrustedDomains(ListTrustedDomainsRequest) returns (ListTrustedDomainsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
