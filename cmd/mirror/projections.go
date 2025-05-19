@@ -3,7 +3,6 @@ package mirror
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -104,7 +103,6 @@ func projections(
 	config *ProjectionsConfig,
 	masterKey string,
 ) {
-	logging.Info("starting to fill projections")
 	start := time.Now()
 
 	client, err := database.Connect(config.Destination, false)
@@ -253,10 +251,8 @@ func projections(
 		go execProjections(ctx, instances, failedInstances, &wg)
 	}
 
-	existingInstances := queryInstanceIDs(ctx, client)
-	for i, instance := range existingInstances {
+	for _, instance := range queryInstanceIDs(ctx, client) {
 		instances <- instance
-		logging.WithFields("id", instance, "index", fmt.Sprintf("%d/%d", i, len(existingInstances))).Info("instance queued for projection")
 	}
 	close(instances)
 	wg.Wait()
@@ -268,7 +264,7 @@ func projections(
 
 func execProjections(ctx context.Context, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {
 	for instance := range instances {
-		logging.WithFields("instance", instance).Info("starting projections")
+		logging.WithFields("instance", instance).Info("start projections")
 		ctx = internal_authz.WithInstanceID(ctx, instance)
 
 		err := projection.ProjectInstance(ctx)
@@ -303,7 +299,7 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 	wg.Done()
 }
 
-// queryInstanceIDs returns the instance configured by flag
+// returns the instance configured by flag
 // or all instances which are not removed
 func queryInstanceIDs(ctx context.Context, source *database.DB) []string {
 	if len(instanceIDs) > 0 {

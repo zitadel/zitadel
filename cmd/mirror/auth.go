@@ -4,7 +4,6 @@ import (
 	"context"
 	_ "embed"
 	"io"
-	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5/stdlib"
@@ -42,15 +41,11 @@ func copyAuth(ctx context.Context, config *Migration) {
 	logging.OnError(err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
-	copyAuthRequests(ctx, sourceClient, destClient, config.MaxAuthRequestAge)
+	copyAuthRequests(ctx, sourceClient, destClient)
 }
 
-func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthRequestAge time.Duration) {
+func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	start := time.Now()
-
-	logging.Info("creating index on auth.auth_requests.change_date to speed up copy in source database")
-	_, err := source.ExecContext(ctx, "CREATE INDEX CONCURRENTLY IF NOT EXISTS auth_requests_change_date ON auth.auth_requests (change_date)")
-	logging.OnError(err).Fatal("unable to create index on auth.auth_requests.change_date")
 
 	sourceConn, err := source.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire connection")
@@ -60,9 +55,9 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthReq
 	errs := make(chan error, 1)
 
 	go func() {
-		err = sourceConn.Raw(func(driverConn any) error {
+		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON request, code, request_type, creation_date, change_date, instance_id FROM auth.auth_requests "+instanceClause()+" AND change_date > NOW() - INTERVAL '"+strconv.FormatFloat(maxAuthRequestAge.Seconds(), 'f', -1, 64)+" seconds') TO STDOUT")
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON request, code, request_type, creation_date, change_date, instance_id FROM auth.auth_requests "+instanceClause()+") TO STDOUT")
 			w.Close()
 			return err
 		})
@@ -74,7 +69,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthReq
 	defer destConn.Close()
 
 	var affected int64
-	err = destConn.Raw(func(driverConn any) error {
+	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
 		if shouldReplace {
