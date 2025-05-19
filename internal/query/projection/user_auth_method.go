@@ -125,6 +125,10 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanOTPEmailRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
 				},
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
 			},
 		},
 		{
@@ -308,6 +312,21 @@ func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*
 		[]handler.Condition{
 			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(UserAuthMethodResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *userAuthMethodProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-FwDZ8", "reduce.wrong.event.type %s", user.UserRemovedType)
+	}
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserAuthMethodResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(UserAuthMethodUserIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

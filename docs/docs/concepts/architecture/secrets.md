@@ -71,6 +71,8 @@ The following hash algorithms are supported:
 - md5: implementation of md5Crypt with salt and password shuffling [^2]
 - md5plain: md5 digest of a password without salt [^2]
 - md5salted: md5 digest of a salted password [^2]
+- phpass: md5 digest with PHPass algorithm (used in WordPress) [^2]
+- sha2: implementation of crypt(3) SHA-256 & SHA-512
 - scrypt
 - pbkdf2
 
