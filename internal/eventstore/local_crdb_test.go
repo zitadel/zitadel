@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 	}
 	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
 		pgxdecimal.Register(conn.TypeMap())
-		return new_es.RegisterEventstoreTypes(ctx, conn)
+		return nil
 	}
 	pool, err := pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
