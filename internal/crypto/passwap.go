@@ -14,7 +14,9 @@ import (
 	"github.com/zitadel/passwap/md5plain"
 	"github.com/zitadel/passwap/md5salted"
 	"github.com/zitadel/passwap/pbkdf2"
+	"github.com/zitadel/passwap/phpass"
 	"github.com/zitadel/passwap/scrypt"
+	"github.com/zitadel/passwap/sha2"
 	"github.com/zitadel/passwap/verifier"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -51,6 +53,8 @@ const (
 	HashNameMd5       HashName = "md5"       // verify only, as hashing with md5 is insecure and deprecated
 	HashNameMd5Plain  HashName = "md5plain"  // verify only, as hashing with md5 is insecure and deprecated
 	HashNameMd5Salted HashName = "md5salted" // verify only, as hashing with md5 is insecure and deprecated
+	HashNamePHPass    HashName = "phpass"    // verify only, as hashing with md5 is insecure and deprecated
+	HashNameSha2      HashName = "sha2"      // hash and verify
 	HashNameScrypt    HashName = "scrypt"    // hash and verify
 	HashNamePBKDF2    HashName = "pbkdf2"    // hash and verify
 )
@@ -125,6 +129,14 @@ var knowVerifiers = map[HashName]prefixVerifier{
 		prefixes: []string{md5salted.Prefix},
 		verifier: md5salted.Verifier,
 	},
+	HashNameSha2: {
+		prefixes: []string{sha2.Sha256Identifier, sha2.Sha512Identifier},
+		verifier: sha2.Verifier,
+	},
+	HashNamePHPass: {
+		prefixes: []string{phpass.IdentifierP, phpass.IdentifierH},
+		verifier: phpass.Verifier,
+	},
 }
 
 func (c *HashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes []string, err error) {
@@ -158,9 +170,11 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 		return c.scrypt()
 	case HashNamePBKDF2:
 		return c.pbkdf2()
+	case HashNameSha2:
+		return c.sha2()
 	case "":
 		return nil, nil, fmt.Errorf("missing hasher algorithm")
-	case HashNameArgon2, HashNameMd5:
+	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass:
 		fallthrough
 	default:
 		return nil, nil, fmt.Errorf("invalid algorithm %q", c.Algorithm)
@@ -296,6 +310,44 @@ func (c *HasherConfig) pbkdf2() (passwap.Hasher, []string, error) {
 	case HashModeSHA512:
 		return pbkdf2.NewSHA512(p), prefix, nil
 	default:
-		return nil, nil, fmt.Errorf("unsuppored pbkdf2 hash mode: %s", hash)
+		return nil, nil, fmt.Errorf("unsupported pbkdf2 hash mode: %s", hash)
+	}
+}
+
+func (c *HasherConfig) sha2Params() (use512 bool, rounds int, err error) {
+	var dst = struct {
+		Rounds uint32   `mapstructure:"Rounds"`
+		Hash   HashMode `mapstructure:"Hash"`
+	}{}
+	if err := c.decodeParams(&dst); err != nil {
+		return false, 0, fmt.Errorf("decode sha2 params: %w", err)
+	}
+	switch dst.Hash {
+	case HashModeSHA256:
+		use512 = false
+	case HashModeSHA512:
+		use512 = true
+	case HashModeSHA1, HashModeSHA224, HashModeSHA384:
+		fallthrough
+	default:
+		return false, 0, fmt.Errorf("cannot use %s with sha2", dst.Hash)
+	}
+	if dst.Rounds > sha2.RoundsMax {
+		return false, 0, fmt.Errorf("rounds with sha2 cannot be larger than %d", sha2.RoundsMax)
+	} else {
+		rounds = int(dst.Rounds)
+	}
+	return use512, rounds, nil
+}
+
+func (c *HasherConfig) sha2() (passwap.Hasher, []string, error) {
+	use512, rounds, err := c.sha2Params()
+	if err != nil {
+		return nil, nil, err
+	}
+	if use512 {
+		return sha2.New512(rounds), []string{sha2.Sha256Identifier, sha2.Sha512Identifier}, nil
+	} else {
+		return sha2.New256(rounds), []string{sha2.Sha256Identifier, sha2.Sha512Identifier}, nil
 	}
 }
