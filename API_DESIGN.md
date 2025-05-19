@@ -220,6 +220,30 @@ Additionally, state changes, specific actions or operations that do not fit into
 - `Send` for sending a resource.
 - etc.
 
+#### REST Path
+
+Paths of operations MUST be structured as follows:
+
+| Operation     | Method | Path                                     |
+|---------------|--------|------------------------------------------|
+| Create/Add    | POST   | /\<version\>/\<resource\>                |
+| Update        | POST   | /\<version\>/\<resource\>/\<identifier\> |
+| Delete/Remove | DELETE | /\<version\>/\<resource\>/\<identifier\> |
+| Set           | PUT    | /\<version\>/\<resource\>                |
+| Get           | GET    | /\<version\>/\<resource\>/\<identifier\> |
+| List          | POST   | /\<version\>/\<resource\>/search         |
+
+Which results in an example path for operations like `/v2beta/users/search`.
+
+Paths of status changes on resources MUST be structured as follows:
+
+| Operation  | Method | Path                                                |
+|------------|--------|-----------------------------------------------------|
+| Activate   | POST   | /\<version\>/\<resource\>/\<identifier\>/activate   |
+| Deactivate | POST   | /\<version\>/\<resource\>/\<identifier\>/deactivate |
+
+Which results in an example path for status changes like `/v2beta/users/1234567890/activate`.
+
 ## Authentication and Authorization
 
 The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
