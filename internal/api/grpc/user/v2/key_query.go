@@ -38,8 +38,7 @@ func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user
 		Result:     make([]*user.Key, len(result.AuthNKeys)),
 		Pagination: filter.QueryToPaginationPb(search.SearchRequest, result.SearchResponse),
 	}
-	for i := range result.AuthNKeys {
-		key := result.AuthNKeys[i]
+	for i, key := range result.AuthNKeys {
 		resp.Result[i] = &user.Key{
 			CreationDate:   timestamppb.New(key.CreationDate),
 			ChangeDate:     timestamppb.New(key.ChangeDate),

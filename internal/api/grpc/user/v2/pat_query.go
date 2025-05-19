@@ -37,8 +37,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 		Result:     make([]*user.PersonalAccessToken, len(result.PersonalAccessTokens)),
 		Pagination: filter.QueryToPaginationPb(search.SearchRequest, result.SearchResponse),
 	}
-	for i := range result.PersonalAccessTokens {
-		pat := result.PersonalAccessTokens[i]
+	for i, pat := range result.PersonalAccessTokens {
 		resp.Result[i] = &user.PersonalAccessToken{
 			CreationDate:   timestamppb.New(pat.CreationDate),
 			ChangeDate:     timestamppb.New(pat.ChangeDate),
