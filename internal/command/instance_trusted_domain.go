@@ -34,6 +34,14 @@ func (c *Commands) AddTrustedDomain(ctx context.Context, trustedDomain string) (
 }
 
 func (c *Commands) RemoveTrustedDomain(ctx context.Context, trustedDomain string) (*domain.ObjectDetails, error) {
+	trustedDomain = strings.TrimSpace(trustedDomain)
+	if trustedDomain == "" || len(trustedDomain) > 253 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-ajAzwu", "Errors.Invalid.Argument")
+	}
+	if !allowDomainRunes.MatchString(trustedDomain) {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-lfs3Te", "Errors.Instance.Domain.InvalidCharacter")
+	}
+
 	model := NewInstanceTrustedDomainsWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, model)
 	if err != nil {

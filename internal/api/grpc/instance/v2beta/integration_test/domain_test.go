@@ -322,16 +322,6 @@ func TestRemoveTrustedDomain(t *testing.T) {
 			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 		},
 		{
-			testName: "when invalid domain should return invalid argument error",
-			inputRequest: &instance.RemoveTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     " ",
-			},
-			inputContext:      ctxWithSysAuthZ,
-			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "domain must not be empty (domain)",
-		},
-		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.RemoveTrustedDomainRequest{
 				InstanceId: inst.ID(),

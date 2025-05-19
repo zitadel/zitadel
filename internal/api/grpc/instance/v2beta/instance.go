@@ -2,7 +2,6 @@ package instance
 
 import (
 	"context"
-	"strings"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -10,12 +9,7 @@ import (
 )
 
 func (s *Server) DeleteInstance(ctx context.Context, request *instance.DeleteInstanceRequest) (*instance.DeleteInstanceResponse, error) {
-	instanceID := strings.TrimSpace(request.GetInstanceId())
-	if err := validateParam(instanceID, "instance_id"); err != nil {
-		return nil, err
-	}
-
-	obj, err := s.command.RemoveInstance(ctx, instanceID)
+	obj, err := s.command.RemoveInstance(ctx, request.GetInstanceId())
 	if err != nil {
 		return nil, err
 	}
@@ -27,12 +21,7 @@ func (s *Server) DeleteInstance(ctx context.Context, request *instance.DeleteIns
 }
 
 func (s *Server) UpdateInstance(ctx context.Context, request *instance.UpdateInstanceRequest) (*instance.UpdateInstanceResponse, error) {
-	instanceName := strings.TrimSpace(request.GetInstanceName())
-	if err := validateParam(instanceName, "instance_name"); err != nil {
-		return nil, err
-	}
-
-	obj, err := s.command.UpdateInstance(ctx, instanceName)
+	obj, err := s.command.UpdateInstance(ctx, request.GetInstanceName())
 	if err != nil {
 		return nil, err
 	}

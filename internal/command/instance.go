@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -666,7 +667,7 @@ func setupMessageTexts(validations *[]preparation.Validation, setupMessageTexts 
 
 func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareUpdateInstance(instanceAgg, name)
+	validation := c.prepareUpdateInstance(instanceAgg, strings.TrimSpace(name))
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -885,7 +886,12 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 }
 
 func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(id)
+	instID := strings.TrimSpace(id)
+	if instID == "" || len(instID) > 200 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-VeS2zI", "Errors.Invalid.Argument")
+	}
+
+	instanceAgg := instance.NewAggregate(instID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
 	if err != nil {
 		return nil, err

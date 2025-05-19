@@ -2,7 +2,6 @@ package instance
 
 import (
 	"context"
-	"strings"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -40,13 +39,7 @@ func (s *Server) AddTrustedDomain(ctx context.Context, req *instance.AddTrustedD
 }
 
 func (s *Server) RemoveTrustedDomain(ctx context.Context, req *instance.RemoveTrustedDomainRequest) (*instance.RemoveTrustedDomainResponse, error) {
-	domain := strings.TrimSpace(req.GetDomain())
-	err := validateParam(domain, "domain")
-	if err != nil {
-		return nil, err
-	}
-
-	details, err := s.command.RemoveTrustedDomain(ctx, domain)
+	details, err := s.command.RemoveTrustedDomain(ctx, req.GetDomain())
 	if err != nil {
 		return nil, err
 	}

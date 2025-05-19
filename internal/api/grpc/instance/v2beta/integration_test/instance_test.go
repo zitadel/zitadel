@@ -50,15 +50,6 @@ func TestDeleteInstace(t *testing.T) {
 		{
 			testName: "when invalid input should return invalid argument error",
 			inputRequest: &instance.DeleteInstanceRequest{
-				InstanceId: " ",
-			},
-			inputContext:      ctxWithSysAuthZ,
-			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "instance_id must not be empty (instance_id)",
-		},
-		{
-			testName: "when invalid input should return invalid argument error",
-			inputRequest: &instance.DeleteInstanceRequest{
 				InstanceId: inst.ID() + "invalid",
 			},
 			inputContext:      ctxWithSysAuthZ,
@@ -66,7 +57,7 @@ func TestDeleteInstace(t *testing.T) {
 			expectedErrorMsg:  "Instance not found (COMMA-AE3GS)",
 		},
 		{
-			testName: "when invalid input should return invalid argument error",
+			testName: "when delete succeeds should return deletion date",
 			inputRequest: &instance.DeleteInstanceRequest{
 				InstanceId: inst.ID(),
 			},
@@ -134,16 +125,6 @@ func TestUpdateInstace(t *testing.T) {
 			inputContext:      orgOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
 			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
-		},
-		{
-			testName: "when invalid input should return invalid argument error",
-			inputRequest: &instance.UpdateInstanceRequest{
-				InstanceId:   inst.ID(),
-				InstanceName: " ",
-			},
-			inputContext:      ctxWithSysAuthZ,
-			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "instance_name must not be empty (instance_name)",
 		},
 		{
 			testName: "when update succeeds should change instance name",
