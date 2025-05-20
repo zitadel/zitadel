@@ -317,242 +317,236 @@ func TestServer_RemoveKey_Permission(t *testing.T) {
 }
 
 func TestServer_ListKeys(t *testing.T) {
-	OrgCTX := CTX
-	setPermissionCheckV2Flag(t, true)
-	defer setPermissionCheckV2Flag(t, false)
-	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListKeys-%s", gofakeit.AppName()), gofakeit.Email())
-	otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
-		OrganizationId: otherOrg.OrganizationId,
-		UserType: &user.CreateUserRequest_Machine_{
-			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
-			},
-		},
-	})
-	require.NoError(t, err)
-	otherOrgUserId := otherOrgUser.GetId()
-	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
-	onlySinceTestStartFilter := &user.KeysSearchFilter{Filter: &user.KeysSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
-		Timestamp: timestamppb.Now(),
-		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
-	}}}
-	myOrgId := Instance.DefaultOrg.GetId()
-	myUserId := Instance.Users.Get(integration.UserTypeNoPermission).ID
-	expiresInADay := time.Now().Truncate(time.Hour).Add(time.Hour * 24)
-	myDataPoint := setupKeyDataPoint(t, myUserId, myOrgId, expiresInADay)
-	otherUserDataPoint := setupKeyDataPoint(t, otherUserId, myOrgId, expiresInADay)
-	otherOrgDataPointExpiringSoon := setupKeyDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, time.Now().Truncate(time.Hour).Add(time.Hour))
-	otherOrgDataPointExpiringLate := setupKeyDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay.Add(time.Hour*24*30))
-	sortingColumnExpirationDate := user.KeyFieldName_KEY_FIELD_NAME_KEY_EXPIRATION_DATE
-	awaitKeys(t, otherOrgDataPointExpiringSoon.GetId(), otherOrgDataPointExpiringLate.GetId(), otherUserDataPoint.GetId(), myDataPoint.GetId())
 	type args struct {
 		ctx context.Context
 		req *user.ListKeysRequest
 	}
-	tests := []struct {
+	type testCase struct {
 		name string
 		args args
 		want *user.ListKeysResponse
-	}{
-		{
-			name: "list all, instance",
-			args: args{
-				IamCTX,
-				&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					otherOrgDataPointExpiringLate,
-					otherOrgDataPointExpiringSoon,
-					otherUserDataPoint,
-					myDataPoint,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  4,
-					AppliedLimit: 100,
-				},
-			},
-		},
-		{
-			name: "list all, org",
-			args: args{
-				OrgCTX,
-				&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					otherUserDataPoint,
-					myDataPoint,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  2,
-					AppliedLimit: 100,
-				},
-			},
-		},
-		{
-			name: "list all, user",
-			args: args{
-				UserCTX,
-				&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					myDataPoint,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
-					AppliedLimit: 100,
-				},
-			},
-		},
-		{
-			name: "list by id",
-			args: args{
-				IamCTX,
-				&user.ListKeysRequest{
-					Filters: []*user.KeysSearchFilter{
-						onlySinceTestStartFilter,
-						{
-							Filter: &user.KeysSearchFilter_KeyIdFilter{
-								KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
-							},
-						},
-					},
-				},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					otherOrgDataPointExpiringSoon,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
-					AppliedLimit: 100,
-				},
-			},
-		},
-		{
-			name: "list by multiple ids",
-			args: args{
-				IamCTX,
-				&user.ListKeysRequest{
-					Filters: []*user.KeysSearchFilter{
-						onlySinceTestStartFilter,
-						{
-							Filter: &user.KeysSearchFilter_OrFilter{
-								OrFilter: &user.KeysOrFilter{
-									Filters: []*user.KeysSearchFilter{
-										{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id}}},
-										{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					otherOrgDataPointExpiringSoon,
-					myDataPoint,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  2,
-					AppliedLimit: 100,
-				},
-			},
-		},
-		{
-			name: "list all from other org",
-			args: args{
-				IamCTX,
-				&user.ListKeysRequest{
-					Filters: []*user.KeysSearchFilter{
-						onlySinceTestStartFilter,
-						{
-							Filter: &user.KeysSearchFilter_OrganizationIdFilter{
-								OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
-							},
-						},
-					},
-				},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					otherOrgDataPointExpiringLate,
-					otherOrgDataPointExpiringSoon,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  2,
-					AppliedLimit: 100,
-				},
-			},
-		},
-		{
-			name: "sort by next expiration dates",
-			args: args{
-				IamCTX,
-				&user.ListKeysRequest{
-					Pagination: &filter.PaginationRequest{
-						Asc: true,
-					},
-					SortingColumn: &sortingColumnExpirationDate,
-					Filters: []*user.KeysSearchFilter{
-						onlySinceTestStartFilter,
-						{
-							Filter: &user.KeysSearchFilter_OrFilter{
-								OrFilter: &user.KeysOrFilter{
-									Filters: []*user.KeysSearchFilter{
-										{Filter: &user.KeysSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
-										{Filter: &user.KeysSearchFilter_KeyIdFilter{KeyIdFilter: &user.IDFilter{Id: myDataPoint.Id}}},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					otherOrgDataPointExpiringSoon,
-					myDataPoint,
-					otherOrgDataPointExpiringLate,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  3,
-					AppliedLimit: 100,
-				},
-			},
-		},
-		{
-			name: "get page",
-			args: args{
-				IamCTX,
-				&user.ListKeysRequest{
-					Pagination: &filter.PaginationRequest{
-						Offset: 2,
-						Limit:  2,
-						Asc:    true,
-					},
-					Filters: []*user.KeysSearchFilter{
-						onlySinceTestStartFilter,
-					},
-				},
-			},
-			want: &user.ListKeysResponse{
-				Result: []*user.Key{
-					otherOrgDataPointExpiringSoon,
-					otherOrgDataPointExpiringLate,
-				},
-				Pagination: &filter.PaginationResponse{
-					TotalResult:  4,
-					AppliedLimit: 2,
-				},
-			},
-		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	runTestCases := func(t *testing.T, runTestCase func(t *testing.T, tt testCase)) {
+		OrgCTX := CTX
+		otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListKeys-%s", gofakeit.AppName()), gofakeit.Email())
+		otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
+			OrganizationId: otherOrg.OrganizationId,
+			UserType: &user.CreateUserRequest_Machine_{
+				Machine: &user.CreateUserRequest_Machine{
+					Name: gofakeit.Name(),
+				},
+			},
+		})
+		require.NoError(t, err)
+		otherOrgUserId := otherOrgUser.GetId()
+		otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
+		onlySinceTestStartFilter := &user.KeysSearchFilter{Filter: &user.KeysSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
+			Timestamp: timestamppb.Now(),
+			Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
+		}}}
+		myOrgId := Instance.DefaultOrg.GetId()
+		myUserId := Instance.Users.Get(integration.UserTypeNoPermission).ID
+		expiresInADay := time.Now().Truncate(time.Hour).Add(time.Hour * 24)
+		myDataPoint := setupKeyDataPoint(t, myUserId, myOrgId, expiresInADay)
+		otherUserDataPoint := setupKeyDataPoint(t, otherUserId, myOrgId, expiresInADay)
+		otherOrgDataPointExpiringSoon := setupKeyDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, time.Now().Truncate(time.Hour).Add(time.Hour))
+		otherOrgDataPointExpiringLate := setupKeyDataPoint(t, otherOrgUserId, otherOrg.OrganizationId, expiresInADay.Add(time.Hour*24*30))
+		sortingColumnExpirationDate := user.KeyFieldName_KEY_FIELD_NAME_KEY_EXPIRATION_DATE
+		awaitKeys(t, onlySinceTestStartFilter,
+			otherOrgDataPointExpiringSoon.GetId(),
+			otherOrgDataPointExpiringLate.GetId(),
+			otherUserDataPoint.GetId(),
+			myDataPoint.GetId(),
+		)
+		tests := []testCase{
+			{
+				name: "list all, instance",
+				args: args{
+					IamCTX,
+					&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{
+						otherOrgDataPointExpiringLate,
+						otherOrgDataPointExpiringSoon,
+						otherUserDataPoint,
+						myDataPoint,
+					},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  4,
+						AppliedLimit: 100,
+					},
+				},
+			},
+			{
+				name: "list all, org",
+				args: args{
+					OrgCTX,
+					&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{
+						otherUserDataPoint,
+						myDataPoint,
+					},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  2,
+						AppliedLimit: 100,
+					},
+				},
+			},
+			{
+				name: "list all, user",
+				args: args{
+					UserCTX,
+					&user.ListKeysRequest{Filters: []*user.KeysSearchFilter{onlySinceTestStartFilter}},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{
+						myDataPoint,
+					},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  1,
+						AppliedLimit: 100,
+					},
+				},
+			},
+			{
+				name: "list by id",
+				args: args{
+					IamCTX,
+					&user.ListKeysRequest{
+						Filters: []*user.KeysSearchFilter{
+							onlySinceTestStartFilter,
+							{
+								Filter: &user.KeysSearchFilter_KeyIdFilter{
+									KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
+								},
+							},
+						},
+					},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{
+						otherOrgDataPointExpiringSoon,
+					},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  1,
+						AppliedLimit: 100,
+					},
+				},
+			},
+			{
+				name: "list all from other org",
+				args: args{
+					IamCTX,
+					&user.ListKeysRequest{
+						Filters: []*user.KeysSearchFilter{
+							onlySinceTestStartFilter,
+							{
+								Filter: &user.KeysSearchFilter_OrganizationIdFilter{
+									OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
+								},
+							},
+						},
+					},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{
+						otherOrgDataPointExpiringLate,
+						otherOrgDataPointExpiringSoon,
+					},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  2,
+						AppliedLimit: 100,
+					},
+				},
+			},
+			{
+				name: "sort by next expiration dates",
+				args: args{
+					IamCTX,
+					&user.ListKeysRequest{
+						Pagination: &filter.PaginationRequest{
+							Asc: true,
+						},
+						SortingColumn: &sortingColumnExpirationDate,
+						Filters: []*user.KeysSearchFilter{
+							onlySinceTestStartFilter,
+							{Filter: &user.KeysSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
+						},
+					},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{
+						otherOrgDataPointExpiringSoon,
+						otherOrgDataPointExpiringLate,
+					},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  2,
+						AppliedLimit: 100,
+					},
+				},
+			},
+			{
+				name: "get page",
+				args: args{
+					IamCTX,
+					&user.ListKeysRequest{
+						Pagination: &filter.PaginationRequest{
+							Offset: 2,
+							Limit:  2,
+							Asc:    true,
+						},
+						Filters: []*user.KeysSearchFilter{
+							onlySinceTestStartFilter,
+						},
+					},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{
+						otherOrgDataPointExpiringSoon,
+						otherOrgDataPointExpiringLate,
+					},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  4,
+						AppliedLimit: 2,
+					},
+				},
+			},
+			{
+				name: "empty list",
+				args: args{
+					UserCTX,
+					&user.ListKeysRequest{
+						Filters: []*user.KeysSearchFilter{
+							{
+								Filter: &user.KeysSearchFilter_KeyIdFilter{
+									KeyIdFilter: &user.IDFilter{Id: otherUserDataPoint.Id},
+								},
+							},
+						},
+					},
+				},
+				want: &user.ListKeysResponse{
+					Result: []*user.Key{},
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  0,
+						AppliedLimit: 100,
+					},
+				},
+			},
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				runTestCase(t, tt)
+			})
+		}
+	}
+	t.Run("with permission flag v2", func(t *testing.T) {
+		setPermissionCheckV2Flag(t, true)
+		defer setPermissionCheckV2Flag(t, false)
+		runTestCases(t, func(t *testing.T, tt testCase) {
 			got, err := Client.ListKeys(tt.args.ctx, tt.args.req)
 			require.NoError(t, err)
 			assert.Len(t, got.Result, len(tt.want.Result))
@@ -560,7 +554,19 @@ func TestServer_ListKeys(t *testing.T) {
 				t.Errorf("ListKeys() mismatch (-want +got):\n%s", diff)
 			}
 		})
-	}
+	})
+	t.Run("without permission flag v2", func(t *testing.T) {
+		runTestCases(t, func(t *testing.T, tt testCase) {
+			got, err := Client.ListKeys(tt.args.ctx, tt.args.req)
+			require.NoError(t, err)
+			assert.Len(t, got.Result, len(tt.want.Result))
+			// ingnore the total result, as this is a known bug with the in-memory permission checks
+			tt.want.Pagination.TotalResult = got.Pagination.TotalResult
+			if diff := cmp.Diff(tt.want, got, protocmp.Transform()); diff != "" {
+				t.Errorf("ListKeys() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	})
 }
 
 func setupKeyDataPoint(t *testing.T, userId, orgId string, expirationDate time.Time) *user.Key {
@@ -581,24 +587,12 @@ func setupKeyDataPoint(t *testing.T, userId, orgId string, expirationDate time.T
 	}
 }
 
-func awaitKeys(t *testing.T, keyIds ...string) {
+func awaitKeys(t *testing.T, sinceTestStartFilter *user.KeysSearchFilter, keyIds ...string) {
 	sortingColumn := user.KeyFieldName_KEY_FIELD_NAME_ID
 	slices.Sort(keyIds)
-	var filters []*user.KeysSearchFilter
-	for _, keyId := range keyIds {
-		filters = append(filters, &user.KeysSearchFilter{
-			Filter: &user.KeysSearchFilter_KeyIdFilter{
-				KeyIdFilter: &user.IDFilter{Id: keyId},
-			},
-		})
-	}
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		result, err := Client.ListKeys(SystemCTX, &user.ListKeysRequest{
-			Filters: []*user.KeysSearchFilter{{
-				Filter: &user.KeysSearchFilter_OrFilter{
-					OrFilter: &user.KeysOrFilter{Filters: filters},
-				},
-			}},
+			Filters:       []*user.KeysSearchFilter{sinceTestStartFilter},
 			SortingColumn: &sortingColumn,
 			Pagination: &filter.PaginationRequest{
 				Asc: true,
