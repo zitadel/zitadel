@@ -60,14 +60,6 @@ func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 
 	id.Configure(config.Machine)
 
-	config.Projections.MaxFailureCount = 1
-	for key, customization := range config.Projections.Customizations {
-		if customization.MaxFailureCount == nil {
-			continue
-		}
-		*config.Projections.Customizations[key].MaxFailureCount = 1
-	}
-
 	return config
 }
 
