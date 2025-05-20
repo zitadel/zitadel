@@ -2678,7 +2678,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 GetProject.
+    // Get Project By ID
+    //
+    // Deprecated: [Get Project](apis/resources/project_service_v2/project-service-get-project.api.mdx) to get project by ID.
+    //
+    // Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context.
    rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{id}"
@@ -2691,9 +2695,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Get Project By ID";
             deprecated: true;
-            description: "Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 GetProject."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2730,7 +2732,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 ListProjects.
+    // List Projects
+    //
+    // Deprecated: [List Projects](apis/resources/project_service_v2/project-service-list-projects.api.mdx) to list all projects and granted projects.
+    //
+    // Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
         option (google.api.http) = {
             post: "/projects/_search"
@@ -2743,9 +2749,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Search Project";
             deprecated: true;
-            description: "Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 ListProjects."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2757,7 +2761,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 ListProject.
+    // List Granted Projects
+    //
+    // Deprecated: [List Projects](apis/resources/project_service_v2/project-service-list-projects.api.mdx) to list all projects and granted projects.
+    //
+    // Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context.
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
         option (google.api.http) = {
             post: "/granted_projects/_search"
@@ -2770,9 +2778,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Search Granted Project";
             deprecated: true;
-            description: "Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 ListProjects."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2834,7 +2840,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 CreateProject.
+    // Create Project
+    //
+    // Deprecated: [Create Project](apis/resources/project_service_v2/project-service-create-project.api.mdx) to create a project.
+    //
+    // Create a new project. A Project is a vessel for different applications sharing the same role context.
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
@@ -2847,9 +2857,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Create Project";
             deprecated: true;
-            description: "Create a new project. A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 CreateProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2861,7 +2869,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 UpdateProject.
+    // Update Project
+    //
+    // Deprecated: [Update Project](apis/resources/project_service_v2/project-service-update-project.api.mdx) to update a project.
+    //
+    // Update a project and its settings. A Project is a vessel for different applications sharing the same role context.
     rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
         option (google.api.http) = {
             put: "/projects/{id}"
@@ -2875,9 +2887,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Update Project";
             deprecated: true;
-            description: "Update a project and its settings. A Project is a vessel for different applications sharing the same role context.\n\nDeprecated: please use user service v2 UpdateProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2889,7 +2899,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 DeactivateProject.
+    // Deactivate Project
+    //
+    // Deprecated: [Deactivate Project](apis/resources/project_service_v2/project-service-deactivate-project.api.mdx) to deactivate a project.
+    //
+    // Set the state of a project to deactivated. Request returns an error if the project is already deactivated.
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_deactivate"
@@ -2903,9 +2917,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Deactivate Project";
             deprecated: true;
-            description: "Set the state of a project to deactivated. Request returns an error if the project is already deactivated.\n\nDeprecated: please use user service v2 DeactivateProject."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2917,7 +2929,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 ActivateProject.
+    // Activate Project
+    //
+    // Deprecated: [Activate Project](apis/resources/project_service_v2/project-service-activate-project.api.mdx) to activate a project.
+    //
+    // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_reactivate"
@@ -2931,9 +2947,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Reactivate Project";
             deprecated: true;
-            description: "Set the state of a project to active. Request returns an error if the project is not deactivated.\n\nDeprecated: please use user service v2 ActivateProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2945,7 +2959,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use project service v2 DeleteProject.
+    // Remove Project
+    //
+    // Deprecated: [Delete Project](apis/resources/project_service_v2/project-service-delete-project.api.mdx) to remove a project.
+    //
+    // Project and all its sub-resources like project grants, applications, roles and user grants will be removed.
     rpc RemoveProject(RemoveProjectRequest) returns (RemoveProjectResponse) {
         option (google.api.http) = {
             delete: "/projects/{id}"
@@ -2958,9 +2976,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Remove Project";
             deprecated: true;
-            description: "Project and all its sub-resources like project grants, applications, roles and user grants will be removed.\n\nDeprecated: please use user service v2 DeleteProject"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";

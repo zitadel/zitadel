@@ -5,7 +5,6 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -14,7 +13,7 @@ import (
 )
 
 func (s *Server) GetProject(ctx context.Context, req *project_pb.GetProjectRequest) (*project_pb.GetProjectResponse, error) {
-	project, err := s.query.ProjectByID(ctx, true, req.Id)
+	project, err := s.query.GetProjectByIDWithPermission(ctx, true, req.Id, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -28,11 +27,7 @@ func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsR
 	if err != nil {
 		return nil, err
 	}
-	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
-	if err != nil {
-		return nil, err
-	}
-	resp, err := s.query.SearchGrantedProjects(ctx, queries, nil)
+	resp, err := s.query.SearchGrantedProjects(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

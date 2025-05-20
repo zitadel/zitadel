@@ -34,14 +34,6 @@ func TestServer_CreateProject(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
-			req: &project.CreateProjectRequest{
-				Name: gofakeit.Name(),
-			},
-			wantErr: true,
-		},
-		{
 			name: "empty name",
 			ctx:  iamOwnerCtx,
 			req: &project.CreateProjectRequest{
@@ -69,6 +61,88 @@ func TestServer_CreateProject(t *testing.T) {
 		},
 		{
 			name: "empty, ok",
+			ctx:  iamOwnerCtx,
+			req: &project.CreateProjectRequest{
+				Name:           gofakeit.Name(),
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			want: want{
+				id:           true,
+				creationDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
+			got, err := instance.Client.Projectv2Beta.CreateProject(tt.ctx, tt.req)
+			changeDate := time.Now().UTC()
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+			assertCreateProjectResponse(t, creationDate, changeDate, tt.want.creationDate, tt.want.id, got)
+		})
+	}
+}
+
+func TestServer_CreateProject_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type want struct {
+		id           bool
+		creationDate bool
+	}
+	tests := []struct {
+		name string
+		ctx  context.Context
+		req  *project.CreateProjectRequest
+		want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			ctx:  CTX,
+			req: &project.CreateProjectRequest{
+				Name:           gofakeit.Name(),
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing permission",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			req: &project.CreateProjectRequest{
+				Name:           gofakeit.Name(),
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing permission, other organization",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			req: &project.CreateProjectRequest{
+				Name:           gofakeit.Name(),
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, ok",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			req: &project.CreateProjectRequest{
+				Name:           gofakeit.Name(),
+				OrganizationId: instance.DefaultOrg.GetId(),
+			},
+			want: want{
+				id:           true,
+				creationDate: true,
+			},
+		},
+		{
+			name: "instance owner, ok",
 			ctx:  iamOwnerCtx,
 			req: &project.CreateProjectRequest{
 				Name:           gofakeit.Name(),
@@ -132,20 +206,6 @@ func TestServer_UpdateProject(t *testing.T) {
 		want    want
 		wantErr bool
 	}{
-		{
-			name: "missing permission",
-			prepare: func(request *project.UpdateProjectRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				request.Id = projectResp.GetId()
-			},
-			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
-				req: &project.UpdateProjectRequest{
-					Name: gu.Ptr(gofakeit.Name()),
-				},
-			},
-			wantErr: true,
-		},
 		{
 			name: "not existing",
 			prepare: func(request *project.UpdateProjectRequest) {
@@ -236,6 +296,122 @@ func TestServer_UpdateProject(t *testing.T) {
 	}
 }
 
+func TestServer_UpdateProject_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type args struct {
+		ctx context.Context
+		req *project.UpdateProjectRequest
+	}
+	type want struct {
+		change     bool
+		changeDate bool
+	}
+	tests := []struct {
+		name    string
+		prepare func(request *project.UpdateProjectRequest)
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			prepare: func(request *project.UpdateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+			},
+			args: args{
+				ctx: CTX,
+				req: &project.UpdateProjectRequest{
+					Name: gu.Ptr(gofakeit.Name()),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing permission",
+			prepare: func(request *project.UpdateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				req: &project.UpdateProjectRequest{
+					Name: gu.Ptr(gofakeit.Name()),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing permission, other organization",
+			prepare: func(request *project.UpdateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.UpdateProjectRequest{
+					Name: gu.Ptr(gofakeit.Name()),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, ok",
+			prepare: func(request *project.UpdateProjectRequest) {
+				projectID := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false).GetId()
+				request.Id = projectID
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.UpdateProjectRequest{
+					Name: gu.Ptr(gofakeit.AppName()),
+				},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+		{
+			name: "instance owner, ok",
+			prepare: func(request *project.UpdateProjectRequest) {
+				projectID := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false).GetId()
+				request.Id = projectID
+			},
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &project.UpdateProjectRequest{
+					Name: gu.Ptr(gofakeit.AppName()),
+				},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
+			tt.prepare(tt.args.req)
+
+			got, err := instance.Client.Projectv2Beta.UpdateProject(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			changeDate := time.Time{}
+			if tt.want.change {
+				changeDate = time.Now().UTC()
+			}
+			assert.NoError(t, err)
+			assertUpdateProjectResponse(t, creationDate, changeDate, tt.want.changeDate, got)
+		})
+	}
+}
+
 func assertUpdateProjectResponse(t *testing.T, creationDate, changeDate time.Time, expectedChangeDate bool, actualResp *project.UpdateProjectResponse) {
 	if expectedChangeDate {
 		if !changeDate.IsZero() {
@@ -260,14 +436,6 @@ func TestServer_DeleteProject(t *testing.T) {
 		wantDeletionDate bool
 		wantErr          bool
 	}{
-		{
-			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
-			req: &project.DeleteProjectRequest{
-				Id: "notexisting",
-			},
-			wantErr: true,
-		},
 		{
 			name: "empty id",
 			ctx:  iamOwnerCtx,
@@ -327,6 +495,96 @@ func TestServer_DeleteProject(t *testing.T) {
 	}
 }
 
+func TestServer_DeleteProject_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	tests := []struct {
+		name             string
+		ctx              context.Context
+		prepare          func(request *project.DeleteProjectRequest) (time.Time, time.Time)
+		req              *project.DeleteProjectRequest
+		wantDeletionDate bool
+		wantErr          bool
+	}{
+		{
+			name: "unauthenticated",
+			ctx:  CTX,
+			prepare: func(request *project.DeleteProjectRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
+				request.Id = projectID
+				return creationDate, time.Time{}
+			},
+			req:     &project.DeleteProjectRequest{},
+			wantErr: true,
+		},
+		{
+			name: "missing permission",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			prepare: func(request *project.DeleteProjectRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
+				request.Id = projectID
+				return creationDate, time.Time{}
+			},
+			req:     &project.DeleteProjectRequest{},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *project.DeleteProjectRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
+				request.Id = projectID
+				return creationDate, time.Time{}
+			},
+			req:     &project.DeleteProjectRequest{},
+			wantErr: true,
+		},
+		{
+			name: "organization owner",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *project.DeleteProjectRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectID := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false).GetId()
+				request.Id = projectID
+				return creationDate, time.Time{}
+			},
+			req:              &project.DeleteProjectRequest{},
+			wantDeletionDate: true,
+		},
+		{
+			name: "instance owner",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.DeleteProjectRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectID := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false).GetId()
+				request.Id = projectID
+				return creationDate, time.Time{}
+			},
+			req:              &project.DeleteProjectRequest{},
+			wantDeletionDate: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var creationDate, deletionDate time.Time
+			if tt.prepare != nil {
+				creationDate, deletionDate = tt.prepare(tt.req)
+			}
+			got, err := instance.Client.Projectv2Beta.DeleteProject(tt.ctx, tt.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+			assertDeleteProjectResponse(t, creationDate, deletionDate, tt.wantDeletionDate, got)
+		})
+	}
+}
+
 func assertDeleteProjectResponse(t *testing.T, creationDate, deletionDate time.Time, expectedDeletionDate bool, actualResp *project.DeleteProjectResponse) {
 	if expectedDeletionDate {
 		if !deletionDate.IsZero() {
@@ -359,18 +617,6 @@ func TestServer_DeactivateProject(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "missing permission",
-			prepare: func(request *project.DeactivateProjectRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				request.Id = projectResp.GetId()
-			},
-			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
-				req: &project.DeactivateProjectRequest{},
-			},
-			wantErr: true,
-		},
-		{
 			name: "not existing",
 			prepare: func(request *project.DeactivateProjectRequest) {
 				request.Id = "notexisting"
@@ -401,6 +647,112 @@ func TestServer_DeactivateProject(t *testing.T) {
 			prepare: func(request *project.DeactivateProjectRequest) {
 				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
 				request.Id = projectID
+			},
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &project.DeactivateProjectRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
+			tt.prepare(tt.args.req)
+
+			got, err := instance.Client.Projectv2Beta.DeactivateProject(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			changeDate := time.Time{}
+			if tt.want.change {
+				changeDate = time.Now().UTC()
+			}
+			assert.NoError(t, err)
+			assertDeactivateProjectResponse(t, creationDate, changeDate, tt.want.changeDate, got)
+		})
+	}
+}
+
+func TestServer_DeactivateProject_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type args struct {
+		ctx context.Context
+		req *project.DeactivateProjectRequest
+	}
+	type want struct {
+		change     bool
+		changeDate bool
+	}
+	tests := []struct {
+		name    string
+		prepare func(request *project.DeactivateProjectRequest)
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			prepare: func(request *project.DeactivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+			},
+			args: args{
+				ctx: CTX,
+				req: &project.DeactivateProjectRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing permission",
+			prepare: func(request *project.DeactivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				req: &project.DeactivateProjectRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			prepare: func(request *project.DeactivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.DeactivateProjectRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner",
+			prepare: func(request *project.DeactivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.DeactivateProjectRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+		{
+			name: "instance owner",
+			prepare: func(request *project.DeactivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
 			},
 			args: args{
 				ctx: iamOwnerCtx,
@@ -470,7 +822,7 @@ func TestServer_ActivateProject(t *testing.T) {
 				request.Id = projectResp.GetId()
 			},
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 				req: &project.ActivateProjectRequest{},
 			},
 			wantErr: true,
@@ -506,6 +858,117 @@ func TestServer_ActivateProject(t *testing.T) {
 				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false).GetId()
 				request.Id = projectID
 				instance.DeactivateProject(iamOwnerCtx, t, projectID)
+			},
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &project.ActivateProjectRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
+			tt.prepare(tt.args.req)
+
+			got, err := instance.Client.Projectv2Beta.ActivateProject(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			changeDate := time.Time{}
+			if tt.want.change {
+				changeDate = time.Now().UTC()
+			}
+			assert.NoError(t, err)
+			assertActivateProjectResponse(t, creationDate, changeDate, tt.want.changeDate, got)
+		})
+	}
+}
+
+func TestServer_ActivateProject_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type args struct {
+		ctx context.Context
+		req *project.ActivateProjectRequest
+	}
+	type want struct {
+		change     bool
+		changeDate bool
+	}
+	tests := []struct {
+		name    string
+		prepare func(request *project.ActivateProjectRequest)
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			prepare: func(request *project.ActivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
+			},
+			args: args{
+				ctx: CTX,
+				req: &project.ActivateProjectRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing permission",
+			prepare: func(request *project.ActivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				req: &project.ActivateProjectRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			prepare: func(request *project.ActivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.ActivateProjectRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner",
+			prepare: func(request *project.ActivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.ActivateProjectRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+		{
+			name: "instance owner",
+			prepare: func(request *project.ActivateProjectRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.Id = projectResp.GetId()
+				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
 			},
 			args: args{
 				ctx: iamOwnerCtx,
