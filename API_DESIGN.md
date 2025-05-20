@@ -465,16 +465,16 @@ message VerifyEmailRequest{
 
 As a rule of thumb, redundant API methods are deprecated.
 
-- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` is set to true
+- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` is set to true.
 - One or more links to recommended replacement methods are added to the deprecation message as a proto comment above the rpc spec.
-- A guidance for switching to the recommended methods for common use cases is added as a proto comment above the rpc spec if appropriate.
+- Guidance for switching to the recommended methods for common use cases is added as a proto comment above the rpc spec if appropriate.
 
 ### Example
 
 ```protobuf
 // Delete the user phone
 //
-// Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+// Deprecated: [Update the user's phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
 //
 // Delete the phone number of a user.
 rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
