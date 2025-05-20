@@ -145,8 +145,8 @@ func Test_createdOrganizationToPb(t *testing.T) {
 				},
 			},
 			want: &org.CreateOrganizationResponse{
-				CreatedDate: timestamppb.New(now),
-				Id:          "orgID",
+				CreationDate: timestamppb.New(now),
+				Id:           "orgID",
 				CreatedAdmins: []*org.CreatedAdmin{
 					{
 						UserId:    "id",

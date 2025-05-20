@@ -65,13 +65,13 @@ message OrganizationSearchFilter{
     oneof filter {
         option (validate.required) = true;
 
-        OrgNameQuery name_filter = 1;
-        OrgDomainQuery domain_filter = 2;
-        OrgStateQuery state_filter = 3;
-        OrgIDQuery id_filter = 4;
+        OrgNameFilter name_filter = 1;
+        OrgDomainFilter domain_filter = 2;
+        OrgStateFilter state_filter = 3;
+        OrgIDFilter id_filter = 4;
     }
 }
-message OrgNameQuery {
+message OrgNameFilter {
     // Organization name.
     string name = 1 [
         (validate.rules).string = {max_len: 200},
@@ -85,7 +85,7 @@ message OrgNameQuery {
     ];
 }
 
-message OrgDomainQuery {
+message OrgDomainFilter {
     // The domain.
     string domain = 1 [
         (validate.rules).string = {max_len: 200},
@@ -99,14 +99,14 @@ message OrgDomainQuery {
     ];
 }
 
-message OrgStateQuery {
+message OrgStateFilter {
     // Current state of the organization.
     OrgState state = 1 [
         (validate.rules).enum.defined_only = true
     ];
 }
 
-message OrgIDQuery {
+message OrgIDFilter {
     // The Organization id.
     string id = 1 [
         (validate.rules).string = {max_len: 200},
@@ -120,12 +120,12 @@ message OrgIDQuery {
 message DomainSearchFilter {
     oneof filter {
         option (validate.required) = true;
-        DomainNameQuery domain_name_filter = 1;
+        DomainNameFilter domain_name_filter = 1;
     }
 }
 
 // from proto/zitadel/org.proto
-message DomainNameQuery {
+message DomainNameFilter {
     // The domain.
     string name = 1 [
         (validate.rules).string = {max_len: 200},
