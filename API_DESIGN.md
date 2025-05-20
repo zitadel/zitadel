@@ -460,3 +460,51 @@ message VerifyEmailRequest{
 }
 
 ```
+
+## Deprecations
+
+As a rule of thumb, redundant API methods are deprecated.
+
+- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` is set to true
+- One or more links to recommended replacement methods are added to the deprecation message as a comment above the rpc.
+- A guidance for switching to the recommended methods for common use cases is added as a comment above the rpc if appropriate.
+
+### Example
+
+```protobuf
+// Create User (Machine)
+//
+// Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a user of type machine instead.
+//
+// Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.
+rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
+option (google.api.http) = {
+post: "/users/machine"
+body: "*"
+};
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            deprecated: true;
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+```
