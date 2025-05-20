@@ -48,6 +48,52 @@ When creating a new service, start with version `2`, as version `1` is reserved 
 
 Please check out the structure Buf style guide for more information about the folder and package structure: https://buf.build/docs/best-practices/style-guide/
 
+### Deprecations
+
+As a rule of thumb, redundant API methods are deprecated.
+
+- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` is set to true.
+- One or more links to recommended replacement methods are added to the deprecation message as a proto comment above the rpc spec.
+- Guidance for switching to the recommended methods for common use cases is added as a proto comment above the rpc spec if appropriate.
+
+#### Example
+
+```protobuf
+// Delete the user phone
+//
+// Deprecated: [Update the user's phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+//
+// Delete the phone number of a user.
+rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
+  option (google.api.http) = {
+    delete: "/v2/users/{user_id}/phone"
+    body: "*"
+  };
+
+  option (zitadel.protoc_gen_zitadel.v2.options) = {
+    auth_option: {
+      permission: "authenticated"
+    }
+  };
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    deprecated: true;
+    responses: {
+      key: "200"
+      value: {
+        description: "OK";
+      }
+    };
+    responses: {
+      key: "404";
+      value: {
+        description: "User ID does not exist.";
+      }
+    }
+  };
+}
+```
+
 ### Explicitness
 
 Make the handling of the API as explicit as possible. Do not make assumptions about the client's knowledge of the system or the API. 
@@ -459,50 +505,4 @@ message VerifyEmailRequest{
   ];
 }
 
-```
-
-## Deprecations
-
-As a rule of thumb, redundant API methods are deprecated.
-
-- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` is set to true.
-- One or more links to recommended replacement methods are added to the deprecation message as a proto comment above the rpc spec.
-- Guidance for switching to the recommended methods for common use cases is added as a proto comment above the rpc spec if appropriate.
-
-### Example
-
-```protobuf
-// Delete the user phone
-//
-// Deprecated: [Update the user's phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
-//
-// Delete the phone number of a user.
-rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
-  option (google.api.http) = {
-    delete: "/v2/users/{user_id}/phone"
-    body: "*"
-  };
-
-  option (zitadel.protoc_gen_zitadel.v2.options) = {
-    auth_option: {
-      permission: "authenticated"
-    }
-  };
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-    deprecated: true;
-    responses: {
-      key: "200"
-      value: {
-        description: "OK";
-      }
-    };
-    responses: {
-      key: "404";
-      value: {
-        description: "User ID does not exist.";
-      }
-    }
-  };
-}
 ```
