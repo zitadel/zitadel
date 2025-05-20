@@ -1,3 +1,8 @@
 version: v1
 directories:
   - proto
+breaking:
+  ignore:
+    # TODO: remove this before merging to main
+    - proto/zitadel/user/v2/key.proto
+    - proto/zitadel/user/v2/pat.proto
