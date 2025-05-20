@@ -29,11 +29,7 @@ import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
-import {
-  SendInviteCodeSchema,
-  User,
-  UserState,
-} from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   ResendEmailCodeRequest,
@@ -45,10 +41,8 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import crypto from "crypto";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { cookies } from "next/headers";
-import { getFingerprintId, getUserAgent } from "./fingerprint";
+import { getUserAgent } from "./fingerprint";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -1172,13 +1166,11 @@ export async function setUserPassword({
   serviceUrl,
   userId,
   password,
-  user,
   code,
 }: {
   serviceUrl: string;
   userId: string;
   password: string;
-  user: User;
   code?: string;
 }) {
   let payload = create(SetPasswordRequestSchema, {
@@ -1187,41 +1179,6 @@ export async function setUserPassword({
       password,
     },
   });
-
-  // check if the user has no password set in order to set a password
-  if (!code) {
-    const authmethods = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
-    });
-
-    // if the user has no authmethods set, we can set a password otherwise we need a code
-    if (
-      !(authmethods.authMethodTypes.length === 0) &&
-      user.state !== UserState.INITIAL
-    ) {
-      // check if a verification was done earlier
-
-      const cookiesList = await cookies();
-
-      const userAgentId = await getFingerprintId();
-
-      const verificationCheck = crypto
-        .createHash("sha256")
-        .update(`${user.userId}:${userAgentId}`)
-        .digest("hex");
-
-      await cookiesList.set({
-        name: "verificationCheck",
-        value: verificationCheck,
-        httpOnly: true,
-        path: "/",
-        maxAge: 300, // 5 minutes
-      });
-
-      return { error: "Provide a code to set a password" };
-    }
-  }
 
   if (code) {
     payload = {

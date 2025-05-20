@@ -5,6 +5,7 @@ import {
   getLoginSettings,
   getSession,
   getUserByID,
+  listAuthenticationMethodTypes,
   registerPasskey,
   verifyPasskeyRegistration as zitadelVerifyPasskeyRegistration,
 } from "@/lib/zitadel";
@@ -14,7 +15,8 @@ import {
   RegisterPasskeyResponse,
   VerifyPasskeyRegistrationRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { headers } from "next/headers";
+import crypto from "crypto";
+import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getNextUrl } from "../client";
 import {
@@ -22,6 +24,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
+import { getFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
@@ -39,7 +42,7 @@ type RegisterPasskeyCommand = {
 
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
-): Promise<RegisterPasskeyResponse> {
+): Promise<RegisterPasskeyResponse | { error: string }> {
   const { sessionId } = command;
 
   const _headers = await headers();
@@ -56,6 +59,43 @@ export async function registerPasskeyLink(
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
+
+  if (!session?.session?.factors?.user?.id) {
+    return { error: "Could not determine user from session" };
+  }
+
+  const authmethods = await listAuthenticationMethodTypes({
+    serviceUrl,
+    userId: session?.session?.factors?.user?.id,
+  });
+
+  // if the user has no authmethods set, we need to check if the user was verified
+  // users are redirected from /authenticator/set to /password/set
+  if (authmethods.authMethodTypes.length !== 0) {
+    return {
+      error:
+        "You have to provide a code or have a valid User Verification Check",
+    };
+  }
+
+  // check if a verification was done earlier
+  const cookiesList = await cookies();
+  const userAgentId = await getFingerprintId();
+
+  const verificationCheck = crypto
+    .createHash("sha256")
+    .update(`${user.userId}:${userAgentId}`)
+    .digest("hex");
+
+  const cookieValue = await cookiesList.get("verificationCheck")?.value;
+
+  if (!cookieValue) {
+    return { error: "User Verification Check has to be done" };
+  }
+
+  if (cookieValue !== verificationCheck) {
+    return { error: "User Verification Check has to be done" };
+  }
 
   const [hostname, port] = host.split(":");
 
