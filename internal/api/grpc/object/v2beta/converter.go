@@ -94,7 +94,7 @@ func DomainsToPb(domains []*query.Domain) []*org_pb.Domain {
 
 func DomainToPb(d *query.Domain) *org_pb.Domain {
 	return &org_pb.Domain{
-		OrgId:          d.OrgID,
+		OrganizationId: d.OrgID,
 		DomainName:     d.Domain,
 		IsVerified:     d.IsVerified,
 		IsPrimary:      d.IsPrimary,
@@ -131,17 +131,6 @@ func ToViewDetailsPb(
 	}
 	if !changeDate.IsZero() {
 		details.ChangeDate = timestamppb.New(changeDate)
-	}
-	return details
-}
-
-func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
-	details := &object.Details{
-		Sequence:      objectDetail.Sequence,
-		ResourceOwner: objectDetail.ResourceOwner,
-	}
-	if !objectDetail.EventDate.IsZero() {
-		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
 	}
 	return details
 }

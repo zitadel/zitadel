@@ -92,7 +92,7 @@ func (s *Server) ListOrganizationMetadata(ctx context.Context, request *v2beta_o
 		return nil, err
 	}
 	return &v2beta_org.ListOrganizationMetadataResponse{
-		Result: metadata.OrgMetadataListToPb(res.Metadata),
+		Metadata: metadata.OrgMetadataListToPb(res.Metadata),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  res.Count,
 			AppliedLimit: uint64(request.GetPagination().GetLimit()),
@@ -131,11 +131,11 @@ func (s *Server) ActivateOrganization(ctx context.Context, request *org.Activate
 }
 
 func (s *Server) AddOrganizationDomain(ctx context.Context, request *org.AddOrganizationDomainRequest) (*org.AddOrganizationDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.Id)
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.AddOrgDomain(ctx, request.Id, request.Domain, userIDs)
+	details, err := s.command.AddOrgDomain(ctx, request.OrganizationId, request.Domain, userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrgan
 	if err != nil {
 		return nil, err
 	}
-	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(req.Id)
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(req.OrganizationId)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrgan
 		return nil, err
 	}
 	return &org.ListOrganizationDomainsResponse{
-		Result: object.DomainsToPb(domains.Domains),
+		Domains: object.DomainsToPb(domains.Domains),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  domains.Count,
 			AppliedLimit: uint64(req.GetPagination().GetLimit()),
@@ -243,7 +243,7 @@ func createOrganizationRequestAdminToCommand(admin *v2beta_org.CreateOrganizatio
 			Roles: admin.GetRoles(),
 		}, nil
 	default:
-		return nil, zerrors.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganization not implemented", a)
+		return nil, zerrors.ThrowUnimplementedf(nil, "ORGv2-SL2r8", "userType oneOf %T in method AddOrganization not implemented", a)
 	}
 }
 

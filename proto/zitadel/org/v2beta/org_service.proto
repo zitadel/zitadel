@@ -114,7 +114,7 @@ service OrganizationService {
   // Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER.
   //
   // Required permission:
-  //   - `org.create`
+  //  - `org.create`
   rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2beta/organizations"
@@ -133,10 +133,10 @@ service OrganizationService {
   // Change the name of the organization.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
     option (google.api.http) = {
-      put: "/v2beta/organizations"
+      put: "/v2beta/organizations/{id}"
       body: "*"
     };
 
@@ -152,10 +152,10 @@ service OrganizationService {
   // Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition.
   //
   // Required permission:
-  //   - `iam.read`
+  //  - `iam.read`
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
-        post: "/v2beta/organizations/_search";
+        post: "/v2beta/organizations/search";
         body: "*";
     };
 
@@ -165,15 +165,15 @@ service OrganizationService {
       }
     };
       // responses: {
-      //   key: "400";
-      //   value: {
-      //     description: "invalid list query";
-      //     schema: {
-      //       json_schema: {
-      //         ref: "#/definitions/rpcStatus";
-      //       };
-      //     };
-      //   };
+      //  key: "400";
+      //  value: {
+      //    description: "invalid list query";
+      //    schema: {
+      //      json_schema: {
+      //        ref: "#/definitions/rpcStatus";
+      //      };
+      //    };
+      //  };
       // };
   }
 
@@ -182,28 +182,28 @@ service OrganizationService {
   // Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.delete`
   rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
     option (google.api.http) = {
-        delete: "/v2beta/organizations"
+        delete: "/v2beta/organizations/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write";
+        permission: "org.delete";
       }
     };
 
       // responses: {
-      //   key: "400";
-      //   value: {
-      //     description: "invalid org";
-      //     schema: {
-      //       json_schema: {
-      //           ref: "#/definitions/rpcStatus";
-      //         };
-      //       };
-      //   };
+      //  key: "400";
+      //  value: {
+      //    description: "invalid org";
+      //    schema: {
+      //      json_schema: {
+      //          ref: "#/definitions/rpcStatus";
+      //        };
+      //      };
+      //  };
       // };
   }
 
@@ -212,10 +212,10 @@ service OrganizationService {
   // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc SetOrganizationMetadata(SetOrganizationMetadataRequest) returns (SetOrganizationMetadataResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organizations/metadata"
+      post: "/v2beta/organizations/{organization_id}/metadata"
       body: "*"
     };
 
@@ -231,10 +231,10 @@ service OrganizationService {
   // List metadata of an organization filtered by query.
   //
   // Required permission:
-  //   - `org.read`
+  //  - `org.read`
   rpc ListOrganizationMetadata(ListOrganizationMetadataRequest) returns (ListOrganizationMetadataResponse ) {
     option (google.api.http) = {
-        post: "/v2beta/organizations/metadata/_search"
+        post: "/v2beta/organizations/{organization_id}/metadata/search"
         body: "*"
     };
 
@@ -250,10 +250,10 @@ service OrganizationService {
   // Delete metadata objects from an organization with a specific key.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc DeleteOrganizationMetadata(DeleteOrganizationMetadataRequest) returns (DeleteOrganizationMetadataResponse) {
       option (google.api.http) = {
-          delete: "/v2beta/organizations/metadata"
+          delete: "/v2beta/organizations/{organization_id}/metadata"
       };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -269,10 +269,10 @@ service OrganizationService {
   // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc AddOrganizationDomain(AddOrganizationDomainRequest) returns (AddOrganizationDomainResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organizations/domains"
+      post: "/v2beta/organizations/{organization_id}/domains"
       body: "*"
     };
 
@@ -289,10 +289,10 @@ service OrganizationService {
   // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs. 
   //
   // Required permission:
-  //   - `org.read`
+  //  - `org.read`
   rpc ListOrganizationDomains(ListOrganizationDomainsRequest) returns (ListOrganizationDomainsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organizations/domains/_search"
+      post: "/v2beta/organizations/{organization_id}/domains/search"
       body: "*"
     };
 
@@ -309,10 +309,10 @@ service OrganizationService {
   // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc DeleteOrganizationDomain(DeleteOrganizationDomainRequest) returns (DeleteOrganizationDomainResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/organizations/domains"
+      delete: "/v2beta/organizations/{organization_id}/domains"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -328,10 +328,10 @@ service OrganizationService {
   // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc GenerateOrganizationDomainValidation(GenerateOrganizationDomainValidationRequest) returns (GenerateOrganizationDomainValidationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organizations/domains/validation/_generate"
+      post: "/v2beta/organizations/{organization_id}/domains/validation/generate"
       body: "*"
     };
 
@@ -348,10 +348,10 @@ service OrganizationService {
   // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc VerifyOrganizationDomain(VerifyOrganizationDomainRequest) returns (VerifyOrganizationDomainResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organizations/domains/validation/_verify"
+      post: "/v2beta/organizations/{organization_id}/domains/validation/verify"
       body: "*"
     };
 
@@ -368,10 +368,10 @@ service OrganizationService {
   // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc DeactivateOrganization(DeactivateOrganizationRequest) returns (DeactivateOrganizationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organizations/deactivate"
+      post: "/v2beta/organizations/{id}/deactivate"
       body: "*"
     };
 
@@ -388,10 +388,10 @@ service OrganizationService {
   // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
   //
   // Required permission:
-  //   - `org.write`
+  //  - `org.write`
   rpc ActivateOrganization(ActivateOrganizationRequest) returns (ActivateOrganizationResponse) {
     option (google.api.http) = {
-        post: "/v2beta/organizations/_activate"
+        post: "/v2beta/organizations/{id}/activate"
         body: "*"
     };
 
@@ -484,7 +484,7 @@ message UpdateOrganizationRequest {
 }
 
 message UpdateOrganizationResponse {
-  //  The timestamp of the update to the organization.
+  // The timestamp of the update to the organization.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -498,8 +498,8 @@ message ListOrganizationsRequest {
   // the field the result is sorted
   zitadel.org.v2beta.OrgFieldName sorting_column = 2;
   // Define the criteria to query for.
-  // repeated ProjectRoleFilter filters = 4;
-  repeated zitadel.org.v2beta.OrganizationSearchFilter filter = 3;
+  // repeated ProjectRoleQuery filters = 4;
+  repeated zitadel.org.v2beta.OrganizationSearchFilter filter= 3;
 }
 
 message ListOrganizationsResponse {
@@ -528,7 +528,7 @@ message DeleteOrganizationRequest {
 }
 
 message DeleteOrganizationResponse {
-  //  The timestamp of the deletion of the organization.
+  // The timestamp of the deletion of the organization.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -549,7 +549,7 @@ message DeactivateOrganizationRequest {
 }
 
 message DeactivateOrganizationResponse {
-  //  The timestamp of the deactivation of the organization.
+  // The timestamp of the deactivation of the organization.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -570,7 +570,7 @@ message ActivateOrganizationRequest {
 }
 
 message ActivateOrganizationResponse {
-  //  The timestamp of the activation of the organization.
+  // The timestamp of the activation of the organization.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -580,7 +580,7 @@ message ActivateOrganizationResponse {
 
 message AddOrganizationDomainRequest {
   // Organization Id for the Organization for which the domain is to be added to.
-  string id = 1 [
+  string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -613,7 +613,7 @@ message AddOrganizationDomainResponse {
 
 message ListOrganizationDomainsRequest {
   // Organization Id for the Organization which domains are to be listed.
-  string id = 1 [
+  string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -627,18 +627,19 @@ message ListOrganizationDomainsRequest {
   // List limitations and ordering.
   optional zitadel.filter.v2beta.PaginationRequest pagination = 2;
   // Define the criteria to query for.
-  repeated DomainSearchQuery filter = 3;
+  repeated DomainSearchFilter filters = 3;
 }
 
 message ListOrganizationDomainsResponse {
   // Pagination of the Organizations domain results.
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated Domain result = 2;
+  // The domains requested.
+  repeated Domain domains = 2;
 }
 
 message DeleteOrganizationDomainRequest {
   // Organization Id for the Organization which domain is to be deleted.
-  string id = 1 [
+  string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -660,7 +661,7 @@ message DeleteOrganizationDomainRequest {
 }
 
 message DeleteOrganizationDomainResponse {
-  //  The timestamp of the deletion of the organization domain.
+  // The timestamp of the deletion of the organization domain.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -732,7 +733,7 @@ message VerifyOrganizationDomainRequest {
 }
 
 message VerifyOrganizationDomainResponse {
-  //  The timestamp of the verification of the organization domain.
+  // The timestamp of the verification of the organization domain.
   google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -758,7 +759,7 @@ message SetOrganizationMetadataRequest{
 }
 
 message SetOrganizationMetadataResponse{
-  //  The timestamp of the update of the organization metadata.
+  // The timestamp of the update of the organization metadata.
   google.protobuf.Timestamp set_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -787,19 +788,19 @@ message ListOrganizationMetadataRequest {
 message ListOrganizationMetadataResponse {
   // Pagination of the Organizations metadata results.
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  // THe Organization metadata requested.
-  repeated zitadel.metadata.v2beta.Metadata result = 2;
+  // The Organization metadata requested.
+  repeated zitadel.metadata.v2beta.Metadata metadata = 2;
 }
 
 message DeleteOrganizationMetadataRequest {
   // Organization ID of Orgalization which metadata is to be deleted is stored on.
   string organization_id = 1;
-  // The key for the Organization metadata to be deleted.
+  // The keys for the Organization metadata to be deleted.
   repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
 }
 
 message DeleteOrganizationMetadataResponse{
-  //  The timestamp of the deletiion of the organization metadata.
+  // The timestamp of the deletiion of the organization metadata.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
