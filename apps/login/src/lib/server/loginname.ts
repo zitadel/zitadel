@@ -9,7 +9,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkInvite } from "../verify-helper";
+import { checkEmailVerified, checkUserVerification } from "../verify-helper";
 import {
   getActiveIdentityProviders,
   getIDPByID,
@@ -257,7 +257,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // this can be expected to be an invite as users created in console have a password set.
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
       // redirect to /verify invite if no auth method is set and email is not verified
-      const inviteCheck = checkInvite(
+      const inviteCheck = checkEmailVerified(
         session,
         humanUser,
         session.factors.user.organizationId,
@@ -266,6 +266,30 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       if (inviteCheck?.redirect) {
         return inviteCheck;
+      }
+
+      // check if user was verified
+      const isUserVerified = await checkUserVerification(
+        session.factors.user.id,
+      );
+      if (!isUserVerified) {
+        const params = new URLSearchParams({
+          loginName: session.factors?.user?.loginName as string,
+        });
+
+        if (command.requestId) {
+          params.append("requestId", command.requestId);
+        }
+
+        if (command.organization || session.factors?.user?.organizationId) {
+          params.append(
+            "organization",
+            command.organization ??
+              (session.factors?.user?.organizationId as string),
+          );
+        }
+
+        return { redirect: `/verify?` + params };
       }
 
       const paramsAuthenticatorSetup = new URLSearchParams({

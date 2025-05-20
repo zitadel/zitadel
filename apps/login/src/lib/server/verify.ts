@@ -21,7 +21,7 @@ import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { cookies, headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
-import { getFingerprintId } from "../fingerprint";
+import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
@@ -197,11 +197,9 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       params.set("loginName", session.factors?.user?.loginName);
     }
 
-    // set hash of userId and userAgentId to prevent replay attacks, TODO: check on the /authenticator/set page
-
+    // set hash of userId and userAgentId to prevent attacks, checks are done for users with invalid sessions and invalid userAgentId
     const cookiesList = await cookies();
-
-    const userAgentId = await getFingerprintId();
+    const userAgentId = await getOrSetFingerprintId();
 
     const verificationCheck = crypto
       .createHash("sha256")

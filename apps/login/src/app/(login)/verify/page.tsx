@@ -6,6 +6,7 @@ import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { checkUserVerification } from "@/lib/verify-helper";
 import {
   getBrandingSettings,
   getUserByID,
@@ -96,13 +97,22 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   id = userId ?? sessionFactors?.factors?.user?.id;
 
+  if (!id) {
+    throw Error("Failed to get user id");
+  }
+
   let authMethods: AuthenticationMethodType[] | null = null;
   if (human?.email?.isVerified) {
-    const authMethodsResponse = await listAuthenticationMethodTypes(userId);
+    const authMethodsResponse = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId,
+    });
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
     }
   }
+
+  const hasValidUserVerificationCheck = await checkUserVerification(id);
 
   const params = new URLSearchParams({
     userId: userId,
@@ -155,27 +165,27 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
 
-        {id &&
-          (human?.email?.isVerified ? (
-            // show page for already verified users
-            <VerifyRedirectButton
-              userId={id}
-              loginName={loginName}
-              organization={organization}
-              requestId={requestId}
-              authMethods={authMethods}
-            />
-          ) : (
-            // check if auth methods are set
-            <VerifyForm
-              loginName={loginName}
-              organization={organization}
-              userId={id}
-              code={code}
-              isInvite={invite === "true"}
-              requestId={requestId}
-            />
-          ))}
+        {/* show a button to setup auth method for the user otherwise show the UI for reverifying */}
+        {human?.email?.isVerified && hasValidUserVerificationCheck ? (
+          // show page for already verified users
+          <VerifyRedirectButton
+            userId={id}
+            loginName={loginName}
+            organization={organization}
+            requestId={requestId}
+            authMethods={authMethods}
+          />
+        ) : (
+          // check if auth methods are set
+          <VerifyForm
+            loginName={loginName}
+            organization={organization}
+            userId={id}
+            code={code}
+            isInvite={invite === "true"}
+            requestId={requestId}
+          />
+        )}
       </div>
     </DynamicTheme>
   );

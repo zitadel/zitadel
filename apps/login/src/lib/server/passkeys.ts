@@ -9,14 +9,14 @@ import {
   registerPasskey,
   verifyPasskeyRegistration as zitadelVerifyPasskeyRegistration,
 } from "@/lib/zitadel";
-import { create, Duration } from "@zitadel/client";
+import { create, Duration, Timestamp, timestampDate } from "@zitadel/client";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {
   RegisterPasskeyResponse,
   VerifyPasskeyRegistrationRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import crypto from "crypto";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getNextUrl } from "../client";
 import {
@@ -24,9 +24,11 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
-import { getFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkEmailVerification } from "../verify-helper";
+import {
+  checkEmailVerification,
+  checkUserVerification,
+} from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
@@ -39,6 +41,22 @@ type VerifyPasskeyCommand = {
 type RegisterPasskeyCommand = {
   sessionId: string;
 };
+
+function isSessionValid(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const stillValid = session.expirationDate
+    ? timestampDate(session.expirationDate) > new Date()
+    : true;
+
+  const verifiedAt = validPassword || validPasskey;
+  const valid = !!((validPassword || validPasskey) && stillValid);
+
+  return { valid, verifiedAt };
+}
 
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
@@ -64,37 +82,30 @@ export async function registerPasskeyLink(
     return { error: "Could not determine user from session" };
   }
 
-  const authmethods = await listAuthenticationMethodTypes({
-    serviceUrl,
-    userId: session?.session?.factors?.user?.id,
-  });
+  const sessionValid = isSessionValid(session.session);
 
-  // if the user has no authmethods set, we need to check if the user was verified
-  // users are redirected from /authenticator/set to /password/set
-  if (authmethods.authMethodTypes.length !== 0) {
-    return {
-      error:
-        "You have to provide a code or have a valid User Verification Check",
-    };
-  }
+  if (!sessionValid) {
+    const authmethods = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId: session.session.factors.user.id,
+    });
 
-  // check if a verification was done earlier
-  const cookiesList = await cookies();
-  const userAgentId = await getFingerprintId();
+    // if the user has no authmethods set, we need to check if the user was verified
+    if (authmethods.authMethodTypes.length !== 0) {
+      return {
+        error:
+          "You have to authenticate or have a valid User Verification Check",
+      };
+    }
 
-  const verificationCheck = crypto
-    .createHash("sha256")
-    .update(`${user.userId}:${userAgentId}`)
-    .digest("hex");
+    // check if a verification was done earlier
+    const hasValidUserVerificationCheck = await checkUserVerification(
+      session.session.factors.user.id,
+    );
 
-  const cookieValue = await cookiesList.get("verificationCheck")?.value;
-
-  if (!cookieValue) {
-    return { error: "User Verification Check has to be done" };
-  }
-
-  if (cookieValue !== verificationCheck) {
-    return { error: "User Verification Check has to be done" };
+    if (!hasValidUserVerificationCheck) {
+      return { error: "User Verification Check has to be done" };
+    }
   }
 
   const [hostname, port] = host.split(":");

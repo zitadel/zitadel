@@ -4,7 +4,10 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { PasswordExpirySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import crypto from "crypto";
 import moment from "moment";
+import { cookies } from "next/headers";
+import { getOrSetFingerprintId } from "./fingerprint";
 import { getUserByID } from "./zitadel";
 
 export function checkPasswordChangeRequired(
@@ -44,7 +47,7 @@ export function checkPasswordChangeRequired(
   }
 }
 
-export function checkInvite(
+export function checkEmailVerified(
   session: Session,
   humanUser?: HumanUser,
   organization?: string,
@@ -247,4 +250,33 @@ export async function checkMFAFactors(
     // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   }
+}
+
+export async function checkUserVerification(userId: string): Promise<boolean> {
+  // check if a verification was done earlier
+  const cookiesList = await cookies();
+  const userAgentId = await getOrSetFingerprintId();
+
+  const verificationCheck = crypto
+    .createHash("sha256")
+    .update(`${userId}:${userAgentId}`)
+    .digest("hex");
+
+  const cookieValue = await cookiesList.get("verificationCheck")?.value;
+
+  if (!cookieValue) {
+    console.warn(
+      "User verification check cookie not found. User verification check failed.",
+    );
+    return false;
+  }
+
+  if (cookieValue !== verificationCheck) {
+    console.warn(
+      `User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`,
+    );
+    return false;
+  }
+
+  return true;
 }

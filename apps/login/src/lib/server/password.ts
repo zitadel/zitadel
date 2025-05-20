@@ -25,16 +25,15 @@ import {
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import crypto from "crypto";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
-import { getFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
 import {
   checkEmailVerification,
   checkMFAFactors,
   checkPasswordChangeRequired,
+  checkUserVerification,
 } from "../verify-helper";
 
 type ResetPasswordCommand = {
@@ -327,7 +326,6 @@ export async function changePassword(command: {
     });
 
     // if the user has no authmethods set, we need to check if the user was verified
-    // users are redirected from /authenticator/set to /password/set
     if (authmethods.authMethodTypes.length !== 0) {
       return {
         error:
@@ -336,21 +334,11 @@ export async function changePassword(command: {
     }
 
     // check if a verification was done earlier
-    const cookiesList = await cookies();
-    const userAgentId = await getFingerprintId();
+    const hasValidUserVerificationCheck = await checkUserVerification(
+      user.userId,
+    );
 
-    const verificationCheck = crypto
-      .createHash("sha256")
-      .update(`${user.userId}:${userAgentId}`)
-      .digest("hex");
-
-    const cookieValue = await cookiesList.get("verificationCheck")?.value;
-
-    if (!cookieValue) {
-      return { error: "User Verification Check has to be done" };
-    }
-
-    if (cookieValue !== verificationCheck) {
+    if (!hasValidUserVerificationCheck) {
       return { error: "User Verification Check has to be done" };
     }
   }
