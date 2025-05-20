@@ -18,6 +18,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+const (
+	PgUniqueConstraintErrorCode = "23505"
+)
+
 type Config struct {
 	Dialects                   map[string]interface{} `mapstructure:",remain"`
 	EventPushConnRatio         float64
