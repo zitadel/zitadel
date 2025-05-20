@@ -30,19 +30,6 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
-			prepare: func(request *project.CreateProjectGrantRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
-
-				request.ProjectId = projectResp.GetId()
-				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
-			},
-			req:     &project.CreateProjectGrantRequest{},
-			wantErr: true,
-		},
-		{
 			name:    "empty projectID",
 			ctx:     iamOwnerCtx,
 			req:     &project.CreateProjectGrantRequest{},
@@ -178,6 +165,110 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 	}
 }
 
+func TestServer_CreateProjectGrant_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type want struct {
+		creationDate bool
+	}
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		prepare func(request *project.CreateProjectGrantRequest)
+		req     *project.CreateProjectGrantRequest
+		want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			ctx:  CTX,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+				request.ProjectId = projectResp.GetId()
+				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "no permission",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+				request.ProjectId = projectResp.GetId()
+				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+				request.ProjectId = projectResp.GetId()
+				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, ok",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+			},
+			req: &project.CreateProjectGrantRequest{},
+			want: want{
+				creationDate: true,
+			},
+		},
+		{
+			name: "instance owner",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+				request.ProjectId = projectResp.GetId()
+				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
+			},
+			req: &project.CreateProjectGrantRequest{},
+			want: want{
+				creationDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.prepare != nil {
+				tt.prepare(tt.req)
+			}
+
+			creationDate := time.Now().UTC()
+			got, err := instance.Client.Projectv2Beta.CreateProjectGrant(tt.ctx, tt.req)
+			changeDate := time.Now().UTC()
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+			assertCreateProjectGrantResponse(t, creationDate, changeDate, tt.want.creationDate, got)
+		})
+	}
+}
+
 func assertCreateProjectGrantResponse(t *testing.T, creationDate, changeDate time.Time, expectedCreationDate bool, actualResp *project.CreateProjectGrantResponse) {
 	if expectedCreationDate {
 		if !changeDate.IsZero() {
@@ -209,25 +300,6 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 		want    want
 		wantErr bool
 	}{
-		{
-			name: "missing permission",
-			prepare: func(request *project.UpdateProjectGrantRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				request.ProjectId = projectResp.GetId()
-
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
-				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
-
-				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
-			},
-			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
-				req: &project.UpdateProjectGrantRequest{
-					RoleKeys: []string{"nopermission"},
-				},
-			},
-			wantErr: true,
-		},
 		{
 			name: "not existing",
 			prepare: func(request *project.UpdateProjectGrantRequest) {
@@ -329,6 +401,155 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 	}
 }
 
+func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type args struct {
+		ctx context.Context
+		req *project.UpdateProjectGrantRequest
+	}
+	type want struct {
+		change     bool
+		changeDate bool
+	}
+	tests := []struct {
+		name    string
+		prepare func(request *project.UpdateProjectGrantRequest)
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			prepare: func(request *project.UpdateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: CTX,
+				req: &project.UpdateProjectGrantRequest{
+					RoleKeys: []string{"nopermission"},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission",
+			prepare: func(request *project.UpdateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				req: &project.UpdateProjectGrantRequest{
+					RoleKeys: []string{"nopermission"},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			prepare: func(request *project.UpdateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.UpdateProjectGrantRequest{
+					RoleKeys: []string{"nopermission"},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, ok",
+			prepare: func(request *project.UpdateProjectGrantRequest) {
+				roles := []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+				for _, role := range roles {
+					instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), role, role, "")
+				}
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId(), roles...)
+				request.RoleKeys = roles
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.UpdateProjectGrantRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+		{
+			name: "instance owner, ok",
+			prepare: func(request *project.UpdateProjectGrantRequest) {
+				roles := []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+				for _, role := range roles {
+					instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), role, role, "")
+				}
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId(), roles...)
+				request.RoleKeys = roles
+			},
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &project.UpdateProjectGrantRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
+			if tt.prepare != nil {
+				tt.prepare(tt.args.req)
+			}
+
+			got, err := instance.Client.Projectv2Beta.UpdateProjectGrant(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			changeDate := time.Time{}
+			if tt.want.change {
+				changeDate = time.Now().UTC()
+			}
+			assert.NoError(t, err)
+			assertUpdateProjectGrantResponse(t, creationDate, changeDate, tt.want.changeDate, got)
+		})
+	}
+}
+
 func assertUpdateProjectGrantResponse(t *testing.T, creationDate, changeDate time.Time, expectedChangeDate bool, actualResp *project.UpdateProjectGrantResponse) {
 	if expectedChangeDate {
 		if !changeDate.IsZero() {
@@ -353,25 +574,6 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 		wantDeletionDate bool
 		wantErr          bool
 	}{
-		{
-			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
-			prepare: func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				request.ProjectId = projectResp.GetId()
-
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
-				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
-
-				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
-				return time.Time{}, time.Time{}
-			},
-			req: &project.DeleteProjectGrantRequest{
-				ProjectId:             "notexisting",
-				GrantedOrganizationId: "notexisting",
-			},
-			wantErr: true,
-		},
 		{
 			name: "empty project id",
 			ctx:  iamOwnerCtx,
@@ -469,6 +671,119 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 	}
 }
 
+func TestServer_DeleteProjectGrant_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	tests := []struct {
+		name             string
+		ctx              context.Context
+		prepare          func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time)
+		req              *project.DeleteProjectGrantRequest
+		wantDeletionDate bool
+		wantErr          bool
+	}{
+		{
+			name: "unauthenticated",
+			ctx:  CTX,
+			prepare: func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				return time.Time{}, time.Time{}
+			},
+			req:     &project.DeleteProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "no permission",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			prepare: func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				return time.Time{}, time.Time{}
+			},
+			req:     &project.DeleteProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				return creationDate, time.Time{}
+			},
+			req:     &project.DeleteProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, ok",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				return creationDate, time.Time{}
+			},
+			req:              &project.DeleteProjectGrantRequest{},
+			wantDeletionDate: true,
+		},
+		{
+			name: "organization owner, ok",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *project.DeleteProjectGrantRequest) (time.Time, time.Time) {
+				creationDate := time.Now().UTC()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				return creationDate, time.Time{}
+			},
+			req:              &project.DeleteProjectGrantRequest{},
+			wantDeletionDate: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var creationDate, deletionDate time.Time
+			if tt.prepare != nil {
+				creationDate, deletionDate = tt.prepare(tt.req)
+			}
+			got, err := instance.Client.Projectv2Beta.DeleteProjectGrant(tt.ctx, tt.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+			assertDeleteProjectGrantResponse(t, creationDate, deletionDate, tt.wantDeletionDate, got)
+		})
+	}
+}
+
 func assertDeleteProjectGrantResponse(t *testing.T, creationDate, deletionDate time.Time, expectedDeletionDate bool, actualResp *project.DeleteProjectGrantResponse) {
 	if expectedDeletionDate {
 		if !deletionDate.IsZero() {
@@ -512,7 +827,7 @@ func TestServer_DeactivateProjectGrant(t *testing.T) {
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
 			},
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 				req: &project.DeactivateProjectGrantRequest{},
 			},
 			wantErr: true,
@@ -592,6 +907,137 @@ func TestServer_DeactivateProjectGrant(t *testing.T) {
 	}
 }
 
+func TestServer_DeactivateProjectGrant_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type args struct {
+		ctx context.Context
+		req *project.DeactivateProjectGrantRequest
+	}
+	type want struct {
+		change     bool
+		changeDate bool
+	}
+	tests := []struct {
+		name    string
+		prepare func(request *project.DeactivateProjectGrantRequest)
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			prepare: func(request *project.DeactivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: CTX,
+				req: &project.DeactivateProjectGrantRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission",
+			prepare: func(request *project.DeactivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				req: &project.DeactivateProjectGrantRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			prepare: func(request *project.DeactivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.DeactivateProjectGrantRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, ok",
+			prepare: func(request *project.DeactivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.DeactivateProjectGrantRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+		{
+			name: "instance owner, ok",
+			prepare: func(request *project.DeactivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &project.DeactivateProjectGrantRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
+			tt.prepare(tt.args.req)
+
+			got, err := instance.Client.Projectv2Beta.DeactivateProjectGrant(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			changeDate := time.Time{}
+			if tt.want.change {
+				changeDate = time.Now().UTC()
+			}
+			assert.NoError(t, err)
+			assertDeactivateProjectGrantResponse(t, creationDate, changeDate, tt.want.changeDate, got)
+		})
+	}
+}
+
 func assertDeactivateProjectGrantResponse(t *testing.T, creationDate, changeDate time.Time, expectedChangeDate bool, actualResp *project.DeactivateProjectGrantResponse) {
 	if expectedChangeDate {
 		if !changeDate.IsZero() {
@@ -623,23 +1069,6 @@ func TestServer_ActivateProjectGrant(t *testing.T) {
 		want    want
 		wantErr bool
 	}{
-		{
-			name: "missing permission",
-			prepare: func(request *project.ActivateProjectGrantRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				request.ProjectId = projectResp.GetId()
-
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
-				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
-
-				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
-			},
-			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
-				req: &project.ActivateProjectGrantRequest{},
-			},
-			wantErr: true,
-		},
 		{
 			name: "not existing",
 			prepare: func(request *project.ActivateProjectGrantRequest) {
@@ -675,6 +1104,140 @@ func TestServer_ActivateProjectGrant(t *testing.T) {
 		},
 		{
 			name: "change, ok",
+			prepare: func(request *project.ActivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				instance.DeactivateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &project.ActivateProjectGrantRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
+			tt.prepare(tt.args.req)
+
+			got, err := instance.Client.Projectv2Beta.ActivateProjectGrant(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			changeDate := time.Time{}
+			if tt.want.change {
+				changeDate = time.Now().UTC()
+			}
+			assert.NoError(t, err)
+			assertActivateProjectGrantResponse(t, creationDate, changeDate, tt.want.changeDate, got)
+		})
+	}
+}
+
+func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+	type args struct {
+		ctx context.Context
+		req *project.ActivateProjectGrantRequest
+	}
+	type want struct {
+		change     bool
+		changeDate bool
+	}
+	tests := []struct {
+		name    string
+		prepare func(request *project.ActivateProjectGrantRequest)
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "unauthenticated",
+			prepare: func(request *project.ActivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: CTX,
+				req: &project.ActivateProjectGrantRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission",
+			prepare: func(request *project.ActivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				req: &project.ActivateProjectGrantRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, other org",
+			prepare: func(request *project.ActivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				instance.DeactivateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.ActivateProjectGrantRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "organization owner, ok",
+			prepare: func(request *project.ActivateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+
+				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				instance.DeactivateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+			},
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				req: &project.ActivateProjectGrantRequest{},
+			},
+			want: want{
+				change:     true,
+				changeDate: true,
+			},
+		},
+		{
+			name: "instance owner, ok",
 			prepare: func(request *project.ActivateProjectGrantRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
 				request.ProjectId = projectResp.GetId()

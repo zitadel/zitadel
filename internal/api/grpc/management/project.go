@@ -105,11 +105,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	if err != nil {
 		return nil, err
 	}
-	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
-	if err != nil {
-		return nil, err
-	}
-	projects, err := s.query.SearchProjectGrants(ctx, queries)
+	projects, err := s.query.SearchProjectGrants(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +249,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	if err != nil {
 		return nil, err
 	}
-	roles, err := s.query.SearchProjectRoles(ctx, true, queries)
+	roles, err := s.query.SearchProjectRoles(ctx, true, queries, nil)
 	if err != nil {
 		return nil, err
 	}

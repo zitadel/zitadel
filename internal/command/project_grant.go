@@ -50,10 +50,6 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) 
 		}
 	}
 
-	if err := c.checkPermissionWriteProjectGrant(ctx, grant.ResourceOwner, grant.GrantID); err != nil {
-		return nil, err
-	}
-
 	projectResourceOwner, err := c.checkProjectGrantPreCondition(ctx, grant.AggregateID, grant.GrantedOrgID, grant.ResourceOwner, grant.RoleKeys)
 	if err != nil {
 		return nil, err
@@ -61,6 +57,9 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) 
 	// if there is no resourceowner provided then use the resourceowner of the project
 	if grant.ResourceOwner == "" {
 		grant.ResourceOwner = projectResourceOwner
+	}
+	if err := c.checkPermissionWriteProjectGrant(ctx, grant.ResourceOwner, grant.GrantID); err != nil {
+		return nil, err
 	}
 
 	wm := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, grant.ResourceOwner)
@@ -92,11 +91,11 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *ChangeProjectG
 	if grant.GrantID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1j83s", "Errors.IDMissing")
 	}
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grant.GrantID, grant.AggregateID, "")
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grant.GrantID, grant.AggregateID, grant.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, grant.ResourceOwner, grant.GrantID); err != nil {
+	if err := c.checkPermissionWriteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	projectResourceOwner, err := c.checkProjectGrantPreCondition(ctx, existingGrant.AggregateID, existingGrant.GrantedOrgID, existingGrant.ResourceOwner, grant.RoleKeys)

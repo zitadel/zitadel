@@ -157,6 +157,20 @@ func projectCheckPermission(ctx context.Context, resourceOwner string, projectID
 	return permissionCheck(ctx, domain.PermissionProjectRead, resourceOwner, projectID)
 }
 
+func projectPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectAndGrantedProjectSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		grantedProjectColumnResourceOwner,
+		domain.PermissionProjectRead,
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(GrantedProjectColumnID),
+	)
+	return query.JoinClause(join, args...)
+}
+
 type Project struct {
 	ID            string
 	CreationDate  time.Time
@@ -176,6 +190,17 @@ type ProjectSearchQueries struct {
 	SearchRequest
 	Queries      []SearchQuery
 	GrantQueries []SearchQuery
+}
+
+func (q *Queries) GetProjectByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, id string, permissionCheck domain.PermissionCheck) (*Project, error) {
+	project, err := q.ProjectByID(ctx, shouldTriggerBulk, id)
+	if err != nil {
+		return nil, err
+	}
+	if err := projectCheckPermission(ctx, project.ResourceOwner, project.ID, permissionCheck); err != nil {
+		return nil, err
+	}
+	return project, nil
 }
 
 func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string) (project *Project, err error) {
@@ -252,34 +277,24 @@ func (q *ProjectAndGrantedProjectSearchQueries) toQuery(query sq.SelectBuilder) 
 	return query
 }
 
-func (r *ProjectAndGrantedProjectSearchQueries) AppendPermissionQueries(permissions []string) error {
-	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetAllPermissionCtxIDs(permissions)
-		projectIDquery, err := NewGrantedProjectIDSearchQuery(ids)
-		if err != nil {
-			return err
-		}
-		r.Queries = append(r.Queries, projectIDquery)
-	}
-	return nil
-}
-
 func (q *Queries) SearchGrantedProjects(ctx context.Context, queries *ProjectAndGrantedProjectSearchQueries, permissionCheck domain.PermissionCheck) (*GrantedProjects, error) {
-	projects, err := q.searchGrantedProjects(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	projects, err := q.searchGrantedProjects(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		grantedProjectsCheckPermission(ctx, projects, permissionCheck)
 	}
 	return projects, nil
 }
 
-func (q *Queries) searchGrantedProjects(ctx context.Context, queries *ProjectAndGrantedProjectSearchQueries) (grantedProjects *GrantedProjects, err error) {
+func (q *Queries) searchGrantedProjects(ctx context.Context, queries *ProjectAndGrantedProjectSearchQueries, permissionCheckV2 bool) (grantedProjects *GrantedProjects, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareGrantedProjectsQuery()
+	query = projectPermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	eq := sq.Eq{grantedProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
