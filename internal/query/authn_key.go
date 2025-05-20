@@ -298,6 +298,10 @@ func NewAuthNKeyIDQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnID, id, TextEquals)
 }
 
+func NewAuthNKeyIdentifyerQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(AuthNKeyColumnIdentifier, id, TextEquals)
+}
+
 func NewAuthNKeyCreationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
 	return NewTimestampQuery(AuthNKeyColumnCreationDate, ts, compare)
 }

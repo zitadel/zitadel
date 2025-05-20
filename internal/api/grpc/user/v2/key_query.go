@@ -84,7 +84,7 @@ func authnKeyIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
 }
 
 func authnKeyUserIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
-	return query.NewAuthNKeyAggregateIDQuery(f.Id)
+	return query.NewAuthNKeyIdentifyerQuery(f.Id)
 }
 
 func authnKeyOrgIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
