@@ -3,6 +3,8 @@ package mirror
 import (
 	"context"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/projection"
 	"github.com/zitadel/zitadel/internal/v2/readmodel"
@@ -30,12 +32,12 @@ func queryLastSuccessfulMigration(ctx context.Context, destinationES *eventstore
 	return lastSuccess, nil
 }
 
-func writeMigrationStart(ctx context.Context, sourceES *eventstore.EventStore, id string, destination string) (_ float64, err error) {
+func writeMigrationStart(ctx context.Context, sourceES *eventstore.EventStore, id string, destination string) (_ decimal.Decimal, err error) {
 	var cmd *eventstore.Command
 	if len(instanceIDs) > 0 {
 		cmd, err = mirror_event.NewStartedInstancesCommand(destination, instanceIDs)
 		if err != nil {
-			return 0, err
+			return decimal.Decimal{}, err
 		}
 	} else {
 		cmd = mirror_event.NewStartedSystemCommand(destination)
@@ -58,12 +60,12 @@ func writeMigrationStart(ctx context.Context, sourceES *eventstore.EventStore, i
 		),
 	)
 	if err != nil {
-		return 0, err
+		return decimal.Decimal{}, err
 	}
 	return position.Position, nil
 }
 
-func writeMigrationSucceeded(ctx context.Context, destinationES *eventstore.EventStore, id, source string, position float64) error {
+func writeMigrationSucceeded(ctx context.Context, destinationES *eventstore.EventStore, id, source string, position decimal.Decimal) error {
 	return destinationES.Push(
 		ctx,
 		eventstore.NewPushIntent(
