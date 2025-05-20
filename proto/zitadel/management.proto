@@ -3884,7 +3884,7 @@ service ManagementService {
 
     // Add Project Grant
     //
-    // Deprecated: [Add Project Grant](apis/resources/project_service_v2/project-service-add-project-grant.api.mdx) to add a project grant.
+    // Deprecated: [Create Project Grant](apis/resources/project_service_v2/project-service-create-project-grant.api.mdx) to add a project grant.
     //
     // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
