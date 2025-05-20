@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -122,8 +123,13 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
+	}
+
+	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
+		currentState.position = config.minPosition
+		currentState.offset = 0
 	}
 
 	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
@@ -146,7 +152,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 }
 
 func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
+	events, err := h.es.Filter(ctx, h.EventQuery(currentState).SetTx(tx))
 	if err != nil || len(events) == 0 {
 		h.log().OnError(err).Debug("filter eventstore failed")
 		return nil, false, err
@@ -155,7 +161,7 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 
 	idx, offset := skipPreviouslyReducedEvents(events, currentState)
 
-	if currentState.position == events[len(events)-1].Position() {
+	if currentState.position.Equal(events[len(events)-1].Position()) {
 		offset += currentState.offset
 	}
 	currentState.position = events[len(events)-1].Position()
@@ -185,9 +191,9 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 }
 
 func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) (index int, offset uint32) {
-	var position float64
+	var position decimal.Decimal
 	for i, event := range events {
-		if event.Position() != position {
+		if !event.Position().Equal(position) {
 			offset = 0
 			position = event.Position()
 		}

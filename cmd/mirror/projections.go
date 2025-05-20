@@ -3,6 +3,7 @@ package mirror
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -104,6 +105,7 @@ func projections(
 	config *ProjectionsConfig,
 	masterKey string,
 ) {
+	logging.Info("starting to fill projections")
 	start := time.Now()
 
 	client, err := database.Connect(config.Destination, false, dialect.DBPurposeQuery)
@@ -121,7 +123,11 @@ func projections(
 	config.Eventstore.Querier = old_es.NewCRDB(client)
 	esPusherDBClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
 	logging.OnError(err).Fatal("unable to connect eventstore push client")
-	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
+
+	newES := new_es.NewEventstore(esPusherDBClient)
+	config.Eventstore.Pusher = newES
+	config.Eventstore.Searcher = newES
+
 	es := eventstore.NewEventstore(config.Eventstore)
 	esV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(client, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
@@ -251,11 +257,13 @@ func projections(
 	}()
 
 	for i := 0; i < int(config.Projections.ConcurrentInstances); i++ {
-		go execProjections(ctx, instances, failedInstances, &wg)
+		go execProjections(ctx, es, instances, failedInstances, &wg)
 	}
 
-	for _, instance := range queryInstanceIDs(ctx, client) {
+	existingInstances := queryInstanceIDs(ctx, client)
+	for i, instance := range existingInstances {
 		instances <- instance
+		logging.WithFields("id", instance, "index", fmt.Sprintf("%d/%d", i, len(existingInstances))).Info("instance queued for projection")
 	}
 	close(instances)
 	wg.Wait()
@@ -265,9 +273,9 @@ func projections(
 	logging.WithFields("took", time.Since(start)).Info("projections executed")
 }
 
-func execProjections(ctx context.Context, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {
+func execProjections(ctx context.Context, es *eventstore.Eventstore, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {
 	for instance := range instances {
-		logging.WithFields("instance", instance).Info("start projections")
+		logging.WithFields("instance", instance).Info("starting projections")
 		ctx = internal_authz.WithInstanceID(ctx, instance)
 
 		err := projection.ProjectInstance(ctx)
@@ -284,6 +292,13 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			continue
 		}
 
+		err = projection.ProjectInstanceFields(ctx)
+		if err != nil {
+			logging.WithFields("instance", instance).WithError(err).Info("trigger fields failed")
+			failedInstances <- instance
+			continue
+		}
+
 		err = auth_handler.ProjectInstance(ctx)
 		if err != nil {
 			logging.WithFields("instance", instance).OnError(err).Info("trigger auth handler failed")
@@ -291,7 +306,7 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			continue
 		}
 
-		err = notification.ProjectInstance(ctx)
+		err = notification.SetCurrentState(ctx, es)
 		if err != nil {
 			logging.WithFields("instance", instance).OnError(err).Info("trigger notification failed")
 			failedInstances <- instance
@@ -302,7 +317,7 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 	wg.Done()
 }
 
-// returns the instance configured by flag
+// queryInstanceIDs returns the instance configured by flag
 // or all instances which are not removed
 func queryInstanceIDs(ctx context.Context, source *database.DB) []string {
 	if len(instanceIDs) > 0 {

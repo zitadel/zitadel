@@ -2,8 +2,12 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -72,11 +76,13 @@ func Projections() []*handler2.Handler {
 }
 
 func ProjectInstance(ctx context.Context) error {
-	for _, projection := range projections {
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting auth projection")
 		_, err := projection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("auth projection done")
 	}
 	return nil
 }

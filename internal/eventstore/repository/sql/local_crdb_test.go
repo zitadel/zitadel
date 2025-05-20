@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
@@ -15,7 +17,6 @@ import (
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/cockroach"
-	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 var (
@@ -36,7 +37,10 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to parse db url")
 	}
-	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
+	connConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		pgxdecimal.Register(conn.TypeMap())
+		return nil
+	}
 	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to create db pool")
