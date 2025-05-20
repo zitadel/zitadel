@@ -23,7 +23,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, code, organization, requestId, invite } =
+  const { userId, loginName, code, organization, requestId, invite, send } =
     searchParams;
 
   const _headers = await headers();
@@ -44,7 +44,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let human: HumanUser | undefined;
   let id: string | undefined;
 
-  const doSend = invite !== "true";
+  const doSend = send === "true";
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -62,7 +62,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         serviceUrl,
         userId: sessionFactors?.factors?.user?.id,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
@@ -75,7 +75,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         serviceUrl,
         userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);

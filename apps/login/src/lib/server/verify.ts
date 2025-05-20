@@ -1,12 +1,12 @@
 "use server";
 
 import {
+  createInviteCode,
   getLoginSettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
   resendEmailCode,
-  resendInviteCode,
   verifyEmail,
   verifyInviteCode,
   verifyTOTPRegistration,
@@ -274,14 +274,24 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+  const doSend = true;
+  // create a new invite whenever the resend is called
   return command.isInvite
-    ? resendInviteCode({ serviceUrl, userId: command.userId })
+    ? createInviteCode({
+        serviceUrl,
+        userId: command.userId,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          (command.requestId ? `&requestId=${command.requestId}` : "") +
+          (doSend ? `&send=${doSend}` : ""),
+      }) //resendInviteCode({ serviceUrl, userId: command.userId })
     : resendEmailCode({
         userId: command.userId,
         serviceUrl,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-          (command.requestId ? `&requestId=${command.requestId}` : ""),
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          (command.requestId ? `&requestId=${command.requestId}` : "") +
+          (doSend ? `&send=${doSend}` : ""),
       });
 }
 

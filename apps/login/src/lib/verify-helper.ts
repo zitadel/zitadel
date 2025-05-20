@@ -57,7 +57,7 @@ export function checkEmailVerified(
     const paramsVerify = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       userId: session.factors?.user?.id as string, // verify needs user id
-      invite: "true", // TODO: check - set this to true as we dont expect old email verification method here
+      send: "true", // set this to true to request a new code immediately
     });
 
     if (organization || session.factors?.user?.organizationId) {
@@ -87,6 +87,7 @@ export function checkEmailVerification(
   ) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
+      send: "true", // set this to true as we dont expect old email codes to be valid anymore
     });
 
     if (requestId) {
