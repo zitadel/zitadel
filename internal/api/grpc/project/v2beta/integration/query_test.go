@@ -370,6 +370,98 @@ func TestServer_ListProjects(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "list project and granted projects",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
+					orgID := instance.DefaultOrg.GetId()
+					projectResp := createProject(iamOwnerCtx, t, orgID, true, true)
+					response.Projects[3] = projectResp
+					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
+						InProjectIdsFilter: &project.InProjectIDsFilter{
+							ProjectIds: []string{projectResp.GetId()},
+						},
+					}
+					response.Projects[2] = createGrantedProject(iamOwnerCtx, t, projectResp)
+					response.Projects[1] = createGrantedProject(iamOwnerCtx, t, projectResp)
+					response.Projects[0] = createGrantedProject(iamOwnerCtx, t, projectResp)
+				},
+				req: &project.ListProjectsRequest{
+					Filters: []*project.ProjectSearchFilter{{}},
+				},
+			},
+			want: &project.ListProjectsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  4,
+					AppliedLimit: 100,
+				},
+				Projects: []*project.Project{
+					{},
+					{},
+					{},
+					{},
+				},
+			},
+		},
+		{
+			name: "list project and granted projects, organization",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
+					orgID := instance.DefaultOrg.GetId()
+					projectResp := createProject(iamOwnerCtx, t, orgID, true, true)
+
+					grantedProjectResp := createGrantedProject(iamOwnerCtx, t, projectResp)
+					response.Projects[1] = grantedProjectResp
+					response.Projects[0] = createProject(iamOwnerCtx, t, *grantedProjectResp.GrantedOrganizationId, true, true)
+					request.Filters[0].Filter = &project.ProjectSearchFilter_ProjectOrganizationIdFilter{
+						ProjectOrganizationIdFilter: &project.ProjectOrganizationIDFilter{ProjectOrganizationId: *grantedProjectResp.GrantedOrganizationId},
+					}
+				},
+				req: &project.ListProjectsRequest{
+					Filters: []*project.ProjectSearchFilter{{}},
+				},
+			},
+			want: &project.ListProjectsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+				Projects: []*project.Project{
+					{},
+					{},
+				},
+			},
+		},
+		{
+			name: "list project and granted projects, project resourceowner",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
+					orgID := instance.DefaultOrg.GetId()
+					projectResp := createProject(iamOwnerCtx, t, orgID, true, true)
+
+					grantedProjectResp := createGrantedProject(iamOwnerCtx, t, projectResp)
+					response.Projects[0] = createProject(iamOwnerCtx, t, *grantedProjectResp.GrantedOrganizationId, true, true)
+					request.Filters[0].Filter = &project.ProjectSearchFilter_ProjectResourceOwnerFilter{
+						ProjectResourceOwnerFilter: &project.ProjectResourceOwnerFilter{ProjectResourceOwner: *grantedProjectResp.GrantedOrganizationId},
+					}
+				},
+				req: &project.ListProjectsRequest{
+					Filters: []*project.ProjectSearchFilter{{}},
+				},
+			},
+			want: &project.ListProjectsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Projects: []*project.Project{
+					{},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -656,6 +748,15 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 				},
 				req: &project.ListProjectsRequest{
 					Filters: []*project.ProjectSearchFilter{{}},
+				},
+			},
+			want: &project.ListProjectsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Projects: []*project.Project{
+					{},
 				},
 			},
 		},
