@@ -81,13 +81,15 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 		return nil, nil, err
 	}
 
-	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
-		for _, f := range connConfig.AfterConnect {
-			if err := f(ctx, conn); err != nil {
-				return err
+	if len(connConfig.AfterConnect) > 0 {
+		config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			for _, f := range connConfig.AfterConnect {
+				if err := f(ctx, conn); err != nil {
+					return err
+				}
 			}
+			return nil
 		}
-		return nil
 	}
 
 	if connConfig.MaxOpenConns != 0 {

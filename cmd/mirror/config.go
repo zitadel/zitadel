@@ -23,7 +23,8 @@ type Migration struct {
 	Source      database.Config
 	Destination database.Config
 
-	EventBulkSize uint32
+	EventBulkSize     uint32
+	MaxAuthRequestAge time.Duration
 
 	Log     *logging.Config
 	Machine *id.Config
@@ -58,6 +59,14 @@ func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 	logging.OnError(err).Fatal("unable to set logger")
 
 	id.Configure(config.Machine)
+
+	config.Projections.MaxFailureCount = 1
+	for key, customization := range config.Projections.Customizations {
+		if customization.MaxFailureCount == nil {
+			continue
+		}
+		*config.Projections.Customizations[key].MaxFailureCount = 1
+	}
 
 	return config
 }

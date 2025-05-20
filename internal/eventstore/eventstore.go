@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -229,11 +230,11 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 	})
 }
 
-// LatestSequence filters the latest sequence for the given search query
-func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error) {
+// LatestPosition filters the latest position for the given search query
+func (es *Eventstore) LatestPosition(ctx context.Context, queryFactory *SearchQueryBuilder) (decimal.Decimal, error) {
 	queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
 
-	return es.querier.LatestSequence(ctx, queryFactory)
+	return es.querier.LatestPosition(ctx, queryFactory)
 }
 
 // InstanceIDs returns the distinct instance ids found by the search query
@@ -265,8 +266,8 @@ type Querier interface {
 	Health(ctx context.Context) error
 	// FilterToReducer calls r for every event returned from the storage
 	FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r Reducer) error
-	// LatestSequence returns the latest sequence found by the search query
-	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error)
+	// LatestPosition returns the latest position found by the search query
+	LatestPosition(ctx context.Context, queryFactory *SearchQueryBuilder) (decimal.Decimal, error)
 	// InstanceIDs returns the instance ids found by the search query
 	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)
 	// Client returns the underlying database connection
