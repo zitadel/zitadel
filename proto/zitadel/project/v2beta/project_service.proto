@@ -356,7 +356,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.role.write"
+        permission: "authenticated"
       }
     };
 
@@ -390,7 +390,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.role.write"
+        permission: "authenticated"
       }
     };
 
@@ -423,7 +423,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.role.delete"
+        permission: "authenticated"
       }
     };
 
@@ -491,7 +491,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 
@@ -526,7 +526,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 
@@ -562,7 +562,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.delete"
+        permission: "authenticated"
       }
     };
 
@@ -591,7 +591,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 
@@ -619,7 +619,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 

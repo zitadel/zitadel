@@ -514,15 +514,6 @@ func TestServer_DeleteProjectRole(t *testing.T) {
 		wantErr          bool
 	}{
 		{
-			name: "missing permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
-			req: &project.RemoveProjectRoleRequest{
-				ProjectId: "notexisting",
-				RoleKey:   "notexisting",
-			},
-			wantErr: true,
-		},
-		{
 			name: "empty id",
 			ctx:  iamOwnerCtx,
 			req: &project.RemoveProjectRoleRequest{

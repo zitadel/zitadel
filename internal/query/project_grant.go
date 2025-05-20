@@ -126,7 +126,7 @@ func projectGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, 
 		ProjectGrantColumnResourceOwner,
 		domain.PermissionProjectGrantRead,
 		SingleOrgPermissionOption(queries.Queries),
-		OwnedRowsPermissionOption(ProjectGrantMemberGrantID),
+		OwnedRowsPermissionOption(ProjectGrantColumnGrantID),
 	)
 	return query.JoinClause(join, args...)
 }

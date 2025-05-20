@@ -113,7 +113,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 			name: "with roles, not existing",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
-				roles := []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+				roles := []string{gofakeit.Name(), gofakeit.Name(), gofakeit.Name()}
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
 				request.ProjectId = projectResp.GetId()
 				request.RoleKeys = roles
@@ -128,7 +128,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 			name: "with roles, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
-				roles := []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+				roles := []string{gofakeit.Name(), gofakeit.Name(), gofakeit.Name()}
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
 				request.ProjectId = projectResp.GetId()
 				for _, role := range roles {
@@ -1190,6 +1190,7 @@ func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
+				instance.DeactivateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
 			},
 			args: args{
 				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
