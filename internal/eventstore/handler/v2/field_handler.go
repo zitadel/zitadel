@@ -185,7 +185,7 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	fillFieldsEvents := make([]eventstore.FillFieldsEvent, len(events))
 	highestPosition := events[len(events)-1].Position()
 	for i, event := range events {
-		if event.Position() == highestPosition {
+		if event.Position().Equal(highestPosition) {
 			offset++
 		}
 		fillFieldsEvents[i] = event.(eventstore.FillFieldsEvent)
@@ -202,7 +202,7 @@ func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state)
 			position = event.Position()
 		}
 		offset++
-		if event.Position() == currentState.position &&
+		if event.Position().Equal(currentState.position) &&
 			event.Aggregate().ID == currentState.aggregateID &&
 			event.Aggregate().Type == currentState.aggregateType &&
 			event.Sequence() == currentState.sequence {
