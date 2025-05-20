@@ -472,39 +472,37 @@ As a rule of thumb, redundant API methods are deprecated.
 ### Example
 
 ```protobuf
-// Create User (Machine)
+// Delete the user phone
 //
-// Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a user of type machine instead.
+// Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
 //
-// Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.
-rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
-option (google.api.http) = {
-post: "/users/machine"
-body: "*"
-};
+// Delete the phone number of a user.
+rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
+  option (google.api.http) = {
+    delete: "/v2/users/{user_id}/phone"
+    body: "*"
+  };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "user.write"
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
-            tags: "Users";
-            tags: "User Machine";
-            responses: {
-                key: "200"
-                value: {
-                    description: "OK";
-                }
-            };
-            parameters: {
-                headers: {
-                    name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
-                    type: STRING,
-                    required: false;
-                };
-            };
-        };
+  option (zitadel.protoc_gen_zitadel.v2.options) = {
+    auth_option: {
+      permission: "authenticated"
     }
+  };
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    deprecated: true;
+    responses: {
+      key: "200"
+      value: {
+        description: "OK";
+      }
+    };
+    responses: {
+      key: "404";
+      value: {
+        description: "User ID does not exist.";
+      }
+    }
+  };
+}
 ```
