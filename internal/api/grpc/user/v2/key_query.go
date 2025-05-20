@@ -17,7 +17,7 @@ func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user
 		return nil, err
 	}
 
-	filters, err := keyFiltersToQueries(req.Filters, 0)
+	filters, err := keyFiltersToQueries(req.Filters)
 	if err != nil {
 		return nil, err
 	}
@@ -51,10 +51,10 @@ func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user
 	return resp, nil
 }
 
-func keyFiltersToQueries(filters []*user.KeysSearchFilter, level uint8) (_ []query.SearchQuery, err error) {
+func keyFiltersToQueries(filters []*user.KeysSearchFilter) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(filters))
 	for i, filter := range filters {
-		q[i], err = keyFilterToQuery(filter, level)
+		q[i], err = keyFilterToQuery(filter)
 		if err != nil {
 			return nil, err
 		}
@@ -62,16 +62,10 @@ func keyFiltersToQueries(filters []*user.KeysSearchFilter, level uint8) (_ []que
 	return q, nil
 }
 
-func keyFilterToQuery(filter *user.KeysSearchFilter, level uint8) (query.SearchQuery, error) {
-	if level > 20 {
-		// can't go deeper than 20 levels of nesting.
-		return nil, zerrors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.Query.TooManyNestingLevels")
-	}
+func keyFilterToQuery(filter *user.KeysSearchFilter) (query.SearchQuery, error) {
 	switch q := filter.Filter.(type) {
 	case *user.KeysSearchFilter_CreatedDateFilter:
 		return authnKeyCreatedFilterToQuery(q.CreatedDateFilter)
-	case *user.KeysSearchFilter_ChangedDateFilter:
-		return authnKeyChangedFilterToQuery(q.ChangedDateFilter)
 	case *user.KeysSearchFilter_ExpirationDateFilter:
 		return authnKeyExpirationFilterToQuery(q.ExpirationDateFilter)
 	case *user.KeysSearchFilter_KeyIdFilter:
@@ -80,12 +74,6 @@ func keyFilterToQuery(filter *user.KeysSearchFilter, level uint8) (query.SearchQ
 		return authnKeyUserIdFilterToQuery(q.UserIdFilter)
 	case *user.KeysSearchFilter_OrganizationIdFilter:
 		return authnKeyOrgIdFilterToQuery(q.OrganizationIdFilter)
-	case *user.KeysSearchFilter_OrFilter:
-		return authnKeyOrFilterToQuery(q.OrFilter, level)
-	case *user.KeysSearchFilter_AndFilter:
-		return authnKeyAndFilterToQuery(q.AndFilter, level)
-	case *user.KeysSearchFilter_NotFilter:
-		return authnKeyNotFilterToQuery(q.NotFilter, level)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -107,34 +95,8 @@ func authnKeyCreatedFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, e
 	return query.NewAuthNKeyCreationDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
-func authnKeyChangedFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
-	return query.NewAuthNKeyChangedDateDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
-}
-
 func authnKeyExpirationFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
 	return query.NewAuthNKeyExpirationDateDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
-}
-
-func authnKeyOrFilterToQuery(q *user.KeysOrFilter, level uint8) (query.SearchQuery, error) {
-	mappedQueries, err := keyFiltersToQueries(q.Filters, level+1)
-	if err != nil {
-		return nil, err
-	}
-	return query.NewOrQuery(mappedQueries...)
-}
-func authnKeyAndFilterToQuery(q *user.KeysAndFilter, level uint8) (query.SearchQuery, error) {
-	mappedQueries, err := keyFiltersToQueries(q.Filters, level+1)
-	if err != nil {
-		return nil, err
-	}
-	return query.NewAndQuery(mappedQueries...)
-}
-func authnKeyNotFilterToQuery(q *user.KeysNotFilter, level uint8) (query.SearchQuery, error) {
-	mappedQuery, err := keyFilterToQuery(q.Filter, level+1)
-	if err != nil {
-		return nil, err
-	}
-	return query.NewNotQuery(mappedQuery)
 }
 
 // authnKeyFieldNameToSortingColumn defaults to the creation date because this ensures deterministic pagination
@@ -148,13 +110,11 @@ func authnKeyFieldNameToSortingColumn(field *user.KeyFieldName) query.Column {
 	case user.KeyFieldName_KEY_FIELD_NAME_ID:
 		return query.AuthNKeyColumnID
 	case user.KeyFieldName_KEY_FIELD_NAME_USER_ID:
-		return query.AuthNKeyColumnAggregateID
+		return query.AuthNKeyColumnIdentifier
 	case user.KeyFieldName_KEY_FIELD_NAME_ORGANIZATION_ID:
 		return query.AuthNKeyColumnResourceOwner
 	case user.KeyFieldName_KEY_FIELD_NAME_CREATED_DATE:
 		return query.AuthNKeyColumnCreationDate
-	case user.KeyFieldName_KEY_FIELD_NAME_CHANGED_DATE:
-		return query.AuthNKeyColumnChangeDate
 	case user.KeyFieldName_KEY_FIELD_NAME_KEY_EXPIRATION_DATE:
 		return query.AuthNKeyColumnExpiration
 	default:

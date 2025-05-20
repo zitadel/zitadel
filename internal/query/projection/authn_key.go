@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	AuthNKeyTable            = "projections.authn_keys2"
+	AuthNKeyTable            = "projections.authn_keys3"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
 	AuthNKeyChangeDateCol    = "change_date"
@@ -62,6 +62,9 @@ func (*authNKeyProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
 			handler.WithIndex(handler.NewIndex("enabled", []string{AuthNKeyEnabledCol})),
 			handler.WithIndex(handler.NewIndex("identifier", []string{AuthNKeyIdentifierCol})),
+			handler.WithIndex(handler.NewIndex("resource_owner", []string{AuthNKeyResourceOwnerCol})),
+			handler.WithIndex(handler.NewIndex("creation_date", []string{AuthNKeyCreationDateCol})),
+			handler.WithIndex(handler.NewIndex("expiration_date", []string{AuthNKeyExpirationCol})),
 		),
 	)
 }

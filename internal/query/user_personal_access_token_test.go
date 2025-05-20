@@ -15,15 +15,15 @@ import (
 
 var (
 	personalAccessTokenStmt = regexp.QuoteMeta(
-		"SELECT projections.personal_access_tokens3.id," +
-			" projections.personal_access_tokens3.creation_date," +
-			" projections.personal_access_tokens3.change_date," +
-			" projections.personal_access_tokens3.resource_owner," +
-			" projections.personal_access_tokens3.sequence," +
-			" projections.personal_access_tokens3.user_id," +
-			" projections.personal_access_tokens3.expiration," +
-			" projections.personal_access_tokens3.scopes" +
-			" FROM projections.personal_access_tokens3")
+		"SELECT projections.personal_access_tokens4.id," +
+			" projections.personal_access_tokens4.creation_date," +
+			" projections.personal_access_tokens4.change_date," +
+			" projections.personal_access_tokens4.resource_owner," +
+			" projections.personal_access_tokens4.sequence," +
+			" projections.personal_access_tokens4.user_id," +
+			" projections.personal_access_tokens4.expiration," +
+			" projections.personal_access_tokens4.scopes" +
+			" FROM projections.personal_access_tokens4")
 	personalAccessTokenCols = []string{
 		"id",
 		"creation_date",
@@ -35,16 +35,16 @@ var (
 		"scopes",
 	}
 	personalAccessTokensStmt = regexp.QuoteMeta(
-		"SELECT projections.personal_access_tokens3.id," +
-			" projections.personal_access_tokens3.creation_date," +
-			" projections.personal_access_tokens3.change_date," +
-			" projections.personal_access_tokens3.resource_owner," +
-			" projections.personal_access_tokens3.sequence," +
-			" projections.personal_access_tokens3.user_id," +
-			" projections.personal_access_tokens3.expiration," +
-			" projections.personal_access_tokens3.scopes," +
+		"SELECT projections.personal_access_tokens4.id," +
+			" projections.personal_access_tokens4.creation_date," +
+			" projections.personal_access_tokens4.change_date," +
+			" projections.personal_access_tokens4.resource_owner," +
+			" projections.personal_access_tokens4.sequence," +
+			" projections.personal_access_tokens4.user_id," +
+			" projections.personal_access_tokens4.expiration," +
+			" projections.personal_access_tokens4.scopes," +
 			" COUNT(*) OVER ()" +
-			" FROM projections.personal_access_tokens3")
+			" FROM projections.personal_access_tokens4")
 	personalAccessTokensCols = []string{
 		"id",
 		"creation_date",

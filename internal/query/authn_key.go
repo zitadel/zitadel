@@ -169,11 +169,11 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		// Select all authN keys
 	case JoinFilterApp:
 		joinCol := ProjectColumnID
-		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnAggregateID.identifier() + " = " + joinCol.identifier())
+		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnIdentifier.identifier() + " = " + joinCol.identifier())
 	case JoinFilterUserMachine:
 		joinCol := MachineUserIDCol
-		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnAggregateID.identifier() + " = " + joinCol.identifier())
-		query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, AuthNKeyColumnResourceOwner, AuthNKeyColumnAggregateID)
+		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnIdentifier.identifier() + " = " + joinCol.identifier())
+		query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, AuthNKeyColumnResourceOwner, AuthNKeyColumnIdentifier)
 	}
 	eq := sq.Eq{
 		AuthNKeyColumnEnabled.identifier():    true,
@@ -300,10 +300,6 @@ func NewAuthNKeyIDQuery(id string) (SearchQuery, error) {
 
 func NewAuthNKeyCreationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
 	return NewTimestampQuery(AuthNKeyColumnCreationDate, ts, compare)
-}
-
-func NewAuthNKeyChangedDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
-	return NewTimestampQuery(AuthNKeyColumnChangeDate, ts, compare)
 }
 
 func NewAuthNKeyExpirationDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {

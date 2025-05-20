@@ -52,52 +52,20 @@ message PersonalAccessToken {
 message PersonalAccessTokensSearchFilter {
   oneof filter {
     option (validate.required) = true;
-    PersonalAccessTokensOrFilter or_filter = 1;
-    PersonalAccessTokensAndFilter and_filter = 2;
-    PersonalAccessTokensNotFilter not_filter = 3;
-    IDFilter token_id_filter = 6;
-    IDFilter user_id_filter = 5;
-    IDFilter organization_id_filter = 4;
-    TimestampFilter created_date_filter = 7;
-    TimestampFilter changed_date_filter = 8;
-    TimestampFilter expiration_date_filter = 9;
+    IDFilter token_id_filter = 1;
+    IDFilter user_id_filter = 2;
+    IDFilter organization_id_filter = 3;
+    TimestampFilter created_date_filter = 4;
+    TimestampFilter expiration_date_filter = 5;
   }
-}
-
-// Connect multiple sub-condition with and OR operator.
-message PersonalAccessTokensOrFilter {
-  repeated PersonalAccessTokensSearchFilter filters = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the sub queries to 'OR'"
-    }
-  ];
-}
-
-// Connect multiple sub-condition with and AND operator.
-message PersonalAccessTokensAndFilter {
-  repeated PersonalAccessTokensSearchFilter filters = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the sub queries to 'AND'"
-    }
-  ];
-}
-
-// Negate the sub-condition.
-message PersonalAccessTokensNotFilter {
-  PersonalAccessTokensSearchFilter filter = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the sub query to negate (NOT)"
-    }
-  ];
 }
 
 enum PersonalAccessTokenFieldName {
   PERSONAL_ACCESS_TOKEN_FIELD_NAME_UNSPECIFIED = 0;
   PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATED_DATE = 1;
-  PERSONAL_ACCESS_TOKEN_FIELD_NAME_CHANGED_DATE = 2;
-  PERSONAL_ACCESS_TOKEN_FIELD_NAME_ID = 3;
-  PERSONAL_ACCESS_TOKEN_FIELD_NAME_USER_ID = 4;
-  PERSONAL_ACCESS_TOKEN_FIELD_NAME_ORGANIZATION_ID = 5;
-  PERSONAL_ACCESS_TOKEN_FIELD_NAME_EXPIRATION_DATE = 6;
+  PERSONAL_ACCESS_TOKEN_FIELD_NAME_ID = 2;
+  PERSONAL_ACCESS_TOKEN_FIELD_NAME_USER_ID = 3;
+  PERSONAL_ACCESS_TOKEN_FIELD_NAME_ORGANIZATION_ID = 4;
+  PERSONAL_ACCESS_TOKEN_FIELD_NAME_EXPIRATION_DATE = 5;
 }
 

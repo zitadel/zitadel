@@ -52,52 +52,19 @@ message Key {
 message KeysSearchFilter {
   oneof filter {
     option (validate.required) = true;
-    KeysOrFilter or_filter = 1;
-    KeysAndFilter and_filter = 2;
-    KeysNotFilter not_filter = 3;
-    IDFilter key_id_filter = 6;
-    IDFilter user_id_filter = 5;
-    IDFilter organization_id_filter = 4;
-    TimestampFilter created_date_filter = 7;
-    TimestampFilter changed_date_filter = 8;
-    TimestampFilter expiration_date_filter = 9;
+    IDFilter key_id_filter = 1;
+    IDFilter user_id_filter = 2;
+    IDFilter organization_id_filter = 3;
+    TimestampFilter created_date_filter = 4;
+    TimestampFilter expiration_date_filter = 5;
   }
 }
-
-// Connect multiple sub-condition with and OR operator.
-message KeysOrFilter {
-  repeated KeysSearchFilter filters = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the sub queries to 'OR'"
-    }
-  ];
-}
-
-// Connect multiple sub-condition with and AND operator.
-message KeysAndFilter {
-  repeated KeysSearchFilter filters = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the sub queries to 'AND'"
-    }
-  ];
-}
-
-// Negate the sub-condition.
-message KeysNotFilter {
-  KeysSearchFilter filter = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the sub query to negate (NOT)"
-    }
-  ];
-}
-
 
 enum KeyFieldName {
   KEY_FIELD_NAME_UNSPECIFIED = 0;
   KEY_FIELD_NAME_CREATED_DATE = 1;
-  KEY_FIELD_NAME_CHANGED_DATE = 2;
-  KEY_FIELD_NAME_ID = 3;
-  KEY_FIELD_NAME_USER_ID = 4;
-  KEY_FIELD_NAME_ORGANIZATION_ID = 5;
-  KEY_FIELD_NAME_KEY_EXPIRATION_DATE = 6;
+  KEY_FIELD_NAME_ID = 2;
+  KEY_FIELD_NAME_USER_ID = 3;
+  KEY_FIELD_NAME_ORGANIZATION_ID = 4;
+  KEY_FIELD_NAME_KEY_EXPIRATION_DATE = 5;
 }
