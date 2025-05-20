@@ -2,13 +2,14 @@ package eventstore_test
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
@@ -41,13 +42,15 @@ func TestMain(m *testing.M) {
 	testCRDBClient = &database.DB{
 		Database: new(testDB),
 	}
-
-	connConfig, err := pgxpool.ParseConfig(ts.PGURL().String())
+	config, err := pgxpool.ParseConfig(ts.PGURL().String())
 	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to parse db url")
+		logging.WithFields("error", err).Fatal("unable to parse db config")
 	}
-	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
-	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
+	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		pgxdecimal.Register(conn.TypeMap())
+		return new_es.RegisterEventstoreTypes(ctx, conn)
+	}
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to create db pool")
 	}
@@ -112,10 +115,15 @@ func initDB(ctx context.Context, db *database.DB) error {
 }
 
 func connectLocalhost() (*database.DB, error) {
-	client, err := sql.Open("pgx", "postgresql://root@localhost:26257/defaultdb?sslmode=disable")
+	config, err := pgxpool.ParseConfig("postgresql://root@localhost:26257/defaultdb?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		return nil, err
+	}
+	client := stdlib.OpenDBFromPool(pool)
 	if err = client.Ping(); err != nil {
 		return nil, err
 	}

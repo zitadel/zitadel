@@ -5,6 +5,7 @@ import (
 	"errors"
 	"reflect"
 
+	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -21,7 +22,12 @@ type ConnectionConfig struct {
 	AfterConnect []func(ctx context.Context, c *pgx.Conn) error
 }
 
-var afterConnectFuncs []func(ctx context.Context, c *pgx.Conn) error
+var afterConnectFuncs = []func(ctx context.Context, c *pgx.Conn) error{
+	func(ctx context.Context, c *pgx.Conn) error {
+		pgxdecimal.Register(c.TypeMap())
+		return nil
+	},
+}
 
 func RegisterAfterConnect(f func(ctx context.Context, c *pgx.Conn) error) {
 	afterConnectFuncs = append(afterConnectFuncs, f)
