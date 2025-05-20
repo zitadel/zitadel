@@ -552,7 +552,10 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
-	err = h.setState(tx, currentState)
+	setStateErr := h.setState(tx, currentState)
+	if setStateErr != nil {
+		err = setStateErr
+	}
 
 	return additionalIteration, err
 }
