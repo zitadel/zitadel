@@ -466,8 +466,8 @@ message VerifyEmailRequest{
 As a rule of thumb, redundant API methods are deprecated.
 
 - The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` is set to true
-- One or more links to recommended replacement methods are added to the deprecation message as a comment above the rpc.
-- A guidance for switching to the recommended methods for common use cases is added as a comment above the rpc if appropriate.
+- One or more links to recommended replacement methods are added to the deprecation message as a proto comment above the rpc spec.
+- A guidance for switching to the recommended methods for common use cases is added as a proto comment above the rpc spec if appropriate.
 
 ### Example
 
