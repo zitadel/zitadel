@@ -18,16 +18,16 @@ import (
 )
 
 var (
-	prepareAuthNKeysStmt = `SELECT projections.authn_keys2.id,` +
-		` projections.authn_keys2.aggregate_id,` +
-		` projections.authn_keys2.creation_date,` +
-		` projections.authn_keys2.change_date,` +
-		` projections.authn_keys2.resource_owner,` +
-		` projections.authn_keys2.sequence,` +
-		` projections.authn_keys2.expiration,` +
-		` projections.authn_keys2.type,` +
+	prepareAuthNKeysStmt = `SELECT projections.authn_keys3.id,` +
+		` projections.authn_keys3.aggregate_id,` +
+		` projections.authn_keys3.creation_date,` +
+		` projections.authn_keys3.change_date,` +
+		` projections.authn_keys3.resource_owner,` +
+		` projections.authn_keys3.sequence,` +
+		` projections.authn_keys3.expiration,` +
+		` projections.authn_keys3.type,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.authn_keys2`
+		` FROM projections.authn_keys3`
 	prepareAuthNKeysCols = []string{
 		"id",
 		"aggregate_id",
@@ -40,17 +40,17 @@ var (
 		"count",
 	}
 
-	prepareAuthNKeysDataStmt = `SELECT projections.authn_keys2.id,` +
-		` projections.authn_keys2.creation_date,` +
-		` projections.authn_keys2.change_date,` +
-		` projections.authn_keys2.resource_owner,` +
-		` projections.authn_keys2.sequence,` +
-		` projections.authn_keys2.expiration,` +
-		` projections.authn_keys2.type,` +
-		` projections.authn_keys2.identifier,` +
-		` projections.authn_keys2.public_key,` +
+	prepareAuthNKeysDataStmt = `SELECT projections.authn_keys3.id,` +
+		` projections.authn_keys3.creation_date,` +
+		` projections.authn_keys3.change_date,` +
+		` projections.authn_keys3.resource_owner,` +
+		` projections.authn_keys3.sequence,` +
+		` projections.authn_keys3.expiration,` +
+		` projections.authn_keys3.type,` +
+		` projections.authn_keys3.identifier,` +
+		` projections.authn_keys3.public_key,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.authn_keys2`
+		` FROM projections.authn_keys3`
 	prepareAuthNKeysDataCols = []string{
 		"id",
 		"creation_date",
@@ -64,14 +64,14 @@ var (
 		"count",
 	}
 
-	prepareAuthNKeyStmt = `SELECT projections.authn_keys2.id,` +
-		` projections.authn_keys2.creation_date,` +
-		` projections.authn_keys2.change_date,` +
-		` projections.authn_keys2.resource_owner,` +
-		` projections.authn_keys2.sequence,` +
-		` projections.authn_keys2.expiration,` +
-		` projections.authn_keys2.type` +
-		` FROM projections.authn_keys2`
+	prepareAuthNKeyStmt = `SELECT projections.authn_keys3.id,` +
+		` projections.authn_keys3.creation_date,` +
+		` projections.authn_keys3.change_date,` +
+		` projections.authn_keys3.resource_owner,` +
+		` projections.authn_keys3.sequence,` +
+		` projections.authn_keys3.expiration,` +
+		` projections.authn_keys3.type` +
+		` FROM projections.authn_keys3`
 	prepareAuthNKeyCols = []string{
 		"id",
 		"creation_date",
@@ -82,8 +82,8 @@ var (
 		"type",
 	}
 
-	prepareAuthNKeyPublicKeyStmt = `SELECT projections.authn_keys2.public_key` +
-		` FROM projections.authn_keys2`
+	prepareAuthNKeyPublicKeyStmt = `SELECT projections.authn_keys3.public_key` +
+		` FROM projections.authn_keys3`
 	prepareAuthNKeyPublicKeyCols = []string{
 		"public_key",
 	}

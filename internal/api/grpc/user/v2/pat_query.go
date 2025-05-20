@@ -16,7 +16,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 	if err != nil {
 		return nil, err
 	}
-	filters, err := patFiltersToQueries(req.Filters, 0)
+	filters, err := patFiltersToQueries(req.Filters)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 		},
 		Queries: filters,
 	}
-	result, err := s.query.SearchPersonalAccessTokens(ctx, search, false, s.checkPermission)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, search, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 		Result:     make([]*user.PersonalAccessToken, len(result.PersonalAccessTokens)),
 		Pagination: filter.QueryToPaginationPb(search.SearchRequest, result.SearchResponse),
 	}
-	for i := range result.PersonalAccessTokens {
-		pat := result.PersonalAccessTokens[i]
+	for i, pat := range result.PersonalAccessTokens {
 		resp.Result[i] = &user.PersonalAccessToken{
 			CreationDate:   timestamppb.New(pat.CreationDate),
 			ChangeDate:     timestamppb.New(pat.ChangeDate),
@@ -51,10 +50,10 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 	return resp, nil
 }
 
-func patFiltersToQueries(filters []*user.PersonalAccessTokensSearchFilter, level uint8) (_ []query.SearchQuery, err error) {
+func patFiltersToQueries(filters []*user.PersonalAccessTokensSearchFilter) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(filters))
 	for i, filter := range filters {
-		q[i], err = patFilterToQuery(filter, level)
+		q[i], err = patFilterToQuery(filter)
 		if err != nil {
 			return nil, err
 		}
@@ -62,16 +61,10 @@ func patFiltersToQueries(filters []*user.PersonalAccessTokensSearchFilter, level
 	return q, nil
 }
 
-func patFilterToQuery(filter *user.PersonalAccessTokensSearchFilter, level uint8) (query.SearchQuery, error) {
-	if level > 20 {
-		// can't go deeper than 20 levels of nesting.
-		return nil, zerrors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.Query.TooManyNestingLevels")
-	}
+func patFilterToQuery(filter *user.PersonalAccessTokensSearchFilter) (query.SearchQuery, error) {
 	switch q := filter.Filter.(type) {
 	case *user.PersonalAccessTokensSearchFilter_CreatedDateFilter:
 		return authnPersonalAccessTokenCreatedFilterToQuery(q.CreatedDateFilter)
-	case *user.PersonalAccessTokensSearchFilter_ChangedDateFilter:
-		return authnPersonalAccessTokenChangedFilterToQuery(q.ChangedDateFilter)
 	case *user.PersonalAccessTokensSearchFilter_ExpirationDateFilter:
 		return authnPersonalAccessTokenExpirationFilterToQuery(q.ExpirationDateFilter)
 	case *user.PersonalAccessTokensSearchFilter_TokenIdFilter:
@@ -80,12 +73,6 @@ func patFilterToQuery(filter *user.PersonalAccessTokensSearchFilter, level uint8
 		return authnPersonalAccessTokenUserIdFilterToQuery(q.UserIdFilter)
 	case *user.PersonalAccessTokensSearchFilter_OrganizationIdFilter:
 		return authnPersonalAccessTokenOrgIdFilterToQuery(q.OrganizationIdFilter)
-	case *user.PersonalAccessTokensSearchFilter_OrFilter:
-		return authnPersonalAccessTokenOrFilterToQuery(q.OrFilter, level)
-	case *user.PersonalAccessTokensSearchFilter_AndFilter:
-		return authnPersonalAccessTokenAndFilterToQuery(q.AndFilter, level)
-	case *user.PersonalAccessTokensSearchFilter_NotFilter:
-		return authnPersonalAccessTokenNotFilterToQuery(q.NotFilter, level)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -107,34 +94,8 @@ func authnPersonalAccessTokenCreatedFilterToQuery(f *user.TimestampFilter) (quer
 	return query.NewPersonalAccessTokenCreationDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
-func authnPersonalAccessTokenChangedFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
-	return query.NewPersonalAccessTokenChangedDateDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
-}
-
 func authnPersonalAccessTokenExpirationFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
 	return query.NewPersonalAccessTokenExpirationDateDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
-}
-
-func authnPersonalAccessTokenOrFilterToQuery(q *user.PersonalAccessTokensOrFilter, level uint8) (query.SearchQuery, error) {
-	mappedQueries, err := patFiltersToQueries(q.Filters, level+1)
-	if err != nil {
-		return nil, err
-	}
-	return query.NewOrQuery(mappedQueries...)
-}
-func authnPersonalAccessTokenAndFilterToQuery(q *user.PersonalAccessTokensAndFilter, level uint8) (query.SearchQuery, error) {
-	mappedQueries, err := patFiltersToQueries(q.Filters, level+1)
-	if err != nil {
-		return nil, err
-	}
-	return query.NewAndQuery(mappedQueries...)
-}
-func authnPersonalAccessTokenNotFilterToQuery(q *user.PersonalAccessTokensNotFilter, level uint8) (query.SearchQuery, error) {
-	mappedQuery, err := patFilterToQuery(q.Filter, level+1)
-	if err != nil {
-		return nil, err
-	}
-	return query.NewNotQuery(mappedQuery)
 }
 
 // authnPersonalAccessTokenFieldNameToSortingColumn defaults to the creation date because this ensures deterministic pagination
@@ -153,8 +114,6 @@ func authnPersonalAccessTokenFieldNameToSortingColumn(field *user.PersonalAccess
 		return query.PersonalAccessTokenColumnResourceOwner
 	case user.PersonalAccessTokenFieldName_PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATED_DATE:
 		return query.PersonalAccessTokenColumnCreationDate
-	case user.PersonalAccessTokenFieldName_PERSONAL_ACCESS_TOKEN_FIELD_NAME_CHANGED_DATE:
-		return query.PersonalAccessTokenColumnChangeDate
 	case user.PersonalAccessTokenFieldName_PERSONAL_ACCESS_TOKEN_FIELD_NAME_EXPIRATION_DATE:
 		return query.PersonalAccessTokenColumnExpiration
 	default:

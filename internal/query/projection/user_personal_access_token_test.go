@@ -40,7 +40,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.personal_access_tokens3 (id, creation_date, change_date, resource_owner, instance_id, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.personal_access_tokens4 (id, creation_date, change_date, resource_owner, instance_id, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"tokenID",
 								anyArg{},
@@ -74,7 +74,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.personal_access_tokens3 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens4 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"tokenID",
 								"instance-id",
@@ -101,7 +101,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.personal_access_tokens3 WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens4 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -128,7 +128,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.personal_access_tokens3 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens4 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
@@ -155,7 +155,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.personal_access_tokens3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens4 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

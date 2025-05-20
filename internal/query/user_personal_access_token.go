@@ -68,10 +68,6 @@ var (
 		name:  projection.PersonalAccessTokenColumnSequence,
 		table: personalAccessTokensTable,
 	}
-	PersonalAccessTokenColumnOwnerRemoved = Column{
-		name:  projection.PersonalAccessTokenColumnOwnerRemoved,
-		table: personalAccessTokensTable,
-	}
 )
 
 type PersonalAccessTokens struct {
@@ -96,7 +92,7 @@ type PersonalAccessTokenSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (pat *PersonalAccessToken, err error) {
+func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (pat *PersonalAccessToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -114,9 +110,6 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	eq := sq.Eq{
 		PersonalAccessTokenColumnID.identifier():         id,
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[PersonalAccessTokenColumnOwnerRemoved.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -137,9 +130,9 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 // If permissionCheck is nil, the PATs are not filtered.
 // If permissionCheck is not nil and the PermissionCheckV2 feature flag is false, the returned PATs are filtered in-memory by the given permission check.
 // If permissionCheck is not nil and the PermissionCheckV2 feature flag is true, the returned PATs are filtered in the database.
-func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool, permissionCheck domain.PermissionCheck) (authNKeys *PersonalAccessTokens, err error) {
+func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, permissionCheck domain.PermissionCheck) (authNKeys *PersonalAccessTokens, err error) {
 	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	keys, err := q.searchPersonalAccessTokens(ctx, withOwnerRemoved, queries, permissionCheckV2)
+	keys, err := q.searchPersonalAccessTokens(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +142,7 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 	return keys, nil
 }
 
-func (q *Queries) searchPersonalAccessTokens(ctx context.Context, withOwnerRemoved bool, queries *PersonalAccessTokenSearchQueries, permissionCheckV2 bool) (personalAccessTokens *PersonalAccessTokens, err error) {
+func (q *Queries) searchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, permissionCheckV2 bool) (personalAccessTokens *PersonalAccessTokens, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -158,9 +151,6 @@ func (q *Queries) searchPersonalAccessTokens(ctx context.Context, withOwnerRemov
 	query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, PersonalAccessTokenColumnResourceOwner, PersonalAccessTokenColumnUserID)
 	eq := sq.Eq{
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[PersonalAccessTokenColumnOwnerRemoved.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -194,10 +184,6 @@ func NewPersonalAccessTokenIDQuery(id string) (SearchQuery, error) {
 
 func NewPersonalAccessTokenCreationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
 	return NewTimestampQuery(PersonalAccessTokenColumnCreationDate, ts, compare)
-}
-
-func NewPersonalAccessTokenChangedDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
-	return NewTimestampQuery(PersonalAccessTokenColumnChangeDate, ts, compare)
 }
 
 func NewPersonalAccessTokenExpirationDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
