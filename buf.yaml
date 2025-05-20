@@ -1,6 +1,0 @@
-# TODO: remove this file before merging to main
-version: v1
-breaking:
-  ignore:
-    - proto/zitadel/user/v2/key.proto
-    - proto/zitadel/user/v2/pat.proto
