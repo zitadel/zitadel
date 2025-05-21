@@ -150,7 +150,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
         {id && send && (
           <div className="py-4 w-full">
-            <Alert type={AlertType.INFO}>{tError("verify.codeSent")}</Alert>
+            <Alert type={AlertType.INFO}>{t("verify.codeSent")}</Alert>
           </div>
         )}
 
