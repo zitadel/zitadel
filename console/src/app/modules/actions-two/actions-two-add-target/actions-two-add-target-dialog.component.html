@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{ 'ACTIONSTWO.TARGET.CREATE.TITLE' | translate }}</h2>
+<mat-dialog-content>
+  <p class="target-description">{{ 'ACTIONSTWO.TARGET.CREATE.DESCRIPTION' | translate }}</p>
+
+  <form *ngIf="targetForm" class="form-grid" [formGroup]="targetForm" (ngSubmit)="closeWithResult()">
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.NAME' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" formControlName="name" />
+      <span class="name-hint cnsl-secondary-text" cnslHint>{{
+        'ACTIONSTWO.TARGET.CREATE.NAME_DESCRIPTION' | translate
+      }}</span>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.ENDPOINT' | translate }}</cnsl-label>
+      <input cnslInput type="text" placeholder="" formControlName="endpoint" />
+      <span class="name-hint cnsl-secondary-text" cnslHint>{{
+        'ACTIONSTWO.TARGET.CREATE.ENDPOINT_DESCRIPTION' | translate
+      }}</span>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TYPE' | translate }}</cnsl-label>
+      <mat-select [formControl]="targetForm.controls.type" name="type">
+        <mat-option *ngFor="let type of targetTypes" [value]="type">
+          {{ 'ACTIONSTWO.TARGET.CREATE.TYPES.' + type | translate }}
+        </mat-option>
+      </mat-select>
+      <span class="name-hint cnsl-secondary-text types-description">
+        {{ 'ACTIONSTWO.TARGET.CREATE.TYPES_DESCRIPTION' | translate }}
+      </span>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'ACTIONSTWO.TARGET.CREATE.TIMEOUT' | translate }}</cnsl-label>
+      <input cnslInput type="number" placeholder="10" [formControl]="targetForm.controls.timeout" />
+      <span class="name-hint cnsl-secondary-text" cnslHint>{{
+        'ACTIONSTWO.TARGET.CREATE.TIMEOUT_DESCRIPTION' | translate
+      }}</span>
+    </cnsl-form-field>
+
+    <mat-checkbox
+      *ngIf="targetForm.controls.type.value === 'restWebhook' || targetForm.controls.type.value === 'restCall'"
+      class="target-checkbox"
+      [formControl]="targetForm.controls.interruptOnError"
+    >
+      <div class="target-condition-text">
+        <span>{{ 'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR' | translate }}</span>
+        <span class="description cnsl-secondary-text">{{
+          'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR_DESCRIPTION' | translate
+        }}</span>
+        <span [style.color]="'var(--warn)'" class="description cnsl-secondary-text"
+          >{{ 'ACTIONSTWO.TARGET.CREATE.INTERRUPT_ON_ERROR_WARNING' | translate }}
+        </span>
+      </div>
+    </mat-checkbox>
+  </form>
+</mat-dialog-content>
+<div>
+  <mat-dialog-actions class="actions">
+    <button mat-stroked-button mat-dialog-close>
+      {{ 'ACTIONS.CANCEL' | translate }}
+    </button>
+    <button color="primary" [disabled]="targetForm.invalid" mat-raised-button (click)="closeWithResult()" cdkFocusInitial>
+      {{ (data.target ? 'ACTIONS.CHANGE' : 'ACTIONS.CREATE') | translate }}
+    </button>
+  </mat-dialog-actions>
+</div>

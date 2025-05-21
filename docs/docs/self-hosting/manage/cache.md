@@ -110,7 +110,6 @@ Drawbacks:
 
 - Slowest of the available caching options
 - Might put additional strain on the database server, limiting horizontal scalability
-- CockroachDB does not support unlogged tables. When this connector is enabled against CockroachDB, it does work but little to no performance benefit is to be expected.
 
 ### Local memory cache
 

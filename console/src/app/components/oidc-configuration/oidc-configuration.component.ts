@@ -2,10 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
-import { listFrameworks, hasFramework, getFramework } from '@netlify/framework-info';
-import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
+import type { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
 import { AddOIDCAppRequest } from 'src/app/proto/generated/zitadel/management_pb';
 
 export type FrameworkDefinition = {

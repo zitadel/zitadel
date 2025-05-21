@@ -64,6 +64,7 @@ type Storage struct {
 
 	defaultLoginURL   string
 	defaultLoginURLv2 string
+	contextToIssuer   func(context.Context) string
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
@@ -137,14 +138,15 @@ func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.A
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	samlRequest := &command.SAMLRequest{
-		ApplicationID: applicationID,
-		ACSURL:        acsUrl,
-		RelayState:    relayState,
-		RequestID:     req.Id,
-		Binding:       protocolBinding,
-		Issuer:        req.Issuer.Text,
-		Destination:   req.Destination,
-		LoginClient:   loginClient,
+		ApplicationID:  applicationID,
+		ACSURL:         acsUrl,
+		RelayState:     relayState,
+		RequestID:      req.Id,
+		Binding:        protocolBinding,
+		Issuer:         req.Issuer.Text,
+		Destination:    req.Destination,
+		LoginClient:    loginClient,
+		ResponseIssuer: p.contextToIssuer(ctx),
 	}
 
 	aar, err := p.command.AddSAMLRequest(ctx, samlRequest)

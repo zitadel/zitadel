@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -767,7 +766,7 @@ func (q *Queries) idpTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 	if !withOwnerRemoved {
 		eq[IDPTemplateOwnerRemovedCol.identifier()] = false
 	}
-	query, scan := prepareIDPTemplateByIDQuery(ctx, q.client)
+	query, scan := prepareIDPTemplateByIDQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -788,7 +787,7 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPTemplatesQuery(ctx, q.client)
+	query, scan := prepareIDPTemplatesQuery()
 	eq := sq.Eq{
 		IDPTemplateInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -864,7 +863,7 @@ func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
+func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -993,7 +992,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
@@ -1371,7 +1370,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 		}
 }
 
-func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
+//nolint:gocognit
+func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -1502,7 +1502,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)

@@ -157,14 +157,15 @@ func (p *Storage) getMaxKeySequence(ctx context.Context) (float64, error) {
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AwaitOpenTransactions().
 			AddQuery().
-			AggregateTypes(keypair.AggregateType).
+			AggregateTypes(
+				keypair.AggregateType,
+				instance.AggregateType,
+			).
 			EventTypes(
 				keypair.AddedEventType,
 				keypair.AddedCertificateEventType,
+				instance.InstanceRemovedEventType,
 			).
-			Or().
-			AggregateTypes(instance.AggregateType).
-			EventTypes(instance.InstanceRemovedEventType).
 			Builder(),
 	)
 }

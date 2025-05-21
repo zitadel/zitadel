@@ -6,7 +6,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"reflect"
 	"regexp"
 	"testing"
 
@@ -268,8 +267,7 @@ var (
 		` ON login_names.user_id = projections.users14.id AND login_names.instance_id = projections.users14.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id`
 	userCols = []string{
 		"id",
 		"creation_date",
@@ -319,8 +317,7 @@ var (
 		` projections.users14_humans.gender,` +
 		` projections.users14_humans.avatar_key` +
 		` FROM projections.users14` +
-		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id`
 	profileCols = []string{
 		"id",
 		"creation_date",
@@ -345,8 +342,7 @@ var (
 		` projections.users14_humans.email,` +
 		` projections.users14_humans.is_email_verified` +
 		` FROM projections.users14` +
-		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id`
 	emailCols = []string{
 		"id",
 		"creation_date",
@@ -366,8 +362,7 @@ var (
 		` projections.users14_humans.phone,` +
 		` projections.users14_humans.is_phone_verified` +
 		` FROM projections.users14` +
-		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id`
 	phoneCols = []string{
 		"id",
 		"creation_date",
@@ -385,8 +380,7 @@ var (
 		` projections.users14_humans.email,` +
 		` projections.users14_humans.is_email_verified` +
 		` FROM projections.users14` +
-		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id`
 	userUniqueCols = []string{
 		"id",
 		"state",
@@ -428,8 +422,7 @@ var (
 		` ON login_names.user_id = projections.users14.id AND login_names.instance_id = projections.users14.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id`
 	notifyUserCols = []string{
 		"id",
 		"creation_date",
@@ -497,8 +490,7 @@ var (
 		` ON login_names.user_id = projections.users14.id AND login_names.instance_id = projections.users14.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id`
 	usersCols = []string{
 		"id",
 		"creation_date",
@@ -1572,12 +1564,7 @@ func Test_UserPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			params := defaultPrepareArgs
-			if reflect.TypeOf(tt.prepare).NumIn() == 0 {
-				params = []reflect.Value{}
-			}
-
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, params...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

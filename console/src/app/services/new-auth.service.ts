@@ -5,6 +5,7 @@ import {
   AddMyAuthFactorOTPSMSResponse,
   GetMyLoginPolicyResponse,
   GetMyLoginPolicyRequestSchema,
+  GetMyPasswordComplexityPolicyResponse,
   GetMyUserResponse,
   ListMyAuthFactorsRequestSchema,
   ListMyAuthFactorsResponse,
@@ -31,7 +32,7 @@ export class NewAuthService {
   }
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
-    return this.grpcService.authNew.verifyMyPhone({});
+    return this.grpcService.authNew.verifyMyPhone({ code });
   }
 
   public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse> {
@@ -41,7 +42,7 @@ export class NewAuthService {
   public listMyMetadata(): Promise<ListMyMetadataResponse> {
     return this.grpcService.authNew.listMyMetadata({});
   }
-
+  
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse> {
     return this.grpcService.authNew.listMyAuthFactors(create(ListMyAuthFactorsRequestSchema), null);
   }
@@ -50,7 +51,6 @@ export class NewAuthService {
     return this.grpcService.authNew
       .removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema), null);
   }
-
 
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse> {
     return this.grpcService.authNew.getMyLoginPolicy(create(GetMyLoginPolicyRequestSchema), null);
@@ -70,4 +70,7 @@ export class NewAuthService {
       .removeMyAuthFactorOTPEmail(create(RemoveMyAuthFactorOTPEmailRequestSchema), null);
   }
 
+  public getMyPasswordComplexityPolicy(): Promise<GetMyPasswordComplexityPolicyResponse> {
+    return this.grpcService.authNew.getMyPasswordComplexityPolicy({});
+  }
 }

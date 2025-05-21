@@ -60,6 +60,7 @@ type Handler struct {
 	requeueEvery     time.Duration
 	txDuration       time.Duration
 	now              nowFunc
+	queryGlobal      bool
 
 	triggeredInstancesSync sync.Map
 
@@ -67,6 +68,8 @@ type Handler struct {
 	cacheInvalidations   []func(ctx context.Context, aggregates []*eventstore.Aggregate)
 
 	queryInstances func() ([]string, error)
+
+	metrics *ProjectionMetrics
 }
 
 var _ migration.Migration = (*Handler)(nil)
@@ -141,6 +144,11 @@ type Projection interface {
 	Reducers() []AggregateReducer
 }
 
+type GlobalProjection interface {
+	Projection
+	FilterGlobalEvents()
+}
+
 func NewHandler(
 	ctx context.Context,
 	config *Config,
@@ -158,6 +166,8 @@ func NewHandler(
 		}
 		aggregates[reducer.Aggregate] = eventTypes
 	}
+
+	metrics := NewProjectionMetrics()
 
 	handler := &Handler{
 		projection:             projection,
@@ -178,6 +188,11 @@ func NewHandler(
 			}
 			return nil, nil
 		},
+		metrics: metrics,
+	}
+
+	if _, ok := projection.(GlobalProjection); ok {
+		handler.queryGlobal = true
 	}
 
 	return handler
@@ -483,6 +498,8 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		defer cancel()
 	}
 
+	start := time.Now()
+
 	tx, err := h.client.BeginTx(txCtx, nil)
 	if err != nil {
 		return false, err
@@ -502,7 +519,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 		return additionalIteration, err
 	}
-	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
+	// stop execution if currentState.position >= config.maxPosition
 	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
 		return false, nil
 	}
@@ -518,7 +535,14 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		if err == nil {
 			err = commitErr
 		}
+
+		h.metrics.ProjectionEventsProcessed(ctx, h.ProjectionName(), int64(len(statements)), err == nil)
+
 		if err == nil && currentState.aggregateID != "" && len(statements) > 0 {
+			// Don't update projection timing or latency unless we successfully processed events
+			h.metrics.ProjectionUpdateTiming(ctx, h.ProjectionName(), float64(time.Since(start).Seconds()))
+			h.metrics.ProjectionStateLatency(ctx, h.ProjectionName(), time.Since(currentState.eventTimestamp).Seconds())
+
 			h.invalidateCaches(ctx, aggregatesFromStatements(statements))
 		}
 	}()
@@ -540,6 +564,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
+
 	err = h.setState(tx, currentState)
 
 	return additionalIteration, err
@@ -650,7 +675,6 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		Limit(uint64(h.bulkLimit)).
-		AllowTimeTravel().
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
@@ -662,15 +686,19 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		}
 	}
 
-	for aggregateType, eventTypes := range h.eventTypes {
-		builder = builder.
-			AddQuery().
-			AggregateTypes(aggregateType).
-			EventTypes(eventTypes...).
-			Builder()
+	if h.queryGlobal {
+		return builder
 	}
 
-	return builder
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(h.eventTypes))
+	eventTypes := make([]eventstore.EventType, 0, len(h.eventTypes))
+
+	for aggregate, events := range h.eventTypes {
+		aggregateTypes = append(aggregateTypes, aggregate)
+		eventTypes = append(eventTypes, events...)
+	}
+
+	return builder.AddQuery().AggregateTypes(aggregateTypes...).EventTypes(eventTypes...).Builder()
 }
 
 // ProjectionName returns the name of the underlying projection.

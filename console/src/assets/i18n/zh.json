@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "流程",
         "DESCRIPTION": "选择一个认证流程，并在该流程中的特定事件上触发您的操作。"
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2，一个全新改进版的Actions，现在已上线。目前版本仍可使用，但未来开发将专注于新版本，最终将取代当前版本。"
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "空闲刷新令牌",
           "DESCRIPTION": "空闲刷新令牌的生命周期是刷新令牌可以未使用的最长时间。"
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "管理您的 OIDC Web 密钥，以安全地签署和验证您的 ZITADEL 实例的令牌。",
+        "TABLE": {
+          "TITLE": "活动和未来的 Web 密钥",
+          "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "ACTIVATE": "激活下一个 Web 密钥",
+          "ACTIVE": "当前活动",
+          "NEXT": "队列中的下一个",
+          "FUTURE": "未来",
+          "WARNING": "Web密钥不到5分钟。"
+        },
+        "CREATE": {
+          "TITLE": "创建新的 Web 密钥",
+          "DESCRIPTION": "创建新的 Web 密钥会将其添加到您的列表。ZITADEL 默认使用 RSA2048 密钥和 SHA256 哈希算法。",
+          "KEY_TYPE": "密钥类型",
+          "BITS": "位数",
+          "HASHER": "哈希算法",
+          "CURVE": "曲线"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "先前的 Web 密钥",
+          "DESCRIPTION": "这些是您之前使用但不再活动的 Web 密钥。",
+          "DEACTIVATED_ON": "停用时间"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "下载",
     "APPLY": "申请"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "您目前正在使用新的 Actions V2（测试版）。之前的版本1仍可使用，但未来将停止支持。请报告任何问题或反馈意见。",
+    "EXECUTION": {
+      "TITLE": "操作",
+      "DESCRIPTION": "操作允许您运行自定义代码以响应 API 请求、事件或特定函数。使用它们来扩展 Zitadel、自动化工作流程并与其他系统集成。",
+      "TYPES": {
+        "request": "请求",
+        "response": "响应",
+        "event": "事件",
+        "function": "函数"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "创建操作",
+        "UPDATE_TITLE": "更新操作",
+        "TYPE": {
+          "DESCRIPTION": "选择您希望此操作运行的时间",
+          "REQUEST": {
+            "TITLE": "请求",
+            "DESCRIPTION": "Zitadel 中发生的请求。这可能是登录请求调用之类的操作。"
+          },
+          "RESPONSE": {
+            "TITLE": "响应",
+            "DESCRIPTION": "来自 Zitadel 中请求的响应。考虑一下从获取用户返回的响应。"
+          },
+          "EVENTS": {
+            "TITLE": "事件",
+            "DESCRIPTION": "Zitadel 中发生的事件。这可能是用户创建帐户、成功登录等任何操作。"
+          },
+          "FUNCTIONS": {
+            "TITLE": "函数",
+            "DESCRIPTION": "您可以在 Zitadel 中调用的函数。这可能是从发送电子邮件到创建用户的任何操作。"
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "选择此操作是适用于所有请求、特定服务（例如用户管理）还是单个请求（例如创建用户）。",
+          "ALL": {
+            "TITLE": "全部",
+            "DESCRIPTION": "如果您希望在每个请求上运行您的操作，请选择此项"
+          },
+          "ALL_EVENTS": "如果您想在每个事件上运行操作，请选择此项",
+          "SELECT_SERVICE": {
+            "TITLE": "选择服务",
+            "DESCRIPTION": "为您的操作选择一个 Zitadel 服务。"
+          },
+          "SELECT_METHOD": {
+            "TITLE": "选择方法",
+            "DESCRIPTION": "如果您只想在特定请求上执行，请在此处选择它",
+            "NOTE": "如果您不选择方法，您的操作将在您选择的服务中的每个请求上运行。"
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "函数名称",
+            "DESCRIPTION": "选择您要执行的函数"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "设置组",
+            "DESCRIPTION": "如果您只想在事件组上执行，请在此处设置组"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "选择事件",
+            "DESCRIPTION": "如果您只想在特定事件上执行，请在此处指定它"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "您可以选择执行目标，或在与其他目标相同的条件下运行它。",
+          "TARGET": {
+            "DESCRIPTION": "您要为此操作执行的目标"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "执行条件"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "条件",
+        "TYPE": "类型",
+        "TARGET": "目标",
+        "CREATIONDATE": "创建日期"
+      }
+    },
+    "TARGET": {
+      "TITLE": "目标",
+      "DESCRIPTION": "目标是您要从操作中执行的代码的目标。在此处创建一个目标并将其添加到您的操作中。",
+      "CREATE": {
+        "TITLE": "创建您的目标",
+        "DESCRIPTION": "在 Zitadel 外部创建您自己的目标",
+        "NAME": "名称",
+        "NAME_DESCRIPTION": "为您的目标提供清晰、描述性的名称，以便稍后轻松识别",
+        "TYPE": "类型",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST 调用",
+          "restAsync": "REST 异步"
+        },
+        "TYPES_DESCRIPTION": "Webhook，调用处理状态码但响应无关紧要\nCall，调用处理状态码和响应\nAsync，调用既不处理状态码也不处理响应，但可以与其他目标并行调用",
+        "ENDPOINT": "端点",
+        "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
+        "TIMEOUT": "超时",
+        "TIMEOUT_DESCRIPTION": "设置您的目标必须响应的最大时间。如果花费的时间更长，我们将停止请求。",
+        "INTERRUPT_ON_ERROR": "错误时中断",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "当目标返回错误时，停止所有执行",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：“出错时中断”会在失败时停止操作，存在被锁定的风险。请在禁用该选项的情况下进行测试，以避免阻止登录/创建。",
+        "AWAIT_RESPONSE": "等待响应",
+        "AWAIT_RESPONSE_DESCRIPTION": "我们将在执行任何其他操作之前等待响应。如果您打算为单个操作使用多个目标，这将非常有用"
+      },
+      "TABLE": {
+        "NAME": "名称",
+        "ENDPOINT": "端点",
+        "CREATIONDATE": "创建日期",
+        "REORDER": "重新排序"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",
     "IAM_OWNER_VIEWER": "有权审查整个实例，包括所有组织",
@@ -509,6 +648,7 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
+    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
@@ -553,6 +693,7 @@
     "EMAIL": "邮箱",
     "USERNAME": "用户名",
     "ORGNAME": "组织名称",
+    "ORGID": "组织ID",
     "PRIMARYDOMAIN": "主域",
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
@@ -789,7 +930,10 @@
       "PHONESECTION": "手机号码",
       "PASSWORDSECTION": "初始密码",
       "ADDRESSANDPHONESECTION": "手机号码",
-      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。"
+      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。",
+      "SETUPAUTHENTICATIONLATER": "稍后为此用户设置身份验证。",
+      "INVITATION": "发送邀请邮件以进行身份验证设置和电子邮件验证。",
+      "INITIALPASSWORD": "为用户设置初始密码。"
     },
     "CODEDIALOG": {
       "TITLE": "验证手机号码",
@@ -1353,6 +1497,7 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "验证码外观",
       "SECURITY": "安全设置",
       "EVENTS": "活动",
@@ -1368,7 +1513,8 @@
       "APPEARANCE": "外观",
       "OTHER": "其他",
       "STORAGE": "贮存"
-    }
+    },
+    "BETA": "测试版"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1490,6 +1636,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 终止会话",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
+      "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
+      "DISABLEUSERTOKENEVENT": "禁用用户令牌事件",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
+      "PERMISSIONCHECKV2": "权限检查 V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
+      "WEBKEY": "Web 密钥",
+      "WEBKEY_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",
@@ -1502,7 +1658,10 @@
       },
       "RESET": "全部设置为继承",
       "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。"
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
+      "LOGINV2": "登录 V2",
+      "LOGINV2_DESCRIPTION": "启用此选项将激活基于 TypeScript 的新登录界面，具有更高的安全性、性能和可定制性。",
+      "LOGINV2_BASEURI": "基础 URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1991,6 +2150,7 @@
       "ACTIVATE": "启用项目",
       "DELETE": "删除项目",
       "ORGNAME": "组织名称",
+      "ORGID": "组织ID",
       "ORGDOMAIN": "组织域名",
       "STATE": "状态",
       "TYPE": "类型",

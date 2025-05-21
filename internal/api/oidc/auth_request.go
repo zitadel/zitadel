@@ -111,6 +111,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		Prompt:           PromptToBusiness(req.Prompt),
 		UILocales:        UILocalesToBusiness(req.UILocales),
 		MaxAge:           MaxAgeToBusiness(req.MaxAge),
+		Issuer:           o.contextToIssuer(ctx),
 	}
 	if req.LoginHint != "" {
 		authRequest.LoginHint = &req.LoginHint
@@ -149,7 +150,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, true)
+	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -545,11 +546,7 @@ func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authoriz
 		code:  code,
 		state: authReq.GetState(),
 	}
-	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
-	if err != nil {
-		return "", err
-	}
-	return callback, err
+	return op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
 }
 
 func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest) (string, error) {
@@ -568,6 +565,7 @@ func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest)
 		req.GetID(),
 		implicitFlowComplianceChecker(),
 		slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
+		client.client.BackChannelLogoutURI,
 	)
 	if err != nil {
 		return "", err

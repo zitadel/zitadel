@@ -1,11 +1,11 @@
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, DestroyRef, EventEmitter, OnInit } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnInit, signal } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { defer, EMPTY, fromEvent, mergeWith, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
+import { defer, EMPTY, mergeWith, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -25,7 +25,7 @@ import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogData, EditDialogResult, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { Gender, HumanProfile, HumanUser, User, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
-import { catchError, filter, map, startWith, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, startWith } from 'rxjs/operators';
 import { pairwiseStartWith } from 'src/app/utils/pairwiseStartWith';
 import { NewAuthService } from 'src/app/services/new-auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -75,7 +75,7 @@ export class AuthUserDetailComponent implements OnInit {
   protected readonly user$: Observable<UserQuery>;
   protected readonly metadata$: Observable<MetadataQuery>;
   private readonly savedLanguage$: Observable<string>;
-  protected readonly currentSetting$: Observable<string | undefined>;
+  protected readonly currentSetting$ = signal<SidenavSetting>(this.settingsList[0]);
   protected readonly loginPolicy$: Observable<LoginPolicy>;
   protected readonly userName$: Observable<string>;
 
@@ -86,7 +86,6 @@ export class AuthUserDetailComponent implements OnInit {
     private dialog: MatDialog,
     private auth: AuthenticationService,
     private breadcrumbService: BreadcrumbService,
-    private mediaMatcher: MediaMatcher,
     public langSvc: LanguagesService,
     private readonly route: ActivatedRoute,
     private readonly newAuthService: NewAuthService,
@@ -95,7 +94,6 @@ export class AuthUserDetailComponent implements OnInit {
     private readonly destroyRef: DestroyRef,
     private readonly router: Router,
   ) {
-    this.currentSetting$ = this.getCurrentSetting$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.userName$ = this.getUserName(this.user$);
     this.savedLanguage$ = this.getSavedLanguage$(this.user$);
@@ -150,6 +148,7 @@ export class AuthUserDetailComponent implements OnInit {
         ]);
       }
     });
+
     this.user$.pipe(mergeWith(this.metadata$), takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
       if (query.state == 'error') {
         this.toast.showError(query.error);
@@ -159,22 +158,16 @@ export class AuthUserDetailComponent implements OnInit {
     this.savedLanguage$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((savedLanguage) => this.translate.use(savedLanguage));
-  }
 
-  private getCurrentSetting$(): Observable<string | undefined> {
-    const mediaq: string = '(max-width: 500px)';
-    const matcher = this.mediaMatcher.matchMedia(mediaq);
-    const small$ = fromEvent(matcher, 'change', ({ matches }: MediaQueryListEvent) => matches).pipe(
-      startWith(matcher.matches),
-    );
-
-    return this.route.queryParamMap.pipe(
-      map((params) => params.get('id')),
-      filter(Boolean),
-      startWith('general'),
-      withLatestFrom(small$),
-      map(([id, small]) => (small ? undefined : id)),
-    );
+    const param = this.route.snapshot.queryParamMap.get('id');
+    if (!param) {
+      return;
+    }
+    const setting = this.settingsList.find(({ id }) => id === param);
+    if (!setting) {
+      return;
+    }
+    this.currentSetting$.set(setting);
   }
 
   private getUser$(): Observable<UserQuery> {
@@ -192,7 +185,7 @@ export class AuthUserDetailComponent implements OnInit {
   }
 
   private getMyUser(): Observable<UserQuery> {
-    return defer(() => this.userService.getMyUser()).pipe(
+    return this.userService.user$.pipe(
       map((user) => ({ state: 'success' as const, value: user })),
       catchError((error) => of({ state: 'error', error } as const)),
       startWith({ state: 'loading' } as const),

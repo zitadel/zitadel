@@ -11,6 +11,5 @@ The sql-files in this folder initialize the ZITADEL database and user. These obj
 - 05_projections.sql: creates the schema needed to read the data
 - 06_system.sql: creates the schema needed for ZITADEL itself
 - 07_encryption_keys_table.sql: creates the table for encryption keys (for event data)
-- files 08_enable_hash_sharded_indexes.sql and 09_events_table.sql must run in the same session
-  - 08_enable_hash_sharded_indexes.sql enables the [hash sharded index](https://www.cockroachlabs.com/docs/stable/hash-sharded-indexes.html) feature for this session
-  - 09_events_table.sql creates the table for eventsourcing
+- 08_events_table.sql creates the table for eventsourcing
+- 10_unique_constraints_table.sql creates the table to check unique constraints for events

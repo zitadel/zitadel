@@ -1,4 +1,4 @@
-function checkWebauthnSupported(button, func) {
+function checkWebauthnSupported(func, optionalClickId) {
   let support = document.getElementsByClassName("wa-support");
   let noSupport = document.getElementsByClassName("wa-no-support");
   if (!window.PublicKeyCredential) {
@@ -10,7 +10,13 @@ function checkWebauthnSupported(button, func) {
     }
     return;
   }
-  document.getElementById(button).addEventListener("click", func);
+
+  // if id is provided add click event only, otherwise call the function directly
+  if (optionalClickId) {
+    document.getElementById(optionalClickId).addEventListener("click", func);
+  } else {
+    func();
+  }
 }
 
 function webauthnError(error) {

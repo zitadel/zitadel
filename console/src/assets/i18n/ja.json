@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "フロー",
         "DESCRIPTION": "認証フローを選択し、そのフロー内の特定のイベントでアクションをトリガーします。"
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2（アクションズV2）、改善された新しいバージョンが利用可能になりました。現在のバージョンも引き続き利用可能ですが、今後の開発は新バージョンに集中し、最終的には現在のバージョンを置き換える予定です。"
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "アイドル状態のリフレッシュトークン",
           "DESCRIPTION": "アイドル状態のリフレッシュトークンの有効期間は、リフレッシュトークンが使用されない最大時間です。"
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "ZITADELインスタンスのトークンを安全に署名および検証するために、OIDC Webキーを管理します。",
+        "TABLE": {
+          "TITLE": "アクティブおよび今後のWebキー",
+          "DESCRIPTION": "現在アクティブなWebキーと、今後使用予定のWebキーです。新しいキーをアクティブ化すると、現在のキーは無効になります。",
+          "NOTE": "注意: JWKs OIDCエンドポイントはキャッシュ可能なレスポンスを返します（デフォルト5分）。キーを早くアクティブ化しすぎると、キャッシュやクライアントでまだ利用できない可能性があります。",
+          "ACTIVATE": "次のWebキーをアクティブ化",
+          "ACTIVE": "現在アクティブ",
+          "NEXT": "次のキュー",
+          "FUTURE": "今後",
+          "WARNING": "ウェブキーは5分未満です。"
+        },
+        "CREATE": {
+          "TITLE": "新しいWebキーを作成",
+          "DESCRIPTION": "新しいWebキーを作成すると、リストに追加されます。ZITADELはデフォルトでRSA2048キーとSHA256ハッシュを使用します。",
+          "KEY_TYPE": "キーの種類",
+          "BITS": "ビット",
+          "HASHER": "ハッシュ方式",
+          "CURVE": "カーブ"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "以前のWebキー",
+          "DESCRIPTION": "これらは、すでに無効になった以前のWebキーです。",
+          "DEACTIVATED_ON": "無効化日"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "ダウンロード",
     "APPLY": "アプライ"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "現在、新しいActions V2（ベータ版）を使用しています。以前のバージョン1はまだ利用可能ですが、今後廃止される予定です。問題やフィードバックがあればお知らせください。",
+    "EXECUTION": {
+      "TITLE": "アクション",
+      "DESCRIPTION": "アクションを使用すると、APIリクエスト、イベント、または特定の関数に応答してカスタムコードを実行できます。これらを使用して、Zitadelを拡張し、ワークフローを自動化し、他のシステムと統合します。",
+      "TYPES": {
+        "request": "リクエスト",
+        "response": "レスポンス",
+        "event": "イベント",
+        "function": "関数"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "アクションを作成",
+        "UPDATE_TITLE": "アクションを更新",
+        "TYPE": {
+          "DESCRIPTION": "このアクションを実行するタイミングを選択します",
+          "REQUEST": {
+            "TITLE": "リクエスト",
+            "DESCRIPTION": "Zitadel内で発生するリクエスト。これはログインリクエストの呼び出しのようなものです。"
+          },
+          "RESPONSE": {
+            "TITLE": "レスポンス",
+            "DESCRIPTION": "Zitadel内のリクエストからのレスポンス。ユーザーのフェッチから返されるレスポンスを考えてください。"
+          },
+          "EVENTS": {
+            "TITLE": "イベント",
+            "DESCRIPTION": "Zitadel内で発生するイベント。これは、ユーザーアカウントの作成、ログインの成功など、あらゆる可能性があります。"
+          },
+          "FUNCTIONS": {
+            "TITLE": "関数",
+            "DESCRIPTION": "Zitadel内で呼び出すことができる関数。これは、電子メールの送信からユーザーの作成まで、あらゆる可能性があります。"
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "このアクションをすべてのリクエスト、特定のサービス（例：ユーザー管理）、または単一のリクエスト（例：ユーザーの作成）に適用するかどうかを選択します。",
+          "ALL": {
+            "TITLE": "すべて",
+            "DESCRIPTION": "すべてのリクエストでアクションを実行する場合は、これを選択します"
+          },
+          "ALL_EVENTS": "すべてのイベントでアクションを実行する場合はこれを選択してください",
+          "SELECT_SERVICE": {
+            "TITLE": "サービスを選択",
+            "DESCRIPTION": "アクションのZitadelサービスを選択します。"
+          },
+          "SELECT_METHOD": {
+            "TITLE": "メソッドを選択",
+            "DESCRIPTION": "特定のリクエストでのみ実行する場合は、ここで選択します",
+            "NOTE": "メソッドを選択しない場合、アクションは選択したサービスのすべてのリクエストで実行されます。"
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "関数名",
+            "DESCRIPTION": "実行する関数を選択します"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "グループを設定",
+            "DESCRIPTION": "イベントのグループでのみ実行する場合は、ここでグループを設定します"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "イベントを選択",
+            "DESCRIPTION": "特定のイベントでのみ実行する場合は、ここで指定します"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "ターゲットを実行するか、他のターゲットと同じ条件で実行するかを選択できます。",
+          "TARGET": {
+            "DESCRIPTION": "このアクションで実行するターゲット"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "実行条件"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "条件",
+        "TYPE": "タイプ",
+        "TARGET": "ターゲット",
+        "CREATIONDATE": "作成日"
+      }
+    },
+    "TARGET": {
+      "TITLE": "ターゲット",
+      "DESCRIPTION": "ターゲットは、アクションから実行するコードの宛先です。ここでターゲットを作成し、アクションに追加します。",
+      "CREATE": {
+        "TITLE": "ターゲットを作成",
+        "DESCRIPTION": "Zitadelの外部で独自のターゲットを作成します",
+        "NAME": "名前",
+        "NAME_DESCRIPTION": "後で簡単に識別できるように、ターゲットに明確でわかりやすい名前を付けます",
+        "TYPE": "タイプ",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST 呼び出し",
+          "restAsync": "REST 非同期"
+        },
+        "TYPES_DESCRIPTION": "Webhook、呼び出しはステータスコードを処理しますが、応答は無関係です\nCall、呼び出しはステータスコードと応答を処理します\nAsync、呼び出しはステータスコードも応答も処理しませんが、他のターゲットと並行して呼び出すことができます",
+        "ENDPOINT": "エンドポイント",
+        "ENDPOINT_DESCRIPTION": "コードがホストされているエンドポイントを入力します。アクセス可能であることを確認してください。",
+        "TIMEOUT": "タイムアウト",
+        "TIMEOUT_DESCRIPTION": "ターゲットが応答する最大時間を設定します。これより時間がかかる場合は、リクエストを停止します。",
+        "INTERRUPT_ON_ERROR": "エラー時に中断",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "ターゲットがエラーを返した場合、すべての実行を停止します",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：「エラー時に中断」を有効にすると、失敗時に処理が停止し、ロックアウトのリスクがあります。ログイン/作成のブロックを防ぐため、無効にしてテストしてください。",
+        "AWAIT_RESPONSE": "レスポンスを待機",
+        "AWAIT_RESPONSE_DESCRIPTION": "他の処理を行う前にレスポンスを待機します。単一のアクションに複数のターゲットを使用する場合に便利です"
+      },
+      "TABLE": {
+        "NAME": "名前",
+        "ENDPOINT": "エンドポイント",
+        "CREATIONDATE": "作成日",
+        "REORDER": "順序を変更"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "すべての組織を含むインスタンス全体を管理する権限を持ちます",
     "IAM_OWNER_VIEWER": "すべての組織を含むインスタンス全体を閲覧する権限を持ちます",
@@ -509,6 +648,7 @@
     "IAM_USER_MANAGER": "ユーザーの作成および管理する権限を持ちます",
     "IAM_ADMIN_IMPERSONATOR": "すべての組織の管理者およびエンドユーザーになりすます権限を持っています",
     "IAM_END_USER_IMPERSONATOR": "すべての組織のエンドユーザーになりすます権限を持っています",
+    "IAM_LOGIN_CLIENT": "ログインクライアントを管理する権限を持っています",
     "ORG_OWNER": "組織全体に対する権限を持ちます",
     "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
     "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",
@@ -553,6 +693,7 @@
     "EMAIL": "Eメール",
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
+    "ORGID": "組織ID",
     "PRIMARYDOMAIN": "プライマリドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
@@ -789,7 +930,10 @@
       "PHONESECTION": "電話番号",
       "PASSWORDSECTION": "初期パスワード",
       "ADDRESSANDPHONESECTION": "電話番号",
-      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。"
+      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。",
+      "SETUPAUTHENTICATIONLATER": "このユーザーの認証を後で設定します。",
+      "INVITATION": "認証設定とメール確認のための招待メールを送信してください。",
+      "INITIALPASSWORD": "ユーザーの初期パスワードを設定してください。"
     },
     "CODEDIALOG": {
       "TITLE": "電話番号の検証",
@@ -1353,6 +1497,7 @@
       "BRANDING": "ブランディング",
       "PRIVACYPOLICY": "プライバシーポリシー",
       "OIDC": "OIDCトークンのライフタイムと有効期限",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "シークレット設定",
       "SECURITY": "セキュリティ設定",
       "EVENTS": "イベント",
@@ -1368,7 +1513,8 @@
       "APPEARANCE": "設定",
       "OTHER": "その他",
       "STORAGE": "ストレージ"
-    }
+    },
+    "BETA": "ベータ"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1490,6 +1636,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 セッション終了",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
+      "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
+      "DISABLEUSERTOKENEVENT": "ユーザートークンイベントを無効にする",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
+      "PERMISSIONCHECKV2": "権限チェック V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
+      "WEBKEY": "ウェブキー",
+      "WEBKEY_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
@@ -1502,7 +1658,10 @@
       },
       "RESET": "すべて継承に設定",
       "CONSOLEUSEV2USERAPI": "コンソールでユーザー作成のためにV2 APIを使用してください。",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。"
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。",
+      "LOGINV2": "ログイン V2",
+      "LOGINV2_DESCRIPTION": "これを有効にすると、セキュリティ、パフォーマンス、およびカスタマイズ性が向上した、TypeScript ベースの新しいログイン UI が有効になります。",
+      "LOGINV2_BASEURI": "ベースURI"
     },
     "DIALOG": {
       "RESET": {
@@ -1992,6 +2151,7 @@
       "ACTIVATE": "プロジェクトのアクティブ化",
       "DELETE": "プロジェクトの削除",
       "ORGNAME": "組織名",
+      "ORGID": "組織ID",
       "ORGDOMAIN": "組織ドメイン",
       "STATE": "ステータス",
       "TYPE": "タイプ",

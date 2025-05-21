@@ -11,9 +11,12 @@ services:
       - "./example-zitadel-config.yaml:/example-zitadel-config.yaml:ro"
       - "./example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro"
       - "./example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro"
+    depends_on:
+      db:
+        condition: "service_healthy"
 
   db:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     restart: always
     environment:
       - POSTGRES_USER=root
@@ -25,7 +28,7 @@ services:
       interval: 10s
       timeout: 60s
       retries: 5
-      start_period: 10s 
+      start_period: 10s
     volumes:
       - 'data:/var/lib/postgresql/data:rw'
 
@@ -34,3 +37,4 @@ networks:
 
 volumes:
   data:
+

@@ -69,7 +69,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries, orgID, nil)
+	res, err := s.query.SearchUsers(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,6 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		AwaitOpenTransactions().
 		OrderDesc().

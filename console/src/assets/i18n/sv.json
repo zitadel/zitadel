@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flöden",
         "DESCRIPTION": "Välj ett autentiseringsflöde och trigga din åtgärd vid en specifik händelse inom detta flöde."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, en ny och förbättrad version av Actions, är nu tillgänglig. Den nuvarande versionen är fortfarande tillgänglig, men framtida utveckling kommer att fokusera på den nya, som så småningom kommer att ersätta den nuvarande."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "Inaktiv förnyelsetoken",
           "DESCRIPTION": "Den inaktiva förnyelsetokenens livslängd är den maximala tiden en förnyelsetoken kan vara oanvänd."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Hantera dina OIDC-webbnycklar för att säkert signera och validera tokens för din ZITADEL-instans.",
+        "TABLE": {
+          "TITLE": "Aktiva och framtida webbnycklar",
+          "DESCRIPTION": "Dina aktiva och kommande webbnycklar. Aktivering av en ny nyckel kommer att inaktivera den nuvarande.",
+          "NOTE": "Observera: JWKs OIDC-slutpunkten returnerar ett cachebart svar (standard 5 min). Undvik att aktivera en nyckel för tidigt, eftersom den kanske ännu inte är tillgänglig i cache och för klienter.",
+          "ACTIVATE": "Aktivera nästa webbnyckel",
+          "ACTIVE": "För närvarande aktiv",
+          "NEXT": "Nästa i kön",
+          "FUTURE": "Framtida",
+          "WARNING": "Webbnyckeln är mindre än 5 minuter gammal"
+        },
+        "CREATE": {
+          "TITLE": "Skapa ny webbnyckel",
+          "DESCRIPTION": "Att skapa en ny webbnyckel lägger till den i din lista. ZITADEL använder som standard RSA2048-nycklar med en SHA256-hasher.",
+          "KEY_TYPE": "Nyckeltyp",
+          "BITS": "Bitar",
+          "HASHER": "Hasher",
+          "CURVE": "Kurva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Tidigare webbnycklar",
+          "DESCRIPTION": "Detta är dina tidigare webbnycklar som inte längre är aktiva.",
+          "DEACTIVATED_ON": "Inaktiverad den"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "Ladda ner",
     "APPLY": "Tillämpa"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Du använder för närvarande nya Actions V2, som är i betaversion. Den tidigare versionen 1 är fortfarande tillgänglig men kommer att avvecklas i framtiden. Vänligen rapportera eventuella problem eller ge feedback.",
+    "EXECUTION": {
+      "TITLE": "Åtgärder",
+      "DESCRIPTION": "Åtgärder låter dig köra anpassad kod som svar på API-förfrågningar, händelser eller specifika funktioner. Använd dem för att utöka Zitadel, automatisera arbetsflöden och integrera med andra system.",
+      "TYPES": {
+        "request": "Förfrågan",
+        "response": "Svar",
+        "event": "Händelser",
+        "function": "Funktion"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Skapa en åtgärd",
+        "UPDATE_TITLE": "Uppdatera en åtgärd",
+        "TYPE": {
+          "DESCRIPTION": "Välj när du vill att denna åtgärd ska köras",
+          "REQUEST": {
+            "TITLE": "Förfrågan",
+            "DESCRIPTION": "Förfrågningar som sker inom Zitadel. Detta kan vara något som ett inloggningsförfrågningsanrop."
+          },
+          "RESPONSE": {
+            "TITLE": "Svar",
+            "DESCRIPTION": "Ett svar från en förfrågan inom Zitadel. Tänk på svaret du får tillbaka från att hämta en användare."
+          },
+          "EVENTS": {
+            "TITLE": "Händelser",
+            "DESCRIPTION": "Händelser som händer inom Zitadel. Detta kan vara vad som helst som en användare som skapar ett konto, en lyckad inloggning etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funktioner",
+            "DESCRIPTION": "Funktioner som du kan anropa inom Zitadel. Detta kan vara allt från att skicka ett e-postmeddelande till att skapa en användare."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Välj om denna åtgärd gäller för alla förfrågningar, en specifik tjänst (t.ex. användarhantering) eller en enskild förfrågan (t.ex. skapa användare).",
+          "ALL": {
+            "TITLE": "Alla",
+            "DESCRIPTION": "Välj detta om du vill köra din åtgärd på varje förfrågan"
+          },
+          "ALL_EVENTS": "Välj detta om du vill köra din åtgärd vid varje händelse",
+          "SELECT_SERVICE": {
+            "TITLE": "Välj tjänst",
+            "DESCRIPTION": "Välj en Zitadel-tjänst för din åtgärd."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Välj metod",
+            "DESCRIPTION": "Om du bara vill köra på en specifik förfrågan, välj den här",
+            "NOTE": "Om du inte väljer en metod körs din åtgärd på varje förfrågan i din valda tjänst."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Funktionsnamn",
+            "DESCRIPTION": "Välj den funktion du vill köra"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Ange grupp",
+            "DESCRIPTION": "Om du bara vill köra på en grupp händelser, ange gruppen här"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Välj händelse",
+            "DESCRIPTION": "Om du bara vill köra på en specifik händelse, ange den här"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Du kan välja att köra ett mål eller att köra det under samma villkor som andra mål.",
+          "TARGET": {
+            "DESCRIPTION": "Målet du vill köra för denna åtgärd"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Körningsvillkor"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Villkor",
+        "TYPE": "Typ",
+        "TARGET": "Mål",
+        "CREATIONDATE": "Skapat datum"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Mål",
+      "DESCRIPTION": "Ett mål är destinationen för koden du vill köra från en åtgärd. Skapa ett mål här och lägg till det i dina åtgärder.",
+      "CREATE": {
+        "TITLE": "Skapa ditt mål",
+        "DESCRIPTION": "Skapa ditt eget mål utanför Zitadel",
+        "NAME": "Namn",
+        "NAME_DESCRIPTION": "Ge ditt mål ett tydligt, beskrivande namn för att göra det enkelt att identifiera senare",
+        "TYPE": "Typ",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Anrop",
+          "restAsync": "REST Asynkron"
+        },
+        "TYPES_DESCRIPTION": "Webhook, anropet hanterar statuskoden men svaret är irrelevant\nCall, anropet hanterar statuskoden och svaret\nAsync, anropet hanterar varken statuskod eller svar men kan anropas parallellt med andra mål",
+        "ENDPOINT": "Slutpunkt",
+        "ENDPOINT_DESCRIPTION": "Ange slutpunkten där din kod finns. Se till att den är tillgänglig för oss!",
+        "TIMEOUT": "Tidsgräns",
+        "TIMEOUT_DESCRIPTION": "Ange den maximala tid ditt mål har att svara. Om det tar längre tid stoppar vi förfrågan.",
+        "INTERRUPT_ON_ERROR": "Avbryt vid fel",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stoppa alla körningar när målen returnerar ett fel",
+        "INTERRUPT_ON_ERROR_WARNING": "Varning: ”Avbryt vid fel” stoppar åtgärder vid fel och kan leda till att du blir utelåst. Testa med funktionen avstängd för att undvika att blockera inloggning/skapa.",
+        "AWAIT_RESPONSE": "Vänta på svar",
+        "AWAIT_RESPONSE_DESCRIPTION": "Vi väntar på ett svar innan vi gör något annat. Användbart om du avser att använda flera mål för en enda åtgärd"
+      },
+      "TABLE": {
+        "NAME": "Namn",
+        "ENDPOINT": "Slutpunkt",
+        "CREATIONDATE": "Skapat datum",
+        "REORDER": "Ordna om"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",
     "IAM_OWNER_VIEWER": "Har behörighet att granska hela instansen, inklusive alla organisationer",
@@ -509,6 +648,7 @@
     "IAM_USER_MANAGER": "Har behörighet att skapa och hantera användare",
     "IAM_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från alla organisationer",
     "IAM_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från alla organisationer",
+    "IAM_LOGIN_CLIENT": "Har behörighet att hantera inloggningsklienter",
     "ORG_OWNER": "Har behörighet över hela organisationen",
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
@@ -553,6 +693,7 @@
     "EMAIL": "E-post",
     "USERNAME": "Användarnamn",
     "ORGNAME": "Organisationsnamn",
+    "ORGID": "Organisations ID",
     "PRIMARYDOMAIN": "Primär domän",
     "PROJECTNAME": "Projektnamn",
     "RESOURCEOWNER": "Resursägare",
@@ -789,7 +930,10 @@
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Initialt lösenord",
       "ADDRESSANDPHONESECTION": "Telefonnummer",
-      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas."
+      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas.",
+      "SETUPAUTHENTICATIONLATER": "Ställ in autentisering senare för den här användaren.",
+      "INVITATION": "Skicka en inbjudningsmail för autentiseringsinställning och e-postverifiering.",
+      "INITIALPASSWORD": "Ställ in ett initialt lösenord för användaren."
     },
     "CODEDIALOG": {
       "TITLE": "Verifiera telefonnummer",
@@ -1357,6 +1501,7 @@
       "BRANDING": "Varumärke",
       "PRIVACYPOLICY": "Externa länkar",
       "OIDC": "OIDC-token livstid och utgång",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Hemlighetsgenerator",
       "SECURITY": "Säkerhetsinställningar",
       "EVENTS": "Händelser",
@@ -1372,7 +1517,8 @@
       "APPEARANCE": "Utseende",
       "OTHER": "Övrigt",
       "STORAGE": "Lagring"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1494,6 +1640,16 @@
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
+      "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
+      "DISABLEUSERTOKENEVENT": "Inaktivera Användartokenhändelse",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela klienter om sessionens avslutning hos OpenID-leverantören.",
+      "PERMISSIONCHECKV2": "Behörighetskontroll V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
+      "WEBKEY": "Webbnyckel",
+      "WEBKEY_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
@@ -1506,7 +1662,10 @@
       },
       "RESET": "Återställ allt till arv",
       "CONSOLEUSEV2USERAPI": "Använd V2 API i konsolen för att skapa användare",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd.",
+      "LOGINV2": "Inloggning V2",
+      "LOGINV2_DESCRIPTION": "Att aktivera detta startar det nya inloggningsgränssnittet baserat på TypeScript med förbättrad säkerhet, prestanda och anpassning.",
+      "LOGINV2_BASEURI": "Bas-URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1996,6 +2155,7 @@
       "ACTIVATE": "Aktivera projekt",
       "DELETE": "Ta bort projekt",
       "ORGNAME": "Organisationsnamn",
+      "ORGID": "Organisations ID",
       "ORGDOMAIN": "Organisationsdomän",
       "STATE": "Status",
       "TYPE": "Typ",

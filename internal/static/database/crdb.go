@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var _ static.Storage = (*crdbStorage)(nil)
+var _ static.Storage = (*storage)(nil)
 
 const (
 	assetsTable           = "system.assets"
@@ -29,15 +29,15 @@ const (
 	AssetColUpdatedAt     = "updated_at"
 )
 
-type crdbStorage struct {
+type storage struct {
 	client *sql.DB
 }
 
 func NewStorage(client *sql.DB, _ map[string]interface{}) (static.Storage, error) {
-	return &crdbStorage{client: client}, nil
+	return &storage{client: client}, nil
 }
 
-func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
+func (c *storage) PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
 	data, err := io.ReadAll(object)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "DATAB-Dfwvq", "Errors.Internal")
@@ -71,7 +71,7 @@ func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resou
 	}, nil
 }
 
-func (c *crdbStorage) GetObject(ctx context.Context, instanceID, resourceOwner, name string) ([]byte, func() (*static.Asset, error), error) {
+func (c *storage) GetObject(ctx context.Context, instanceID, resourceOwner, name string) ([]byte, func() (*static.Asset, error), error) {
 	query, args, err := squirrel.Select(AssetColData, AssetColContentType, AssetColHash, AssetColUpdatedAt).
 		From(assetsTable).
 		Where(squirrel.Eq{
@@ -111,7 +111,7 @@ func (c *crdbStorage) GetObject(ctx context.Context, instanceID, resourceOwner, 
 		nil
 }
 
-func (c *crdbStorage) GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*static.Asset, error) {
+func (c *storage) GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*static.Asset, error) {
 	query, args, err := squirrel.Select(AssetColContentType, AssetColLocation, "length("+AssetColData+")", AssetColHash, AssetColUpdatedAt).
 		From(assetsTable).
 		Where(squirrel.Eq{
@@ -143,7 +143,7 @@ func (c *crdbStorage) GetObjectInfo(ctx context.Context, instanceID, resourceOwn
 	return asset, nil
 }
 
-func (c *crdbStorage) RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error {
+func (c *storage) RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error {
 	stmt, args, err := squirrel.Delete(assetsTable).
 		Where(squirrel.Eq{
 			AssetColInstanceID:    instanceID,
@@ -162,7 +162,7 @@ func (c *crdbStorage) RemoveObject(ctx context.Context, instanceID, resourceOwne
 	return nil
 }
 
-func (c *crdbStorage) RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType static.ObjectType) error {
+func (c *storage) RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType static.ObjectType) error {
 	stmt, args, err := squirrel.Delete(assetsTable).
 		Where(squirrel.Eq{
 			AssetColInstanceID:    instanceID,
@@ -181,7 +181,7 @@ func (c *crdbStorage) RemoveObjects(ctx context.Context, instanceID, resourceOwn
 	return nil
 }
 
-func (c *crdbStorage) RemoveInstanceObjects(ctx context.Context, instanceID string) error {
+func (c *storage) RemoveInstanceObjects(ctx context.Context, instanceID string) error {
 	stmt, args, err := squirrel.Delete(assetsTable).
 		Where(squirrel.Eq{
 			AssetColInstanceID: instanceID,

@@ -1,0 +1,60 @@
+<cnsl-card
+  [title]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.TITLE' | translate"
+  [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.DESCRIPTION' | translate"
+>
+  <cnsl-form-field>
+    <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.KEY_TYPE' | translate }}</cnsl-label>
+    <mat-select [value]="keyType()" (valueChange)="keyType.set($event)">
+      <mat-option value="rsa">RSA</mat-option>
+      <mat-option value="ecdsa">ECDSA</mat-option>
+      <mat-option value="ed25519">ED25519</mat-option>
+    </mat-select>
+  </cnsl-form-field>
+  <ng-container [ngSwitch]="keyType()">
+    <form *ngSwitchCase="'rsa'" [formGroup]="rsaForm" (ngSubmit)="ngSubmit.emit(rsaForm.getRawValue())">
+      <cnsl-form-field>
+        <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.BITS' | translate }}</cnsl-label>
+        <mat-select formControlName="bits">
+          <ng-container *ngFor="let bit of RSABits | keyvalue">
+            <mat-option *ngIf="Number(bit.key) as key" [value]="key">{{
+              $any(bit.value).replace('RSA_BITS_', '')
+            }}</mat-option>
+          </ng-container>
+        </mat-select>
+      </cnsl-form-field>
+      <cnsl-form-field>
+        <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.HASHER' | translate }}</cnsl-label>
+        <mat-select formControlName="hasher">
+          <ng-container *ngFor="let hasher of RSAHasher | keyvalue">
+            <mat-option *ngIf="Number(hasher.key) as key" [value]="key">{{
+              $any(hasher.value).replace('RSA_HASHER_', '')
+            }}</mat-option>
+          </ng-container>
+        </mat-select>
+      </cnsl-form-field>
+      <ng-container *ngTemplateOutlet="submitButton; context: { form: rsaForm }" />
+    </form>
+    <form *ngSwitchCase="'ecdsa'" [formGroup]="ecdsaForm" (ngSubmit)="ngSubmit.emit(ecdsaForm.getRawValue())">
+      <cnsl-form-field>
+        <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.CREATE.CURVE' | translate }}</cnsl-label>
+        <mat-select formControlName="curve">
+          <ng-container *ngFor="let curve of ECDSACurve | keyvalue">
+            <mat-option *ngIf="Number(curve.key) as key" [value]="key">{{
+              $any(curve.value).replace('ECDSA_CURVE_', '')
+            }}</mat-option>
+          </ng-container>
+        </mat-select>
+      </cnsl-form-field>
+      <ng-container *ngTemplateOutlet="submitButton; context: { form: ecdsaForm }" />
+    </form>
+    <form *ngSwitchCase="'ed25519'" (submit)="emitEd25519($event)">
+      <ng-container *ngTemplateOutlet="submitButton" />
+    </form>
+    <ng-template #submitButton let-form="form">
+      <button [disabled]="(loading$ | async) || form?.invalid" mat-raised-button color="primary" type="submit">
+        <mat-spinner diameter="20" *ngIf="loading$ | async"></mat-spinner>
+        <span *ngIf="(loading$ | async) === false || (loading$ | async) === null">{{ 'ACTIONS.CREATE' | translate }}</span>
+      </button>
+    </ng-template>
+  </ng-container>
+</cnsl-card>

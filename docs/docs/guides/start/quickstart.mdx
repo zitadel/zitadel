@@ -103,25 +103,35 @@ The order of creation for the above components may vary depending on the specifi
 
 ![Login](/img/guides/quickstart/v3_8.png)
 
-### 2. Create your first instance
+### 2. Complete onboarding questions
 
-As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs. This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications. For example, you might create an instance for each product in a B2C scenario, or an instance for each tenant or customer in a B2B scenario. The possibilities are endless. You can create your first instance for free.
+To begin, we'll ask you a few questions.
+These will help us understand your needs and personalize your ZITADEL experience, ensuring you get the most out of it.
 
-1. Let’s create an instance. Click on “Create new instance”.
+![Onboarding Questions](/img/guides/quickstart/onboarding_questions.png)
 
-![2-factor Authentication](/img/guides/quickstart/v3_9.png)
+### 3. Create your first instance
+
+As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs.
+This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications.
+The possibilities are endless. You can create your first instance for free.
+
+1. Create an instance.
+by clicking on “Create Instance”.
+
+![Create Instance](/img/guides/quickstart/create_instance.png)
 
 2. Provide a name for your instance and click on the “Continue” button at the bottom of this screen.
 
-![Select Tier](/img/guides/quickstart/v3_10.png)
+![Create Instance Name](/img/guides/quickstart/create_instance_name.png)
 
-3. Next, you should see the following screen. Add a username and password for the instance manager and click "Create".
+3. Next, you should see the following screen. Add a username and password for the instance administrator and click "Create".
 
-![Instance Details](/img/guides/quickstart/v3_11.png)
+![Create Instance Admin](/img/guides/quickstart/create_instance_admin.png)
 
-3. Now you will see the details of your first instance. You can click on "Visit" at the top right to go to your instance.
+3. After creating your first instance, you're ready to configure user authentication. To access the management console, click the 'Sign in to your instance' button.
 
-![Instance Details](/img/guides/quickstart/v3_12.png)
+![Sign In Instance](/img/guides/quickstart/sign_in_instance.png)
 
 6. To log in to your instance, provide the username and password you set in the instance creation, and click “next”.
 
@@ -129,23 +139,33 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 8. And there you go! You now have access to your instance.
 
-![Instance Details](/img/guides/quickstart/v3_16.png)
+![Instance Details](/img/guides/quickstart/instance_dashboard.png)
 
-### 3. Create your first project
+### 4. Create your first project and app
 
-1. To create a project in the instance you just created, click on "Projects" in the navigation and then “Create a project”.
+Because applications are always associated with a project, we'll guide you through setting up both in the following steps.
 
-2. Insert “Project1” (or any name of your choice) as the project’s name and click the “Continue” button.
+1. Click the "Create Application" button or the Framework/Language of your choice on the right side
 
-![Project Name](/img/guides/quickstart/20.png)
+2. Insert “Project1” (or any name of your choice) as the project’s name and select the framework/language of your choice in our case "React" and click the “Continue” button. (If you can't find your framework/languages select "Other")
 
-3. Now you will be taken to the screen below. “Project1” has been created.
+![Project Name and Framework/Language](/img/guides/quickstart/create_project_react.png)
 
-![Project Created](/img/guides/quickstart/21.png)
+3. An overview of the configuration for the framework you have selected is shown
 
-### 4. Add users (optional)
+![Project Configuration Overview - React App](/img/guides/quickstart/project_config_overview_react.png)
 
-[Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the create application step.
+What the configuration does:
+- We recommend using the [Authentication Code Flow](/docs/apis/openidoauth/grant-types#authorization-code) with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#authorization-code) for secure OIDC configuration. This setup includes specific App, Grant, and Response Types, as well as an Authentication Method. More about the different app types can be found [here](/docs/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
+- The redirect URI is where the ZITADEL authorization server redirects the user after they have been authenticated. The "Redirect URI" is preconfigured to [http://localhost:3000/callback](http://localhost:3000/callback) and the “Post Logout URI” to [http://localhost:3000/](http://localhost:3000/) for the React example
+
+4. The detailed configuration of your app will be shown
+
+![Project Name and Framework/Language](/img/guides/quickstart/app_detail_overview_react.png)
+
+### 5. Add users (optional)
+
+[Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the obtain ClientId and OIDC endpoints.
 
 1. To add users, click on “Users” at the top menu. You will see that the user you already created is listed as a user here. Click on the “New” button to create a new user.
 
@@ -163,7 +183,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![User Info](/img/guides/quickstart/29.png)
 
-### 5. Add roles to your project (optional)
+### 6. Add roles to your project (optional)
 
 1. To add roles to your project, click on “Roles” on the left as shown below. Next, click on the “New” button.
 
@@ -181,7 +201,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![Add Role](/img/guides/quickstart/25.png)
 
-### 6. Add authorizations to your project (optional)
+### 7. Add authorizations to your project (optional)
 
 1. Click on “Authorizations” on the top menu.
 
@@ -210,54 +230,6 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 7. You can see that additional roles have been assigned to the users in this updated authorization list and this should now give you an indication of how authorizations work in ZITADEL.
 
 ![Add Authorization](/img/guides/quickstart/37.png)
-
-### 7. Create an application in your project
-
-We will now create an application in the project, which will allow our React client application to access protected resources through the use of the OpenID Connect (OIDC) protocol.
-
-1. Go to “Projects” and click on “Project1”.
-
-![Add Application](/img/guides/quickstart/38.png)
-
-2. Click on “New” to add a new application.
-
-![Add Application](/img/guides/quickstart/39.png)
-
-3. Provide the name of the app as “React-SPA”. Select “User Agent” and click on “Continue”.
-
-![Add Application](/img/guides/quickstart/41.png)
-
-4. Select “PKCE” because we recommend the use of [Authorization Code](/docs/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#authorization-code) for all web applications. More about the different app types can be found [here](/docs/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles). Click on "Continue".
-
-![Add Application](/img/guides/quickstart/42.png)
-
-5. The Redirect URL in your application is where the ZITADEL authorization server redirects the user after they have been authenticated. Set your “Redirect URI” to [http://localhost:3000/callback](http://localhost:3000/callback) and “Post Logout URI” to [http://localhost:3000/](http://localhost:3000/). Click on “Continue”.
-
-![Add Application](/img/guides/quickstart/43.png)
-
-6. Now you will be presented with the details of your application for review. Click on “Create”.
-
-![Add Application](/img/guides/quickstart/44.png)
-
-7. After that, a window will appear showing you your “ClientId”. Click on “Close”.
-
-![Add Application](/img/guides/quickstart/45.png)
-
-8. On the following screen, you may notice some warnings at the top. These warnings are displayed because the URLs for our application are using unsecure HTTP instead of HTTPS. To resolve this, we will need to update our URLs, but there is a workaround to this so that we can continue using HTTP during the development phase.
-
-![Add Application](/img/guides/quickstart/46.png)
-
-9. To proceed with HTTP, go to “Redirect Settings” on the left.
-
-![Add Application](/img/guides/quickstart/47.png)
-
-10. Now activate “Development Mode” as shown below and click “Save”.
-
-![Add Application](/img/guides/quickstart/48.png)
-
-11. Now if you go to “Projects” and “Project1”, you will see the “React-SPA” app listed as an application in the project:
-
-![Add Application](/img/guides/quickstart/50.png)
 
 ### 8. Obtain ClientId and OIDC endpoints for your application {#referred1}
 

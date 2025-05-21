@@ -12,8 +12,7 @@ type Config struct {
 
 type Connector struct {
 	PGXPool
-	Dialect string
-	Config  Config
+	Config Config
 }
 
 func NewConnector(config Config, client *database.DB) *Connector {
@@ -22,7 +21,6 @@ func NewConnector(config Config, client *database.DB) *Connector {
 	}
 	return &Connector{
 		PGXPool: client.Pool,
-		Dialect: client.Type(),
 		Config:  config,
 	}
 }

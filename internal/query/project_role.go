@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -94,7 +93,7 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 
-	query, scan := prepareProjectRolesQuery(ctx, q.client)
+	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
@@ -126,7 +125,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 
-	query, scan := prepareProjectRolesQuery(ctx, q.client)
+	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
@@ -207,7 +206,7 @@ func (q *ProjectRoleSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareProjectRolesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
+func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
 	return sq.Select(
 			ProjectRoleColumnProjectID.identifier(),
 			ProjectRoleColumnCreationDate.identifier(),
@@ -218,7 +217,7 @@ func prepareProjectRolesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			ProjectRoleColumnDisplayName.identifier(),
 			ProjectRoleColumnGroupName.identifier(),
 			countColumn.identifier()).
-			From(projectRolesTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(projectRolesTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*ProjectRoles, error) {
 			projects := make([]*ProjectRole, 0)

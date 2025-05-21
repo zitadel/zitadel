@@ -1,8 +1,7 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import {
-  take,
   map,
   switchMap,
   firstValueFrom,
@@ -12,24 +11,18 @@ import {
   of,
   shareReplay,
   combineLatestWith,
+  EMPTY,
 } from 'rxjs';
-import {
-  containsLowerCaseValidator,
-  containsNumberValidator,
-  containsSymbolValidator,
-  containsUpperCaseValidator,
-  minLengthValidator,
-  passwordConfirmValidator,
-  requiredValidator,
-} from 'src/app/modules/form-field/validators/validators';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { passwordConfirmValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { catchError, filter } from 'rxjs/operators';
-import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { UserService } from '../../../../services/user.service';
+import { UserService } from 'src/app/services/user.service';
+import { User } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { NewAuthService } from 'src/app/services/new-auth.service';
+import { PasswordComplexityPolicy } from '@zitadel/proto/zitadel/policy_pb';
+import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
 
 @Component({
   selector: 'cnsl-password',
@@ -41,34 +34,53 @@ export class PasswordComponent implements OnInit {
   protected readonly username$: Observable<string>;
   protected readonly id$: Observable<string | undefined>;
   protected readonly form$: Observable<UntypedFormGroup>;
-  protected readonly passwordPolicy$: Observable<PasswordComplexityPolicy.AsObject | undefined>;
-  protected readonly user$: Observable<User.AsObject>;
+  protected readonly passwordPolicy$: Observable<PasswordComplexityPolicy | undefined>;
+  protected readonly user$: Observable<User>;
 
   constructor(
-    activatedRoute: ActivatedRoute,
+    private readonly activatedRoute: ActivatedRoute,
     private readonly fb: UntypedFormBuilder,
-    private readonly authService: GrpcAuthService,
     private readonly userService: UserService,
+    private readonly newAuthService: NewAuthService,
     private readonly toast: ToastService,
     private readonly breadcrumbService: BreadcrumbService,
     private readonly destroyRef: DestroyRef,
+    private readonly passwordComplexityValidatorFactory: PasswordComplexityValidatorFactoryService,
   ) {
-    const usernameParam$ = activatedRoute.queryParamMap.pipe(
-      map((params) => params.get('username')),
-      filter(Boolean),
-    );
     this.id$ = activatedRoute.paramMap.pipe(map((params) => params.get('id') ?? undefined));
-
-    this.user$ = this.authService.user.pipe(take(1), filter(Boolean));
-    this.username$ = usernameParam$.pipe(mergeWith(this.user$.pipe(map((user) => user.preferredLoginName))));
-
+    this.user$ = this.getUser().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.username$ = this.getUsername(this.user$);
     this.breadcrumb$ = this.getBreadcrumb$(this.id$, this.user$);
     this.passwordPolicy$ = this.getPasswordPolicy$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    const validators$ = this.getValidators$(this.passwordPolicy$);
-    this.form$ = this.getForm$(this.id$, validators$);
+    this.form$ = this.getForm$(this.id$, this.passwordPolicy$);
   }
 
-  private getBreadcrumb$(id$: Observable<string | undefined>, user$: Observable<User.AsObject>): Observable<Breadcrumb[]> {
+  ngOnInit() {
+    this.breadcrumb$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((breadcrumbs) => {
+      this.breadcrumbService.setBreadcrumb(breadcrumbs);
+    });
+  }
+
+  private getUser() {
+    return this.userService.user$.pipe(
+      catchError((err) => {
+        this.toast.showError(err);
+        return EMPTY;
+      }),
+    );
+  }
+
+  private getUsername(user$: Observable<User>) {
+    const prefferedLoginName$ = user$.pipe(map((user) => user.preferredLoginName));
+
+    return this.activatedRoute.queryParamMap.pipe(
+      map((params) => params.get('username')),
+      filter(Boolean),
+      mergeWith(prefferedLoginName$),
+    );
+  }
+
+  private getBreadcrumb$(id$: Observable<string | undefined>, user$: Observable<User>): Observable<Breadcrumb[]> {
     return id$.pipe(
       switchMap(async (id) => {
         if (id) {
@@ -86,7 +98,7 @@ export class PasswordComponent implements OnInit {
         return [
           new Breadcrumb({
             type: BreadcrumbType.AUTHUSER,
-            name: user.human?.profile?.displayName,
+            name: (user.type.case === 'human' && user.type.value.profile?.displayName) || undefined,
             routerLink: ['/users', 'me'],
           }),
         ];
@@ -94,39 +106,22 @@ export class PasswordComponent implements OnInit {
     );
   }
 
-  private getValidators$(
-    passwordPolicy$: Observable<PasswordComplexityPolicy.AsObject | undefined>,
-  ): Observable<Validators[]> {
-    return passwordPolicy$.pipe(
-      map((policy) => {
-        const validators: Validators[] = [requiredValidator];
-        if (!policy) {
-          return validators;
-        }
-        if (policy.minLength) {
-          validators.push(minLengthValidator(policy.minLength));
-        }
-        if (policy.hasLowercase) {
-          validators.push(containsLowerCaseValidator);
-        }
-        if (policy.hasUppercase) {
-          validators.push(containsUpperCaseValidator);
-        }
-        if (policy.hasNumber) {
-          validators.push(containsNumberValidator);
-        }
-        if (policy.hasSymbol) {
-          validators.push(containsSymbolValidator);
-        }
-        return validators;
+  private getPasswordPolicy$(): Observable<PasswordComplexityPolicy | undefined> {
+    return defer(() => this.newAuthService.getMyPasswordComplexityPolicy()).pipe(
+      map((resp) => resp.policy),
+      catchError((err) => {
+        this.toast.showError(err);
+        return of(undefined);
       }),
     );
   }
 
   private getForm$(
     id$: Observable<string | undefined>,
-    validators$: Observable<Validators[]>,
+    policy$: Observable<PasswordComplexityPolicy | undefined>,
   ): Observable<UntypedFormGroup> {
+    const validators$ = policy$.pipe(map((policy) => this.passwordComplexityValidatorFactory.buildValidators(policy)));
+
     return id$.pipe(
       combineLatestWith(validators$),
       map(([id, validators]) => {
@@ -144,19 +139,6 @@ export class PasswordComponent implements OnInit {
         }
       }),
     );
-  }
-
-  private getPasswordPolicy$(): Observable<PasswordComplexityPolicy.AsObject | undefined> {
-    return defer(() => this.authService.getMyPasswordComplexityPolicy()).pipe(
-      map((resp) => resp.policy),
-      catchError(() => of(undefined)),
-    );
-  }
-
-  ngOnInit() {
-    this.breadcrumb$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((breadcrumbs) => {
-      this.breadcrumbService.setBreadcrumb(breadcrumbs);
-    });
   }
 
   public async setInitialPassword(userId: string, form: UntypedFormGroup): Promise<void> {
@@ -182,7 +164,7 @@ export class PasswordComponent implements OnInit {
     window.history.back();
   }
 
-  public async setPassword(form: UntypedFormGroup, user: User.AsObject): Promise<void> {
+  public async setPassword(form: UntypedFormGroup, user: User): Promise<void> {
     const currentPassword = this.currentPassword(form);
     const newPassword = this.newPassword(form);
 
@@ -192,7 +174,7 @@ export class PasswordComponent implements OnInit {
 
     try {
       await this.userService.setPassword({
-        userId: user.id,
+        userId: user.userId,
         newPassword: {
           password: newPassword.value,
           changeRequired: false,

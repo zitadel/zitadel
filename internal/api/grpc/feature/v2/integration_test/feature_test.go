@@ -159,14 +159,6 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "permission error",
-			args: args{
-				ctx: IamCTX,
-				req: &feature.GetSystemFeaturesRequest{},
-			},
-			wantErr: true,
-		},
-		{
 			name: "nothing set",
 			args: args{
 				ctx: SystemCTX,
@@ -219,7 +211,6 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
 			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
-			assertFeatureFlag(t, tt.want.Actions, got.Actions)
 		})
 	}
 }
@@ -350,14 +341,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "permission error",
-			args: args{
-				ctx: OrgCTX,
-				req: &feature.GetInstanceFeaturesRequest{},
-			},
-			wantErr: true,
-		},
-		{
 			name: "defaults, no inheritance",
 			args: args{
 				ctx: IamCTX,
@@ -390,10 +373,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
-				Actions: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
 			},
 		},
 		{
@@ -403,7 +382,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					LoginDefaultOrg:                     gu.Ptr(true),
 					OidcTriggerIntrospectionProjections: gu.Ptr(false),
 					UserSchema:                          gu.Ptr(true),
-					Actions:                             gu.Ptr(true),
 				})
 				require.NoError(t, err)
 			},
@@ -421,10 +399,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
 				UserSchema: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_INSTANCE,
-				},
-				Actions: &feature.FeatureFlag{
 					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
@@ -458,10 +432,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
 				UserSchema: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
-				Actions: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},

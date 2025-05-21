@@ -13,9 +13,6 @@ type RiverMigrateRepeatable struct {
 }
 
 func (mig *RiverMigrateRepeatable) Execute(ctx context.Context, _ eventstore.Event) error {
-	if mig.client.Type() != "postgres" {
-		return nil
-	}
 	return queue.NewMigrator(mig.client).Execute(ctx)
 }
 

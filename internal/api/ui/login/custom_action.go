@@ -430,7 +430,7 @@ func (l *Login) runPostCreationActions(
 }
 
 func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOption {
-	var accessToken, idToken string
+	var accessToken, idToken, refreshToken string
 	getClaim := func(claim string) interface{} {
 		return nil
 	}
@@ -443,9 +443,11 @@ func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOpt
 			actions.SetFields("idToken", idToken),
 			actions.SetFields("getClaim", getClaim),
 			actions.SetFields("claimsJSON", claimsJSON),
+			actions.SetFields("refreshToken", refreshToken),
 		}
 	}
 	accessToken = tokens.AccessToken
+	refreshToken = tokens.RefreshToken
 	idToken = tokens.IDToken
 	if tokens.IDTokenClaims != nil {
 		getClaim = func(claim string) interface{} {
@@ -464,6 +466,7 @@ func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOpt
 		actions.SetFields("idToken", idToken),
 		actions.SetFields("getClaim", getClaim),
 		actions.SetFields("claimsJSON", claimsJSON),
+		actions.SetFields("refreshToken", refreshToken),
 	}
 }
 

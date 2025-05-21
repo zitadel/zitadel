@@ -19,11 +19,13 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -704,8 +706,9 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 		keyAlgorithm                    crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx        context.Context
-		deviceCode string
+		ctx                  context.Context
+		deviceCode           string
+		backChannelLogoutURI string
 	}
 	tests := []struct {
 		name    string
@@ -724,6 +727,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"device1",
+				"",
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -748,6 +752,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateInitiated),
 		},
@@ -761,6 +766,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-ua1Vo", "Errors.DeviceAuth.NotFound"),
 		},
@@ -789,6 +795,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateExpired),
 		},
@@ -820,6 +827,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateExpired),
 		},
@@ -851,6 +859,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateDenied),
 		},
@@ -888,6 +897,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateDone),
 		},
@@ -951,6 +961,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive"),
 		},
@@ -1030,6 +1041,114 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
+			},
+			want: &OIDCSession{
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason:    domain.TokenReasonAuthRequest,
+				SessionID: "sessionID",
+			},
+		},
+		{
+			name: "approved with backChannelLogout (feature enabled), success",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							deviceauth.NewAddedEvent(
+								ctx,
+								deviceauth.NewAggregate("123", "instance1"),
+								"clientID", "123", "456", time.Now().Add(-time.Minute),
+								[]string{"openid", "offline_access"},
+								[]string{"audience"}, false,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							deviceauth.NewApprovedEvent(ctx,
+								deviceauth.NewAggregate("123", "instance1"),
+								"userID", "org1",
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+								testNow, &language.Afrikaans, &domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+								"sessionID",
+							),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							ctx,
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.English,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilter(), // token lifetime
+					expectPush(
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						sessionlogout.NewBackChannelLogoutRegisteredEvent(context.Background(),
+							&sessionlogout.NewAggregate("sessionID", "instance1").Aggregate,
+							"V2_oidcSessionID",
+							"userID",
+							"clientID",
+							"backChannelLogoutURI",
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
+						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
+						deviceauth.NewDoneEvent(ctx,
+							deviceauth.NewAggregate("123", "instance1"),
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				authz.WithFeatures(ctx, feature.Features{
+					EnableBackChannelLogout: true,
+				}),
+				"123",
+				"backChannelLogoutURI",
 			},
 			want: &OIDCSession{
 				TokenID:           "V2_oidcSessionID-at_accessTokenID",
@@ -1130,6 +1249,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 			},
 			want: &OIDCSession{
 				TokenID:           "V2_oidcSessionID-at_accessTokenID",
@@ -1163,7 +1283,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
-			got, err := c.CreateOIDCSessionFromDeviceAuth(tt.args.ctx, tt.args.deviceCode)
+			got, err := c.CreateOIDCSessionFromDeviceAuth(tt.args.ctx, tt.args.deviceCode, tt.args.backChannelLogoutURI)
 			c.jobs.Wait()
 
 			require.ErrorIs(t, err, tt.wantErr)

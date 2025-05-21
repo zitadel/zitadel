@@ -41,7 +41,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         }
         license: {
             name: "Apache 2.0",
-            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+            url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
         };
     };
     tags: [
@@ -307,6 +307,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: Use [ListCustomDomains](apis/resources/instance_service_v2/instance-service-list-custom-domains.api.mdx) instead to list custom domains
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
@@ -319,10 +320,12 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "List Instance Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running.";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [ListTrustedDomains](apis/resources/instance_service_v2/instance-service-list-trusted-domains.api.mdx) instead to list trusted domains
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
         option (google.api.http) = {
             post: "/trusted_domains/_search";
@@ -335,10 +338,12 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "List Instance Trusted Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [AddTrustedDomain](apis/resources/instance_service_v2/instance-service-add-trusted-domain.api.mdx) instead to add a trusted domain
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
@@ -352,10 +357,12 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "Add an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [RemoveTrustedDomain](apis/resources/instance_service_v2/instance-service-remove-trusted-domain.api.mdx) instead to remove a trusted domain
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             delete: "/trusted_domains/{domain}";
@@ -368,7 +375,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "Remove an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
+            deprecated: true;
         };
     }
 

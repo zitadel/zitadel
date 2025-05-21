@@ -149,33 +149,40 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 	}, nil
 }
 
-func DecodeHook(from, to reflect.Value) (_ interface{}, err error) {
-	if to.Type() != reflect.TypeOf(Config{}) {
-		return from.Interface(), nil
-	}
-
-	config := new(Config)
-	if err = mapstructure.Decode(from.Interface(), config); err != nil {
-		return nil, err
-	}
-
-	configuredDialect := dialect.SelectByConfig(config.Dialects)
-	configs := make([]interface{}, 0, len(config.Dialects)-1)
-
-	for name, dialectConfig := range config.Dialects {
-		if !configuredDialect.Matcher.MatchName(name) {
-			continue
+func DecodeHook(allowCockroach bool) func(from, to reflect.Value) (_ interface{}, err error) {
+	return func(from, to reflect.Value) (_ interface{}, err error) {
+		if to.Type() != reflect.TypeOf(Config{}) {
+			return from.Interface(), nil
 		}
 
-		configs = append(configs, dialectConfig)
-	}
+		config := new(Config)
+		if err = mapstructure.Decode(from.Interface(), config); err != nil {
+			return nil, err
+		}
 
-	config.connector, err = configuredDialect.Matcher.Decode(configs)
-	if err != nil {
-		return nil, err
-	}
+		configuredDialect := dialect.SelectByConfig(config.Dialects)
+		configs := make([]any, 0, len(config.Dialects))
 
-	return config, nil
+		for name, dialectConfig := range config.Dialects {
+			if !configuredDialect.Matcher.MatchName(name) {
+				continue
+			}
+
+			configs = append(configs, dialectConfig)
+		}
+
+		if !allowCockroach && configuredDialect.Matcher.Type() == dialect.DatabaseTypeCockroach {
+			logging.Info("Cockroach support was removed with Zitadel v3, please refer to https://zitadel.com/docs/self-hosting/manage/cli/mirror to migrate your data to postgres")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "DATAB-0pIWD", "Cockroach support was removed with Zitadel v3")
+		}
+
+		config.connector, err = configuredDialect.Matcher.Decode(configs)
+		if err != nil {
+			return nil, err
+		}
+
+		return config, nil
+	}
 }
 
 func (c Config) DatabaseName() string {
@@ -190,7 +197,7 @@ func (c Config) Password() string {
 	return c.connector.Password()
 }
 
-func (c Config) Type() string {
+func (c Config) Type() dialect.DatabaseType {
 	return c.connector.Type()
 }
 

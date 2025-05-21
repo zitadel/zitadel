@@ -1288,7 +1288,6 @@ func Test_push(t *testing.T) {
 			},
 		},
 	}
-	initPushStmt("postgres")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbMock := mock.NewSQLMock(t, append([]mock.Expectation{mock.ExpectBegin(nil)}, tt.args.expectations...)...)
@@ -1297,9 +1296,7 @@ func Test_push(t *testing.T) {
 				t.Errorf("unexpected error in begin: %v", err)
 				t.FailNow()
 			}
-			s := Storage{
-				pushPositionStmt: initPushStmt("postgres"),
-			}
+			s := Storage{}
 			err = s.push(context.Background(), tx, tt.args.reducer, tt.args.commands)
 			tt.want.assertErr(t, err)
 			dbMock.Assert(t)

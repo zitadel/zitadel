@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/cockroach"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -65,7 +65,7 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
 				},
 				args: []any{
 					"instance",
@@ -114,8 +114,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
-					"($11, $12, $13, $14, $15, $16, $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $20)",
 				},
 				args: []any{
 					// first event
@@ -180,8 +180,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
-					"($11, $12, $13, $14, $15, $16, $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $20)",
 				},
 				args: []any{
 					// first event
@@ -236,7 +236,7 @@ func Test_mapCommands(t *testing.T) {
 			}
 		}
 		// is used to set the the [pushPlaceholderFmt]
-		NewEventstore(&database.DB{Database: new(cockroach.Config)})
+		NewEventstore(&database.DB{Database: new(postgres.Config)})
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				cause := recover()

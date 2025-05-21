@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddHumanUserRequestSchema,
@@ -70,54 +70,62 @@ import { ObjectDetails } from '../proto/generated/zitadel/object_pb';
 import { Timestamp } from '../proto/generated/google/protobuf/timestamp_pb';
 import { HumanPhone, HumanPhoneSchema } from '@zitadel/proto/zitadel/user/v2/phone_pb';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { firstValueFrom, Observable, shareReplay } from 'rxjs';
-import { filter, map, startWith, tap, timeout } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, EMPTY, Observable, of, ReplaySubject, shareReplay, switchAll, switchMap } from 'rxjs';
+import { catchError, filter, map, startWith } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  private readonly userId$: Observable<string>;
-  private user: UserV2 | undefined;
+  private user$$ = new ReplaySubject<Observable<UserV2>>(1);
+  public user$ = this.user$$.pipe(
+    startWith(this.getUser()),
+    // makes sure if many subscribers reset the observable only one wins
+    debounceTime(10),
+    switchAll(),
+    catchError((err) => {
+      // reset user observable on error
+      this.user$$.next(this.getUser());
+      throw err;
+    }),
+  );
 
   constructor(
     private readonly grpcService: GrpcService,
     private readonly oauthService: OAuthService,
-    destroyRef: DestroyRef,
-  ) {
-    this.userId$ = this.getUserId().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-
-    // this preloads the userId and deletes the cache everytime the userId changes
-    this.userId$.pipe(takeUntilDestroyed(destroyRef)).subscribe(async () => {
-      this.user = undefined;
-      try {
-        await this.getMyUser();
-      } catch (error) {
-        console.warn(error);
-      }
-    });
-  }
+  ) {}
 
   private getUserId() {
     return this.oauthService.events.pipe(
       filter((event) => event.type === 'token_received'),
-      startWith(this.oauthService.getIdToken),
       map(() => this.oauthService.getIdToken()),
+      startWith(this.oauthService.getIdToken()),
       filter(Boolean),
-      // split jwt and get base64 encoded payload
-      map((token) => token.split('.')[1]),
-      // decode payload
-      map(atob),
-      // parse payload
-      map((payload) => JSON.parse(payload)),
-      map((payload: unknown) => {
-        // check if sub is in payload and is a string
-        if (payload && typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string') {
-          return payload.sub;
+      switchMap((token) => {
+        // we do this in a try catch so the observable will retry this logic if it fails
+        try {
+          // split jwt and get base64 encoded payload
+          const unparsedPayload = atob(token.split('.')[1]);
+          // parse payload
+          const payload: unknown = JSON.parse(unparsedPayload);
+          // check if sub is in payload and is a string
+          if (payload && typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string') {
+            return of(payload.sub);
+          }
+          return EMPTY;
+        } catch {
+          return EMPTY;
         }
-        throw new Error('Invalid payload');
       }),
+    );
+  }
+
+  private getUser() {
+    return this.getUserId().pipe(
+      switchMap((id) => this.getUserById(id)),
+      map((resp) => resp.user),
+      filter(Boolean),
+      shareReplay({ refCount: true, bufferSize: 1 }),
     );
   }
 
@@ -127,20 +135,6 @@ export class UserService {
 
   public listUsers(req: MessageInitShape<typeof ListUsersRequestSchema>): Promise<ListUsersResponse> {
     return this.grpcService.userNew.listUsers(req);
-  }
-
-  public async getMyUser(): Promise<UserV2> {
-    const userId = await firstValueFrom(this.userId$.pipe(timeout(2000)));
-    if (this.user) {
-      return this.user;
-    }
-    const resp = await this.getUserById(userId);
-    if (!resp.user) {
-      throw new Error("Couldn't find user");
-    }
-
-    this.user = resp.user;
-    return resp.user;
   }
 
   public getUserById(userId: string): Promise<GetUserByIDResponse> {

@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Folyamatok",
         "DESCRIPTION": "Válassz egy hitelesítési folyamatot, és váltasd ki a műveletedet egy adott esemény bekövetkezésekor ebben a folyamatban."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Az Actions V2, az Actions új, továbbfejlesztett verziója mostantól elérhető. A jelenlegi verzió továbbra is elérhető, de a jövőbeli fejlesztéseink az új verzióra összpontosítanak, amely végül felváltja a jelenlegi verziót."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "Tétlen Frissítő Token",
           "DESCRIPTION": "A tétlen frissítő token élettartama az a maximális idő, ameddig a frissítő token használaton kívül maradhat."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Kezelje az OIDC Webkulcsokat, hogy biztonságosan aláírja és érvényesítse a tokeneket a ZITADEL példányában.",
+        "TABLE": {
+          "TITLE": "Aktív és Jövőbeli Webkulcsok",
+          "DESCRIPTION": "Az aktív és közelgő webkulcsai. Egy új kulcs aktiválása deaktiválja az aktuálisat.",
+          "NOTE": "Megjegyzés: A JWKs OIDC végpont egy gyorsítótárazható választ ad vissza (alapértelmezett: 5 perc). Kerülje a kulcs túl korai aktiválását, mivel lehet, hogy még nem érhető el a gyorsítótárakban és a klienseknél.",
+          "ACTIVATE": "Következő Webkulcs aktiválása",
+          "ACTIVE": "Jelenleg aktív",
+          "NEXT": "Következő a sorban",
+          "FUTURE": "Jövőbeli",
+          "WARNING": "A webkulcs kevesebb mint 5 perces"
+        },
+        "CREATE": {
+          "TITLE": "Új Webkulcs létrehozása",
+          "DESCRIPTION": "Egy új webkulcs létrehozása hozzáadja azt a listájához. A ZITADEL alapértelmezés szerint RSA2048 kulcsokat használ SHA256 hasheléssel.",
+          "KEY_TYPE": "Kulcstípus",
+          "BITS": "Bitek",
+          "HASHER": "Hasher",
+          "CURVE": "Görbe"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Korábbi Webkulcsok",
+          "DESCRIPTION": "Ezek a korábbi webkulcsai, amelyek már nem aktívak.",
+          "DEACTIVATED_ON": "Deaktiválva ekkor"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "Letöltés",
     "APPLY": "Alkalmaz"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Jelenleg az új Actions V2-t használja, amely béta verzióban van. Az előző 1-es verzió továbbra is elérhető, de a jövőben megszűnik. Kérjük, jelezze az esetleges problémákat vagy visszajelzéseit.",
+    "EXECUTION": {
+      "TITLE": "Műveletek",
+      "DESCRIPTION": "A műveletek lehetővé teszik egyedi kód futtatását API-kérésekre, eseményekre vagy konkrét függvényekre válaszul. Használja őket a Zitadel kiterjesztéséhez, a munkafolyamatok automatizálásához és más rendszerekkel való integrációhoz.",
+      "TYPES": {
+        "request": "Kérés",
+        "response": "Válasz",
+        "event": "Események",
+        "function": "Függvény"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Művelet létrehozása",
+        "UPDATE_TITLE": "Művelet frissítése",
+        "TYPE": {
+          "DESCRIPTION": "Válassza ki, mikor szeretné futtatni ezt a műveletet",
+          "REQUEST": {
+            "TITLE": "Kérés",
+            "DESCRIPTION": "A Zitadelen belül előforduló kérések. Ez lehet például egy bejelentkezési kérés hívása."
+          },
+          "RESPONSE": {
+            "TITLE": "Válasz",
+            "DESCRIPTION": "Válasz egy Zitadelen belüli kérésre. Gondoljon arra a válaszra, amelyet egy felhasználó lekérésekor kap."
+          },
+          "EVENTS": {
+            "TITLE": "Események",
+            "DESCRIPTION": "A Zitadelen belül zajló események. Ez bármi lehet, például egy felhasználó fiók létrehozása, sikeres bejelentkezés stb."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Függvények",
+            "DESCRIPTION": "Függvények, amelyeket a Zitadelen belül hívhat. Ez bármi lehet, az e-mail küldésétől a felhasználó létrehozásáig."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Válassza ki, hogy ez a művelet vonatkozik-e minden kérésre, egy adott szolgáltatásra (pl. felhasználókezelés) vagy egyetlen kérésre (pl. felhasználó létrehozása).",
+          "ALL": {
+            "TITLE": "Összes",
+            "DESCRIPTION": "Válassza ezt, ha minden kérésnél futtatni szeretné a műveletet"
+          },
+          "ALL_EVENTS": "Válaszd ezt, ha minden eseménynél futtatni szeretnéd a műveletet",
+          "SELECT_SERVICE": {
+            "TITLE": "Szolgáltatás kiválasztása",
+            "DESCRIPTION": "Válasszon egy Zitadel szolgáltatást a művelethez."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Módszer kiválasztása",
+            "DESCRIPTION": "Ha csak egy adott kérésnél szeretne futtatni, válassza ki itt",
+            "NOTE": "Ha nem választ módszert, a művelet minden kérésnél futni fog a kiválasztott szolgáltatásban."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Függvénynév",
+            "DESCRIPTION": "Válassza ki a futtatni kívánt függvényt"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Csoport beállítása",
+            "DESCRIPTION": "Ha csak események egy csoportján szeretne futtatni, állítsa be itt a csoportot"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Esemény kiválasztása",
+            "DESCRIPTION": "Ha csak egy adott eseményen szeretne futtatni, adja meg itt"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Választhat, hogy futtat egy célt, vagy ugyanazokkal a feltételekkel futtatja, mint más célokat.",
+          "TARGET": {
+            "DESCRIPTION": "A cél, amelyet futtatni szeretne ehhez a művelethez"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Végrehajtási feltételek"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Feltétel",
+        "TYPE": "Típus",
+        "TARGET": "Cél",
+        "CREATIONDATE": "Létrehozás dátuma"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Célok",
+      "DESCRIPTION": "A cél annak a kódnak a célja, amelyet egy műveletből szeretne futtatni. Hozzon létre itt egy célt, és adja hozzá a műveleteihez.",
+      "CREATE": {
+        "TITLE": "Cél létrehozása",
+        "DESCRIPTION": "Hozza létre saját célját a Zitadelen kívül",
+        "NAME": "Név",
+        "NAME_DESCRIPTION": "Adjon a céljának egy világos, leíró nevet, hogy később könnyen azonosítható legyen",
+        "TYPE": "Típus",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Hívás",
+          "restAsync": "REST Aszinkron"
+        },
+        "TYPES_DESCRIPTION": "Webhook, a hívás kezeli az állapotkódot, de a válasz lényegtelen\nCall, a hívás kezeli az állapotkódot és a választ\nAsync, a hívás sem az állapotkódot, sem a választ nem kezeli, de párhuzamosan hívható más célokkal",
+        "ENDPOINT": "Végpont",
+        "ENDPOINT_DESCRIPTION": "Adja meg azt a végpontot, ahol a kódja található. Győződjön meg arról, hogy elérhető számunkra!",
+        "TIMEOUT": "Időtúllépés",
+        "TIMEOUT_DESCRIPTION": "Állítsa be a maximális időt, amíg a céljának válaszolnia kell. Ha tovább tart, leállítjuk a kérést.",
+        "INTERRUPT_ON_ERROR": "Hiba esetén megszakítás",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Állítsa le az összes végrehajtást, ha a célok hibát adnak vissza",
+        "INTERRUPT_ON_ERROR_WARNING": "Figyelem: Az „Hiba esetén megszakítás” funkció leállítja a műveleteket hiba esetén, ami kizáráshoz vezethet. Tesztelje kikapcsolt állapotban a bejelentkezés/létrehozás blokkolásának elkerülése érdekében.",
+        "AWAIT_RESPONSE": "Válaszra várás",
+        "AWAIT_RESPONSE_DESCRIPTION": "Megvárjuk a választ, mielőtt bármi mást tennénk. Hasznos, ha több célt szeretne használni egyetlen művelethez"
+      },
+      "TABLE": {
+        "NAME": "Név",
+        "ENDPOINT": "Végpont",
+        "CREATIONDATE": "Létrehozás dátuma",
+        "REORDER": "Újrarendelés"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Teljes irányítása van az egész példány felett, beleértve minden szervezetet",
     "IAM_OWNER_VIEWER": "Jogosultsága van az egész példány átnézésére, beleértve minden szervezetet",
@@ -509,6 +648,7 @@
     "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
     "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
     "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
+    "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési kliensek kezelésére",
     "ORG_OWNER": "Engedélye van az egész szervezet fölött",
     "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
@@ -553,6 +693,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Felhasználói Név",
     "ORGNAME": "Szervezet Neve",
+    "ORGID": "Szervezet ID",
     "PRIMARYDOMAIN": "Elsődleges Domain",
     "PROJECTNAME": "Projekt Neve",
     "RESOURCEOWNER": "Erőforrás Tulajdonos",
@@ -789,7 +930,10 @@
       "PHONESECTION": "Telefonszámok",
       "PASSWORDSECTION": "Kezdeti jelszó",
       "ADDRESSANDPHONESECTION": "Telefonszám",
-      "INITMAILDESCRIPTION": "Ha mindkét opció ki van választva, nem kerül kiküldésre inicializáló e-mail. Ha csak az egyik opció van kiválasztva, egy e-mailt küldünk az adatok megadására / ellenőrzésére."
+      "INITMAILDESCRIPTION": "Ha mindkét opció ki van választva, nem kerül kiküldésre inicializáló e-mail. Ha csak az egyik opció van kiválasztva, egy e-mailt küldünk az adatok megadására / ellenőrzésére.",
+      "SETUPAUTHENTICATIONLATER": "Állítsa be később az autentikációt ehhez a felhasználóhoz.",
+      "INVITATION": "Küldjön meghívó e-mailt az autentikáció beállításához és az e-mail hitelesítéséhez.",
+      "INITIALPASSWORD": "Állítson be egy kezdeti jelszót a felhasználónak."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonszám ellenőrzése",
@@ -1353,6 +1497,7 @@
       "BRANDING": "Márkaépítés",
       "PRIVACYPOLICY": "Külső hivatkozások",
       "OIDC": "OIDC token élettartam és lejárat",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Titokgenerátor",
       "SECURITY": "Biztonsági beállítások",
       "EVENTS": "Események",
@@ -1368,7 +1513,8 @@
       "APPEARANCE": "Megjelenés",
       "OTHER": "Egyéb",
       "STORAGE": "Tárolás"
-    }
+    },
+    "BETA": "BÉTA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1488,6 +1634,16 @@
       "ACTIONS_DESCRIPTION": "A Műveletek v2 lehetővé teszik az adat futtatások és célok kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Egyedüli V1 Munkamenet Befejezése",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ha a zászló engedélyezve van, képes leszel egyetlen munkamenetet megszüntetni a bejelentkezési UI-ben, ha egy id_tokent biztosítasz egy `sid` claim-mel mint id_token_hint az end_session végpontnál. Megjegyzendő, hogy jelenleg az összes munkamenet ugyanabból a felhasználói ügynökből (böngésző) leállításra kerül a bejelentkezési UI-ben. A Session API-val kezelt munkamenetek már lehetővé teszik egyes munkamenetek megszüntetését.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ha a zászló engedélyezve van, az OIDC szülő hiba naplózva lesz a konzolban.",
+      "DISABLEUSERTOKENEVENT": "Felhasználói token esemény letiltása",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout engedélyezése",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az ügyfelek értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
+      "PERMISSIONCHECKV2": "Engedély ellenőrzés V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
+      "WEBKEY": "Webkulcs",
+      "WEBKEY_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
       "STATES": {
         "INHERITED": "Örököl",
         "ENABLED": "Engedélyezve",
@@ -1500,7 +1656,10 @@
       },
       "RESET": "Mindent állíts öröklésre",
       "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a konzolban felhasználók létrehozásához",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak.",
+      "LOGINV2": "Bejelentkezés V2",
+      "LOGINV2_DESCRIPTION": "Ennek engedélyezésével aktiválódik az új, TypeScript-alapú bejelentkezési felület, amely jobb biztonságot, teljesítményt és testreszabhatóságot nyújt.",
+      "LOGINV2_BASEURI": "Alap URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1990,6 +2149,7 @@
       "ACTIVATE": "Projekt aktiválása",
       "DELETE": "Projekt törlése",
       "ORGNAME": "Szervezet neve",
+      "ORGID": "Szervezet ID",
       "ORGDOMAIN": "Szervezet domainje",
       "STATE": "Státusz",
       "TYPE": "Típus",

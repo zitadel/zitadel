@@ -24,13 +24,11 @@
   <div class="max-width-container">
     <cnsl-meta-layout *ngIf="user(userQuery) as user">
       <cnsl-sidenav
-        *ngIf="currentSetting$ | async as currentSetting"
-        [ngModel]="currentSetting"
-        (ngModelChange)="goToSetting($event)"
+        [setting]="currentSetting$()"
+        (settingChange)="currentSetting$.set($event)"
         [settingsList]="settingsList"
-        queryParam="id"
       >
-        <ng-container *ngIf="currentSetting === 'general' && humanUser(userQuery) as humanUser">
+        <ng-container *ngIf="currentSetting$().id === 'general' && humanUser(userQuery) as humanUser">
           <cnsl-card
             *ngIf="humanUser.type.value.profile as profile"
             class="app-card"
@@ -91,11 +89,11 @@
           </ng-template>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'idp'">
+        <ng-container *ngIf="currentSetting$().id === 'idp'">
           <cnsl-external-idps [userId]="user.userId" [service]="grpcAuthService"></cnsl-external-idps>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'security'">
+        <ng-container *ngIf="currentSetting$().id === 'security'">
           <cnsl-card *ngIf="humanUser(userQuery) as humanUser" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
             <div class="contact-method-col">
               <div class="contact-method-row">
@@ -127,7 +125,7 @@
           ></cnsl-auth-user-mfa>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'grants'">
+        <ng-container *ngIf="currentSetting$().id === 'grants'">
           <cnsl-card title="{{ 'GRANTS.USER.TITLE' | translate }}" description="{{ 'GRANTS.USER.DESCRIPTION' | translate }}">
             <cnsl-user-grants
               [userId]="user.userId"
@@ -149,7 +147,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'memberships'">
+        <ng-container *ngIf="currentSetting$().id === 'memberships'">
           <cnsl-card
             title="{{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
             description="{{ 'USER.MEMBERSHIPS.DESCRIPTION' | translate }}"
@@ -158,7 +156,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'metadata' && (metadata$ | async) as metadataQuery">
+        <ng-container *ngIf="currentSetting$().id === 'metadata' && (metadata$ | async) as metadataQuery">
           <cnsl-metadata
             *ngIf="metadataQuery.state !== 'error'"
             [metadata]="metadataQuery.value"

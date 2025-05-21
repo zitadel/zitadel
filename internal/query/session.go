@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -112,6 +111,24 @@ func sessionCheckPermission(ctx context.Context, resourceOwner string, creator s
 	}
 	// default, check for permission on instance
 	return permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, "")
+}
+
+func sessionsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		SessionColumnResourceOwner,
+		domain.PermissionSessionRead,
+		// Allow if user is creator
+		OwnedRowsPermissionOption(SessionColumnCreator),
+		// Allow if session belongs to the user
+		OwnedRowsPermissionOption(SessionColumnUserID),
+		// Allow if session belongs to the same useragent
+		ConnectionPermissionOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
+	)
+	return query.JoinClause(join, args...)
 }
 
 func (q *SessionsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -261,7 +278,7 @@ func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id st
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareSessionQuery(ctx, q.client)
+	query, scan := prepareSessionQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			SessionColumnID.identifier():         id,
@@ -283,21 +300,23 @@ func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id st
 }
 
 func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheck domain.PermissionCheck) (*Sessions, error) {
-	sessions, err := q.searchSessions(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	sessions, err := q.searchSessions(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
+	if permissionCheck != nil && !permissionCheckV2 {
 		sessionsCheckPermission(ctx, sessions, permissionCheck)
 	}
 	return sessions, nil
 }
 
-func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
+func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheckV2 bool) (sessions *Sessions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSessionsQuery(ctx, q.client)
+	query, scan := prepareSessionsQuery()
+	query = sessionsPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -343,7 +362,7 @@ func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (Sear
 	return NewTimestampQuery(SessionColumnCreationDate, datetime, compare)
 }
 
-func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
+func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -374,7 +393,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
 			session := new(Session)
 
@@ -456,7 +475,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error)) {
+func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -487,7 +506,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
 			sessions := &Sessions{Sessions: []*Session{}}
 

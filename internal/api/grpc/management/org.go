@@ -50,7 +50,6 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
 		AwaitOpenTransactions().
@@ -330,7 +329,7 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, or
 		}
 		queries = append(queries, owner)
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, orgID, nil)
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func TestCRDB_Push_OneAggregate(t *testing.T) {
+func TestEventstore_Push_OneAggregate(t *testing.T) {
 	type args struct {
 		ctx                  context.Context
 		commands             []eventstore.Command
@@ -202,7 +202,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					}
 				}
 				if _, err := db.Push(tt.args.ctx, tt.args.commands...); (err != nil) != tt.res.wantErr {
-					t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
+					t.Errorf("eventstore.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 				}
 
 				assertEventCount(t,
@@ -218,7 +218,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 	}
 }
 
-func TestCRDB_Push_MultipleAggregate(t *testing.T) {
+func TestEventstore_Push_MultipleAggregate(t *testing.T) {
 	type args struct {
 		commands []eventstore.Command
 	}
@@ -312,7 +312,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 					},
 				)
 				if _, err := db.Push(context.Background(), tt.args.commands...); (err != nil) != tt.res.wantErr {
-					t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
+					t.Errorf("eventstore.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 				}
 
 				assertEventCount(t, clients[pusherName], tt.res.eventsRes.aggType, tt.res.eventsRes.aggID, tt.res.eventsRes.pushedEventsCount)
@@ -321,7 +321,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 }
 
-func TestCRDB_Push_Parallel(t *testing.T) {
+func TestEventstore_Push_Parallel(t *testing.T) {
 	type args struct {
 		commands [][]eventstore.Command
 	}
@@ -453,7 +453,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	}
 }
 
-func TestCRDB_Push_ResourceOwner(t *testing.T) {
+func TestEventstore_Push_ResourceOwner(t *testing.T) {
 	type args struct {
 		commands []eventstore.Command
 	}
@@ -587,7 +587,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 
 				events, err := db.Push(context.Background(), tt.args.commands...)
 				if err != nil {
-					t.Errorf("CRDB.Push() error = %v", err)
+					t.Errorf("eventstore.Push() error = %v", err)
 				}
 
 				if len(events) != len(tt.res.resourceOwners) {

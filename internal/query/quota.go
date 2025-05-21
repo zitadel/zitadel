@@ -62,7 +62,7 @@ type Quota struct {
 func (q *Queries) GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (qu *Quota, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	query, scan := prepareQuotaQuery(ctx, q.client)
+	query, scan := prepareQuotaQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			QuotaColumnInstanceID.identifier(): instanceID,
@@ -79,7 +79,7 @@ func (q *Queries) GetQuota(ctx context.Context, instanceID string, unit quota.Un
 	return qu, err
 }
 
-func prepareQuotaQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Quota, error)) {
+func prepareQuotaQuery() (sq.SelectBuilder, func(*sql.Row) (*Quota, error)) {
 	return sq.
 			Select(
 				QuotaColumnID.identifier(),

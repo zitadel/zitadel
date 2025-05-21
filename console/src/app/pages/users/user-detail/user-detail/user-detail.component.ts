@@ -1,12 +1,11 @@
-import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, OnInit } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnInit, signal } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { catchError, filter, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, startWith, take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -39,7 +38,7 @@ import {
   combineLatestWith,
   defer,
   EMPTY,
-  fromEvent,
+  identity,
   mergeWith,
   Observable,
   ObservedValueOf,
@@ -79,6 +78,7 @@ type MetadataQuery =
 
 type UserWithHumanType = Omit<UserV2, 'type'> & { type: { case: 'human'; value: HumanUser } };
 
+// todo: figure out why media matcher is needed
 @Component({
   selector: 'cnsl-user-detail',
   templateUrl: './user-detail.component.html',
@@ -98,7 +98,7 @@ export class UserDetailComponent implements OnInit {
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
   public InfoSectionType: any = InfoSectionType;
 
-  public currentSetting$: Observable<string | undefined>;
+  public currentSetting$ = signal<SidenavSetting>(GENERAL);
   public settingsList$: Observable<SidenavSetting[]>;
   public metadata$: Observable<MetadataQuery>;
   public loginPolicy$: Observable<LoginPolicy>;
@@ -111,7 +111,6 @@ export class UserDetailComponent implements OnInit {
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
-    private mediaMatcher: MediaMatcher,
     public langSvc: LanguagesService,
     private readonly userService: UserService,
     private readonly newMgmtService: NewMgmtService,
@@ -126,9 +125,8 @@ export class UserDetailComponent implements OnInit {
       }),
     ]);
 
-    this.currentSetting$ = this.getCurrentSetting$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.settingsList$ = this.getSettingsList$(this.user$);
+    this.settingsList$ = this.getSettingsList$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.metadata$ = this.getMetadata$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
@@ -177,31 +175,6 @@ export class UserDetailComponent implements OnInit {
     );
   }
 
-  private getCurrentSetting$(): Observable<string | undefined> {
-    const mediaq: string = '(max-width: 500px)';
-    const matcher = this.mediaMatcher.matchMedia(mediaq);
-    const small$ = fromEvent(matcher, 'change', ({ matches }: MediaQueryListEvent) => matches).pipe(
-      startWith(matcher.matches),
-    );
-
-    return this.route.queryParamMap.pipe(
-      map((params) => params.get('id')),
-      filter(Boolean),
-      startWith('general'),
-      withLatestFrom(small$),
-      map(([id, small]) => (small ? undefined : id)),
-    );
-  }
-
-  public async goToSetting(setting: string) {
-    await this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { id: setting },
-      queryParamsHandling: 'merge',
-      skipLocationChange: true,
-    });
-  }
-
   private getUserById(userId: string): Observable<UserQuery> {
     return defer(() => this.userService.getUserById(userId)).pipe(
       map(({ user }) => {
@@ -244,6 +217,20 @@ export class UserDetailComponent implements OnInit {
         this.toast.showError(query.value);
       }
     });
+
+    const param = this.route.snapshot.queryParamMap.get('id');
+    if (!param) {
+      return;
+    }
+
+    this.settingsList$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((settings) => settings.find(({ id }) => id === param)),
+        filter(Boolean),
+        take(1),
+      )
+      .subscribe((setting) => this.currentSetting$.set(setting));
   }
 
   public changeUsername(user: UserV2): void {

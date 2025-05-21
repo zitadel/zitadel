@@ -789,7 +789,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// if there's an active (human) user, let's use it
 	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).IsEnabled() {
-		request.SetUserInfo(user.ID, loginNameInput, user.PreferredLoginName, "", "", user.ResourceOwner)
+		request.SetUserInfo(user.ID, loginNameInput, preferredLoginName, "", "", user.ResourceOwner)
 		return nil
 	}
 	// the user was either not found or not active
@@ -1054,9 +1054,6 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
 		return nil, err
-	}
-	if user.PreferredLoginName != "" {
-		request.LoginName = user.PreferredLoginName
 	}
 	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
 	if err != nil {

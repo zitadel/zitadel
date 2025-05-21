@@ -96,7 +96,7 @@ func (q *Queries) GetUserSchemaByID(ctx context.Context, id string) (userSchema 
 	}
 
 	query, scan := prepareUserSchemaQuery()
-	return genericRowQuery[*UserSchema](ctx, q.client, query.Where(eq), scan)
+	return genericRowQuery(ctx, q.client, query.Where(eq), scan)
 }
 
 func (q *Queries) SearchUserSchema(ctx context.Context, queries *UserSchemaSearchQueries) (userSchemas *UserSchemas, err error) {
@@ -108,7 +108,7 @@ func (q *Queries) SearchUserSchema(ctx context.Context, queries *UserSchemaSearc
 	}
 
 	query, scan := prepareUserSchemasQuery()
-	return genericRowsQueryWithState[*UserSchemas](ctx, q.client, userSchemaTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	return genericRowsQueryWithState(ctx, q.client, userSchemaTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *UserSchemaSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {

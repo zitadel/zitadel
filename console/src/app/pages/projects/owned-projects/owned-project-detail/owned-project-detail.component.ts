@@ -1,7 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
@@ -12,8 +11,7 @@ import { ProjectPrivateLabelingDialogComponent } from 'src/app/modules/project-p
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { App } from 'src/app/proto/generated/zitadel/app_pb';
-import { ListAppsResponse, UpdateProjectRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { UpdateProjectRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { PrivateLabelingSetting, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -21,7 +19,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { NameDialogComponent } from '../../../../modules/name-dialog/name-dialog.component';
+import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 
 const ROUTEPARAM = 'projectid';
 
@@ -38,11 +36,6 @@ const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'MENU.GRANTS' };
 export class OwnedProjectDetailComponent implements OnInit {
   public projectId: string = '';
   public project?: Project.AsObject;
-
-  public pageSizeApps: number = 10;
-  public appsDataSource: MatTableDataSource<App.AsObject> = new MatTableDataSource<App.AsObject>();
-  public appsResult!: ListAppsResponse.AsObject;
-  public appsColumns: string[] = ['name'];
 
   public ProjectState: any = ProjectState;
   public ChangeType: any = ChangeType;
@@ -61,22 +54,25 @@ export class OwnedProjectDetailComponent implements OnInit {
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
   public settingsList: SidenavSetting[] = [GENERAL, ROLES, PROJECTGRANTS, GRANTS];
-  public currentSetting: string = '';
+  public currentSetting = this.settingsList[0];
+
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private mgmtService: ManagementService,
-    private _location: Location,
     private dialog: MatDialog,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
   ) {
-    this.currentSetting = 'general';
-    route.queryParams.pipe(take(1)).subscribe((params: Params) => {
-      const { id } = params;
-      if (id) {
-        this.currentSetting = id;
+    route.queryParamMap.pipe(take(1)).subscribe((params) => {
+      const id = params.get('id');
+      if (!id) {
+        return;
+      }
+      const setting = this.settingsList.find((setting) => setting.id === id);
+      if (setting) {
+        this.currentSetting = setting;
       }
     });
   }
@@ -85,7 +81,7 @@ export class OwnedProjectDetailComponent implements OnInit {
     const projectId = this.route.snapshot.paramMap.get(ROUTEPARAM);
     if (projectId) {
       this.projectId = projectId;
-      this.getData(projectId);
+      this.getData(projectId).then();
     }
   }
 
@@ -249,7 +245,7 @@ export class OwnedProjectDetailComponent implements OnInit {
             const params: Params = {
               deferredReload: true,
             };
-            this.router.navigate(['/projects'], { queryParams: params });
+            this.router.navigate(['/projects'], { queryParams: params }).then();
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -278,10 +274,6 @@ export class OwnedProjectDetailComponent implements OnInit {
           this.toast.showError(error);
         });
     }
-  }
-
-  public navigateBack(): void {
-    this._location.back();
   }
 
   public updateName(): void {
@@ -323,7 +315,7 @@ export class OwnedProjectDetailComponent implements OnInit {
 
   public showDetail(): void {
     if (this.project) {
-      this.router.navigate(['projects', this.project.id, 'members']);
+      this.router.navigate(['projects', this.project.id, 'members']).then();
     }
   }
 }

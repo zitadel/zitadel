@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Vyberte proces autentizace a spusťte vaši akci na konkrétní události v rámci tohoto procesu."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, nová a vylepšená verze Actions, je nyní k dispozici. Aktuální verze je stále přístupná, ale budoucí vývoj se zaměří na novou verzi, která nakonec nahradí tu současnou."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "Nečinný Refresh Token",
           "DESCRIPTION": "Životnost nečinného refresh tokenu je maximální doba, po kterou může být refresh token nepoužitý."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Spravujte své OIDC webové klíče pro bezpečné podepisování a ověřování tokenů ve vaší instanci ZITADEL.",
+        "TABLE": {
+          "TITLE": "Aktivní a budoucí webové klíče",
+          "DESCRIPTION": "Vaše aktivní a nadcházející webové klíče. Aktivací nového klíče dojde k deaktivaci aktuálního.",
+          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a klientům.",
+          "ACTIVATE": "Aktivovat další webový klíč",
+          "ACTIVE": "Aktuálně aktivní",
+          "NEXT": "Další v řadě",
+          "FUTURE": "Budoucí",
+          "WARNING": "Webový klíč je starý méně než 5 minut"
+        },
+        "CREATE": {
+          "TITLE": "Vytvořit nový webový klíč",
+          "DESCRIPTION": "Vytvořením nového webového klíče jej přidáte do svého seznamu. ZITADEL používá klíče RSA2048 s hashováním SHA256 jako výchozí.",
+          "KEY_TYPE": "Typ klíče",
+          "BITS": "Bity",
+          "HASHER": "Hasher",
+          "CURVE": "Křivka"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Předchozí webové klíče",
+          "DESCRIPTION": "Toto jsou vaše předchozí webové klíče, které již nejsou aktivní.",
+          "DEACTIVATED_ON": "Deaktivováno dne"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "Stáhnout",
     "APPLY": "Platit"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Aktuálně používáte novou verzi Actions V2, která je v beta verzi. Předchozí verze 1 je stále k dispozici, ale v budoucnu bude ukončena. Prosím, hlaste jakékoliv problémy nebo zpětnou vazbu.",
+    "EXECUTION": {
+      "TITLE": "Akce",
+      "DESCRIPTION": "Akce vám umožňují spouštět vlastní kód v reakci na požadavky API, události nebo specifické funkce. Použijte je k rozšíření Zitadel, automatizaci pracovních postupů a integraci s dalšími systémy.",
+      "TYPES": {
+        "request": "Požadavek",
+        "response": "Odpověď",
+        "event": "Události",
+        "function": "Funkce"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Vytvořit akci",
+        "UPDATE_TITLE": "Aktualizovat akci",
+        "TYPE": {
+          "DESCRIPTION": "Vyberte, kdy chcete tuto akci spustit",
+          "REQUEST": {
+            "TITLE": "Požadavek",
+            "DESCRIPTION": "Požadavky, které se vyskytují v rámci Zitadel. Může to být něco jako volání požadavku na přihlášení."
+          },
+          "RESPONSE": {
+            "TITLE": "Odpověď",
+            "DESCRIPTION": "Odpověď na požadavek v rámci Zitadel. Představte si odpověď, kterou získáte při načítání uživatele."
+          },
+          "EVENTS": {
+            "TITLE": "Události",
+            "DESCRIPTION": "Události, které se dějí v rámci Zitadel. Může to být cokoli, jako je vytvoření uživatelského účtu, úspěšné přihlášení atd."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funkce",
+            "DESCRIPTION": "Funkce, které můžete volat v rámci Zitadel. Může to být cokoli od odeslání e-mailu po vytvoření uživatele."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Vyberte, zda se tato akce vztahuje na všechny požadavky, konkrétní službu (např. správa uživatelů) nebo jeden požadavek (např. vytvoření uživatele).",
+          "ALL": {
+            "TITLE": "Všechny",
+            "DESCRIPTION": "Vyberte tuto možnost, pokud chcete spustit akci pro každý požadavek"
+          },
+          "ALL_EVENTS": "Vyberte toto, pokud chcete spustit akci při každé události",
+          "SELECT_SERVICE": {
+            "TITLE": "Vybrat službu",
+            "DESCRIPTION": "Vyberte službu Zitadel pro svou akci."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Vybrat metodu",
+            "DESCRIPTION": "Pokud chcete spustit pouze pro konkrétní požadavek, vyberte jej zde",
+            "NOTE": "Pokud nevyberete metodu, vaše akce se spustí pro každý požadavek ve vaší vybrané službě."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Název funkce",
+            "DESCRIPTION": "Vyberte funkci, kterou chcete spustit"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Nastavit skupinu",
+            "DESCRIPTION": "Pokud chcete spustit pouze pro skupinu událostí, nastavte zde skupinu"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Vybrat událost",
+            "DESCRIPTION": "Pokud chcete spustit pouze pro konkrétní událost, zadejte ji zde"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Můžete se rozhodnout spustit cíl nebo jej spustit za stejných podmínek jako jiné cíle.",
+          "TARGET": {
+            "DESCRIPTION": "Cíl, který chcete spustit pro tuto akci"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Podmínky spuštění"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Podmínka",
+        "TYPE": "Typ",
+        "TARGET": "Cíl",
+        "CREATIONDATE": "Datum vytvoření"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Cíle",
+      "DESCRIPTION": "Cíl je cíl kódu, který chcete spustit z akce. Vytvořte zde cíl a přidejte jej do svých akcí.",
+      "CREATE": {
+        "TITLE": "Vytvořit cíl",
+        "DESCRIPTION": "Vytvořte si vlastní cíl mimo Zitadel",
+        "NAME": "Název",
+        "NAME_DESCRIPTION": "Dejte svému cíli jasný, popisný název, aby bylo snadné jej později identifikovat",
+        "TYPE": "Typ",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Volání",
+          "restAsync": "REST Asynchronní"
+        },
+        "TYPES_DESCRIPTION": "Webhook, volání zpracovává stavový kód, ale odpověď je irelevantní\nCall, volání zpracovává stavový kód a odpověď\nAsync, volání nezpracovává ani stavový kód, ani odpověď, ale může být spuštěno paralelně s jinými cíli",
+        "ENDPOINT": "Koncový bod",
+        "ENDPOINT_DESCRIPTION": "Zadejte koncový bod, kde je hostován váš kód. Ujistěte se, že je pro nás přístupný!",
+        "TIMEOUT": "Časový limit",
+        "TIMEOUT_DESCRIPTION": "Nastavte maximální dobu, po kterou musí váš cíl odpovědět. Pokud to trvá déle, požadavek zastavíme.",
+        "INTERRUPT_ON_ERROR": "Přerušit při chybě",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Zastavte všechna spuštění, když cíle vrátí chybu",
+        "INTERRUPT_ON_ERROR_WARNING": "Pozor: „Přerušit při chybě“ zastaví operace při selhání, což může vést k zablokování. Otestujte s vypnutou možností, abyste předešli zablokování přihlášení/vytváření.",
+        "AWAIT_RESPONSE": "Čekat na odpověď",
+        "AWAIT_RESPONSE_DESCRIPTION": "Před provedením čehokoli jiného počkáme na odpověď. Užitečné, pokud hodláte použít více cílů pro jednu akci"
+      },
+      "TABLE": {
+        "NAME": "Název",
+        "ENDPOINT": "Koncový bod",
+        "CREATIONDATE": "Datum vytvoření",
+        "REORDER": "Změnit pořadí"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
     "IAM_OWNER_VIEWER": "Má oprávnění prohlížet celou instanci, včetně všech organizací",
@@ -509,6 +648,7 @@
     "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
     "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
     "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
+    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací klienty",
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
@@ -553,6 +693,7 @@
     "EMAIL": "Email",
     "USERNAME": "Uživatelské jméno",
     "ORGNAME": "Název organizace",
+    "ORGID": "ID organizace",
     "PRIMARYDOMAIN": "Primární doména",
     "PROJECTNAME": "Název projektu",
     "RESOURCEOWNER": "Vlastník zdroje",
@@ -789,7 +930,10 @@
       "PHONESECTION": "Telefonní čísla",
       "PASSWORDSECTION": "Prvotní heslo",
       "ADDRESSANDPHONESECTION": "Telefonní číslo",
-      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů."
+      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů.",
+      "SETUPAUTHENTICATIONLATER": "Nastavte ověřování později pro tohoto uživatele.",
+      "INVITATION": "Odešlete pozvánkový e-mail pro nastavení ověřování a ověření e-mailu.",
+      "INITIALPASSWORD": "Nastavte počáteční heslo pro uživatele."
     },
     "CODEDIALOG": {
       "TITLE": "Ověření telefonního čísla",
@@ -1353,6 +1497,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Zásady ochrany osobních údajů",
       "OIDC": "Životnost a expirace OIDC tokenu",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Generátor tajemství",
       "SECURITY": "Bezpečnostní nastavení",
       "EVENTS": "Události",
@@ -1368,7 +1513,8 @@
       "APPEARANCE": "Vzhled",
       "OTHER": "Ostatní",
       "STORAGE": "Data"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1490,6 +1636,16 @@
       "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 ukončení relace",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
+      "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
+      "DISABLEUSERTOKENEVENT": "Zakázat událost uživatelského tokenu",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
+      "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
+      "WEBKEY": "Webový klíč",
+      "WEBKEY_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",
@@ -1502,7 +1658,10 @@
       },
       "RESET": "Nastavit vše na děděné",
       "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro vytvoření uživatele",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu.",
+      "LOGINV2": "Přihlášení V2",
+      "LOGINV2_DESCRIPTION": "Povolením této možnosti se aktivuje nové přihlašovací rozhraní založené na TypeScriptu s vylepšeným zabezpečením, výkonem a přizpůsobitelností.",
+      "LOGINV2_BASEURI": "Základní URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1993,6 +2152,7 @@
       "ACTIVATE": "Aktivovat projekt",
       "DELETE": "Smazat projekt",
       "ORGNAME": "Název organizace",
+      "ORGID": "ID organizace",
       "ORGDOMAIN": "Doména organizace",
       "STATE": "Stav",
       "TYPE": "Typ",

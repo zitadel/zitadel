@@ -5,8 +5,13 @@ import (
 	"embed"
 	_ "embed"
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"path"
+	"syscall"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spf13/cobra"
@@ -55,7 +60,7 @@ func New() *cobra.Command {
 		Short: "setup ZITADEL instance",
 		Long: `sets up data to start ZITADEL.
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
@@ -102,12 +107,39 @@ func bindForMirror(cmd *cobra.Command) error {
 func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) {
 	logging.Info("setup started")
 
-	i18n.MustLoadSupportedLanguagesFromDir()
+	var setupErr error
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 
+	defer func() {
+		stop()
+
+		if setupErr == nil {
+			logging.Info("setup completed")
+			return
+		}
+
+		if setupErr != nil && !errors.Is(setupErr, context.Canceled) {
+			// If Setup failed for some other reason than the context being cancelled,
+			// then this could be a fatal error we should not retry
+			logging.WithFields("error", setupErr).Fatal("setup failed, skipping cleanup")
+			return
+		}
+
+		// if we're in the middle of long-running setup, run cleanup before exiting
+		// so if/when we're restarted we can pick up where we left off rather than
+		// booting into a broken state that requires manual intervention
+		// kubernetes will typically kill the pod after 30 seconds if the container does not exit
+		cleanupCtx, cleanupCancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+		defer cleanupCancel()
+
+		Cleanup(cleanupCtx, config)
+	}()
+
+	i18n.MustLoadSupportedLanguagesFromDir()
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	esV3 := new_es.NewEventstore(dbClient)
 	config.Eventstore.Pusher = esV3
 	config.Eventstore.Searcher = esV3
@@ -137,7 +169,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
-	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.CorrectCreationDate.dbClient = dbClient
 	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}
@@ -166,7 +198,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s35AddPositionToIndexEsWm = &AddPositionToIndexEsWm{dbClient: dbClient}
 	steps.s36FillV2Milestones = &FillV3Milestones{dbClient: dbClient, eventstore: eventstoreClient}
 	steps.s37Apps7OIDConfigsBackChannelLogoutURI = &Apps7OIDConfigsBackChannelLogoutURI{dbClient: dbClient}
-	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: dbClient, esClient: eventstoreClient}
+	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: dbClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: dbClient}
 	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: dbClient}
 	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: dbClient}
@@ -177,6 +209,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s48Apps7SAMLConfigsLoginVersion = &Apps7SAMLConfigsLoginVersion{dbClient: dbClient}
 	steps.s49InitPermittedOrgsFunction = &InitPermittedOrgsFunction{eventstoreClient: dbClient}
 	steps.s50IDPTemplate6UsePKCE = &IDPTemplate6UsePKCE{dbClient: dbClient}
+	steps.s51IDPTemplate6RootCA = &IDPTemplate6RootCA{dbClient: dbClient}
+	steps.s52IDPTemplate6LDAP2 = &IDPTemplate6LDAP2{dbClient: dbClient}
+	steps.s53InitPermittedOrgsFunction = &InitPermittedOrgsFunction53{dbClient: dbClient}
+	steps.s54InstancePositionIndex = &InstancePositionIndex{dbClient: dbClient}
+	steps.s55ExecutionHandlerStart = &ExecutionHandlerStart{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -216,8 +253,16 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s47FillMembershipFields,
 		steps.s49InitPermittedOrgsFunction,
 		steps.s50IDPTemplate6UsePKCE,
+		steps.s51IDPTemplate6RootCA,
+		steps.s52IDPTemplate6LDAP2,
+		steps.s53InitPermittedOrgsFunction,
+		steps.s54InstancePositionIndex,
+		steps.s55ExecutionHandlerStart,
 	} {
-		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
+		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if setupErr != nil {
+			return
+		}
 	}
 
 	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
@@ -251,7 +296,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}
 
 	for _, repeatableStep := range repeatableSteps {
-		mustExecuteMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
+		setupErr = executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
+		if setupErr != nil {
+			return
+		}
 	}
 
 	// These steps are executed after the repeatable steps because they add fields projections
@@ -267,22 +315,25 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
 	} {
-		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
+		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if setupErr != nil {
+			return
+		}
 	}
 
 	// projection initialization must be done last, since the steps above might add required columns to the projections
 	if !config.ForMirror && config.InitProjections.Enabled {
-		initProjections(
-			ctx,
-			eventstoreClient,
-		)
+		setupErr = initProjections(ctx, eventstoreClient)
+		if setupErr != nil {
+			return
+		}
 	}
 }
 
-func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) {
+func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) error {
 	err := migration.Migrate(ctx, eventstoreClient, step)
 	if err == nil {
-		return
+		return nil
 	}
 	logFields := []any{
 		"name", step.String(),
@@ -297,15 +348,16 @@ func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Even
 			"hint", pgErr.Hint,
 		)
 	}
-	logging.WithFields(logFields...).WithError(err).Fatal(errorMsg)
+	logging.WithFields(logFields...).WithError(err).Error(errorMsg)
+	return fmt.Errorf("%s: %w", errorMsg, err)
 }
 
 // readStmt reads a single file from the embedded FS,
 // under the folder/typ/filename path.
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
-func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
-	stmt, err := fs.ReadFile(path.Join(folder, typ, filename))
+func readStmt(fs embed.FS, folder, filename string) (string, error) {
+	stmt, err := fs.ReadFile(path.Join(folder, filename))
 	return string(stmt), err
 }
 
@@ -318,16 +370,15 @@ type statement struct {
 // under the folder/type path.
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
-func readStatements(fs embed.FS, folder, typ string) ([]statement, error) {
-	basePath := path.Join(folder, typ)
-	dir, err := fs.ReadDir(basePath)
+func readStatements(fs embed.FS, folder string) ([]statement, error) {
+	dir, err := fs.ReadDir(folder)
 	if err != nil {
 		return nil, err
 	}
 	statements := make([]statement, len(dir))
 	for i, file := range dir {
 		statements[i].file = file.Name()
-		statements[i].query, err = readStmt(fs, folder, typ, file.Name())
+		statements[i].query, err = readStmt(fs, folder, file.Name())
 		if err != nil {
 			return nil, err
 		}
@@ -408,7 +459,7 @@ func startCommandsQueries(
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
 			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 			}
 		},
 		0,   // not needed for projections
@@ -433,7 +484,7 @@ func startCommandsQueries(
 	authZRepo, err := authz.Start(queries, eventstoreClient, dbClient, keys.OIDC, config.ExternalSecure)
 	logging.OnError(err).Fatal("unable to start authz repo")
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+		return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
 	commands, err := command.StartCommands(ctx,
@@ -468,9 +519,6 @@ func startCommandsQueries(
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
-	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
-		logging.Fatal("notifications must be set to LegacyEnabled=true when using CockroachDB")
-	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
@@ -497,7 +545,6 @@ func startCommandsQueries(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		dbClient,
 		q,
 	)
 
@@ -507,26 +554,36 @@ func startCommandsQueries(
 func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
-) {
+) error {
 	logging.Info("init-projections is currently in beta")
 
 	for _, p := range projection.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err).Error("projection migration failed")
+			return err
+		}
 	}
 
 	for _, p := range admin_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err).Error("admin schema migration failed")
+			return err
+		}
 	}
 
 	for _, p := range auth_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err).Error("auth schema migration failed")
+			return err
+		}
 	}
 
 	for _, p := range notify_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithFields("name", p.String()).OnError(err).Error("notification migration failed")
+			return err
+		}
 	}
+
+	return nil
 }

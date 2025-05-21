@@ -1,1 +1,0 @@
-CREATE USER "%[1]s"

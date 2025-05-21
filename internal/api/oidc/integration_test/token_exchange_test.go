@@ -429,6 +429,17 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "IMPERSONATION: subject: userID, actor: access token, requested type: JWT, membership not found error",
+			args: args{
+				SubjectToken:       userResp.GetUserId(),
+				SubjectTokenType:   oidc_api.UserIDTokenType,
+				RequestedTokenType: oidc.JWTTokenType,
+				ActorToken:         noPermPAT,
+				ActorTokenType:     oidc.AccessTokenType,
+			},
+			wantErr: true,
+		},
+		{
 			name: "IAM IMPERSONATION: subject: userID, actor: access token, success",
 			args: args{
 				SubjectToken:       userResp.GetUserId(),

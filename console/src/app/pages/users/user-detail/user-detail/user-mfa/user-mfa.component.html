@@ -12,12 +12,7 @@
   >
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <cnsl-refresh-table
-    [hideRefresh]="true"
-    [loading]="mfaQuery.state === 'loading'"
-    (refreshed)="refresh$.next(true)"
-    [dataSize]="mfaQuery.value.data.length"
-  >
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="mfaQuery.state === 'loading'" (refreshed)="refresh$.next(true)">
     <table class="table" mat-table [dataSource]="mfaQuery.value">
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.TABLETYPE' | translate }}</th>

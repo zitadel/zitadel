@@ -9,12 +9,14 @@ import (
 )
 
 type Config struct {
-	Fraction float64
+	Fraction    float64
+	ServiceName string
 }
 
 func NewTracer(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
 	c.Fraction, err = otel.FractionFromConfig(rawConfig["fraction"])
+	c.ServiceName, _ = rawConfig["servicename"].(string)
 	if err != nil {
 		return err
 	}
@@ -32,6 +34,6 @@ func (c *Config) NewTracer() error {
 		return err
 	}
 
-	tracing.T, err = otel.NewTracer(sampler, exporter)
+	tracing.T, err = otel.NewTracer(sampler, exporter, c.ServiceName)
 	return err
 }

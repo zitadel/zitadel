@@ -71,14 +71,7 @@ const _MatInputBase = mixinErrorState(
 })
 export class InputDirective
   extends _MatInputBase
-  implements
-    MatFormFieldControl<any>,
-    OnChanges,
-    CanUpdateErrorState,
-    OnDestroy,
-    AfterViewInit,
-    DoCheck,
-    CanUpdateErrorState
+  implements MatFormFieldControl<any>, OnChanges, CanUpdateErrorState, OnDestroy, AfterViewInit, DoCheck, CanUpdateErrorState
 {
   protected _uid: string = `cnsl-input-${nextUniqueId++}`;
   protected _previousNativeValue: any;

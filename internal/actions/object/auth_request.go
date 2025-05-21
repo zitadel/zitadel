@@ -18,6 +18,9 @@ func AuthRequestField(authRequest *domain.AuthRequest) func(c *actions.FieldConf
 }
 
 func AuthRequestFromDomain(c *actions.FieldConfig, request *domain.AuthRequest) goja.Value {
+	if request == nil {
+		return c.Runtime.ToValue(nil)
+	}
 	var maxAuthAge *time.Duration
 	if request.MaxAuthAge != nil {
 		maxAuthAgeCopy := *request.MaxAuthAge

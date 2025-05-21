@@ -7,7 +7,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -40,7 +39,7 @@ var (
 func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit) (remaining *uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	stmt, scan := prepareRemainingQuotaUsageQuery(ctx, q.client)
+	stmt, scan := prepareRemainingQuotaUsageQuery()
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
@@ -66,13 +65,13 @@ func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string,
 	return remaining, err
 }
 
-func prepareRemainingQuotaUsageQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*uint64, error)) {
+func prepareRemainingQuotaUsageQuery() (sq.SelectBuilder, func(*sql.Row) (*uint64, error)) {
 	return sq.
 			Select(
 				"greatest(0, " + QuotaColumnAmount.identifier() + "-" + QuotaPeriodColumnUsage.identifier() + ")",
 			).
 			From(quotaPeriodsTable.identifier()).
-			Join(join(QuotaColumnUnit, QuotaPeriodColumnUnit) + db.Timetravel(call.Took(ctx))).
+			Join(join(QuotaColumnUnit, QuotaPeriodColumnUnit)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*uint64, error) {
 			remaining := new(uint64)
 			err := row.Scan(remaining)

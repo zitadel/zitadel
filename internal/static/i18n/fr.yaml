@@ -536,6 +536,7 @@ Errors:
     StateMissing: Paramètre d'état manquant dans la requête
     NotStarted: Intent n'a pas démarré ou s'est déjà terminé
     NotSucceeded: l'intention n'a pas abouti
+    Expired: L'intention a expiré
     TokenCreationFailed: La création du token a échoué
     InvalidToken: Le jeton d'intention n'est pas valide
     OtherUser: Intention destinée à un autre utilisateur

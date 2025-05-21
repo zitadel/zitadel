@@ -12,7 +12,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -68,7 +67,7 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareCurrentStateQuery(ctx, q.client)
+	query, scan := prepareCurrentStateQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
@@ -210,12 +209,12 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 	return nil
 }
 
-func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
+func prepareLatestState() (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
 	return sq.Select(
 			CurrentStateColEventDate.identifier(),
 			CurrentStateColPosition.identifier(),
 			CurrentStateColLastUpdated.identifier()).
-			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(currentStateTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*State, error) {
 			var (
@@ -239,7 +238,7 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 		}
 }
 
-func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
+func prepareCurrentStateQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
 	return sq.Select(
 			CurrentStateColLastUpdated.identifier(),
 			CurrentStateColEventDate.identifier(),
@@ -249,7 +248,7 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			CurrentStateColAggregateID.identifier(),
 			CurrentStateColSequence.identifier(),
 			countColumn.identifier()).
-			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(currentStateTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*CurrentStates, error) {
 			states := make([]*CurrentState, 0)

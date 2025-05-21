@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -72,6 +73,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	return u, nil
 }
 
+func (s *Session) ExpiresAt() time.Time {
+	if s.Tokens == nil {
+		return time.Time{}
+	}
+	return s.Tokens.Expiry
+}
+
 func (s *Session) Authorize(ctx context.Context) (err error) {
 	if s.Code == "" {
 		return ErrCodeMissing
@@ -86,6 +94,10 @@ func (s *Session) Authorize(ctx context.Context) (err error) {
 
 func NewUser(info *oidc.UserInfo) *User {
 	return &User{UserInfo: info}
+}
+
+func InitUser() *User {
+	return &User{UserInfo: &oidc.UserInfo{}}
 }
 
 type User struct {

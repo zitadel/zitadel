@@ -1516,6 +1516,11 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, writeModel *OrgLD
 		if len(provider.UserFilters) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-aAx9x1n", "Errors.Invalid.Argument")
 		}
+		if len(provider.RootCA) > 0 {
+			if err := validateRootCA(provider.RootCA); err != nil {
+				return nil, err
+			}
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1578,6 +1583,11 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, writeModel *Or
 		}
 		if len(provider.UserFilters) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-aBx901n", "Errors.Invalid.Argument")
+		}
+		if len(provider.RootCA) > 0 {
+			if err := validateRootCA(provider.RootCA); err != nil {
+				return nil, err
+			}
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

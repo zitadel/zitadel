@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	_ "embed"
-	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -35,21 +34,21 @@ import (
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	action_v2_beta "github.com/zitadel/zitadel/internal/api/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
+	instance "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
 	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
 	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
-	action_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/action/v3alpha"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/debug_events/debug_events"
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
 	userschema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/userschema/v3alpha"
-	"github.com/zitadel/zitadel/internal/api/grpc/resources/webkey/v3"
 	saml_v2 "github.com/zitadel/zitadel/internal/api/grpc/saml/v2"
 	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
@@ -58,6 +57,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
+	webkey "github.com/zitadel/zitadel/internal/api/grpc/webkey/v2beta"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/idp"
@@ -82,13 +82,14 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
+	emit_execution "github.com/zitadel/zitadel/internal/logstore/emitters/execution"
+	emit_stdout "github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification"
@@ -107,7 +108,7 @@ func New(server chan<- *Server) *cobra.Command {
 		Short: "starts ZITADEL instance",
 		Long: `starts ZITADEL.
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := cmd_tls.ModeFromFlag(cmd)
 			if err != nil {
@@ -163,7 +164,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
 	config.Eventstore.Searcher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
@@ -193,7 +194,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
 			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 			}
 		},
 		config.AuditLogRetention,
@@ -209,7 +210,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+		return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
 	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
@@ -257,11 +258,12 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	defer closeSink()
 
 	clock := clockpkg.New()
-	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())
+	actionsExecutionStdoutEmitter, err := logstore.NewEmitter(ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, emit_stdout.NewStdoutEmitter[*record.ExecutionLog]())
 	if err != nil {
 		return err
 	}
-	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.Quotas.Execution, execution.NewDatabaseLogStorage(dbClient, commands, queries))
+
+	actionsExecutionDBEmitter, err := logstore.NewEmitter(ctx, clock, config.Quotas.Execution, emit_execution.NewDatabaseLogStorage(dbClient, commands, queries))
 	if err != nil {
 		return err
 	}
@@ -269,9 +271,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	if !config.Notifications.LegacyEnabled && dbClient.Type() == "cockroach" {
-		return errors.New("notifications must be set to LegacyEnabled=true when using CockroachDB")
-	}
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
@@ -300,10 +299,19 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		dbClient,
 		q,
 	)
 	notification.Start(ctx)
+
+	execution.Register(
+		ctx,
+		config.Projections.Customizations["execution_handler"],
+		config.Executions,
+		queries,
+		eventstoreClient.EventTypes(),
+		q,
+	)
+	execution.Start(ctx)
 
 	if err = q.Start(ctx); err != nil {
 		return err
@@ -395,23 +403,23 @@ func startAPIs(
 		return nil, err
 	}
 
-	accessStdoutEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Access.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.AccessLog]())
+	accessStdoutEmitter, err := logstore.NewEmitter(ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Access.Stdout.Enabled}, emit_stdout.NewStdoutEmitter[*record.AccessLog]())
 	if err != nil {
 		return nil, err
 	}
-	accessDBEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &config.Quotas.Access.EmitterConfig, access.NewDatabaseLogStorage(dbClient, commands, queries))
+	accessDBEmitter, err := logstore.NewEmitter(ctx, clock, &config.Quotas.Access.EmitterConfig, access.NewDatabaseLogStorage(dbClient, commands, queries))
 	if err != nil {
 		return nil, err
 	}
 
-	accessSvc := logstore.New[*record.AccessLog](queries, accessDBEmitter, accessStdoutEmitter)
+	accessSvc := logstore.New(queries, accessDBEmitter, accessStdoutEmitter)
 	exhaustedCookieHandler := http_util.NewCookieHandler(
 		http_util.WithUnsecure(),
 		http_util.WithNonHttpOnly(),
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.SystemAuthZ, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}
@@ -433,6 +441,9 @@ func startAPIs(
 	}
 
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, instance.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
@@ -477,7 +488,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, idp_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
+	if err := apis.RegisterService(ctx, action_v2_beta.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
@@ -494,7 +505,7 @@ func startAPIs(
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
+	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.SystemAuthZ, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
 
 	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, instanceInterceptor.Handler))
 
@@ -538,7 +549,7 @@ func startAPIs(
 			keys.User,
 			&config.SCIM,
 			instanceInterceptor.HandlerFuncWithError,
-			middleware.AuthorizationInterceptor(verifier, config.InternalAuthZ).HandlerFuncWithError))
+			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError))
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
@@ -604,7 +615,7 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	go func() {
 		logging.Infof("server is listening on %s", lis.Addr().String())
 		if tlsConfig != nil {
-			//we don't need to pass the files here, because we already initialized the TLS config on the server
+			// we don't need to pass the files here, because we already initialized the TLS config on the server
 			errCh <- http1Server.ServeTLS(lis, "", "")
 		} else {
 			errCh <- http1Server.Serve(lis)

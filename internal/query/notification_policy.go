@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -93,7 +92,7 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 	if !withOwnerRemoved {
 		eq[NotificationPolicyColOwnerRemoved.identifier()] = false
 	}
-	stmt, scan := prepareNotificationPolicyQuery(ctx, q.client)
+	stmt, scan := prepareNotificationPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{
 			eq,
@@ -127,7 +126,7 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 		}
 	}
 
-	stmt, scan := prepareNotificationPolicyQuery(ctx, q.client)
+	stmt, scan := prepareNotificationPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		NotificationPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		NotificationPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -145,7 +144,7 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 	return policy, err
 }
 
-func prepareNotificationPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*NotificationPolicy, error)) {
+func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*NotificationPolicy, error)) {
 	return sq.Select(
 			NotificationPolicyColID.identifier(),
 			NotificationPolicyColSequence.identifier(),
@@ -156,7 +155,7 @@ func prepareNotificationPolicyQuery(ctx context.Context, db prepareDatabase) (sq
 			NotificationPolicyColIsDefault.identifier(),
 			NotificationPolicyColState.identifier(),
 		).
-			From(notificationPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(notificationPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*NotificationPolicy, error) {
 			policy := new(NotificationPolicy)

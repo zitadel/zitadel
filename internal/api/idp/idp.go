@@ -287,7 +287,7 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 	userID, err := h.checkExternalUser(ctx, intent.IDPID, idpUser.GetID())
 	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
 
-	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session.Assertion)
+	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session)
 	if err != nil {
 		redirectToFailureURLErr(w, r, intent, zerrors.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return

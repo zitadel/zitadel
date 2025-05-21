@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from 'src/app/guards/auth.guard';
-import { RoleGuard } from 'src/app/guards/role.guard';
+import { authGuard } from 'src/app/guards/auth.guard';
+import { roleGuard } from 'src/app/guards/role-guard';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 
 import { InstanceComponent } from './instance.component';
@@ -10,22 +10,28 @@ const routes: Routes = [
   {
     path: '',
     component: InstanceComponent,
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['iam.read'],
     },
+    children: [
+      {
+        path: 'actions',
+        loadChildren: () => import('src/app/modules/actions-two/actions-two.module'),
+      },
+    ],
   },
   {
     path: 'members',
     loadChildren: () => import('./instance-members/instance-members.module'),
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: ['iam.member.read'],
     },
   },
   {
     path: 'provider',
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     loadChildren: () => import('src/app/modules/providers/providers.module'),
     data: {
       roles: ['iam.idp.read'],
@@ -34,7 +40,7 @@ const routes: Routes = [
   },
   {
     path: 'smtpprovider',
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, roleGuard],
     loadChildren: () => import('src/app/modules/smtp-provider/smtp-provider.module'),
     data: {
       roles: ['iam.idp.read'],

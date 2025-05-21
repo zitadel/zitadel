@@ -107,7 +107,7 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to react on events with custom code and extended ZITADEL for you needs
 - [Branding](https://zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
 - [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
-- [CockroachDB](https://www.cockroachlabs.com/) or a [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
+- [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
 
 ## Features
 
@@ -151,7 +151,7 @@ Self-Service
 - [Administration UI (Console)](https://zitadel.com/docs/guides/manage/console/overview)
 
 Deployment
-- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version latest stable)
+- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14)
 - [Zero Downtime Updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)
 - [High scalability](https://zitadel.com/docs/self-hosting/manage/production)
 
@@ -168,7 +168,7 @@ Join our [Discord Chat](https://zitadel.com/chat) to get help.
   <img src="https://contrib.rocks/image?repo=zitadel/zitadel" />
 </a>
 
-Made with [contrib.rocks](https://contrib.rocks).
+Made with [contrib.rocks](https://contrib.rocks/preview?repo=zitadel/zitadel).
 
 ## Showcase
 

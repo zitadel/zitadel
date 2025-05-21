@@ -255,7 +255,7 @@ type userSearchByID struct {
 }
 
 func (u userSearchByID) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUserByID(ctx, true, u.id)
+	return q.GetUserByID(ctx, false, u.id)
 }
 
 type userSearchByLoginName struct {

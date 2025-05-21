@@ -1,7 +1,18 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, combineLatestWith, EMPTY, mergeWith, NEVER, Observable, of, shareReplay, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatestWith,
+  EMPTY,
+  identity,
+  mergeWith,
+  NEVER,
+  Observable,
+  of,
+  shareReplay,
+  Subject,
+} from 'rxjs';
 import { catchError, distinctUntilChanged, filter, finalize, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
 
 import {
@@ -314,7 +325,7 @@ export class GrpcAuthService {
         return new RegExp(reqRegexp).test(role);
       });
 
-    const allCheck = requestedRoles.map(test).every((x) => !!x);
+    const allCheck = requestedRoles.map(test).every(identity);
     const oneCheck = requestedRoles.some(test);
 
     return requiresAll ? allCheck : oneCheck;

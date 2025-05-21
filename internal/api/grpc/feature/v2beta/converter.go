@@ -14,7 +14,6 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
-		Actions:                         req.Actions,
 		TokenExchange:                   req.OidcTokenExchange,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
@@ -29,7 +28,6 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
-		Actions:                             featureSourceToFlagPb(&f.Actions),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 	}
@@ -42,7 +40,6 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
-		Actions:                         req.Actions,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		WebKey:                          req.WebKey,
 		DebugOIDCParentError:            req.DebugOidcParentError,
@@ -58,7 +55,6 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
-		Actions:                             featureSourceToFlagPb(&f.Actions),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		WebKey:                              featureSourceToFlagPb(&f.WebKey),
 		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
@@ -113,7 +109,7 @@ func improvedPerformanceTypesToPb(types []feature.ImprovedPerformanceType) []fea
 
 func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb.ImprovedPerformance {
 	switch typ {
-	case feature.ImprovedPerformanceTypeUnknown:
+	case feature.ImprovedPerformanceTypeUnspecified:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
 	case feature.ImprovedPerformanceTypeOrgByID:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
@@ -146,7 +142,7 @@ func improvedPerformanceListToDomain(list []feature_pb.ImprovedPerformance) []fe
 func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.ImprovedPerformanceType {
 	switch typ {
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED:
-		return feature.ImprovedPerformanceTypeUnknown
+		return feature.ImprovedPerformanceTypeUnspecified
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
 		return feature.ImprovedPerformanceTypeOrgByID
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT:
@@ -158,6 +154,6 @@ func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.Imp
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED:
 		return feature.ImprovedPerformanceTypeOrgDomainVerified
 	default:
-		return feature.ImprovedPerformanceTypeUnknown
+		return feature.ImprovedPerformanceTypeUnspecified
 	}
 }

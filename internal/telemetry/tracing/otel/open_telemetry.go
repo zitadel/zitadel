@@ -18,8 +18,8 @@ type Tracer struct {
 	sampler  sdk_trace.Sampler
 }
 
-func NewTracer(sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter) (*Tracer, error) {
-	resource, err := otel_resource.ResourceWithService()
+func NewTracer(sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter, serviceName string) (*Tracer, error) {
+	resource, err := otel_resource.ResourceWithService(serviceName)
 	if err != nil {
 		return nil, err
 	}

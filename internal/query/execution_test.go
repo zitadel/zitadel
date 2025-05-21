@@ -22,9 +22,10 @@ var (
 		` COUNT(*) OVER ()` +
 		` FROM projections.executions1` +
 		` JOIN (` +
-		`SELECT instance_id, execution_id, JSONB_AGG( JSON_OBJECT( 'position' : position, 'include' : include, 'target' : target_id ) ) as targets` +
-		` FROM projections.executions1_targets` +
-		` GROUP BY instance_id, execution_id` +
+		`SELECT et.instance_id, et.execution_id, JSONB_AGG( JSON_OBJECT( 'position' : et.position, 'include' : et.include, 'target' : et.target_id ) ) as targets` +
+		` FROM projections.executions1_targets AS et` +
+		` INNER JOIN projections.targets2 AS t ON et.instance_id = t.instance_id AND et.target_id IS NOT NULL AND et.target_id = t.id` +
+		` GROUP BY et.instance_id, et.execution_id` +
 		`)` +
 		` AS execution_targets` +
 		` ON execution_targets.instance_id = projections.executions1.instance_id` +
@@ -45,9 +46,10 @@ var (
 		` execution_targets.targets` +
 		` FROM projections.executions1` +
 		` JOIN (` +
-		`SELECT instance_id, execution_id, JSONB_AGG( JSON_OBJECT( 'position' : position, 'include' : include, 'target' : target_id ) ) as targets` +
-		` FROM projections.executions1_targets` +
-		` GROUP BY instance_id, execution_id` +
+		`SELECT et.instance_id, et.execution_id, JSONB_AGG( JSON_OBJECT( 'position' : et.position, 'include' : et.include, 'target' : et.target_id ) ) as targets` +
+		` FROM projections.executions1_targets AS et` +
+		` INNER JOIN projections.targets2 AS t ON et.instance_id = t.instance_id AND et.target_id IS NOT NULL AND et.target_id = t.id` +
+		` GROUP BY et.instance_id, et.execution_id` +
 		`)` +
 		` AS execution_targets` +
 		` ON execution_targets.instance_id = projections.executions1.instance_id` +
@@ -180,6 +182,63 @@ func Test_ExecutionPrepares(t *testing.T) {
 			},
 		},
 		{
+			name:    "prepareExecutionsQuery multiple result, removed target, position missing",
+			prepare: prepareExecutionsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareExecutionsStmt),
+					prepareExecutionsCols,
+					[][]driver.Value{
+						{
+							"ro",
+							"id-1",
+							testNow,
+							testNow,
+							[]byte(`[{"position" : 1, "target" : "target"}, {"position" : 3, "include" : "include"}]`),
+						},
+						{
+							"ro",
+							"id-2",
+							testNow,
+							testNow,
+							[]byte(`[{"position" : 2, "target" : "target"}, {"position" : 1, "include" : "include"}]`),
+						},
+					},
+				),
+			},
+			object: &Executions{
+				SearchResponse: SearchResponse{
+					Count: 2,
+				},
+				Executions: []*Execution{
+					{
+						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-1",
+							EventDate:     testNow,
+							CreationDate:  testNow,
+							ResourceOwner: "ro",
+						},
+						Targets: []*exec.Target{
+							{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+							{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+						},
+					},
+					{
+						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-2",
+							EventDate:     testNow,
+							CreationDate:  testNow,
+							ResourceOwner: "ro",
+						},
+						Targets: []*exec.Target{
+							{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+							{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:    "prepareExecutionsQuery sql err",
 			prepare: prepareExecutionsQuery,
 			want: want{
@@ -263,7 +322,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

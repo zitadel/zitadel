@@ -174,7 +174,7 @@ func (e DeviceAuthStateError) Error() string {
 // As devices can poll at various intervals, an explicit state takes precedence over expiry.
 // This is to prevent cases where users might approve or deny the authorization on time, but the next poll
 // happens after expiry.
-func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode string) (_ *OIDCSession, err error) {
+func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode, backChannelLogoutURI string) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -219,6 +219,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		deviceAuthModel.PreferredLanguage,
 		deviceAuthModel.UserAgent,
 	)
+	cmd.RegisterLogout(ctx, deviceAuthModel.SessionID, deviceAuthModel.UserID, deviceAuthModel.ClientID, backChannelLogoutURI)
 	if err = cmd.AddAccessToken(ctx, deviceAuthModel.Scopes, deviceAuthModel.UserID, deviceAuthModel.UserOrgID, domain.TokenReasonAuthRequest, nil); err != nil {
 		return nil, err
 	}

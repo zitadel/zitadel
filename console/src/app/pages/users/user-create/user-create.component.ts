@@ -1,9 +1,19 @@
 import { Location } from '@angular/common';
 import { Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { debounceTime, defer, of, Observable, shareReplay, forkJoin, ObservedValueOf, EMPTY, ReplaySubject } from 'rxjs';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import {
+  debounceTime,
+  defer,
+  of,
+  Observable,
+  shareReplay,
+  forkJoin,
+  ObservedValueOf,
+  EMPTY,
+  ReplaySubject,
+  TimeoutError,
+} from 'rxjs';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -11,10 +21,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import {
-  containsLowerCaseValidator,
-  containsNumberValidator,
-  containsSymbolValidator,
-  containsUpperCaseValidator,
   emailValidator,
   minLengthValidator,
   passwordConfirmValidator,
@@ -23,8 +29,12 @@ import {
 } from 'src/app/modules/form-field/validators/validators';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
-import { catchError, map, startWith } from 'rxjs/operators';
+import { catchError, map, startWith, timeout } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NewFeatureService } from 'src/app/services/new-feature.service';
+import { PasswordComplexityPolicy } from '@zitadel/proto/zitadel/policy_pb';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
+import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
 
 @Component({
   selector: 'cnsl-user-create',
@@ -43,15 +53,18 @@ export class UserCreateComponent implements OnInit {
   protected loading = false;
 
   private readonly suffix$ = new ReplaySubject<HTMLSpanElement>(1);
-  @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement>) {
-    this.suffix$.next(suffix.nativeElement);
+  @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement> | undefined) {
+    if (suffix?.nativeElement) {
+      this.suffix$.next(suffix.nativeElement);
+    }
   }
 
   protected usePassword: boolean = false;
   protected readonly envSuffix$: Observable<string>;
   protected readonly userForm: ReturnType<typeof this.buildUserForm>;
   protected readonly pwdForm$: ReturnType<typeof this.buildPwdForm>;
-  protected readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy.AsObject | undefined>;
+  protected readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy | undefined>;
+  protected readonly useV2Api$: Observable<boolean>;
   protected readonly suffixPadding$: Observable<string>;
 
   constructor(
@@ -59,24 +72,24 @@ export class UserCreateComponent implements OnInit {
     private readonly toast: ToastService,
     private readonly fb: FormBuilder,
     private readonly mgmtService: ManagementService,
+    private readonly newMgmtService: NewMgmtService,
     private readonly destroyRef: DestroyRef,
     private readonly breadcrumbService: BreadcrumbService,
     protected readonly location: Location,
     protected readonly langSvc: LanguagesService,
+    private readonly featureService: NewFeatureService,
+    private readonly passwordComplexityValidatorFactory: PasswordComplexityValidatorFactoryService,
     countryCallingCodesService: CountryCallingCodesService,
   ) {
     this.envSuffix$ = this.getEnvSuffix();
     this.suffixPadding$ = this.getSuffixPadding();
     this.passwordComplexityPolicy$ = this.getPasswordComplexityPolicy().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.useV2Api$ = this.getUseV2Api().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.userForm = this.buildUserForm();
     this.pwdForm$ = this.buildPwdForm(this.passwordComplexityPolicy$);
 
     this.countryPhoneCodes = countryCallingCodesService.getCountryCallingCodes();
-  }
-
-  ngOnInit(): void {
-    this.watchPhoneChanges();
 
     this.breadcrumbService.setBreadcrumb([
       new Breadcrumb({
@@ -84,6 +97,10 @@ export class UserCreateComponent implements OnInit {
         routerLink: ['/org'],
       }),
     ]);
+  }
+
+  ngOnInit(): void {
+    this.watchPhoneChanges();
   }
 
   private getEnvSuffix() {
@@ -112,11 +129,24 @@ export class UserCreateComponent implements OnInit {
   }
 
   private getPasswordComplexityPolicy() {
-    return defer(() => this.mgmtService.getPasswordComplexityPolicy()).pipe(
+    return defer(() => this.newMgmtService.getPasswordComplexityPolicy()).pipe(
       map(({ policy }) => policy),
       catchError((error) => {
         this.toast.showError(error);
         return EMPTY;
+      }),
+    );
+  }
+
+  private getUseV2Api() {
+    return defer(() => this.featureService.getInstanceFeatures()).pipe(
+      map((features) => features.consoleUseV2UserApi?.enabled ?? false),
+      timeout(1000),
+      catchError((err) => {
+        if (!(err instanceof TimeoutError)) {
+          this.toast.showError(err);
+        }
+        return of(false);
       }),
     );
   }
@@ -135,27 +165,14 @@ export class UserCreateComponent implements OnInit {
     });
   }
 
-  private buildPwdForm(passwordComplexityPolicy$: Observable<PasswordComplexityPolicy.AsObject | undefined>) {
+  private buildPwdForm(passwordComplexityPolicy$: Observable<PasswordComplexityPolicy | undefined>) {
     return passwordComplexityPolicy$.pipe(
       map((policy) => {
-        const validators: ValidatorFn[] = [requiredValidator];
-        if (policy?.minLength) {
-          validators.push(minLengthValidator(policy.minLength));
-        }
-        if (policy?.hasLowercase) {
-          validators.push(containsLowerCaseValidator);
-        }
-        if (policy?.hasUppercase) {
-          validators.push(containsUpperCaseValidator);
-        }
-        if (policy?.hasNumber) {
-          validators.push(containsNumberValidator);
-        }
-        if (policy?.hasSymbol) {
-          validators.push(containsSymbolValidator);
-        }
         return this.fb.group({
-          password: new FormControl('', { nonNullable: true, validators }),
+          password: new FormControl('', {
+            nonNullable: true,
+            validators: this.passwordComplexityValidatorFactory.buildValidators(policy),
+          }),
           confirmPassword: new FormControl('', {
             nonNullable: true,
             validators: [requiredValidator, passwordConfirmValidator()],

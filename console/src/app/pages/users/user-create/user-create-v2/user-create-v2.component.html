@@ -1,0 +1,96 @@
+<cnsl-create-layout
+  title="{{ 'USER.CREATE.TITLE' | translate }}"
+  [createSteps]="1"
+  [currentCreateStep]="1"
+  (closed)="location.back()"
+>
+  <div class="content">
+    <mat-progress-bar *ngIf="loading()" color="primary" mode="indeterminate" />
+    <form
+      *ngIf="authenticationFactor$ | async as authenticationFactor"
+      class="form-grid"
+      [formGroup]="userForm"
+      (ngSubmit)="createUserV2(authenticationFactor)"
+    >
+      <cnsl-form-field class="email">
+        <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}</cnsl-label>
+        <input class="stretchInput" cnslInput matRipple formControlName="email" required />
+      </cnsl-form-field>
+      <div class="emailVerified">
+        <mat-checkbox [disabled]="authenticationFactor.factor === 'invitation'" formControlName="emailVerified">
+          {{ 'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate }}
+        </mat-checkbox>
+      </div>
+      <cnsl-form-field class="username">
+        <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
+        <input class="stretchInput" cnslInput formControlName="username" required />
+      </cnsl-form-field>
+
+      <cnsl-form-field class="givenName">
+        <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</cnsl-label>
+        <input cnslInput formControlName="givenName" required />
+      </cnsl-form-field>
+      <cnsl-form-field class="familyName">
+        <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</cnsl-label>
+        <input cnslInput formControlName="familyName" required />
+      </cnsl-form-field>
+
+      <div class="authenticationFactor">
+        <mat-radio-group
+          class="authenticationFactorRadioGroup"
+          aria-label="Select an option"
+          formControlName="authenticationFactor"
+        >
+          <mat-radio-button value="none">{{ 'USER.CREATE.SETUPAUTHENTICATIONLATER' | translate }}</mat-radio-button>
+          <mat-radio-button value="invitation">{{ 'USER.CREATE.INVITATION' | translate }}</mat-radio-button>
+          <mat-radio-button value="initialPassword">{{ 'USER.CREATE.INITIALPASSWORD' | translate }}</mat-radio-button>
+        </mat-radio-group>
+        <form *ngIf="authenticationFactor.factor === 'initialPassword'" [formGroup]="authenticationFactor.form">
+          <cnsl-form-field>
+            <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
+            <input
+              class="stretchInput"
+              cnslInput
+              autocomplete="off"
+              name="firstpassword"
+              formControlName="password"
+              type="password"
+            />
+          </cnsl-form-field>
+          <cnsl-form-field>
+            <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
+            <input
+              cnslInput
+              autocomplete="off"
+              name="confirmPassword"
+              formControlName="confirmPassword"
+              type="password"
+              class="stretchInput"
+            />
+          </cnsl-form-field>
+          <cnsl-password-complexity-view
+            class="complexity-view"
+            [policy]="authenticationFactor.policy"
+            [password]="authenticationFactor.form.controls.password"
+          >
+          </cnsl-password-complexity-view>
+        </form>
+      </div>
+
+      <div>
+        <button
+          data-e2e="create-button"
+          color="primary"
+          [disabled]="
+            userForm.invalid || (authenticationFactor.factor === 'initialPassword' && authenticationFactor.form.invalid)
+          "
+          type="submit"
+          class="create-button"
+          mat-raised-button
+        >
+          {{ 'ACTIONS.CREATE' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

@@ -27,8 +27,7 @@ var (
 		` projections.privacy_policies4.custom_link_text,` +
 		` projections.privacy_policies4.is_default,` +
 		` projections.privacy_policies4.state` +
-		` FROM projections.privacy_policies4` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.privacy_policies4`
 	preparePrivacyPolicyCols = []string{
 		"id",
 		"sequence",
@@ -138,7 +137,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

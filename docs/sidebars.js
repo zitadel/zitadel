@@ -1,3 +1,20 @@
+
+const sidebar_api_auth  = require("./docs/apis/resources/auth/sidebar.ts").default
+const sidebar_api_mgmt = require("./docs/apis/resources/mgmt/sidebar.ts").default
+const sidebar_api_admin = require("./docs/apis/resources/admin/sidebar.ts").default
+const sidebar_api_system = require("./docs/apis/resources/system/sidebar.ts").default
+
+const sidebar_api_user_service_v2 = require("./docs/apis/resources/user_service_v2/sidebar.ts").default
+const sidebar_api_session_service_v2 = require("./docs/apis/resources/session_service_v2/sidebar.ts").default
+const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_v2/sidebar.ts").default
+const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
+const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
+const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
+const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
+const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
+const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
+const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
+
 module.exports = {
   guides: [
     "guides/overview",
@@ -123,6 +140,7 @@ module.exports = {
           items: [
             "guides/manage/cloud/start",
             "guides/manage/cloud/instances",
+            "guides/manage/cloud/settings",
             "guides/manage/cloud/billing",
             "guides/manage/cloud/users",
             "guides/manage/cloud/support",
@@ -454,6 +472,60 @@ module.exports = {
           ],
         },
         "guides/integrate/external-audit-log",
+        {
+          type: "category",
+          label: "Actions",
+          link: {
+            type: "generated-index",
+            title: "Use Actions to integrate ZITADEL with your Favorite Services",
+            slug: "/guides/integrate/actions",
+            description:
+              "With the guides in this section you will learn how to use action to integrate Zitadel with your services.",
+          },
+          collapsed: true,
+          items: [
+            {
+              type: "doc",
+              id: "guides/integrate/actions/usage",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request-signature",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-response",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-response-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-function",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-function-manipulation",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-event",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/migrate-from-v1",
+            },
+          ],
+        },
       ],
     },
     {
@@ -575,7 +647,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "V1 (Generally Available)",
+          label: "V1",
           collapsed: false,
           link: {
             type: "generated-index",
@@ -595,7 +667,7 @@ module.exports = {
                 description:
                   "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
               },
-              items: require("./docs/apis/resources/auth/sidebar.ts"),
+              items: sidebar_api_auth,
             },
             {
               type: "category",
@@ -607,7 +679,7 @@ module.exports = {
                 description:
                   "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
               },
-              items: require("./docs/apis/resources/mgmt/sidebar.ts"),
+              items: sidebar_api_mgmt,
             },
             {
               type: "category",
@@ -619,7 +691,7 @@ module.exports = {
                 description:
                   "This API is intended to configure and manage one ZITADEL instance itself.",
               },
-              items: require("./docs/apis/resources/admin/sidebar.ts"),
+              items: sidebar_api_admin,
             },
             {
               type: "category",
@@ -633,13 +705,13 @@ module.exports = {
                   "\n" +
                   "Checkout the guide how to access the ZITADEL System API.",
               },
-              items: require("./docs/apis/resources/system/sidebar.ts"),
+              items: sidebar_api_system,
             },
           ],
         },
         {
           type: "category",
-          label: "V2 (Generally Available)",
+          label: "V2",
           collapsed: false,
           link: {
             type: "doc",
@@ -648,7 +720,7 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "User Lifecycle",
+              label: "User",
               link: {
                 type: "generated-index",
                 title: "User Service API",
@@ -656,11 +728,11 @@ module.exports = {
                 description:
                   "This API is intended to manage users in a ZITADEL instance.\n",
               },
-              items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
+              items: sidebar_api_user_service_v2,
             },
             {
               type: "category",
-              label: "Session Lifecycle",
+              label: "Session",
               link: {
                 type: "generated-index",
                 title: "Session Service API",
@@ -668,11 +740,11 @@ module.exports = {
                 description:
                   "This API is intended to manage sessions in a ZITADEL instance.\n",
               },
-              items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
+              items: sidebar_api_session_service_v2,
             },
             {
               type: "category",
-              label: "OIDC Lifecycle",
+              label: "OIDC",
               link: {
                 type: "generated-index",
                 title: "OIDC Service API",
@@ -680,11 +752,11 @@ module.exports = {
                 description:
                   "Get OIDC Auth Request details and create callback URLs.\n",
               },
-              items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
+              items: sidebar_api_oidc_service_v2,
             },
             {
               type: "category",
-              label: "Settings Lifecycle",
+              label: "Settings",
               link: {
                 type: "generated-index",
                 title: "Settings Service API",
@@ -692,11 +764,11 @@ module.exports = {
                 description:
                   "This API is intended to manage settings in a ZITADEL instance.\n",
               },
-              items: require("./docs/apis/resources/settings_service_v2/sidebar.ts"),
+              items: sidebar_api_settings_service_v2,
             },
             {
               type: "category",
-              label: "Feature Lifecycle",
+              label: "Feature",
               link: {
                 type: "generated-index",
                 title: "Feature Service API",
@@ -704,11 +776,11 @@ module.exports = {
                 description:
                   'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n',
               },
-              items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
+              items: sidebar_api_feature_service_v2,
             },
             {
               type: "category",
-              label: "Organization Lifecycle",
+              label: "Organization",
               link: {
                 type: "generated-index",
                 title: "Organization Service API",
@@ -716,11 +788,11 @@ module.exports = {
                 description:
                   "This API is intended to manage organizations for ZITADEL. \n",
               },
-              items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
+              items: sidebar_api_org_service_v2,
             },
             {
               type: "category",
-              label: "Identity Provider Lifecycle",
+              label: "Identity Provider",
               link: {
                 type: "generated-index",
                 title: "Identity Provider Service API",
@@ -728,57 +800,64 @@ module.exports = {
                 description:
                   "This API is intended to manage identity providers (IdPs) for ZITADEL.\n",
               },
-              items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "V3 (Preview)",
-          collapsed: false,
-          items: [
-            {
-              type: "category",
-              label: "Action Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "Action Service API (Preview)",
-                slug: "/apis/resources/action_service_v3",
-                description:
-                  "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
-                  "The version 3 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
-                  "Also, v3 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
-                  "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v3 action executions anymore.\n" +
-                  "Instead, it calls external endpoints which are implemented and maintained by action v3 users.\n" +
-                  "\n" +
-                  "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
-              },
-              items: [
-                {
-                  type: "doc",
-                  id: "apis/actions/v3/usage",
-                },
-                {
-                  type: "doc",
-                  id: "apis/actions/v3/testing-locally",
-                },
-              ].concat(
-                require("./docs/apis/resources/action_service_v3/sidebar.ts")
-              ),
+              items: sidebar_api_idp_service_v2,
             },
             {
               type: "category",
-              label: "Web key Lifecycle (Preview)",
+              label: "Web key (Beta)",
               link: {
                 type: "generated-index",
-                title: "Web Key Service API (Preview)",
-                slug: "/apis/resources/webkey_service_v3",
+                title: "Web Key Service API (Beta)",
+                slug: "/apis/resources/webkey_service_v2",
                 description:
-                  "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
-                  "\n" +
-                  "This project is in preview state. It can AND will continue breaking until a stable version is released.",
+                    "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n"+
+                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n"+
+                    "\n"+
+                    "Please make sure to enable the `web_key` feature flag on your instance to use this service and that you're running ZITADEL V3.",
               },
-              items: require("./docs/apis/resources/webkey_service_v3/sidebar.ts"),
+              items: sidebar_api_webkey_service_v2
+            },
+            {
+              type: "category",
+              label: "Action (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Action Service API (Beta)",
+                slug: "/apis/resources/action_service_v2",
+                description:
+                    "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n" +
+                    "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
+                    "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
+                    "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
+                    "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n"+
+                    "\n" +
+                    "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
+              },
+              items: sidebar_api_actions_v2,
+            },
+            {
+              type: "category",
+              label: "Instance (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Instance Service API (Beta)",
+                slug: "/apis/resources/instance_service_v2",
+                description:
+                    "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n" +
+                    "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
+                    "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
+                    ,
+              },
+              items: sidebar_api_instance_service_v2,
             },
           ],
         },
@@ -854,8 +933,8 @@ module.exports = {
     },
     {
       type: "link",
-      label: "Rate Limits (Cloud)", // The link label
-      href: "/legal/policies/rate-limit-policy", // The internal path
+      label: "Rate Limits (Cloud)",
+      href: "/legal/policies/rate-limit-policy",
     },
     {
       type: "category",
@@ -939,7 +1018,6 @@ module.exports = {
             "self-hosting/manage/reverseproxy/traefik/traefik",
             "self-hosting/manage/reverseproxy/nginx/nginx",
             "self-hosting/manage/reverseproxy/caddy/caddy",
-            //            "self-hosting/manage/reverseproxy/httpd/httpd", grpc NOT WORKING
             "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
             "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
             "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",

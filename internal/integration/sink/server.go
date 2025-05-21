@@ -17,6 +17,7 @@ import (
 
 	crewjam_saml "github.com/crewjam/saml"
 	"github.com/go-chi/chi/v5"
+	goldap "github.com/go-ldap/ldap/v3"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
@@ -48,7 +49,7 @@ func CallURL(ch Channel) string {
 	return u.String()
 }
 
-func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
 	u := url.URL{
 		Scheme: "http",
 		Host:   host,
@@ -59,6 +60,7 @@ func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string,
 		IDPID:      idpID,
 		IDPUserID:  idpUserID,
 		UserID:     userID,
+		Expiry:     expiry,
 	})
 	if err != nil {
 		return "", "", time.Time{}, uint64(0), err
@@ -66,7 +68,7 @@ func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string,
 	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
 }
 
-func SuccessfulOIDCIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+func SuccessfulOIDCIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
 	u := url.URL{
 		Scheme: "http",
 		Host:   host,
@@ -77,6 +79,7 @@ func SuccessfulOIDCIntent(instanceID, idpID, idpUserID, userID string) (string, 
 		IDPID:      idpID,
 		IDPUserID:  idpUserID,
 		UserID:     userID,
+		Expiry:     expiry,
 	})
 	if err != nil {
 		return "", "", time.Time{}, uint64(0), err
@@ -84,7 +87,7 @@ func SuccessfulOIDCIntent(instanceID, idpID, idpUserID, userID string) (string, 
 	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
 }
 
-func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
 	u := url.URL{
 		Scheme: "http",
 		Host:   host,
@@ -95,6 +98,7 @@ func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string) (string, 
 		IDPID:      idpID,
 		IDPUserID:  idpUserID,
 		UserID:     userID,
+		Expiry:     expiry,
 	})
 	if err != nil {
 		return "", "", time.Time{}, uint64(0), err
@@ -282,10 +286,11 @@ func readLoop(ws *websocket.Conn) (done chan error) {
 }
 
 type SuccessfulIntentRequest struct {
-	InstanceID string `json:"instance_id"`
-	IDPID      string `json:"idp_id"`
-	IDPUserID  string `json:"idp_user_id"`
-	UserID     string `json:"user_id"`
+	InstanceID string    `json:"instance_id"`
+	IDPID      string    `json:"idp_id"`
+	IDPUserID  string    `json:"idp_user_id"`
+	UserID     string    `json:"user_id"`
+	Expiry     time.Time `json:"expiry"`
 }
 type SuccessfulIntentResponse struct {
 	IntentID   string    `json:"intent_id"`
@@ -376,6 +381,7 @@ func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
 				AccessToken: "accessToken",
+				Expiry:      req.Expiry,
 			},
 			IDToken: "idToken",
 		},
@@ -407,6 +413,7 @@ func createSuccessfulOIDCIntent(ctx context.Context, cmd *command.Commands, req 
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
 				AccessToken: "accessToken",
+				Expiry:      req.Expiry,
 			},
 			IDToken: "idToken",
 		},
@@ -431,9 +438,16 @@ func createSuccessfulSAMLIntent(ctx context.Context, cmd *command.Commands, req 
 		ID:         req.IDPUserID,
 		Attributes: map[string][]string{"attribute1": {"value1"}},
 	}
-	assertion := &crewjam_saml.Assertion{ID: "id"}
+	session := &saml.Session{
+		Assertion: &crewjam_saml.Assertion{
+			ID: "id",
+			Conditions: &crewjam_saml.Conditions{
+				NotOnOrAfter: req.Expiry,
+			},
+		},
+	}
 
-	token, err := cmd.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, req.UserID, assertion)
+	token, err := cmd.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, req.UserID, session)
 	if err != nil {
 		return nil, err
 	}
@@ -465,8 +479,14 @@ func createSuccessfulLDAPIntent(ctx context.Context, cmd *command.Commands, req 
 		"",
 		"",
 	)
-	attributes := map[string][]string{"id": {req.IDPUserID}, "username": {username}, "language": {lang.String()}}
-	token, err := cmd.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, req.UserID, attributes)
+	session := &ldap.Session{Entry: &goldap.Entry{
+		Attributes: []*goldap.EntryAttribute{
+			{Name: "id", Values: []string{req.IDPUserID}},
+			{Name: "username", Values: []string{username}},
+			{Name: "language", Values: []string{lang.String()}},
+		},
+	}}
+	token, err := cmd.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, req.UserID, session)
 	if err != nil {
 		return nil, err
 	}

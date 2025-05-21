@@ -29,11 +29,11 @@ func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) 
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*user.ListUsersResponse, error) {
-	queries, filterOrgIds, err := listUsersRequestToModel(req)
+	queries, err := listUsersRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries, filterOrgIds, s.checkPermission)
+	res, err := s.query.SearchUsers(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -165,11 +165,11 @@ func accessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user.AccessTokenT
 	}
 }
 
-func listUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueries, string, error) {
+func listUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
-	queries, filterOrgId, err := userQueriesToQuery(req.Queries, 0 /*start from level 0*/)
+	queries, err := userQueriesToQuery(req.Queries, 0 /*start from level 0*/)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 	return &query.UserSearchQueries{
 		SearchRequest: query.SearchRequest{
@@ -179,7 +179,7 @@ func listUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueri
 			SortingColumn: userFieldNameToSortingColumn(req.SortingColumn),
 		},
 		Queries: queries,
-	}, filterOrgId, nil
+	}, nil
 }
 
 func userFieldNameToSortingColumn(field user.UserFieldName) query.Column {
@@ -209,18 +209,15 @@ func userFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 	}
 }
 
-func userQueriesToQuery(queries []*user.SearchQuery, level uint8) (_ []query.SearchQuery, filterOrgId string, err error) {
+func userQueriesToQuery(queries []*user.SearchQuery, level uint8) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		if orgFilter := query.GetOrganizationIdQuery(); orgFilter != nil {
-			filterOrgId = orgFilter.OrganizationId
-		}
 		q[i], err = userQueryToQuery(query, level)
 		if err != nil {
-			return nil, filterOrgId, err
+			return nil, err
 		}
 	}
-	return q, filterOrgId, nil
+	return q, nil
 }
 
 func userQueryToQuery(query *user.SearchQuery, level uint8) (query.SearchQuery, error) {
@@ -314,14 +311,14 @@ func inUserIdsQueryToQuery(q *user.InUserIDQuery) (query.SearchQuery, error) {
 	return query.NewUserInUserIdsSearchQuery(q.UserIds)
 }
 func orQueryToQuery(q *user.OrQuery, level uint8) (query.SearchQuery, error) {
-	mappedQueries, _, err := userQueriesToQuery(q.Queries, level+1)
+	mappedQueries, err := userQueriesToQuery(q.Queries, level+1)
 	if err != nil {
 		return nil, err
 	}
 	return query.NewUserOrSearchQuery(mappedQueries)
 }
 func andQueryToQuery(q *user.AndQuery, level uint8) (query.SearchQuery, error) {
-	mappedQueries, _, err := userQueriesToQuery(q.Queries, level+1)
+	mappedQueries, err := userQueriesToQuery(q.Queries, level+1)
 	if err != nil {
 		return nil, err
 	}

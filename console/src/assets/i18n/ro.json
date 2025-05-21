@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Fluxuri",
         "DESCRIPTION": "Alegeți un flux de autentificare și declanșați acțiunea dvs. la un anumit eveniment din cadrul acestui flux."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, o nouă versiune îmbunătățită a Actions, este acum disponibilă. Versiunea actuală este încă accesibilă, dar dezvoltarea viitoare se va concentra pe cea nouă, care în cele din urmă va înlocui versiunea actuală."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "Token de reîmprospătare inactiv",
           "DESCRIPTION": "Durata de viață inactivă a tokenului de reîmprospătare este timpul maxim în care un token de reîmprospătare poate fi neutilizat."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gestionează-ți cheile web OIDC pentru a semna și valida în siguranță tokenurile pentru instanța ta ZITADEL.",
+        "TABLE": {
+          "TITLE": "Chei Web Active și Viitoare",
+          "DESCRIPTION": "Cheile tale web active și viitoare. Activarea unei noi chei va dezactiva cheia curentă.",
+          "NOTE": "Notă: Endpoint-ul JWKs OIDC returnează un răspuns care poate fi stocat în cache (implicit 5 min). Evită activarea unei chei prea devreme, deoarece este posibil să nu fie încă disponibilă în cache și pentru clienți.",
+          "ACTIVATE": "Activează următoarea Cheie Web",
+          "ACTIVE": "În prezent activă",
+          "NEXT": "Următoarea în coadă",
+          "FUTURE": "Viitoare",
+          "WARNING": "Cheia web are mai puțin de 5 minute"
+        },
+        "CREATE": {
+          "TITLE": "Creează o nouă Cheie Web",
+          "DESCRIPTION": "Crearea unei noi chei web o va adăuga pe lista ta. ZITADEL folosește implicit chei RSA2048 cu un algoritm de hash SHA256.",
+          "KEY_TYPE": "Tip de Cheie",
+          "BITS": "Biti",
+          "HASHER": "Algoritm de Hash",
+          "CURVE": "Curbă"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Chei Web Anterioare",
+          "DESCRIPTION": "Acestea sunt cheile tale web anterioare care nu mai sunt active.",
+          "DEACTIVATED_ON": "Dezactivată pe"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "Descărcați",
     "APPLY": "Aplicați"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "În prezent utilizați noua versiune Actions V2, care este în faza beta. Versiunea anterioară 1 este încă disponibilă, dar va fi întreruptă în viitor. Vă rugăm să raportați orice problemă sau feedback.",
+    "EXECUTION": {
+      "TITLE": "Acțiuni",
+      "DESCRIPTION": "Acțiunile vă permit să rulați cod personalizat ca răspuns la cereri API, evenimente sau funcții specifice. Folosiți-le pentru a extinde Zitadel, a automatiza fluxurile de lucru și a vă integra cu alte sisteme.",
+      "TYPES": {
+        "request": "Cerere",
+        "response": "Răspuns",
+        "event": "Evenimente",
+        "function": "Funcție"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Creează o Acțiune",
+        "UPDATE_TITLE": "Actualizează o Acțiune",
+        "TYPE": {
+          "DESCRIPTION": "Selectați când doriți să rulați această Acțiune",
+          "REQUEST": {
+            "TITLE": "Cerere",
+            "DESCRIPTION": "Cereri care apar în Zitadel. Acesta ar putea fi ceva de genul unui apel de cerere de autentificare."
+          },
+          "RESPONSE": {
+            "TITLE": "Răspuns",
+            "DESCRIPTION": "Un răspuns la o cerere în Zitadel. Gândiți-vă la răspunsul pe care îl primiți la preluarea unui utilizator."
+          },
+          "EVENTS": {
+            "TITLE": "Evenimente",
+            "DESCRIPTION": "Evenimente care se întâmplă în Zitadel. Acesta ar putea fi orice, cum ar fi un utilizator care își creează un cont, o autentificare reușită etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funcții",
+            "DESCRIPTION": "Funcții pe care le puteți apela în Zitadel. Acesta ar putea fi orice, de la trimiterea unui e-mail la crearea unui utilizator."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Alegeți dacă această acțiune se aplică tuturor cererilor, unui serviciu specific (de exemplu, gestionarea utilizatorilor) sau unei singure cereri (de exemplu, crearea unui utilizator).",
+          "ALL": {
+            "TITLE": "Toate",
+            "DESCRIPTION": "Selectați aceasta dacă doriți să rulați acțiunea la fiecare cerere"
+          },
+          "ALL_EVENTS": "Selectează aceasta dacă vrei să rulezi acțiunea ta la fiecare eveniment",
+          "SELECT_SERVICE": {
+            "TITLE": "Selectați Serviciul",
+            "DESCRIPTION": "Alegeți un Serviciu Zitadel pentru acțiunea dvs."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Selectați Metoda",
+            "DESCRIPTION": "Dacă doriți să rulați numai la o cerere specifică, selectați-o aici",
+            "NOTE": "Dacă nu selectați o metodă, acțiunea dvs. va rula la fiecare cerere din serviciul selectat."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Numele Funcției",
+            "DESCRIPTION": "Alegeți funcția pe care doriți să o rulați"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Setează Grupul",
+            "DESCRIPTION": "Dacă doriți să rulați numai pe un grup de evenimente, setați grupul aici"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Selectați Evenimentul",
+            "DESCRIPTION": "Dacă doriți să rulați numai la un eveniment specific, specificați-l aici"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Puteți alege să rulați o țintă sau să o rulați în aceleași condiții ca și alte ținte.",
+          "TARGET": {
+            "DESCRIPTION": "Ținta pe care doriți să o rulați pentru această acțiune"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Condiții de Execuție"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condiție",
+        "TYPE": "Tip",
+        "TARGET": "Țintă",
+        "CREATIONDATE": "Data Creării"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Ținte",
+      "DESCRIPTION": "O țintă este destinația codului pe care doriți să-l rulați dintr-o acțiune. Creați o țintă aici și adăugați-o la acțiunile dvs.",
+      "CREATE": {
+        "TITLE": "Creează-ți Ținta",
+        "DESCRIPTION": "Creați-vă propria țintă în afara Zitadel",
+        "NAME": "Nume",
+        "NAME_DESCRIPTION": "Dați țintei dvs. un nume clar, descriptiv, pentru a o identifica ușor mai târziu",
+        "TYPE": "Tip",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Apel REST",
+          "restAsync": "REST Asincron"
+        },
+        "TYPES_DESCRIPTION": "Webhook, apelul gestionează codul de stare, dar răspunsul este irelevant\nCall, apelul gestionează codul de stare și răspunsul\nAsync, apelul nu gestionează nici codul de stare, nici răspunsul, dar poate fi apelat în paralel cu alte Ținte",
+        "ENDPOINT": "Punct Final",
+        "ENDPOINT_DESCRIPTION": "Introduceți punctul final unde este găzduit codul dvs. Asigurați-vă că este accesibil pentru noi!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Setați timpul maxim pe care ținta dvs. îl are pentru a răspunde. Dacă durează mai mult, vom opri cererea.",
+        "INTERRUPT_ON_ERROR": "Întrerupe la Eroare",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Opriți toate execuțiile când țintele returnează o eroare",
+        "INTERRUPT_ON_ERROR_WARNING": "Atenție: „Întrerupe la eroare” oprește operațiunile în caz de eșec, riscând blocarea accesului. Testați cu această opțiune dezactivată pentru a evita blocarea autentificării/creării.",
+        "AWAIT_RESPONSE": "Așteaptă Răspuns",
+        "AWAIT_RESPONSE_DESCRIPTION": "Vom aștepta un răspuns înainte de a face altceva. Util dacă intenționați să utilizați mai multe ținte pentru o singură acțiune"
+      },
+      "TABLE": {
+        "NAME": "Nume",
+        "ENDPOINT": "Punct Final",
+        "CREATIONDATE": "Data Creării",
+        "REORDER": "Reordonați"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Are control asupra întregii instanțe, inclusiv asupra tuturor organizațiilor",
     "IAM_OWNER_VIEWER": "Are permisiunea de a revizui întreaga instanță, inclusiv toate organizațiile",
@@ -509,6 +648,7 @@
     "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
     "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
     "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
+    "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona clientii de login",
     "ORG_OWNER": "Are permisiunea asupra întregii organizații",
     "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
     "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",
@@ -551,6 +691,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Numele utilizatorului",
     "ORGNAME": "Numele organizației",
+    "ORGID": "ID-ul organizației",
     "PRIMARYDOMAIN": "Domeniu principal",
     "PROJECTNAME": "Numele proiectului",
     "RESOURCEOWNER": "Proprietarul resursei",
@@ -787,7 +928,10 @@
       "PHONESECTION": "Numere de telefon",
       "PASSWORDSECTION": "Parola inițială",
       "ADDRESSANDPHONESECTION": "Număr de telefon",
-      "INITMAILDESCRIPTION": "Dacă ambele opțiuni sunt selectate, nu va fi trimis niciun e-mail pentru inițializare. Dacă este selectată doar una dintre opțiuni, va fi trimis un e-mail pentru a furniza / verifica datele."
+      "INITMAILDESCRIPTION": "Dacă ambele opțiuni sunt selectate, nu va fi trimis niciun e-mail pentru inițializare. Dacă este selectată doar una dintre opțiuni, va fi trimis un e-mail pentru a furniza / verifica datele.",
+      "SETUPAUTHENTICATIONLATER": "Configurați autentificarea mai târziu pentru acest utilizator.",
+      "INVITATION": "Trimiteți un e-mail de invitație pentru configurarea autentificării și verificarea e-mailului.",
+      "INITIALPASSWORD": "Setați o parolă inițială pentru utilizator."
     },
     "CODEDIALOG": {
       "TITLE": "Verificați numărul de telefon",
@@ -1351,6 +1495,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Linkuri externe",
       "OIDC": "Durata de viață și expirarea tokenului OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Generator de secrete",
       "SECURITY": "Setări de securitate",
       "EVENTS": "Evenimente",
@@ -1366,7 +1511,8 @@
       "APPEARANCE": "Aspect",
       "OTHER": "Altele",
       "STORAGE": "Stocare"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1488,6 +1634,16 @@
       "ACTIONS_DESCRIPTION": "Acțiunile v2 permit gestionarea execuțiilor și țintelor de date. Dacă indicatorul este activat, veți putea utiliza noul API și caracteristicile sale.",
       "OIDCSINGLEV1SESSIONTERMINATION": "Terminarea sesiunii unice OIDC V1",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Dacă indicatorul este activat, veți putea termina o singură sesiune din UI-ul de conectare furnizând un id_token cu o revendicare sid ca id_token_hint pe endpointul end_session. Rețineți că în prezent toate sesiunile de la același agent utilizator (browser) sunt terminate în UI-ul de conectare. Sesiunile gestionate prin API-ul Session permit deja terminarea sesiunilor individuale.",
+      "DEBUGOIDCPARENTERROR": "Eroare de Depanare Părinte OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Dacă steagul este activat, eroarea părinte OIDC va fi înregistrată în consolă.",
+      "DISABLEUSERTOKENEVENT": "Dezactivează Evenimentul Token Utilizator",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Activează Logout Backchannel",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout-ul Back-Channel implementează OpenID Connect Back-Channel Logout 1.0 și poate fi folosit pentru a notifica clienții despre terminarea sesiunii la Producătorul OpenID.",
+      "PERMISSIONCHECKV2": "Verificare Permisiuni V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
+      "WEBKEY": "Cheie Web",
+      "WEBKEY_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
       "STATES": {
         "INHERITED": "Moșteniți",
         "ENABLED": "Activat",
@@ -1500,7 +1656,10 @@
       },
       "RESET": "Setați totul pentru a moșteni",
       "CONSOLEUSEV2USERAPI": "Utilizați API-ul V2 în Consola pentru crearea utilizatorului",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială."
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
+      "LOGINV2": "Autentificare V2",
+      "LOGINV2_DESCRIPTION": "Activarea acestei opțiuni pornește noua interfață de autentificare bazată pe TypeScript, cu securitate, performanță și personalizare îmbunătățite.",
+      "LOGINV2_BASEURI": "URI de bază"
     },
     "DIALOG": {
       "RESET": {
@@ -1990,6 +2149,7 @@
       "ACTIVATE": "Activați proiectul",
       "DELETE": "Ștergeți proiectul",
       "ORGNAME": "Nume organizație",
+      "ORGID": "ID organizație",
       "ORGDOMAIN": "Domeniu organizație",
       "STATE": "Stare",
       "TYPE": "Tip",

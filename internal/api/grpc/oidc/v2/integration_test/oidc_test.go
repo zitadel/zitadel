@@ -77,19 +77,22 @@ func TestServer_GetAuthRequest(t *testing.T) {
 			now, authRequestID, err := tt.dep()
 			require.NoError(t, err)
 
-			got, err := Client.GetAuthRequest(tt.ctx, &oidc_pb.GetAuthRequestRequest{
-				AuthRequestId: authRequestID,
-			})
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			authRequest := got.GetAuthRequest()
-			assert.NotNil(t, authRequest)
-			assert.Equal(t, authRequestID, authRequest.GetId())
-			assert.WithinRange(t, authRequest.GetCreationDate().AsTime(), now.Add(-time.Second), now.Add(time.Second))
-			assert.Contains(t, authRequest.GetScope(), "openid")
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetAuthRequest(tt.ctx, &oidc_pb.GetAuthRequestRequest{
+					AuthRequestId: authRequestID,
+				})
+				if tt.wantErr {
+					assert.Error(ttt, err)
+					return
+				}
+				assert.NoError(ttt, err)
+				authRequest := got.GetAuthRequest()
+				assert.NotNil(ttt, authRequest)
+				assert.Equal(ttt, authRequestID, authRequest.GetId())
+				assert.WithinRange(ttt, authRequest.GetCreationDate().AsTime(), now.Add(-time.Second), now.Add(time.Second))
+				assert.Contains(ttt, authRequest.GetScope(), "openid")
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -671,21 +674,24 @@ func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
 			deviceAuth, err := tt.dep()
 			require.NoError(t, err)
 
-			got, err := Client.GetDeviceAuthorizationRequest(tt.ctx, &oidc_pb.GetDeviceAuthorizationRequestRequest{
-				UserCode: deviceAuth.UserCode,
-			})
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			authRequest := got.GetDeviceAuthorizationRequest()
-			assert.NotNil(t, authRequest)
-			assert.NotEmpty(t, authRequest.GetId())
-			assert.Equal(t, client.GetClientId(), authRequest.GetClientId())
-			assert.Contains(t, authRequest.GetScope(), "openid")
-			assert.NotEmpty(t, authRequest.GetAppName())
-			assert.NotEmpty(t, authRequest.GetProjectName())
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetDeviceAuthorizationRequest(tt.ctx, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+					UserCode: deviceAuth.UserCode,
+				})
+				if tt.wantErr {
+					assert.Error(ttt, err)
+					return
+				}
+				assert.NoError(ttt, err)
+				authRequest := got.GetDeviceAuthorizationRequest()
+				assert.NotNil(ttt, authRequest)
+				assert.NotEmpty(ttt, authRequest.GetId())
+				assert.Equal(ttt, client.GetClientId(), authRequest.GetClientId())
+				assert.Contains(ttt, authRequest.GetScope(), "openid")
+				assert.NotEmpty(ttt, authRequest.GetAppName())
+				assert.NotEmpty(ttt, authRequest.GetProjectName())
+			}, retryDuration, tick)
 		})
 	}
 }

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ColorEvent } from 'ngx-color';
+import type { ColorEvent } from 'ngx-color';
 import { BehaviorSubject, debounceTime } from 'rxjs';
 
 import { ColorType } from '../private-labeling-policy.component';
