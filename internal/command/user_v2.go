@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -115,36 +114,6 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
-}
-
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {

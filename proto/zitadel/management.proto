@@ -9241,7 +9241,7 @@ message AddOrgMemberRequest {
     repeated string roles = 2  [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"ORG_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -9254,7 +9254,7 @@ message UpdateOrgMemberRequest {
     repeated string roles = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"IAM_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -9675,7 +9675,7 @@ message AddProjectMemberRequest {
     repeated string roles = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -9690,7 +9690,7 @@ message UpdateProjectMemberRequest {
     repeated string roles = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -10345,7 +10345,7 @@ message AddProjectGrantMemberRequest {
     repeated string roles = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_GRANT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
@@ -10369,7 +10369,7 @@ message UpdateProjectGrantMemberRequest {
     repeated string roles = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_GRANT_OWNER\"]";
-            description: "If no roles are provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights, so the member definition will be regarded as invalid."
         }
     ];
 }
