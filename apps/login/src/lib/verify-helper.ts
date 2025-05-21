@@ -258,15 +258,15 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
   const cookiesList = await cookies();
 
   // only read cookie to prevent issues on page.tsx
-  const userAgentId = await getFingerprintIdCookie();
+  const fingerPrintCookie = await getFingerprintIdCookie();
 
-  if (!userAgentId || userAgentId.value) {
+  if (!fingerPrintCookie || !fingerPrintCookie.value) {
     return false;
   }
 
   const verificationCheck = crypto
     .createHash("sha256")
-    .update(`${userId}:${userAgentId}`)
+    .update(`${userId}:${fingerPrintCookie.value}`)
     .digest("hex");
 
   const cookieValue = await cookiesList.get("verificationCheck")?.value;

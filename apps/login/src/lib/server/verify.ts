@@ -6,7 +6,6 @@ import {
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-  resendEmailCode,
   verifyEmail,
   verifyInviteCode,
   verifyTOTPRegistration,
@@ -283,7 +282,7 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
           `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
       }) //resendInviteCode({ serviceUrl, userId: command.userId })
-    : resendEmailCode({
+    : sendEmailCode({
         userId: command.userId,
         serviceUrl,
         urlTemplate:
