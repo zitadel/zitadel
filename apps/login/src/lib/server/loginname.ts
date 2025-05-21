@@ -9,8 +9,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkUserVerification } from "../verification-helper";
-import { checkEmailVerified } from "../verify-helper";
+import { checkEmailVerified, checkUserVerification } from "../verify-helper";
 import {
   getActiveIdentityProviders,
   getIDPByID,
