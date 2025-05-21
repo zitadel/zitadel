@@ -13,7 +13,6 @@ import {
   listAuthenticationMethodTypes,
   listUsers,
   passwordReset,
-  setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
 import { ConnectError, create } from "@zitadel/client";
@@ -25,10 +24,7 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import {
-  AuthenticationMethodType,
-  SetPasswordRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
@@ -37,6 +33,7 @@ import {
   checkEmailVerification,
   checkMFAFactors,
   checkPasswordChangeRequired,
+  checkUserVerification,
 } from "../verify-helper";
 
 type ResetPasswordCommand = {
@@ -297,6 +294,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   return { redirect: url };
 }
 
+// this function lets users with code set a password or users with valid User Verification Check
 export async function changePassword(command: {
   code?: string;
   userId: string;
@@ -316,11 +314,39 @@ export async function changePassword(command: {
   }
   const userId = user.userId;
 
+  if (user.state === UserState.INITIAL) {
+    return { error: "User Initial State is not supported" };
+  }
+
+  // check if the user has no password set in order to set a password
+  if (!command.code) {
+    const authmethods = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId,
+    });
+
+    // if the user has no authmethods set, we need to check if the user was verified
+    if (authmethods.authMethodTypes.length !== 0) {
+      return {
+        error:
+          "You have to provide a code or have a valid User Verification Check",
+      };
+    }
+
+    // check if a verification was done earlier
+    const hasValidUserVerificationCheck = await checkUserVerification(
+      user.userId,
+    );
+
+    if (!hasValidUserVerificationCheck) {
+      return { error: "User Verification Check has to be done" };
+    }
+  }
+
   return setUserPassword({
     serviceUrl,
     userId,
     password: command.password,
-    user,
     code: command.code,
   });
 }
@@ -366,67 +392,32 @@ export async function checkSessionAndSetPassword({
     return { error: "Could not load auth methods" };
   }
 
-  const requiredAuthMethodsForForceMFA = [
-    AuthenticationMethodType.OTP_EMAIL,
-    AuthenticationMethodType.OTP_SMS,
-    AuthenticationMethodType.TOTP,
-    AuthenticationMethodType.U2F,
-  ];
-
-  const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every(
-    (method) => !authmethods.authMethodTypes.includes(method),
-  );
-
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: session.factors.user.organizationId,
-  });
-
-  const forceMfa = !!(
-    loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly
-  );
-
-  // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa && hasNoMFAMethods) {
-    return setPassword({ serviceUrl, payload }).catch((error) => {
-      // throw error if failed precondition (ex. User is not yet initialized)
-      if (error.code === 9 && error.message) {
-        return { error: "Failed precondition" };
-      } else {
-        throw error;
-      }
+  const transport = async (serviceUrl: string, token: string) => {
+    return createServerTransport(token, {
+      baseUrl: serviceUrl,
     });
-  } else {
-    const transport = async (serviceUrl: string, token: string) => {
-      return createServerTransport(token, {
-        baseUrl: serviceUrl,
-      });
-    };
+  };
 
-    const myUserService = async (serviceUrl: string, sessionToken: string) => {
-      const transportPromise = await transport(serviceUrl, sessionToken);
-      return createUserServiceClient(transportPromise);
-    };
+  const myUserService = async (serviceUrl: string, sessionToken: string) => {
+    const transportPromise = await transport(serviceUrl, sessionToken);
+    return createUserServiceClient(transportPromise);
+  };
 
-    const selfService = await myUserService(
-      serviceUrl,
-      `${sessionCookie.token}`,
-    );
+  const selfService = await myUserService(serviceUrl, `${sessionCookie.token}`);
 
-    return selfService
-      .setPassword(
-        {
-          userId: session.factors.user.id,
-          newPassword: { password, changeRequired: false },
-        },
-        {},
-      )
-      .catch((error: ConnectError) => {
-        console.log(error);
-        if (error.code === 7) {
-          return { error: "Session is not valid." };
-        }
-        throw error;
-      });
-  }
+  return selfService
+    .setPassword(
+      {
+        userId: session.factors.user.id,
+        newPassword: { password, changeRequired: false },
+      },
+      {},
+    )
+    .catch((error: ConnectError) => {
+      console.log(error);
+      if (error.code === 7) {
+        return { error: "Session is not valid." };
+      }
+      throw error;
+    });
 }

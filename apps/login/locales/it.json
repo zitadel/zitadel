@@ -181,6 +181,7 @@
       "description": "Inserisci il codice fornito nell'email di verifica.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
+      "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
       "submit": "Continua"
     }
   },

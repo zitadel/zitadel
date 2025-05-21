@@ -1,4 +1,4 @@
-import { Alert } from "@/components/alert";
+import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
@@ -6,6 +6,7 @@ import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { checkUserVerification } from "@/lib/verify-helper";
 import {
   getBrandingSettings,
   getUserByID,
@@ -22,7 +23,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, code, organization, requestId, invite } =
+  const { userId, loginName, code, organization, requestId, invite, send } =
     searchParams;
 
   const _headers = await headers();
@@ -43,7 +44,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let human: HumanUser | undefined;
   let id: string | undefined;
 
-  const doSend = invite !== "true";
+  const doSend = send === "true";
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -61,7 +62,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         serviceUrl,
         userId: sessionFactors?.factors?.user?.id,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
@@ -74,7 +75,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         serviceUrl,
         userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
@@ -96,13 +97,22 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   id = userId ?? sessionFactors?.factors?.user?.id;
 
+  if (!id) {
+    throw Error("Failed to get user id");
+  }
+
   let authMethods: AuthenticationMethodType[] | null = null;
   if (human?.email?.isVerified) {
-    const authMethodsResponse = await listAuthenticationMethodTypes(userId);
+    const authMethodsResponse = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId,
+    });
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
     }
   }
+
+  const hasValidUserVerificationCheck = await checkUserVerification(id);
 
   const params = new URLSearchParams({
     userId: userId,
@@ -138,6 +148,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </>
         )}
 
+        {id && send && (
+          <div className="py-4 w-full">
+            <Alert type={AlertType.INFO}>{t("verify.codeSent")}</Alert>
+          </div>
+        )}
+
         {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -155,27 +171,27 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
 
-        {id &&
-          (human?.email?.isVerified ? (
-            // show page for already verified users
-            <VerifyRedirectButton
-              userId={id}
-              loginName={loginName}
-              organization={organization}
-              requestId={requestId}
-              authMethods={authMethods}
-            />
-          ) : (
-            // check if auth methods are set
-            <VerifyForm
-              loginName={loginName}
-              organization={organization}
-              userId={id}
-              code={code}
-              isInvite={invite === "true"}
-              requestId={requestId}
-            />
-          ))}
+        {/* show a button to setup auth method for the user otherwise show the UI for reverifying */}
+        {human?.email?.isVerified && hasValidUserVerificationCheck ? (
+          // show page for already verified users
+          <VerifyRedirectButton
+            userId={id}
+            loginName={loginName}
+            organization={organization}
+            requestId={requestId}
+            authMethods={authMethods}
+          />
+        ) : (
+          // check if auth methods are set
+          <VerifyForm
+            loginName={loginName}
+            organization={organization}
+            userId={id}
+            code={code}
+            isInvite={invite === "true"}
+            requestId={requestId}
+          />
+        )}
       </div>
     </DynamicTheme>
   );

@@ -1,24 +1,26 @@
 "use server";
 
 import {
+  createInviteCode,
   getLoginSettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-  resendEmailCode,
-  resendInviteCode,
   verifyEmail,
   verifyInviteCode,
   verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
+import crypto from "crypto";
+
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
+import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
@@ -193,6 +195,24 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
     }
+
+    // set hash of userId and userAgentId to prevent attacks, checks are done for users with invalid sessions and invalid userAgentId
+    const cookiesList = await cookies();
+    const userAgentId = await getOrSetFingerprintId();
+
+    const verificationCheck = crypto
+      .createHash("sha256")
+      .update(`${user.userId}:${userAgentId}`)
+      .digest("hex");
+
+    await cookiesList.set({
+      name: "verificationCheck",
+      value: verificationCheck,
+      httpOnly: true,
+      path: "/",
+      maxAge: 300, // 5 minutes
+    });
+
     return { redirect: `/authenticator/set?${params}` };
   }
 
@@ -253,20 +273,26 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+  // create a new invite whenever the resend is called
   return command.isInvite
-    ? resendInviteCode({ serviceUrl, userId: command.userId })
-    : resendEmailCode({
+    ? createInviteCode({
+        serviceUrl,
+        userId: command.userId,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          (command.requestId ? `&requestId=${command.requestId}` : ""),
+      }) //resendInviteCode({ serviceUrl, userId: command.userId })
+    : sendEmailCode({
         userId: command.userId,
         serviceUrl,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
       });
 }
 
 type sendEmailCommand = {
   serviceUrl: string;
-
   userId: string;
   urlTemplate: string;
 };
