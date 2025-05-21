@@ -50,6 +50,10 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 	if err != nil {
 		return nil, err
 	}
+	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	if err != nil {
+		return nil, err
+	}
 	grants, err := s.query.SearchProjectGrants(ctx, queries, nil)
 	if err != nil {
 		return nil, err

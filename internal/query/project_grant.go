@@ -254,6 +254,18 @@ func NewProjectGrantProjectIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnProjectID, value, TextEquals)
 }
 
+func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetAllPermissionCtxIDs(permissions)
+		query, err := NewProjectGrantIDsSearchQuery(ids)
+		if err != nil {
+			return err
+		}
+		q.Queries = append(q.Queries, query)
+	}
+	return nil
+}
+
 func NewProjectGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
 	list := make([]interface{}, len(ids))
 	for i, value := range ids {
