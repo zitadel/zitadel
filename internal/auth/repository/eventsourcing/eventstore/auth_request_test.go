@@ -286,7 +286,7 @@ func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.P
 	return &query.Project{ResourceOwner: m.resourceOwner, HasProjectCheck: m.projectCheck}, nil
 }
 
-func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries) (*query.ProjectGrants, error) {
+func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, permissionCheck domain.PermissionCheck) (*query.ProjectGrants, error) {
 	if m.hasProject {
 		mockProjectGrant := new(query.ProjectGrant)
 		return &query.ProjectGrants{ProjectGrants: []*query.ProjectGrant{mockProjectGrant}}, nil
