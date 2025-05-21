@@ -10,6 +10,7 @@ const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
 const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
+const sidebar_api_org_service_v2beta = require("./docs/apis/resources/org_service_v2beta/sidebar.ts").default
 const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
 const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
@@ -788,6 +789,18 @@ module.exports = {
                   "This API is intended to manage organizations for ZITADEL. \n",
               },
               items: sidebar_api_org_service_v2,
+            },
+            {
+              type: "category",
+              label: "Organization beta",
+              link: {
+                type: "generated-index",
+                title: "Organization Service beta API",
+                slug: "/apis/resources/org_service/v2beta",
+                description:
+                  "This API is intended to manage organizations for ZITADEL. \n",
+              },
+              items: sidebar_api_org_service_v2beta,
             },
             {
               type: "category",
