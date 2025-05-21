@@ -150,17 +150,6 @@ func FieldNameToOrgColumn(fieldName v2beta_org.OrgFieldName) query.Column {
 	}
 }
 
-// func OrgViewToPb(org *query.Org) *v2beta_org.Organization {
-// 	return &v2beta_org.Organization{
-// 		Id:            org.ID,
-// 		State:         OrgStateToPb(org.State),
-// 		Name:          org.Name,
-// 		PrimaryDomain: org.Domain,
-// 		CreationDate:  timestamppb.New(org.CreationDate),
-// 		ChangedDate:   timestamppb.New(org.ChangeDate),
-// 	}
-// }
-
 func ListOrgDomainsRequestToModel(systemDefaults systemdefaults.SystemDefaults, request *org.ListOrganizationDomainsRequest) (*query.OrgDomainSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)
 	if err != nil {
@@ -202,7 +191,6 @@ func DomainQueriesToModel(queries []*v2beta_org.DomainSearchFilter) (_ []query.S
 func DomainQueryToModel(searchQuery *v2beta_org.DomainSearchFilter) (query.SearchQuery, error) {
 	switch q := searchQuery.Filter.(type) {
 	case *v2beta_org.DomainSearchFilter_DomainNameFilter:
-		// return query.NewOrgDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainNameQuery.Method), q.DomainNameQuery.Name)
 		return query.NewOrgDomainDomainSearchQuery(v2beta_object.TextMethodToQuery(q.DomainNameFilter.Method), q.DomainNameFilter.Name)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Ags89", "List.Query.Invalid")

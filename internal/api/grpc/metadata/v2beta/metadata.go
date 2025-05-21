@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	meta_pb "github.com/zitadel/zitadel/pkg/grpc/metadata/v2beta"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // code in this file is copied from internal/api/grpc/metadata/metadata.go
@@ -19,14 +20,10 @@ func OrgMetadataListToPb(dataList []*query.OrgMetadata) []*meta_pb.Metadata {
 
 func OrgMetadataToPb(data *query.OrgMetadata) *meta_pb.Metadata {
 	return &meta_pb.Metadata{
-		Key:   data.Key,
-		Value: data.Value,
-		Details: v2beta_object.ToViewDetailsPb(
-			data.Sequence,
-			data.CreationDate,
-			data.ChangeDate,
-			data.ResourceOwner,
-		),
+		Key:          data.Key,
+		Value:        data.Value,
+		CreationDate: timestamppb.New(data.CreationDate),
+		ChangeDate:   timestamppb.New(data.ChangeDate),
 	}
 }
 

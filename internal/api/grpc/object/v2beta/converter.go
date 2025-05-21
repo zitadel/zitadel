@@ -2,7 +2,6 @@ package object
 
 import (
 	"context"
-	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -114,25 +113,6 @@ func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType
 	default:
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
 	}
-}
-
-func ToViewDetailsPb(
-	sequence uint64,
-	creationDate,
-	changeDate time.Time,
-	resourceOwner string,
-) *object.Details {
-	details := &object.Details{
-		Sequence:      sequence,
-		ResourceOwner: resourceOwner,
-	}
-	if !creationDate.IsZero() {
-		details.CreationDate = timestamppb.New(creationDate)
-	}
-	if !changeDate.IsZero() {
-		details.ChangeDate = timestamppb.New(changeDate)
-	}
-	return details
 }
 
 func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) domain.OrgDomainValidationType {

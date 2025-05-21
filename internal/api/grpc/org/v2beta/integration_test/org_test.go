@@ -5,6 +5,7 @@ package org_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -25,11 +26,10 @@ import (
 )
 
 var (
-	CTX         context.Context
-	Instance    *integration.Instance
-	Client      v2beta_org.OrganizationServiceClient
-	AdminClient admin.AdminServiceClient
-	User        *user.AddHumanUserResponse
+	CTX      context.Context
+	Instance *integration.Instance
+	Client   v2beta_org.OrganizationServiceClient
+	User     *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -39,7 +39,6 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 		Client = Instance.Client.OrgV2beta
-		AdminClient = Instance.Client.Admin
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		User = Instance.CreateHumanUser(CTX)
@@ -168,6 +167,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.CreateOrganization(tt.ctx, tt.req)
+			fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -279,12 +279,17 @@ func TestServer_ListOrganization(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := []struct {
-		name    string
-		ctx     context.Context
-		query   []*v2beta_org.OrganizationSearchFilter
-		want    []*v2beta_org.Organization
-		wantErr bool
+		name  string
+		ctx   context.Context
+		query []*v2beta_org.OrganizationSearchFilter
+		want  []*v2beta_org.Organization
+		err   error
 	}{
+		{
+			name: "list organizations, without required permissions",
+			ctx:  ListOrgIinstance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			err:  errors.New("membership not found"),
+		},
 		{
 			name: "list organizations happy path, no filter",
 			ctx:  listOrgIAmOwnerCtx,
@@ -538,9 +543,9 @@ func TestServer_ListOrganization(t *testing.T) {
 				got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
 					Filter: tt.query,
 				})
-
-				if tt.wantErr {
-					assert.Error(ttt, err)
+				if tt.err != nil {
+					require.ErrorContains(t, err, tt.err.Error())
+					return
 				}
 				require.NoError(ttt, err)
 
@@ -585,6 +590,20 @@ func TestServer_DeleteOrganization(t *testing.T) {
 		dontCheckTime bool
 		err           error
 	}{
+		{
+			name: "delete org no permission",
+			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			createOrgFunc: func() string {
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return ""
+				}
+				return orgs[0].Id
+			},
+			req: &v2beta_org.DeleteOrganizationRequest{},
+			err: errors.New("membership not found"),
+		},
 		{
 			name: "delete org happy path",
 			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
@@ -982,7 +1001,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 	}
 	orgId := orgs[0].Id
 
-	_, err = AdminClient.UpdateDomainPolicy(CTX, &admin.UpdateDomainPolicyRequest{
+	_, err = Instance.Client.Admin.UpdateDomainPolicy(CTX, &admin.UpdateDomainPolicyRequest{
 		ValidateOrgDomains: true,
 	})
 	if err != nil && !strings.Contains(err.Error(), "Organisation is already deactivated") {
