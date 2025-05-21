@@ -3129,9 +3129,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Remove Project Role";
             deprecated: true;
-            description: "Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.\n\nDeprecated: please use user service v2 RemoveProjectRole."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
