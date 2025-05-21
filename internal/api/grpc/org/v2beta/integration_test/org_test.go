@@ -707,19 +707,22 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 3. check organization state is deactivated
-				listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
-					Filter: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: orgId,
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
+						Filter: []*v2beta_org.OrganizationSearchFilter{
+							{
+								Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
+									IdFilter: &v2beta_org.OrgIDFilter{
+										Id: orgId,
+									},
 								},
 							},
 						},
-					},
-				})
-				require.NoError(t, err)
-				require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					})
+					require.NoError(t, err)
+					require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				// 4. repeat deactivate organization once
 				_, err = Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
@@ -729,7 +732,7 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 				require.Contains(t, err.Error(), "Organisation is already deactivated")
 
 				// 5. repeat check organization state is still deactivated
-				listOrgRes, err = Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
+				listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
 					Filter: []*v2beta_org.OrganizationSearchFilter{
 						{
 							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
@@ -782,19 +785,22 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 4. check organization state is deactivated
-				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-					Filter: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: orgId,
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+						Filter: []*v2beta_org.OrganizationSearchFilter{
+							{
+								Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
+									IdFilter: &v2beta_org.OrgIDFilter{
+										Id: orgId,
+									},
 								},
 							},
 						},
-					},
-				})
-				require.NoError(t, err)
-				require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					})
+					require.NoError(ttt, err)
+					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				// 5. reactivate organization
 				reactivate_res, err := Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
@@ -806,19 +812,22 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 6. check organization state is active
-				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-					Filter: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: orgId,
+				retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+						Filter: []*v2beta_org.OrganizationSearchFilter{
+							{
+								Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
+									IdFilter: &v2beta_org.OrgIDFilter{
+										Id: orgId,
+									},
 								},
 							},
 						},
-					},
-				})
-				require.NoError(t, err)
-				require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+					})
+					require.NoError(ttt, err)
+					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				// 7. repeat reactivate organization
 				reactivate_res, err = Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
@@ -1181,24 +1190,27 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-			// check metadata
-			listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				OrganizationId: orgId,
-			})
-			require.NoError(t, err)
-			foundMetadata := false
-			foundMetadataKeyCount := 0
-			for _, res := range listMetadataRes.Metadata {
-				if res.Key == tt.key {
-					foundMetadataKeyCount += 1
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// check metadata
+				listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+					OrganizationId: orgId,
+				})
+				require.NoError(t, err)
+				foundMetadata := false
+				foundMetadataKeyCount := 0
+				for _, res := range listMetadataRes.Metadata {
+					if res.Key == tt.key {
+						foundMetadataKeyCount += 1
+					}
+					if res.Key == tt.key &&
+						string(res.Value) == tt.value {
+						foundMetadata = true
+					}
 				}
-				if res.Key == tt.key &&
-					string(res.Value) == tt.value {
-					foundMetadata = true
-				}
-			}
-			require.True(t, foundMetadata, "unable to find added metadata")
-			require.Equal(t, 1, foundMetadataKeyCount, "same metadata key found multiple times")
+				require.True(ttt, foundMetadata, "unable to find added metadata")
+				require.Equal(ttt, 1, foundMetadataKeyCount, "same metadata key found multiple times")
+			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
 }
@@ -1491,20 +1503,23 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			}
 
 			// check metadata exists
-			listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				OrganizationId: tt.orgId,
-			})
-			require.NoError(t, err)
-			foundMetadataCount := 0
-			for _, kv := range tt.metadataToDelete {
-				for _, res := range listOrgMetadataRes.Metadata {
-					if res.Key == kv.key &&
-						string(res.Value) == kv.value {
-						foundMetadataCount += 1
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+					OrganizationId: tt.orgId,
+				})
+				require.NoError(ttt, err)
+				foundMetadataCount := 0
+				for _, kv := range tt.metadataToDelete {
+					for _, res := range listOrgMetadataRes.Metadata {
+						if res.Key == kv.key &&
+							string(res.Value) == kv.value {
+							foundMetadataCount += 1
+						}
 					}
 				}
-			}
-			require.Equal(t, len(tt.metadataToDelete), foundMetadataCount)
+				require.Equal(ttt, len(tt.metadataToDelete), foundMetadataCount)
+			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 			keys := make([]string, len(tt.metadataToDelete))
 			for i, kvp := range tt.metadataToDelete {
@@ -1522,28 +1537,31 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			// check metadata was definitely deleted
-			listOrgMetadataRes, err = Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				OrganizationId: tt.orgId,
-			})
-			require.NoError(t, err)
-			foundMetadataCount = 0
-			for _, kv := range tt.metadataToDelete {
-				for _, res := range listOrgMetadataRes.Metadata {
-					if res.Key == kv.key &&
-						string(res.Value) == kv.value {
-						foundMetadataCount += 1
+			retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// check metadata was definitely deleted
+				listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+					OrganizationId: tt.orgId,
+				})
+				require.NoError(ttt, err)
+				foundMetadataCount := 0
+				for _, kv := range tt.metadataToDelete {
+					for _, res := range listOrgMetadataRes.Metadata {
+						if res.Key == kv.key &&
+							string(res.Value) == kv.value {
+							foundMetadataCount += 1
+						}
 					}
 				}
-			}
-			require.Equal(t, foundMetadataCount, 0)
+				require.Equal(ttt, foundMetadataCount, 0)
+			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 			// check metadata that should not be delted was not deleted
-			listOrgMetadataRes, err = Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
+			listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 				OrganizationId: tt.orgId,
 			})
 			require.NoError(t, err)
-			foundMetadataCount = 0
+			foundMetadataCount := 0
 			for _, kv := range tt.metadataToRemain {
 				for _, res := range listOrgMetadataRes.Metadata {
 					if res.Key == kv.key &&
