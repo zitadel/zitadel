@@ -312,6 +312,16 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Federated logouts store the information needed to handle federated logout and their state transfer
+  FederatedLogouts:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
