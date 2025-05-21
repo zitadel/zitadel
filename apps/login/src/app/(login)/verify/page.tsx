@@ -1,4 +1,4 @@
-import { Alert } from "@/components/alert";
+import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
@@ -146,6 +146,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               <Alert>{tError("unknownContext")}</Alert>
             </div>
           </>
+        )}
+
+        {id && send && (
+          <div className="py-4 w-full">
+            <Alert type={AlertType.INFO}>{tError("verify.codesent")}</Alert>
+          </div>
         )}
 
         {sessionFactors ? (

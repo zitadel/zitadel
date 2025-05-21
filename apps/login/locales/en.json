@@ -181,6 +181,7 @@
       "description": "Enter the Code provided in the verification email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
+      "codeSent": "A code has just been sent to your email address.",
       "submit": "Continue"
     }
   },

@@ -268,13 +268,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         return inviteCheck;
       }
 
-      // check if user was verified
+      // check if user was verified recently
       const isUserVerified = await checkUserVerification(
         session.factors.user.id,
       );
       if (!isUserVerified) {
         const params = new URLSearchParams({
           loginName: session.factors?.user?.loginName as string,
+          // send: "true", // set this to true to request a new code immediately
         });
 
         if (command.requestId) {
