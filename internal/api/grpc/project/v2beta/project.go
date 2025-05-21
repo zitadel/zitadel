@@ -92,18 +92,12 @@ func projectUpdateToCommand(req *project_pb.UpdateProjectRequest) *command.Chang
 }
 
 func (s *Server) DeleteProject(ctx context.Context, req *project_pb.DeleteProjectRequest) (*project_pb.DeleteProjectResponse, error) {
-	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: []query.SearchQuery{projectQuery},
-	}, true)
+	userGrantIDs, err := s.userGrantsFromProject(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	deletedAt, err := s.command.DeleteProject(ctx, req.Id, "", userGrantsToIDs(grants.UserGrants)...)
+	deletedAt, err := s.command.DeleteProject(ctx, req.Id, "", userGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +108,20 @@ func (s *Server) DeleteProject(ctx context.Context, req *project_pb.DeleteProjec
 	return &project_pb.DeleteProjectResponse{
 		DeletionDate: deletionDate,
 	}, nil
+}
+
+func (s *Server) userGrantsFromProject(ctx context.Context, projectID string) ([]string, error) {
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery},
+	}, false)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantsToIDs(userGrants.UserGrants), nil
 }
 
 func (s *Server) DeactivateProject(ctx context.Context, req *project_pb.DeactivateProjectRequest) (*project_pb.DeactivateProjectResponse, error) {

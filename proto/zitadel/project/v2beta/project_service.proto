@@ -232,7 +232,7 @@ service ProjectService {
       responses: {
         key: "404"
         value: {
-          description: "The project to update does not exist.";
+          description: "The project to get does not exist.";
         }
       };
     };
@@ -356,7 +356,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.role.write"
+        permission: "authenticated"
       }
     };
 
@@ -390,7 +390,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.role.write"
+        permission: "authenticated"
       }
     };
 
@@ -423,7 +423,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.role.delete"
+        permission: "authenticated"
       }
     };
 
@@ -491,7 +491,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 
@@ -526,7 +526,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 
@@ -562,7 +562,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.delete"
+        permission: "authenticated"
       }
     };
 
@@ -591,7 +591,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 
@@ -619,7 +619,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "project.grant.write"
+        permission: "authenticated"
       }
     };
 
@@ -632,7 +632,6 @@ service ProjectService {
       };
     };
   }
-
 
   // List Project Grants
   //
@@ -1023,10 +1022,16 @@ message ListProjectRolesRequest {
   ];
   // List limitations and ordering.
   optional zitadel.filter.v2beta.PaginationRequest pagination = 2;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional ProjectRoleFieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"PROJECT_ROLE_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
   // Define the criteria to query for.
-  repeated ProjectRoleFilter filters = 4;
+  repeated ProjectRoleSearchFilter filters = 4;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"PROJECT_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"keyFilter\":{\"key\":\"role.super.man\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"displayNameFilter\":{\"displayName\":\"SUPER\"}}]}";
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"PROJECT_ROLE_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"keyFilter\":{\"key\":\"role.super.man\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"displayNameFilter\":{\"displayName\":\"SUPER\"}}]}";
   };
 }
 
@@ -1213,8 +1218,14 @@ message ActivateProjectGrantResponse {
 message ListProjectGrantsRequest {
   // List limitations and ordering.
   optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional ProjectGrantFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"PROJECT_GRANT_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
   // Define the criteria to query for.
-  repeated ProjectSearchFilter filters = 3;
+  repeated ProjectGrantSearchFilter filters = 3;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"filters\":[{\"projectNameFilter\":{\"projectName\":\"MyProject\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inProjectIdsFilter\":{\"projectIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
   };

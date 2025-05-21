@@ -17,8 +17,9 @@ import (
 )
 
 var (
-	CTX      context.Context
-	instance *integration.Instance
+	CTX                  context.Context
+	instance             *integration.Instance
+	instancePermissionV2 *integration.Instance
 )
 
 func TestMain(m *testing.M) {
@@ -27,6 +28,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 		CTX = ctx
 		instance = integration.NewInstance(ctx)
+		instancePermissionV2 = integration.NewInstance(CTX)
 		return m.Run()
 	}())
 }

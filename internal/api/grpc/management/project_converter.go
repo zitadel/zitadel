@@ -56,10 +56,11 @@ func privateLabelingSettingToDomain(setting proj_pb.PrivateLabelingSetting) doma
 	}
 }
 
-func AddProjectRoleRequestToDomain(req *mgmt_pb.AddProjectRoleRequest) *domain.ProjectRole {
-	return &domain.ProjectRole{
+func AddProjectRoleRequestToCommand(req *mgmt_pb.AddProjectRoleRequest, resourceOwner string) *command.AddProjectRole {
+	return &command.AddProjectRole{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
 		Key:         req.RoleKey,
 		DisplayName: req.DisplayName,
@@ -67,12 +68,13 @@ func AddProjectRoleRequestToDomain(req *mgmt_pb.AddProjectRoleRequest) *domain.P
 	}
 }
 
-func BulkAddProjectRolesRequestToDomain(req *mgmt_pb.BulkAddProjectRolesRequest) []*domain.ProjectRole {
-	roles := make([]*domain.ProjectRole, len(req.Roles))
+func BulkAddProjectRolesRequestToCommand(req *mgmt_pb.BulkAddProjectRolesRequest, resourceOwner string) []*command.AddProjectRole {
+	roles := make([]*command.AddProjectRole, len(req.Roles))
 	for i, role := range req.Roles {
-		roles[i] = &domain.ProjectRole{
+		roles[i] = &command.AddProjectRole{
 			ObjectRoot: models.ObjectRoot{
-				AggregateID: req.ProjectId,
+				AggregateID:   req.ProjectId,
+				ResourceOwner: resourceOwner,
 			},
 			Key:         role.Key,
 			DisplayName: role.DisplayName,
@@ -82,10 +84,11 @@ func BulkAddProjectRolesRequestToDomain(req *mgmt_pb.BulkAddProjectRolesRequest)
 	return roles
 }
 
-func UpdateProjectRoleRequestToDomain(req *mgmt_pb.UpdateProjectRoleRequest) *domain.ProjectRole {
-	return &domain.ProjectRole{
+func UpdateProjectRoleRequestToCommand(req *mgmt_pb.UpdateProjectRoleRequest, resourceOwner string) *command.ChangeProjectRole {
+	return &command.ChangeProjectRole{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
 		Key:         req.RoleKey,
 		DisplayName: req.DisplayName,

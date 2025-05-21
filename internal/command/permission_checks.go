@@ -67,3 +67,7 @@ func (c *Commands) checkPermissionDeleteProject(ctx context.Context, resourceOwn
 func (c *Commands) checkPermissionUpdateProject(ctx context.Context, resourceOwner, projectID string) error {
 	return c.newPermissionCheck(ctx, domain.PermissionProjectWrite, project.AggregateType)(resourceOwner, projectID)
 }
+
+func (c *Commands) checkPermissionWriteProjectGrant(ctx context.Context, resourceOwner, projectGrantID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantWrite, project.AggregateType)(resourceOwner, projectGrantID)
+}

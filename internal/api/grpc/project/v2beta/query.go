@@ -149,17 +149,28 @@ func projectToPb(project *query.Project) *project_pb.Project {
 }
 
 func grantedProjectToPb(project *query.GrantedProject) *project_pb.Project {
+	var grantedOrganizationID, grantedOrganizationName *string
+	if project.GrantedOrgID != "" {
+		grantedOrganizationID = &project.GrantedOrgID
+	}
+	if project.OrgName != "" {
+		grantedOrganizationName = &project.OrgName
+	}
+
 	return &project_pb.Project{
-		Id:                     project.ProjectID,
-		OrganizationId:         project.ResourceOwner,
-		CreationDate:           timestamppb.New(project.CreationDate),
-		ChangeDate:             timestamppb.New(project.ChangeDate),
-		State:                  projectStateToPb(project.ProjectState),
-		Name:                   project.ProjectName,
-		PrivateLabelingSetting: privateLabelingSettingToPb(project.PrivateLabelingSetting),
-		ProjectAccessRequired:  project.HasProjectCheck,
-		ProjectRoleAssertion:   project.ProjectRoleAssertion,
-		AuthorizationRequired:  project.ProjectRoleCheck,
+		Id:                      project.ProjectID,
+		OrganizationId:          project.ResourceOwner,
+		CreationDate:            timestamppb.New(project.CreationDate),
+		ChangeDate:              timestamppb.New(project.ChangeDate),
+		State:                   projectStateToPb(project.ProjectState),
+		Name:                    project.ProjectName,
+		PrivateLabelingSetting:  privateLabelingSettingToPb(project.PrivateLabelingSetting),
+		ProjectAccessRequired:   project.HasProjectCheck,
+		ProjectRoleAssertion:    project.ProjectRoleAssertion,
+		AuthorizationRequired:   project.ProjectRoleCheck,
+		GrantedOrganizationId:   grantedOrganizationID,
+		GrantedOrganizationName: grantedOrganizationName,
+		GrantedState:            grantedProjectStateToPb(project.ProjectGrantState),
 	}
 }
 
@@ -175,6 +186,18 @@ func projectStateToPb(state domain.ProjectState) project_pb.ProjectState {
 		return project_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
 	}
 }
+func grantedProjectStateToPb(state domain.ProjectGrantState) project_pb.GrantedProjectState {
+	switch state {
+	case domain.ProjectGrantStateActive:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_ACTIVE
+	case domain.ProjectGrantStateInactive:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_INACTIVE
+	case domain.ProjectGrantStateUnspecified, domain.ProjectGrantStateRemoved:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_UNSPECIFIED
+	default:
+		return project_pb.GrantedProjectState_GRANTED_PROJECT_STATE_UNSPECIFIED
+	}
+}
 
 func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) project_pb.PrivateLabelingSetting {
 	switch setting {
@@ -186,5 +209,219 @@ func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) project_p
 		return project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
 	default:
 		return project_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
+	}
+}
+
+func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProjectGrantsRequest) (*project_pb.ListProjectGrantsResponse, error) {
+	queries, err := s.listProjectGrantsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.SearchProjectGrants(ctx, queries, s.checkPermission)
+	if err != nil {
+		return nil, err
+	}
+	return &project_pb.ListProjectGrantsResponse{
+		ProjectGrants: projectGrantsToPb(resp.ProjectGrants),
+		Pagination:    filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
+	}, nil
+}
+
+func (s *Server) listProjectGrantsRequestToModel(req *project_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	if err != nil {
+		return nil, err
+	}
+	queries, err := projectGrantFiltersToModel(req.Filters)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: projectGrantFieldNameToSortingColumn(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func projectGrantFieldNameToSortingColumn(field *project_pb.ProjectGrantFieldName) query.Column {
+	if field == nil {
+		return query.ProjectGrantColumnCreationDate
+	}
+	switch *field {
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_PROJECT_ID:
+		return query.ProjectGrantColumnProjectID
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_CREATION_DATE:
+		return query.ProjectGrantColumnCreationDate
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_CHANGE_DATE:
+		return query.ProjectGrantColumnChangeDate
+	case project_pb.ProjectGrantFieldName_PROJECT_GRANT_FIELD_NAME_UNSPECIFIED:
+		return query.ProjectGrantColumnCreationDate
+	default:
+		return query.ProjectGrantColumnCreationDate
+	}
+}
+
+func projectGrantFiltersToModel(queries []*project_pb.ProjectGrantSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, qry := range queries {
+		q[i], err = projectGrantFilterToModel(qry)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func projectGrantFilterToModel(filter *project_pb.ProjectGrantSearchFilter) (query.SearchQuery, error) {
+	switch q := filter.Filter.(type) {
+	case *project_pb.ProjectGrantSearchFilter_ProjectNameFilter:
+		return projectNameFilterToQuery(q.ProjectNameFilter)
+	case *project_pb.ProjectGrantSearchFilter_RoleKeyFilter:
+		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyFilter.Key)
+	case *project_pb.ProjectGrantSearchFilter_InProjectIdsFilter:
+		return query.NewProjectGrantProjectIDsSearchQuery(q.InProjectIdsFilter.ProjectIds)
+	case *project_pb.ProjectGrantSearchFilter_ProjectResourceOwnerFilter:
+		return query.NewProjectGrantResourceOwnerSearchQuery(q.ProjectResourceOwnerFilter.ProjectResourceOwner)
+	case *project_pb.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter:
+		return query.NewProjectGrantGrantedOrgIDSearchQuery(q.ProjectGrantResourceOwnerFilter.ProjectGrantResourceOwner)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
+	}
+}
+
+func projectGrantsToPb(projects []*query.ProjectGrant) []*project_pb.ProjectGrant {
+	p := make([]*project_pb.ProjectGrant, len(projects))
+	for i, project := range projects {
+		p[i] = projectGrantToPb(project)
+	}
+	return p
+}
+
+func projectGrantToPb(project *query.ProjectGrant) *project_pb.ProjectGrant {
+	return &project_pb.ProjectGrant{
+		OrganizationId:          project.ResourceOwner,
+		CreationDate:            timestamppb.New(project.CreationDate),
+		ChangeDate:              timestamppb.New(project.ChangeDate),
+		GrantedOrganizationId:   project.GrantedOrgID,
+		GrantedOrganizationName: project.OrgName,
+		GrantedRoleKeys:         project.GrantedRoleKeys,
+		ProjectId:               project.ProjectID,
+		ProjectName:             project.ProjectName,
+		State:                   projectGrantStateToPb(project.State),
+	}
+}
+
+func projectGrantStateToPb(state domain.ProjectGrantState) project_pb.ProjectGrantState {
+	switch state {
+	case domain.ProjectGrantStateActive:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_ACTIVE
+	case domain.ProjectGrantStateInactive:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
+	case domain.ProjectGrantStateUnspecified, domain.ProjectGrantStateRemoved:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
+	default:
+		return project_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
+	}
+}
+
+func (s *Server) ListProjectRoles(ctx context.Context, req *project_pb.ListProjectRolesRequest) (*project_pb.ListProjectRolesResponse, error) {
+	queries, err := s.listProjectRolesRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendProjectIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	roles, err := s.query.SearchProjectRoles(ctx, true, queries, s.checkPermission)
+	if err != nil {
+		return nil, err
+	}
+	return &project_pb.ListProjectRolesResponse{
+		ProjectRoles: roleViewsToPb(roles.ProjectRoles),
+		Pagination:   filter.QueryToPaginationPb(queries.SearchRequest, roles.SearchResponse),
+	}, nil
+}
+
+func (s *Server) listProjectRolesRequestToModel(req *project_pb.ListProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	if err != nil {
+		return nil, err
+	}
+	queries, err := roleQueriesToModel(req.Filters)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectRoleSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: projectRoleFieldNameToSortingColumn(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func projectRoleFieldNameToSortingColumn(field *project_pb.ProjectRoleFieldName) query.Column {
+	if field == nil {
+		return query.ProjectRoleColumnCreationDate
+	}
+	switch *field {
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_KEY:
+		return query.ProjectRoleColumnKey
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_CREATION_DATE:
+		return query.ProjectRoleColumnCreationDate
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_CHANGE_DATE:
+		return query.ProjectRoleColumnChangeDate
+	case project_pb.ProjectRoleFieldName_PROJECT_ROLE_FIELD_NAME_UNSPECIFIED:
+		return query.ProjectRoleColumnCreationDate
+	default:
+		return query.ProjectRoleColumnCreationDate
+	}
+}
+
+func roleQueriesToModel(queries []*project_pb.ProjectRoleSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = roleQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func roleQueryToModel(apiQuery *project_pb.ProjectRoleSearchFilter) (query.SearchQuery, error) {
+	switch q := apiQuery.Filter.(type) {
+	case *project_pb.ProjectRoleSearchFilter_RoleKeyFilter:
+		return query.NewProjectRoleKeySearchQuery(filter.TextMethodPbToQuery(q.RoleKeyFilter.Method), q.RoleKeyFilter.Key)
+	case *project_pb.ProjectRoleSearchFilter_DisplayNameFilter:
+		return query.NewProjectRoleDisplayNameSearchQuery(filter.TextMethodPbToQuery(q.DisplayNameFilter.Method), q.DisplayNameFilter.DisplayName)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
+	}
+}
+
+func roleViewsToPb(roles []*query.ProjectRole) []*project_pb.ProjectRole {
+	o := make([]*project_pb.ProjectRole, len(roles))
+	for i, org := range roles {
+		o[i] = roleViewToPb(org)
+	}
+	return o
+}
+
+func roleViewToPb(role *query.ProjectRole) *project_pb.ProjectRole {
+	return &project_pb.ProjectRole{
+		ProjectId:    role.ProjectID,
+		Key:          role.Key,
+		CreationDate: timestamppb.New(role.CreationDate),
+		ChangeDate:   timestamppb.New(role.ChangeDate),
+		DisplayName:  role.DisplayName,
+		Group:        role.Group,
 	}
 }
