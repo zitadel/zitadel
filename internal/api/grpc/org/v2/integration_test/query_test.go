@@ -5,7 +5,9 @@ package org_test
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -99,6 +101,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 					Queries: []*org.SearchQuery{
 						OrganizationIdQuery(Instance.DefaultOrg.Id),
 					},
+					SortingColumn: org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_NAME,
 				},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					count := 3
@@ -111,6 +114,10 @@ func TestServer_ListOrganizations(t *testing.T) {
 					request.Queries = []*org.SearchQuery{
 						OrganizationNamePrefixQuery(prefix),
 					}
+
+					slices.SortFunc(orgs, func(a, b orgAttr) int {
+						return -1 * strings.Compare(a.Name, b.Name)
+					})
 					return orgs, nil
 				},
 			},
