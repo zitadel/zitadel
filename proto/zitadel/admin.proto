@@ -1237,7 +1237,7 @@ service AdminService {
         };
     }
 
-    // Deprecated: use ListOrganization [/v2beta/organization/_search] API instead
+    // Deprecated: use ListOrganization [apis/resources/org_service_v2beta/organization-service-list-organizations.api.mdx] API instead
     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search";
@@ -1273,7 +1273,7 @@ service AdminService {
         };
     }
 
-    // Deprecated: use CreateOrganization [/v2beta/organization] API instead
+    // Deprecated: use CreateOrganization [apis/resources/org_service_v2beta/organization-service-create-organization.api.mdx] API instead
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/_setup";
@@ -1309,7 +1309,7 @@ service AdminService {
         };
     }
 
-    // Deprecated: use ListOrganization [/v2beta/organization] API instead
+    // Deprecated: use DeleteOrganization [apis/resources/org_service_v2beta/organization-service-delete-organization.api.mdx] API instead
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}"

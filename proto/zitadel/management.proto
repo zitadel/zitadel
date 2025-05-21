@@ -2119,7 +2119,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use CreateOrganization [/v2beta/organization] API instead
+    // Deprecated: use CreateOrganization [apis/resources/org_service_v2beta/organization-service-create-organization.api.mdx] API instead
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
         option (google.api.http) = {
             post: "/orgs"
@@ -2146,7 +2146,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use UpdateOrganization [/v2beta/organization] API instead
+    // Deprecated: use UpdateOrganization [apis/resources/org_service_v2beta/organization-service-update-organization.api.mdx] API instead
     rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
         option (google.api.http) = {
             put: "/orgs/me"
@@ -2173,7 +2173,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeactivateOrganization [/v2beta/organization/_deactivate] API instead
+    // Deprecated: use DeactivateOrganization [apis/resources/org_service_v2beta/organization-service-deactivate-organization.api.mdx] API instead
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_deactivate"
@@ -2200,7 +2200,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ReactivateOrganization [/v2beta/organization/_reactivate] API instead
+    // Deprecated: use ActivateOrganization [apis/resources/org_service_v2beta/organization-service-activate-organization.api.mdx] API instead
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_reactivate"
@@ -2227,7 +2227,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ListOrganization [/v2beta/organization] API instead
+    // Deprecated: use DeleteOrganization [apis/resources/org_service_v2beta/organization-service-delete-organization.api.mdx] API instead
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/me"
@@ -2253,7 +2253,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use SetOrganizationMetadata [/v2beta/organization/metadata] API instead
+    // Deprecated: use SetOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-set-organization-metadata.api.mdx] API instead
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/{key}"
@@ -2281,7 +2281,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use SetOrganizationMetadata [/v2beta/organization/metadata] API instead
+    // Deprecated: use SetOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-set-organization-metadata.api.mdx] API instead
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/_bulk"
@@ -2309,7 +2309,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ListOrganizationMetadata [/v2beta/organization/metadata/_search] API instead
+    // Deprecated: use ListOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-list-organization-metadata.api.mdx] API instead
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/_search"
@@ -2337,7 +2337,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ListOrganizationMetadata [/v2beta/organization/metadata/_search] API instead
+    // Deprecated: use ListOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-list-organization-metadata.api.mdx] API instead
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
         option (google.api.http) = {
             get: "/metadata/{key}"
@@ -2364,7 +2364,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeleteOrganizationMetadata [/v2beta/organization/metadata] API instead
+    // Deprecated: use DeleteOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-delete-organization-metadata.api.mdx] API instead
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
         option (google.api.http) = {
             delete: "/metadata/{key}"
@@ -2391,6 +2391,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: use DeleteOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-delete-organization-metadata.api.mdx] API instead
     rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
         option (google.api.http) = {
             delete: "/metadata/_bulk"
@@ -2404,6 +2405,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             tags: "Organization Metadata";
+            deprecated: true
             summary: "Bulk Delete Metadata";
             description: "Remove a list of metadata objects from an organization with a list of keys."
             parameters: {
@@ -2417,7 +2419,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use AddOrganizationDomain [/v2beta/organization/domain] API instead
+    // Deprecated: use AddOrganizationDomain [apis/resources/org_service_v2beta/organization-service-add-organization-domain.api.mdx] API instead
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains"
@@ -2444,7 +2446,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ListOrganizationDomains [/v2beta/organization/domain/_search] API instead
+    // Deprecated: use ListOrganizationDomains [apis/resources/org_service_v2beta/organization-service-list-organization-domains.api.mdx] API instead
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/_search"
@@ -2471,7 +2473,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeleteOrganizationDomain [/v2beta/organization/domain] API instead
+    // Deprecated: use DeleteOrganizationDomain [apis/resources/org_service_v2beta/organization-service-delete-organization-domain.api.mdx] API instead
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/domains/{domain}"
@@ -2497,7 +2499,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use GenerateOrganizationDomainValidation [/v2beta/organization/domains/validation/_generate] API instead
+    // Deprecated: use GenerateOrganizationDomainValidation [apis/resources/org_service_v2beta/organization-service-generate-organization-domain-validation.api.mdx] API instead
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_generate"
@@ -2524,7 +2526,7 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use VerifyOrganizationDomain [/v2beta/organization/domains/validation/_verify] API instead
+    // Deprecated: use VerifyOrganizationDomain [apis/resources/org_service_v2beta/organization-service-verify-organization-domain.api.mdx] API instead
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_validate"
