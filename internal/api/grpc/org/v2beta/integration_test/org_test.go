@@ -5,7 +5,6 @@ package org_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -167,7 +166,6 @@ func TestServer_CreateOrganization(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.CreateOrganization(tt.ctx, tt.req)
-			fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

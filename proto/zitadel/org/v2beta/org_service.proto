@@ -126,6 +126,21 @@ service OrganizationService {
         permission: "org.create"
       }
     };
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Organization created successfully";
+        };
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The organization to create already exists.";
+        }
+      };
+    };
   }
 
   // Update Organization
@@ -136,7 +151,7 @@ service OrganizationService {
   //  - `org.write`
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
     option (google.api.http) = {
-      put: "/v2beta/organizations/{id}"
+      post: "/v2beta/organizations/{id}"
       body: "*"
     };
 
@@ -145,6 +160,28 @@ service OrganizationService {
         permission: "org.write"
       }
     };
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Organization created successfully";
+        };
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "Organisation's not found";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "Organisation's name already taken";
+        }
+      };
+    };
+
   }
 
   // List Organizations
@@ -164,17 +201,12 @@ service OrganizationService {
         permission: "iam.read";
       }
     };
-      // responses: {
-      //  key: "400";
-      //  value: {
-      //    description: "invalid list query";
-      //    schema: {
-      //      json_schema: {
-      //        ref: "#/definitions/rpcStatus";
-      //      };
-      //    };
-      //  };
-      // };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
   }
 
   // Delete Organization
@@ -194,17 +226,20 @@ service OrganizationService {
       }
     };
 
-      // responses: {
-      //  key: "400";
-      //  value: {
-      //    description: "invalid org";
-      //    schema: {
-      //      json_schema: {
-      //          ref: "#/definitions/rpcStatus";
-      //        };
-      //      };
-      //  };
-      // };
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Organization created successfully";
+        };
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "Organisation's not found";
+        }
+      };
+    };
   }
 
   // Set Organization Metadata
@@ -224,6 +259,19 @@ service OrganizationService {
         permission: "org.write"
       }
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+        responses: {
+          // TODO This needs to chagne to 404
+          key: "400"
+          value: {
+            description: "Organisation's not found";
+          }
+        };
+      };
   }
 
   // List Organization Metadata
@@ -243,6 +291,12 @@ service OrganizationService {
       }
     };
 
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
+
   }
 
   // Delete Organization Metadata
@@ -261,6 +315,12 @@ service OrganizationService {
         permission: "org.write"
       }
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
 
   }
 
@@ -282,6 +342,18 @@ service OrganizationService {
       }
     };
 
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+        responses: {
+          key: "409"
+          value: {
+            description: "Domain already exists";
+          }
+        };
+      };
+
   }
 
   // List Organization Domains
@@ -302,6 +374,12 @@ service OrganizationService {
       }
     };
 
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
+
   }
 
   // Delete Organization Domain
@@ -320,6 +398,12 @@ service OrganizationService {
         permission: "org.write"
       }
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
 
   }
 
@@ -341,6 +425,17 @@ service OrganizationService {
       }
     };
 
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+        responses: {
+          key: "404"
+          value: {
+            description: "Domain doesn't exist on organization";
+          }
+        };
+      };
   }
 
   // Verify Organization Domain
@@ -361,6 +456,11 @@ service OrganizationService {
       }
     };
 
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
   }
 
   // Deactivate Organization
@@ -380,6 +480,12 @@ service OrganizationService {
         permission: "org.write"
       }
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
 
   }
 
@@ -401,7 +507,14 @@ service OrganizationService {
       }
     };
 
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+
   }
+
 
 }
 
@@ -646,7 +759,6 @@ message DeleteOrganizationDomainRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want to delete."
     }
   ];
   string domain = 2 [
@@ -748,7 +860,18 @@ message Metadata {
   bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
 message SetOrganizationMetadataRequest{
-  string organization_id = 1;
+  // Organization Id for the Organization doman to be verified.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "Organization ID of the organization you want to veryify the domain on."
+    }
+  ];
+  // Metadata to set.
   repeated Metadata metadata = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       title: "Medata (Key/Value)"
