@@ -40,6 +40,7 @@ import (
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
+	instance "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
 	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
@@ -306,7 +307,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	execution.Register(
 		ctx,
-		config.Projections.Customizations["executions"],
+		config.Projections.Customizations["execution_handler"],
 		config.Executions,
 		queries,
 		eventstoreClient.EventTypes(),
@@ -442,6 +443,9 @@ func startAPIs(
 	}
 
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, instance.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {

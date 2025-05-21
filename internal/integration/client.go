@@ -26,6 +26,7 @@ import (
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
@@ -70,6 +71,11 @@ type Client struct {
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
 	SCIM           *scim.Client
+	InstanceV2Beta instance.InstanceServiceClient
+}
+
+func NewDefaultClient(ctx context.Context) (*Client, error) {
+	return newClient(ctx, loadedConfig.Host())
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
@@ -103,6 +109,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
 		SCIM:           scim.NewScimClient(target),
+		InstanceV2Beta: instance.NewInstanceServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }

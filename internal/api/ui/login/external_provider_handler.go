@@ -642,9 +642,10 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	}
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	if orgIAMPolicy == nil {
-		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
+		var policyErr error
+		orgIAMPolicy, policyErr = l.getOrgDomainPolicy(r, resourceOwner)
+		if policyErr != nil {
+			l.renderError(w, r, authReq, policyErr)
 			return
 		}
 	}
@@ -655,19 +656,22 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		human, idpLink, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
 	}
 
-	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
+	labelPolicy, policyErr := l.getLabelPolicy(r, resourceOwner)
+	if policyErr != nil {
+		l.renderError(w, r, authReq, policyErr)
 		return
 	}
 
-	idpTemplate, err := l.getIDPByID(r, idpLink.IDPConfigID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
+	idpTemplate, idpErr := l.getIDPByID(r, idpLink.IDPConfigID)
+	if idpErr != nil {
+		l.renderError(w, r, authReq, idpErr)
 		return
 	}
 	if !idpTemplate.IsCreationAllowed && !idpTemplate.IsLinkingAllowed {
-		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed"))
+		if err == nil {
+			err = zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed")
+		}
+		l.renderError(w, r, authReq, err)
 		return
 	}
 
