@@ -68,6 +68,10 @@ var (
 		name:  projection.PersonalAccessTokenColumnSequence,
 		table: personalAccessTokensTable,
 	}
+	PersonalAccessTokenColumnOwnerRemoved = Column{
+		name:  projection.PersonalAccessTokenColumnOwnerRemoved,
+		table: personalAccessTokensTable,
+	}
 )
 
 type PersonalAccessTokens struct {
@@ -108,8 +112,9 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{
-		PersonalAccessTokenColumnID.identifier():         id,
-		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		PersonalAccessTokenColumnID.identifier():           id,
+		PersonalAccessTokenColumnInstanceID.identifier():   authz.GetInstance(ctx).InstanceID(),
+		PersonalAccessTokenColumnOwnerRemoved.identifier(): false,
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -150,7 +155,8 @@ func (q *Queries) searchPersonalAccessTokens(ctx context.Context, queries *Perso
 	query = queries.toQuery(query)
 	query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, PersonalAccessTokenColumnResourceOwner, PersonalAccessTokenColumnUserID)
 	eq := sq.Eq{
-		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		PersonalAccessTokenColumnInstanceID.identifier():   authz.GetInstance(ctx).InstanceID(),
+		PersonalAccessTokenColumnOwnerRemoved.identifier(): false,
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
