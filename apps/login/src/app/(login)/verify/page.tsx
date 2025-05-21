@@ -6,7 +6,7 @@ import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { checkUserVerification } from "@/lib/verify-helper";
+import { checkUserVerification } from "@/lib/verification-helper";
 import {
   getBrandingSettings,
   getUserByID,

@@ -25,10 +25,8 @@ import {
   getSessionCookieByLoginName,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
-import {
-  checkEmailVerification,
-  checkUserVerification,
-} from "../verify-helper";
+import { checkUserVerification } from "../verification-helper";
+import { checkEmailVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
