@@ -200,7 +200,7 @@ service InstanceService {
   // The request is paginated and returns 100 results by default.
   //
   // Required permissions:
-  //  - `iam.read`
+  //  - `system.instance.read`
   rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -218,7 +218,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "iam.read"
+        permission: "system.instance.read"
       }
     };
   }
@@ -230,7 +230,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future
   //
   // Required permissions:
-  //   - `iam.write`
+  //   - `system.domain.write`
   rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -248,7 +248,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "iam.write"
+        permission: "system.domain.write"
       }
     };
   }
@@ -260,7 +260,7 @@ service InstanceService {
   // The instance_id in the input message will be used in the future.
   //
   // Required permissions:
-  //  - `iam.write`
+  //  - `system.domain.write`
   rpc RemoveCustomDomain(RemoveCustomDomainRequest) returns (RemoveCustomDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -277,7 +277,7 @@ service InstanceService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "iam.write"
+        permission: "system.domain.write"
       }
     };
   }

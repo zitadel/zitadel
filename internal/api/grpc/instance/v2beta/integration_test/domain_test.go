@@ -11,10 +11,11 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/zitadel/zitadel/internal/integration"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
 func TestAddCustomDomain(t *testing.T) {
@@ -27,7 +28,7 @@ func TestAddCustomDomain(t *testing.T) {
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
 	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	iamOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
@@ -56,7 +57,7 @@ func TestAddCustomDomain(t *testing.T) {
 				InstanceId: inst.ID(),
 				Domain:     gofakeit.DomainName(),
 			},
-			inputContext:      orgOwnerCtx,
+			inputContext:      iamOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
 			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 		},
@@ -112,7 +113,7 @@ func TestRemoveCustomDomain(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	iamOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
 	customDomain := gofakeit.DomainName()
 
@@ -147,7 +148,7 @@ func TestRemoveCustomDomain(t *testing.T) {
 				InstanceId: inst.ID(),
 				Domain:     "custom1",
 			},
-			inputContext:      orgOwnerCtx,
+			inputContext:      iamOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
 			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 		},
