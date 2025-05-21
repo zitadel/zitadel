@@ -31,6 +31,7 @@ type OrgSetup struct {
 	Name         string
 	CustomDomain string
 	Admins       []*OrgSetupAdmin
+	OrgID        string
 }
 
 // OrgSetupAdmin describes a user to be created (Human / Machine) or an existing (ID) to be used for an org setup.
@@ -62,6 +63,13 @@ type CreatedOrgAdmin struct {
 	PhoneCode  *string
 	PAT        *PersonalAccessToken
 	MachineKey *MachineKey
+}
+
+func (o *OrgSetup) Validate() (err error) {
+	if o.OrgID != "" && strings.TrimSpace(o.OrgID) == "" {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-4ABd3", "Errors.Invalid.Argument")
+	}
+	return nil
 }
 
 func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, userIDs ...string) (_ *CreatedOrg, err error) {
@@ -233,12 +241,19 @@ func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrg
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
-	orgID, err := c.idGenerator.Next()
-	if err != nil {
+	if err := o.Validate(); err != nil {
 		return nil, err
 	}
 
-	return c.setUpOrgWithIDs(ctx, o, orgID, allowInitialMail, userIDs...)
+	if o.OrgID == "" {
+		var err error
+		o.OrgID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return c.setUpOrgWithIDs(ctx, o, o.OrgID, allowInitialMail, userIDs...)
 }
 
 // AddOrgCommand defines the commands to create a new org,

@@ -26,6 +26,7 @@ import (
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
@@ -72,6 +73,11 @@ type Client struct {
 	SAMLv2         saml_pb.SAMLServiceClient
 	SCIM           *scim.Client
 	Projectv2Beta  project_v2beta.ProjectServiceClient
+	InstanceV2Beta instance.InstanceServiceClient
+}
+
+func NewDefaultClient(ctx context.Context) (*Client, error) {
+	return newClient(ctx, loadedConfig.Host())
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
@@ -106,6 +112,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
 		SCIM:           scim.NewScimClient(target),
 		Projectv2Beta:  project_v2beta.NewProjectServiceClient(cc),
+		InstanceV2Beta: instance.NewInstanceServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -287,6 +294,15 @@ func SetOrgID(ctx context.Context, orgID string) context.Context {
 	}
 	md.Set("x-zitadel-orgid", orgID)
 	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func (i *Instance) CreateOrganizationWithCustomOrgID(ctx context.Context, name, orgID string) *org.AddOrganizationResponse {
+	resp, err := i.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
+		Name:  name,
+		OrgId: gu.Ptr(orgID),
+	})
+	logging.OnError(err).Fatal("create org")
+	return resp
 }
 
 func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userID string) *org.AddOrganizationResponse {

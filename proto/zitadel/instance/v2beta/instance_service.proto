@@ -1,0 +1,648 @@
+syntax = "proto3";
+
+package zitadel.instance.v2beta;
+
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/instance/v2beta/instance.proto";
+import "zitadel/filter/v2beta/filter.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta;instance";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Instance Service";
+    version: "2.0-beta";
+    description: "This API is intended to manage instances in ZITADEL.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "AGPL-3.0-only",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// Service to manage instances and their domains.
+// The service provides methods to create, update, delete and list instances and their domains.
+service InstanceService {
+
+  // Delete Instance
+  //
+  // Deletes an instance with the given ID.
+  //
+  // Required permissions:
+  //   - `system.instance.delete`
+  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The deleted instance.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2beta/instances/{instance_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.instance.delete"
+      }
+    };
+  }
+
+  // Get Instance
+  //
+  // Returns the instance in the current context.
+  //
+  // The instace_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //   - `iam.read`
+  rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The instance of the context.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      get: "/v2beta/instances/{instance_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.read"
+      }
+    };
+  }
+
+  // Update Instance
+  //
+  // Updates instance in context with the given name.
+  //
+  // The instance_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //   - `iam.write`
+  rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The instance was successfully updated.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      put: "/v2beta/instances/{instance_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.write"
+      }
+    };
+  }
+
+  // List Instances
+  //
+  // Lists instances matching the given query.
+  // The query can be used to filter either by instance ID or domain.
+  // The request is paginated and returns 100 results by default.
+  //
+  // Required permissions:
+  //  - `system.instance.read`
+  rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The list of instances.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2beta/instances/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.instance.read"
+      }
+    };
+  }
+  
+  // Add Custom Domain
+  //
+  // Adds a custom domain to the instance in context.
+  //
+  // The instance_id in the input message will be used in the future
+  //
+  // Required permissions:
+  //   - `system.domain.write`
+  rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The added custom domain.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2beta/instances/{instance_id}/custom-domains"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.write"
+      }
+    };
+  }
+
+  // Remove Custom Domain
+  //
+  // Removes a custom domain from the instance.
+  //
+  // The instance_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //  - `system.domain.write`
+  rpc RemoveCustomDomain(RemoveCustomDomainRequest) returns (RemoveCustomDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The removed custom domain.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2beta/instances/{instance_id}/custom-domains/{domain}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.write"
+      }
+    };
+  }
+
+  // List Custom Domains
+  //
+  // Lists custom domains of the instance.
+  //
+  // The instance_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //  - `iam.read`
+  rpc ListCustomDomains(ListCustomDomainsRequest) returns (ListCustomDomainsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The list of custom domains.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2beta/instances/{instance_id}/custom-domains/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.read"
+      }
+    };
+  }
+
+  // Add Trusted Domain
+  //
+  // Adds a trusted domain to the instance.
+  //
+  // The instance_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //  - `iam.write`
+  rpc AddTrustedDomain(AddTrustedDomainRequest) returns (AddTrustedDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The added trusted domain.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2beta/instances/{instance_id}/trusted-domains"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.write"
+      }
+    };
+  }
+
+  // Remove Trusted Domain
+  //
+  // Removes a trusted domain from the instance.
+  //
+  // The instance_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //  - `iam.write`
+  rpc RemoveTrustedDomain(RemoveTrustedDomainRequest) returns (RemoveTrustedDomainResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The removed trusted domain.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2beta/instances/{instance_id}/trusted-domains/{domain}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.write"
+      }
+    };
+  }
+
+  
+  // List Trusted Domains
+  //
+  // Lists trusted domains of the instance.
+  //
+  // The instance_id in the input message will be used in the future.
+  //
+  // Required permissions:
+  //   - `iam.read`
+  rpc ListTrustedDomains(ListTrustedDomainsRequest) returns (ListTrustedDomainsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The list of trusted domains.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2beta/instances/{instance_id}/trusted-domains/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.read"
+      }
+    };
+  }
+}
+
+message DeleteInstanceRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+}
+
+message DeleteInstanceResponse {
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GetInstanceRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+}
+
+message GetInstanceResponse {
+  zitadel.instance.v2beta.Instance instance = 1;
+}
+
+message UpdateInstanceRequest {
+  // used only to identify the instance to change.
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string instance_name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"name of the instance to update\"";
+      example: "\"my instance\"";
+    }
+  ];
+}
+
+message UpdateInstanceResponse {
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListInstancesRequest {
+  // Criterias the client is looking for.
+  repeated Query queries = 1;
+
+  // Pagination and sorting.
+  zitadel.filter.v2beta.PaginationRequest pagination = 2;
+  
+  // The field the result is sorted by.
+  optional FieldName sorting_column = 3;
+}
+
+message ListInstancesResponse {
+  // The list of instances.
+  repeated Instance instances = 1;
+
+  // Contains the total number of instances matching the query and the applied limit.
+  zitadel.filter.v2beta.PaginationResponse pagination = 2;
+}
+
+message AddCustomDomainRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+    }
+  ];
+}
+
+message AddCustomDomainResponse {
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message RemoveCustomDomainRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+    }
+  ];
+}
+
+message RemoveCustomDomainResponse {
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListCustomDomainsRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // Pagination and sorting.
+  zitadel.filter.v2beta.PaginationRequest pagination = 2;
+
+  // The field the result is sorted by.
+  DomainFieldName sorting_column = 3;
+
+  // Criterias the client is looking for.
+  repeated DomainSearchQuery queries = 4;
+}
+
+message ListCustomDomainsResponse {
+  repeated Domain domains = 1;
+
+  // Contains the total number of domains matching the query and the applied limit.
+  zitadel.filter.v2beta.PaginationResponse pagination = 2;
+}
+
+message AddTrustedDomainRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"login.example.com\"";
+        min_length: 1;
+        max_length: 253;
+    }
+  ];
+}
+
+message AddTrustedDomainResponse {
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message RemoveTrustedDomainRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"login.example.com\"";
+        min_length: 1;
+        max_length: 253;
+    }
+  ];
+}
+
+message RemoveTrustedDomainResponse {
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListTrustedDomainsRequest {
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // Pagination and sorting.
+  zitadel.filter.v2beta.PaginationRequest pagination = 2;
+
+  // The field the result is sorted by.
+  TrustedDomainFieldName sorting_column = 3;
+  
+  // Criterias the client is looking for.
+  repeated TrustedDomainSearchQuery queries = 4;
+}
+
+message ListTrustedDomainsResponse {
+  repeated TrustedDomain trusted_domain = 1;
+
+  // Contains the total number of domains matching the query and the applied limit.
+  zitadel.filter.v2beta.PaginationResponse pagination = 2;
+}
