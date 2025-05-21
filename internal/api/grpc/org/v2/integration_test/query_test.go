@@ -38,6 +38,16 @@ func createOrganization(ctx context.Context, name string) orgAttr {
 	}
 }
 
+func createOrganizationWithCustomOrgID(ctx context.Context, name string, orgID string) orgAttr {
+	orgResp := Instance.CreateOrganizationWithCustomOrgID(ctx, name, orgID)
+	orgResp.Details.CreationDate = orgResp.Details.ChangeDate
+	return orgAttr{
+		ID:      orgResp.GetOrganizationId(),
+		Name:    name,
+		Details: orgResp.GetDetails(),
+	}
+}
+
 func TestServer_ListOrganizations(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -159,6 +169,35 @@ func TestServer_ListOrganizations(t *testing.T) {
 						},
 						Id:            Instance.DefaultOrg.Id,
 						PrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
+					},
+				},
+			},
+		},
+		{
+			name: "list org by custom id, ok",
+			args: args{
+				CTX,
+				&org.ListOrganizationsRequest{},
+				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
+					orgs := make([]orgAttr, 1)
+					name := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
+					orgID := gofakeit.Company()
+					orgs[0] = createOrganizationWithCustomOrgID(ctx, name, orgID)
+					request.Queries = []*org.SearchQuery{
+						OrganizationIdQuery(orgID),
+					}
+					return orgs, nil
+				},
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*org.Organization{
+					{
+						State: org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
 					},
 				},
 			},
