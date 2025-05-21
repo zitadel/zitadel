@@ -70,7 +70,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -85,7 +85,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery one result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -149,7 +149,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery multiple results",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -253,7 +253,8 @@ func Test_InstancePrepares(t *testing.T) {
 								IsPrimary:    true,
 							},
 						},
-					}, {
+					},
+					{
 						ID:           "id2",
 						CreationDate: testNow,
 						ChangeDate:   testNow,
@@ -282,7 +283,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
