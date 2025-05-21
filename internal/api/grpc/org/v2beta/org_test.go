@@ -36,7 +36,6 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 					},
 				},
 			},
-			// expected error
 			wantErr: zerrors.ThrowUnimplementedf(nil, "ORGv2-SL2r8", "userType oneOf %T in method AddOrganization not implemented", nil),
 		},
 		{
