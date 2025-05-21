@@ -1,11 +1,12 @@
 package metadata
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	v2beta_object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	meta_pb "github.com/zitadel/zitadel/pkg/grpc/metadata/v2beta"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // code in this file is copied from internal/api/grpc/metadata/metadata.go
