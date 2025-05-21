@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 55.sql
+	//go:embed 56.sql
 	addSAMLFederatedLogout string
 )
 
@@ -23,5 +23,5 @@ func (mig *IDPTemplate6SAMLFederatedLogout) Execute(ctx context.Context, _ event
 }
 
 func (mig *IDPTemplate6SAMLFederatedLogout) String() string {
-	return "55_idp_templates6_add_saml_federated_logout"
+	return "56_idp_templates6_add_saml_federated_logout"
 }

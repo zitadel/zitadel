@@ -151,7 +151,7 @@ type Steps struct {
 	s52IDPTemplate6LDAP2                    *IDPTemplate6LDAP2
 	s53InitPermittedOrgsFunction            *InitPermittedOrgsFunction53
 	s54InstancePositionIndex                *InstancePositionIndex
-	s55IDPTemplate6SAMLFederatedLogout      *IDPTemplate6SAMLFederatedLogout
+	s56IDPTemplate6SAMLFederatedLogout      *IDPTemplate6SAMLFederatedLogout
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
