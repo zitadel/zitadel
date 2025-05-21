@@ -293,6 +293,15 @@ func SetOrgID(ctx context.Context, orgID string) context.Context {
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
+func (i *Instance) CreateOrganizationWithCustomOrgID(ctx context.Context, name, orgID string) *org.AddOrganizationResponse {
+	resp, err := i.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
+		Name:  name,
+		OrgId: gu.Ptr(orgID),
+	})
+	logging.OnError(err).Fatal("create org")
+	return resp
+}
+
 func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userID string) *org.AddOrganizationResponse {
 	resp, err := i.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
 		Name: name,
