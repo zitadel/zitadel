@@ -57,7 +57,7 @@ export function checkEmailVerified(
     const paramsVerify = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       userId: session.factors?.user?.id as string, // verify needs user id
-      // send: "true", // we do not request a new code again
+      send: "true", // we request a new email code once the page is loaded
     });
 
     if (organization || session.factors?.user?.organizationId) {
