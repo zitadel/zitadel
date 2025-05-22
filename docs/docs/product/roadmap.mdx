@@ -4,6 +4,12 @@ sidebar_label: Release Versions and Roadmap
 ---
 
 
+import NewFeature from './_new-feature.mdx';
+import BreakingChanges from './_breaking-changes.mdx';
+import Deprecated from './_deprecated.mdx';
+import BetaToGA from './_beta-ga.mdx';
+
+
 ## Timeline and Overview
 
 <table id="zitadel-versions">
@@ -135,6 +141,7 @@ For more detailed description about the different stages and the release cycle c
                 [v4.x](/docs/product/roadmap#v4x)
                 <ul>
                     <li>Resource API</li>
+                    <li>Login v2 as default</li>
                 </ul>
 
             </td>
@@ -143,7 +150,9 @@ For more detailed description about the different stages and the release cycle c
                 <ul>
                     <li>Analytics</li>
                     <li>User Groups</li>
+                    <li>Basic Thread Detection Framework</li>
                     <li>User Uniqueness on Instance Level</li>
+                    <li>Remove Required Fields from User</li>
                 </ul>
             </td>
         </tr>
@@ -224,6 +233,10 @@ For more detailed description about the different stages and the release cycle c
 
 **Release**: [v2.x](https://github.com/zitadel/zitadel/releases?q=v2.&expanded=true)
 
+In Zitadel versions 2.x and earlier, new releases were deployed with a minimum frequency of every two weeks.
+This practice resulted in a significant number of individual versions.
+To review the features and bug fixes for these releases, please consult the linked release information provided above.
+
 ### v3.x
 
 ZITADEL v3 is here, bringing key changes designed to empower your identity management experience.
@@ -240,6 +253,8 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
 <details>
     <summary>New Features</summary>
+
+    <NewFeature/>
 
     <details>
         <summary>Actions V2</summary>
@@ -263,6 +278,8 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 <details>
     <summary>Breaking Changes</summary>
 
+    <BreakingChanges/>
+
     <details>
         <summary>CockroachDB Support removed</summary>
 
@@ -282,13 +299,81 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
     </details>
 </details>
 
-
 ### v4.x
 
-**Current State**: In Implementation
+**Current State**: Implementation
+
 
 <details>
     <summary>New Features</summary>
+
+    <NewFeature/>
+
+    <details>
+        <summary>Resource API (v2)</summary>
+
+
+    </details>
+</details>
+
+
+<details>
+    <summary>General Availability</summary>
+
+    <BetaToGA/>
+
+    <details>
+        <summary>Hosted Login v2</summary>
+
+        - Feature Complete
+        - Default
+
+    </details>
+
+    <details>
+        <summary>Web Keys</summary>
+    </details>
+
+    <details>
+        <summary>SCIM 2.0 Server - User Resource</summary>
+
+        The Zitadel SCIM v2 service provider interface enables seamless integration of identity and access management (IAM) systems with Zitadel, following the System for Cross-domain Identity Management (SCIM) v2.0 specification.
+        This interface allows standardized management of IAM resources, making it easier to automate user provisioning and deprovisioning.
+
+        - [SCIM 2.0 API](https://zitadel.com/docs/apis/scim2)
+        - [Manage Users Guide](https://zitadel.com/docs/guides/manage/user/scim2)
+    </details>
+
+
+    <details>
+        <summary>Token Exchange (Impersonation)</summary>
+
+        The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject.
+        Changing the subject of an authenticated token is called impersonation or delegation.
+        Read more in our [Impersonation and delegation using Token Exchange](https://zitadel.com/docs/guides/integrate/token-exchange) Guide
+    </details>
+
+    <details>
+        <summary>Caches</summary>
+
+        ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects.
+        As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated.
+        Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic.
+        For example, each request made to ZITADEL needs to retrieve and set instance information in middleware.
+
+        Read more about Zitadel Caches [here](https://zitadel.com/docs/self-hosting/manage/cache)
+    </details>
+</details>
+
+### v5.x
+
+**Current State**: Planning
+
+<details>
+    <summary>New Features</summary>
+
+    <NewFeature/>
+
     <details>
         <summary>Analytics</summary>
 
@@ -329,12 +414,54 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
         </details>
     </details>
+
+    <details>
+        <summary>User Groups</summary>
+
+        Administrators will be able to define groups within an organization and assign users to these groups.
+        More details about the feature can be found [here](https://github.com/zitadel/zitadel/issues/9702)
+    </details>
+
+    <details>
+        <summary>Basic Thread Detection Framework</summary>
+
+        ...
+    </details>
+
+    <details>
+        <summary>User Uniqueness on Organization Level</summary>
+
+        Administrators will be able to define weather users should be unique across the instance or within an organization.
+        This allows managing users independently and avoids conflicts due to shared user identifiers.
+        Example: The user with the username user@gmail.com can be created in the Organization "Customer A" and "Customer B" if uniqueness is defined on the organization level.
+
+        Stay updated on the progress and details on our [GitHub Issue](https://github.com/zitadel/zitadel/issues/9535)
+    </details>
+
+
+    <details>
+        <summary>Remove Required Fields</summary>
+
+        Currently, the user creation process requires several fields, such as email, first name, and last name, which can be restrictive in certain scenarios. This feature allows administrators to create users with only a username, making other fields optional.
+        This provides flexibility for systems that don't require complete user profiles upon initial creation for example simplified onboarding flows.
+
+        For more details check out our [GitHub Issue](https://github.com/zitadel/zitadel/issues/4386)
+    </details>
 </details>
 
 <details>
     <summary>General Availability</summary>
+
+    <BetaToGA/>
+
     <details>
         <summary>SCIM 2.0 Server - User Resource</summary>
+        [SCIM (System for Cross-domain Identity Management)](https://scim.cloud/) is a standard that allows the exchange of user identity information between different systems, such as when a new employee is onboarded and needs to be provisioned  to various applications.
+        For more detailed information read the section about the [User Resource Schema](https://datatracker.ietf.org/doc/html/rfc7643#section-4.1) in the [RFC7643](https://datatracker.ietf.org/doc/html/rfc7643).
+        The implementation is compliant with the standard  and includes all requests for the user resource and the discovery endpoints.
+        Read the full description of the API in our [SCIM API Docs](https://zitadel.com/docs/apis/scim2) or our guide about [managing users with SCIM 2.0](https://zitadel.com/docs/guides/manage/user/scim2).
+
+        Let us know your thoughts and report any issues via our [GitHub](https://github.com/zitadel/zitadel).
     </details>
 
     <details>
@@ -345,6 +472,8 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 <details>
     <summary>Feature Deprecation</summary>
 
+    <Deprecated/>
+
     <details>
         <summary>Actions V1</summary>
     </details>
@@ -352,6 +481,8 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
 <details>
     <summary>Breaking Changes</summary>
+
+    <BreakingChanges/>
 
     <details>
         <summary>Hosted Login v1 will be removed</summary>
@@ -363,16 +494,42 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
     </details>
 </details>
 
-### v5.x
-
-**Current State**: Planning
-
 
 ### Future Vision / Upcoming Features
 
 #### Fine Grained Authorization
 
-...
+We're planning the future of Zitadel and fine-grained authorization is high on our list.
+While Zitadel already offers strong role-based access (RBAC), we know many of you need more granular control.
+
+**What is Fine-Grained Authorization?**
+
+It's about moving beyond broad roles to define precise access based on:
+
+- Attributes (ABAC): User details (department, location), resource characteristics (sensitivity), or context (time of day).
+- Relationships (ReBAC): Connections between users and resources (e.g., "owner" of a document, "manager" of a team).
+- Policies (PBAC): Explicit rules combining attributes and relationships.
+
+**Why Explore This?**
+
+Fine-grained authorization can offer:
+- Tighter Security: Minimize access to only what's essential.
+- Greater Flexibility: Adapt to complex and dynamic business rules.
+- Easier Compliance: Meet strict regulatory demands.
+- Scalable Permissions: Manage access effectively as you grow.
+
+**We Need Your Input!** 🗣️
+
+As we explore the best way to bring this to Zitadel, tell us:
+- Your Use Cases: Where do you need more detailed access control than standard roles provide?
+- Preferred Models: Are you thinking attribute-based, relationship-based, or something else?
+- Integration Preferences:
+    - A fully integrated solution within Zitadel?
+    - Or integration with existing authorization vendors (e.g. openFGA, cerbos, etc.)?
+
+Your feedback is crucial for shaping our roadmap.
+
+🔗 Share your thoughts and needs in our [discussion forum](https://discord.com/channels/927474939156643850/1368861057669533736)
 
 #### Thread Detection
 
