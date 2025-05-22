@@ -112,7 +112,11 @@ func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
-	csp.ScriptSrc = csp.ScriptSrc.AddNonce().AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=")
+	csp.FrameSrc = csp.FrameSrc.AddHost("https://www.google.com") // Allow frame from google.com for recaptcha
+	csp.ScriptSrc = csp.ScriptSrc.AddNonce().
+		AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=").
+		AddHost("https://www.google.com"). // Allow script from google.com for recaptcha
+		AddHost("https://www.gstatic.com") // Allow script from gstatic.com for recaptcha
 	return &csp
 }
 
