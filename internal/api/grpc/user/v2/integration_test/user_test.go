@@ -1753,8 +1753,8 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	projectResp := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+
 	type args struct {
 		req     *user.DeleteUserRequest
 		prepare func(*testing.T, *user.DeleteUserRequest) context.Context

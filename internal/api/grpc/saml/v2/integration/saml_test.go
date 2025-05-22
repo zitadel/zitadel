@@ -332,7 +332,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID2, _, _ := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "saml-permission-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID2, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID2, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
@@ -346,7 +346,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "saml-permission-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
@@ -368,9 +368,9 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "saml-permission-"+gofakeit.AppName(), gofakeit.Email())
-				projectGrantResp := Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
+				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -502,9 +502,9 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
 
 				orgResp := Instance.CreateOrganization(ctx, "saml-permissison-"+gofakeit.AppName(), gofakeit.Email())
-				projectGrantResp := Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
+				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -523,7 +523,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
 
 				orgResp := Instance.CreateOrganization(ctx, "saml-permissison-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
@@ -563,7 +563,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, false, true)
 				orgResp := Instance.CreateOrganization(ctx, "saml-permissison-"+gofakeit.AppName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
+				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
@@ -640,10 +640,9 @@ func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding stri
 }
 
 func createSAMLApplication(ctx context.Context, t *testing.T, idpMetadata *saml.EntityDescriptor, binding string, projectRoleCheck, hasProjectCheck bool) (string, string, *samlsp.Middleware) {
-	project, err := Instance.CreateProjectWithPermissionCheck(ctx, projectRoleCheck, hasProjectCheck)
-	require.NoError(t, err)
+	project := Instance.CreateProject(ctx, t, "", gofakeit.AppName(), projectRoleCheck, hasProjectCheck)
 	rootURL, sp := createSAMLSP(t, idpMetadata, binding)
-	_, err = Instance.CreateSAMLClient(ctx, project.GetId(), sp)
+	_, err := Instance.CreateSAMLClient(ctx, project.GetId(), sp)
 	require.NoError(t, err)
 	return project.GetId(), rootURL, sp
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/v2/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -57,4 +58,16 @@ func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner,
 
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
 	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite)(resourceOwner, userID)
+}
+
+func (c *Commands) checkPermissionDeleteProject(ctx context.Context, resourceOwner, projectID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectDelete, project.AggregateType)(resourceOwner, projectID)
+}
+
+func (c *Commands) checkPermissionUpdateProject(ctx context.Context, resourceOwner, projectID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectWrite, project.AggregateType)(resourceOwner, projectID)
+}
+
+func (c *Commands) checkPermissionWriteProjectGrant(ctx context.Context, resourceOwner, projectGrantID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantWrite, project.AggregateType)(resourceOwner, projectGrantID)
 }
