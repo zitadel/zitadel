@@ -9,9 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
-var (
-	emptyInstance = &instance{}
-)
+var emptyInstance = &instance{}
 
 type Instance interface {
 	InstanceID() string
@@ -33,13 +31,14 @@ type InstanceVerifier interface {
 }
 
 type instance struct {
-	id        string
-	domain    string
-	projectID string
-	appID     string
-	clientID  string
-	orgID     string
-	features  feature.Features
+	id              string
+	domain          string
+	projectID       string
+	appID           string
+	clientID        string
+	orgID           string
+	defaultLanguage language.Tag
+	features        feature.Features
 }
 
 func (i *instance) Block() *bool {
@@ -67,7 +66,7 @@ func (i *instance) ConsoleApplicationID() string {
 }
 
 func (i *instance) DefaultLanguage() language.Tag {
-	return language.Und
+	return i.defaultLanguage
 }
 
 func (i *instance) DefaultOrganisationID() string {
@@ -104,6 +103,16 @@ func WithInstance(ctx context.Context, instance Instance) context.Context {
 
 func WithInstanceID(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, instanceKey, &instance{id: id})
+}
+
+func WithDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+
+	i.defaultLanguage = defaultLanguage
+	return context.WithValue(ctx, instanceKey, i)
 }
 
 func WithConsole(ctx context.Context, projectID, appID string) context.Context {
