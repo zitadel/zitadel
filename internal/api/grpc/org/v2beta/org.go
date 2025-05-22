@@ -31,6 +31,7 @@ func addOrganizationRequestToCommand(request *org.AddOrganizationRequest) (*comm
 		Name:         request.GetName(),
 		CustomDomain: "",
 		Admins:       admins,
+		OrgID:        request.GetOrgId(),
 	}, nil
 }
 
