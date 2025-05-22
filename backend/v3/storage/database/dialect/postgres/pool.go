@@ -66,10 +66,5 @@ func (c *pgxPool) Migrate(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	migrator, err := migration.New(ctx, client.Conn())
-	if err != nil {
-		return err
-	}
-
-	return migrator.Migrate(ctx)
+	return migration.Migrate(ctx, client.Conn())
 }

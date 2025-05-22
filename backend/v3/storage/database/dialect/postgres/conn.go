@@ -53,10 +53,5 @@ func (c *pgxConn) Exec(ctx context.Context, sql string, args ...any) error {
 
 // Migrate implements [database.Migrator].
 func (c *pgxConn) Migrate(ctx context.Context) error {
-	migrator, err := migration.New(ctx, c.Conn.Conn())
-	if err != nil {
-		return err
-	}
-
-	return migrator.Migrate(ctx)
+	return migration.Migrate(ctx, c.Conn.Conn())
 }
