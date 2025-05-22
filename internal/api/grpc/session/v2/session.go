@@ -144,6 +144,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if otp := checks.GetOtpEmail(); otp != nil {
 		sessionChecks = append(sessionChecks, command.CheckOTPEmail(otp.GetCode()))
 	}
+	if recoveryCode := checks.GetRecoveryCode(); recoveryCode != nil {
+		sessionChecks = append(sessionChecks, command.CheckRecoveryCode(recoveryCode.GetCode()))
+	}
 	return sessionChecks, nil
 }
 
@@ -169,6 +172,9 @@ func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds
 		}
 		resp.OtpEmail = challenge
 		cmds = append(cmds, cmd)
+	}
+	if req := challenges.GetRecoveryCode(); req != nil {
+		cmds = append(cmds, s.command.CreateRecoveryCodeChallenge())
 	}
 	return resp, cmds, nil
 }

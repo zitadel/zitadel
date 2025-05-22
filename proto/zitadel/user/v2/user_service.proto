@@ -864,6 +864,53 @@ service UserService {
     };
   }
 
+  // Generate single-use recovery codes for a user
+  //
+  // Generate new single-use recovery codes for the authenticated user. Recovery codes can be used to recover access to the account if other second factors are not available.
+  rpc GenerateRecoveryCodes (GenerateRecoveryCodesRequest) returns (GenerateRecoveryCodesResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/recovery_codes"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Remove recovery codes from a user
+  //
+  // Remove all recovery codes from the authenticated user. This will disable the recovery code second factor.
+  rpc RemoveRecoveryCodes (RemoveRecoveryCodesRequest) returns (RemoveRecoveryCodesResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/recovery_codes"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   // Add OTP Email for a user
   //
   // Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
@@ -1889,6 +1936,39 @@ message RemoveTOTPRequest {
 }
 
 message RemoveTOTPResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message GenerateRecoveryCodesRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message GenerateRecoveryCodesResponse {
+  zitadel.object.v2.Details details = 1;
+  repeated string recovery_codes = 2;
+}
+
+message RemoveRecoveryCodesRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message RemoveRecoveryCodesResponse {
   zitadel.object.v2.Details details = 1;
 }
 

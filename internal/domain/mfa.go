@@ -1,6 +1,8 @@
 package domain
 
-import "github.com/zitadel/zitadel/internal/crypto"
+import (
+	"github.com/zitadel/zitadel/internal/crypto"
+)
 
 type MFAState int32
 
@@ -14,10 +16,15 @@ const (
 )
 
 type MultifactorConfigs struct {
-	OTP OTPConfig
+	OTP           OTPConfig
+	RecoveryCodes RecoveryCodesConfig
 }
 
 type OTPConfig struct {
 	Issuer    string
 	CryptoMFA crypto.EncryptionAlgorithm
+}
+
+type RecoveryCodesConfig struct {
+	Count int
 }

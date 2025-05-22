@@ -12,19 +12,21 @@ import (
 )
 
 const (
-	otpEventPrefix                  = mfaEventPrefix + "otp."
-	HumanMFAOTPAddedType            = otpEventPrefix + "added"
-	HumanMFAOTPVerifiedType         = otpEventPrefix + "verified"
-	HumanMFAOTPRemovedType          = otpEventPrefix + "removed"
-	HumanMFAOTPCheckSucceededType   = otpEventPrefix + "check.succeeded"
-	HumanMFAOTPCheckFailedType      = otpEventPrefix + "check.failed"
-	otpSMSEventPrefix               = otpEventPrefix + "sms."
-	HumanOTPSMSAddedType            = otpSMSEventPrefix + "added"
-	HumanOTPSMSRemovedType          = otpSMSEventPrefix + "removed"
-	HumanOTPSMSCodeAddedType        = otpSMSEventPrefix + "code.added"
-	HumanOTPSMSCodeSentType         = otpSMSEventPrefix + "code.sent"
-	HumanOTPSMSCheckSucceededType   = otpSMSEventPrefix + "check.succeeded"
-	HumanOTPSMSCheckFailedType      = otpSMSEventPrefix + "check.failed"
+	otpEventPrefix                = mfaEventPrefix + "otp."
+	HumanMFAOTPAddedType          = otpEventPrefix + "added"
+	HumanMFAOTPVerifiedType       = otpEventPrefix + "verified"
+	HumanMFAOTPRemovedType        = otpEventPrefix + "removed"
+	HumanMFAOTPCheckSucceededType = otpEventPrefix + "check.succeeded"
+	HumanMFAOTPCheckFailedType    = otpEventPrefix + "check.failed"
+
+	otpSMSEventPrefix             = otpEventPrefix + "sms."
+	HumanOTPSMSAddedType          = otpSMSEventPrefix + "added"
+	HumanOTPSMSRemovedType        = otpSMSEventPrefix + "removed"
+	HumanOTPSMSCodeAddedType      = otpSMSEventPrefix + "code.added"
+	HumanOTPSMSCodeSentType       = otpSMSEventPrefix + "code.sent"
+	HumanOTPSMSCheckSucceededType = otpSMSEventPrefix + "check.succeeded"
+	HumanOTPSMSCheckFailedType    = otpSMSEventPrefix + "check.failed"
+
 	otpEmailEventPrefix             = otpEventPrefix + "email."
 	HumanOTPEmailAddedType          = otpEmailEventPrefix + "added"
 	HumanOTPEmailRemovedType        = otpEmailEventPrefix + "removed"
@@ -32,6 +34,12 @@ const (
 	HumanOTPEmailCodeSentType       = otpEmailEventPrefix + "code.sent"
 	HumanOTPEmailCheckSucceededType = otpEmailEventPrefix + "check.succeeded"
 	HumanOTPEmailCheckFailedType    = otpEmailEventPrefix + "check.failed"
+
+	recoveryCodeEventPrefix             = mfaEventPrefix + "recoverycode."
+	HumanRecoveryCodesAddedType         = recoveryCodeEventPrefix + "added"
+	HumanRecoveryCodesRemovedType       = recoveryCodeEventPrefix + "removed"
+	HumanRecoveryCodeCheckSucceededType = recoveryCodeEventPrefix + "check.succeeded"
+	HumanRecoveryCodeCheckFailedType    = recoveryCodeEventPrefix + "check.failed"
 )
 
 type HumanOTPAddedEvent struct {
@@ -616,6 +624,136 @@ func NewHumanOTPEmailCheckFailedEvent(
 			ctx,
 			aggregate,
 			HumanOTPEmailCheckFailedType,
+		),
+		AuthRequestInfo: info,
+	}
+}
+
+type HumanRecoveryCodesAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+	Codes []string `json:"codes,omitempty"`
+}
+
+func (e *HumanRecoveryCodesAddedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *HumanRecoveryCodesAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *HumanRecoveryCodesAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanRecoveryCodesAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	hashedCodes []string,
+	optionalAuthRequest *AuthRequestInfo,
+) *HumanRecoveryCodesAddedEvent {
+	return &HumanRecoveryCodesAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanRecoveryCodesAddedType,
+		),
+		Codes:           hashedCodes,
+		AuthRequestInfo: optionalAuthRequest,
+	}
+}
+
+type HumanRecoveryCodeRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+}
+
+func (e *HumanRecoveryCodeRemovedEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanRecoveryCodeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *HumanRecoveryCodeRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanRecoveryCodeRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	authRequest *AuthRequestInfo,
+) *HumanRecoveryCodeRemovedEvent {
+	return &HumanRecoveryCodeRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanRecoveryCodesRemovedType,
+		),
+		AuthRequestInfo: authRequest,
+	}
+}
+
+type HumanRecoveryCodeCheckSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+	CodeIndex int `json:"codeIndex,omitempty"`
+}
+
+func (e *HumanRecoveryCodeCheckSucceededEvent) Payload() interface{} {
+	return e
+}
+
+func (e *HumanRecoveryCodeCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *HumanRecoveryCodeCheckSucceededEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanRecoveryCodeCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	codeIndex int,
+	info *AuthRequestInfo,
+) *HumanRecoveryCodeCheckSucceededEvent {
+	return &HumanRecoveryCodeCheckSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanRecoveryCodeCheckSucceededType,
+		),
+		AuthRequestInfo: info,
+		CodeIndex:       codeIndex,
+	}
+}
+
+type HumanRecoveryCodeCheckFailedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+}
+
+func (e *HumanRecoveryCodeCheckFailedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *HumanRecoveryCodeCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanRecoveryCodeCheckFailedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanRecoveryCodeCheckFailedEvent {
+	return &HumanRecoveryCodeCheckFailedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanRecoveryCodeCheckFailedType,
 		),
 		AuthRequestInfo: info,
 	}

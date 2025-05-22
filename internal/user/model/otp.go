@@ -21,4 +21,5 @@ const (
 	MFATypeUnspecified MFAType = iota
 	MFATypeOTP
 	MFATypeU2F
+	MFATypeRecoveryCode
 )
