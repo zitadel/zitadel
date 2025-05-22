@@ -150,7 +150,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	filter, query, scan := prepareInstancesQuery()
+	filter, query, scan := prepareInstancesQuery(queries.SortingColumn, queries.Asc)
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
@@ -260,17 +260,20 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLang
 }
 
-func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
 	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
-	return sq.Select(
-			InstanceColumnID.identifier(),
-			countColumn.identifier(),
-		).Distinct().From(instanceTable.identifier()).
+
+	selector := sq.Select(InstanceColumnID.identifier(), countColumn.identifier())
+	if !sortBy.isZero() {
+		selector = sq.Select(InstanceColumnID.identifier(), countColumn.identifier(), sortBy.identifier())
+	}
+
+	return selector.Distinct().From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
-			return sq.Select(
+			outerQuery := sq.Select(
 				instanceFilterCountColumn,
 				instanceFilterIDColumn.identifier(),
 				InstanceColumnCreationDate.identifier(),
@@ -292,6 +295,16 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
 				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
 				PlaceholderFormat(sq.Dollar)
+
+			if !sortBy.isZero() {
+				sorting := sortBy.identifier()
+				if !isAscedingSort {
+					sorting += " DESC"
+				}
+				return outerQuery.OrderBy(sorting)
+			}
+
+			return outerQuery
 		},
 		func(rows *sql.Rows) (*Instances, error) {
 			instances := make([]*Instance, 0)
