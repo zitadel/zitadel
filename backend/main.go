@@ -3,8 +3,8 @@
 // to get an overview i would start in the api package.
 package main
 
-import "github.com/zitadel/zitadel/backend/cmd"
+// import "github.com/zitadel/zitadel/backend/cmd"
 
-func main() {
-	cmd.Execute()
-}
+// func main() {
+// 	cmd.Execute()
+// }

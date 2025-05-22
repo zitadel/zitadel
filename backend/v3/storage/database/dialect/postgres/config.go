@@ -19,6 +19,7 @@ var (
 
 type Config struct {
 	*pgxpool.Config
+	*pgxpool.Pool
 
 	// Host               string
 	// Port               int32
@@ -37,7 +38,7 @@ type Config struct {
 
 // Connect implements [database.Connector].
 func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
-	pool, err := pgxpool.NewWithConfig(ctx, c.Config)
+	pool, err := c.getPool(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +46,13 @@ func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
 		return nil, err
 	}
 	return &pgxPool{pool}, nil
+}
+
+func (c *Config) getPool(ctx context.Context) (*pgxpool.Pool, error) {
+	if c.Pool != nil {
+		return c.Pool, nil
+	}
+	return pgxpool.NewWithConfig(ctx, c.Config)
 }
 
 func NameMatcher(name string) bool {

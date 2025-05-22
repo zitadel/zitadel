@@ -6,11 +6,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/migration"
 )
 
 type pgxConn struct{ *pgxpool.Conn }
 
-var _ database.Client = (*pgxConn)(nil)
+var (
+	_ database.Client   = (*pgxConn)(nil)
+	_ database.Migrator = (*pgxConn)(nil)
+)
 
 // Release implements [database.Client].
 func (c *pgxConn) Release(_ context.Context) error {
@@ -45,4 +49,14 @@ func (c *pgxConn) QueryRow(ctx context.Context, sql string, args ...any) databas
 func (c *pgxConn) Exec(ctx context.Context, sql string, args ...any) error {
 	_, err := c.Conn.Exec(ctx, sql, args...)
 	return err
+}
+
+// Migrate implements [database.Migrator].
+func (c *pgxConn) Migrate(ctx context.Context) error {
+	migrator, err := migration.New(ctx, c.Conn.Conn())
+	if err != nil {
+		return err
+	}
+
+	return migrator.Migrate(ctx)
 }
