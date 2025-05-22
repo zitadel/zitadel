@@ -12,6 +12,7 @@ const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_se
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
 const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
 const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
+const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
 
@@ -843,6 +844,17 @@ module.exports = {
             },
             {
               type: "category",
+              label: "Project (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Project Service API (Beta)",
+                slug: "/apis/resources/project_service_v2",
+                description:
+                  "This API is intended to manage projects and subresources for ZITADEL. \n"+
+                  "\n" +
+                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
+              },
+              items: sidebar_api_project_service_v2,
               label: "Instance (Beta)",
               link: {
                 type: "generated-index",
