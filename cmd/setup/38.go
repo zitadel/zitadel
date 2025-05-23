@@ -15,7 +15,6 @@ var (
 
 type BackChannelLogoutNotificationStart struct {
 	dbClient *database.DB
-	esClient *eventstore.Eventstore
 }
 
 func (mig *BackChannelLogoutNotificationStart) Execute(ctx context.Context, e eventstore.Event) error {

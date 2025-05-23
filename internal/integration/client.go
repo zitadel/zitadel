@@ -26,6 +26,7 @@ import (
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
@@ -33,6 +34,7 @@ import (
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
@@ -70,6 +72,12 @@ type Client struct {
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
 	SCIM           *scim.Client
+	Projectv2Beta  project_v2beta.ProjectServiceClient
+	InstanceV2Beta instance.InstanceServiceClient
+}
+
+func NewDefaultClient(ctx context.Context) (*Client, error) {
+	return newClient(ctx, loadedConfig.Host())
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
@@ -103,6 +111,8 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
 		SCIM:           scim.NewScimClient(target),
+		Projectv2Beta:  project_v2beta.NewProjectServiceClient(cc),
+		InstanceV2Beta: instance.NewInstanceServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -286,6 +296,15 @@ func SetOrgID(ctx context.Context, orgID string) context.Context {
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
+func (i *Instance) CreateOrganizationWithCustomOrgID(ctx context.Context, name, orgID string) *org.AddOrganizationResponse {
+	resp, err := i.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
+		Name:  name,
+		OrgId: gu.Ptr(orgID),
+	})
+	logging.OnError(err).Fatal("create org")
+	return resp
+}
+
 func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userID string) *org.AddOrganizationResponse {
 	resp, err := i.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
 		Name: name,
@@ -428,6 +447,70 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 	})
 	logging.OnError(err).Panic("set user password")
 	return resp.GetDetails()
+}
+
+func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name string, projectRoleCheck, hasProjectCheck bool) *project_v2beta.CreateProjectResponse {
+	if orgID == "" {
+		orgID = i.DefaultOrg.GetId()
+	}
+
+	resp, err := i.Client.Projectv2Beta.CreateProject(ctx, &project_v2beta.CreateProjectRequest{
+		OrganizationId:        orgID,
+		Name:                  name,
+		AuthorizationRequired: projectRoleCheck,
+		ProjectAccessRequired: hasProjectCheck,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeleteProjectResponse {
+	resp, err := i.Client.Projectv2Beta.DeleteProject(ctx, &project_v2beta.DeleteProjectRequest{
+		Id: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeactivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeactivateProjectResponse {
+	resp, err := i.Client.Projectv2Beta.DeactivateProject(ctx, &project_v2beta.DeactivateProjectRequest{
+		Id: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) ActivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.ActivateProjectResponse {
+	resp, err := i.Client.Projectv2Beta.ActivateProject(ctx, &project_v2beta.ActivateProjectRequest{
+		Id: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) AddProjectRole(ctx context.Context, t *testing.T, projectID, roleKey, displayName, group string) *project_v2beta.AddProjectRoleResponse {
+	var groupP *string
+	if group != "" {
+		groupP = &group
+	}
+
+	resp, err := i.Client.Projectv2Beta.AddProjectRole(ctx, &project_v2beta.AddProjectRoleRequest{
+		ProjectId:   projectID,
+		RoleKey:     roleKey,
+		DisplayName: displayName,
+		Group:       groupP,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) RemoveProjectRole(ctx context.Context, t *testing.T, projectID, roleKey string) *project_v2beta.RemoveProjectRoleResponse {
+	resp, err := i.Client.Projectv2Beta.RemoveProjectRole(ctx, &project_v2beta.RemoveProjectRoleRequest{
+		ProjectId: projectID,
+		RoleKey:   roleKey,
+	})
+	require.NoError(t, err)
+	return resp
 }
 
 func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id string) {
@@ -689,12 +772,40 @@ func (i *Instance) CreateIntentSession(t *testing.T, ctx context.Context, userID
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
-func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *mgmt.AddProjectGrantResponse {
-	resp, err := i.Client.Mgmt.AddProjectGrant(ctx, &mgmt.AddProjectGrantRequest{
-		GrantedOrgId: grantedOrgID,
-		ProjectId:    projectID,
+func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string, roles ...string) *project_v2beta.CreateProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.CreateProjectGrant(ctx, &project_v2beta.CreateProjectGrantRequest{
+		GrantedOrganizationId: grantedOrgID,
+		ProjectId:             projectID,
+		RoleKeys:              roles,
 	})
-	logging.OnError(err).Panic("create project grant")
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeleteProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.DeleteProjectGrant(ctx, &project_v2beta.DeleteProjectGrantRequest{
+		GrantedOrganizationId: grantedOrgID,
+		ProjectId:             projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeactivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeactivateProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.DeactivateProjectGrant(ctx, &project_v2beta.DeactivateProjectGrantRequest{
+		ProjectId:             projectID,
+		GrantedOrganizationId: grantedOrgID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.ActivateProjectGrantResponse {
+	resp, err := i.Client.Projectv2Beta.ActivateProjectGrant(ctx, &project_v2beta.ActivateProjectGrantRequest{
+		ProjectId:             projectID,
+		GrantedOrganizationId: grantedOrgID,
+	})
+	require.NoError(t, err)
 	return resp
 }
 

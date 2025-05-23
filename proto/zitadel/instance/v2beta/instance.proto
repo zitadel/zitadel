@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/object/v2/object.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+package zitadel.instance.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta;instance";
+
+message Instance {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+
+    // change_date is the timestamp when the object was changed
+    //
+    // on read: the timestamp of the last event reduced by the projection
+    //
+    // on manipulation: the timestamp of the event(s) added by the manipulation
+    google.protobuf.Timestamp change_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+
+    google.protobuf.Timestamp creation_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+    State state = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the instance";
+        }
+    ];
+    string name = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string version = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"1.0.0\"";
+        }
+    ];
+    repeated Domain domains = 7;
+}
+
+enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_CREATING = 1;
+    STATE_RUNNING = 2;
+    STATE_STOPPING = 3;
+    STATE_STOPPED = 4;
+}
+
+message Domain {
+    string instance_id = 1;
+
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+
+    string domain = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.com\""
+        }
+    ];
+    bool primary = 4;
+    bool generated = 5;
+}
+
+enum FieldName {
+    FIELD_NAME_UNSPECIFIED = 0;
+    FIELD_NAME_ID = 1;
+    FIELD_NAME_NAME = 2;
+    FIELD_NAME_CREATION_DATE = 3;
+}
+
+message Query {
+    oneof query {
+        option (validate.required) = true;
+
+        IdsQuery id_query = 1;
+        DomainsQuery domain_query = 2;
+    }
+}
+
+message IdsQuery {
+    repeated string ids = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Instance ID";
+            example: "[\"4820840938402429\",\"4820840938402422\"]"
+        }
+    ];
+}
+
+message DomainsQuery {
+    repeated string domains = 1  [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_items: 20;
+            example: "[\"my-instace.zitadel.cloud\", \"auth.custom.com\"]";
+            description: "Return the instances that have the requested domains";
+        }
+    ];
+}
+message DomainSearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        DomainQuery domain_query = 1;
+        DomainGeneratedQuery generated_query = 2;
+        DomainPrimaryQuery primary_query = 3;
+    }
+}
+
+message DomainQuery {
+    string domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"zitadel.com\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines which text equality method is used";
+        }
+    ];
+}
+
+message DomainGeneratedQuery {
+    bool generated = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Generated domains";
+        }
+    ];
+}
+
+message DomainPrimaryQuery {
+    bool primary = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Primary domains";
+        }
+    ];
+}
+
+enum DomainFieldName {
+    DOMAIN_FIELD_NAME_UNSPECIFIED = 0;
+    DOMAIN_FIELD_NAME_DOMAIN = 1;
+    DOMAIN_FIELD_NAME_PRIMARY = 2;
+    DOMAIN_FIELD_NAME_GENERATED = 3;
+    DOMAIN_FIELD_NAME_CREATION_DATE = 4;
+}
+
+message TrustedDomain {
+    string instance_id = 1;
+
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+
+    string domain = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.com\""
+        }
+    ];
+}
+
+message TrustedDomainSearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        DomainQuery domain_query = 1;
+    }
+}
+
+enum TrustedDomainFieldName {
+    TRUSTED_DOMAIN_FIELD_NAME_UNSPECIFIED = 0;
+    TRUSTED_DOMAIN_FIELD_NAME_DOMAIN = 1;
+    TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE = 2;
+}
