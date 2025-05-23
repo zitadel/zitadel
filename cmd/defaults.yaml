@@ -719,6 +719,9 @@ SystemDefaults:
       # If this is empty, the issuer is the requested domain
       # This is helpful in scenarios with multiple ZITADEL environments or virtual instances
       Issuer: "ZITADEL" # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER
+    RecoveryCodes:
+      # The number of recovery codes to generate for a user
+      Count: 5 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_COUNT
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH
