@@ -134,6 +134,7 @@ export default async function Page(props: {
 
         {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
 
+        {/* this happens if you register a user and open up the email verification link on a different device than the device where the registration was made. */}
         {!valid && <Alert>{tError("sessionExpired")}</Alert>}
 
         {isSessionValid(sessionWithData).valid &&

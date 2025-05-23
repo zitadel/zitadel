@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  createInviteCode,
   getLoginSettings,
   getSession,
   getUserByID,
@@ -93,88 +94,26 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   let session: Session | undefined;
-  let user: User | undefined;
+  const userResponse = await getUserByID({
+    serviceUrl,
+    userId: command.userId,
+  });
 
-  if ("loginName" in command) {
-    const sessionCookie = await getSessionCookieByLoginName({
-      loginName: command.loginName,
-      organization: command.organization,
-    }).catch((error) => {
-      console.warn("Ignored error:", error);
-    });
-
-    if (!sessionCookie) {
-      return { error: "Could not load session cookie" };
-    }
-
-    session = await getSession({
-      serviceUrl,
-      sessionId: sessionCookie.id,
-      sessionToken: sessionCookie.token,
-    }).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-
-    if (!session?.factors?.user?.id) {
-      return { error: "Could not create session for user" };
-    }
-
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session?.factors?.user?.id,
-    });
-
-    if (!userResponse?.user) {
-      return { error: "Could not load user" };
-    }
-
-    user = userResponse.user;
-  } else {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: command.userId,
-    });
-
-    if (!userResponse || !userResponse.user) {
-      return { error: "Could not load user" };
-    }
-
-    user = userResponse.user;
-
-    const checks = create(ChecksSchema, {
-      user: {
-        search: {
-          case: "loginName",
-          value: userResponse.user.preferredLoginName,
-        },
-      },
-    });
-
-    session = await createSessionAndUpdateCookie({
-      checks,
-      requestId: command.requestId,
-    });
-  }
-
-  if (!session?.factors?.user?.id) {
-    return { error: "Could not create session for user" };
-  }
-
-  if (!session?.factors?.user?.id) {
-    return { error: "Could not create session for user" };
-  }
-
-  if (!user) {
+  if (!userResponse || !userResponse.user) {
     return { error: "Could not load user" };
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: user.details?.resourceOwner,
+  const user = userResponse.user;
+
+  const sessionCookie = await getSessionCookieByLoginName({
+    loginName:
+      "loginName" in command ? command.loginName : user.preferredLoginName,
+    organization: command.organization,
+  }).catch((error) => {
+    console.warn("Ignored error:", error); // checked later
   });
 
+  // load auth methods for user
   const authMethodResponse = await listAuthenticationMethodTypes({
     serviceUrl,
     userId: user.userId,
@@ -190,6 +129,36 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     authMethodResponse.authMethodTypes &&
     authMethodResponse.authMethodTypes.length == 0
   ) {
+    if (!sessionCookie) {
+      const checks = create(ChecksSchema, {
+        user: {
+          search: {
+            case: "loginName",
+            value: userResponse.user.preferredLoginName,
+          },
+        },
+      });
+
+      session = await createSessionAndUpdateCookie({
+        checks,
+        requestId: command.requestId,
+      });
+    } else {
+      session = await getSession({
+        serviceUrl,
+        sessionId: sessionCookie.id,
+        sessionToken: sessionCookie.token,
+      }).then((response) => {
+        if (response?.session) {
+          return response.session;
+        }
+      });
+    }
+
+    if (!session) {
+      return { error: "Could not create session" };
+    }
+
     const params = new URLSearchParams({
       sessionId: session.id,
     });
@@ -218,44 +187,80 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { redirect: `/authenticator/set?${params}` };
   }
 
-  // redirect to mfa factor if user has one, or redirect to set one up
-  const mfaFactorCheck = await checkMFAFactors(
-    serviceUrl,
-    session,
-    loginSettings,
-    authMethodResponse.authMethodTypes,
-    command.organization,
-    command.requestId,
-  );
+  // if no session found and user is not invited, only show success page,
+  // if user is invited, recreate invite flow to not depend on session
 
-  if (mfaFactorCheck?.redirect) {
-    return mfaFactorCheck;
-  }
+  if (!sessionCookie || !session?.factors?.user?.id) {
+    const verifySuccessParams = new URLSearchParams({});
 
-  // login user if no additional steps are required
-  if (command.requestId && session.id) {
-    const nextUrl = await getNextUrl(
+    if (command.userId) {
+      verifySuccessParams.set("userId", command.userId);
+    }
+
+    if (
+      ("loginName" in command && command.loginName) ||
+      user.preferredLoginName
+    ) {
+      verifySuccessParams.set(
+        "loginName",
+        "loginName" in command && command.loginName
+          ? command.loginName
+          : user.preferredLoginName,
+      );
+    }
+    if (command.requestId) {
+      verifySuccessParams.set("requestId", command.requestId);
+    }
+    if (command.organization) {
+      verifySuccessParams.set("organization", command.organization);
+    }
+
+    return { redirect: `/verify/success?${verifySuccessParams}` };
+  } else {
+    const loginSettings = await getLoginSettings({
+      serviceUrl,
+      organization: user.details?.resourceOwner,
+    });
+
+    // redirect to mfa factor if user has one, or redirect to set one up
+    const mfaFactorCheck = await checkMFAFactors(
+      serviceUrl,
+      session,
+      loginSettings,
+      authMethodResponse.authMethodTypes,
+      command.organization,
+      command.requestId,
+    );
+
+    if (mfaFactorCheck?.redirect) {
+      return mfaFactorCheck;
+    }
+
+    // login user if no additional steps are required
+    if (command.requestId && session.id) {
+      const nextUrl = await getNextUrl(
+        {
+          sessionId: session.id,
+          requestId: command.requestId,
+          organization:
+            command.organization ?? session.factors?.user?.organizationId,
+        },
+        loginSettings?.defaultRedirectUri,
+      );
+
+      return { redirect: nextUrl };
+    }
+
+    const url = await getNextUrl(
       {
-        sessionId: session.id,
-        requestId: command.requestId,
-        organization:
-          command.organization ?? session.factors?.user?.organizationId,
+        loginName: session.factors.user.loginName,
+        organization: session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri,
     );
 
-    return { redirect: nextUrl };
+    return { redirect: url };
   }
-
-  const url = await getNextUrl(
-    {
-      loginName: session.factors.user.loginName,
-      organization: session.factors?.user?.organizationId,
-    },
-    loginSettings?.defaultRedirectUri,
-  );
-
-  return { redirect: url };
 }
 
 type resendVerifyEmailCommand = {
@@ -279,6 +284,11 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
     ? resendInviteCode({
         serviceUrl,
         userId: command.userId,
+      }).catch((error) => {
+        if (error.code === 9) {
+          return { error: "User is already verified!" };
+        }
+        return { error: "Could not resend invite" };
       })
     : sendEmailCode({
         userId: command.userId,
@@ -297,6 +307,15 @@ type sendEmailCommand = {
 
 export async function sendEmailCode(command: sendEmailCommand) {
   return zitadelSendEmailCode({
+    serviceUrl: command.serviceUrl,
+    userId: command.userId,
+    urlTemplate: command.urlTemplate,
+  });
+}
+
+export async function sendInviteEmailCode(command: sendEmailCommand) {
+  // TODO: change this to sendInvite
+  return createInviteCode({
     serviceUrl: command.serviceUrl,
     userId: command.userId,
     urlTemplate: command.urlTemplate,

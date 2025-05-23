@@ -120,6 +120,7 @@ export default async function Page(props: {
   if (!isUserVerified) {
     const params = new URLSearchParams({
       loginName: sessionWithData.factors.user.loginName as string,
+      invite: "true",
       send: "true", // set this to true to request a new code immediately
     });
 

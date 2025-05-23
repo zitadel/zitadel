@@ -2,7 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
-import { sendEmailCode } from "@/lib/server/verify";
+import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
@@ -21,11 +21,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
 
   const branding = await getBrandingSettings({
     serviceUrl,
@@ -41,29 +36,25 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  if ("loginName" in searchParams) {
-    sessionFactors = await loadMostRecentSession({
-      serviceUrl,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    });
+  async function sendEmail() {
+    const host = _headers.get("host");
 
-    if (doSend && sessionFactors?.factors?.user?.id) {
-      await sendEmailCode({
+    if (!host || typeof host !== "string") {
+      throw new Error("No host found");
+    }
+
+    if (invite === "true") {
+      await sendInviteEmailCode({
         serviceUrl,
-        userId: sessionFactors?.factors?.user?.id,
+        userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
       });
-    }
-  } else if ("userId" in searchParams && userId) {
-    if (doSend) {
+    } else {
       await sendEmailCode({
         serviceUrl,
         userId,
@@ -74,6 +65,24 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
       });
+    }
+  }
+
+  if ("loginName" in searchParams) {
+    sessionFactors = await loadMostRecentSession({
+      serviceUrl,
+      sessionParams: {
+        loginName,
+        organization,
+      },
+    });
+
+    if (doSend && sessionFactors?.factors?.user?.id) {
+      await sendEmail();
+    }
+  } else if ("userId" in searchParams && userId) {
+    if (doSend) {
+      await sendEmail();
     }
 
     const userResponse = await getUserByID({
@@ -151,15 +160,19 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
 
-        {/* always show the code form / TODO improve UI for email links which were already used (currently we get an error code 3 due being reused) */}
-        <VerifyForm
-          loginName={loginName}
-          organization={organization}
-          userId={id}
-          code={code}
-          isInvite={invite === "true"}
-          requestId={requestId}
-        />
+        {/* always show the code form, except code is an invite code and the email is verified */}
+        {invite === "true" && human?.email?.isVerified ? (
+          <Alert type={AlertType.INFO}>{t("success")}</Alert>
+        ) : (
+          <VerifyForm
+            loginName={loginName}
+            organization={organization}
+            userId={id}
+            code={code}
+            isInvite={invite === "true"}
+            requestId={requestId}
+          />
+        )}
       </div>
     </DynamicTheme>
   );
