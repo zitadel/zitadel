@@ -279,7 +279,7 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
     ? resendInviteCode({
         serviceUrl,
         userId: command.userId,
-      }) //resendInviteCode({ serviceUrl, userId: command.userId })
+      })
     : sendEmailCode({
         userId: command.userId,
         serviceUrl,
