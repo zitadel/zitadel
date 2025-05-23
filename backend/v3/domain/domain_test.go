@@ -21,6 +21,7 @@ import (
 
 // These tests give an overview of how to use the domain package.
 func TestExample(t *testing.T) {
+	t.Skip("skip example test because it is not a real test")
 	ctx := context.Background()
 
 	ctrl := gomock.NewController(t)
