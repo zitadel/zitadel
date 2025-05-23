@@ -1,0 +1,15 @@
+services:
+  zitadel:
+    restart: 'always'
+    networks:
+      - 'zitadel'
+    image: 'ghcr.io/zitadel/zitadel:latest'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    env_file:
+      - .env
+    depends_on: []
+    ports:
+      - '8080:8080'
+
+networks:
+  zitadel:
