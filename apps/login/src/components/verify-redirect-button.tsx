@@ -6,6 +6,7 @@ import {
 } from "@/lib/server/verify";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -29,6 +30,7 @@ export function VerifyRedirectButton({
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   async function submitAndContinue(): Promise<boolean | void> {
     setLoading(true);
@@ -50,7 +52,7 @@ export function VerifyRedirectButton({
       } as SendVerificationRedirectWithoutCheckCommand;
     }
 
-    await sendVerificationRedirectWithoutCheck(command)
+    const response = await sendVerificationRedirectWithoutCheck(command)
       .catch(() => {
         setError("Could not verify");
         return;
@@ -58,6 +60,16 @@ export function VerifyRedirectButton({
       .finally(() => {
         setLoading(false);
       });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
+
+    if (response && "redirect" in response && response.redirect) {
+      router.push(response.redirect);
+      return true;
+    }
   }
 
   return (

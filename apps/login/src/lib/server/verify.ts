@@ -71,14 +71,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
-      }).catch(() => {
+      }).catch((error) => {
+        console.warn(error);
         return { error: "Could not verify invite" };
       })
     : await verifyEmail({
         serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
-      }).catch(() => {
+      }).catch((error) => {
+        console.warn(error);
         return { error: "Could not verify email" };
       });
 
