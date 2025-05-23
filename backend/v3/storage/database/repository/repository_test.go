@@ -32,7 +32,7 @@ func runTests(m *testing.M) int {
 
 	err = pool.(database.Migrator).Migrate(ctx)
 	if err != nil {
-		log.Fatalf("unable to migrate database")
+		log.Fatalf("unable to migrate database: %v", err)
 	}
 
 	return m.Run()
