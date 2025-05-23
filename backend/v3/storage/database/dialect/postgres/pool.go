@@ -9,11 +9,12 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/migration"
 )
 
-type pgxPool struct{ *pgxpool.Pool }
+type pgxPool struct {
+	*pgxpool.Pool
+}
 
 var (
-	_ database.Pool     = (*pgxPool)(nil)
-	_ database.Migrator = (*pgxPool)(nil)
+	_ database.Pool = (*pgxPool)(nil)
 )
 
 // Acquire implements [database.Pool].
@@ -22,7 +23,7 @@ func (c *pgxPool) Acquire(ctx context.Context) (database.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &pgxConn{conn}, nil
+	return &pgxConn{Conn: conn}, nil
 }
 
 // Query implements [database.Pool].
@@ -62,9 +63,15 @@ func (c *pgxPool) Close(_ context.Context) error {
 
 // Migrate implements [database.Migrator].
 func (c *pgxPool) Migrate(ctx context.Context) error {
+	if isMigrated {
+		return nil
+	}
+
 	client, err := c.Pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
-	return migration.Migrate(ctx, client.Conn())
+	err = migration.Migrate(ctx, client.Conn())
+	isMigrated = err == nil
+	return err
 }

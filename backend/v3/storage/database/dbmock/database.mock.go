@@ -199,6 +199,44 @@ func (c *MockPoolExecCall) DoAndReturn(f func(context.Context, string, ...any) e
 	return c
 }
 
+// Migrate mocks base method.
+func (m *MockPool) Migrate(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Migrate", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Migrate indicates an expected call of Migrate.
+func (mr *MockPoolMockRecorder) Migrate(arg0 any) *MockPoolMigrateCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Migrate", reflect.TypeOf((*MockPool)(nil).Migrate), arg0)
+	return &MockPoolMigrateCall{Call: call}
+}
+
+// MockPoolMigrateCall wrap *gomock.Call
+type MockPoolMigrateCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockPoolMigrateCall) Return(arg0 error) *MockPoolMigrateCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockPoolMigrateCall) Do(f func(context.Context) error) *MockPoolMigrateCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockPoolMigrateCall) DoAndReturn(f func(context.Context) error) *MockPoolMigrateCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Query mocks base method.
 func (m *MockPool) Query(arg0 context.Context, arg1 string, arg2 ...any) (database.Rows, error) {
 	m.ctrl.T.Helper()
@@ -387,6 +425,44 @@ func (c *MockClientExecCall) Do(f func(context.Context, string, ...any) error) *
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockClientExecCall) DoAndReturn(f func(context.Context, string, ...any) error) *MockClientExecCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Migrate mocks base method.
+func (m *MockClient) Migrate(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Migrate", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Migrate indicates an expected call of Migrate.
+func (mr *MockClientMockRecorder) Migrate(arg0 any) *MockClientMigrateCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Migrate", reflect.TypeOf((*MockClient)(nil).Migrate), arg0)
+	return &MockClientMigrateCall{Call: call}
+}
+
+// MockClientMigrateCall wrap *gomock.Call
+type MockClientMigrateCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockClientMigrateCall) Return(arg0 error) *MockClientMigrateCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockClientMigrateCall) Do(f func(context.Context) error) *MockClientMigrateCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockClientMigrateCall) DoAndReturn(f func(context.Context) error) *MockClientMigrateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
