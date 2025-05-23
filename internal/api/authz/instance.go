@@ -32,7 +32,6 @@ type InstanceVerifier interface {
 
 type instance struct {
 	id              string
-	domain          string
 	projectID       string
 	appID           string
 	clientID        string
