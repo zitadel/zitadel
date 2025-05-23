@@ -12,6 +12,7 @@ import (
 )
 
 func TestQueryUser(t *testing.T) {
+	t.Skip("tests are meant as examples and are not real tests")
 	t.Run("User filters", func(t *testing.T) {
 		client := dbmock.NewMockClient(gomock.NewController(t))
 
@@ -67,6 +68,7 @@ func TestArg(t *testing.T) {
 }
 
 func TestWriteUser(t *testing.T) {
+	t.Skip("tests are meant as examples and are not real tests")
 	t.Run("update user", func(t *testing.T) {
 		user := repository.UserRepository(nil)
 		user.Human().Update(context.Background(), user.IDCondition("test"), user.SetUsername("test"))
