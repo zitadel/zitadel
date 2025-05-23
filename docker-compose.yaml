@@ -1,15 +1,27 @@
+name: auth
 services:
   zitadel:
     restart: 'always'
-    networks:
-      - 'zitadel'
     image: 'ghcr.io/zitadel/zitadel:latest'
-    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    container_name: zitadel
+    command: 'start-from-init --steps /zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}"'
     env_file:
       - .env
     depends_on: []
     ports:
       - '8080:8080'
-
+    volumes:
+      - ./zitadel-init-steps.yaml:/zitadel-init-steps.yaml:ro
+    networks:
+      - 'Gateway'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zitadel.rule=Host(`auth.joy.box`)"
+      - "traefik.http.routers.zitadel.entrypoints=websecure"
+      - "traefik.http.routers.zitadel.tls.certresolver=myresolver"
+      - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.csp.headers.contentSecurityPolicy=media-src 'none';script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline';img-src 'self' auth.joy.box blob: data:;frame-src 'none';frame-ancestors 'none';font-src 'self';manifest-src 'self';connect-src 'self' auth.joy.box;default-src 'none';object-src 'none'"
+      - "traefik.http.routers.zitadel.middlewares=csp@docker"
 networks:
-  zitadel:
+  Gateway:
+    external: true
