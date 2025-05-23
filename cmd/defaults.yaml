@@ -1787,6 +1787,8 @@ InternalAuthZ:
         - "group.membership.read"
         - "group.read"
         - "group.grant.read"
+        - "group.grant.write"
+        - "group.grant.delete"
     - Role: "PROJECT_OWNER_VIEWER_GLOBAL"
       Permissions:
         - "policy.read"

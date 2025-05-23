@@ -3063,7 +3063,7 @@ service ManagementService {
 
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/roles/{role_key}"
+            put: "/projects/{project_id}/roles/{role_key=**}"
             body: "*"
         };
 
@@ -3089,7 +3089,7 @@ service ManagementService {
 
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/roles/{role_key}"
+            delete: "/projects/{project_id}/roles/{role_key=**}"
         };
 
         option (zitadel.v1.auth_option) = {
