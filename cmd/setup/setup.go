@@ -214,7 +214,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s53InitPermittedOrgsFunction = &InitPermittedOrgsFunction53{dbClient: dbClient}
 	steps.s54InstancePositionIndex = &InstancePositionIndex{dbClient: dbClient}
 	steps.s55ExecutionHandlerStart = &ExecutionHandlerStart{dbClient: dbClient}
-	steps.s56SessionRecoveryCodeCheckedColumn = &SessionRecoveryCodeCheckedColumn{dbClient: dbClient}
+	steps.s56IDPTemplate6SAMLFederatedLogout = &IDPTemplate6SAMLFederatedLogout{dbClient: dbClient}
+	steps.s57SessionRecoveryCodeCheckedAt = &SessionRecoveryCodeCheckedAt{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -259,6 +260,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s53InitPermittedOrgsFunction,
 		steps.s54InstancePositionIndex,
 		steps.s55ExecutionHandlerStart,
+		steps.s56IDPTemplate6SAMLFederatedLogout,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -315,7 +317,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s42Apps7OIDCConfigsLoginVersion,
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
-		steps.s56SessionRecoveryCodeCheckedColumn,
+		steps.s57SessionRecoveryCodeCheckedAt,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

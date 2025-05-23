@@ -1,2 +1,1 @@
-ALTER TABLE IF EXISTS projections.sessions8
-ADD COLUMN IF NOT EXISTS mfa_recovery_code_checked_at TIMESTAMPTZ; 
+ALTER TABLE IF EXISTS projections.idp_templates6_saml ADD COLUMN IF NOT EXISTS federated_logout_enabled BOOLEAN DEFAULT FALSE;

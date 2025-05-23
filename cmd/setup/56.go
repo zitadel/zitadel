@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 56.sql
-	sessionRecoveryCodeCheckedColumn string
+	addSAMLFederatedLogout string
 )
 
-type SessionRecoveryCodeCheckedColumn struct {
+type IDPTemplate6SAMLFederatedLogout struct {
 	dbClient *database.DB
 }
 
-func (mig *SessionRecoveryCodeCheckedColumn) Execute(ctx context.Context, e eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, sessionRecoveryCodeCheckedColumn)
+func (mig *IDPTemplate6SAMLFederatedLogout) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addSAMLFederatedLogout)
 	return err
 }
 
-func (mig *SessionRecoveryCodeCheckedColumn) String() string {
-	return "56_session_recovery_code_checked_column"
+func (mig *IDPTemplate6SAMLFederatedLogout) String() string {
+	return "56_idp_templates6_add_saml_federated_logout"
 }

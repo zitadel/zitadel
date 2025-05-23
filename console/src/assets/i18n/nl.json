@@ -2348,6 +2348,8 @@
     "REMOVE_WARN_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. Dit zal de selectie van de beschikbare IDP voor uw gebruikers verwijderen en reeds geregistreerde gebruikers zullen niet opnieuw kunnen inloggen. Weet u zeker dat u wilt doorgaan?",
     "DELETE_SELECTION_TITLE": "Verwijder IDP",
     "DELETE_SELECTION_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. De resulterende wijzigingen zijn onomkeerbaar. Weet u zeker dat u dit wilt doen?",
+    "FEDERATEDLOGOUTENABLED": "Federatieve afmelding ingeschakeld",
+    "FEDERATEDLOGOUTENABLED_DESC": "Indien ingeschakeld, wordt de gebruiker ook afgemeld bij de IdP als de gebruiker de sessie in ZITADEL beëindigt.",
     "EMPTY": "Geen IDP beschikbaar",
     "OIDC": {
       "GENERAL": "Algemene Informatie",
