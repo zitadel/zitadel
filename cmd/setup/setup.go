@@ -214,6 +214,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s53InitPermittedOrgsFunction = &InitPermittedOrgsFunction53{dbClient: dbClient}
 	steps.s54InstancePositionIndex = &InstancePositionIndex{dbClient: dbClient}
 	steps.s55ExecutionHandlerStart = &ExecutionHandlerStart{dbClient: dbClient}
+	steps.s56SessionRecoveryCodeCheckedColumn = &SessionRecoveryCodeCheckedColumn{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -314,6 +315,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s42Apps7OIDCConfigsLoginVersion,
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
+		steps.s56SessionRecoveryCodeCheckedColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
