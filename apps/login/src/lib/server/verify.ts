@@ -1,11 +1,11 @@
 "use server";
 
 import {
-  createInviteCode,
   getLoginSettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
+  resendInviteCode,
   verifyEmail,
   verifyInviteCode,
   verifyTOTPRegistration,
@@ -71,14 +71,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
-      }).catch(() => {
+      }).catch((error) => {
+        console.warn(error);
         return { error: "Could not verify invite" };
       })
     : await verifyEmail({
         serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
-      }).catch(() => {
+      }).catch((error) => {
+        console.warn(error);
         return { error: "Could not verify email" };
       });
 
@@ -273,15 +275,11 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  // create a new invite whenever the resend is called
   return command.isInvite
-    ? createInviteCode({
+    ? resendInviteCode({
         serviceUrl,
         userId: command.userId,
-        urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
-          (command.requestId ? `&requestId=${command.requestId}` : ""),
-      }) //resendInviteCode({ serviceUrl, userId: command.userId })
+      })
     : sendEmailCode({
         userId: command.userId,
         serviceUrl,
