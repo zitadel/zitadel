@@ -12,9 +12,6 @@ import (
 )
 
 func TestMigrate(t *testing.T) {
-	type args struct {
-		ctx context.Context
-	}
 	tests := []struct {
 		name string
 		stmt string

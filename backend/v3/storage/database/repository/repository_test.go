@@ -27,12 +27,14 @@ func runTests(m *testing.M) int {
 
 	pool, err = connector.Connect(ctx)
 	if err != nil {
-		log.Fatalf("unable to connect to embedded postgres: %v", err)
+		log.Printf("unable to connect to embedded postgres: %v", err)
+		return 1
 	}
 
-	err = pool.(database.Migrator).Migrate(ctx)
+	err = pool.Migrate(ctx)
 	if err != nil {
-		log.Fatalf("unable to migrate database: %v", err)
+		log.Printf("unable to migrate database: %v", err)
+		return 1
 	}
 
 	return m.Run()
