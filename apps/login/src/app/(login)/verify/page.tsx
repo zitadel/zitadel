@@ -2,17 +2,11 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
-import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getUserByID,
-  listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -100,17 +94,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     throw Error("Failed to get user id");
   }
 
-  let authMethods: AuthenticationMethodType[] | null = null;
-  if (human?.email?.isVerified) {
-    const authMethodsResponse = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
-    });
-    if (authMethodsResponse.authMethodTypes) {
-      authMethods = authMethodsResponse.authMethodTypes;
-    }
-  }
-
   const params = new URLSearchParams({
     userId: userId,
     initial: "true", // defines that a code is not required and is therefore not shown in the UI
@@ -168,27 +151,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
 
-        {/* show a button to setup auth method for the user otherwise show the UI for reverifying */}
-        {human?.email?.isVerified ? (
-          // show page for already verified users
-          <VerifyRedirectButton
-            userId={id}
-            loginName={loginName}
-            organization={organization}
-            requestId={requestId}
-            authMethods={authMethods}
-          />
-        ) : (
-          // check if auth methods are set
-          <VerifyForm
-            loginName={loginName}
-            organization={organization}
-            userId={id}
-            code={code}
-            isInvite={invite === "true"}
-            requestId={requestId}
-          />
-        )}
+        {/* always show the code form / TODO improve UI for email links which were already used (currently we get an error code 3 due being reused) */}
+        <VerifyForm
+          loginName={loginName}
+          organization={organization}
+          userId={id}
+          code={code}
+          isInvite={invite === "true"}
+          requestId={requestId}
+        />
       </div>
     </DynamicTheme>
   );
