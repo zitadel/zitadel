@@ -45,7 +45,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
     if (invite === "true") {
       await sendInviteEmailCode({
-        serviceUrl,
         userId,
         urlTemplate:
           `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
@@ -56,7 +55,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       });
     } else {
       await sendEmailCode({
-        serviceUrl,
         userId,
         urlTemplate:
           `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +

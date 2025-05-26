@@ -301,23 +301,28 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
       });
 }
 
-type sendEmailCommand = {
-  serviceUrl: string;
+type SendEmailCommand = {
   userId: string;
   urlTemplate: string;
 };
 
-export async function sendEmailCode(command: sendEmailCommand) {
+export async function sendEmailCode(command: SendEmailCommand) {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
   return zitadelSendEmailCode({
-    serviceUrl: command.serviceUrl,
+    serviceUrl,
     userId: command.userId,
     urlTemplate: command.urlTemplate,
   });
 }
 
-export async function sendInviteEmailCode(command: sendEmailCommand) {
+export async function sendInviteEmailCode(command: SendEmailCommand) {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
   return createInviteCode({
-    serviceUrl: command.serviceUrl,
+    serviceUrl,
     userId: command.userId,
     urlTemplate: command.urlTemplate,
   });
