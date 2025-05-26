@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: 手机号码已经验证
       Empty: 电话号码是空的
       NotChanged: 电话号码没有改变
+      VerifyingRemovalIsNotSupported: 验证手机号码删除不受支持
     Address:
       NotFound: 找不到地址
       NotChanged: 地址没有改变

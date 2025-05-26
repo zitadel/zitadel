@@ -15,12 +15,14 @@ import (
 )
 
 type AddMachineKey struct {
-	Type           domain.AuthNKeyType
-	ExpirationDate time.Time
+	Type            domain.AuthNKeyType
+	ExpirationDate  time.Time
+	PermissionCheck PermissionCheck
 }
 
 type MachineKey struct {
 	models.ObjectRoot
+	PermissionCheck PermissionCheck
 
 	KeyID          string
 	Type           domain.AuthNKeyType
@@ -64,7 +66,7 @@ func (key *MachineKey) Detail() ([]byte, error) {
 }
 
 func (key *MachineKey) content() error {
-	if key.ResourceOwner == "" {
+	if key.PermissionCheck == nil && key.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-kqpoix", "Errors.ResourceOwnerMissing")
 	}
 	if key.AggregateID == "" {
@@ -91,7 +93,7 @@ func (key *MachineKey) valid() (err error) {
 }
 
 func (key *MachineKey) checkAggregate(ctx context.Context, filter preparation.FilterToQueryReducer) error {
-	if exists, err := ExistsUser(ctx, filter, key.AggregateID, key.ResourceOwner); err != nil || !exists {
+	if exists, err := ExistsUser(ctx, filter, key.AggregateID, key.ResourceOwner, true); err != nil || !exists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-bnipwm1", "Errors.User.NotFound")
 	}
 	return nil
@@ -142,7 +144,7 @@ func prepareAddUserMachineKey(machineKey *MachineKey, keySize int) preparation.V
 					return nil, err
 				}
 			}
-			writeModel, err := getMachineKeyWriteModelByID(ctx, filter, machineKey.AggregateID, machineKey.KeyID, machineKey.ResourceOwner)
+			writeModel, err := getMachineKeyWriteModelByID(ctx, filter, machineKey.AggregateID, machineKey.KeyID, machineKey.ResourceOwner, machineKey.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -186,7 +188,7 @@ func prepareRemoveUserMachineKey(machineKey *MachineKey) preparation.Validation 
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getMachineKeyWriteModelByID(ctx, filter, machineKey.AggregateID, machineKey.KeyID, machineKey.ResourceOwner)
+			writeModel, err := getMachineKeyWriteModelByID(ctx, filter, machineKey.AggregateID, machineKey.KeyID, machineKey.ResourceOwner, machineKey.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -204,16 +206,18 @@ func prepareRemoveUserMachineKey(machineKey *MachineKey) preparation.Validation 
 	}
 }
 
-func getMachineKeyWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, keyID, resourceOwner string) (_ *MachineKeyWriteModel, err error) {
+func getMachineKeyWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, keyID, resourceOwner string, permissionCheck PermissionCheck) (_ *MachineKeyWriteModel, err error) {
 	writeModel := NewMachineKeyWriteModel(userID, keyID, resourceOwner)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
 	}
-	if len(events) == 0 {
-		return writeModel, nil
-	}
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
+	if permissionCheck != nil {
+		if err := permissionCheck(writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+			return nil, err
+		}
+	}
 	return writeModel, err
 }

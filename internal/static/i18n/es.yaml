@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: El teléfono ya se verificó
       Empty: El teléfono está vacío
       NotChanged: El teléfono no ha cambiado
+      VerifyingRemovalIsNotSupported: La verificación de eliminación no está soportada
     Address:
       NotFound: Dirección no encontrada
       NotChanged: La dirección no ha cambiado
