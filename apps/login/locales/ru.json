@@ -37,6 +37,7 @@
   "idp": {
     "title": "Войти через SSO",
     "description": "Выберите одного из провайдеров для входа",
+    "orSignInWith": "или войти через",
     "signInWithApple": "Войти через Apple",
     "signInWithGoogle": "Войти через Google",
     "signInWithAzureAD": "Войти через AzureAD",

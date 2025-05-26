@@ -37,6 +37,7 @@
   "idp": {
     "title": "Accedi con SSO",
     "description": "Seleziona uno dei seguenti provider per accedere",
+    "orSignInWith": "o accedi con",
     "signInWithApple": "Accedi con Apple",
     "signInWithGoogle": "Accedi con Google",
     "signInWithAzureAD": "Accedi con AzureAD",

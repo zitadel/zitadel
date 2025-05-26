@@ -6,6 +6,7 @@ import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { useTranslations } from "next-intl";
 import { ReactNode, useActionState } from "react";
 import { Alert } from "./alert";
 import { SignInWithIdentityProviderProps } from "./idps/base-button";
@@ -31,6 +32,7 @@ export function SignInWithIdp({
   linkOnly,
 }: Readonly<SignInWithIDPProps>) {
   const [state, action, _isPending] = useActionState(redirectToIdp, {});
+  const t = useTranslations("idp");
 
   const renderIDPButton = (idp: IdentityProvider, index: number) => {
     const { id, name, type } = idp;
@@ -53,6 +55,7 @@ export function SignInWithIdp({
       [IdentityProviderType.GITLAB]: SignInWithGitlab,
       [IdentityProviderType.GITLAB_SELF_HOSTED]: SignInWithGitlab,
       [IdentityProviderType.SAML]: SignInWithGeneric,
+      [IdentityProviderType.LDAP]: SignInWithGeneric,
     };
 
     const Component = components[type];
@@ -74,6 +77,7 @@ export function SignInWithIdp({
 
   return (
     <div className="flex flex-col w-full space-y-2 text-sm">
+      <p className="text-center ztdl-p">{t("orSignInWith")}</p>
       {!!identityProviders.length && identityProviders?.map(renderIDPButton)}
       {state?.error && (
         <div className="py-4">

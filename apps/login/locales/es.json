@@ -37,6 +37,7 @@
   "idp": {
     "title": "Iniciar sesión con SSO",
     "description": "Selecciona uno de los siguientes proveedores para iniciar sesión",
+    "orSignInWith": "o iniciar sesión con",
     "signInWithApple": "Iniciar sesión con Apple",
     "signInWithGoogle": "Iniciar sesión con Google",
     "signInWithAzureAD": "Iniciar sesión con AzureAD",

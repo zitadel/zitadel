@@ -37,6 +37,7 @@
   "idp": {
     "title": "Zaloguj się za pomocą SSO",
     "description": "Wybierz jednego z poniższych dostawców, aby się zalogować",
+    "orSignInWith": "lub zaloguj się przez",
     "signInWithApple": "Zaloguj się przez Apple",
     "signInWithGoogle": "Zaloguj się przez Google",
     "signInWithAzureAD": "Zaloguj się przez AzureAD",
