@@ -14,7 +14,7 @@ type pgxPool struct {
 }
 
 var (
-  _ database.Pool = (*pgxPool)(nil)
+	_ database.Pool = (*pgxPool)(nil)
 )
 
 // Acquire implements [database.Pool].
