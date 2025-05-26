@@ -113,6 +113,18 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     console.warn("Ignored error:", error); // checked later
   });
 
+  if (sessionCookie) {
+    session = await getSession({
+      serviceUrl,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    }).then((response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    });
+  }
+
   // load auth methods for user
   const authMethodResponse = await listAuthenticationMethodTypes({
     serviceUrl,
@@ -142,16 +154,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       session = await createSessionAndUpdateCookie({
         checks,
         requestId: command.requestId,
-      });
-    } else {
-      session = await getSession({
-        serviceUrl,
-        sessionId: sessionCookie.id,
-        sessionToken: sessionCookie.token,
-      }).then((response) => {
-        if (response?.session) {
-          return response.session;
-        }
       });
     }
 
@@ -187,10 +189,9 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { redirect: `/authenticator/set?${params}` };
   }
 
-  // if no session found and user is not invited, only show success page,
+  // if no session found only show success page,
   // if user is invited, recreate invite flow to not depend on session
-
-  if (!sessionCookie || !session?.factors?.user?.id) {
+  if (!session?.factors?.user?.id) {
     const verifySuccessParams = new URLSearchParams({});
 
     if (command.userId) {
@@ -216,51 +217,51 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     return { redirect: `/verify/success?${verifySuccessParams}` };
-  } else {
-    const loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: user.details?.resourceOwner,
-    });
+  }
 
-    // redirect to mfa factor if user has one, or redirect to set one up
-    const mfaFactorCheck = await checkMFAFactors(
-      serviceUrl,
-      session,
-      loginSettings,
-      authMethodResponse.authMethodTypes,
-      command.organization,
-      command.requestId,
-    );
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization: user.details?.resourceOwner,
+  });
 
-    if (mfaFactorCheck?.redirect) {
-      return mfaFactorCheck;
-    }
+  // redirect to mfa factor if user has one, or redirect to set one up
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
+    session,
+    loginSettings,
+    authMethodResponse.authMethodTypes,
+    command.organization,
+    command.requestId,
+  );
 
-    // login user if no additional steps are required
-    if (command.requestId && session.id) {
-      const nextUrl = await getNextUrl(
-        {
-          sessionId: session.id,
-          requestId: command.requestId,
-          organization:
-            command.organization ?? session.factors?.user?.organizationId,
-        },
-        loginSettings?.defaultRedirectUri,
-      );
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
+  }
 
-      return { redirect: nextUrl };
-    }
-
-    const url = await getNextUrl(
+  // login user if no additional steps are required
+  if (command.requestId && session.id) {
+    const nextUrl = await getNextUrl(
       {
-        loginName: session.factors.user.loginName,
-        organization: session.factors?.user?.organizationId,
+        sessionId: session.id,
+        requestId: command.requestId,
+        organization:
+          command.organization ?? session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri,
     );
 
-    return { redirect: url };
+    return { redirect: nextUrl };
   }
+
+  const url = await getNextUrl(
+    {
+      loginName: session.factors.user.loginName,
+      organization: session.factors?.user?.organizationId,
+    },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  return { redirect: url };
 }
 
 type resendVerifyEmailCommand = {

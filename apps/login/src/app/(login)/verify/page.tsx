@@ -36,7 +36,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  async function sendEmail() {
+  async function sendEmail(userId: string) {
     const host = _headers.get("host");
 
     if (!host || typeof host !== "string") {
@@ -51,7 +51,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
-        console.error("Could not resend verification email", error);
+        console.error("Could not send invitation email", error);
         throw Error("Failed to send verification email");
       });
     } else {
@@ -62,7 +62,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
-        console.error("Could not resend verification email", error);
+        console.error("Could not send verification email", error);
         throw Error("Failed to send verification email");
       });
     }
@@ -78,11 +78,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
-      await sendEmail();
+      await sendEmail(sessionFactors.factors.user.id);
     }
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
-      await sendEmail();
+      await sendEmail(userId);
     }
 
     const userResponse = await getUserByID({

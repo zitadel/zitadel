@@ -174,7 +174,8 @@
   },
   "verify": {
     "userIdMissing": "Не указан userId!",
-    "success": "Пользователь успешно подтверждён.",
+    "successTitle": "Пользователь подтверждён",
+    "successDescription": "Пользователь успешно подтверждён.",
     "setupAuthenticator": "Настроить аутентификатор",
     "verify": {
       "title": "Подтверждение пользователя",

@@ -174,7 +174,8 @@
   },
   "verify": {
     "userIdMissing": "No userId provided!",
-    "success": "The user has been verified successfully.",
+    "successTitle": "User verified",
+    "successDescription": "The user has been verified successfully.",
     "setupAuthenticator": "Setup authenticator",
     "verify": {
       "title": "Verify user",

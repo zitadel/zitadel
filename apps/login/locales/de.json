@@ -174,7 +174,8 @@
   },
   "verify": {
     "userIdMissing": "Keine Benutzer-ID angegeben!",
-    "success": "Erfolgreich verifiziert",
+    "successTitle": "Benutzer verifiziert",
+    "successDescription": "Der Benutzer wurde erfolgreich verifiziert.",
     "setupAuthenticator": "Authentifikator einrichten",
     "verify": {
       "title": "Benutzer verifizieren",

@@ -174,7 +174,8 @@
   },
   "verify": {
     "userIdMissing": "未提供用户 ID！",
-    "success": "用户验证成功。",
+    "successTitle": "用户已验证",
+    "successDescription": "用户已成功验证。",
     "setupAuthenticator": "设置认证器",
     "verify": {
       "title": "验证用户",

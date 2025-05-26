@@ -33,7 +33,7 @@ async function loadSessionById(
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "signedin" });
+  const t = await getTranslations({ locale, namespace: "verify" });
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -84,10 +84,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>
-          {t("title", { user: sessionFactors?.factors?.user?.displayName })}
-        </h1>
-        <p className="ztdl-p mb-6 block">{t("description")}</p>
+        <h1>{t("successTitle")}</h1>
+        <p className="ztdl-p mb-6 block">{t("successDescription")}</p>
 
         {sessionFactors ? (
           <UserAvatar
