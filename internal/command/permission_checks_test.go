@@ -276,4 +276,3 @@ func mockDomainPermissionCheck(expectCtx context.Context, expectPermission, expe
 		}
 	}
 }
-
