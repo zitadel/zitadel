@@ -908,7 +908,6 @@ export async function startIdentityProviderFlow({
   urls,
 }: {
   serviceUrl: string;
-
   idpId: string;
   urls: RedirectURLsJson;
 }) {

@@ -30,6 +30,10 @@ export async function redirectToIdp(
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
 
+  if (provider === "ldap") {
+    redirect("/idp/ldap?linkOnly=" + linkOnly + "&" + params.toString());
+  }
+
   const response = await startIDPFlow({
     idpId,
     successUrl: `/idp/${provider}/success?` + params.toString(),
