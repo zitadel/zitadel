@@ -3,7 +3,6 @@ package jwt
 import (
 	"context"
 	"encoding/base64"
-	"errors"
 	"net/url"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -11,15 +10,11 @@ import (
 )
 
 const (
-	queryAuthRequestID = "authRequestID"
-	queryUserAgentID   = "userAgentID"
+	QueryAuthRequestID = "authRequestID"
+	QueryUserAgentID   = "userAgentID"
 )
 
 var _ idp.Provider = (*Provider)(nil)
-
-var (
-	ErrMissingUserAgentID = errors.New("userAgentID missing")
-)
 
 // Provider is the [idp.Provider] implementation for a JWT provider
 type Provider struct {
@@ -92,32 +87,29 @@ func (p *Provider) Name() string {
 // It will create a [Session] with an AuthURL, pointing to the jwtEndpoint
 // with the authRequest and encrypted userAgent ids.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
-	userAgentID, err := userAgentIDFromParams(params...)
-	if err != nil {
-		return nil, err
-	}
+	userAgentID := userAgentIDFromParams(state, params...)
 	redirect, err := url.Parse(p.jwtEndpoint)
 	if err != nil {
 		return nil, err
 	}
 	q := redirect.Query()
-	q.Set(queryAuthRequestID, state)
+	q.Set(QueryAuthRequestID, state)
 	nonce, err := p.encryptionAlg.Encrypt([]byte(userAgentID))
 	if err != nil {
 		return nil, err
 	}
-	q.Set(queryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
+	q.Set(QueryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
 	redirect.RawQuery = q.Encode()
 	return &Session{AuthURL: redirect.String()}, nil
 }
 
-func userAgentIDFromParams(params ...idp.Parameter) (string, error) {
+func userAgentIDFromParams(state string, params ...idp.Parameter) string {
 	for _, param := range params {
 		if id, ok := param.(idp.UserAgentID); ok {
-			return string(id), nil
+			return string(id)
 		}
 	}
-	return "", ErrMissingUserAgentID
+	return state
 }
 
 // IsLinkingAllowed implements the [idp.Provider] interface.

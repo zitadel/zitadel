@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -32,6 +34,11 @@ type Session struct {
 
 func NewSession(provider *Provider, tokens *oidc.Tokens[*oidc.IDTokenClaims]) *Session {
 	return &Session{Provider: provider, Tokens: tokens}
+}
+
+func NewSessionFromRequest(provider *Provider, r *http.Request) *Session {
+	token := strings.TrimPrefix(r.Header.Get(provider.headerName), oidc.PrefixBearer)
+	return NewSession(provider, &oidc.Tokens[*oidc.IDTokenClaims]{IDToken: token, Token: &oauth2.Token{}})
 }
 
 // GetAuth implements the [idp.Session] interface.
@@ -97,6 +104,12 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 		}
 	}
 	return claims, nil
+}
+
+func InitUser() *User {
+	return &User{
+		IDTokenClaims: &oidc.IDTokenClaims{},
+	}
 }
 
 type User struct {

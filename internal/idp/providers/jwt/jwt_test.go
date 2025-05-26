@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,6 +22,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 	}
 	type args struct {
+		state  string
 		params []idp.Parameter
 	}
 	type want struct {
@@ -36,7 +36,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		want   want
 	}{
 		{
-			name: "missing userAgentID error",
+			name: "missing userAgentID, fallback to state",
 			fields: fields{
 				issuer:       "https://jwt.com",
 				jwtEndpoint:  "https://auth.com/jwt",
@@ -47,12 +47,11 @@ func TestProvider_BeginAuth(t *testing.T) {
 				},
 			},
 			args: args{
+				state:  "testState",
 				params: nil,
 			},
 			want: want{
-				err: func(err error) bool {
-					return errors.Is(err, ErrMissingUserAgentID)
-				},
+				session: &Session{AuthURL: "https://auth.com/jwt?authRequestID=testState&userAgentID=dGVzdFN0YXRl"},
 			},
 		},
 		{
