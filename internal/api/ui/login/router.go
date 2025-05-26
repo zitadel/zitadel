@@ -14,6 +14,7 @@ const (
 	EndpointExternalLogin                 = "/login/externalidp"
 	EndpointExternalLoginCallback         = "/login/externalidp/callback"
 	EndpointExternalLoginCallbackFormPost = "/login/externalidp/callback/form"
+	EndpointExternalLogout                = "/logout/externalidp"
 	EndpointSAMLACS                       = "/login/externalidp/saml/acs"
 	EndpointJWTAuthorize                  = "/login/jwt/authorize"
 	EndpointJWTCallback                   = "/login/jwt/callback"
@@ -77,6 +78,7 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.HandleFunc(EndpointExternalLogin, login.handleExternalLogin).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalLoginCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalLoginCallbackFormPost, login.handleExternalLoginCallbackForm).Methods(http.MethodPost)
+	router.HandleFunc(EndpointExternalLogout, login.handleExternalLogout).Methods(http.MethodGet)
 	router.HandleFunc(EndpointSAMLACS, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointSAMLACS, login.handleExternalLoginCallbackForm).Methods(http.MethodPost)
 	router.HandleFunc(EndpointJWTAuthorize, login.handleJWTRequest).Methods(http.MethodGet)

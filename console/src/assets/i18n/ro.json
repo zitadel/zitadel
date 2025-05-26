@@ -2346,6 +2346,8 @@
     "REMOVE_WARN_DESCRIPTION": "Sunteți pe cale să eliminați un furnizor de identitate. Aceasta va elimina selecția IdP-ului disponibil pentru utilizatorii dvs. și utilizatorii deja înregistrați nu se vor mai putea conecta. Sigur doriți să continuați?",
     "DELETE_SELECTION_TITLE": "Ștergeți IdP",
     "DELETE_SELECTION_DESCRIPTION": "Sunteți pe cale să ștergeți un furnizor de identitate. Modificările rezultate sunt irevocabile. Doriți cu adevărat să faceți acest lucru?",
+    "FEDERATEDLOGOUTENABLED": "Deconectare federată activată",
+    "FEDERATEDLOGOUTENABLED_DESC": "Dacă este activat, utilizatorul va fi deconectat și de la IdP dacă încheie sesiunea în ZITADEL.",
     "EMPTY": "Niciun IdP disponibil",
     "OIDC": {
       "GENERAL": "Informații generale",
