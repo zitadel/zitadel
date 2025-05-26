@@ -292,7 +292,7 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
         }
         return { error: "Could not resend invite" };
       })
-    : sendEmailCode({
+    : zitadelSendEmailCode({
         userId: command.userId,
         serviceUrl,
         urlTemplate:
