@@ -28,18 +28,17 @@ func (wm *WriteModel) Reduce() error {
 	if len(wm.Events) == 0 {
 		return nil
 	}
+
 	latestEvent := wm.Events[len(wm.Events)-1]
 	if wm.AggregateID == "" {
 		wm.AggregateID = latestEvent.Aggregate().ID
 	}
 
 	if wm.ResourceOwner == "" {
-		// TODO: use the latest events resource owner for cases where the resource is recreated with the same ID and different resource owner?
 		wm.ResourceOwner = latestEvent.Aggregate().ResourceOwner
 	}
 
 	if wm.InstanceID == "" {
-		// TODO: use the latest events instance ID for cases where the resource is recreated with the same ID and different instance?
 		wm.InstanceID = latestEvent.Aggregate().InstanceID
 	}
 
