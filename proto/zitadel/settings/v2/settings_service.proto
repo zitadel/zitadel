@@ -15,6 +15,8 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "google/protobuf/struct.proto";
+import "zitadel/settings/v2/settings.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
@@ -362,6 +364,66 @@ service SettingsService {
       description: "Set the security settings of the ZITADEL instance."
     };
   }
+
+  // Get Hosted Login Translation
+  //
+  // Returns the translations in the requested locale for the hosted login.
+  // The translations returned are based on the input level specified (system, instance or organisation).
+  //
+  // If the requested level doesn't contain all translations, a merging process fallbacks onto the higher levels
+  // ensuring all keys in the file have a translation, which could be in the default languange if the one of the locale
+  // is missing on all levels.
+  //
+  // Required permissions:
+  //   - `iam.policy.read`
+  rpc GetHostedLoginTranslation(GetHostedLoginTranslationRequest) returns (GetHostedLoginTranslationResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The localized translations.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      get: "/v2/settings/hosted_login_translation"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+  }
+
+  // Set Hosted Login Translation
+  //
+  // Sets the input translations at the specified level (instance or organization) for the input language.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc SetHostedLoginTranslation(SetHostedLoginTranslationRequest) returns (SetHostedLoginTranslationResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+    
+    option (google.api.http) = {
+      put: "/v2/settings/hosted_login_translation";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
 }
 
 message GetLoginSettingsRequest {
@@ -480,4 +542,89 @@ message SetSecuritySettingsRequest{
 
 message SetSecuritySettingsResponse{
   zitadel.object.v2.Details details = 1;
+}
+
+message GetHostedLoginTranslationRequest {
+  TranslationLevelType level = 1;
+
+  // instance ID if level = INSTANCE or organization ID if level = ORGANIZATION. Ignored otherwise
+  string level_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];  
+
+  string locale = 3 [
+    (validate.rules).string = {min_len: 2},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 2;
+      example: "\"fr-FR\"";
+    }
+  ];
+
+  // if set to true, higher levels are ignored, if false higher levels are merged into the file
+  bool ignore_inheritance = 4;
+}
+
+message GetHostedLoginTranslationResponse {
+  // md5 of the payload
+  string etag = 1 [
+    (validate.rules).string = {min_len: 32, max_len: 32},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 32;
+      max_length: 32;
+      example: "\"42a1ba123e6ea6f0c93e286ed97c7018\"";
+    }
+  ];
+
+  google.protobuf.Struct translations = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
+        description: "Translations contains the translations in the request language.";
+    }
+  ];
+}
+
+message SetHostedLoginTranslationRequest {
+  TranslationLevelType level = 1;
+
+  // instance ID if level = INSTANCE or organization ID if level = ORGANIZATION. Ignored otherwise
+  string level_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ]; 
+ 
+  string locale = 3 [
+    (validate.rules).string = {min_len: 2},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 2;
+      example: "\"fr-FR\"";
+    }
+  ];
+
+  google.protobuf.Struct translations = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
+        description: "Translations should contain the translations in the specified locale.";
+    }
+  ];
+}
+
+message SetHostedLoginTranslationResponse {
+  // md5 of the saved translation
+  string etag = 1 [
+    (validate.rules).string = {min_len: 32, max_len: 32},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 32;
+      max_length: 32;
+      example: "\"42a1ba123e6ea6f0c93e286ed97c7018\"";
+    }
+  ];
 }
