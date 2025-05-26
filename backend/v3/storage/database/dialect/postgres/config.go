@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	_    database.Connector = (*Config)(nil)
-	Name                    = "postgres"
+	_          database.Connector = (*Config)(nil)
+	Name                          = "postgres"
+	isMigrated bool
 )
 
 type Config struct {
@@ -45,7 +46,7 @@ func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
 	if err = pool.Ping(ctx); err != nil {
 		return nil, err
 	}
-	return &pgxPool{pool}, nil
+	return &pgxPool{Pool: pool}, nil
 }
 
 func (c *Config) getPool(ctx context.Context) (*pgxpool.Pool, error) {

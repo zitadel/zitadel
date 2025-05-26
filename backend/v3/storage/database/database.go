@@ -8,6 +8,7 @@ import (
 type Pool interface {
 	Beginner
 	QueryExecutor
+	Migrator
 
 	Acquire(ctx context.Context) (Client, error)
 	Close(ctx context.Context) error
@@ -17,6 +18,7 @@ type Pool interface {
 type Client interface {
 	Beginner
 	QueryExecutor
+	Migrator
 
 	Release(ctx context.Context) error
 }
