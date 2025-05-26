@@ -6,7 +6,6 @@ import {
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-  resendInviteCode,
   verifyEmail,
   verifyInviteCode,
   verifyTOTPRegistration,
@@ -282,9 +281,12 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   return command.isInvite
-    ? resendInviteCode({
+    ? createInviteCode({
         serviceUrl,
         userId: command.userId,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          (command.requestId ? `&requestId=${command.requestId}` : ""),
       }).catch((error) => {
         if (error.code === 9) {
           return { error: "User is already verified!" };
@@ -315,7 +317,6 @@ export async function sendEmailCode(command: sendEmailCommand) {
 }
 
 export async function sendInviteEmailCode(command: sendEmailCommand) {
-  // TODO: change this to sendInvite
   return createInviteCode({
     serviceUrl: command.serviceUrl,
     userId: command.userId,
