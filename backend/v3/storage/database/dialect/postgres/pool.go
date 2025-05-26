@@ -14,7 +14,7 @@ type pgxPool struct {
 }
 
 var (
-	_ database.Pool = (*pgxPool)(nil)
+  _ database.Pool = (*pgxPool)(nil)
 )
 
 // Acquire implements [database.Pool].
@@ -71,6 +71,7 @@ func (c *pgxPool) Migrate(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	err = migration.Migrate(ctx, client.Conn())
 	isMigrated = err == nil
 	return err

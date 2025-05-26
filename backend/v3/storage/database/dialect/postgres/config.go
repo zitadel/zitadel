@@ -56,6 +56,13 @@ func (c *Config) getPool(ctx context.Context) (*pgxpool.Pool, error) {
 	return pgxpool.NewWithConfig(ctx, c.Config)
 }
 
+func (c *Config) getPool(ctx context.Context) (*pgxpool.Pool, error) {
+	if c.Pool != nil {
+		return c.Pool, nil
+	}
+	return pgxpool.NewWithConfig(ctx, c.Config)
+}
+
 func NameMatcher(name string) bool {
 	return slices.Contains([]string{"postgres", "pg"}, strings.ToLower(name))
 }
