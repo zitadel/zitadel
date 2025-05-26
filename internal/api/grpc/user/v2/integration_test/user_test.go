@@ -3303,6 +3303,33 @@ func TestServer_CreateInviteCode(t *testing.T) {
 			},
 		},
 		{
+			name: "recreate",
+			args: args{
+				ctx: CTX,
+				req: &user.CreateInviteCodeRequest{},
+				prepare: func(request *user.CreateInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Instance.Client.UserV2.CreateInviteCode(CTX, &user.CreateInviteCodeRequest{
+						UserId: resp.GetUserId(),
+						Verification: &user.CreateInviteCodeRequest_SendCode{
+							SendCode: &user.SendInviteCode{
+								UrlTemplate:     gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+								ApplicationName: gu.Ptr("TestApp"),
+							},
+						},
+					})
+					return err
+				},
+			},
+			want: &user.CreateInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
 			name: "create, return code, ok",
 			args: args{
 				ctx: CTX,
