@@ -52,7 +52,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not send invitation email", error);
-        throw Error("Failed to send verification email");
+        throw Error("Failed to send invitation email");
       });
     } else {
       await sendEmailCode({
@@ -160,19 +160,14 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
 
-        {/* always show the code form, except code is an invite code and the email is verified */}
-        {invite === "true" && human?.email?.isVerified ? (
-          <Alert type={AlertType.INFO}>{t("success")}</Alert>
-        ) : (
-          <VerifyForm
-            loginName={loginName}
-            organization={organization}
-            userId={id}
-            code={code}
-            isInvite={invite === "true"}
-            requestId={requestId}
-          />
-        )}
+        <VerifyForm
+          loginName={loginName}
+          organization={organization}
+          userId={id}
+          code={code}
+          isInvite={invite === "true"}
+          requestId={requestId}
+        />
       </div>
     </DynamicTheme>
   );

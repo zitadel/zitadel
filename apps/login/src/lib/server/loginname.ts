@@ -255,23 +255,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // always resend invite if user has no auth method set
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      // redirect to /verify invite if no auth method is set and email is not verified
-      // const inviteCheck = checkEmailVerified(
-      //   session,
-      //   humanUser,
-      //   session.factors.user.organizationId,
-      //   command.requestId,
-      // );
-
-      // if (inviteCheck?.redirect) {
-      //   return inviteCheck;
-      // }
-
-      // // check if user was verified recently
-      // const isUserVerified = await checkUserVerification(
-      //   session.factors.user.id,
-      // );
-      // if (!isUserVerified) {
       const params = new URLSearchParams({
         loginName: session.factors?.user?.loginName as string,
         send: "true", // set this to true to request a new code immediately
@@ -291,25 +274,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       return { redirect: `/verify?` + params };
-      // }
-
-      // const paramsAuthenticatorSetup = new URLSearchParams({
-      //   loginName: session.factors?.user?.loginName,
-      //   userId: session.factors?.user?.id, // verify needs user id
-      // });
-
-      // if (command.organization || session.factors?.user?.organizationId) {
-      //   paramsAuthenticatorSetup.append(
-      //     "organization",
-      //     command.organization ?? session.factors?.user?.organizationId,
-      //   );
-      // }
-
-      // if (command.requestId) {
-      //   paramsAuthenticatorSetup.append("requestId", command.requestId);
-      // }
-
-      // return { redirect: "/authenticator/set?" + paramsAuthenticatorSetup };
     }
 
     if (methods.authMethodTypes.length == 1) {
