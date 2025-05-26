@@ -344,9 +344,9 @@ func (h *Handler) handleJWT(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) intentIDFromJWTRequest(r *http.Request) (string, error) {
-	// for compatability of the old JWT provider we use the auth request id parameter to pass the intent id
+	// for compatibility of the old JWT provider we use the auth request id parameter to pass the intent id
 	intentID := r.FormValue(jwt.QueryAuthRequestID)
-	// for compatability of the old JWT provider we use the user agent id parameter to pass the encrypted intent id
+	// for compatibility of the old JWT provider we use the user agent id parameter to pass the encrypted intent id
 	encryptedIntentID := r.FormValue(jwt.QueryUserAgentID)
 	if err := h.checkIntentID(intentID, encryptedIntentID); err != nil {
 		return "", err
