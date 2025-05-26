@@ -10,7 +10,6 @@ import {
   getLoginSettings,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -22,7 +21,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "password" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  let { loginName, organization, requestId, alt } = searchParams;
+  let { loginName, organization, requestId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -93,10 +92,6 @@ export default async function Page(props: {
             requestId={requestId}
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             loginSettings={loginSettings}
-            promptPasswordless={
-              loginSettings?.passkeysType == PasskeysType.ALLOWED
-            }
-            isAlternative={alt === "true"}
           />
         )}
       </div>
