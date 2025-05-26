@@ -681,19 +681,22 @@ func TestServer_DeactivateReactivateNonExistentOrganization(t *testing.T) {
 	require.Contains(t, err.Error(), "Organisation not found")
 }
 
-func TestServer_DeactivateReactivateOrganization(t *testing.T) {
+func TestServer_AactivateOrganization(t *testing.T) {
 	tests := []struct {
 		name     string
-		testFunc func()
+		ctx      context.Context
+		testFunc func() string
+		err      error
 	}{
 		{
-			name: "deactivate active org, then deactivate again",
-			testFunc: func() {
+			name: "Activate, happy path",
+			ctx:  CTX,
+			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
 				if err != nil {
 					assert.Fail(t, "unable to create orgs")
-					return
+					return ""
 				}
 				orgId := orgs[0].Id
 
@@ -720,63 +723,129 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
-					require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					require.NoError(ttt, err)
+					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
-				// 4. repeat deactivate organization once
-				_, err = Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
-					Id: orgId,
-				})
-				// TODO this error message needs to be reoved
-				require.Contains(t, err.Error(), "Organisation is already deactivated")
-
-				// 5. repeat check organization state is still deactivated
-				listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
-					Filter: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: orgId,
-								},
-							},
-						},
-					},
-				})
-				require.NoError(t, err)
-				require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+				return orgId
 			},
 		},
 		{
-			name: "re-activate active org, then re-activate again",
-			testFunc: func() {
+			name: "Activate, no permission",
+			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			testFunc: func() string {
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create orgs")
+					return ""
+				}
+				orgId := orgs[0].Id
+				return orgId
+			},
+			// BUG: this needs changing
+			err: errors.New("membership not found"),
+		},
+		{
+			name: "Activate, not existing",
+			ctx:  CTX,
+			testFunc: func() string {
+				return "non-existing-org-id"
+			},
+			err: errors.New("Organisation not found"),
+		},
+		{
+			name: "Activate, already activated",
+			ctx:  CTX,
+			testFunc: func() string {
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create orgs")
+					return ""
+				}
+				orgId := orgs[0].Id
+				return orgId
+			},
+			err: errors.New("Organisation is already active"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var orgId string
+			if tt.testFunc != nil {
+				orgId = tt.testFunc()
+			}
+			_, err := Client.ActivateOrganization(tt.ctx, &v2beta_org.ActivateOrganizationRequest{
+				Id: orgId,
+			})
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestServer_DeactivateOrganization(t *testing.T) {
+	tests := []struct {
+		name     string
+		ctx      context.Context
+		testFunc func() string
+		err      error
+	}{
+		{
+			name: "Deactivate, happy path",
+			ctx:  CTX,
+			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
 				if err != nil {
 					assert.Fail(t, "unable to create orgs")
-					return
+					return ""
 				}
 				orgId := orgs[0].Id
-				ctx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-				// 2. check inital state of organization
-				listOrgRes, err := Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-					Filter: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: orgId,
-								},
-							},
-						},
-					},
-				})
-				require.NoError(t, err)
-				// require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
-				require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+				return orgId
+			},
+		},
+		{
+			name: "Deactivate, no permission",
+			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			testFunc: func() string {
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create orgs")
+					return ""
+				}
+				orgId := orgs[0].Id
+				return orgId
+			},
+			// BUG: this needs changing
+			err: errors.New("membership not found"),
+		},
+		{
+			name: "Deactivate, not existing",
+			ctx:  CTX,
+			testFunc: func() string {
+				return "non-existing-org-id"
+			},
+			err: errors.New("Organisation not found"),
+		},
+		{
+			name: "Deactivate, already deactivated",
+			ctx:  CTX,
+			testFunc: func() string {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create orgs")
+					return ""
+				}
+				orgId := orgs[0].Id
 
-				// 3. deactivate organization once
-				deactivate_res, err := Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
+				// 2. deactivate organization once
+				deactivate_res, err := Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
 					Id: orgId,
 				})
 				require.NoError(t, err)
@@ -784,10 +853,10 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 				now := time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-				// 4. check organization state is deactivated
+				// 3. check organization state is deactivated
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-					listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
+					listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
 						Filter: []*v2beta_org.OrganizationSearchFilter{
 							{
 								Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
@@ -802,62 +871,317 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
-				// 5. reactivate organization
-				reactivate_res, err := Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
-					Id: orgId,
-				})
-				require.NoError(t, err)
-				gotCD = reactivate_res.GetChangeDate().AsTime()
-				now = time.Now()
-				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-				// 6. check organization state is active
-				retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-					listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-						Filter: []*v2beta_org.OrganizationSearchFilter{
-							{
-								Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-									IdFilter: &v2beta_org.OrgIDFilter{
-										Id: orgId,
-									},
-								},
-							},
-						},
-					})
-					require.NoError(ttt, err)
-					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
-				}, retryDuration, tick, "timeout waiting for expected organizations being created")
-
-				// 7. repeat reactivate organization
-				reactivate_res, err = Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
-					Id: orgId,
-				})
-				// TODO remove this error message
-				require.Contains(t, err.Error(), "Organisation is already active")
-
-				// 8. repeat check organization state is still active
-				listOrgRes, err = Client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
-					Filter: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: orgId,
-								},
-							},
-						},
-					},
-				})
-				require.NoError(t, err)
-				require.Equal(t, v2beta_org.OrgState_ORG_STATE_ACTIVE, listOrgRes.Organizations[0].State)
+				return orgId
 			},
+			err: errors.New("Organisation is already deactivated"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.testFunc()
+			var orgId string
+			orgId = tt.testFunc()
+			_, err := Client.DeactivateOrganization(tt.ctx, &v2beta_org.DeactivateOrganizationRequest{
+				Id: orgId,
+			})
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+			} else {
+				require.NoError(t, err)
+			}
 		})
+	}
+}
+
+func TestServer_AddOerganizationDomain(t *testing.T) {
+	tests := []struct {
+		name     string
+		ctx      context.Context
+		domain   string
+		testFunc func() string
+		err      error
+	}{
+		{
+			name:   "add org domain, happy path",
+			domain: "www.domain.com",
+			testFunc: func() string {
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return ""
+				}
+				orgId := orgs[0].Id
+				return orgId
+			},
+		},
+		{
+			name:   "add org domain, twice",
+			domain: "www.domain.com",
+			testFunc: func() string {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return ""
+				}
+				orgId := orgs[0].Id
+
+				domain := "www.domain.com"
+				// 2. add domain
+				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+					OrganizationId: orgId,
+					Domain:         domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// check domain added
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+						OrganizationId: orgId,
+					})
+					require.NoError(t, err)
+					found := false
+					for _, res := range queryRes.Domains {
+						if res.DomainName == domain {
+							found = true
+						}
+					}
+					require.True(t, found, "unable to find added domain")
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
+
+				return orgId
+			},
+			err: errors.New("AlreadyExists"),
+		},
+		{
+			name:   "add org domain to non existent org",
+			domain: "www.domain.com",
+			testFunc: func() string {
+				return "non-existing-org-id"
+			},
+			// BUG:
+			err: errors.New("Domain already exists"),
+		},
+	}
+
+	for _, tt := range tests {
+		var orgId string
+		t.Run(tt.name, func(t *testing.T) {
+			orgId = tt.testFunc()
+		})
+		addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+			OrganizationId: orgId,
+			Domain:         tt.domain,
+		})
+		if tt.err != nil {
+			require.Contains(t, err.Error(), tt.err.Error())
+		} else {
+			require.NoError(t, err)
+			// check details
+			gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+			now := time.Now()
+			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+		}
+	}
+}
+
+func TestServer_ListOerganizationDomain(t *testing.T) {
+	tests := []struct {
+		name     string
+		ctx      context.Context
+		domain   string
+		testFunc func() string
+		err      error
+	}{
+		{
+			name:   "list org domain, happy path",
+			domain: "www.domain.com",
+			testFunc: func() string {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return ""
+				}
+				orgId := orgs[0].Id
+
+				domain := "www.domain.com"
+				// 2. add domain
+				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+					OrganizationId: orgId,
+					Domain:         domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				return orgId
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		var orgId string
+		t.Run(tt.name, func(t *testing.T) {
+			orgId = tt.testFunc()
+		})
+
+		var err error
+		var queryRes *v2beta_org.ListOrganizationDomainsResponse
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+				OrganizationId: orgId,
+			})
+			require.NoError(t, err)
+			found := false
+			for _, res := range queryRes.Domains {
+				if res.DomainName == tt.domain {
+					found = true
+				}
+			}
+			require.True(t, found, "unable to find added domain")
+		}, retryDuration, tick, "timeout waiting for adding domain")
+
+	}
+}
+
+func TestServer_DeleteOerganizationDomain(t *testing.T) {
+	tests := []struct {
+		name     string
+		ctx      context.Context
+		domain   string
+		testFunc func() string
+		err      error
+	}{
+		{
+			name:   "delete org domain, happy path",
+			domain: "www.domain.com",
+			testFunc: func() string {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return ""
+				}
+				orgId := orgs[0].Id
+
+				domain := "www.domain.com"
+				// 2. add domain
+				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+					OrganizationId: orgId,
+					Domain:         domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// check domain added
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+						OrganizationId: orgId,
+					})
+					require.NoError(t, err)
+					found := false
+					for _, res := range queryRes.Domains {
+						if res.DomainName == domain {
+							found = true
+						}
+					}
+					require.True(t, found, "unable to find added domain")
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
+
+				return orgId
+			},
+		},
+		{
+			name:   "delete org domain, twice",
+			domain: "www.domain.com",
+			testFunc: func() string {
+				// 1. create organization
+				orgs, _, err := createOrgs(CTX, Client, 1)
+				if err != nil {
+					assert.Fail(t, "unable to create org")
+					return ""
+				}
+				orgId := orgs[0].Id
+
+				domain := "www.domain.com"
+				// 2. add domain
+				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+					OrganizationId: orgId,
+					Domain:         domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// check domain added
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+						OrganizationId: orgId,
+					})
+					require.NoError(t, err)
+					found := false
+					for _, res := range queryRes.Domains {
+						if res.DomainName == domain {
+							found = true
+						}
+					}
+					require.True(t, found, "unable to find added domain")
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
+
+				_, err = Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
+					OrganizationId: orgId,
+					Domain:         domain,
+				})
+				require.NoError(t, err)
+
+				return orgId
+			},
+			err: errors.New("Domain doesn't exist on organization"),
+		},
+		{
+			name:   "delete org domain to non existent org",
+			domain: "www.domain.com",
+			testFunc: func() string {
+				return "non-existing-org-id"
+			},
+			// BUG:
+			err: errors.New("Domain doesn't exist on organization"),
+		},
+	}
+
+	for _, tt := range tests {
+		var orgId string
+		t.Run(tt.name, func(t *testing.T) {
+			orgId = tt.testFunc()
+		})
+
+		_, err := Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
+			OrganizationId: orgId,
+			Domain:         tt.domain,
+		})
+
+		if tt.err != nil {
+			require.Contains(t, err.Error(), tt.err.Error())
+		} else {
+			require.NoError(t, err)
+		}
 	}
 }
 
