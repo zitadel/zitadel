@@ -25,7 +25,6 @@ import BetaToGA from './_beta-ga.mdx';
             <th scope="col" colSpan={3}>Q2</th>
             <th scope="col" colSpan={3}>Q3</th>
             <th scope="col" colSpan={3}>Q4</th>
-
             <th scope="col" colSpan={3}>Q1</th>
             <th scope="col" colSpan={3}>Q2</th>
             <th scope="col" colSpan={3}>Q3</th>
@@ -45,8 +44,6 @@ import BetaToGA from './_beta-ga.mdx';
             <th scope="col">Oct</th>
             <th scope="col">Nov</th>
             <th scope="col">Dec</th>
-
-
             <th scope="col">Jan</th>
             <th scope="col">Feb</th>
             <th scope="col">Mar</th>
@@ -62,7 +59,6 @@ import BetaToGA from './_beta-ga.mdx';
         </tr>
     </thead>
     <tbody>
-
         <tr>
             <td colspan={25}>Zitadel Core</td>
         </tr>
@@ -313,6 +309,7 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
     <details>
         <summary>Resource API (v2)</summary>
+
         We are revamping our APIs to improve the developer experience.
         Currently, our use-case-based APIs are complex and inconsistent, causing confusion and slowing down integration.
         To fix this, we're shifting to a resource-based approach.
@@ -340,12 +337,14 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
         We're officially moving our new Login UI v2 from beta to General Availability.
         Starting now, it will be the default login experience for all new customers.
-        With this release, we are also focused on implementing previously missing features, such as device authorization and LDAP IDP support, to make the new UI fully feature-complete.
+        With this release, 8.0we are also focused on implementing previously missing features, such as device authorization and LDAP IDP support, to make the new UI fully feature-complete.
 
+        - [Hosted Login V2](http://localhost:3000/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
     </details>
 
     <details>
         <summary>Web Keys</summary>
+
         Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
         ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or OAuth2 authorization flow completes and a user is authenticated.
         Based on customer and community feedback, we've updated our key management system. You now have full manual control over key generation and rotation, instead of the previous automatic process.
@@ -469,26 +468,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 </details>
 
 <details>
-    <summary>General Availability</summary>
-
-    <BetaToGA/>
-
-    <details>
-        <summary>SCIM 2.0 Server - User Resource</summary>
-        [SCIM (System for Cross-domain Identity Management)](https://scim.cloud/) is a standard that allows the exchange of user identity information between different systems, such as when a new employee is onboarded and needs to be provisioned  to various applications.
-        For more detailed information read the section about the [User Resource Schema](https://datatracker.ietf.org/doc/html/rfc7643#section-4.1) in the [RFC7643](https://datatracker.ietf.org/doc/html/rfc7643).
-        The implementation is compliant with the standard  and includes all requests for the user resource and the discovery endpoints.
-        Read the full description of the API in our [SCIM API Docs](https://zitadel.com/docs/apis/scim2) or our guide about [managing users with SCIM 2.0](https://zitadel.com/docs/guides/manage/user/scim2).
-
-        Let us know your thoughts and report any issues via our [GitHub](https://github.com/zitadel/zitadel).
-    </details>
-
-    <details>
-        <summary>Actions V2</summary>
-    </details>
-</details>
-
-<details>
     <summary>Feature Deprecation</summary>
 
     <Deprecated/>
@@ -516,8 +495,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
 ### v6.x
 
-**Current State**: Planning
-
 <details>
     <summary>New Features</summary>
 
@@ -526,13 +503,27 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
     <details>
         <summary>Basic Thread Detection Framework</summary>
 
-        ...
+        This initial version of our Threat Detection Framework is designed to enhance the security of your account by identifying and challenging potentially anomalous user behavior.
+        When the system detects unusual activity, it will present a challenge, such as a reCAPTCHA, to verify that the user is legitimate and not a bot or malicious actor.
+        Security administrators will also have the ability to revoke user sessions based on the output of the threat detection model, providing a crucial tool to mitigate potential security risks in real-time.
+
+        We are beginning with a straightforward reCAPTCHA-style challenge to build and refine the core framework.
+        This foundational step will allow us to gather insights into how the system performs and how it can be improved.
+        Future iterations will build upon this groundwork to incorporate more sophisticated detection methods and a wider range of challenge and response mechanisms, ensuring an increasingly robust and intelligent security posture for all users.
+
+        More details can be found in the (GitHub Issue](https://github.com/zitadel/zitadel/issues/9707)
     </details>
 
     <details>
         <summary>SCIM Outbound</summary>
 
-        ...
+        Automate user provisioning to your external applications with our new SCIM Client.
+        This feature ensures users are automatically created in downstream systems before their first SSO login, preventing access issues and streamlining onboarding.
+
+        It also synchronizes user lifecycle events, so changes like deactivations or deletions are instantly reflected across all connected applications for consistent and secure access management.
+        The initial release will focus on provisioning the user resource.
+
+        More details can be found in the (GitHub Issue](https://github.com/zitadel/zitadel/issues/6601)
     </details>
 
     <details>
@@ -553,7 +544,15 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
     <details>
         <summary>Impersonation: External Token Exchange</summary>
 
-        ...
+        This feature expands our existing impersonation capabilities to support seamless and secure integration with external, third-party applications.
+        Currently, our platform supports impersonation for internal use cases, allowing administrators or support staff to obtain a temporary token for an end-user to troubleshoot issues or provide assistance within applications that already use ZITADEL for authentication. (You can find more details in our [existing documentation](/docs/guides/integrate/token-exchange)).
+
+        The next evolution of this feature will focus on external applications.
+        This enables scenarios where a user, already authenticated in a third-party system (like their primary e-banking portal), can seamlessly access a connected application that is secured by ZITADEL without needing to log in again.
+
+        For example, a user in their e-banking app could click to open an integrated "Budget Planning" tool that relies on ZITADEL for access.
+        Using a secure token exchange, the budget app will grant the user a valid session on their behalf, creating a smooth, uninterrupted user experience while maintaining a high level of security.
+        This enhancement bridges the authentication gap between external platforms and ZITADEL-powered applications.
     </details>
 </details>
 
