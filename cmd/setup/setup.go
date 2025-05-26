@@ -289,6 +289,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&RiverMigrateRepeatable{
 			client: dbClient,
 		},
+		&TransactionalTables{
+			dbClient: dbClient,
+		},
 	}
 
 	for _, repeatableStep := range repeatableSteps {
