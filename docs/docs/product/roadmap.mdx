@@ -69,7 +69,7 @@ import BetaToGA from './_beta-ga.mdx';
         <tr>
             <th scope="row">[v2.x](/docs/product/roadmap#v2x)</th>
             <td colspan={6} class="release-stable">GA / Stable </td>
-            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
             <td colSpan={16}></td>
         </tr>
         <tr>
@@ -77,7 +77,7 @@ import BetaToGA from './_beta-ga.mdx';
             <td colspan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
             <td colspan={5} class="release-stable">GA / Stable </td>
-            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
             <td colSpan={12}></td>
         </tr>
         <tr>
@@ -86,7 +86,7 @@ import BetaToGA from './_beta-ga.mdx';
             <td colSpan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
             <td colspan={5} class="release-stable">GA / Stable </td>
-            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
             <td colSpan={9}></td>
         </tr>
         <tr>
@@ -95,7 +95,7 @@ import BetaToGA from './_beta-ga.mdx';
             <td colSpan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
             <td colspan={5} class="release-stable">GA / Stable </td>
-            <td colSpan={3} class="release-deprecated">Extended Support (deprecated)</td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
             <td colSpan={6}></td>
         </tr>
     </tbody>
@@ -313,8 +313,19 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
     <details>
         <summary>Resource API (v2)</summary>
+        We are revamping our APIs to improve the developer experience.
+        Currently, our use-case-based APIs are complex and inconsistent, causing confusion and slowing down integration.
+        To fix this, we're shifting to a resource-based approach.
+        This means developers will use consistent endpoints (e.g., /users) to manage resources, regardless of their own role.
+        This change, along with standardized naming and improved documentation, will simplify integration, accelerate development, and create a more intuitive experience for our customers and community.
 
+        Resources integrated in this release:
+        - Instances
+        - Organizations
+        - Projects
+        - Users
 
+        For more details read the [Github Issue](https://github.com/zitadel/zitadel/issues/6305)
     </details>
 </details>
 
@@ -327,13 +338,19 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
     <details>
         <summary>Hosted Login v2</summary>
 
-        - Feature Complete
-        - Default
+        We're officially moving our new Login UI v2 from beta to General Availability.
+        Starting now, it will be the default login experience for all new customers.
+        With this release, we are also focused on implementing previously missing features, such as device authorization and LDAP IDP support, to make the new UI fully feature-complete.
 
     </details>
 
     <details>
         <summary>Web Keys</summary>
+        Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
+        ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or OAuth2 authorization flow completes and a user is authenticated.
+        Based on customer and community feedback, we've updated our key management system. You now have full manual control over key generation and rotation, instead of the previous automatic process.
+
+        Read the full description about Web Keys in our [Documentation](https://zitadel.com/docs/guides/integrate/login/oidc/webkeys).
     </details>
 
     <details>
@@ -496,6 +513,49 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
     </details>
 </details>
 
+
+### v6.x
+
+**Current State**: Planning
+
+<details>
+    <summary>New Features</summary>
+
+    <NewFeature/>
+
+    <details>
+        <summary>Basic Thread Detection Framework</summary>
+
+        ...
+    </details>
+
+    <details>
+        <summary>SCIM Outbound</summary>
+
+        ...
+    </details>
+
+    <details>
+        <summary>Analytics</summary>
+
+        We provide comprehensive and insightful analytics capabilities that empower you with the information needed to understand platform usage, monitor system health, and make data-driven decisions.
+
+        <details>
+            <summary>Login Insights: Successful and Failed Login Metrics</summary>
+            To enhance security monitoring and gain insights into user authentication patterns, administrators need access to login metrics.
+            This feature provides data on successful and failed login attempts, allowing for filtering by time range and level (overall instance, within a specific organization, or for a particular application).
+            This will enable administrators to detect suspicious login activity, analyze authentication trends, and proactively address potential security concerns.
+
+            For more details track our [GitHub issue](https://github.com/zitadel/zitadel/issues/9711).
+        </details>
+    </details>
+
+    <details>
+        <summary>Impersonation: External Token Exchange</summary>
+
+        ...
+    </details>
+</details>
 
 ### Future Vision / Upcoming Features
 
