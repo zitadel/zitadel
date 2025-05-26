@@ -2340,6 +2340,8 @@
     "DELETE_DESCRIPTION": "Você está prestes a excluir um provedor de identidade. As alterações resultantes são irreversíveis. Você realmente deseja fazer isso?",
     "DELETE_SELECTION_TITLE": "Excluir Provedor de Identidade",
     "DELETE_SELECTION_DESCRIPTION": "Você está prestes a excluir um provedor de identidade. As alterações resultantes são irreversíveis. Você realmente deseja fazer isso?",
+    "FEDERATEDLOGOUTENABLED": "Logout Federado Ativado",
+    "FEDERATEDLOGOUTENABLED_DESC": "Se ativado, o usuário também será desconectado do IdP se encerrar a sessão no ZITADEL.",
     "EMPTY": "Nenhum provedor de identidade disponível",
     "OIDC": {
       "GENERAL": "Informações Gerais",

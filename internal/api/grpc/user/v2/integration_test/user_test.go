@@ -2166,8 +2166,8 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	projectResp := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+
 	type args struct {
 		req     *user.DeleteUserRequest
 		prepare func(*testing.T, *user.DeleteUserRequest) (deleteCtx context.Context, tryAuthCtx context.Context)
@@ -2303,7 +2303,7 @@ func TestServer_DeleteUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			deleteCtx, tryAuthCtx := tt.args.prepare(t, tt.args.req)
 			if tryAuthCtx != nil {
-				_, err = Client.ListKeys(tryAuthCtx, &user.ListKeysRequest{Filters: []*user.KeysSearchFilter{{
+				_, err := Client.ListKeys(tryAuthCtx, &user.ListKeysRequest{Filters: []*user.KeysSearchFilter{{
 					Filter: &user.KeysSearchFilter_UserIdFilter{UserIdFilter: &user.IDFilter{
 						Id: "not existing",
 					}}},

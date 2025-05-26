@@ -25,6 +25,7 @@ const (
 	PersonalAccessTokenColumnUserID        = "user_id"
 	PersonalAccessTokenColumnExpiration    = "expiration"
 	PersonalAccessTokenColumnScopes        = "scopes"
+	PersonalAccessTokenColumnOwnerRemoved  = "owner_removed"
 )
 
 type personalAccessTokenProjection struct{}
@@ -53,6 +54,7 @@ func (*personalAccessTokenProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{PersonalAccessTokenColumnUserID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{PersonalAccessTokenColumnResourceOwner})),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{PersonalAccessTokenColumnOwnerRemoved})),
 			handler.WithIndex(handler.NewIndex("creation_date", []string{PersonalAccessTokenColumnCreationDate})),
 			handler.WithIndex(handler.NewIndex("expiration_date", []string{PersonalAccessTokenColumnExpiration})),
 		),

@@ -2753,6 +2753,11 @@ service ManagementService {
         };
     }
 
+    // Get Project By ID
+    //
+    // Deprecated: [Get Project](apis/resources/project_service_v2/project-service-get-project.api.mdx) to get project by ID.
+    //
+    // Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context.
    rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{id}"
@@ -2765,8 +2770,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Get Project By ID";
-            description: "Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2778,6 +2782,11 @@ service ManagementService {
         };
     }
 
+    // Get Granted Project By ID
+    //
+    // Deprecated: [List Projects](apis/resources/project_service_v2/project-service-list-projects.api.mdx) to get granted projects.
+    //
+    // Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context.
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
         option (google.api.http) = {
             get: "/granted_projects/{project_id}/grants/{grant_id}"
@@ -2790,8 +2799,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Get Granted Project By ID";
-            description: "Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2803,6 +2811,11 @@ service ManagementService {
         };
     }
 
+    // List Projects
+    //
+    // Deprecated: [List Projects](apis/resources/project_service_v2/project-service-list-projects.api.mdx) to list all projects and granted projects.
+    //
+    // Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
         option (google.api.http) = {
             post: "/projects/_search"
@@ -2815,8 +2828,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Search Project";
-            description: "Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2828,6 +2840,11 @@ service ManagementService {
         };
     }
 
+    // List Granted Projects
+    //
+    // Deprecated: [List Projects](apis/resources/project_service_v2/project-service-list-projects.api.mdx) to list all projects and granted projects.
+    //
+    // Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context.
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
         option (google.api.http) = {
             post: "/granted_projects/_search"
@@ -2840,8 +2857,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Search Granted Project";
-            description: "Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2903,6 +2919,11 @@ service ManagementService {
         };
     }
 
+    // Create Project
+    //
+    // Deprecated: [Create Project](apis/resources/project_service_v2/project-service-create-project.api.mdx) to create a project.
+    //
+    // Create a new project. A Project is a vessel for different applications sharing the same role context.
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
@@ -2915,8 +2936,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Create Project";
-            description: "Create a new project. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2928,6 +2948,11 @@ service ManagementService {
         };
     }
 
+    // Update Project
+    //
+    // Deprecated: [Update Project](apis/resources/project_service_v2/project-service-update-project.api.mdx) to update a project.
+    //
+    // Update a project and its settings. A Project is a vessel for different applications sharing the same role context.
     rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
         option (google.api.http) = {
             put: "/projects/{id}"
@@ -2941,8 +2966,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Update Project";
-            description: "Update a project and its settings. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2954,6 +2978,11 @@ service ManagementService {
         };
     }
 
+    // Deactivate Project
+    //
+    // Deprecated: [Deactivate Project](apis/resources/project_service_v2/project-service-deactivate-project.api.mdx) to deactivate a project.
+    //
+    // Set the state of a project to deactivated. Request returns an error if the project is already deactivated.
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_deactivate"
@@ -2967,8 +2996,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Deactivate Project";
-            description: "Set the state of a project to deactivated. Request returns an error if the project is already deactivated."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2980,6 +3008,11 @@ service ManagementService {
         };
     }
 
+    // Activate Project
+    //
+    // Deprecated: [Activate Project](apis/resources/project_service_v2/project-service-activate-project.api.mdx) to activate a project.
+    //
+    // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_reactivate"
@@ -2993,8 +3026,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Reactivate Project";
-            description: "Set the state of a project to active. Request returns an error if the project is not deactivated."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3006,6 +3038,11 @@ service ManagementService {
         };
     }
 
+    // Remove Project
+    //
+    // Deprecated: [Delete Project](apis/resources/project_service_v2/project-service-delete-project.api.mdx) to remove a project.
+    //
+    // Project and all its sub-resources like project grants, applications, roles and user grants will be removed.
     rpc RemoveProject(RemoveProjectRequest) returns (RemoveProjectResponse) {
         option (google.api.http) = {
             delete: "/projects/{id}"
@@ -3018,8 +3055,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Remove Project";
-            description: "Project and all its sub-resources like project grants, applications, roles and user grants will be removed."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3031,6 +3067,11 @@ service ManagementService {
         };
     }
 
+    // Search Project Roles
+    //
+    // Deprecated: [List Project Roles](apis/resources/project_service_v2/project-service-list-project-roles.api.mdx) to get project roles.
+    //
+    // Returns all roles of a project matching the search query.
     rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles/_search"
@@ -3044,8 +3085,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Search Project Roles";
-            description: "Returns all roles of a project matching the search query."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3057,6 +3097,11 @@ service ManagementService {
         };
     }
 
+    // Add Project Role
+    //
+    // Deprecated: [Add Project Role](apis/resources/project_service_v2/project-service-add-project-role.api.mdx) to add a project role.
+    //
+    // Add a new project role to a project. The key must be unique within the project.\n\nDeprecated: please use user service v2 AddProjectRole.
     rpc AddProjectRole(AddProjectRoleRequest) returns (AddProjectRoleResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles"
@@ -3070,8 +3115,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Add Project Role";
-            description: "Add a new project role to a project. The key must be unique within the project."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3083,6 +3127,11 @@ service ManagementService {
         };
     }
 
+    // Bulk add Project Role
+    //
+    // Deprecated: [Add Project Role](apis/resources/project_service_v2/project-service-add-project-role.api.mdx) to add a project role.
+    //
+    // Add a list of roles to a project. The keys must be unique within the project.
     rpc BulkAddProjectRoles(BulkAddProjectRolesRequest) returns (BulkAddProjectRolesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles/_bulk"
@@ -3096,8 +3145,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Bulk Add Project Role";
-            description: "Add a list of roles to a project. The keys must be unique within the project."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3109,6 +3157,11 @@ service ManagementService {
         };
     }
 
+    // Update Project Role
+    //
+    // Deprecated: [Update Project Role](apis/resources/project_service_v2/project-service-update-project-role.api.mdx) to update a project role.
+    //
+    // Change a project role. The key is not editable. If a key should change, remove the role and create a new one.
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/roles/{role_key}"
@@ -3122,8 +3175,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Change Project Role";
-            description: "Change a project role. The key is not editable. If a key should change, remove the role and create a new one."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3135,6 +3187,11 @@ service ManagementService {
         };
     }
 
+    // Remove Project Role
+    //
+    // Deprecated: [Delete Project Role](apis/resources/project_service_v2/project-service-update-project-role.api.mdx) to remove a project role.
+    //
+    // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/roles/{role_key}"
@@ -3147,8 +3204,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Remove Project Role";
-            description: "Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3812,6 +3868,11 @@ service ManagementService {
         };
     }
 
+    // Get Project Grant By ID
+    //
+    // Deprecated: [List Project Grants](apis/resources/project_service_v2/project-service-list-project-grants.api.mdx) to get a project grant.
+    //
+    // Returns a project grant. A project grant is when the organization grants its project to another organization.
     rpc GetProjectGrantByID(GetProjectGrantByIDRequest) returns (GetProjectGrantByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/grants/{grant_id}"
@@ -3823,8 +3884,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Project Grant By ID";
-            description: "Returns a project grant. A project grant is when the organization grants its project to another organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3836,6 +3896,11 @@ service ManagementService {
         };
     }
 
+    // List Project Grants
+    //
+    // Deprecated: [List Project Grants](apis/resources/project_service_v2/project-service-list-project-grants.api.mdx) to list project grants.
+    //
+    // Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization.
     rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/_search"
@@ -3849,8 +3914,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Search Project Grants from Project";
-            description: "Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3862,6 +3926,11 @@ service ManagementService {
         };
     }
 
+    // Search Project Grants
+    //
+    // Deprecated: [List Project Grants](apis/resources/project_service_v2/project-service-list-project-grants.api.mdx) to list project grants.
+    //
+    // Returns a list of project grants. A project grant is when the organization grants its project to another organization.
     rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
         option (google.api.http) = {
             post: "/projectgrants/_search"
@@ -3874,8 +3943,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Search Project Grants";
-            description: "Returns a list of project grants. A project grant is when the organization grants its project to another organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3887,6 +3955,11 @@ service ManagementService {
         };
     }
 
+    // Add Project Grant
+    //
+    // Deprecated: [Create Project Grant](apis/resources/project_service_v2/project-service-create-project-grant.api.mdx) to add a project grant.
+    //
+    // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants"
@@ -3899,8 +3972,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Add Project Grant";
-            description: "Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3912,6 +3984,11 @@ service ManagementService {
         };
     }
 
+    // Update Project Grant
+    //
+    // Deprecated: [Update Project Grant](apis/resources/project_service_v2/project-service-update-project-grant.api.mdx) to update a project grant.
+    //
+    // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}"
@@ -3924,8 +4001,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Change Project Grant";
-            description: "Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3937,6 +4013,11 @@ service ManagementService {
         };
     }
 
+    // Deactivate Project Grant
+    //
+    // Deprecated: [Deactivate Project Grant](apis/resources/project_service_v2/project-service-deactivate-project-grant.api.mdx) to deactivate a project grant.
+    //
+    // Set the state of the project grant to deactivated. The grant has to be active to be able to deactivate.
     rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/_deactivate"
@@ -3949,8 +4030,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Deactivate Project Grant";
-            description: "Set the state of the project grant to deactivated. The grant has to be active to be able to deactivate."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3962,6 +4042,11 @@ service ManagementService {
         };
     }
 
+    // Reactivate Project Grant
+    //
+    // Deprecated: [Activate Project Grant](apis/resources/project_service_v2/project-service-activate-project-grant.api.mdx) to activate a project grant.
+    //
+    // Set the state of the project grant to active. The grant has to be deactivated to be able to reactivate.
     rpc ReactivateProjectGrant(ReactivateProjectGrantRequest) returns (ReactivateProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/_reactivate"
@@ -3974,8 +4059,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Reactivate Project Grant";
-            description: "Set the state of the project grant to active. The grant has to be deactivated to be able to reactivate."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3987,6 +4071,11 @@ service ManagementService {
         };
     }
 
+    // Remove Project Grant
+    //
+    // Deprecated: [Delete Project Grant](apis/resources/project_service_v2/project-service-delete-project-grant.api.mdx) to remove a project grant.
+    //
+    // Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked).
     rpc RemoveProjectGrant(RemoveProjectGrantRequest) returns (RemoveProjectGrantResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/grants/{grant_id}"
@@ -3998,8 +4087,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Remove Project Grant";
-            description: "Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked)."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -13395,6 +13483,9 @@ message AddSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 8;
+    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 9;
 }
 
 message AddSAMLProviderResponse {
@@ -13429,6 +13520,9 @@ message UpdateSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 9;
+    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 10;
 }
 
 message UpdateSAMLProviderResponse {

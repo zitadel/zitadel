@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	AuthNKeyTable            = "projections.authn_keys3"
+	AuthNKeyTable            = "projections.authn_keys2"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
 	AuthNKeyChangeDateCol    = "change_date"
