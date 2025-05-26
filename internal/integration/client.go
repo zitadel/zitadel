@@ -684,6 +684,24 @@ func (i *Instance) AddLDAPProvider(ctx context.Context) string {
 	return resp.GetId()
 }
 
+func (i *Instance) AddJWTProvider(ctx context.Context) string {
+	resp, err := i.Client.Admin.AddJWTProvider(ctx, &admin.AddJWTProviderRequest{
+		Name:         "jwt-idp",
+		Issuer:       "https://example.com",
+		JwtEndpoint:  "https://example.com/jwt",
+		KeysEndpoint: "https://example.com/keys",
+		HeaderName:   "Authorization",
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	logging.OnError(err).Panic("create saml idp")
+	return resp.GetId()
+}
+
 func (i *Instance) CreateIntent(ctx context.Context, idpID string) *user_v2.StartIdentityProviderIntentResponse {
 	resp, err := i.Client.UserV2.StartIdentityProviderIntent(ctx, &user_v2.StartIdentityProviderIntentRequest{
 		IdpId: idpID,
