@@ -64,6 +64,10 @@ func CloseTransaction(tx Tx, err error) error {
 	return commitErr
 }
 
+const (
+	PgUniqueConstraintErrorCode = "23505"
+)
+
 type Config struct {
 	Dialects                   map[string]interface{} `mapstructure:",remain"`
 	EventPushConnRatio         float64
