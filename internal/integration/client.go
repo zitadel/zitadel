@@ -698,7 +698,7 @@ func (i *Instance) AddJWTProvider(ctx context.Context) string {
 			IsAutoUpdate:      true,
 		},
 	})
-	logging.OnError(err).Panic("create saml idp")
+	logging.OnError(err).Panic("create jwt idp")
 	return resp.GetId()
 }
 
