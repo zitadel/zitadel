@@ -301,11 +301,11 @@ func phoneQueryToQuery(q *user.PhoneQuery) (query.SearchQuery, error) {
 }
 
 func stateQueryToQuery(q *user.StateQuery) (query.SearchQuery, error) {
-	return query.NewUserStateSearchQuery(int32(q.State))
+	return query.NewUserStateSearchQuery(q.State.ToDomain())
 }
 
 func typeQueryToQuery(q *user.TypeQuery) (query.SearchQuery, error) {
-	return query.NewUserTypeSearchQuery(int32(q.Type))
+	return query.NewUserTypeSearchQuery(q.Type.ToDomain())
 }
 
 func loginNameQueryToQuery(q *user.LoginNameQuery) (query.SearchQuery, error) {

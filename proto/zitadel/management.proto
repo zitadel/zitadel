@@ -13320,6 +13320,9 @@ message AddSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 8;
+    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 9;
 }
 
 message AddSAMLProviderResponse {
@@ -13354,6 +13357,9 @@ message UpdateSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 9;
+    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 10;
 }
 
 message UpdateSAMLProviderResponse {

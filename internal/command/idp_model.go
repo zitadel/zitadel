@@ -1760,6 +1760,7 @@ type SAMLIDPWriteModel struct {
 	WithSignedRequest             bool
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
 	idp.Options
 
 	State domain.IDPState
@@ -1788,6 +1789,7 @@ func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
 	wm.WithSignedRequest = e.WithSignedRequest
 	wm.NameIDFormat = e.NameIDFormat
 	wm.TransientMappingAttributeName = e.TransientMappingAttributeName
+	wm.FederatedLogoutEnabled = e.FederatedLogoutEnabled
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -1817,6 +1819,9 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 	if e.TransientMappingAttributeName != nil {
 		wm.TransientMappingAttributeName = *e.TransientMappingAttributeName
 	}
+	if e.FederatedLogoutEnabled != nil {
+		wm.FederatedLogoutEnabled = *e.FederatedLogoutEnabled
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -1830,6 +1835,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	withSignedRequest bool,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options idp.Options,
 ) ([]idp.SAMLIDPChanges, error) {
 	changes := make([]idp.SAMLIDPChanges, 0)
@@ -1860,6 +1866,9 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	}
 	if wm.TransientMappingAttributeName != transientMappingAttributeName {
 		changes = append(changes, idp.ChangeSAMLTransientMappingAttributeName(transientMappingAttributeName))
+	}
+	if wm.FederatedLogoutEnabled != federatedLogoutEnabled {
+		changes = append(changes, idp.ChangeSAMLFederatedLogoutEnabled(federatedLogoutEnabled))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -1899,6 +1908,7 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if wm.TransientMappingAttributeName != "" {
 		opts = append(opts, saml2.WithTransientMappingAttributeName(wm.TransientMappingAttributeName))
 	}
+	// TODO: ? if wm.FederatedLogoutEnabled
 	opts = append(opts, saml2.WithCustomRequestTracker(
 		requesttracker.New(
 			addRequest,

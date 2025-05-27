@@ -127,6 +127,7 @@ export class ProviderSamlSpComponent {
         withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
         nameIdFormat: new UntypedFormControl(SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT, []),
         transientMappingAttributeName: new UntypedFormControl('', []),
+        federatedLogoutEnabled: new UntypedFormControl(false, []),
       },
       atLeastOneIsFilled('metadataXml', 'metadataUrl'),
     );
@@ -210,6 +211,7 @@ export class ProviderSamlSpComponent {
       // @ts-ignore
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat?.value]);
       req.setTransientMappingAttributeName(this.transientMapping?.value);
+      req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
       req.setProviderOptions(this.options);
 
       this.loading = true;
@@ -250,6 +252,7 @@ export class ProviderSamlSpComponent {
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value]);
     }
     req.setTransientMappingAttributeName(this.transientMapping?.value);
+    req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
     this.loading = true;
     this.service
       .addSAMLProvider(req)
@@ -334,5 +337,9 @@ export class ProviderSamlSpComponent {
 
   private get transientMapping(): AbstractControl | null {
     return this.form.get('transientMappingAttributeName');
+  }
+
+  private get federatedLogoutEnabled(): AbstractControl | null {
+    return this.form.get('federatedLogoutEnabled');
   }
 }

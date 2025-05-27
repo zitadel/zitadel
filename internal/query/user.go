@@ -768,11 +768,11 @@ func NewUserVerifiedPhoneSearchQuery(value string, comparison TextComparison) (S
 	return NewTextQuery(NotifyVerifiedPhoneCol, value, comparison)
 }
 
-func NewUserStateSearchQuery(value int32) (SearchQuery, error) {
+func NewUserStateSearchQuery(value domain.UserState) (SearchQuery, error) {
 	return NewNumberQuery(UserStateCol, value, NumberEquals)
 }
 
-func NewUserTypeSearchQuery(value int32) (SearchQuery, error) {
+func NewUserTypeSearchQuery(value domain.UserType) (SearchQuery, error) {
 	return NewNumberQuery(UserTypeCol, value, NumberEquals)
 }
 
