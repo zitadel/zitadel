@@ -612,7 +612,7 @@ message ListOrganizationsRequest {
   zitadel.org.v2beta.OrgFieldName sorting_column = 2;
   // Define the criteria to query for.
   // repeated ProjectRoleQuery filters = 4;
-  repeated zitadel.org.v2beta.OrganizationSearchFilter filter= 3;
+  repeated zitadel.org.v2beta.OrganizationSearchFilter filter = 3;
 }
 
 message ListOrganizationsResponse {
@@ -623,15 +623,11 @@ message ListOrganizationsResponse {
 }
 
 message DeleteOrganizationRequest {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["id"]
-    };
-  };
 
   // Organization Id for the Organization to be deleted
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
       min_length: 1;
@@ -700,7 +696,6 @@ message AddOrganizationDomainRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want to add a domain to."
     }
   ];
   // The domain you want to add to the organization.
@@ -733,7 +728,6 @@ message ListOrganizationDomainsRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want the domains of."
     }
   ];
   
@@ -830,7 +824,6 @@ message VerifyOrganizationDomainRequest {
       min_length: 1;
       max_length: 200;
       example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want to veryify the domain on."
     }
   ];
   // Organization Id for the Organization doman to be verified.
@@ -868,7 +861,6 @@ message SetOrganizationMetadataRequest{
       min_length: 1;
       max_length: 200;
       example: "\"69629012906488334\"";
-      description: "Organization ID of the organization you want to veryify the domain on."
     }
   ];
   // Metadata to set.
@@ -917,7 +909,15 @@ message ListOrganizationMetadataResponse {
 
 message DeleteOrganizationMetadataRequest {
   // Organization ID of Orgalization which metadata is to be deleted is stored on.
-  string organization_id = 1;
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
   // The keys for the Organization metadata to be deleted.
   repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
 }
