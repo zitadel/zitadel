@@ -64,12 +64,12 @@ var (
 		name:  projection.PersonalAccessTokenColumnInstanceID,
 		table: personalAccessTokensTable,
 	}
-	PersonalAccessTokenColumnOwnerRemoved = Column{
-		name:  projection.PersonalAccessTokenColumnOwnerRemoved,
-		table: personalAccessTokensTable,
-	}
 	PersonalAccessTokenColumnSequence = Column{
 		name:  projection.PersonalAccessTokenColumnSequence,
+		table: personalAccessTokensTable,
+	}
+	PersonalAccessTokenColumnOwnerRemoved = Column{
+		name:  projection.PersonalAccessTokenColumnOwnerRemoved,
 		table: personalAccessTokensTable,
 	}
 )

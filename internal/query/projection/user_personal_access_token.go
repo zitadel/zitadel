@@ -50,6 +50,7 @@ func (*personalAccessTokenProjection) Init() *old_handler.Check {
 			handler.NewColumn(PersonalAccessTokenColumnUserID, handler.ColumnTypeText),
 			handler.NewColumn(PersonalAccessTokenColumnExpiration, handler.ColumnTypeTimestamp),
 			handler.NewColumn(PersonalAccessTokenColumnScopes, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(PersonalAccessTokenColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{PersonalAccessTokenColumnUserID})),

@@ -12,10 +12,6 @@ breaking:
   except:
     - FIELD_NO_DELETE
   ignore_unstable_packages: true
-  ignore:
-    # TODO: remove the following two before merging to main
-    - zitadel/user/v2/key.proto
-    - zitadel/user/v2/pat.proto
 lint:
   use:
     - MINIMAL
