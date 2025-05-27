@@ -2344,6 +2344,8 @@
     "REMOVE_WARN_DESCRIPTION": "您即将删除身份提供者。这将为您的用户删除可用 IDP 的选择，并且已经注册的用户将无法再次登录。您确定要继续吗？",
     "DELETE_SELECTION_TITLE": "删除 IDP",
     "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "FEDERATEDLOGOUTENABLED": "已启用联合注销",
+    "FEDERATEDLOGOUTENABLED_DESC": "如果启用，用户在 ZITADEL 中终止会话时，也会从 IdP 注销。",
     "EMPTY": "没有可用的 IDP",
     "OIDC": {
       "GENERAL": "通用信息",
