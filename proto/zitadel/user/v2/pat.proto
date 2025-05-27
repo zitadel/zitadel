@@ -7,7 +7,6 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
-import "zitadel/user/v2/filter.proto";
 import "zitadel/filter/v2/filter.proto";
 
 message PersonalAccessToken {
@@ -52,11 +51,11 @@ message PersonalAccessToken {
 message PersonalAccessTokensSearchFilter {
   oneof filter {
     option (validate.required) = true;
-    IDFilter token_id_filter = 1;
-    IDFilter user_id_filter = 2;
-    IDFilter organization_id_filter = 3;
-    TimestampFilter created_date_filter = 4;
-    TimestampFilter expiration_date_filter = 5;
+    zitadel.filter.v2.IDFilter token_id_filter = 1;
+    zitadel.filter.v2.IDFilter user_id_filter = 2;
+    zitadel.filter.v2.IDFilter organization_id_filter = 3;
+    zitadel.filter.v2.TimestampFilter created_date_filter = 4;
+    zitadel.filter.v2.TimestampFilter expiration_date_filter = 5;
   }
 }
 
