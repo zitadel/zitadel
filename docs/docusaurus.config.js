@@ -376,8 +376,15 @@ module.exports = {
   ],
   themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
   future: {
+    v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
     experimental_faster: {
+      swcJsLoader: true,
+      swcJsMinimizer: true,
+      swcHtmlMinimizer : true,
+      lightningCssMinimizer: true,
       rspackBundler: true,
+      mdxCrossCompilerCache: true,
+      ssgWorkerThreads: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
       rspackPersistentCache: true,
     },
   },
