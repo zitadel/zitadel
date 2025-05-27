@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Stromen",
         "DESCRIPTION": "Kies een authenticatiestroom en activeer je actie bij een specifieke gebeurtenis binnen deze stroom."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, een nieuwe en verbeterde versie van Actions, is nu beschikbaar. De huidige versie blijft toegankelijk, maar onze toekomstige ontwikkeling zal zich richten op de nieuwe versie, die uiteindelijk de huidige zal vervangen."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "Inactief Vernieuwingstoken",
           "DESCRIPTION": "De levensduur van het inactieve vernieuwingstoken is de maximale tijd dat een vernieuwingstoken ongebruikt kan zijn."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Beheer je OIDC Web Keys om tokens veilig te ondertekenen en te valideren voor je ZITADEL-instantie.",
+        "TABLE": {
+          "TITLE": "Actieve en Toekomstige Websleutels",
+          "DESCRIPTION": "Je actieve en aankomende websleutels. Het activeren van een nieuwe sleutel deactiveert de huidige.",
+          "NOTE": "Opmerking: Het JWKs OIDC-eindpunt geeft een cachebare respons terug (standaard 5 minuten). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is in caches en bij clients.",
+          "ACTIVATE": "Volgende Websleutel activeren",
+          "ACTIVE": "Momenteel actief",
+          "NEXT": "Volgende in de wachtrij",
+          "FUTURE": "Toekomstig",
+          "WARNING": "De websleutel is minder dan 5 minuten oud"
+        },
+        "CREATE": {
+          "TITLE": "Nieuwe Websleutel aanmaken",
+          "DESCRIPTION": "Het aanmaken van een nieuwe websleutel voegt deze toe aan je lijst. ZITADEL gebruikt standaard RSA2048-sleutels met een SHA256-hasher.",
+          "KEY_TYPE": "Sleuteltype",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Curve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Vorige Websleutels",
+          "DESCRIPTION": "Dit zijn je vorige websleutels die niet langer actief zijn.",
+          "DEACTIVATED_ON": "Gedeactiveerd op"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "Download",
     "APPLY": "Toepassen"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "U gebruikt momenteel de nieuwe Actions V2, die zich in de bètaversie bevindt. De vorige versie 1 is nog beschikbaar maar zal in de toekomst worden stopgezet. Meld alstublieft eventuele problemen of feedback.",
+    "EXECUTION": {
+      "TITLE": "Acties",
+      "DESCRIPTION": "Met acties kunt u aangepaste code uitvoeren als reactie op API-verzoeken, gebeurtenissen of specifieke functies. Gebruik ze om Zitadel uit te breiden, workflows te automatiseren en te integreren met andere systemen.",
+      "TYPES": {
+        "request": "Verzoek",
+        "response": "Reactie",
+        "event": "Gebeurtenissen",
+        "function": "Functie"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Een actie maken",
+        "UPDATE_TITLE": "Een actie bijwerken",
+        "TYPE": {
+          "DESCRIPTION": "Selecteer wanneer u deze actie wilt uitvoeren",
+          "REQUEST": {
+            "TITLE": "Verzoek",
+            "DESCRIPTION": "Verzoeken die binnen Zitadel plaatsvinden. Dit kan zoiets zijn als een inlogverzoek-oproep."
+          },
+          "RESPONSE": {
+            "TITLE": "Reactie",
+            "DESCRIPTION": "Een reactie op een verzoek binnen Zitadel. Denk aan de reactie die u terugkrijgt van het ophalen van een gebruiker."
+          },
+          "EVENTS": {
+            "TITLE": "Gebeurtenissen",
+            "DESCRIPTION": "Gebeurtenissen die binnen Zitadel plaatsvinden. Dit kan van alles zijn, zoals een gebruiker die een account aanmaakt, een succesvolle login enz."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Functies",
+            "DESCRIPTION": "Functies die u binnen Zitadel kunt aanroepen. Dit kan van alles zijn, van het verzenden van een e-mail tot het maken van een gebruiker."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Kies of deze actie van toepassing is op alle verzoeken, een specifieke service (bijv. gebruikersbeheer) of een enkel verzoek (bijv. gebruiker maken).",
+          "ALL": {
+            "TITLE": "Alle",
+            "DESCRIPTION": "Selecteer dit als u uw actie bij elk verzoek wilt uitvoeren"
+          },
+          "ALL_EVENTS": "Selecteer dit als je je actie bij elk evenement wilt uitvoeren",
+          "SELECT_SERVICE": {
+            "TITLE": "Service selecteren",
+            "DESCRIPTION": "Kies een Zitadel-service voor uw actie."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Methode selecteren",
+            "DESCRIPTION": "Als u alleen bij een specifiek verzoek wilt uitvoeren, selecteert u dit hier",
+            "NOTE": "Als u geen methode selecteert, wordt uw actie bij elk verzoek in uw geselecteerde service uitgevoerd."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Functienaam",
+            "DESCRIPTION": "Kies de functie die u wilt uitvoeren"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Groep instellen",
+            "DESCRIPTION": "Als u alleen bij een groep gebeurtenissen wilt uitvoeren, stelt u de groep hier in"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Gebeurtenis selecteren",
+            "DESCRIPTION": "Als u alleen bij een specifieke gebeurtenis wilt uitvoeren, specificeert u deze hier"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "U kunt ervoor kiezen om een doel uit te voeren of om het onder dezelfde voorwaarden als andere doelen uit te voeren.",
+          "TARGET": {
+            "DESCRIPTION": "Het doel dat u voor deze actie wilt uitvoeren"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Uitvoeringsvoorwaarden"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Voorwaarde",
+        "TYPE": "Type",
+        "TARGET": "Doel",
+        "CREATIONDATE": "Aanmaakdatum"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Doelen",
+      "DESCRIPTION": "Een doel is de bestemming van de code die u vanuit een actie wilt uitvoeren. Maak hier een doel en voeg het toe aan uw acties.",
+      "CREATE": {
+        "TITLE": "Uw doel maken",
+        "DESCRIPTION": "Maak uw eigen doel buiten Zitadel",
+        "NAME": "Naam",
+        "NAME_DESCRIPTION": "Geef uw doel een duidelijke, beschrijvende naam om het later gemakkelijk te kunnen identificeren",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Aanroep",
+          "restAsync": "REST Asynchroon"
+        },
+        "TYPES_DESCRIPTION": "Webhook, de oproep verwerkt de statuscode maar de reactie is irrelevant\nCall, de oproep verwerkt de statuscode en de reactie\nAsync, de oproep verwerkt noch de statuscode noch de reactie, maar kan parallel aan andere doelen worden aangeroepen",
+        "ENDPOINT": "Eindpunt",
+        "ENDPOINT_DESCRIPTION": "Voer het eindpunt in waar uw code wordt gehost. Zorg ervoor dat het voor ons toegankelijk is!",
+        "TIMEOUT": "Time-out",
+        "TIMEOUT_DESCRIPTION": "Stel de maximale tijd in die uw doel heeft om te reageren. Als het langer duurt, stoppen we het verzoek.",
+        "INTERRUPT_ON_ERROR": "Onderbreken bij fout",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop alle uitvoeringen als de doelen een fout retourneren",
+        "INTERRUPT_ON_ERROR_WARNING": "Let op: “Onderbreken bij fout” stopt operaties bij een mislukking, met kans op blokkering. Test met deze optie uitgeschakeld om inloggen/aanmaken niet te blokkeren.",
+        "AWAIT_RESPONSE": "Wachten op reactie",
+        "AWAIT_RESPONSE_DESCRIPTION": "We wachten op een reactie voordat we iets anders doen. Handig als u van plan bent om meerdere doelen voor één actie te gebruiken"
+      },
+      "TABLE": {
+        "NAME": "Naam",
+        "ENDPOINT": "Eindpunt",
+        "CREATIONDATE": "Aanmaakdatum",
+        "REORDER": "Opnieuw ordenen"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
     "IAM_OWNER_VIEWER": "Heeft toestemming om de hele instantie te bekijken, inclusief alle organisaties",
@@ -509,14 +648,17 @@
     "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
     "IAM_ADMIN_IMPERSONATOR": "Heeft toestemming om zich voor te doen als beheerder en eindgebruikers van alle organisaties",
     "IAM_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van alle organisaties na te bootsen",
+    "IAM_LOGIN_CLIENT": "Heeft toestemming om aanmeldklanten te beheren",
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
+    "ORG_SETTINGS_MANAGER": "Heeft toestemming om de instellingen van de organisatie te beheren",
     "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
     "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
     "ORG_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van de organisatie na te bootsen",
+    "ORG_USER_SELF_MANAGER": "Heeft toestemming om zijn eigen gebruiker te beheren",
     "PROJECT_OWNER": "Heeft toestemming over het hele project",
     "PROJECT_OWNER_VIEWER": "Heeft toestemming om het hele project te bekijken",
     "PROJECT_OWNER_GLOBAL": "Heeft toestemming over het hele project",
@@ -551,6 +693,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Gebruikersnaam",
     "ORGNAME": "Organisatienaam",
+    "ORGID": "Organisatie ID",
     "PRIMARYDOMAIN": "Primair domein",
     "PROJECTNAME": "Projectnaam",
     "RESOURCEOWNER": "Eigenaar van de bron",
@@ -787,7 +930,10 @@
       "PHONESECTION": "Telefoonnummers",
       "PASSWORDSECTION": "Initieel wachtwoord",
       "ADDRESSANDPHONESECTION": "Telefoonnummer",
-      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren."
+      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren.",
+      "SETUPAUTHENTICATIONLATER": "Authenticatie later instellen voor deze gebruiker.",
+      "INVITATION": "Stuur een uitnodigingsmail voor het instellen van authenticatie en e-mailverificatie.",
+      "INITIALPASSWORD": "Stel een initieel wachtwoord in voor de gebruiker."
     },
     "CODEDIALOG": {
       "TITLE": "Verifieer telefoonnummer",
@@ -809,6 +955,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Telefoonnummer",
       "PHONE_HINT": "Gebruik het + symbool gevolgd door de landcode, of selecteer het land uit de dropdown en voer ten slotte het telefoonnummer in",
+      "PHONE_VERIFIED": "Telefoonnummer geverifieerd",
+      "SEND_SMS": "Verificatie-SMS verzenden",
+      "SEND_EMAIL": "E-mail verzenden",
       "USERNAME": "Gebruikersnaam",
       "CHANGEUSERNAME": "wijzigen",
       "CHANGEUSERNAME_TITLE": "Gebruikersnaam wijzigen",
@@ -948,6 +1097,14 @@
       "4": "Vergrendeld",
       "5": "Opgeschort",
       "6": "Initieel"
+    },
+    "STATEV2": {
+      "0": "Onbekend",
+      "1": "Actief",
+      "2": "Inactief",
+      "3": "Verwijderd",
+      "4": "Vergrendeld",
+      "5": "Initieel"
     },
     "SEARCH": {
       "ADDITIONAL": "Loginnaam (huidige organisatie)",
@@ -1340,6 +1497,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacybeleid",
       "OIDC": "OIDC Token levensduur en vervaldatum",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Beveiligingsinstellingen",
       "EVENTS": "Evenementen",
@@ -1355,7 +1513,8 @@
       "APPEARANCE": "Verschijning",
       "OTHER": "Andere",
       "STORAGE": "opslag"
-    }
+    },
+    "BETA": "BÈTA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1383,7 +1542,10 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "hu": "Magyar"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1474,6 +1636,16 @@
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
+      "DISABLEUSERTOKENEVENT": "Gebruikerstokengebeurtenis uitschakelen",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
+      "PERMISSIONCHECKV2": "Permissiecontrole V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
+      "WEBKEY": "Websleutel",
+      "WEBKEY_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1484,7 +1656,12 @@
         "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
         "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
       },
-      "RESET": "Alles instellen op overgenomen"
+      "RESET": "Alles instellen op overgenomen",
+      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de console voor het aanmaken van gebruikers",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
+      "LOGINV2": "Inloggen V2",
+      "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
+      "LOGINV2_BASEURI": "Basis-URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1621,7 +1798,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1972,6 +2151,7 @@
       "ACTIVATE": "Activeer Project",
       "DELETE": "Verwijder Project",
       "ORGNAME": "Organisatienaam",
+      "ORGID": "Organisatie ID",
       "ORGDOMAIN": "Organisatie Domein",
       "STATE": "Status",
       "TYPE": "Type",
@@ -2168,6 +2348,8 @@
     "REMOVE_WARN_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. Dit zal de selectie van de beschikbare IDP voor uw gebruikers verwijderen en reeds geregistreerde gebruikers zullen niet opnieuw kunnen inloggen. Weet u zeker dat u wilt doorgaan?",
     "DELETE_SELECTION_TITLE": "Verwijder IDP",
     "DELETE_SELECTION_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. De resulterende wijzigingen zijn onomkeerbaar. Weet u zeker dat u dit wilt doen?",
+    "FEDERATEDLOGOUTENABLED": "Federatieve afmelding ingeschakeld",
+    "FEDERATEDLOGOUTENABLED_DESC": "Indien ingeschakeld, wordt de gebruiker ook afgemeld bij de IdP als de gebruiker de sessie in ZITADEL beëindigt.",
     "EMPTY": "Geen IDP beschikbaar",
     "OIDC": {
       "GENERAL": "Algemene Informatie",
@@ -2207,7 +2389,9 @@
       "REMOVED": "Succesvol verwijderd."
     },
     "ISIDTOKENMAPPING": "Kaart van de ID token",
-    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt."
+    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
+    "USEPKCE": "Gebruik PKCE",
+    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
   },
   "MFA": {
     "LIST": {
@@ -2586,7 +2770,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

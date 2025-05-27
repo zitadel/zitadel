@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"os"
 	"strconv"
 	"time"
 
@@ -214,7 +215,7 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		data = s3Data
 	}
 	if localInput != nil {
-		localData, err := ioutil.ReadFile(localInput.Path)
+		localData, err := os.ReadFile(localInput.Path)
 		if err != nil {
 			return nil, err
 		}
@@ -274,7 +275,7 @@ func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Inpu
 	}
 
 	defer object.Close()
-	return ioutil.ReadAll(object)
+	return io.ReadAll(object)
 }
 
 func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSInput) (_ []byte, err error) {
@@ -297,7 +298,7 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 		return nil, err
 	}
 	defer reader.Close()
-	return ioutil.ReadAll(reader)
+	return io.ReadAll(reader)
 }
 
 func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) (err error) {
@@ -620,7 +621,7 @@ func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	}
 	for _, project := range org.GetProjects() {
 		logging.Debugf("import project: %s", project.GetProjectId())
-		_, err := s.command.AddProjectWithID(ctx, management.ProjectCreateToDomain(project.GetProject()), org.GetOrgId(), project.GetProjectId())
+		_, err := s.command.AddProject(ctx, management.ProjectCreateToCommand(project.GetProject(), project.GetProjectId(), org.GetOrgId()))
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project", Id: project.GetProjectId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -760,7 +761,7 @@ func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 		logging.Debugf("import projectroles: %s", role.ProjectId+"_"+role.RoleKey)
 
 		// TBD: why not command.BulkAddProjectRole?
-		_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToDomain(role), org.GetOrgId())
+		_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToCommand(role, org.GetOrgId()))
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_role", Id: role.ProjectId + "_" + role.RoleKey, Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -1022,7 +1023,7 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	if org.ProjectGrants != nil {
 		for _, grant := range org.GetProjectGrants() {
 			logging.Debugf("import projectgrant: %s", grant.GetGrantId()+"_"+grant.GetProjectGrant().GetProjectId()+"_"+grant.GetProjectGrant().GetGrantedOrgId())
-			_, err := s.command.AddProjectGrantWithID(ctx, management.AddProjectGrantRequestToDomain(grant.GetProjectGrant()), grant.GetGrantId(), org.GetOrgId())
+			_, err := s.command.AddProjectGrant(ctx, management.AddProjectGrantRequestToCommand(grant.GetProjectGrant(), grant.GetGrantId(), org.GetOrgId()))
 			if err != nil {
 				*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectGrant().GetProjectId() + "_" + grant.GetProjectGrant().GetGrantedOrgId(), Message: err.Error()})
 				if isCtxTimeout(ctx) {

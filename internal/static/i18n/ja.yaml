@@ -53,6 +53,7 @@ Errors:
     NotFound: SMS構成が見つかりません
     AlreadyActive: このSMS構成はすでにアクティブです
     AlreadyDeactivated: このSMS構成はすでに非アクティブです
+    NotExternalVerification: SMS構成は外部のコード検証をサポートしていません
   SMTP:
     NotEmailMessage: メッセージは EmailMessage ではありません
     RequiredAttributes: 件名、受信者、コンテンツを設定する必要がありますが、一部またはすべてが空です
@@ -98,16 +99,23 @@ Errors:
     Profile:
       NotFound: プロファイルが見つかりません
       NotChanged: プロファイルが変更されていません
+      Empty: プロファイルが空です
+      FirstNameEmpty: 名前が空です
+      LastNameEmpty: 姓が空です
       Invalid: プロファイルデータが無効です
     Email:
       NotFound: メールアドレスが見つかりません
       Invalid: 無効なメールアドレスです
       AlreadyVerified: メールアドレスはすでに検証済みです
       NotChanged: メールアドレスが変更されていません
+      Empty: メールアドレスが空です
+      IDMissing: メールアドレスIDが不足しています
     Phone:
       NotFound: 電話番号が見つかりません
       Invalid: 無効な電話番号です
       AlreadyVerified: 電話番号はすでに認証済みです
+      Empty: 電話番号が空です
+      NotChanged: 電話番号が変更されていません
     Address:
       NotFound: 住所が見つかりません
       NotChanged: 住所は変更されていません
@@ -129,6 +137,7 @@ Errors:
     Username:
       AlreadyExists: ユーザー名はすでに使用されています
       Reserved: ユーザー名はすでに使用されています
+      Empty: ユーザー名が空です
     Code:
       Empty: コードは空です
       NotFound: コードが見つかりません
@@ -276,6 +285,9 @@ Errors:
       NotFound: 通知ポリシーが見つかりません
       NotChanged: 通知ポリシーは変更されていません
       AlreadyExists: 通知ポリシーはすでに存在しています
+    LabelPolicy:
+      NotFound: プライベートラベルポリシーが見つかりません
+      NotChanged: プライベートラベルポリシーが変更されていません
   Project:
     ProjectIDMissing: プロジェクトIDがありません
     AlreadyExists: プロジェクトはすでに組織に存在しています
@@ -525,6 +537,7 @@ Errors:
     StateMissing: リクエストに State パラメータがありません
     NotStarted: インテントが開始されなかったか、既に終了している
     NotSucceeded: インテントが成功しなかった
+    Expired: 意図の有効期限が切れました
     TokenCreationFailed: トークンの作成に失敗しました
     InvalidToken: インテントのトークンが無効である
     OtherUser: 他のユーザーを意図している
@@ -532,6 +545,7 @@ Errors:
     AlreadyExists: AuthRequestはすでに存在する
     NotExisting: AuthRequest が存在しません
     WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
+    AlreadyHandled: 認証リクエストは既に処理済みです
   OIDCSession:
     RefreshTokenInvalid: 無効なリフレッシュトークンです
     Token:
@@ -542,8 +556,12 @@ Errors:
     AlreadyExists: SAMLリクエストはすでに存在します
     NotExisting: SAMLリクエストが存在しません
     WrongLoginClient: 他のログイン クライアントによって作成された SAMLRequest
+    AlreadyHandled: SAMLリクエストは既に処理済みです
   SAMLSession:
     InvalidClient: このクライアントに対してSAMLResponseは発行されませんでした
+  DeviceAuth:
+    NotFound: デバイス認証リクエストが存在しません
+    AlreadyHandled: デバイス認証リクエストは既に処理済みです
   Feature:
     NotExisting: 機能が存在しません
     TypeNotSupported: 機能タイプはサポートされていません
@@ -710,6 +728,10 @@ EventTypes:
         check:
           succeeded: パスワードチェックの成功
           failed: パスワードチェックの失敗
+        change:
+          sent: パスワード変更メールを送信しました
+        hash:
+          updated: パスワードハッシュが更新されました
       externallogin:
         check:
           succeeded: 外部ログインの成功
@@ -813,10 +835,6 @@ EventTypes:
       check:
         succeeded: パスワードチェックの成功
         failed: パスワードチェックの失敗
-      change:
-        sent: パスワード変更を送信しました
-      hash:
-        updated: パスワードハッシュが更新されました
     phone:
       changed: 電話番号の変更
       verified: 電話番号の検証
@@ -825,7 +843,7 @@ EventTypes:
       code:
         added: 電話番号コードの生成
         sent: 電話番号コードの送信
-      removed: 電話番号の削除
+
     profile:
       changed: ユーザープロファイルの変更
     address:
@@ -1048,6 +1066,9 @@ EventTypes:
           check:
             succeeded: OIDCクライアントシークレットチェックの成功
             failed: OIDCクライアントシークレットチェックの失敗
+        key:
+          added: OIDCアプリキーの追加
+          removed: OIDCアプリキーの削除
       api:
         secret:
           check:
@@ -1345,6 +1366,7 @@ EventTypes:
         code:
           added: 電話番号の確認コードが生成されました
           sent: 電話番号の確認コードが送信されました
+
   web_key:
     added: Web キーが追加されました
     activated: Web キーが有効化されました

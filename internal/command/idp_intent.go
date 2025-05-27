@@ -7,7 +7,6 @@ import (
 	"encoding/xml"
 	"net/url"
 
-	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
@@ -19,13 +18,15 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string) preparation.Validation {
+func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string, idpArguments map[string]any) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
@@ -53,24 +54,25 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, s
 					successURL,
 					failureURL,
 					idpID,
+					idpArguments,
 				),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, nil, err
+func (c *Commands) CreateIntent(ctx context.Context, intentID, idpID, successURL, failureURL, resourceOwner string, idpArguments map[string]any) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
+	if intentID == "" {
+		var err error
+		intentID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, nil, err
+		}
 	}
-	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
-	if err != nil {
-		return nil, nil, err
-	}
+	writeModel := NewIDPIntentWriteModel(intentID, resourceOwner, c.maxIdPIntentLifetime)
 
 	//nolint: staticcheck
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL, idpArguments))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -132,18 +134,17 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthFromProvider(ctx context.Context, idpID, state string, idpCallback, samlRootURL string) (string, bool, error) {
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string) (state string, session idp.Session, err error) {
+	state, err = c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
 	provider, err := c.GetProvider(ctx, idpID, idpCallback, samlRootURL)
 	if err != nil {
-		return "", false, err
+		return "", nil, err
 	}
-	session, err := provider.BeginAuth(ctx, state)
-	if err != nil {
-		return "", false, err
-	}
-
-	content, redirect := session.GetAuth(ctx)
-	return content, redirect, nil
+	session, err = provider.BeginAuth(ctx, state)
+	return state, session, err
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {
@@ -180,6 +181,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 		userID,
 		accessToken,
 		idToken,
+		idpSession.ExpiresAt(),
 	)
 	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
 	if err != nil {
@@ -188,7 +190,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	return token, nil
 }
 
-func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, assertion *saml.Assertion) (string, error) {
+func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, session *saml.Session) (string, error) {
 	token, err := c.generateIntentToken(writeModel.AggregateID)
 	if err != nil {
 		return "", err
@@ -197,7 +199,7 @@ func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 	if err != nil {
 		return "", err
 	}
-	assertionData, err := xml.Marshal(assertion)
+	assertionData, err := xml.Marshal(session.Assertion)
 	if err != nil {
 		return "", err
 	}
@@ -213,6 +215,7 @@ func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 		idpUser.GetPreferredUsername(),
 		userID,
 		assertionEnc,
+		session.ExpiresAt(),
 	)
 	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
 	if err != nil {
@@ -237,7 +240,7 @@ func (c *Commands) generateIntentToken(intentID string) (string, error) {
 	return base64.RawURLEncoding.EncodeToString(token), nil
 }
 
-func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, attributes map[string][]string) (string, error) {
+func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, session *ldap.Session) (string, error) {
 	token, err := c.generateIntentToken(writeModel.AggregateID)
 	if err != nil {
 		return "", err
@@ -245,6 +248,10 @@ func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPInte
 	idpInfo, err := json.Marshal(idpUser)
 	if err != nil {
 		return "", err
+	}
+	attributes := make(map[string][]string, len(session.Entry.Attributes))
+	for _, item := range session.Entry.Attributes {
+		attributes[item.Name] = item.Values
 	}
 	cmd := idpintent.NewLDAPSucceededEvent(
 		ctx,
@@ -254,6 +261,7 @@ func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPInte
 		idpUser.GetPreferredUsername(),
 		userID,
 		attributes,
+		session.ExpiresAt(),
 	)
 	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
 	if err != nil {
@@ -273,7 +281,7 @@ func (c *Commands) FailIDPIntent(ctx context.Context, writeModel *IDPIntentWrite
 }
 
 func (c *Commands) GetIntentWriteModel(ctx context.Context, id, resourceOwner string) (*IDPIntentWriteModel, error) {
-	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
+	writeModel := NewIDPIntentWriteModel(id, resourceOwner, c.maxIdPIntentLifetime)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

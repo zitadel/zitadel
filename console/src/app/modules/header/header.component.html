@@ -4,7 +4,7 @@
       <mat-spinner [diameter]="20"></mat-spinner>
     </div>
     <ng-template #logo>
-      <a class="title custom" [routerLink]="['/']" *ngIf="authService.labelpolicy | async as lP; else defaultHome">
+      <a class="title custom" [routerLink]="['/']" *ngIf="authService.labelpolicy$ | async as lP; else defaultHome">
         <img
           class="logo"
           alt="home logo"
@@ -24,7 +24,7 @@
     </ng-template>
 
     <ng-template #defaultHome>
-      <a class="title" [routerLink]="authService.zitadelPermissions.getValue().length === 0 ? ['/users', 'me'] : ['/']">
+      <a class="title" [routerLink]="(authService.zitadelPermissions | async)?.length ? ['/'] : ['/users', 'me']">
         <img
           class="logo"
           alt="zitadel logo"
@@ -168,7 +168,7 @@
 
     <span class="fill-space"></span>
 
-    <ng-container *ngIf="authService.privacypolicy | async as pP">
+    <ng-container *ngIf="authService.privacypolicy$ | async as pP">
       <a class="custom-link" *ngIf="pP.customLink" href="{{ pP.customLink }}" mat-stroked-button target="_blank">
         {{ pP.customLinkText }}
       </a>

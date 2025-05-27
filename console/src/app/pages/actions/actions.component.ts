@@ -1,8 +1,7 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, DestroyRef } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Subject, takeUntil } from 'rxjs';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -13,31 +12,32 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'cnsl-actions',
   templateUrl: './actions.component.html',
   styleUrls: ['./actions.component.scss'],
 })
-export class ActionsComponent implements OnDestroy {
-  public flow!: Flow.AsObject;
+export class ActionsComponent {
+  protected flow!: Flow.AsObject;
 
-  public typeControl: UntypedFormControl = new UntypedFormControl();
+  protected typeControl: UntypedFormControl = new UntypedFormControl();
 
-  public typesForSelection: FlowType.AsObject[] = [];
+  protected typesForSelection: FlowType.AsObject[] = [];
 
-  public selection: Action.AsObject[] = [];
-  public InfoSectionType: any = InfoSectionType;
-  public ActionKeysType: any = ActionKeysType;
+  protected selection: Action.AsObject[] = [];
+  protected InfoSectionType = InfoSectionType;
+  protected ActionKeysType = ActionKeysType;
 
-  public maxActions: number | null = null;
-  public ActionState: any = ActionState;
-  private destroy$: Subject<void> = new Subject();
+  protected maxActions: number | null = null;
+  protected ActionState = ActionState;
   constructor(
     private mgmtService: ManagementService,
     breadcrumbService: BreadcrumbService,
     private dialog: MatDialog,
     private toast: ToastService,
+    destroyRef: DestroyRef,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -45,31 +45,24 @@ export class ActionsComponent implements OnDestroy {
     };
     breadcrumbService.setBreadcrumb([bread]);
 
-    this.getFlowTypes();
+    this.getFlowTypes().then();
 
-    this.typeControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+    this.typeControl.valueChanges.pipe(takeUntilDestroyed(destroyRef)).subscribe((value) => {
       this.loadFlow((value as FlowType.AsObject).id);
     });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  private getFlowTypes(): Promise<void> {
-    return this.mgmtService
-      .listFlowTypes()
-      .then((resp) => {
-        this.typesForSelection = resp.resultList;
-        if (!this.flow && resp.resultList[0]) {
-          const type = resp.resultList[0];
-          this.typeControl.setValue(type);
-        }
-      })
-      .catch((error: any) => {
-        this.toast.showError(error);
-      });
+  private async getFlowTypes(): Promise<void> {
+    try {
+      let resp = await this.mgmtService.listFlowTypes();
+      this.typesForSelection = resp.resultList;
+      if (!this.flow && resp.resultList[0]) {
+        const type = resp.resultList[0];
+        this.typeControl.setValue(type);
+      }
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   private loadFlow(id: string) {
@@ -106,7 +99,7 @@ export class ActionsComponent implements OnDestroy {
     });
   }
 
-  public openAddTrigger(flow: FlowType.AsObject, trigger?: TriggerType.AsObject): void {
+  protected openAddTrigger(flow: FlowType.AsObject, trigger?: TriggerType.AsObject): void {
     const dialogRef = this.dialog.open(AddFlowDialogComponent, {
       data: {
         flowType: flow,
@@ -119,7 +112,7 @@ export class ActionsComponent implements OnDestroy {
       if (req) {
         this.mgmtService
           .setTriggerActions(req.getActionIdsList(), req.getFlowType(), req.getTriggerType())
-          .then((resp) => {
+          .then(() => {
             this.toast.showInfo('FLOWS.FLOWCHANGED', true);
             this.loadFlow(flow.id);
           })
@@ -157,7 +150,7 @@ export class ActionsComponent implements OnDestroy {
     }
   }
 
-  public removeTriggerActionsList(index: number) {
+  protected removeTriggerActionsList(index: number) {
     if (this.flow.type && this.flow.triggerActionsList && this.flow.triggerActionsList[index]) {
       const dialogRef = this.dialog.open(WarnDialogComponent, {
         data: {

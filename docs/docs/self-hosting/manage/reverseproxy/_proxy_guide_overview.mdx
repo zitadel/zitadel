@@ -2,13 +2,13 @@ import CodeBlock from '@theme/CodeBlock';
 import ComposeYaml from "!!raw-loader!./docker-compose.yaml";
 
 <>With these examples, you create and run a minimal {props.link} configuration for ZITADEL with <a href="https://docs.docker.com/compose">Docker Compose</a>.
-Whereas the guide focuses on the configuration for {props.link}, you can inspect the configurations for ZITADEL and the database in the base Docker Compose file.</>
+Whereas the guide focuses on the configuration for {props.name}, you can inspect the configurations for ZITADEL and the database in the base Docker Compose file.</>
 <details>
     <summary>base docker-compose.yaml</summary>
     <CodeBlock language="yaml">{ComposeYaml}</CodeBlock>
 </details>
 
-<>For running {props.link}, you will extend the base Docker Compose file with the {props.link} specific Docker Compose file.</>
+<>For running {props.name}, you will extend the base Docker Compose file with the {props.name} specific Docker Compose file.</>
 
 <details>
     <summary>specific docker-compose.yaml</summary>

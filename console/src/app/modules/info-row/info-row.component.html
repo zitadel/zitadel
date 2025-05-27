@@ -9,26 +9,26 @@
         inactive: user.state === UserState.USER_STATE_INACTIVE,
       }"
     >
-      {{ 'USER.DATA.STATE' + user.state | translate }}
+      {{ (isV2(user) ? 'USER.STATEV2.' : 'USER.STATE.') + user.state | translate }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'USER.ID' | translate }}</p>
-    <p *ngIf="user && user.id" class="info-row-desc">{{ user.id }}</p>
+    <p *ngIf="userId" class="info-row-desc">{{ userId }}</p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'USER.DETAILS.DATECREATED' | translate }}</p>
-    <p *ngIf="user && user.details && user.details.creationDate" class="info-row-desc">
-      {{ user.details.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+    <p *ngIf="creationDate" class="info-row-desc">
+      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'USER.DETAILS.DATECHANGED' | translate }}</p>
-    <p *ngIf="user && user.details && user.details.changeDate" class="info-row-desc">
-      {{ user.details.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+    <p *ngIf="changeDate" class="info-row-desc">
+      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
     </p>
   </div>
 

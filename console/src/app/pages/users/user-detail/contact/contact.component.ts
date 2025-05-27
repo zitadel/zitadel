@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Human, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog.component';
 import { EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
+import { HumanUser, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { Human } from '@zitadel/proto/zitadel/user_pb';
 
 @Component({
   selector: 'cnsl-contact',
@@ -15,15 +16,14 @@ import { EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.comp
 export class ContactComponent {
   @Input() disablePhoneCode: boolean = false;
   @Input() canWrite: boolean | null = false;
-  @Input() human?: Human.AsObject;
+  @Input({ required: true }) human!: HumanUser | Human;
   @Input() username: string = '';
-  @Input() state!: UserState;
   @Output() editType: EventEmitter<EditDialogType> = new EventEmitter<EditDialogType>();
   @Output() resendEmailVerification: EventEmitter<void> = new EventEmitter<void>();
   @Output() resendPhoneVerification: EventEmitter<void> = new EventEmitter<void>();
   @Output() enteredPhoneCode: EventEmitter<string> = new EventEmitter<string>();
   @Output() deletedPhone: EventEmitter<void> = new EventEmitter<void>();
-  public UserState: any = UserState;
+  public UserState = UserState;
 
   public EditDialogType: any = EditDialogType;
   constructor(
@@ -80,5 +80,19 @@ export class ContactComponent {
 
   public openEditDialog(type: EditDialogType): void {
     this.editType.emit(type);
+  }
+
+  protected get isPhoneVerified() {
+    if (this.human.$typeName === 'zitadel.user.v2.HumanUser') {
+      return !!this.human.phone?.isVerified;
+    }
+    return this.human.phone?.isPhoneVerified;
+  }
+
+  protected get isEmailVerified() {
+    if (this.human.$typeName === 'zitadel.user.v2.HumanUser') {
+      return !!this.human.email?.isVerified;
+    }
+    return this.human.email?.isEmailVerified;
   }
 }

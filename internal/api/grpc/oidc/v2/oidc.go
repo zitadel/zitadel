@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"encoding/base64"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -9,7 +10,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/api/http"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -26,6 +27,54 @@ func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequest
 	return &oidc_pb.GetAuthRequestResponse{
 		AuthRequest: authRequestToPb(authRequest),
 	}, nil
+}
+
+func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallbackRequest) (*oidc_pb.CreateCallbackResponse, error) {
+	switch v := req.GetCallbackKind().(type) {
+	case *oidc_pb.CreateCallbackRequest_Error:
+		return s.failAuthRequest(ctx, req.GetAuthRequestId(), v.Error)
+	case *oidc_pb.CreateCallbackRequest_Session:
+		return s.linkSessionToAuthRequest(ctx, req.GetAuthRequestId(), v.Session)
+	default:
+		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
+	}
+}
+
+func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *oidc_pb.GetDeviceAuthorizationRequestRequest) (*oidc_pb.GetDeviceAuthorizationRequestResponse, error) {
+	deviceRequest, err := s.query.DeviceAuthRequestByUserCode(ctx, req.GetUserCode())
+	if err != nil {
+		return nil, err
+	}
+	encrypted, err := s.encryption.Encrypt([]byte(deviceRequest.DeviceCode))
+	if err != nil {
+		return nil, err
+	}
+	return &oidc_pb.GetDeviceAuthorizationRequestResponse{
+		DeviceAuthorizationRequest: &oidc_pb.DeviceAuthorizationRequest{
+			Id:          base64.RawURLEncoding.EncodeToString(encrypted),
+			ClientId:    deviceRequest.ClientID,
+			Scope:       deviceRequest.Scopes,
+			AppName:     deviceRequest.AppName,
+			ProjectName: deviceRequest.ProjectName,
+		},
+	}, nil
+}
+
+func (s *Server) AuthorizeOrDenyDeviceAuthorization(ctx context.Context, req *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest) (*oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse, error) {
+	deviceCode, err := s.deviceCodeFromID(req.GetDeviceAuthorizationId())
+	if err != nil {
+		return nil, err
+	}
+	switch req.GetDecision().(type) {
+	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session:
+		_, err = s.command.ApproveDeviceAuthWithSession(ctx, deviceCode, req.GetSession().GetSessionId(), req.GetSession().GetSessionToken())
+	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny:
+		_, err = s.command.CancelDeviceAuth(ctx, deviceCode, domain.DeviceAuthCanceledDenied)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse{}, nil
 }
 
 func authRequestToPb(a *query.AuthRequest) *oidc_pb.AuthRequest {
@@ -73,15 +122,18 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 	}
 }
 
-func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallbackRequest) (*oidc_pb.CreateCallbackResponse, error) {
-	switch v := req.GetCallbackKind().(type) {
-	case *oidc_pb.CreateCallbackRequest_Error:
-		return s.failAuthRequest(ctx, req.GetAuthRequestId(), v.Error)
-	case *oidc_pb.CreateCallbackRequest_Session:
-		return s.linkSessionToAuthRequest(ctx, req.GetAuthRequestId(), v.Session)
-	default:
-		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
+func (s *Server) checkPermission(ctx context.Context, clientID string, userID string) error {
+	permission, err := s.query.CheckProjectPermissionByClientID(ctx, clientID, userID)
+	if err != nil {
+		return err
 	}
+	if !permission.HasProjectChecked {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.User.ProjectRequired")
+	}
+	if !permission.ProjectRoleChecked {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.User.GrantRequired")
+	}
+	return nil
 }
 
 func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *oidc_pb.AuthorizationError) (*oidc_pb.CreateCallbackResponse, error) {
@@ -101,12 +153,16 @@ func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *
 }
 
 func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID string, session *oidc_pb.Session) (*oidc_pb.CreateCallbackResponse, error) {
-	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
 	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
-	ctx = op.ContextWithIssuer(ctx, http.DomainContext(ctx).Origin())
+	issuer := authReq.Issuer
+	if issuer == "" {
+		issuer = http_utils.DomainContext(ctx).Origin()
+	}
+	ctx = op.ContextWithIssuer(ctx, issuer)
 	var callback string
 	if aar.ResponseType == domain.OIDCResponseTypeCode {
 		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op.Provider())
@@ -200,4 +256,12 @@ func errorReasonToOIDC(reason oidc_pb.ErrorReason) string {
 	default:
 		return "server_error"
 	}
+}
+
+func (s *Server) deviceCodeFromID(deviceAuthID string) (string, error) {
+	decoded, err := base64.RawURLEncoding.DecodeString(deviceAuthID)
+	if err != nil {
+		return "", err
+	}
+	return s.encryption.DecryptString(decoded, s.encryption.EncryptionKeyID())
 }

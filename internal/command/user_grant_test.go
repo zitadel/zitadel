@@ -1073,6 +1073,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					expectPush(
 						usergrant.NewUserGrantChangedEvent(context.Background(),
 							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
 							[]string{"rolekey1", "rolekey2"},
 						),
 					),
@@ -1167,6 +1168,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					expectPush(
 						usergrant.NewUserGrantChangedEvent(context.Background(),
 							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
 							[]string{"rolekey1", "rolekey2"},
 						),
 					),

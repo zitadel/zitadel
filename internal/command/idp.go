@@ -20,6 +20,7 @@ type GenericOAuthProvider struct {
 	UserEndpoint          string
 	Scopes                []string
 	IDAttribute           string
+	UsePKCE               bool
 	IDPOptions            idp.Options
 }
 
@@ -30,6 +31,7 @@ type GenericOIDCProvider struct {
 	ClientSecret     string
 	Scopes           []string
 	IsIDTokenMapping bool
+	UsePKCE          bool
 	IDPOptions       idp.Options
 }
 
@@ -107,6 +109,7 @@ type LDAPProvider struct {
 	UserObjectClasses []string
 	UserFilters       []string
 	Timeout           time.Duration
+	RootCA            []byte
 	LDAPAttributes    idp.LDAPAttributes
 	IDPOptions        idp.Options
 }
@@ -119,6 +122,7 @@ type SAMLProvider struct {
 	WithSignedRequest             bool
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
 	IDPOptions                    idp.Options
 }
 

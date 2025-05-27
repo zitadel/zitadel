@@ -21,6 +21,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) 
 	return &user.GetUserByIDResponse{
 		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
 			Sequence:      resp.Sequence,
+			CreationDate:  resp.CreationDate,
 			EventDate:     resp.ChangeDate,
 			ResourceOwner: resp.ResourceOwner,
 		}),
@@ -58,6 +59,7 @@ func userToPb(userQ *query.User, assetPrefix string) *user.User {
 			Sequence:      userQ.Sequence,
 			EventDate:     userQ.ChangeDate,
 			ResourceOwner: userQ.ResourceOwner,
+			CreationDate:  userQ.CreationDate,
 		}),
 		State:              userStateToPb(userQ.State),
 		Username:           userQ.Username,
@@ -296,11 +298,11 @@ func phoneQueryToQuery(q *user.PhoneQuery) (query.SearchQuery, error) {
 }
 
 func stateQueryToQuery(q *user.StateQuery) (query.SearchQuery, error) {
-	return query.NewUserStateSearchQuery(int32(q.State))
+	return query.NewUserStateSearchQuery(q.State.ToDomain())
 }
 
 func typeQueryToQuery(q *user.TypeQuery) (query.SearchQuery, error) {
-	return query.NewUserTypeSearchQuery(int32(q.Type))
+	return query.NewUserTypeSearchQuery(q.Type.ToDomain())
 }
 
 func loginNameQueryToQuery(q *user.LoginNameQuery) (query.SearchQuery, error) {

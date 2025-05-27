@@ -22,7 +22,7 @@ type BaseEvent struct {
 	ID        string
 	EventType EventType `json:"-"`
 
-	Agg *Aggregate
+	Agg *Aggregate `json:"-"`
 
 	Seq                           uint64
 	Pos                           float64

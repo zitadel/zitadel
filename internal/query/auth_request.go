@@ -5,13 +5,11 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -44,10 +42,6 @@ func (a *AuthRequest) checkLoginClient(ctx context.Context, permissionCheck doma
 //go:embed auth_request_by_id.sql
 var authRequestByIDQuery string
 
-func (q *Queries) authRequestByIDQuery(ctx context.Context) string {
-	return fmt.Sprintf(authRequestByIDQuery, q.client.Timetravel(call.Took(ctx)))
-}
-
 func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, id string, checkLoginClient bool) (_ *AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -74,7 +68,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 				&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
 			)
 		},
-		q.authRequestByIDQuery(ctx),
+		authRequestByIDQuery,
 		id, authz.GetInstance(ctx).InstanceID(),
 	)
 	if errors.Is(err, sql.ErrNoRows) {

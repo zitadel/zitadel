@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flux",
         "DESCRIPTION": "Choisissez un flux d'authentification et déclenchez votre action sur un événement spécifique dans ce flux."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, une nouvelle version améliorée de Actions, est désormais disponible. La version actuelle reste accessible, mais notre développement futur se concentrera sur la nouvelle, qui finira par remplacer la version actuelle."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "Token de Rafraîchissement Inactif",
           "DESCRIPTION": "La durée de vie du token de rafraîchissement inactif est le temps maximum qu'un token de rafraîchissement peut être inutilisé."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gérez vos clés Web OIDC pour signer et valider en toute sécurité les jetons de votre instance ZITADEL.",
+        "TABLE": {
+          "TITLE": "Clés Web Actives et Futures",
+          "DESCRIPTION": "Vos clés Web actives et à venir. L'activation d'une nouvelle clé désactivera l'actuelle.",
+          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les clients.",
+          "ACTIVATE": "Activer la prochaine Clé Web",
+          "ACTIVE": "Actuellement active",
+          "NEXT": "Prochaine dans la file d'attente",
+          "FUTURE": "Futur",
+          "WARNING": "La clé Web a moins de 5 minutes"
+        },
+        "CREATE": {
+          "TITLE": "Créer une nouvelle Clé Web",
+          "DESCRIPTION": "Créer une nouvelle clé Web l'ajoutera à votre liste. ZITADEL utilise par défaut des clés RSA2048 avec un hacheur SHA256.",
+          "KEY_TYPE": "Type de Clé",
+          "BITS": "Bits",
+          "HASHER": "Hacheur",
+          "CURVE": "Courbe"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Clés Web Précédentes",
+          "DESCRIPTION": "Voici vos anciennes clés Web qui ne sont plus actives.",
+          "DEACTIVATED_ON": "Désactivée le"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "Télécharger",
     "APPLY": "Appliquer"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Vous utilisez actuellement la nouvelle version Actions V2, qui est en phase bêta. L'ancienne version 1 est toujours disponible mais sera arrêtée à l'avenir. Veuillez signaler tout problème ou commentaire.",
+    "EXECUTION": {
+      "TITLE": "Actions",
+      "DESCRIPTION": "Les actions vous permettent d'exécuter du code personnalisé en réponse à des requêtes API, des événements ou des fonctions spécifiques. Utilisez-les pour étendre Zitadel, automatiser les flux de travail et vous intégrer à d'autres systèmes.",
+      "TYPES": {
+        "request": "Requête",
+        "response": "Réponse",
+        "event": "Événements",
+        "function": "Fonction"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Créer une action",
+        "UPDATE_TITLE": "Mettre à jour une action",
+        "TYPE": {
+          "DESCRIPTION": "Sélectionnez quand vous souhaitez que cette action s'exécute",
+          "REQUEST": {
+            "TITLE": "Requête",
+            "DESCRIPTION": "Requêtes qui se produisent dans Zitadel. Cela pourrait être quelque chose comme un appel de requête de connexion."
+          },
+          "RESPONSE": {
+            "TITLE": "Réponse",
+            "DESCRIPTION": "Une réponse à une requête dans Zitadel. Pensez à la réponse que vous obtenez lorsque vous récupérez un utilisateur."
+          },
+          "EVENTS": {
+            "TITLE": "Événements",
+            "DESCRIPTION": "Événements qui se produisent dans Zitadel. Cela pourrait être n'importe quoi, comme un utilisateur créant un compte, une connexion réussie, etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Fonctions",
+            "DESCRIPTION": "Fonctions que vous pouvez appeler dans Zitadel. Cela pourrait être n'importe quoi, de l'envoi d'un e-mail à la création d'un utilisateur."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Choisissez si cette action s'applique à toutes les requêtes, à un service spécifique (par exemple, la gestion des utilisateurs) ou à une seule requête (par exemple, créer un utilisateur).",
+          "ALL": {
+            "TITLE": "Tous",
+            "DESCRIPTION": "Sélectionnez ceci si vous souhaitez exécuter votre action sur chaque requête"
+          },
+          "ALL_EVENTS": "Sélectionnez ceci si vous souhaitez exécuter votre action à chaque événement",
+          "SELECT_SERVICE": {
+            "TITLE": "Sélectionner un service",
+            "DESCRIPTION": "Choisissez un service Zitadel pour votre action."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Sélectionner une méthode",
+            "DESCRIPTION": "Si vous souhaitez exécuter uniquement sur une requête spécifique, sélectionnez-la ici",
+            "NOTE": "Si vous ne sélectionnez pas de méthode, votre action s'exécutera sur chaque requête de votre service sélectionné."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nom de la fonction",
+            "DESCRIPTION": "Choisissez la fonction que vous souhaitez exécuter"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Définir un groupe",
+            "DESCRIPTION": "Si vous souhaitez exécuter uniquement sur un groupe d'événements, définissez le groupe ici"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Sélectionner un événement",
+            "DESCRIPTION": "Si vous souhaitez exécuter uniquement sur un événement spécifique, spécifiez-le ici"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Vous pouvez choisir d'exécuter une cible ou de l'exécuter dans les mêmes conditions que d'autres cibles.",
+          "TARGET": {
+            "DESCRIPTION": "La cible que vous souhaitez exécuter pour cette action"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Conditions d'exécution"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condition",
+        "TYPE": "Type",
+        "TARGET": "Cible",
+        "CREATIONDATE": "Date de création"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Cibles",
+      "DESCRIPTION": "Une cible est la destination du code que vous souhaitez exécuter à partir d'une action. Créez une cible ici et ajoutez-la à vos actions.",
+      "CREATE": {
+        "TITLE": "Créer votre cible",
+        "DESCRIPTION": "Créez votre propre cible en dehors de Zitadel",
+        "NAME": "Nom",
+        "NAME_DESCRIPTION": "Donnez à votre cible un nom clair et descriptif pour la rendre facile à identifier plus tard",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Appel REST",
+          "restAsync": "REST Asynchrone"
+        },
+        "TYPES_DESCRIPTION": "Webhook, l'appel gère le code d'état mais la réponse est sans importance\nCall, l'appel gère le code d'état et la réponse\nAsync, l'appel ne gère ni le code d'état ni la réponse, mais peut être appelé en parallèle avec d'autres cibles",
+        "ENDPOINT": "Point de terminaison",
+        "ENDPOINT_DESCRIPTION": "Entrez le point de terminaison où votre code est hébergé. Assurez-vous qu'il nous est accessible !",
+        "TIMEOUT": "Délai d'attente",
+        "TIMEOUT_DESCRIPTION": "Définissez le temps maximal dont votre cible dispose pour répondre. Si cela prend plus de temps, nous arrêterons la requête.",
+        "INTERRUPT_ON_ERROR": "Interrompre en cas d'erreur",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Arrêtez toutes les exécutions lorsque les cibles renvoient une erreur",
+        "INTERRUPT_ON_ERROR_WARNING": "Attention : “Interrompre en cas d'erreur” arrête les opérations en cas d’échec, ce qui peut entraîner un verrouillage. Testez avec cette option désactivée pour éviter de bloquer la connexion ou la création.",
+        "AWAIT_RESPONSE": "Attendre une réponse",
+        "AWAIT_RESPONSE_DESCRIPTION": "Nous attendrons une réponse avant de faire autre chose. Utile si vous avez l'intention d'utiliser plusieurs cibles pour une seule action"
+      },
+      "TABLE": {
+        "NAME": "Nom",
+        "ENDPOINT": "Point de terminaison",
+        "CREATIONDATE": "Date de création",
+        "REORDER": "Réorganiser"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "A le contrôle de toute l'instance, y compris toutes les organisations",
     "IAM_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'instance, y compris toutes les organisations.",
@@ -509,14 +648,17 @@
     "IAM_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs",
     "IAM_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de toutes les organisations",
     "IAM_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de toutes les organisations",
+    "IAM_LOGIN_CLIENT": "A la permission de gérer les clients de connexion",
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
+    "ORG_SETTINGS_MANAGER": "A le droit de gérer les paramètres de l'organisation",
     "ORG_USER_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux utilisateurs",
     "ORG_PROJECT_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux projets",
     "ORG_PROJECT_CREATOR": "A le droit de créer ses propres projets et leurs paramètres sous-jacents.",
     "ORG_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de l'organisation",
     "ORG_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de l'organisation",
+    "ORG_USER_SELF_MANAGER": "A le droit de gérer ses propres utilisateurs",
     "PROJECT_OWNER": "A le droit de gérer l'ensemble du projet",
     "PROJECT_OWNER_VIEWER": "A le droit de passer en revue l'ensemble du projet",
     "PROJECT_OWNER_GLOBAL": "A le droit d'accéder à l'ensemble du projet",
@@ -551,6 +693,7 @@
     "EMAIL": "Courriel",
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
+    "ORGID": "ID de l'organisation",
     "PRIMARYDOMAIN": "Domaine principal",
     "PROJECTNAME": "Nom du projet",
     "RESOURCEOWNER": "Propriétaire des ressources",
@@ -787,7 +930,10 @@
       "PHONESECTION": "Numéro de téléphone",
       "PASSWORDSECTION": "Mot de passe initial",
       "ADDRESSANDPHONESECTION": "Numéro de téléphone",
-      "INITMAILDESCRIPTION": "Si les deux options sont sélectionnées, aucun mail d'initialisation ne sera envoyé. Si une seule des options est sélectionnée, un mail pour fournir / vérifier les données sera envoyé."
+      "INITMAILDESCRIPTION": "Si les deux options sont sélectionnées, aucun mail d'initialisation ne sera envoyé. Si une seule des options est sélectionnée, un mail pour fournir / vérifier les données sera envoyé.",
+      "SETUPAUTHENTICATIONLATER": "Configurer l'authentification plus tard pour cet utilisateur.",
+      "INVITATION": "Envoyer un e-mail d'invitation pour la configuration de l'authentification et la vérification de l'e-mail.",
+      "INITIALPASSWORD": "Définissez un mot de passe initial pour l'utilisateur."
     },
     "CODEDIALOG": {
       "TITLE": "Vérifier le numéro de téléphone",
@@ -809,6 +955,9 @@
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
       "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone.",
+      "PHONE_VERIFIED": "Numéro de téléphone vérifié",
+      "SEND_SMS": "Envoyer un SMS de vérification",
+      "SEND_EMAIL": "Envoyer un Courriel",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -948,6 +1097,14 @@
       "4": "Verrouillé",
       "5": "Suspendu",
       "6": "Initial"
+    },
+    "STATEV2": {
+      "0": "Inconnu",
+      "1": "Actif",
+      "2": "Inactif",
+      "3": "Supprimé",
+      "4": "Verrouillé",
+      "5": "Initial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nom de connexion (organisation actuelle)",
@@ -1340,6 +1497,7 @@
       "BRANDING": "Image de marque",
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Générateur de secrets",
       "SECURITY": "Paramètres de sécurité",
       "EVENTS": "Événements",
@@ -1355,7 +1513,8 @@
       "APPEARANCE": "Apparence",
       "OTHER": "Autres",
       "STORAGE": "Stockage"
-    }
+    },
+    "BETA": "BÊTA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1385,7 +1544,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1476,6 +1636,16 @@
       "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Fin de session",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si le drapeau est activé, l'erreur parent OIDC sera enregistrée dans la console.",
+      "DISABLEUSERTOKENEVENT": "Désactiver l'événement de jeton utilisateur",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Activer le Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les clients de la fin de session chez le fournisseur OpenID.",
+      "PERMISSIONCHECKV2": "Vérification des permissions V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "WEBKEY": "Clé web",
+      "WEBKEY_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
         "INHERITED": "Hérité",
         "ENABLED": "Activé",
@@ -1486,7 +1656,12 @@
         "ENABLED": "\"Activé\" est hérité",
         "DISABLED": "\"Désactivé\" est hérité"
       },
-      "RESET": "Réinitialiser tout sur hérité"
+      "RESET": "Réinitialiser tout sur hérité",
+      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console pour la création d'utilisateurs",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial.",
+      "LOGINV2": "Connexion V2",
+      "LOGINV2_DESCRIPTION": "L’activation de cette option lance la nouvelle interface de connexion basée sur TypeScript, avec une sécurité, des performances et une personnalisation améliorées.",
+      "LOGINV2_BASEURI": "URI de base"
     },
     "DIALOG": {
       "RESET": {
@@ -1623,7 +1798,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -1974,6 +2151,7 @@
       "ACTIVATE": "Activer le projet",
       "DELETE": "Supprimer le projet",
       "ORGNAME": "Nom de l'organisation",
+      "ORGID": "ID de l'organisation",
       "ORGDOMAIN": "Domaine de l'organisation",
       "STATE": "Statut",
       "TYPE": "Type",
@@ -2167,6 +2345,8 @@
     "REMOVE_WARN_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Cela supprimera la sélection de l'IDP disponible pour vos utilisateurs et les utilisateurs déjà enregistrés ne pourront plus se reconnecter. Êtes-vous sûr de continuer ?",
     "DELETE_SELECTION_TITLE": "Supprimer Idp",
     "DELETE_SELECTION_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
+    "FEDERATEDLOGOUTENABLED": "Déconnexion fédérée activée",
+    "FEDERATEDLOGOUTENABLED_DESC": "Si activé, l'utilisateur sera également déconnecté de l'IdP s'il termine la session dans ZITADEL.",
     "EMPTY": "Aucun IDP disponible",
     "OIDC": {
       "GENERAL": "Informations générales",
@@ -2192,7 +2372,9 @@
       "REMOVED": "Suppression réussie."
     },
     "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
-    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo."
+    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo.",
+    "USEPKCE": "Utiliser PKCE",
+    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification"
   },
   "MFA": {
     "LIST": {
@@ -2571,7 +2753,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",

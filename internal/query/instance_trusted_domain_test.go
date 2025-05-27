@@ -16,8 +16,7 @@ var (
 		` projections.instance_trusted_domains.domain,` +
 		` projections.instance_trusted_domains.instance_id,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.instance_trusted_domains` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.instance_trusted_domains`
 	prepareInstanceTrustedDomainsCols = []string{
 		"creation_date",
 		"change_date",
@@ -151,7 +150,7 @@ func Test_InstanceTrustedDomainPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

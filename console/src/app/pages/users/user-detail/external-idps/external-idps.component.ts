@@ -3,14 +3,14 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { IDPUserLink } from 'src/app/proto/generated/zitadel/idp_pb';
 
-import { GrpcAuthService } from '../../../../services/grpc-auth.service';
-import { ManagementService } from '../../../../services/mgmt.service';
-import { ToastService } from '../../../../services/toast.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'cnsl-external-idps',
@@ -18,7 +18,7 @@ import { ToastService } from '../../../../services/toast.service';
   styleUrls: ['./external-idps.component.scss'],
 })
 export class ExternalIdpsComponent implements OnInit, OnDestroy {
-  @Input() service!: GrpcAuthService | ManagementService;
+  @Input({ required: true }) service!: GrpcAuthService | ManagementService;
   @Input() userId!: string;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public totalResult: number = 0;
@@ -41,7 +41,7 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.getData(10, 0);
+    this.getData(10, 0).then();
   }
 
   ngOnDestroy(): void {
@@ -65,39 +65,37 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
   private async getData(limit: number, offset: number): Promise<void> {
     this.loadingSubject.next(true);
 
-    let promise;
-    if (this.service instanceof ManagementService) {
-      promise = (this.service as ManagementService).listHumanLinkedIDPs(this.userId, limit, offset);
-    } else if (this.service instanceof GrpcAuthService) {
-      promise = (this.service as GrpcAuthService).listMyLinkedIDPs(limit, offset);
+    const promise =
+      this.service instanceof ManagementService
+        ? (this.service as ManagementService).listHumanLinkedIDPs(this.userId, limit, offset)
+        : (this.service as GrpcAuthService).listMyLinkedIDPs(limit, offset);
+
+    let resp;
+    try {
+      resp = await promise;
+    } catch (error) {
+      this.toast.showError(error);
+      this.loadingSubject.next(false);
+      return;
     }
 
-    if (promise) {
-      promise
-        .then((resp) => {
-          this.dataSource.data = resp.resultList;
-          if (resp.details?.viewTimestamp) {
-            this.viewTimestamp = resp.details.viewTimestamp;
-          }
-          if (resp.details?.totalResult) {
-            this.totalResult = resp.details?.totalResult;
-          } else {
-            this.totalResult = 0;
-          }
-          this.loadingSubject.next(false);
-        })
-        .catch((error: any) => {
-          this.toast.showError(error);
-          this.loadingSubject.next(false);
-        });
+    this.dataSource.data = resp.resultList;
+    if (resp.details?.viewTimestamp) {
+      this.viewTimestamp = resp.details.viewTimestamp;
     }
+    if (resp.details?.totalResult) {
+      this.totalResult = resp.details?.totalResult;
+    } else {
+      this.totalResult = 0;
+    }
+    this.loadingSubject.next(false);
   }
 
   public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize).then();
   }
 
-  public removeExternalIdp(idp: IDPUserLink.AsObject): void {
+  public async removeExternalIdp(idp: IDPUserLink.AsObject): Promise<void> {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.REMOVE',
@@ -108,27 +106,23 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        let promise;
-        if (this.service instanceof ManagementService) {
-          promise = (this.service as ManagementService).removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId);
-        } else if (this.service instanceof GrpcAuthService) {
-          promise = (this.service as GrpcAuthService).removeMyLinkedIDP(idp.idpId, idp.providedUserId);
-        }
+    const resp = await firstValueFrom(dialogRef.afterClosed());
+    if (!resp) {
+      return;
+    }
 
-        if (promise) {
-          promise
-            .then((_) => {
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
-            })
-            .catch((error: any) => {
-              this.toast.showError(error);
-            });
-        }
-      }
-    });
+    const promise =
+      this.service instanceof ManagementService
+        ? (this.service as ManagementService).removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId)
+        : (this.service as GrpcAuthService).removeMyLinkedIDP(idp.idpId, idp.providedUserId);
+
+    try {
+      await promise;
+      setTimeout(() => {
+        this.refreshPage();
+      }, 1000);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 }

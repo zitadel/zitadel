@@ -1,9 +1,8 @@
 import { PlatformLocation } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthConfig } from 'angular-oauth2-oidc';
-import { catchError, switchMap, tap, throwError } from 'rxjs';
+import { catchError, firstValueFrom, switchMap, tap } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -12,13 +11,24 @@ import { fallbackLanguage, supportedLanguagesRegexp } from '../utils/language';
 import { AuthenticationService } from './authentication.service';
 import { EnvironmentService } from './environment.service';
 import { ExhaustedService } from './exhausted.service';
-import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { AuthInterceptor, AuthInterceptorProvider, NewConnectWebAuthInterceptor } from './interceptors/auth.interceptor';
 import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
-import { OrgInterceptor } from './interceptors/org.interceptor';
-import { StorageService } from './storage.service';
-import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
-import { GrpcAuthService } from './grpc-auth.service';
+import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
+import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
+//@ts-ignore
+import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
+//@ts-ignore
+import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
+import { createGrpcWebTransport } from '@connectrpc/connect-web';
+// @ts-ignore
+import { createClientFor } from '@zitadel/client';
+
+import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
+import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+
+const createWebKeyServiceClient = createClientFor(WebKeyService);
+const createActionServiceClient = createClientFor(ActionService);
 
 @Injectable({
   providedIn: 'root',
@@ -27,16 +37,24 @@ export class GrpcService {
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
-  public feature!: FeatureServiceClient;
+  public user!: UserServiceClient;
+  public userNew!: ReturnType<typeof createUserServiceClient>;
+  public session!: ReturnType<typeof createSessionServiceClient>;
+  public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
+  public authNew!: ReturnType<typeof createAuthServiceClient>;
+  public featureNew!: ReturnType<typeof createFeatureServiceClient>;
+  public actionNew!: ReturnType<typeof createActionServiceClient>;
+  public webKey!: ReturnType<typeof createWebKeyServiceClient>;
 
   constructor(
-    private envService: EnvironmentService,
-    private platformLocation: PlatformLocation,
-    private authenticationService: AuthenticationService,
-    private storageService: StorageService,
-    private dialog: MatDialog,
-    private translate: TranslateService,
-    private exhaustedService: ExhaustedService,
+    private readonly envService: EnvironmentService,
+    private readonly platformLocation: PlatformLocation,
+    private readonly authenticationService: AuthenticationService,
+    private readonly translate: TranslateService,
+    private readonly exhaustedService: ExhaustedService,
+    private readonly authInterceptor: AuthInterceptor,
+    private readonly authInterceptorProvider: AuthInterceptorProvider,
+    private readonly orgInterceptorProvider: OrgInterceptorProvider,
   ) {}
 
   public loadAppEnvironment(): Promise<any> {
@@ -44,66 +62,84 @@ export class GrpcService {
 
     const browserLanguage = this.translate.getBrowserLang();
     const language = browserLanguage?.match(supportedLanguagesRegexp) ? browserLanguage : fallbackLanguage;
-    return this.translate
-      .use(language || this.translate.defaultLang)
-      .pipe(
-        switchMap(() => this.envService.env),
-        tap((env) => {
-          if (!env?.api || !env?.issuer) {
-            return;
-          }
-          const interceptors = {
-            unaryInterceptors: [
-              new ExhaustedGrpcInterceptor(this.exhaustedService, this.envService),
-              new OrgInterceptor(this.storageService),
-              new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
-              new I18nInterceptor(this.translate),
-            ],
-          };
+    const init = this.translate.use(language || this.translate.defaultLang).pipe(
+      switchMap(() => this.envService.env),
+      tap((env) => {
+        if (!env?.api || !env?.issuer) {
+          return;
+        }
+        const interceptors = {
+          unaryInterceptors: [
+            new ExhaustedGrpcInterceptor(this.exhaustedService, this.envService),
+            new OrgInterceptor(this.orgInterceptorProvider),
+            this.authInterceptor,
+            new I18nInterceptor(this.translate),
+          ],
+        };
 
-          this.auth = new AuthServiceClient(
-            env.api,
-            null,
-            // @ts-ignore
-            interceptors,
-          );
-          this.mgmt = new ManagementServiceClient(
-            env.api,
-            null,
-            // @ts-ignore
-            interceptors,
-          );
-          this.admin = new AdminServiceClient(
-            env.api,
-            null,
-            // @ts-ignore
-            interceptors,
-          );
-          this.feature = new FeatureServiceClient(
-            env.api,
-            null,
-            // @ts-ignore
-            interceptors,
-          );
+        this.auth = new AuthServiceClient(
+          env.api,
+          null,
+          // @ts-ignore
+          interceptors,
+        );
+        this.mgmt = new ManagementServiceClient(
+          env.api,
+          null,
+          // @ts-ignore
+          interceptors,
+        );
+        this.admin = new AdminServiceClient(
+          env.api,
+          null,
+          // @ts-ignore
+          interceptors,
+        );
+        this.user = new UserServiceClient(
+          env.api,
+          null,
+          // @ts-ignore
+          interceptors,
+        );
 
-          const authConfig: AuthConfig = {
-            scope: 'openid profile email',
-            responseType: 'code',
-            oidc: true,
-            clientId: env.clientid,
-            issuer: env.issuer,
-            redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
-            postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
-            requireHttps: false,
-          };
+        const transport = createGrpcWebTransport({
+          baseUrl: env.api,
+          interceptors: [NewConnectWebAuthInterceptor(this.authInterceptorProvider)],
+        });
+        const transportOldAPIs = createGrpcWebTransport({
+          baseUrl: env.api,
+          interceptors: [
+            NewConnectWebAuthInterceptor(this.authInterceptorProvider),
+            NewConnectWebOrgInterceptor(this.orgInterceptorProvider),
+          ],
+        });
+        this.userNew = createUserServiceClient(transport);
+        this.session = createSessionServiceClient(transport);
+        this.mgmtNew = createManagementServiceClient(transportOldAPIs);
+        this.authNew = createAuthServiceClient(transport);
+        this.featureNew = createFeatureServiceClient(transport);
+        this.actionNew = createActionServiceClient(transport);
+        this.webKey = createWebKeyServiceClient(transport);
 
-          this.authenticationService.initConfig(authConfig);
-        }),
-        catchError((err) => {
-          console.error('Failed to load environment from assets', err);
-          return throwError(() => err);
-        }),
-      )
-      .toPromise();
+        const authConfig: AuthConfig = {
+          scope: 'openid profile email',
+          responseType: 'code',
+          oidc: true,
+          clientId: env.clientid,
+          issuer: env.issuer,
+          redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
+          postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
+          requireHttps: false,
+        };
+
+        this.authenticationService.initConfig(authConfig);
+      }),
+      catchError((err) => {
+        console.error('Failed to load environment from assets', err);
+        throw err;
+      }),
+    );
+
+    return firstValueFrom(init);
   }
 }

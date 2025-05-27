@@ -15,7 +15,7 @@ const (
 	KeyLegacyIntrospection
 	KeyUserSchema
 	KeyTokenExchange
-	KeyActions
+	KeyActionsDeprecated
 	KeyImprovedPerformance
 	KeyWebKey
 	KeyDebugOIDCParentError
@@ -24,6 +24,7 @@ const (
 	KeyEnableBackChannelLogout
 	KeyLoginV2
 	KeyPermissionCheckV2
+	KeyConsoleUseV2UserApi
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -45,7 +46,6 @@ type Features struct {
 	LegacyIntrospection             bool                      `json:"legacy_introspection,omitempty"`
 	UserSchema                      bool                      `json:"user_schema,omitempty"`
 	TokenExchange                   bool                      `json:"token_exchange,omitempty"`
-	Actions                         bool                      `json:"actions,omitempty"`
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
 	WebKey                          bool                      `json:"web_key,omitempty"`
 	DebugOIDCParentError            bool                      `json:"debug_oidc_parent_error,omitempty"`
@@ -54,12 +54,15 @@ type Features struct {
 	EnableBackChannelLogout         bool                      `json:"enable_back_channel_logout,omitempty"`
 	LoginV2                         LoginV2                   `json:"login_v2,omitempty"`
 	PermissionCheckV2               bool                      `json:"permission_check_v2,omitempty"`
+	ConsoleUseV2UserApi             bool                      `json:"console_use_v2_user_api,omitempty"`
 }
+
+/* Note: do not generate the stringer or enumer for this type, is it breaks existing events */
 
 type ImprovedPerformanceType int32
 
 const (
-	ImprovedPerformanceTypeUnknown = iota
+	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
 	ImprovedPerformanceTypeOrgByID
 	ImprovedPerformanceTypeProjectGrant
 	ImprovedPerformanceTypeProject

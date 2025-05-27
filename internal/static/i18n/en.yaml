@@ -537,6 +537,7 @@ Errors:
     StateMissing: State parameter is missing in the request
     NotStarted: Intent is not started or was already terminated
     NotSucceeded: Intent has not succeeded
+    Expired: Intent has expired
     TokenCreationFailed: Token creation failed
     InvalidToken: Intent Token is invalid
     OtherUser: Intent meant for another user
@@ -544,6 +545,7 @@ Errors:
     AlreadyExists: Auth Request already exists
     NotExisting: Auth Request does not exist
     WrongLoginClient: Auth Request created by other login client
+    AlreadyHandled: Auth Request has already been handled
   OIDCSession:
     RefreshTokenInvalid: Refresh Token is invalid
     Token:
@@ -554,8 +556,12 @@ Errors:
     AlreadyExists: SAMLRequest already exists
     NotExisting: SAMLRequest does not exist
     WrongLoginClient: SAMLRequest created by other login client
+    AlreadyHandled: SAMLRequest has already been handled
   SAMLSession:
     InvalidClient: SAMLResponse was not issued for this client
+  DeviceAuth:
+    NotFound: Device Authorization Request does not exist
+    AlreadyHandled: Device Authorization Request has already been handled
   Feature:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported

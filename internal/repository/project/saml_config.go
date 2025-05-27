@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -16,10 +17,12 @@ const (
 type SAMLConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID       string `json:"appId"`
-	EntityID    string `json:"entityId"`
-	Metadata    []byte `json:"metadata,omitempty"`
-	MetadataURL string `json:"metadata_url,omitempty"`
+	AppID        string              `json:"appId"`
+	EntityID     string              `json:"entityId"`
+	Metadata     []byte              `json:"metadata,omitempty"`
+	MetadataURL  string              `json:"metadata_url,omitempty"`
+	LoginVersion domain.LoginVersion `json:"loginVersion,omitempty"`
+	LoginBaseURI string              `json:"loginBaseURI,omitempty"`
 }
 
 func (e *SAMLConfigAddedEvent) Payload() interface{} {
@@ -50,6 +53,8 @@ func NewSAMLConfigAddedEvent(
 	entityID string,
 	metadata []byte,
 	metadataURL string,
+	loginVersion domain.LoginVersion,
+	loginBaseURI string,
 ) *SAMLConfigAddedEvent {
 	return &SAMLConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -57,10 +62,12 @@ func NewSAMLConfigAddedEvent(
 			aggregate,
 			SAMLConfigAddedType,
 		),
-		AppID:       appID,
-		EntityID:    entityID,
-		Metadata:    metadata,
-		MetadataURL: metadataURL,
+		AppID:        appID,
+		EntityID:     entityID,
+		Metadata:     metadata,
+		MetadataURL:  metadataURL,
+		LoginVersion: loginVersion,
+		LoginBaseURI: loginBaseURI,
 	}
 }
 
@@ -80,11 +87,13 @@ func SAMLConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 type SAMLConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID       string  `json:"appId"`
-	EntityID    string  `json:"entityId"`
-	Metadata    []byte  `json:"metadata,omitempty"`
-	MetadataURL *string `json:"metadata_url,omitempty"`
-	oldEntityID string
+	AppID        string               `json:"appId"`
+	EntityID     string               `json:"entityId"`
+	Metadata     []byte               `json:"metadata,omitempty"`
+	MetadataURL  *string              `json:"metadata_url,omitempty"`
+	LoginVersion *domain.LoginVersion `json:"loginVersion,omitempty"`
+	LoginBaseURI *string              `json:"loginBaseURI,omitempty"`
+	oldEntityID  string
 }
 
 func (e *SAMLConfigChangedEvent) Payload() interface{} {
@@ -144,6 +153,17 @@ func ChangeMetadataURL(metadataURL string) func(event *SAMLConfigChangedEvent) {
 func ChangeEntityID(entityID string) func(event *SAMLConfigChangedEvent) {
 	return func(e *SAMLConfigChangedEvent) {
 		e.EntityID = entityID
+	}
+}
+
+func ChangeSAMLLoginVersion(loginVersion domain.LoginVersion) func(event *SAMLConfigChangedEvent) {
+	return func(e *SAMLConfigChangedEvent) {
+		e.LoginVersion = &loginVersion
+	}
+}
+func ChangeSAMLLoginBaseURI(loginBaseURI string) func(event *SAMLConfigChangedEvent) {
+	return func(e *SAMLConfigChangedEvent) {
+		e.LoginBaseURI = &loginBaseURI
 	}
 }
 

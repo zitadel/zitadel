@@ -7,11 +7,13 @@ import (
 type SAMLApp struct {
 	models.ObjectRoot
 
-	AppID       string
-	AppName     string
-	EntityID    string
-	Metadata    []byte
-	MetadataURL string
+	AppID        string
+	AppName      string
+	EntityID     string
+	Metadata     []byte
+	MetadataURL  string
+	LoginVersion LoginVersion
+	LoginBaseURI string
 
 	State AppState
 }

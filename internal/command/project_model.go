@@ -88,42 +88,54 @@ func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *ProjectWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	name string,
+	name *string,
 	projectRoleAssertion,
 	projectRoleCheck,
-	hasProjectCheck bool,
-	privateLabelingSetting domain.PrivateLabelingSetting,
-) (*project.ProjectChangeEvent, bool, error) {
+	hasProjectCheck *bool,
+	privateLabelingSetting *domain.PrivateLabelingSetting,
+) *project.ProjectChangeEvent {
 	changes := make([]project.ProjectChanges, 0)
-	var err error
 
 	oldName := ""
-	if wm.Name != name {
+	if name != nil && wm.Name != *name {
 		oldName = wm.Name
-		changes = append(changes, project.ChangeName(name))
+		changes = append(changes, project.ChangeName(*name))
 	}
-	if wm.ProjectRoleAssertion != projectRoleAssertion {
-		changes = append(changes, project.ChangeProjectRoleAssertion(projectRoleAssertion))
+	if projectRoleAssertion != nil && wm.ProjectRoleAssertion != *projectRoleAssertion {
+		changes = append(changes, project.ChangeProjectRoleAssertion(*projectRoleAssertion))
 	}
-	if wm.ProjectRoleCheck != projectRoleCheck {
-		changes = append(changes, project.ChangeProjectRoleCheck(projectRoleCheck))
+	if projectRoleCheck != nil && wm.ProjectRoleCheck != *projectRoleCheck {
+		changes = append(changes, project.ChangeProjectRoleCheck(*projectRoleCheck))
 	}
-	if wm.HasProjectCheck != hasProjectCheck {
-		changes = append(changes, project.ChangeHasProjectCheck(hasProjectCheck))
+	if hasProjectCheck != nil && wm.HasProjectCheck != *hasProjectCheck {
+		changes = append(changes, project.ChangeHasProjectCheck(*hasProjectCheck))
 	}
-	if wm.PrivateLabelingSetting != privateLabelingSetting {
-		changes = append(changes, project.ChangePrivateLabelingSetting(privateLabelingSetting))
+	if privateLabelingSetting != nil && wm.PrivateLabelingSetting != *privateLabelingSetting {
+		changes = append(changes, project.ChangePrivateLabelingSetting(*privateLabelingSetting))
 	}
 	if len(changes) == 0 {
-		return nil, false, nil
+		return nil
 	}
-	changeEvent, err := project.NewProjectChangeEvent(ctx, aggregate, oldName, changes)
-	if err != nil {
-		return nil, false, err
-	}
-	return changeEvent, true, nil
+	return project.NewProjectChangeEvent(ctx, aggregate, oldName, changes)
+}
+
+func isProjectStateExists(state domain.ProjectState) bool {
+	return !hasProjectState(state, domain.ProjectStateRemoved, domain.ProjectStateUnspecified)
 }
 
 func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion)
+}
+
+func ProjectAggregateFromWriteModelWithCTX(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return project.AggregateFromWriteModel(ctx, wm)
+}
+
+func hasProjectState(check domain.ProjectState, states ...domain.ProjectState) bool {
+	for _, state := range states {
+		if check == state {
+			return true
+		}
+	}
+	return false
 }

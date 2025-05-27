@@ -97,22 +97,6 @@ type Instance struct {
 	WebAuthN *webauthn.Client
 }
 
-// GetFirstInstance returns the default instance and org information,
-// with authorized machine users.
-// Using the first instance is not recommended as parallel test might
-// interfere with each other.
-// It is recommended to use [NewInstance] instead.
-func GetFirstInstance(ctx context.Context) *Instance {
-	i := &Instance{
-		Config: loadedConfig,
-		Domain: loadedConfig.Hostname,
-	}
-	token := loadInstanceOwnerPAT()
-	i.setClient(ctx)
-	i.setupInstance(ctx, token)
-	return i
-}
-
 // NewInstance returns a new instance that can be used for integration tests.
 // The instance contains a gRPC client connected to the domain of this instance.
 // The included users are the IAM_OWNER, ORG_OWNER of the default org and

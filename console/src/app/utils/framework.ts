@@ -1,6 +1,4 @@
-import { Framework } from '@netlify/framework-info/lib/types';
 import { AddOIDCAppRequest } from '../proto/generated/zitadel/management_pb';
-import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
 import { OIDCAppType, OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from '../proto/generated/zitadel/app_pb';
 
 type OidcAppConfigurations = {

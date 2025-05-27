@@ -54,6 +54,7 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -82,6 +83,7 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 							"binding",
 							"issuer",
 							"destination",
+							"responseissuer",
 						),
 					),
 				),
@@ -90,27 +92,29 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 			args{
 				ctx: mockCtx,
 				request: &SAMLRequest{
-					LoginClient:   "login",
-					ApplicationID: "application",
-					ACSURL:        "acs",
-					RelayState:    "relaystate",
-					RequestID:     "request",
-					Binding:       "binding",
-					Issuer:        "issuer",
-					Destination:   "destination",
+					LoginClient:    "login",
+					ApplicationID:  "application",
+					ACSURL:         "acs",
+					RelayState:     "relaystate",
+					RequestID:      "request",
+					Binding:        "binding",
+					Issuer:         "issuer",
+					Destination:    "destination",
+					ResponseIssuer: "responseissuer",
 				},
 			},
 			&CurrentSAMLRequest{
 				SAMLRequest: &SAMLRequest{
-					ID:            "V2_id",
-					LoginClient:   "login",
-					ApplicationID: "application",
-					ACSURL:        "acs",
-					RelayState:    "relaystate",
-					RequestID:     "request",
-					Binding:       "binding",
-					Issuer:        "issuer",
-					Destination:   "destination",
+					ID:             "V2_id",
+					LoginClient:    "login",
+					ApplicationID:  "application",
+					ACSURL:         "acs",
+					RelayState:     "relaystate",
+					RequestID:      "request",
+					Binding:        "binding",
+					Issuer:         "issuer",
+					Destination:    "destination",
+					ResponseIssuer: "responseissuer",
 				},
 			},
 			nil,
@@ -132,8 +136,9 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
-		eventstore    func(t *testing.T) *eventstore.Eventstore
-		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx              context.Context
@@ -141,6 +146,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 		sessionID        string
 		sessionToken     string
 		checkLoginClient bool
+		checkPermission  domain.ProjectPermissionCheck
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -185,6 +191,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						eventFromEventPusher(
@@ -206,7 +213,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"wrong login client",
+			"wrong login client / not permitted",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -220,11 +227,13 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
 				),
-				tokenVerifier: newMockTokenVerifierValid(),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
 				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient"),
@@ -234,7 +243,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				checkLoginClient: true,
 			},
 			res{
-				wantErr: zerrors.ThrowPermissionDenied(nil, "COMMAND-KCd48Rxt7x", "Errors.SAMLRequest.WrongLoginClient"),
+				wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 		{
@@ -252,6 +261,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -283,6 +293,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -337,6 +348,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -380,6 +392,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -428,15 +441,16 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
 				authReq: &CurrentSAMLRequest{
 					SAMLRequest: &SAMLRequest{
-						ID:            "V2_id",
-						LoginClient:   "login",
-						ApplicationID: "application",
-						ACSURL:        "acs",
-						RelayState:    "relaystate",
-						RequestID:     "request",
-						Binding:       "binding",
-						Issuer:        "issuer",
-						Destination:   "destination",
+						ID:             "V2_id",
+						LoginClient:    "login",
+						ApplicationID:  "application",
+						ACSURL:         "acs",
+						RelayState:     "relaystate",
+						RequestID:      "request",
+						Binding:        "binding",
+						Issuer:         "issuer",
+						Destination:    "destination",
+						ResponseIssuer: "responseissuer",
 					},
 					SessionID:   "sessionID",
 					UserID:      "userID",
@@ -459,6 +473,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -508,20 +523,244 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
 				authReq: &CurrentSAMLRequest{
 					SAMLRequest: &SAMLRequest{
-						ID:            "V2_id",
-						LoginClient:   "loginClient",
-						ApplicationID: "application",
-						ACSURL:        "acs",
-						RelayState:    "relaystate",
-						RequestID:     "request",
-						Binding:       "binding",
-						Issuer:        "issuer",
-						Destination:   "destination",
+						ID:             "V2_id",
+						LoginClient:    "loginClient",
+						ApplicationID:  "application",
+						ACSURL:         "acs",
+						RelayState:     "relaystate",
+						RequestID:      "request",
+						Binding:        "binding",
+						Issuer:         "issuer",
+						Destination:    "destination",
+						ResponseIssuer: "responseissuer",
 					},
 					SessionID:   "sessionID",
 					UserID:      "userID",
 					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				},
+			},
+		}, {
+			"linked with permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"destination",
+								"responseissuer",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+					expectPush(
+						samlrequest.NewSessionLinkedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							"sessionID",
+							"userID",
+							testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLoginClient: true,
+			},
+			res{
+				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+				authReq: &CurrentSAMLRequest{
+					SAMLRequest: &SAMLRequest{
+						ID:             "V2_id",
+						LoginClient:    "loginClient",
+						ApplicationID:  "application",
+						ACSURL:         "acs",
+						RelayState:     "relaystate",
+						RequestID:      "request",
+						Binding:        "binding",
+						Issuer:         "issuer",
+						Destination:    "destination",
+						ResponseIssuer: "responseissuer",
+					},
+					SessionID:   "sessionID",
+					UserID:      "userID",
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				},
+			},
+		},
+		{
+			"linked with login client check, application permission check",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"destination",
+								"responseissuer",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+					expectPush(
+						samlrequest.NewSessionLinkedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							"sessionID",
+							"userID",
+							testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+						),
+					),
+				),
+				tokenVerifier: newMockTokenVerifierValid(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLoginClient: true,
+				checkPermission:  newMockProjectPermissionCheckAllowed(),
+			},
+			res{
+				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+				authReq: &CurrentSAMLRequest{
+					SAMLRequest: &SAMLRequest{
+						ID:             "V2_id",
+						LoginClient:    "loginClient",
+						ApplicationID:  "application",
+						ACSURL:         "acs",
+						RelayState:     "relaystate",
+						RequestID:      "request",
+						Binding:        "binding",
+						Issuer:         "issuer",
+						Destination:    "destination",
+						ResponseIssuer: "responseissuer",
+					},
+					SessionID:   "sessionID",
+					UserID:      "userID",
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				},
+			},
+		},
+		{
+			"linked with login client check, no application permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"destination",
+								"responseissuer",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+				),
+				tokenVerifier: newMockTokenVerifierValid(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLoginClient: true,
+				checkPermission:  newMockProjectPermissionCheckSAMLNotAllowed(),
+			},
+			res{
+				wantErr: zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.PermissionDenied"),
 			},
 		},
 	}
@@ -530,8 +769,9 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			c := &Commands{
 				eventstore:           tt.fields.eventstore(t),
 				sessionTokenVerifier: tt.fields.tokenVerifier,
+				checkPermission:      tt.fields.checkPermission,
 			}
-			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
+			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient, tt.args.checkPermission)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {
@@ -595,6 +835,7 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						samlrequest.NewFailedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
@@ -628,6 +869,7 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -648,15 +890,16 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
 				samlReq: &CurrentSAMLRequest{
 					SAMLRequest: &SAMLRequest{
-						ID:            "V2_id",
-						LoginClient:   "login",
-						ApplicationID: "application",
-						ACSURL:        "acs",
-						RelayState:    "relaystate",
-						RequestID:     "request",
-						Binding:       "binding",
-						Issuer:        "issuer",
-						Destination:   "destination",
+						ID:             "V2_id",
+						LoginClient:    "login",
+						ApplicationID:  "application",
+						ACSURL:         "acs",
+						RelayState:     "relaystate",
+						RequestID:      "request",
+						Binding:        "binding",
+						Issuer:         "issuer",
+						Destination:    "destination",
+						ResponseIssuer: "responseissuer",
 					},
 				},
 			},

@@ -2,22 +2,21 @@ package handlers
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/muhlemmer/gu"
+	"github.com/riverqueue/river"
+	"github.com/riverqueue/river/rivertype"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
@@ -51,7 +50,6 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			name: "too old",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().NotificationCanceled(gomock.Any(), gomock.Any(), notificationID, instanceID, nil).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -62,19 +60,18 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						now:            testNow,
 					},
 					argsWorker{
-						event: &notification.RequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().Add(-1 * time.Hour),
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								CreatedAt: time.Now().Add(-1 * time.Hour),
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            notificationID,
+									ResourceOwner: instanceID,
+								},
 								UserID:                        userID,
 								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
 								TriggeredAtOrigin:             eventOrigin,
 								EventType:                     user.HumanInviteCodeAddedType,
 								MessageType:                   domain.InviteUserMessageType,
@@ -90,7 +87,12 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								},
 							},
 						},
-					}, w
+					},
+					wantWorker{
+						err: func(tt assert.TestingT, err error, i ...interface{}) bool {
+							return errors.Is(err, new(river.JobCancelError))
+						},
+					}
 			},
 		},
 		{
@@ -99,13 +101,13 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
+					Recipients:          []string{lastEmail},
+					Subject:             "Invitation to APP",
+					Content:             expectContent,
+					TriggeringEventType: user.HumanInviteCodeAddedType,
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().NotificationSent(gomock.Any(), gomock.Any(), notificationID, instanceID).Return(nil)
 				commands.EXPECT().InviteCodeSent(gomock.Any(), orgID, userID).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
@@ -117,19 +119,18 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						now:            testNow,
 					},
 					argsWorker{
-						event: &notification.RequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								CreatedAt: time.Now(),
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            userID,
+									ResourceOwner: orgID,
+								},
 								UserID:                        userID,
 								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
 								TriggeredAtOrigin:             eventOrigin,
 								EventType:                     user.HumanInviteCodeAddedType,
 								MessageType:                   domain.InviteUserMessageType,
@@ -145,7 +146,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								},
 							},
 						},
-					}, w
+					},
+					w
 			},
 		},
 		{
@@ -159,10 +161,13 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					SenderPhoneNumber:    "senderNumber",
 					RecipientPhoneNumber: verifiedPhone,
 					Content:              expectContent,
+					TriggeringEventType:  session.OTPSMSChallengedType,
+					InstanceID:           instanceID,
+					JobID:                "1",
+					UserID:               userID,
 				}
 				codeAlg, code := cryptoValue(t, ctrl, testCode)
 				expectTemplateWithNotifyUserQueriesSMS(queries)
-				commands.EXPECT().NotificationSent(gomock.Any(), gomock.Any(), notificationID, instanceID).Return(nil)
 				commands.EXPECT().OTPSMSSent(gomock.Any(), sessionID, instanceID, &senders.CodeGeneratorInfo{
 					ID:             smsProviderID,
 					VerificationID: verificationID,
@@ -177,19 +182,19 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						now:            testNow,
 					},
 					argsWorker{
-						event: &notification.RequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								CreatedAt: time.Now(),
+								ID:        1,
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            sessionID,
+									ResourceOwner: instanceID,
+								},
 								UserID:                        userID,
 								UserResourceOwner:             orgID,
-								AggregateID:                   sessionID,
-								AggregateResourceOwner:        instanceID,
 								TriggeredAtOrigin:             eventOrigin,
 								EventType:                     session.OTPSMSChallengedType,
 								MessageType:                   domain.VerifySMSOTPMessageType,
@@ -216,12 +221,12 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{verifiedEmail},
-					Subject:    "Domain has been claimed",
-					Content:    expectContent,
+					Recipients:          []string{verifiedEmail},
+					Subject:             "Domain has been claimed",
+					Content:             expectContent,
+					TriggeringEventType: user.UserDomainClaimedType,
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().NotificationSent(gomock.Any(), gomock.Any(), notificationID, instanceID).Return(nil)
 				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
@@ -233,19 +238,18 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						now:            testNow,
 					},
 					argsWorker{
-						event: &notification.RequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								CreatedAt: time.Now(),
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            userID,
+									ResourceOwner: orgID,
+								},
 								UserID:                        userID,
 								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
 								TriggeredAtOrigin:             eventOrigin,
 								EventType:                     user.UserDomainClaimedType,
 								MessageType:                   domain.DomainClaimedMessageType,
@@ -270,47 +274,17 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
+					Recipients:          []string{lastEmail},
+					Subject:             "Invitation to APP",
+					Content:             expectContent,
+					TriggeringEventType: user.HumanInviteCodeAddedType,
 				}
 				w.sendError = sendError
+				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
+					return errors.Is(err, sendError)
+				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().NotificationRetryRequested(gomock.Any(), gomock.Any(), notificationID, instanceID,
-					&command.NotificationRetryRequest{
-						NotificationRequest: command.NotificationRequest{
-							UserID:                        userID,
-							UserResourceOwner:             orgID,
-							AggregateID:                   "",
-							AggregateResourceOwner:        "",
-							TriggerOrigin:                 eventOrigin,
-							EventType:                     user.HumanInviteCodeAddedType,
-							MessageType:                   domain.InviteUserMessageType,
-							NotificationType:              domain.NotificationTypeEmail,
-							URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-							CodeExpiry:                    1 * time.Hour,
-							Code:                          code,
-							UnverifiedNotificationChannel: true,
-							IsOTP:                         false,
-							RequiresPreviousDomain:        false,
-							Args: &domain.NotificationArguments{
-								ApplicationName: "APP",
-							},
-						},
-						BackOff: 1 * time.Second,
-						NotifyUser: &query.NotifyUser{
-							ID:                 userID,
-							ResourceOwner:      orgID,
-							LastEmail:          lastEmail,
-							VerifiedEmail:      verifiedEmail,
-							PreferredLoginName: preferredLoginName,
-							LastPhone:          lastPhone,
-							VerifiedPhone:      verifiedPhone,
-						},
-					},
-					sendError,
-				).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -320,22 +294,21 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						userDataCrypto: codeAlg,
 						now:            testNow,
 						backOff:        testBackOff,
-						maxAttempts:    2,
 					},
 					argsWorker{
-						event: &notification.RequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								ID:        1,
+								CreatedAt: time.Now(),
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            notificationID,
+									ResourceOwner: instanceID,
+								},
 								UserID:                        userID,
 								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
 								TriggeredAtOrigin:             eventOrigin,
 								EventType:                     user.HumanInviteCodeAddedType,
 								MessageType:                   domain.InviteUserMessageType,
@@ -351,7 +324,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								},
 							},
 						},
-					}, w
+					},
+					w
 			},
 		},
 		{
@@ -360,315 +334,18 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				givenTemplate := "{{.LogoURL}}"
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
+					Recipients:          []string{lastEmail},
+					Subject:             "Invitation to APP",
+					Content:             expectContent,
+					TriggeringEventType: user.HumanInviteCodeAddedType,
 				}
 				w.sendError = sendError
-				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().NotificationCanceled(gomock.Any(), gomock.Any(), notificationID, instanceID, sendError).Return(nil)
-				return fieldsWorker{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-						}),
-						userDataCrypto: codeAlg,
-						now:            testNow,
-						backOff:        testBackOff,
-						maxAttempts:    1,
-					},
-					argsWorker{
-						event: &notification.RequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Seq:           1,
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
-								UserID:                        userID,
-								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
-								TriggeredAtOrigin:             eventOrigin,
-								EventType:                     user.HumanInviteCodeAddedType,
-								MessageType:                   domain.InviteUserMessageType,
-								NotificationType:              domain.NotificationTypeEmail,
-								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-								CodeExpiry:                    1 * time.Hour,
-								Code:                          code,
-								UnverifiedNotificationChannel: true,
-								IsOTP:                         false,
-								RequiresPreviousDomain:        false,
-								Args: &domain.NotificationArguments{
-									ApplicationName: "APP",
-								},
-							},
-						},
-					}, w
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRequested(
-				authz.WithInstanceID(context.Background(), instanceID),
-				authz.WithInstanceID(context.Background(), instanceID),
-				&sql.Tx{},
-				a.event.(*notification.RequestedEvent))
-			if w.err != nil {
-				w.err(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
+				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
+					return err != nil
+				}
 
-func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
-	testNow := time.Now
-	testBackOff := func(current time.Duration) time.Duration {
-		return time.Second
-	}
-	sendError := errors.New("send error")
-	tests := []struct {
-		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fieldsWorker, argsWorker, wantWorker)
-	}{
-		{
-			name: "too old",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().NotificationCanceled(gomock.Any(), gomock.Any(), notificationID, instanceID, nil).Return(nil)
-				return fieldsWorker{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-						}),
-						userDataCrypto: codeAlg,
-						now:            testNow,
-					},
-					argsWorker{
-						event: &notification.RetryRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().Add(-1 * time.Hour),
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
-								UserID:                        userID,
-								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
-								TriggeredAtOrigin:             eventOrigin,
-								EventType:                     user.HumanInviteCodeAddedType,
-								MessageType:                   domain.InviteUserMessageType,
-								NotificationType:              domain.NotificationTypeEmail,
-								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-								CodeExpiry:                    1 * time.Hour,
-								Code:                          code,
-								UnverifiedNotificationChannel: true,
-								IsOTP:                         false,
-								RequiresPreviousDomain:        false,
-								Args: &domain.NotificationArguments{
-									ApplicationName: "APP",
-								},
-							},
-							BackOff: 1 * time.Second,
-							NotifyUser: &query.NotifyUser{
-								ID:                 userID,
-								ResourceOwner:      orgID,
-								LastEmail:          lastEmail,
-								VerifiedEmail:      verifiedEmail,
-								PreferredLoginName: preferredLoginName,
-								LastPhone:          lastPhone,
-								VerifiedPhone:      verifiedPhone,
-							},
-						},
-					}, w
-			},
-		},
-		{
-			name: "backoff not done",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-				return fieldsWorker{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-						}),
-						userDataCrypto: codeAlg,
-						now:            testNow,
-					},
-					argsWorker{
-						event: &notification.RetryRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now(),
-								Typ:           notification.RequestedType,
-								Seq:           2,
-							}),
-							Request: notification.Request{
-								UserID:                        userID,
-								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
-								TriggeredAtOrigin:             eventOrigin,
-								EventType:                     user.HumanInviteCodeAddedType,
-								MessageType:                   domain.InviteUserMessageType,
-								NotificationType:              domain.NotificationTypeEmail,
-								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-								CodeExpiry:                    1 * time.Hour,
-								Code:                          code,
-								UnverifiedNotificationChannel: true,
-								IsOTP:                         false,
-								RequiresPreviousDomain:        false,
-								Args: &domain.NotificationArguments{
-									ApplicationName: "APP",
-								},
-							},
-							BackOff: 10 * time.Second,
-							NotifyUser: &query.NotifyUser{
-								ID:                 userID,
-								ResourceOwner:      orgID,
-								LastEmail:          lastEmail,
-								VerifiedEmail:      verifiedEmail,
-								PreferredLoginName: preferredLoginName,
-								LastPhone:          lastPhone,
-								VerifiedPhone:      verifiedPhone,
-							},
-						},
-					}, w
-			},
-		},
-		{
-			name: "send ok",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-				givenTemplate := "{{.LogoURL}}"
-				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
-				}
-				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-				expectTemplateQueries(queries, givenTemplate)
-				commands.EXPECT().NotificationSent(gomock.Any(), gomock.Any(), notificationID, instanceID).Return(nil)
-				commands.EXPECT().InviteCodeSent(gomock.Any(), orgID, userID).Return(nil)
-				return fieldsWorker{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-						}),
-						userDataCrypto: codeAlg,
-						now:            testNow,
-						maxAttempts:    3,
-					},
-					argsWorker{
-						event: &notification.RetryRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().Add(-2 * time.Second),
-								Typ:           notification.RequestedType,
-								Seq:           2,
-							}),
-							Request: notification.Request{
-								UserID:                        userID,
-								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
-								TriggeredAtOrigin:             eventOrigin,
-								EventType:                     user.HumanInviteCodeAddedType,
-								MessageType:                   domain.InviteUserMessageType,
-								NotificationType:              domain.NotificationTypeEmail,
-								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-								CodeExpiry:                    1 * time.Hour,
-								Code:                          code,
-								UnverifiedNotificationChannel: true,
-								IsOTP:                         false,
-								RequiresPreviousDomain:        false,
-								Args: &domain.NotificationArguments{
-									ApplicationName: "APP",
-								},
-							},
-							BackOff: 1 * time.Second,
-							NotifyUser: &query.NotifyUser{
-								ID:                 userID,
-								ResourceOwner:      orgID,
-								LastEmail:          lastEmail,
-								VerifiedEmail:      verifiedEmail,
-								PreferredLoginName: preferredLoginName,
-								LastPhone:          lastPhone,
-								VerifiedPhone:      verifiedPhone,
-							},
-						},
-					}, w
-			},
-		},
-		{
-			name: "send failed, retry",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-				givenTemplate := "{{.LogoURL}}"
-				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
-				}
-				w.sendError = sendError
-				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-				expectTemplateQueries(queries, givenTemplate)
-				commands.EXPECT().NotificationRetryRequested(gomock.Any(), gomock.Any(), notificationID, instanceID,
-					&command.NotificationRetryRequest{
-						NotificationRequest: command.NotificationRequest{
-							UserID:                        userID,
-							UserResourceOwner:             orgID,
-							AggregateID:                   "",
-							AggregateResourceOwner:        "",
-							TriggerOrigin:                 eventOrigin,
-							EventType:                     user.HumanInviteCodeAddedType,
-							MessageType:                   domain.InviteUserMessageType,
-							NotificationType:              domain.NotificationTypeEmail,
-							URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-							CodeExpiry:                    1 * time.Hour,
-							Code:                          code,
-							UnverifiedNotificationChannel: true,
-							IsOTP:                         false,
-							RequiresPreviousDomain:        false,
-							Args: &domain.NotificationArguments{
-								ApplicationName: "APP",
-							},
-						},
-						BackOff: 1 * time.Second,
-						NotifyUser: &query.NotifyUser{
-							ID:                 userID,
-							ResourceOwner:      orgID,
-							LastEmail:          lastEmail,
-							VerifiedEmail:      verifiedEmail,
-							PreferredLoginName: preferredLoginName,
-							LastPhone:          lastPhone,
-							VerifiedPhone:      verifiedPhone,
-						},
-					},
-					sendError,
-				).Return(nil)
+				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -678,23 +355,20 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 						userDataCrypto: codeAlg,
 						now:            testNow,
 						backOff:        testBackOff,
-						maxAttempts:    3,
 					},
 					argsWorker{
-						event: &notification.RetryRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().Add(-2 * time.Second),
-								Typ:           notification.RequestedType,
-								Seq:           2,
-							}),
-							Request: notification.Request{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								CreatedAt: time.Now(),
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            userID,
+									ResourceOwner: orgID,
+								},
 								UserID:                        userID,
 								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
 								TriggeredAtOrigin:             eventOrigin,
 								EventType:                     user.HumanInviteCodeAddedType,
 								MessageType:                   domain.InviteUserMessageType,
@@ -709,86 +383,9 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 									ApplicationName: "APP",
 								},
 							},
-							BackOff: 1 * time.Second,
-							NotifyUser: &query.NotifyUser{
-								ID:                 userID,
-								ResourceOwner:      orgID,
-								LastEmail:          lastEmail,
-								VerifiedEmail:      verifiedEmail,
-								PreferredLoginName: preferredLoginName,
-								LastPhone:          lastPhone,
-								VerifiedPhone:      verifiedPhone,
-							},
 						},
-					}, w
-			},
-		},
-		{
-			name: "send failed (max attempts), cancel",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-				givenTemplate := "{{.LogoURL}}"
-				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-				w.message = &messages.Email{
-					Recipients: []string{lastEmail},
-					Subject:    "Invitation to APP",
-					Content:    expectContent,
-				}
-				w.sendError = sendError
-				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-				expectTemplateQueries(queries, givenTemplate)
-				commands.EXPECT().NotificationCanceled(gomock.Any(), gomock.Any(), notificationID, instanceID, sendError).Return(nil)
-				return fieldsWorker{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-						}),
-						userDataCrypto: codeAlg,
-						now:            testNow,
-						backOff:        testBackOff,
-						maxAttempts:    2,
 					},
-					argsWorker{
-						event: &notification.RetryRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   notificationID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().Add(-2 * time.Second),
-								Seq:           2,
-								Typ:           notification.RequestedType,
-							}),
-							Request: notification.Request{
-								UserID:                        userID,
-								UserResourceOwner:             orgID,
-								AggregateID:                   "",
-								AggregateResourceOwner:        "",
-								TriggeredAtOrigin:             eventOrigin,
-								EventType:                     user.HumanInviteCodeAddedType,
-								MessageType:                   domain.InviteUserMessageType,
-								NotificationType:              domain.NotificationTypeEmail,
-								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-								CodeExpiry:                    1 * time.Hour,
-								Code:                          code,
-								UnverifiedNotificationChannel: true,
-								IsOTP:                         false,
-								RequiresPreviousDomain:        false,
-								Args: &domain.NotificationArguments{
-									ApplicationName: "APP",
-								},
-							},
-							BackOff: 1 * time.Second,
-							NotifyUser: &query.NotifyUser{
-								ID:                 userID,
-								ResourceOwner:      orgID,
-								LastEmail:          lastEmail,
-								VerifiedEmail:      verifiedEmail,
-								PreferredLoginName: preferredLoginName,
-								LastPhone:          lastPhone,
-								VerifiedPhone:      verifiedPhone,
-							},
-						},
-					}, w
+					w
 			},
 		},
 	}
@@ -798,11 +395,9 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRetry(
+			err := newNotificationWorker(t, ctrl, queries, f, w).Work(
 				authz.WithInstanceID(context.Background(), instanceID),
-				authz.WithInstanceID(context.Background(), instanceID),
-				&sql.Tx{},
-				a.event.(*notification.RetryRequestedEvent),
+				a.job,
 			)
 			if w.err != nil {
 				w.err(t, err)
@@ -813,22 +408,18 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 	}
 }
 
-func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fieldsWorker, a argsWorker, w wantWorker) *NotificationWorker {
+func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fieldsWorker, w wantWorker) *NotificationWorker {
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
-	if w.err == nil {
-		if w.message != nil {
-			w.message.TriggeringEvent = a.event
-			channel.EXPECT().HandleMessage(w.message).Return(w.sendError)
-		}
-		if w.messageSMS != nil {
-			w.messageSMS.TriggeringEvent = a.event
-			channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
-				message.VerificationID = gu.Ptr(verificationID)
-				return w.sendError
-			})
-		}
+	if w.message != nil {
+		channel.EXPECT().HandleMessage(w.message).Return(w.sendError)
+	}
+	if w.messageSMS != nil {
+		channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
+			message.VerificationID = gu.Ptr(verificationID)
+			return w.sendError
+		})
 	}
 	return &NotificationWorker{
 		commands: f.commands,
@@ -878,88 +469,9 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 		},
 		config: WorkerConfig{
 			Workers:             1,
-			BulkLimit:           10,
-			RequeueEvery:        2 * time.Second,
 			TransactionDuration: 5 * time.Second,
-			MaxAttempts:         f.maxAttempts,
 			MaxTtl:              5 * time.Minute,
-			MinRetryDelay:       1 * time.Second,
-			MaxRetryDelay:       10 * time.Second,
-			RetryDelayFactor:    2,
 		},
-		now:     f.now,
-		backOff: f.backOff,
-	}
-}
-
-func TestNotificationWorker_exponentialBackOff(t *testing.T) {
-	type fields struct {
-		config WorkerConfig
-	}
-	type args struct {
-		current time.Duration
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantMin time.Duration
-		wantMax time.Duration
-	}{
-		{
-			name: "less than min, min - 1.5*min",
-			fields: fields{
-				config: WorkerConfig{
-					MinRetryDelay:    1 * time.Second,
-					MaxRetryDelay:    5 * time.Second,
-					RetryDelayFactor: 1.5,
-				},
-			},
-			args: args{
-				current: 0,
-			},
-			wantMin: 1000 * time.Millisecond,
-			wantMax: 1500 * time.Millisecond,
-		},
-		{
-			name: "current, 1.5*current - max",
-			fields: fields{
-				config: WorkerConfig{
-					MinRetryDelay:    1 * time.Second,
-					MaxRetryDelay:    5 * time.Second,
-					RetryDelayFactor: 1.5,
-				},
-			},
-			args: args{
-				current: 4 * time.Second,
-			},
-			wantMin: 4000 * time.Millisecond,
-			wantMax: 5000 * time.Millisecond,
-		},
-		{
-			name: "max, max",
-			fields: fields{
-				config: WorkerConfig{
-					MinRetryDelay:    1 * time.Second,
-					MaxRetryDelay:    5 * time.Second,
-					RetryDelayFactor: 1.5,
-				},
-			},
-			args: args{
-				current: 5 * time.Second,
-			},
-			wantMin: 5000 * time.Millisecond,
-			wantMax: 5000 * time.Millisecond,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			w := &NotificationWorker{
-				config: tt.fields.config,
-			}
-			b := w.exponentialBackOff(tt.args.current)
-			assert.GreaterOrEqual(t, b, tt.wantMin)
-			assert.LessOrEqual(t, b, tt.wantMax)
-		})
+		now: f.now,
 	}
 }

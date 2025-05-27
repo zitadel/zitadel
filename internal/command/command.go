@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -79,6 +81,7 @@ type Commands struct {
 	publicKeyLifetime       time.Duration
 	certificateLifetime     time.Duration
 	defaultSecretGenerators *SecretGenerators
+	maxIdPIntentLifetime    time.Duration
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	webKeyGenerator                func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
@@ -150,6 +153,7 @@ func StartCommands(
 		privateKeyLifetime:              defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:               defaults.KeyConfig.PublicKeyLifetime,
 		certificateLifetime:             defaults.KeyConfig.CertificateLifetime,
+		maxIdPIntentLifetime:            defaults.MaxIdPIntentLifetime,
 		idpConfigEncryption:             idpConfigEncryption,
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
@@ -177,13 +181,18 @@ func StartCommands(
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
 		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
-		// always true for now until we can check with an eventlist
-		EventExisting: func(event string) bool { return true },
-		// always true for now until we can check with an eventlist
-		EventGroupExisting:     func(group string) bool { return true },
+		EventExisting: func(value string) bool {
+			return slices.Contains(es.EventTypes(), value)
+		},
+		EventGroupExisting: func(group string) bool {
+			return slices.ContainsFunc(es.EventTypes(), func(value string) bool {
+				return strings.HasPrefix(value, group)
+			},
+			)
+		},
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
-		ActionFunctionExisting: domain.FunctionExists(),
+		ActionFunctionExisting: domain.ActionFunctionExists(),
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
 				CryptoMFA: otpEncryption,

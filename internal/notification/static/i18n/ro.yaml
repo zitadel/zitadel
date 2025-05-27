@@ -1,0 +1,68 @@
+InitCode:
+  Title: Inițializare Utilizator
+  PreHeader: Inițializare Utilizator
+  Subject: Inițializare Utilizator
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: Acest utilizator a fost creat. Folosiți numele de utilizator {{.PreferredLoginName}} pentru a vă autentifica. Vă rugăm să dați clic pe butonul de mai jos pentru a finaliza procesul de inițializare. (Cod {{.Code}}) Dacă nu ați solicitat acest e-mail, vă rugăm să îl ignorați.
+  ButtonText: Finalizare inițializare
+PasswordReset:
+  Title: Resetare parolă
+  PreHeader: Resetare parolă
+  Subject: Resetare parolă
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: Am primit o cerere de resetare a parolei. Vă rugăm să folosiți butonul de mai jos pentru a vă reseta parola. (Cod {{.Code}}) Dacă nu ați solicitat acest e-mail, vă rugăm să îl ignorați.
+  ButtonText: Resetare parolă
+VerifyEmail:
+  Title: Verificare e-mail
+  PreHeader: Verificare e-mail
+  Subject: Verificare e-mail
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: A fost adăugat un e-mail nou. Vă rugăm să folosiți butonul de mai jos pentru a vă verifica e-mailul. (Cod {{.Code}}) Dacă nu ați adăugat un e-mail nou, vă rugăm să ignorați acest e-mail.
+  ButtonText: Verificare e-mail
+VerifyPhone:
+  Title: Verificare telefon
+  PreHeader: Verificare telefon
+  Subject: Verificare telefon
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: "A fost adăugat un număr de telefon nou. Vă rugăm să folosiți următorul cod pentru a-l verifica: {{.Code}}"
+  ButtonText: Verificare telefon
+VerifyEmailOTP:
+  Title: Verificare parolă unică
+  PreHeader: Verificare parolă unică
+  Subject: Verificare parolă unică
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: Vă rugăm să folosiți parola unică {{.OTP}} pentru a vă autentifica în următoarele cinci minute sau dați clic pe butonul "Autentificare".
+  ButtonText: Autentificare
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} este parola dvs. unică pentru {{ .Domain }}. Folosiți-o în următoarele {{.Expiry}}.
+
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domeniul a fost revendicat
+  PreHeader: Schimbare e-mail / nume de utilizator
+  Subject: Domeniul a fost revendicat
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: Domeniul {{.Domain}} a fost revendicat de o organizație. Utilizatorul dvs. actual {{.Username}} nu face parte din această organizație. Prin urmare, va trebui să vă schimbați e-mailul când vă autentificați. Am creat un nume de utilizator temporar ({{.TempUsername}}) pentru această autentificare.
+  ButtonText: Autentificare
+PasswordlessRegistration:
+  Title: Adăugare autentificare fără parolă
+  PreHeader: Adăugare autentificare fără parolă
+  Subject: Adăugare autentificare fără parolă
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: Am primit o cerere de adăugare a unui token pentru autentificare fără parolă. Vă rugăm să folosiți butonul de mai jos pentru a adăuga token-ul sau dispozitivul pentru autentificare fără parolă.
+  ButtonText: Adăugare autentificare fără parolă
+PasswordChange:
+  Title: Parola utilizatorului a fost schimbată
+  PreHeader: Schimbare parolă
+  Subject: Parola utilizatorului a fost schimbată
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: Parola utilizatorului dvs. a fost schimbată. Dacă această modificare nu a fost făcută de dvs., vă recomandăm să vă resetați imediat parola.
+  ButtonText: Autentificare
+InviteUser:
+  Title: Invitație la {{.ApplicationName}}
+  PreHeader: Invitație la {{.ApplicationName}}
+  Subject: Invitație la {{.ApplicationName}}
+  Greeting: Bună ziua, {{.DisplayName}},
+  Text: Utilizatorul dvs. a fost invitat la {{.ApplicationName}}. Vă rugăm să dați clic pe butonul de mai jos pentru a finaliza procesul de invitație. Dacă nu ați solicitat acest e-mail, vă rugăm să îl ignorați.
+  ButtonText: Acceptare invitație

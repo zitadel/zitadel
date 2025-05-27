@@ -1,9 +1,8 @@
 <div class="main-container">
-  <ng-container *ngIf="(authService.userSubject | async) || {} as user">
+  <ng-container *ngIf="authService.user | async as user">
     <cnsl-header
-      *ngIf="user && user !== {}"
       [org]="org"
-      [user]="$any(user)"
+      [user]="user"
       [isDarkTheme]="componentCssClass === 'dark-theme'"
       (changedActiveOrg)="changedOrg($event)"
     ></cnsl-header>
@@ -12,9 +11,8 @@
       id="mainnav"
       class="nav"
       [ngClass]="{ shadow: yoffset > 60 }"
-      *ngIf="user && user !== {}"
       [org]="org"
-      [user]="$any(user)"
+      [user]="user"
       [isDarkTheme]="componentCssClass === 'dark-theme'"
     ></cnsl-nav>
   </ng-container>

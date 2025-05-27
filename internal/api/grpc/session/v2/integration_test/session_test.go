@@ -21,6 +21,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -339,10 +340,9 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactorUserVerified)
 }
 
-/*
 func TestServer_CreateSession_successfulIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
-	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
 				Search: &session.CheckUser_UserId{
@@ -354,8 +354,9 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 
-	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
-	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
+	require.NoError(t, err)
+	updateResp, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
 		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
 			IdpIntent: &session.CheckIDPIntent{
@@ -369,9 +370,10 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
-	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
+	require.NoError(t, err)
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -390,11 +392,11 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
 	// successful intent without known / linked user
 	idpUserID := "id"
-	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, idpUserID, "", time.Now().Add(time.Hour))
 
 	// link the user (with info from intent)
 	Instance.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
@@ -418,7 +420,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -432,19 +434,92 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 
-	intentID := Instance.CreateIntent(t, CTX, idpID)
+	intent := Instance.CreateIntent(CTX, idpID)
 	_, err = Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
 			IdpIntent: &session.CheckIDPIntent{
-				IdpIntentId:    intentID,
+				IdpIntentId:    intent.GetIdpIntent().GetIdpIntentId(),
 				IdpIntentToken: "false",
 			},
 		},
 	})
 	require.Error(t, err)
 }
-*/
+
+func TestServer_CreateSession_reuseIntent(t *testing.T) {
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
+	require.NoError(t, err)
+	updateResp, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
+		SessionId: createResp.GetSessionId(),
+		Checks: &session.Checks{
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
+
+	// the reuse of the intent token is not allowed, not even on the same session
+	session2, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
+		SessionId: createResp.GetSessionId(),
+		Checks: &session.Checks{
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
+			},
+		},
+	})
+	require.Error(t, err)
+	_ = session2
+}
+
+func TestServer_CreateSession_expiredIntent(t *testing.T) {
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Second))
+	require.NoError(t, err)
+
+	// wait for the intent to expire
+	time.Sleep(2 * time.Second)
+
+	_, err = Client.SetSession(LoginCTX, &session.SetSessionRequest{
+		SessionId: createResp.GetSessionId(),
+		Checks: &session.Checks{
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
+			},
+		},
+	})
+	require.Error(t, err)
+}
 
 func registerTOTP(ctx context.Context, t *testing.T, userID string) (secret string) {
 	resp, err := Instance.Client.UserV2.RegisterTOTP(ctx, &user.RegisterTOTPRequest{

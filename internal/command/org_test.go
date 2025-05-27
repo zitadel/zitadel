@@ -1264,10 +1264,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 					),
 					expectPush(
@@ -1342,6 +1342,22 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 			res: res{
 				err: zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "org id empty, error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: " ",
+				},
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "ORG-4ABd3", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -1520,6 +1536,45 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							ID: "userID",
 						},
 					},
+				},
+			},
+		},
+		{
+			name: "no human added, custom org ID",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectPush(
+						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"Org",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate, "org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+					),
+				),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: "custom-org-ID",
+				},
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "custom-org-ID",
+					},
+					CreatedAdmins: []*CreatedOrgAdmin{},
 				},
 			},
 		},

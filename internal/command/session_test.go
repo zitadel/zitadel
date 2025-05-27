@@ -695,6 +695,7 @@ func TestCommands_updateSession(t *testing.T) {
 								"userID2",
 								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -758,6 +759,111 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 		},
 		{
+			"set user, intent token already consumed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"userID",
+								nil,
+								"",
+								time.Now().Add(time.Hour),
+							),
+						),
+						eventFromEventPusher(
+							idpintent.NewConsumedEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded"),
+			},
+		},
+		{
+			"set user, intent token already expired",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"userID",
+								nil,
+								"",
+								time.Now().Add(-time.Hour),
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAf42", "Errors.Intent.Expired"),
+			},
+		},
+		{
 			"set user, intent, metadata and token",
 			fields{
 				eventstore: expectEventstore(
@@ -768,13 +874,14 @@ func TestCommands_updateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							idpintent.NewSucceededEvent(context.Background(),
-								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
 								nil,
 								"idpUserID",
 								"idpUsername",
 								"userID",
 								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -783,6 +890,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate),
 						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							map[string][]byte{"key": []byte("value")}),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -837,17 +945,19 @@ func TestCommands_updateSession(t *testing.T) {
 								nil,
 								nil,
 								"idpID",
+								nil,
 							),
 						),
 						eventFromEventPusher(
 							idpintent.NewSucceededEvent(context.Background(),
-								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
 								nil,
 								"idpUserID",
 								"idpUsername",
 								"",
 								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -865,6 +975,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID"),
 					),

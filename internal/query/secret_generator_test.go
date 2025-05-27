@@ -26,8 +26,7 @@ var (
 		` projections.secret_generators2.include_upper_letters,` +
 		` projections.secret_generators2.include_digits,` +
 		` projections.secret_generators2.include_symbols` +
-		` FROM projections.secret_generators2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.secret_generators2`
 	prepareSecretGeneratorCols = []string{
 		"aggregate_id",
 		"generator_type",
@@ -55,8 +54,7 @@ var (
 		` projections.secret_generators2.include_digits,` +
 		` projections.secret_generators2.include_symbols,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.secret_generators2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.secret_generators2`
 	prepareSecretGeneratorsCols = []string{
 		"aggregate_id",
 		"generator_type",
@@ -312,7 +310,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

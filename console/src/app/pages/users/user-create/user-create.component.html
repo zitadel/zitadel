@@ -1,13 +1,20 @@
+<cnsl-user-create-v2 *ngIf="(useV2Api$ | async) === true" />
 <cnsl-create-layout
+  *ngIf="(useV2Api$ | async) === false"
   title="{{ 'USER.CREATE.TITLE' | translate }}"
   [createSteps]="1"
   [currentCreateStep]="1"
-  (closed)="close()"
+  (closed)="location.back()"
 >
   <div class="user-create-main-content">
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-    <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="user-create-form">
+    <form
+      *ngIf="pwdForm$ | async as pwdForm"
+      [formGroup]="userForm"
+      (ngSubmit)="createUser(pwdForm)"
+      class="user-create-form"
+    >
       <div class="user-create-content">
         <p class="user-create-section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
 
@@ -19,12 +26,13 @@
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
             <input
+              *ngIf="suffixPadding$ | async as suffixPadding"
               cnslInput
               formControlName="userName"
               required
-              [ngStyle]="{ 'padding-right': suffixPadding ? suffixPadding : '10px' }"
+              [ngStyle]="{ 'padding-right': suffixPadding }"
             />
-            <span #suffix *ngIf="envSuffix" cnslSuffix>{{ envSuffix }}</span>
+            <span #suffix *ngIf="envSuffix$ | async as envSuffix" cnslSuffix>{{ envSuffix }}</span>
           </cnsl-form-field>
 
           <cnsl-form-field>
@@ -42,7 +50,7 @@
         </div>
 
         <div class="email-is-verified">
-          <mat-checkbox class="block-checkbox" formControlName="isVerified">
+          <mat-checkbox class="block-checkbox" formControlName="emailVerified">
             {{ 'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate }}
           </mat-checkbox>
           <mat-checkbox class="block-checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{ standalone: true }">
@@ -53,17 +61,21 @@
           </cnsl-info-section>
         </div>
 
-        <div class="pwd-section" *ngIf="usePassword && pwdForm">
-          <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy" [password]="password">
+        <div class="pwd-section" *ngIf="usePassword && (passwordComplexityPolicy$ | async) as passwordComplexityPolicy">
+          <cnsl-password-complexity-view
+            class="complexity-view"
+            [policy]="passwordComplexityPolicy"
+            [password]="pwdForm.controls.password"
+          >
           </cnsl-password-complexity-view>
 
           <form [formGroup]="pwdForm">
             <div class="user-create-grid">
-              <cnsl-form-field *ngIf="password">
+              <cnsl-form-field>
                 <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
                 <input cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
               </cnsl-form-field>
-              <cnsl-form-field *ngIf="confirmPassword">
+              <cnsl-form-field>
                 <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
                 <input
                   cnslInput

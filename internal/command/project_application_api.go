@@ -78,11 +78,10 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	if existingAPI.State != domain.AppStateUnspecified {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Project.App.AlreadyExisting")
 	}
-	_, err = c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-9fnsa", "Errors.Project.NotFound")
-	}
 
+	if _, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
+		return nil, err
+	}
 	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
 }
 
@@ -90,11 +89,10 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 	if apiApp == nil || apiApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Project.App.Invalid")
 	}
-	_, err = c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
-	}
 
+	if _, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
+		return nil, err
+	}
 	if !apiApp.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.App.Invalid")
 	}

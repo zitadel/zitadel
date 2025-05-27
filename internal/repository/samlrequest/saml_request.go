@@ -19,14 +19,15 @@ const (
 type AddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	LoginClient   string `json:"login_client,omitempty"`
-	ApplicationID string `json:"application_id,omitempty"`
-	ACSURL        string `json:"acs_url,omitempty"`
-	RelayState    string `json:"relay_state,omitempty"`
-	RequestID     string `json:"request_id,omitempty"`
-	Binding       string `json:"binding,omitempty"`
-	Issuer        string `json:"issuer,omitempty"`
-	Destination   string `json:"destination,omitempty"`
+	LoginClient    string `json:"login_client,omitempty"`
+	ApplicationID  string `json:"application_id,omitempty"`
+	ACSURL         string `json:"acs_url,omitempty"`
+	RelayState     string `json:"relay_state,omitempty"`
+	RequestID      string `json:"request_id,omitempty"`
+	Binding        string `json:"binding,omitempty"`
+	Issuer         string `json:"issuer,omitempty"`
+	Destination    string `json:"destination,omitempty"`
+	ResponseIssuer string `json:"response_issuer,omitempty"`
 }
 
 func (e *AddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -51,6 +52,7 @@ func NewAddedEvent(ctx context.Context,
 	binding string,
 	issuer string,
 	destination string,
+	responseIssuer string,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -58,14 +60,15 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
-		LoginClient:   loginClient,
-		ApplicationID: applicationID,
-		ACSURL:        acsURL,
-		RelayState:    relayState,
-		RequestID:     requestID,
-		Binding:       binding,
-		Issuer:        issuer,
-		Destination:   destination,
+		LoginClient:    loginClient,
+		ApplicationID:  applicationID,
+		ACSURL:         acsURL,
+		RelayState:     relayState,
+		RequestID:      requestID,
+		Binding:        binding,
+		Issuer:         issuer,
+		Destination:    destination,
+		ResponseIssuer: responseIssuer,
 	}
 }
 

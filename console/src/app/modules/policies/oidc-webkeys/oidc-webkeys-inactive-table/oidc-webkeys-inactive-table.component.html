@@ -1,0 +1,40 @@
+<cnsl-card
+  [title]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.TITLE' | translate"
+  [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DESCRIPTION' | translate"
+>
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="(dataSource$ | async) === null">
+    <div class="table-wrapper">
+      <table
+        *ngIf="dataSource$ | async as dataSource"
+        mat-table
+        class="table"
+        aria-label="Elements"
+        [dataSource]="dataSource"
+      >
+        <ng-container matColumnDef="timestamp">
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DEACTIVATED_ON' | translate }}
+          </th>
+          <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+            {{ row.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>{{ 'APP.PAGES.ID' | translate }}</th>
+          <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+            {{ row.id }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.TYPE.TITLE' | translate }}</th>
+          <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+            {{ row.key.case | uppercase }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['timestamp', 'id', 'type']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['timestamp', 'id', 'type']"></tr>
+      </table>
+    </div>
+  </cnsl-refresh-table>
+</cnsl-card>

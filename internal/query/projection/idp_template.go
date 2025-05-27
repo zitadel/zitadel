@@ -70,6 +70,7 @@ const (
 	OAuthUserEndpointCol          = "user_endpoint"
 	OAuthScopesCol                = "scopes"
 	OAuthIDAttributeCol           = "id_attribute"
+	OAuthUsePKCECol               = "use_pkce"
 
 	OIDCIDCol             = "idp_id"
 	OIDCInstanceIDCol     = "instance_id"
@@ -78,6 +79,7 @@ const (
 	OIDCClientSecretCol   = "client_secret"
 	OIDCScopesCol         = "scopes"
 	OIDCIDTokenMappingCol = "id_token_mapping"
+	OIDCUsePKCECol        = "use_pkce"
 
 	JWTIDCol           = "idp_id"
 	JWTInstanceIDCol   = "instance_id"
@@ -139,6 +141,7 @@ const (
 	LDAPUserObjectClassesCol          = "user_object_classes"
 	LDAPUserFiltersCol                = "user_filters"
 	LDAPTimeoutCol                    = "timeout"
+	LDAPRootCACol                     = "root_ca"
 	LDAPIDAttributeCol                = "id_attribute"
 	LDAPFirstNameAttributeCol         = "first_name_attribute"
 	LDAPLastNameAttributeCol          = "last_name_attribute"
@@ -170,6 +173,7 @@ const (
 	SAMLWithSignedRequestCol          = "with_signed_request"
 	SAMLNameIDFormatCol               = "name_id_format"
 	SAMLTransientMappingAttributeName = "transient_mapping_attribute_name"
+	SAMLFederatedLogoutEnabled        = "federated_logout_enabled"
 )
 
 type idpTemplateProjection struct{}
@@ -216,6 +220,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(OAuthUserEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(OAuthScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(OAuthIDAttributeCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthUsePKCECol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(OAuthInstanceIDCol, OAuthIDCol),
 			IDPTemplateOAuthSuffix,
@@ -229,6 +234,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(OIDCClientSecretCol, handler.ColumnTypeJSONB),
 			handler.NewColumn(OIDCScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(OIDCIDTokenMappingCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(OIDCUsePKCECol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
 			IDPTemplateOIDCSuffix,
@@ -330,6 +336,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(LDAPUserObjectClassesCol, handler.ColumnTypeTextArray),
 			handler.NewColumn(LDAPUserFiltersCol, handler.ColumnTypeTextArray),
 			handler.NewColumn(LDAPTimeoutCol, handler.ColumnTypeInt64),
+			handler.NewColumn(LDAPRootCACol, handler.ColumnTypeBytes, handler.Nullable()),
 			handler.NewColumn(LDAPIDAttributeCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LDAPFirstNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LDAPLastNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
@@ -371,6 +378,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(SAMLWithSignedRequestCol, handler.ColumnTypeBool, handler.Nullable()),
 			handler.NewColumn(SAMLNameIDFormatCol, handler.ColumnTypeEnum, handler.Nullable()),
 			handler.NewColumn(SAMLTransientMappingAttributeName, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SAMLFederatedLogoutEnabled, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
 			IDPTemplateSAMLSuffix,
@@ -720,6 +728,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(OAuthUserEndpointCol, idpEvent.UserEndpoint),
 				handler.NewCol(OAuthScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OAuthIDAttributeCol, idpEvent.IDAttribute),
+				handler.NewCol(OAuthUsePKCECol, idpEvent.UsePKCE),
 			},
 			handler.WithTableSuffix(IDPTemplateOAuthSuffix),
 		),
@@ -811,6 +820,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
+				handler.NewCol(OIDCUsePKCECol, idpEvent.UsePKCE),
 			},
 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -1152,6 +1162,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, true),
+				handler.NewCol(OIDCUsePKCECol, false),
 			},
 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -1896,6 +1907,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(LDAPUserObjectClassesCol, database.TextArray[string](idpEvent.UserObjectClasses)),
 				handler.NewCol(LDAPUserFiltersCol, database.TextArray[string](idpEvent.UserFilters)),
 				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
+				handler.NewCol(LDAPRootCACol, idpEvent.RootCA),
 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
 				handler.NewCol(LDAPLastNameAttributeCol, idpEvent.LastNameAttribute),
@@ -1980,6 +1992,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 		handler.NewCol(SAMLBindingCol, idpEvent.Binding),
 		handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
 		handler.NewCol(SAMLTransientMappingAttributeName, idpEvent.TransientMappingAttributeName),
+		handler.NewCol(SAMLFederatedLogoutEnabled, idpEvent.FederatedLogoutEnabled),
 	}
 	if idpEvent.NameIDFormat != nil {
 		columns = append(columns, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
@@ -2250,6 +2263,9 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 	if idpEvent.IDAttribute != nil {
 		oauthCols = append(oauthCols, handler.NewCol(OAuthIDAttributeCol, *idpEvent.IDAttribute))
 	}
+	if idpEvent.UsePKCE != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthUsePKCECol, *idpEvent.UsePKCE))
+	}
 	return oauthCols
 }
 
@@ -2269,6 +2285,9 @@ func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.IsIDTokenMapping != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIDTokenMappingCol, *idpEvent.IsIDTokenMapping))
+	}
+	if idpEvent.UsePKCE != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCUsePKCECol, *idpEvent.UsePKCE))
 	}
 	return oidcCols
 }
@@ -2421,6 +2440,9 @@ func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Col
 	if idpEvent.Timeout != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPTimeoutCol, *idpEvent.Timeout))
 	}
+	if idpEvent.RootCA != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPRootCACol, idpEvent.RootCA))
+	}
 	if idpEvent.IDAttribute != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPIDAttributeCol, *idpEvent.IDAttribute))
 	}
@@ -2505,6 +2527,9 @@ func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.TransientMappingAttributeName != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLTransientMappingAttributeName, *idpEvent.TransientMappingAttributeName))
+	}
+	if idpEvent.FederatedLogoutEnabled != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLFederatedLogoutEnabled, *idpEvent.FederatedLogoutEnabled))
 	}
 	return SAMLCols
 }

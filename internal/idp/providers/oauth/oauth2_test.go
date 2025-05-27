@@ -18,6 +18,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		name         string
 		userEndpoint string
 		userMapper   func() idp.User
+		options      []ProviderOpts
 	}
 	tests := []struct {
 		name   string
@@ -25,7 +26,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		want   idp.Session
 	}{
 		{
-			name: "successful auth",
+			name: "successful auth without PKCE",
 			fields: fields{
 				config: &oauth2.Config{
 					ClientID:     "clientID",
@@ -40,14 +41,40 @@ func TestProvider_BeginAuth(t *testing.T) {
 			},
 			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
 		},
+		{
+			name: "successful auth with PKCE",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				options: []ProviderOpts{
+					WithLinkingAllowed(),
+					WithCreationAllowed(),
+					WithAutoCreation(),
+					WithAutoUpdate(),
+					WithRelyingPartyOption(rp.WithPKCE(nil)),
+				},
+			},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&code_challenge=2ZoH_a01aprzLkwVbjlPsBo4m8mJ_zOKkaDqYM7Oh5w&code_challenge_method=S256&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper)
+			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper, tt.fields.options...)
 			r.NoError(err)
+			provider.generateVerifier = func() string {
+				return "pkceOAuthVerifier"
+			}
 
 			ctx := context.Background()
 			session, err := provider.BeginAuth(ctx, "testState")

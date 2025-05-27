@@ -30,7 +30,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
   tags: [
@@ -117,6 +117,8 @@ service SystemService {
   }
 
   // Returns a list of ZITADEL instances
+  //
+  // Deprecated: Use [ListInstances](apis/resources/instance_service_v2/instance-service-list-instances.api.mdx) instead to list instances
   rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
     option (google.api.http) = {
       post: "/instances/_search"
@@ -126,9 +128,15 @@ service SystemService {
     option (zitadel.v1.auth_option) = {
       permission: "system.instance.read";
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
+    };
   }
 
   // Returns the detail of an instance
+  //
+  // Deprecated: Use [GetInstance](apis/resources/instance_service_v2/instance-service-get-instance.api.mdx) instead to get the details of the instance in context
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
     option (google.api.http) = {
       get: "/instances/{instance_id}";
@@ -136,6 +144,10 @@ service SystemService {
 
     option (zitadel.v1.auth_option) = {
       permission: "system.instance.read";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
     };
   }
 
@@ -151,9 +163,15 @@ service SystemService {
     option (zitadel.v1.auth_option) = {
       permission: "system.instance.write";
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
+    };
   }
 
   // Updates name of an existing instance
+  //
+  // Deprecated: Use [UpdateInstance](apis/resources/instance_service_v2/instance-service-update-instance.api.mdx) instead to update the name of the instance in context
   rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
     option (google.api.http) = {
       put: "/instances/{instance_id}"
@@ -162,6 +180,10 @@ service SystemService {
 
     option (zitadel.v1.auth_option) = {
       permission: "system.instance.write";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
     };
   }
 
@@ -180,6 +202,8 @@ service SystemService {
 
   // Removes an instance
   // This might take some time
+  //
+  // Deprecated: Use [DeleteInstance](apis/resources/instance_service_v2/instance-service-delete-instance.api.mdx) instead to delete an instance
   rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}"
@@ -187,6 +211,10 @@ service SystemService {
 
     option (zitadel.v1.auth_option) = {
       permission: "system.instance.delete";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
     };
   }
 
@@ -204,7 +232,9 @@ service SystemService {
     };
   }
 
-  //Checks if a domain exists
+  // Checks if a domain exists
+  //
+  // Deprecated: Use [ListCustomDomains](apis/resources/instance_service_v2/instance-service-list-custom-domains.api.mdx) instead to check existence of an instance
   rpc ExistsDomain(ExistsDomainRequest) returns (ExistsDomainResponse) {
     option (google.api.http) = {
       post: "/domains/{domain}/_exists";
@@ -214,10 +244,14 @@ service SystemService {
     option (zitadel.v1.auth_option) = {
       permission: "system.domain.read";
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
+    };
   }
 
   // Returns the custom domains of an instance
-  //Checks if a domain exists
+  // Checks if a domain exists
   // Deprecated: Use the Admin APIs ListInstanceDomains on the admin API instead
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
     option (google.api.http) = {
@@ -228,9 +262,15 @@ service SystemService {
     option (zitadel.v1.auth_option) = {
       permission: "system.domain.read";
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
+    };
   }
 
   // Adds a domain to an instance
+  //
+  // Deprecated: Use [AddCustomDomain](apis/resources/instance_service_v2/instance-service-add-custom-domain.api.mdx) instead to add a custom domain to the instance in context
   rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains";
@@ -240,9 +280,15 @@ service SystemService {
     option (zitadel.v1.auth_option) = {
       permission: "system.domain.write";
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
+    };
   }
 
   // Removes the domain of an instance
+  //
+  // Deprecated: Use [RemoveDomain](apis/resources/instance_service_v2/instance-service-remove-custom-domain.api.mdx) instead to remove a custom domain from the instance in context
   rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}/domains/{domain}";
@@ -250,6 +296,10 @@ service SystemService {
 
     option (zitadel.v1.auth_option) = {
       permission: "system.domain.delete";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        deprecated: true;
     };
   }
 
@@ -689,6 +739,7 @@ message ListIAMMembersRequest {
   zitadel.v1.ListQuery query = 1;
   string instance_id = 2;
   repeated zitadel.member.v1.SearchQuery queries = 3;
+  zitadel.member.v1.MemberFieldColumnName sorting_column = 4;
 }
 
 message ListIAMMembersResponse {

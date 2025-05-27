@@ -24,8 +24,17 @@ const (
 		` projections.device_auth_requests2.device_code,` +
 		` projections.device_auth_requests2.user_code,` +
 		` projections.device_auth_requests2.scopes,` +
-		` projections.device_auth_requests2.audience` +
-		` FROM projections.device_auth_requests2`
+		` projections.device_auth_requests2.audience,` +
+		` projections.apps7.name,` +
+		` projections.projects4.name` +
+		` FROM projections.device_auth_requests2` +
+		` LEFT JOIN projections.apps7_oidc_configs` +
+		` ON projections.device_auth_requests2.client_id = projections.apps7_oidc_configs.client_id` +
+		` AND projections.device_auth_requests2.instance_id = projections.apps7_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps7 ON projections.apps7_oidc_configs.app_id = projections.apps7.id` +
+		` AND projections.apps7_oidc_configs.instance_id = projections.apps7.instance_id` +
+		` LEFT JOIN projections.projects4 ON projections.apps7.project_id = projections.projects4.id` +
+		` AND projections.apps7.instance_id = projections.projects4.instance_id`
 	expectedDeviceAuthWhereUserCodeQueryC = expectedDeviceAuthQueryC +
 		` WHERE projections.device_auth_requests2.instance_id = $1` +
 		` AND projections.device_auth_requests2.user_code = $2`
@@ -40,13 +49,17 @@ var (
 		"user-code",
 		database.TextArray[string]{"a", "b", "c"},
 		[]string{"projectID", "clientID"},
+		"appName",
+		"projectName",
 	}
 	expectedDeviceAuth = &domain.AuthRequestDevice{
-		ClientID:   "client-id",
-		DeviceCode: "device1",
-		UserCode:   "user-code",
-		Scopes:     []string{"a", "b", "c"},
-		Audience:   []string{"projectID", "clientID"},
+		ClientID:    "client-id",
+		DeviceCode:  "device1",
+		UserCode:    "user-code",
+		Scopes:      []string{"a", "b", "c"},
+		Audience:    []string{"projectID", "clientID"},
+		AppName:     "appName",
+		ProjectName: "projectName",
 	}
 )
 
@@ -125,7 +138,7 @@ func Test_prepareDeviceAuthQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, prepareDeviceAuthQuery, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, prepareDeviceAuthQuery, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

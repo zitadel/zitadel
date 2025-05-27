@@ -18,13 +18,27 @@ var (
 type ConnectionConfig struct {
 	MaxOpenConns,
 	MaxIdleConns uint32
-	AfterConnect []func(ctx context.Context, c *pgx.Conn) error
+	AfterConnect  []func(ctx context.Context, c *pgx.Conn) error
+	BeforeAcquire []func(ctx context.Context, c *pgx.Conn) error
+	AfterRelease  []func(c *pgx.Conn) error
 }
 
 var afterConnectFuncs []func(ctx context.Context, c *pgx.Conn) error
 
 func RegisterAfterConnect(f func(ctx context.Context, c *pgx.Conn) error) {
 	afterConnectFuncs = append(afterConnectFuncs, f)
+}
+
+var beforeAcquireFuncs []func(ctx context.Context, c *pgx.Conn) error
+
+func RegisterBeforeAcquire(f func(ctx context.Context, c *pgx.Conn) error) {
+	beforeAcquireFuncs = append(beforeAcquireFuncs, f)
+}
+
+var afterReleaseFuncs []func(c *pgx.Conn) error
+
+func RegisterAfterRelease(f func(c *pgx.Conn) error) {
+	afterReleaseFuncs = append(afterReleaseFuncs, f)
 }
 
 func RegisterDefaultPgTypeVariants[T any](m *pgtype.Map, name, arrayName string) {
@@ -58,8 +72,10 @@ func RegisterDefaultPgTypeVariants[T any](m *pgtype.Map, name, arrayName string)
 // The pusherRatio and spoolerRatio must be between 0 and 1.
 func NewConnectionConfig(openConns, idleConns uint32) *ConnectionConfig {
 	return &ConnectionConfig{
-		MaxOpenConns: openConns,
-		MaxIdleConns: idleConns,
-		AfterConnect: afterConnectFuncs,
+		MaxOpenConns:  openConns,
+		MaxIdleConns:  idleConns,
+		AfterConnect:  afterConnectFuncs,
+		BeforeAcquire: beforeAcquireFuncs,
+		AfterRelease:  afterReleaseFuncs,
 	}
 }

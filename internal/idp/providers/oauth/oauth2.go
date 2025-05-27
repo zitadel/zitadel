@@ -18,11 +18,12 @@ type Provider struct {
 	options           []rp.Option
 	name              string
 	userEndpoint      string
-	userMapper        func() idp.User
+	user              func() idp.User
 	isLinkingAllowed  bool
 	isCreationAllowed bool
 	isAutoCreation    bool
 	isAutoUpdate      bool
+	generateVerifier  func() string
 }
 
 type ProviderOpts func(provider *Provider)
@@ -64,11 +65,12 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 }
 
 // New creates a generic OAuth 2.0 provider
-func New(config *oauth2.Config, name, userEndpoint string, userMapper func() idp.User, options ...ProviderOpts) (provider *Provider, err error) {
+func New(config *oauth2.Config, name, userEndpoint string, user func() idp.User, options ...ProviderOpts) (provider *Provider, err error) {
 	provider = &Provider{
-		name:         name,
-		userEndpoint: userEndpoint,
-		userMapper:   userMapper,
+		name:             name,
+		userEndpoint:     userEndpoint,
+		user:             user,
+		generateVerifier: oauth2.GenerateVerifier,
 	}
 	for _, option := range options {
 		option(provider)
@@ -99,8 +101,15 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 	if !loginHintSet {
 		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
 	}
+
+	var codeVerifier string
+	if p.RelyingParty.IsPKCE() {
+		codeVerifier = p.generateVerifier()
+		opts = append(opts, rp.WithCodeChallenge(oidc.NewSHACodeChallenge(codeVerifier)))
+	}
+
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
-	return &Session{AuthURL: url, Provider: p}, nil
+	return &Session{AuthURL: url, Provider: p, CodeVerifier: codeVerifier}, nil
 }
 
 func loginHint(hint string) rp.AuthURLOpt {
@@ -127,4 +136,8 @@ func (p *Provider) IsAutoCreation() bool {
 // IsAutoUpdate implements the [idp.Provider] interface.
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
+}
+
+func (p *Provider) User() idp.User {
+	return p.user()
 }

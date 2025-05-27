@@ -21,7 +21,7 @@ type ReplaceCurrentSequencesIndex struct {
 }
 
 func (mig *ReplaceCurrentSequencesIndex) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(replaceCurrentSequencesIndex, "44", "")
+	statements, err := readStatements(replaceCurrentSequencesIndex, "44")
 	if err != nil {
 		return err
 	}

@@ -15,7 +15,7 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -29,7 +29,7 @@ import (
 type API struct {
 	port              uint16
 	grpcServer        *grpc.Server
-	verifier          internal_authz.APITokenVerifier
+	verifier          authz.APITokenVerifier
 	health            healthCheck
 	router            *mux.Router
 	hostHeaders       []string
@@ -72,8 +72,9 @@ func New(
 	port uint16,
 	router *mux.Router,
 	queries *query.Queries,
-	verifier internal_authz.APITokenVerifier,
-	authZ internal_authz.Config,
+	verifier authz.APITokenVerifier,
+	systemAuthz authz.Config,
+	authZ authz.Config,
 	tlsConfig *tls.Config,
 	externalDomain string,
 	hostHeaders []string,
@@ -89,7 +90,7 @@ func New(
 		hostHeaders:       hostHeaders,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService())
+	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService())
 	api.grpcGateway, err = server.CreateGateway(ctx, port, hostHeaders, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err

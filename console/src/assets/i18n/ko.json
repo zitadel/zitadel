@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "플로우",
         "DESCRIPTION": "인증 플로우를 선택하고 이 플로우 내의 특정 이벤트에서 작업을 트리거하세요."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, 개선된 새로운 버전이 출시되었습니다. 현재 버전은 여전히 접근할 수 있지만, 앞으로의 개발은 새로운 버전에 집중될 것이며, 결국 현재 버전을 대체할 것입니다."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "유휴 갱신 토큰",
           "DESCRIPTION": "유휴 갱신 토큰 수명은 갱신 토큰이 사용되지 않는 최대 기간을 의미합니다."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "ZITADEL 인스턴스의 토큰을 안전하게 서명하고 검증하기 위해 OIDC 웹 키를 관리하세요.",
+        "TABLE": {
+          "TITLE": "활성 및 예정된 웹 키",
+          "DESCRIPTION": "현재 활성화된 웹 키와 앞으로 활성화될 웹 키입니다. 새로운 키를 활성화하면 기존 키는 비활성화됩니다.",
+          "NOTE": "참고: JWKs OIDC 엔드포인트는 캐시 가능한 응답을 반환합니다 (기본값: 5분). 키를 너무 빨리 활성화하면 캐시 및 클라이언트에서 아직 사용할 수 없을 수 있습니다.",
+          "ACTIVATE": "다음 웹 키 활성화",
+          "ACTIVE": "현재 활성화됨",
+          "NEXT": "대기 중인 다음 키",
+          "FUTURE": "향후 사용 예정",
+          "WARNING": "웹 키가 5분 미만입니다."
+        },
+        "CREATE": {
+          "TITLE": "새 웹 키 생성",
+          "DESCRIPTION": "새 웹 키를 생성하면 목록에 추가됩니다. ZITADEL은 기본적으로 RSA2048 키와 SHA256 해시 알고리즘을 사용합니다.",
+          "KEY_TYPE": "키 유형",
+          "BITS": "비트",
+          "HASHER": "해시 알고리즘",
+          "CURVE": "곡선"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "이전 웹 키",
+          "DESCRIPTION": "더 이상 활성 상태가 아닌 이전 웹 키 목록입니다.",
+          "DEACTIVATED_ON": "비활성화된 날짜"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "다운로드",
     "APPLY": "적용"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "현재 베타 버전인 새로운 Actions V2를 사용하고 있습니다. 이전 버전 1은 여전히 사용 가능하지만, 향후 중단될 예정입니다. 문제나 피드백이 있으면 알려주세요.",
+    "EXECUTION": {
+      "TITLE": "작업",
+      "DESCRIPTION": "작업을 통해 API 요청, 이벤트 또는 특정 함수에 대한 응답으로 사용자 지정 코드를 실행할 수 있습니다. 이를 사용하여 Zitadel을 확장하고 워크플로를 자동화하며 다른 시스템과 통합합니다.",
+      "TYPES": {
+        "request": "요청",
+        "response": "응답",
+        "event": "이벤트",
+        "function": "함수"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "작업 생성",
+        "UPDATE_TITLE": "작업 업데이트",
+        "TYPE": {
+          "DESCRIPTION": "이 작업을 실행할 시점을 선택하십시오.",
+          "REQUEST": {
+            "TITLE": "요청",
+            "DESCRIPTION": "Zitadel 내에서 발생하는 요청. 이는 로그인 요청 호출과 같은 것일 수 있습니다."
+          },
+          "RESPONSE": {
+            "TITLE": "응답",
+            "DESCRIPTION": "Zitadel 내 요청으로부터의 응답. 사용자를 가져올 때 받는 응답을 생각해 보십시오."
+          },
+          "EVENTS": {
+            "TITLE": "이벤트",
+            "DESCRIPTION": "Zitadel 내에서 발생하는 이벤트. 이는 사용자 계정 생성, 로그인 성공 등 모든 것이 될 수 있습니다."
+          },
+          "FUNCTIONS": {
+            "TITLE": "함수",
+            "DESCRIPTION": "Zitadel 내에서 호출할 수 있는 함수입니다. 이는 이메일 전송부터 사용자 생성까지 모든 것이 될 수 있습니다."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "이 작업이 모든 요청, 특정 서비스(예: 사용자 관리) 또는 단일 요청(예: 사용자 생성)에 적용되는지 선택하십시오.",
+          "ALL": {
+            "TITLE": "모두",
+            "DESCRIPTION": "모든 요청에서 작업을 실행하려면 이것을 선택하십시오."
+          },
+          "ALL_EVENTS": "모든 이벤트에서 작업을 실행하려면 이 항목을 선택하세요",
+          "SELECT_SERVICE": {
+            "TITLE": "서비스 선택",
+            "DESCRIPTION": "작업에 대한 Zitadel 서비스를 선택하십시오."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "메서드 선택",
+            "DESCRIPTION": "특정 요청에서만 실행하려면 여기에서 선택하십시오.",
+            "NOTE": "메서드를 선택하지 않으면 선택한 서비스의 모든 요청에서 작업이 실행됩니다."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "함수 이름",
+            "DESCRIPTION": "실행할 함수를 선택하십시오."
+          },
+          "SELECT_GROUP": {
+            "TITLE": "그룹 설정",
+            "DESCRIPTION": "이벤트 그룹에서만 실행하려면 여기에서 그룹을 설정하십시오."
+          },
+          "SELECT_EVENT": {
+            "TITLE": "이벤트 선택",
+            "DESCRIPTION": "특정 이벤트에서만 실행하려면 여기에서 지정하십시오."
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "타겟을 실행하거나 다른 타겟과 동일한 조건으로 실행하도록 선택할 수 있습니다.",
+          "TARGET": {
+            "DESCRIPTION": "이 작업에 대해 실행할 타겟"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "실행 조건"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "조건",
+        "TYPE": "유형",
+        "TARGET": "타겟",
+        "CREATIONDATE": "생성 날짜"
+      }
+    },
+    "TARGET": {
+      "TITLE": "타겟",
+      "DESCRIPTION": "타겟은 작업에서 실행하려는 코드의 대상입니다. 여기에서 타겟을 생성하고 작업에 추가하십시오.",
+      "CREATE": {
+        "TITLE": "타겟 생성",
+        "DESCRIPTION": "Zitadel 외부에서 자체 타겟을 생성하십시오.",
+        "NAME": "이름",
+        "NAME_DESCRIPTION": "나중에 쉽게 식별할 수 있도록 타겟에 명확하고 설명적인 이름을 지정하십시오.",
+        "TYPE": "유형",
+        "TYPES": {
+          "restWebhook": "REST 웹훅",
+          "restCall": "REST 호출",
+          "restAsync": "REST 비동기"
+        },
+        "TYPES_DESCRIPTION": "Webhook, 호출은 상태 코드를 처리하지만 응답은 중요하지 않습니다\nCall, 호출은 상태 코드와 응답을 처리합니다\nAsync, 호출은 상태 코드나 응답을 처리하지 않지만 다른 대상과 병렬로 호출할 수 있습니다",
+        "ENDPOINT": "엔드포인트",
+        "ENDPOINT_DESCRIPTION": "코드가 호스팅되는 엔드포인트를 입력하십시오. 우리에게 액세스할 수 있는지 확인하십시오!",
+        "TIMEOUT": "시간 초과",
+        "TIMEOUT_DESCRIPTION": "타겟이 응답해야 하는 최대 시간을 설정하십시오. 시간이 더 오래 걸리면 요청을 중지합니다.",
+        "INTERRUPT_ON_ERROR": "오류 시 중단",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "타겟이 오류를 반환하면 모든 실행을 중지하십시오.",
+        "INTERRUPT_ON_ERROR_WARNING": "주의: “오류 시 중단” 기능은 실패 시 작업을 중단하며, 잠금 위험이 있습니다. 로그인/생성 차단을 방지하려면 비활성화된 상태로 테스트하세요.",
+        "AWAIT_RESPONSE": "응답 대기",
+        "AWAIT_RESPONSE_DESCRIPTION": "다른 작업을 수행하기 전에 응답을 기다립니다. 단일 작업에 여러 타겟을 사용하려는 경우 유용합니다."
+      },
+      "TABLE": {
+        "NAME": "이름",
+        "ENDPOINT": "엔드포인트",
+        "CREATIONDATE": "생성 날짜",
+        "REORDER": "재정렬"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "인스턴스와 모든 조직에 대한 제어 권한이 있습니다",
     "IAM_OWNER_VIEWER": "인스턴스와 모든 조직을 검토할 수 있는 권한이 있습니다",
@@ -509,14 +648,17 @@
     "IAM_USER_MANAGER": "사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "IAM_ADMIN_IMPERSONATOR": "모든 조직의 관리자와 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_END_USER_IMPERSONATOR": "모든 조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
+    "IAM_LOGIN_CLIENT": "로그인 클라이언트를 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
+    "ORG_SETTINGS_MANAGER": "조직 설정을 관리할 수 있는 권한이 있습니다",
     "ORG_USER_PERMISSION_EDITOR": "사용자 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_PERMISSION_EDITOR": "프로젝트 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_CREATOR": "자신의 프로젝트와 하위 설정을 생성할 수 있는 권한이 있습니다",
     "ORG_ADMIN_IMPERSONATOR": "조직의 관리자 및 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "ORG_END_USER_IMPERSONATOR": "조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
+    "ORG_USER_SELF_MANAGER": "자신의 사용자 계정을 관리할 수 있는 권한이 있습니다",
     "PROJECT_OWNER": "프로젝트에 대한 전체 권한이 있습니다",
     "PROJECT_OWNER_VIEWER": "프로젝트 전체를 검토할 수 있는 권한이 있습니다",
     "PROJECT_OWNER_GLOBAL": "프로젝트에 대한 전체 권한이 있습니다",
@@ -551,6 +693,7 @@
     "EMAIL": "이메일",
     "USERNAME": "사용자 이름",
     "ORGNAME": "조직 이름",
+    "ORGID": "조직 ID",
     "PRIMARYDOMAIN": "기본 도메인",
     "PROJECTNAME": "프로젝트 이름",
     "RESOURCEOWNER": "리소스 소유자",
@@ -787,7 +930,10 @@
       "PHONESECTION": "전화번호",
       "PASSWORDSECTION": "초기 비밀번호",
       "ADDRESSANDPHONESECTION": "전화번호",
-      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다."
+      "INITMAILDESCRIPTION": "두 옵션이 모두 선택된 경우 초기화 이메일이 전송되지 않습니다. 하나의 옵션만 선택된 경우 데이터 제공/확인을 위한 이메일이 전송됩니다.",
+      "SETUPAUTHENTICATIONLATER": "이 사용자의 인증을 나중에 설정하세요.",
+      "INVITATION": "인증 설정 및 이메일 확인을 위한 초대 이메일을 보내세요.",
+      "INITIALPASSWORD": "사용자에 대한 초기 비밀번호를 설정하세요."
     },
     "CODEDIALOG": {
       "TITLE": "전화번호 확인",
@@ -809,6 +955,9 @@
       "EMAIL": "이메일",
       "PHONE": "전화번호",
       "PHONE_HINT": "+ 기호 다음에 국가 코드를 입력하거나 드롭다운에서 국가를 선택한 후 전화번호를 입력하세요.",
+      "PHONE_VERIFIED": "전화번호 확인됨",
+      "SEND_SMS": "인증 SMS 보내기",
+      "SEND_EMAIL": "이메일 보내기",
       "USERNAME": "사용자 이름",
       "CHANGEUSERNAME": "수정",
       "CHANGEUSERNAME_TITLE": "사용자 이름 변경",
@@ -948,6 +1097,14 @@
       "4": "잠김",
       "5": "일시 중단됨",
       "6": "초기"
+    },
+    "STATEV2": {
+      "0": "알 수 없음",
+      "1": "활성",
+      "2": "비활성",
+      "3": "삭제됨",
+      "4": "잠김",
+      "5": "초기"
     },
     "SEARCH": {
       "ADDITIONAL": "로그인 이름 (현재 조직)",
@@ -1340,6 +1497,7 @@
       "BRANDING": "브랜딩",
       "PRIVACYPOLICY": "외부 링크",
       "OIDC": "OIDC 토큰 수명 및 만료",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "시크릿 생성기",
       "SECURITY": "보안 설정",
       "EVENTS": "이벤트",
@@ -1355,7 +1513,8 @@
       "APPEARANCE": "외형",
       "OTHER": "기타",
       "STORAGE": "저장소"
-    }
+    },
+    "BETA": "베타"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1385,7 +1544,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1476,6 +1636,16 @@
       "ACTIONS_DESCRIPTION": "액션 v2는 데이터 실행 및 대상을 관리할 수 있습니다. 플래그가 활성화되면 새 API 및 기능을 사용할 수 있습니다.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC 단일 V1 세션 종료",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "플래그가 활성화되면, `sid` 클레임이 있는 id_token을 사용하여 end_session 엔드포인트에서 로그인 UI의 단일 세션을 종료할 수 있습니다. 현재 동일한 사용자 에이전트(브라우저)에서 모든 세션이 로그인 UI에서 종료됩니다. Session API를 통해 관리된 세션은 이미 단일 세션 종료를 허용합니다.",
+      "DEBUGOIDCPARENTERROR": "디버그 OIDC 부모 오류",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "플래그가 활성화되면 OIDC 부모 오류가 콘솔에 기록됩니다.",
+      "DISABLEUSERTOKENEVENT": "사용자 토큰 이벤트 비활성화",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "백채널 로그아웃 활성화",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 클라이언트에게 알리는 데 사용할 수 있습니다.",
+      "PERMISSIONCHECKV2": "권한 확인 V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
+      "WEBKEY": "웹 키",
+      "WEBKEY_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
         "INHERITED": "상속",
         "ENABLED": "활성화됨",
@@ -1486,7 +1656,12 @@
         "ENABLED": "\"활성화됨\"은 상속되었습니다.",
         "DISABLED": "\"비활성화됨\"은 상속되었습니다."
       },
-      "RESET": "모두 상속으로 설정"
+      "RESET": "모두 상속으로 설정",
+      "CONSOLEUSEV2USERAPI": "콘솔에서 사용자 생성을 위해 V2 API를 사용하세요",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "이 플래그가 활성화되면 콘솔은 V2 사용자 API를 사용하여 새 사용자를 생성합니다. V2 API를 사용하면 새로 생성된 사용자는 초기 상태 없이 시작합니다.",
+      "LOGINV2": "로그인 V2",
+      "LOGINV2_DESCRIPTION": "이 옵션을 활성화하면 보안, 성능 및 사용자 정의 기능이 향상된 새로운 TypeScript 기반 로그인 UI가 활성화됩니다.",
+      "LOGINV2_BASEURI": "기본 URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1623,7 +1798,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "이메일 인증 완료",
@@ -1974,6 +2151,7 @@
       "ACTIVATE": "프로젝트 활성화",
       "DELETE": "프로젝트 삭제",
       "ORGNAME": "조직 이름",
+      "ORGID": "조직 ID",
       "ORGDOMAIN": "조직 도메인",
       "STATE": "상태",
       "TYPE": "유형",
@@ -2170,6 +2348,8 @@
     "REMOVE_WARN_DESCRIPTION": "ID 제공자를 제거하려고 합니다. 사용자가 선택할 수 있는 ID 제공자가 제거되며, 이미 등록된 사용자는 다시 로그인할 수 없습니다. 계속하시겠습니까?",
     "DELETE_SELECTION_TITLE": "ID 제공자 삭제",
     "DELETE_SELECTION_DESCRIPTION": "ID 제공자를 삭제하려고 합니다. 이 변경 사항은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?",
+    "FEDERATEDLOGOUTENABLED": "연합 로그아웃 활성화됨",
+    "FEDERATEDLOGOUTENABLED_DESC": "활성화되면 사용자가 ZITADEL에서 세션을 종료할 경우 IdP에서도 로그아웃됩니다.",
     "EMPTY": "사용 가능한 ID 제공자가 없습니다.",
     "OIDC": {
       "GENERAL": "일반 정보",
@@ -2212,7 +2392,9 @@
       "REMOVED": "성공적으로 제거되었습니다."
     },
     "ISIDTOKENMAPPING": "ID 토큰에서 매핑",
-    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다."
+    "ISIDTOKENMAPPING_DESC": "선택 시, 사용자 정보 엔드포인트가 아닌 ID 토큰에서 제공자 정보를 매핑합니다.",
+    "USEPKCE": "PKCE 사용",
+    "USEPKCE_DESC": "code_challenge 및 code_challenge_method 매개변수가 인증 요청에 포함되는지 여부를 결정합니다"
   },
   "MFA": {
     "LIST": {
@@ -2591,7 +2773,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "매니저 추가",

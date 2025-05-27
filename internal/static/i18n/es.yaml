@@ -536,6 +536,7 @@ Errors:
     StateMissing: Falta un parámetro de estado en la solicitud
     NotStarted: La intención no se ha iniciado o ya ha finalizado
     NotSucceeded: Intento fallido
+    Expired: La intención ha expirado
     TokenCreationFailed: Fallo en la creación del token
     InvalidToken: El token de la intención no es válido
     OtherUser: Destinado a otro usuario
@@ -543,6 +544,7 @@ Errors:
     AlreadyExists: Auth Request ya existe
     NotExisting: Auth Request no existe
     WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+    AlreadyHandled: Auth Request ya ha sido procesada
   OIDCSession:
     RefreshTokenInvalid: El token de refresco no es válido
     Token:
@@ -553,8 +555,12 @@ Errors:
     AlreadyExists: SAMLRequest ya existe
     NotExisting: SAMLRequest no existe
     WrongLoginClient: SAMLRequest creado por otro cliente de inicio de sesión
+    AlreadyHandled: SAMLRequest ya ha sido procesada
   SAMLSession:
     InvalidClient: SAMLResponse no ha sido emitido para este cliente
+  DeviceAuth:
+    NotFound: La solicitud de autorización del dispositivo no existe
+    AlreadyHandled: La solicitud de autorización del dispositivo ya ha sido procesada
   Feature:
     NotExisting: La característica no existe
     TypeNotSupported: El tipo de característica no es compatible

@@ -36,6 +36,7 @@ type WithGatewayPrefix interface {
 
 func CreateServer(
 	verifier authz.APITokenVerifier,
+	systemAuthz authz.Config,
 	authConfig authz.Config,
 	queries *query.Queries,
 	externalDomain string,
@@ -53,7 +54,7 @@ func CreateServer(
 				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.ErrorHandler(),
 				middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
-				middleware.AuthorizationInterceptor(verifier, authConfig),
+				middleware.AuthorizationInterceptor(verifier, systemAuthz, authConfig),
 				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
 				middleware.ExecutionHandler(queries),

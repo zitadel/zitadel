@@ -16,7 +16,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -151,7 +150,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	filter, query, scan := prepareInstancesQuery(ctx, q.client)
+	filter, query, scan := prepareInstancesQuery(queries.SortingColumn, queries.Asc)
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
@@ -178,7 +177,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareInstanceDomainQuery(ctx, q.client)
+	stmt, scan := prepareInstanceDomainQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -261,17 +260,20 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLang
 }
 
-func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
 	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
-	return sq.Select(
-			InstanceColumnID.identifier(),
-			countColumn.identifier(),
-		).Distinct().From(instanceTable.identifier()).
+
+	selector := sq.Select(InstanceColumnID.identifier(), countColumn.identifier())
+	if !sortBy.isZero() {
+		selector = sq.Select(InstanceColumnID.identifier(), countColumn.identifier(), sortBy.identifier())
+	}
+
+	return selector.Distinct().From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
-			return sq.Select(
+			outerQuery := sq.Select(
 				instanceFilterCountColumn,
 				instanceFilterIDColumn.identifier(),
 				InstanceColumnCreationDate.identifier(),
@@ -291,8 +293,18 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				InstanceDomainSequenceCol.identifier(),
 			).FromSelect(builder, InstancesFilterTableAlias).
 				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
-				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn) + db.Timetravel(call.Took(ctx))).
+				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
 				PlaceholderFormat(sq.Dollar)
+
+			if !sortBy.isZero() {
+				sorting := sortBy.identifier()
+				if !isAscedingSort {
+					sorting += " DESC"
+				}
+				return outerQuery.OrderBy(sorting)
+			}
+
+			return outerQuery
 		},
 		func(rows *sql.Rows) (*Instances, error) {
 			instances := make([]*Instance, 0)
@@ -366,7 +378,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -386,7 +398,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			InstanceDomainSequenceCol.identifier(),
 		).
 			From(instanceTable.identifier()).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{

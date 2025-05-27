@@ -1,0 +1,36 @@
+.target-description {
+  margin-bottom: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+
+  .fill-space {
+    font: 1;
+  }
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .mat-row:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.drag-row {
+  backdrop-filter: blur(10px);
+}

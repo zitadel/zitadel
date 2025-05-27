@@ -31,6 +31,7 @@ func addOrganizationRequestToCommand(request *org.AddOrganizationRequest) (*comm
 		Name:         request.GetName(),
 		CustomDomain: "",
 		Admins:       admins,
+		OrgID:        request.GetOrgId(),
 	}, nil
 }
 
@@ -57,6 +58,7 @@ func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admi
 		if err != nil {
 			return nil, err
 		}
+
 		return &command.OrgSetupAdmin{
 			Human: human,
 			Roles: admin.GetRoles(),

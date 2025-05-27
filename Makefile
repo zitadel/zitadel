@@ -8,10 +8,9 @@ COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
 GOCOVERDIR = tmp/coverage
-INTEGRATION_DB_FLAVOR ?= postgres
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
-export GOCOVERDIR INTEGRATION_DB_FLAVOR ZITADEL_MASTERKEY
+export GOCOVERDIR ZITADEL_MASTERKEY
 
 .PHONY: compile
 compile: core_build console_build compile_pipeline
@@ -113,7 +112,7 @@ core_unit_test:
 
 .PHONY: core_integration_db_up
 core_integration_db_up:
-	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait $${INTEGRATION_DB_FLAVOR} cache
+	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait cache postgres
 
 .PHONY: core_integration_db_down
 core_integration_db_down:
@@ -123,13 +122,13 @@ core_integration_db_down:
 core_integration_setup:
 	go build -cover -race -tags integration -o zitadel.test main.go
 	mkdir -p $${GOCOVERDIR}
-	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/steps.yaml
+	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
+	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml --steps internal/integration/config/steps.yaml
 
 .PHONY: core_integration_server_start
 core_integration_server_start: core_integration_setup
 	GORACE="log_path=tmp/race.log" \
-	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml \
+	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml \
 	  > tmp/zitadel.log 2>&1 \
 	  & printf $$! > tmp/zitadel.pid
 

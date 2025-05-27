@@ -3,13 +3,14 @@ package query
 import (
 	"context"
 	"database/sql"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -81,7 +82,45 @@ type ProjectRoleSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries) (roles *ProjectRoles, err error) {
+func projectRolesCheckPermission(ctx context.Context, projectRoles *ProjectRoles, permissionCheck domain.PermissionCheck) {
+	projectRoles.ProjectRoles = slices.DeleteFunc(projectRoles.ProjectRoles,
+		func(projectRole *ProjectRole) bool {
+			return projectRoleCheckPermission(ctx, projectRole.ResourceOwner, projectRole.Key, permissionCheck) != nil
+		},
+	)
+}
+
+func projectRoleCheckPermission(ctx context.Context, resourceOwner string, grantID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, grantID)
+}
+
+func projectRolePermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectRoleSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		ProjectRoleColumnResourceOwner,
+		domain.PermissionProjectRoleRead,
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(ProjectRoleColumnKey),
+	)
+	return query.JoinClause(join, args...)
+}
+
+func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries, permissionCheck domain.PermissionCheck) (roles *ProjectRoles, err error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	projectRoles, err := q.searchProjectRoles(ctx, shouldTriggerBulk, queries, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		projectRolesCheckPermission(ctx, projectRoles, permissionCheck)
+	}
+	return projectRoles, nil
+}
+
+func (q *Queries) searchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries, permissionCheckV2 bool) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -94,7 +133,8 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 
-	query, scan := prepareProjectRolesQuery(ctx, q.client)
+	query, scan := prepareProjectRolesQuery()
+	query = projectRolePermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
@@ -126,7 +166,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 
-	query, scan := prepareProjectRolesQuery(ctx, q.client)
+	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
@@ -207,7 +247,7 @@ func (q *ProjectRoleSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareProjectRolesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
+func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
 	return sq.Select(
 			ProjectRoleColumnProjectID.identifier(),
 			ProjectRoleColumnCreationDate.identifier(),
@@ -218,7 +258,7 @@ func prepareProjectRolesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			ProjectRoleColumnDisplayName.identifier(),
 			ProjectRoleColumnGroupName.identifier(),
 			countColumn.identifier()).
-			From(projectRolesTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(projectRolesTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*ProjectRoles, error) {
 			projects := make([]*ProjectRole, 0)

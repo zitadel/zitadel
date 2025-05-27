@@ -15,14 +15,15 @@ type SAMLRequestWriteModel struct {
 	eventstore.WriteModel
 	aggregate *eventstore.Aggregate
 
-	LoginClient   string
-	ApplicationID string
-	ACSURL        string
-	RelayState    string
-	RequestID     string
-	Binding       string
-	Issuer        string
-	Destination   string
+	LoginClient    string
+	ApplicationID  string
+	ACSURL         string
+	RelayState     string
+	RequestID      string
+	Binding        string
+	Issuer         string
+	Destination    string
+	ResponseIssuer string
 
 	SessionID        string
 	UserID           string
@@ -52,6 +53,7 @@ func (m *SAMLRequestWriteModel) Reduce() error {
 			m.Binding = e.Binding
 			m.Issuer = e.Issuer
 			m.Destination = e.Destination
+			m.ResponseIssuer = e.ResponseIssuer
 			m.SAMLRequestState = domain.SAMLRequestStateAdded
 		case *samlrequest.SessionLinkedEvent:
 			m.SessionID = e.SessionID

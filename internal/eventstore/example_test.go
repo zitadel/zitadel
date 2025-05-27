@@ -289,8 +289,8 @@ func (rm *UserReadModel) Reduce() error {
 func TestUserReadModel(t *testing.T) {
 	es := eventstore.NewEventstore(
 		&eventstore.Config{
-			Querier: query_repo.NewCRDB(testCRDBClient),
-			Pusher:  v3.NewEventstore(testCRDBClient),
+			Querier: query_repo.NewPostgres(testClient),
+			Pusher:  v3.NewEventstore(testClient),
 		},
 	)
 

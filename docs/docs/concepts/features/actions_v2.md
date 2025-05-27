@@ -10,6 +10,12 @@ This is useful when you have special business requirements that ZITADEL doesn't 
 We're working on Actions continuously. In the [roadmap](https://zitadel.com/roadmap), you see how we are planning to expand and improve it. Please tell us about your needs and help us prioritize further fixes and features.
 :::
 
+:::warning
+To use Actions v2 activate the feature flag "Actions" [feature flag](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features), to be able to manage the related resources.
+
+The Actions v2 will always be executed if available, even if the feature flag is switched off, to remove any Actions v2 the related Execution has to be removed.
+:::
+
 ## Why actions?
 ZITADEL can't anticipate and solve every possible business rule and integration requirements from all ZITADEL users. Here are some examples:
 - A business requires domain specific data validation before a user can be created or authenticated.
@@ -31,10 +37,25 @@ so that everybody can implement their custom behaviour for as many processes as 
 Possible conditions for the Execution:
 - Request, to react to or manipulate requests to ZITADEL, for example add information to newly created users
 - Response, to react to or manipulate responses to ZITADEL, for example to provision newly created users to other systems
-- Function, to react to different functionality in ZITADEL, replaces [Actions](/concepts/features/actions)
+- Function, to react to different functionality in ZITADEL, replaces [Actions](/concepts/features/actions).
 - Event, to create to different events which get created in ZITADEL, for example to inform somebody if a user gets locked
+
+:::info
+Currently, the defined Actions v2 will be executed additionally to the defined [Actions](/concepts/features/actions).
+:::
+
+## Migration
+
+- [Migrate Actions v1 to Actions v2](/guides/integrate/actions/migrate-from-v1)
 
 ## Further reading
 
-- [Actions v2 reference](/apis/actions/v3/usage)
-- [Actions v2 example execution locally](/apis/actions/v3/testing-locally)
+- [Actions v2 reference](/guides/integrate/actions/usage)
+- [Actions v2 example execution for request](/guides/integrate/actions/testing-request)
+- [Actions v2 example execution for request manipulation](/guides/integrate/actions/testing-request-manipulation)
+- [Actions v2 example execution for request signature check](/guides/integrate/actions/testing-request-signature)
+- [Actions v2 example execution for response](/guides/integrate/actions/testing-response)
+- [Actions v2 example execution for response manipulation](/guides/integrate/actions/testing-response-manipulation)
+- [Actions v2 example execution for function](/guides/integrate/actions/testing-function)
+- [Actions v2 example execution for function manipulation](/guides/integrate/actions/testing-function-manipulation)
+- [Actions v2 example execution for event](/guides/integrate/actions/testing-event)

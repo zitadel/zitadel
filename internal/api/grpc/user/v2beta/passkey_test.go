@@ -74,6 +74,7 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
+						CreationDate:  time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
 					ID:                                 "123",
@@ -90,6 +91,7 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
+						CreationDate:  time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
 					ID:                                 "123",
@@ -100,6 +102,10 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 			want: &user.RegisterPasskeyResponse{
 				Details: &object.Details{
 					Sequence: 22,
+					CreationDate: &timestamppb.Timestamp{
+						Seconds: 3000,
+						Nanos:   22,
+					},
 					ChangeDate: &timestamppb.Timestamp{
 						Seconds: 3000,
 						Nanos:   22,
@@ -150,6 +156,7 @@ func Test_passkeyDetailsToPb(t *testing.T) {
 				details: &domain.ObjectDetails{
 					Sequence:      22,
 					EventDate:     time.Unix(3000, 22),
+					CreationDate:  time.Unix(3000, 22),
 					ResourceOwner: "me",
 				},
 				err: nil,
@@ -157,6 +164,10 @@ func Test_passkeyDetailsToPb(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					Sequence: 22,
+					CreationDate: &timestamppb.Timestamp{
+						Seconds: 3000,
+						Nanos:   22,
+					},
 					ChangeDate: &timestamppb.Timestamp{
 						Seconds: 3000,
 						Nanos:   22,
@@ -199,6 +210,7 @@ func Test_passkeyCodeDetailsToPb(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
+						CreationDate:  time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
 					CodeID: "123",
@@ -209,6 +221,10 @@ func Test_passkeyCodeDetailsToPb(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					Sequence: 22,
+					CreationDate: &timestamppb.Timestamp{
+						Seconds: 3000,
+						Nanos:   22,
+					},
 					ChangeDate: &timestamppb.Timestamp{
 						Seconds: 3000,
 						Nanos:   22,

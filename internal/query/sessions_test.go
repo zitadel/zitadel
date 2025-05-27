@@ -50,8 +50,7 @@ var (
 		` FROM projections.sessions8` +
 		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
 		` LEFT JOIN projections.users14_humans ON projections.sessions8.user_id = projections.users14_humans.user_id AND projections.sessions8.instance_id = projections.users14_humans.instance_id` +
-		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id`)
 	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions8.id,` +
 		` projections.sessions8.creation_date,` +
 		` projections.sessions8.change_date,` +
@@ -81,8 +80,7 @@ var (
 		` FROM projections.sessions8` +
 		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
 		` LEFT JOIN projections.users14_humans ON projections.sessions8.user_id = projections.users14_humans.user_id AND projections.sessions8.instance_id = projections.users14_humans.instance_id` +
-		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id`)
 
 	sessionCols = []string{
 		"id",
@@ -440,7 +438,7 @@ func Test_SessionsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -577,14 +575,14 @@ func Test_SessionPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
 
-func prepareSessionQueryTesting(t *testing.T, token string) func(context.Context, prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
-	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
-		builder, scan := prepareSessionQuery(ctx, db)
+func prepareSessionQueryTesting(t *testing.T, token string) func() (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
+	return func() (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
+		builder, scan := prepareSessionQuery()
 		return builder, func(row *sql.Row) (*Session, error) {
 			session, tokenID, err := scan(row)
 			require.Equal(t, tokenID, token)

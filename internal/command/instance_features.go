@@ -21,7 +21,6 @@ type InstanceFeatures struct {
 	LegacyIntrospection             *bool
 	UserSchema                      *bool
 	TokenExchange                   *bool
-	Actions                         *bool
 	ImprovedPerformance             []feature.ImprovedPerformanceType
 	WebKey                          *bool
 	DebugOIDCParentError            *bool
@@ -30,6 +29,7 @@ type InstanceFeatures struct {
 	EnableBackChannelLogout         *bool
 	LoginV2                         *feature.LoginV2
 	PermissionCheckV2               *bool
+	ConsoleUseV2UserApi             *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -38,7 +38,6 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
-		m.Actions == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.WebKey == nil &&
@@ -47,7 +46,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.DisableUserTokenEvent == nil &&
 		m.EnableBackChannelLogout == nil &&
 		m.LoginV2 == nil &&
-		m.PermissionCheckV2 == nil
+		m.PermissionCheckV2 == nil && m.ConsoleUseV2UserApi == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

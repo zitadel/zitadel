@@ -1,9 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { OrgDomainQuery, OrgNameQuery, OrgQuery, OrgState, OrgStateQuery } from 'src/app/proto/generated/zitadel/org_pb';
+import {
+  OrgDomainQuery,
+  OrgNameQuery,
+  OrgQuery,
+  OrgState,
+  OrgStateQuery,
+  OrgIDQuery,
+} from 'src/app/proto/generated/zitadel/org_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
@@ -12,6 +19,7 @@ enum SubQuery {
   NAME,
   STATE,
   DOMAIN,
+  ID,
 }
 
 @Component({
@@ -27,9 +35,10 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
 
   constructor(
     router: Router,
+    destroyRef: DestroyRef,
     protected override route: ActivatedRoute,
   ) {
-    super(router, route);
+    super(router, route, destroyRef);
   }
 
   ngOnInit(): void {
@@ -59,6 +68,12 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
             orgDomainQuery.setDomain(filter.domainQuery.domain);
             orgDomainQuery.setMethod(filter.domainQuery.method);
             orgQuery.setDomainQuery(orgDomainQuery);
+            return orgQuery;
+          } else if (filter.idQuery) {
+            const orgQuery = new OrgQuery();
+            const orgIdQuery = new OrgIDQuery();
+            orgIdQuery.setId(filter.idQuery.id);
+            orgQuery.setIdQuery(orgIdQuery);
             return orgQuery;
           } else {
             return undefined;
@@ -99,6 +114,13 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
           odq.setDomainQuery(dq);
           this.searchQueries.push(odq);
           break;
+        case SubQuery.ID:
+          const idq = new OrgIDQuery();
+          idq.setId('');
+          const oidq = new OrgQuery();
+          oidq.setIdQuery(idq);
+          this.searchQueries.push(oidq);
+          break;
       }
     } else {
       switch (subquery) {
@@ -120,6 +142,12 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
             this.searchQueries.splice(index_pdn, 1);
           }
           break;
+        case SubQuery.ID:
+          const index_id = this.searchQueries.findIndex((q) => (q as OrgQuery).toObject().idQuery !== undefined);
+          if (index_id > -1) {
+            this.searchQueries.splice(index_id, 1);
+          }
+          break;
       }
     }
   }
@@ -137,6 +165,10 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
         break;
       case SubQuery.DOMAIN:
         (query as OrgDomainQuery).setDomain(value);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        break;
+      case SubQuery.ID:
+        (query as OrgIDQuery).setId(value);
         this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
     }
@@ -162,6 +194,13 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
         const pdn = this.searchQueries.find((q) => (q as OrgQuery).toObject().domainQuery !== undefined);
         if (pdn) {
           return (pdn as OrgQuery).getDomainQuery();
+        } else {
+          return undefined;
+        }
+      case SubQuery.ID:
+        const id = this.searchQueries.find((q) => (q as OrgQuery).toObject().idQuery !== undefined);
+        if (id) {
+          return (id as OrgQuery).getIdQuery();
         } else {
           return undefined;
         }

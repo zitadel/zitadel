@@ -3,9 +3,6 @@ name: Compile
 on:
   workflow_call:
     inputs:
-      go_version:
-        required: true
-        type: string
       core_cache_key:
         required: true
         type: string
@@ -53,7 +50,7 @@ jobs:
     -
       uses: actions/setup-go@v5
       with:
-        go-version: ${{ inputs.go_version }}
+        go-version-file: 'go.mod'
     - 
       name: compile
       timeout-minutes: 5

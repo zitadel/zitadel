@@ -13,13 +13,15 @@ import (
 )
 
 type Config struct {
-	Fraction float64
-	Endpoint string
+	Fraction    float64
+	Endpoint    string
+	ServiceName string
 }
 
 func NewTracerFromConfig(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
 	c.Endpoint, _ = rawConfig["endpoint"].(string)
+	c.ServiceName, _ = rawConfig["servicename"].(string)
 	c.Fraction, err = FractionFromConfig(rawConfig["fraction"])
 	if err != nil {
 		return err
@@ -54,7 +56,7 @@ func (c *Config) NewTracer() error {
 		return err
 	}
 
-	tracing.T, err = NewTracer(sampler, exporter)
+	tracing.T, err = NewTracer(sampler, exporter, c.ServiceName)
 	return err
 }
 

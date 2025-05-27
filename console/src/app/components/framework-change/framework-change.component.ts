@@ -1,23 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnDestroy, OnInit, Output, effect, signal } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
-import { listFrameworks, hasFramework, getFramework } from '@netlify/framework-info';
-import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
-import { FrameworkAutocompleteComponent } from '../framework-autocomplete/framework-autocomplete.component';
 import { Framework } from '../quickstart/quickstart.component';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
-import {
-  MatDialog,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogModule,
-  MatDialogRef,
-  MatDialogTitle,
-} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { FrameworkChangeDialogComponent } from './framework-change-dialog.component';
 
 @Component({
@@ -25,12 +14,11 @@ import { FrameworkChangeDialogComponent } from './framework-change-dialog.compon
   selector: 'cnsl-framework-change',
   templateUrl: './framework-change.component.html',
   styleUrls: ['./framework-change.component.scss'],
-  imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule, FrameworkAutocompleteComponent],
+  imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
 })
 export class FrameworkChangeComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public framework: BehaviorSubject<Framework | undefined> = new BehaviorSubject<Framework | undefined>(undefined);
-  public showFrameworkAutocomplete = signal<boolean>(false);
   @Output() public frameworkChanged: EventEmitter<Framework> = new EventEmitter();
   public frameworks: Framework[] = frameworkDefinition.map((f) => {
     return {

@@ -1,3 +1,8 @@
+<!--
+Please inform yourself about the contribution guidelines on submitting a PR here: https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#submit-a-pull-request-pr. Take note of how PR/commit titles should be written and replace the template texts in the sections below. Don't remove any of the sections. It is important that the commit history clearly shows what is changed and why.
+Important: By submitting a contribution you agree to the terms from our Licensing Policy as described here: https://github.com/zitadel/zitadel/blob/main/LICENSING.md#community-contributions.
+-->
+
 # Which Problems Are Solved
 
 Replace this example text with a concise list of problems that this PR solves.

@@ -1,32 +1,60 @@
-import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnInit, signal } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { take } from 'rxjs/operators';
+import { catchError, filter, map, startWith, take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
-import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
+import {
+  MetadataDialogComponent,
+  MetadataDialogData,
+} from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
-import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
-import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
-import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
-import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
+import {
+  EditDialogData,
+  EditDialogResult,
+  EditDialogComponent,
+  EditDialogType,
+} from '../auth-user-detail/edit-dialog/edit-dialog.component';
+import {
+  ResendEmailDialogComponent,
+  ResendEmailDialogData,
+  ResendEmailDialogResult,
+} from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 import { MachineSecretDialogComponent } from './machine-secret-dialog/machine-secret-dialog.component';
-import { Observable } from 'rxjs';
-import { LanguagesService } from '../../../../services/languages.service';
+import { LanguagesService } from 'src/app/services/languages.service';
+import { UserService } from 'src/app/services/user.service';
+import { Gender, HumanProfile, HumanUser, User as UserV2, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import {
+  combineLatestWith,
+  defer,
+  EMPTY,
+  identity,
+  mergeWith,
+  Observable,
+  ObservedValueOf,
+  of,
+  shareReplay,
+  Subject,
+  switchMap,
+} from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DetailFormMachineComponent } from '../detail-form-machine/detail-form-machine.component';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
+import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
+import { SendHumanResetPasswordNotificationRequest_Type } from '@zitadel/proto/zitadel/management_pb';
+import { pairwiseStartWith } from 'src/app/utils/pairwiseStartWith';
+import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
@@ -37,22 +65,32 @@ const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS
 const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS' };
 const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' };
 
+type UserQuery =
+  | { state: 'success'; value: UserV2 }
+  | { state: 'error'; value: string }
+  | { state: 'loading'; value?: UserV2 }
+  | { state: 'notfound' };
+
+type MetadataQuery =
+  | { state: 'success'; value: Metadata[] }
+  | { state: 'loading'; value: Metadata[] }
+  | { state: 'error'; value: string };
+
+type UserWithHumanType = Omit<UserV2, 'type'> & { type: { case: 'human'; value: HumanUser } };
+
+// todo: figure out why media matcher is needed
 @Component({
   selector: 'cnsl-user-detail',
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss'],
 })
 export class UserDetailComponent implements OnInit {
-  public user!: User.AsObject;
-  public metadata: Metadata.AsObject[] = [];
-  public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
+  public user$: Observable<UserQuery>;
+  public genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
 
   public ChangeType: any = ChangeType;
 
-  public loading: boolean = true;
-  public loadingMetadata: boolean = true;
-
-  public UserState: any = UserState;
+  public UserState = UserState;
   public copied: string = '';
   public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
 
@@ -60,32 +98,26 @@ export class UserDetailComponent implements OnInit {
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
   public InfoSectionType: any = InfoSectionType;
 
-  public error: string = '';
-
-  public settingsList: SidenavSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
-  public currentSetting: string | undefined = 'general';
-  public loginPolicy?: LoginPolicy.AsObject;
+  public currentSetting$ = signal<SidenavSetting>(GENERAL);
+  public settingsList$: Observable<SidenavSetting[]>;
+  public metadata$: Observable<MetadataQuery>;
+  public loginPolicy$: Observable<LoginPolicy>;
+  public refreshMetadata$ = new Subject<true>();
 
   constructor(
     public translate: TranslateService,
-    private route: ActivatedRoute,
+    private readonly route: ActivatedRoute,
     private toast: ToastService,
-    public mgmtUserService: ManagementService,
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
-    activatedRoute: ActivatedRoute,
-    private mediaMatcher: MediaMatcher,
     public langSvc: LanguagesService,
+    private readonly userService: UserService,
+    private readonly newMgmtService: NewMgmtService,
+    public readonly mgmtService: ManagementService,
     breadcrumbService: BreadcrumbService,
+    private readonly destroyRef: DestroyRef,
   ) {
-    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
-      const { id } = params;
-      if (id) {
-        this.currentSetting = id;
-      }
-    });
-
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
         type: BreadcrumbType.ORG,
@@ -93,63 +125,115 @@ export class UserDetailComponent implements OnInit {
       }),
     ]);
 
-    const mediaq: string = '(max-width: 500px)';
-    const small = this.mediaMatcher.matchMedia(mediaq).matches;
-    if (small) {
-      this.changeSelection(small);
-    }
-    this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
-      this.changeSelection(small.matches);
-    };
+    this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.settingsList$ = this.getSettingsList$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.metadata$ = this.getMetadata$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+
+    this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
+      catchError(() => EMPTY),
+      map(({ policy }) => policy),
+      filter(Boolean),
+    );
   }
 
-  private changeSelection(small: boolean): void {
-    if (small) {
-      this.currentSetting = undefined;
-    } else {
-      this.currentSetting = this.currentSetting === undefined ? 'general' : this.currentSetting;
-    }
+  private getId$(): Observable<string> {
+    return this.route.paramMap.pipe(
+      map((params) => params.get('id')),
+      filter(Boolean),
+    );
   }
 
-  refreshUser(): void {
-    this.refreshChanges$.emit();
-    this.route.params.pipe(take(1)).subscribe((params) => {
-      this.loading = true;
-      const { id } = params;
-      this.mgmtUserService
-        .getUserByID(id)
-        .then((resp) => {
-          this.loadMetadata(id);
-          this.loading = false;
-          if (resp.user) {
-            this.user = resp.user;
+  private getUser$(): Observable<UserQuery> {
+    return this.getId$().pipe(
+      combineLatestWith(this.refreshChanges$.pipe(startWith(undefined))),
+      switchMap(([id]) => this.getUserById(id)),
+      pairwiseStartWith(undefined),
+      map(([prev, curr]) => {
+        if (prev?.state === 'success' && curr.state === 'loading') {
+          return { state: 'loading', value: prev.value } as const;
+        }
+        return curr;
+      }),
+    );
+  }
 
-            if (this.user.human) {
-              this.settingsList = [GENERAL, SECURITY, IDP, GRANTS, MEMBERSHIPS, METADATA];
-            } else if (this.user.machine) {
-              this.settingsList = [GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA];
-            }
-          }
-        })
-        .catch((err) => {
-          this.error = err.message ?? '';
-          this.loading = false;
-          this.toast.showError(err);
-        });
-    });
+  private getSettingsList$(user$: Observable<UserQuery>): Observable<SidenavSetting[]> {
+    return user$.pipe(
+      switchMap((user) => {
+        if (user.state !== 'success') {
+          return EMPTY;
+        }
+
+        if (user.value.type.case === 'human') {
+          return of([GENERAL, SECURITY, IDP, GRANTS, MEMBERSHIPS, METADATA]);
+        } else if (user.value.type.case === 'machine') {
+          return of([GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA]);
+        }
+        return EMPTY;
+      }),
+      startWith([GENERAL, GRANTS, MEMBERSHIPS, METADATA]),
+    );
+  }
+
+  private getUserById(userId: string): Observable<UserQuery> {
+    return defer(() => this.userService.getUserById(userId)).pipe(
+      map(({ user }) => {
+        if (user) {
+          return { state: 'success', value: user } as const;
+        }
+        return { state: 'notfound' } as const;
+      }),
+      catchError((error) => of({ state: 'error', value: error.message ?? '' } as const)),
+      startWith({ state: 'loading' } as const),
+    );
+  }
+
+  getMetadata$(user$: Observable<UserQuery>): Observable<MetadataQuery> {
+    return this.refreshMetadata$.pipe(
+      startWith(true),
+      combineLatestWith(user$),
+      switchMap(([_, user]) => {
+        if (!(user.state === 'success' || user.state === 'loading')) {
+          return EMPTY;
+        }
+        if (!user.value) {
+          return EMPTY;
+        }
+        return this.getMetadataById(user.value.userId);
+      }),
+      pairwiseStartWith(undefined),
+      map(([prev, curr]) => {
+        if (prev?.state === 'success' && curr.state === 'loading') {
+          return { state: 'loading', value: prev.value } as const;
+        }
+        return curr;
+      }),
+    );
   }
 
   public ngOnInit(): void {
-    this.refreshUser();
-
-    this.mgmtUserService.getLoginPolicy().then((policy) => {
-      if (policy.policy) {
-        this.loginPolicy = policy.policy;
+    this.user$.pipe(mergeWith(this.metadata$), takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
+      if (query.state == 'error') {
+        this.toast.showError(query.value);
       }
     });
+
+    const param = this.route.snapshot.queryParamMap.get('id');
+    if (!param) {
+      return;
+    }
+
+    this.settingsList$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((settings) => settings.find(({ id }) => id === param)),
+        filter(Boolean),
+        take(1),
+      )
+      .subscribe((setting) => this.currentSetting$.set(setting));
   }
 
-  public changeUsername(): void {
+  public changeUsername(user: UserV2): void {
     const dialogRef = this.dialog.open(EditDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CHANGE',
@@ -157,43 +241,45 @@ export class UserDetailComponent implements OnInit {
         labelKey: 'ACTIONS.NEWVALUE',
         titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
         descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
-        value: this.user.userName,
+        value: user.username,
       },
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp: { value: string }) => {
-      if (resp.value && resp.value !== this.user.userName) {
-        this.mgmtUserService
-          .updateUserName(this.user.id, resp.value)
-          .then(() => {
-            this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
-            this.refreshUser();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(
+        map(({ value }: { value?: string }) => value),
+        filter(Boolean),
+        filter((value) => user.username != value),
+        switchMap((username) => this.userService.updateUser({ userId: user.userId, username })),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
+          this.refreshChanges$.emit();
+        },
+        error: (error) => {
+          this.toast.showError(error);
+        },
+      });
   }
 
-  public unlockUser(): void {
-    const req = new UnlockUserRequest();
-    req.setId(this.user.id);
-    this.mgmtUserService
-      .unlockUser(req)
+  public unlockUser(user: UserV2): void {
+    this.userService
+      .unlockUser(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.UNLOCKED', true);
-        this.refreshUser();
+        this.refreshChanges$.emit();
       })
       .catch((error) => {
         this.toast.showError(error);
       });
   }
 
-  public generateMachineSecret(): void {
-    this.mgmtUserService
-      .generateMachineSecret(this.user.id)
+  public generateMachineSecret(user: UserV2): void {
+    this.newMgmtService
+      .generateMachineSecret(user.userId)
       .then((resp) => {
         this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
         this.dialog.open(MachineSecretDialogComponent, {
@@ -203,64 +289,41 @@ export class UserDetailComponent implements OnInit {
           },
           width: '400px',
         });
-        this.refreshUser();
+        this.refreshChanges$.emit();
       })
       .catch((error) => {
         this.toast.showError(error);
       });
   }
 
-  public removeMachineSecret(): void {
-    this.mgmtUserService
-      .removeMachineSecret(this.user.id)
-      .then((resp) => {
+  public removeMachineSecret(user: UserV2): void {
+    this.newMgmtService
+      .removeMachineSecret(user.userId)
+      .then(() => {
         this.toast.showInfo('USER.TOAST.SECRETREMOVED', true);
-        this.refreshUser();
+        this.refreshChanges$.emit();
       })
       .catch((error) => {
         this.toast.showError(error);
       });
   }
 
-  public changeState(newState: UserState): void {
-    if (newState === UserState.USER_STATE_ACTIVE) {
-      this.mgmtUserService
-        .reactivateUser(this.user.id)
+  public changeState(user: UserV2, newState: UserState): void {
+    if (newState === UserState.ACTIVE) {
+      this.userService
+        .reactivateUser(user.userId)
         .then(() => {
           this.toast.showInfo('USER.TOAST.REACTIVATED', true);
-          this.user.state = newState;
+          this.refreshChanges$.emit();
         })
         .catch((error) => {
           this.toast.showError(error);
         });
-    } else if (newState === UserState.USER_STATE_INACTIVE) {
-      this.mgmtUserService
-        .deactivateUser(this.user.id)
+    } else if (newState === UserState.INACTIVE) {
+      this.userService
+        .deactivateUser(user.userId)
         .then(() => {
           this.toast.showInfo('USER.TOAST.DEACTIVATED', true);
-          this.user.state = newState;
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
-  }
-
-  public saveProfile(profileData: Profile.AsObject): void {
-    if (this.user.human) {
-      this.user.human.profile = profileData;
-      this.mgmtUserService
-        .updateHumanProfile(
-          this.user.id,
-          this.user.human.profile.firstName,
-          this.user.human.profile.lastName,
-          this.user.human.profile.nickName,
-          this.user.human.profile.displayName,
-          this.user.human.profile.preferredLanguage,
-          this.user.human.profile.gender,
-        )
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.SAVED', true);
           this.refreshChanges$.emit();
         })
         .catch((error) => {
@@ -269,32 +332,48 @@ export class UserDetailComponent implements OnInit {
     }
   }
 
-  public saveMachine(machineData: Machine.AsObject): void {
-    if (this.user.machine) {
-      this.user.machine.name = machineData.name;
-      this.user.machine.description = machineData.description;
-      this.user.machine.accessTokenType = machineData.accessTokenType;
-
-      this.mgmtUserService
-        .updateMachine(
-          this.user.id,
-          this.user.machine.name,
-          this.user.machine.description,
-          this.user.machine.accessTokenType,
-        )
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.SAVED', true);
-          this.refreshChanges$.emit();
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
+  public saveProfile(user: UserV2, profile: HumanProfile): void {
+    this.userService
+      .updateUser({
+        userId: user.userId,
+        profile: {
+          givenName: profile.givenName,
+          familyName: profile.familyName,
+          nickName: profile.nickName,
+          displayName: profile.displayName,
+          preferredLanguage: profile.preferredLanguage,
+          gender: profile.gender,
+        },
+      })
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.SAVED', true);
+        this.refreshChanges$.emit();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
-  public resendEmailVerification(): void {
-    this.mgmtUserService
-      .resendHumanEmailVerification(this.user.id)
+  public saveMachine(user: UserV2, form: ObservedValueOf<DetailFormMachineComponent['submitData']>): void {
+    this.newMgmtService
+      .updateMachine({
+        userId: user.userId,
+        name: form.name,
+        description: form.description,
+        accessTokenType: form.accessTokenType,
+      })
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.SAVED', true);
+        this.refreshChanges$.emit();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public resendEmailVerification(user: UserV2): void {
+    this.newMgmtService
+      .resendHumanEmailVerification(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
         this.refreshChanges$.emit();
@@ -304,9 +383,9 @@ export class UserDetailComponent implements OnInit {
       });
   }
 
-  public resendPhoneVerification(): void {
-    this.mgmtUserService
-      .resendHumanPhoneVerification(this.user.id)
+  public resendPhoneVerification(user: UserV2): void {
+    this.newMgmtService
+      .resendHumanPhoneVerification(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
         this.refreshChanges$.emit();
@@ -316,79 +395,25 @@ export class UserDetailComponent implements OnInit {
       });
   }
 
-  public deletePhone(): void {
-    this.mgmtUserService
-      .removeHumanPhone(this.user.id)
+  public deletePhone(user: UserV2): void {
+    this.userService
+      .removePhone(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        if (this.user.human) {
-          this.user.human.phone = new Phone().setPhone('').toObject();
-          this.refreshUser();
-        }
+        this.refreshChanges$.emit();
       })
       .catch((error) => {
         this.toast.showError(error);
       });
   }
 
-  public saveEmail(email: string, isVerified: boolean): void {
-    if (this.user.id && email) {
-      this.mgmtUserService
-        .updateHumanEmail(this.user.id, email, isVerified)
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-          if (this.user.state === UserState.USER_STATE_INITIAL) {
-            this.mgmtUserService
-              .resendHumanInitialization(this.user.id, email ?? '')
-              .then(() => {
-                this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
-                this.refreshChanges$.emit();
-              })
-              .catch((error) => {
-                this.toast.showError(error);
-              });
-          }
-          if (this.user.human) {
-            this.user.human.email = new Email().setEmail(email).toObject();
-            this.refreshUser();
-          }
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
-  }
-
-  public savePhone(phone: string): void {
-    if (this.user.id && phone) {
-      // Format phone before save (add +)
-      const formattedPhone = formatPhone(phone);
-      if (formattedPhone) {
-        phone = formattedPhone.phone;
-      }
-
-      this.mgmtUserService
-        .updateHumanPhone(this.user.id, phone)
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          if (this.user.human) {
-            this.user.human.phone = new Phone().setPhone(phone).toObject();
-            this.refreshUser();
-          }
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
-  }
-
   public navigateBack(): void {
     this._location.back();
   }
 
-  public sendSetPasswordNotification(): void {
-    this.mgmtUserService
-      .sendHumanResetPasswordNotification(this.user.id, SendHumanResetPasswordNotificationRequest.Type.TYPE_EMAIL)
+  public sendSetPasswordNotification(user: UserV2): void {
+    this.newMgmtService
+      .sendHumanResetPasswordNotification(user.userId, SendHumanResetPasswordNotificationRequest_Type.EMAIL)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
         this.refreshChanges$.emit();
@@ -398,143 +423,190 @@ export class UserDetailComponent implements OnInit {
       });
   }
 
-  public deleteUser(): void {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'USER.DIALOG.DELETE_TITLE',
-        descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
-      },
+  public deleteUser(user: UserV2): void {
+    const data = {
+      confirmKey: 'ACTIONS.DELETE',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'USER.DIALOG.DELETE_TITLE',
+      descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
+    };
+
+    const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
+      data,
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.mgmtUserService
-          .removeUser(this.user.id)
-          .then(() => {
-            const params: Params = {
-              deferredReload: true,
-              type: this.user.human ? 'humans' : 'machines',
-            };
-            this.router.navigate(['/users'], { queryParams: params });
-            this.toast.showInfo('USER.TOAST.DELETED', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.userService.deleteUser(user.userId)),
+      )
+      .subscribe({
+        next: () => {
+          const params: Params = {
+            deferredReload: true,
+            type: user.type.case === 'human' ? 'humans' : 'machines',
+          };
+          this.router.navigate(['/users'], { queryParams: params }).then();
+          this.toast.showInfo('USER.TOAST.DELETED', true);
+        },
+        error: (error) => this.toast.showError(error),
+      });
   }
 
-  public resendInitEmail(): void {
-    const dialogRef = this.dialog.open(ResendEmailDialogComponent, {
-      width: '400px',
-      data: {
-        email: this.user.human?.email?.email ?? '',
+  public resendInitEmail(user: UserV2): void {
+    const dialogRef = this.dialog.open<ResendEmailDialogComponent, ResendEmailDialogData, ResendEmailDialogResult>(
+      ResendEmailDialogComponent,
+      {
+        width: '400px',
+        data: {
+          email: user.type.case === 'human' ? (user.type.value.email?.email ?? '') : '',
+        },
       },
-    });
+    );
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp.send && this.user.id) {
-        this.mgmtUserService
-          .resendHumanInitialization(this.user.id, resp.email ?? '')
-          .then(() => {
-            this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
-            this.refreshChanges$.emit();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter((resp): resp is { send: true; email: string } => !!resp?.send && !!user.userId),
+        switchMap(({ email }) => this.newMgmtService.resendHumanInitialization(user.userId, email)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
+          this.refreshChanges$.emit();
+        },
+        error: (error) => this.toast.showError(error),
+      });
   }
 
-  public openEditDialog(type: EditDialogType): void {
+  public openEditDialog(user: UserWithHumanType, type: EditDialogType): void {
     switch (type) {
       case EditDialogType.PHONE:
-        const dialogRefPhone = this.dialog.open(EditDialogComponent, {
-          data: {
-            confirmKey: 'ACTIONS.SAVE',
-            cancelKey: 'ACTIONS.CANCEL',
-            labelKey: 'ACTIONS.NEWVALUE',
-            titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
-            descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
-            value: this.user.human?.phone?.phone,
-            type: EditDialogType.PHONE,
-            validator: Validators.compose([phoneValidator, requiredValidator]),
-          },
-          width: '400px',
-        });
-
-        dialogRefPhone.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
-          if (resp && resp.value) {
-            this.savePhone(resp.value);
-          }
-        });
-        break;
+        this.openEditPhoneDialog(user);
+        return;
       case EditDialogType.EMAIL:
-        const dialogRefEmail = this.dialog.open(EditDialogComponent, {
-          data: {
-            confirmKey: 'ACTIONS.SAVE',
-            cancelKey: 'ACTIONS.CANCEL',
-            labelKey: 'ACTIONS.NEWVALUE',
-            titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
-            descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
-            isVerifiedTextKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIED',
-            isVerifiedTextDescKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC',
-            value: this.user.human?.email?.email,
-            type: EditDialogType.EMAIL,
-          },
-          width: '400px',
-        });
-
-        dialogRefEmail.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
-          if (resp && resp.value) {
-            this.saveEmail(resp.value, resp.isVerified);
-          }
-        });
-        break;
+        this.openEditEmailDialog(user);
+        return;
     }
   }
 
-  public loadMetadata(id: string): Promise<any> | void {
-    this.loadingMetadata = true;
-    return this.mgmtUserService
-      .listUserMetadata(id)
-      .then((resp) => {
-        this.loadingMetadata = false;
-        this.metadata = resp.resultList.map((md) => {
-          return {
-            key: md.key,
-            value: Buffer.from(md.value as string, 'base64').toString('utf-8'),
-          };
-        });
-      })
-      .catch((error) => {
-        this.loadingMetadata = false;
-        this.toast.showError(error);
+  private openEditEmailDialog(user: UserWithHumanType) {
+    const data: EditDialogData = {
+      confirmKey: 'ACTIONS.SAVE',
+      cancelKey: 'ACTIONS.CANCEL',
+      labelKey: 'ACTIONS.NEWVALUE',
+      titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
+      descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
+      isVerifiedTextKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIED',
+      isVerifiedTextDescKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC',
+      value: user.type.value?.email?.email,
+      type: EditDialogType.EMAIL,
+    } as const;
+
+    const dialogRefEmail = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
+      data,
+      width: '400px',
+    });
+
+    dialogRefEmail
+      .afterClosed()
+      .pipe(
+        filter((resp): resp is Required<EditDialogResult> => !!resp?.value),
+        switchMap(({ value, isVerified }) =>
+          this.userService.setEmail({
+            userId: user.userId,
+            email: value,
+            verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
+          }),
+        ),
+        switchMap(() => {
+          this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+          this.refreshChanges$.emit();
+          if (user.state !== UserState.INITIAL) {
+            return EMPTY;
+          }
+          return this.userService.resendInviteCode(user.userId);
+        }),
+      )
+      .subscribe({
+        next: () => this.toast.showInfo('USER.TOAST.INITEMAILSENT', true),
+        error: (error) => this.toast.showError(error),
       });
   }
 
-  public editMetadata(): void {
-    if (this.user) {
-      const setFcn = (key: string, value: string): Promise<any> =>
-        this.mgmtUserService.setUserMetadata(key, Buffer.from(value).toString('base64'), this.user.id);
-      const removeFcn = (key: string): Promise<any> => this.mgmtUserService.removeUserMetadata(key, this.user.id);
+  private openEditPhoneDialog(user: UserWithHumanType) {
+    const data = {
+      confirmKey: 'ACTIONS.SAVE',
+      cancelKey: 'ACTIONS.CANCEL',
+      labelKey: 'ACTIONS.NEWVALUE',
+      titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
+      descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
+      value: user.type.value.phone?.phone,
+      type: EditDialogType.PHONE,
+      validator: Validators.compose([phoneValidator, requiredValidator]),
+    };
+    const dialogRefPhone = this.dialog.open<EditDialogComponent, typeof data, { value: string; isVerified: boolean }>(
+      EditDialogComponent,
+      { data, width: '400px' },
+    );
 
-      const dialogRef = this.dialog.open(MetadataDialogComponent, {
-        data: {
-          metadata: this.metadata,
-          setFcn: setFcn,
-          removeFcn: removeFcn,
+    dialogRefPhone
+      .afterClosed()
+      .pipe(
+        map((resp) => formatPhone(resp?.value)),
+        filter(Boolean),
+        switchMap(({ phone }) => this.userService.setPhone({ userId: user.userId, phone })),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+          this.refreshChanges$.emit();
+        },
+        error: (error) => {
+          this.toast.showError(error);
         },
       });
+  }
 
-      dialogRef.afterClosed().subscribe(() => {
-        this.loadMetadata(this.user.id);
+  private getMetadataById(userId: string): Observable<MetadataQuery> {
+    return defer(() => this.newMgmtService.listUserMetadata(userId)).pipe(
+      map((metadata) => ({ state: 'success', value: metadata.result }) as const),
+      startWith({ state: 'loading', value: [] as Metadata[] } as const),
+      catchError((err) => of({ state: 'error', value: err.message ?? '' } as const)),
+    );
+  }
+
+  public editMetadata(user: UserV2, metadata: Metadata[]): void {
+    const setFcn = (key: string, value: string) =>
+      this.newMgmtService.setUserMetadata({
+        key,
+        value: Buffer.from(value),
+        id: user.userId,
       });
+    const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
+
+    const dialogRef = this.dialog.open<MetadataDialogComponent, MetadataDialogData>(MetadataDialogComponent, {
+      data: {
+        metadata: [...metadata],
+        setFcn: setFcn,
+        removeFcn: removeFcn,
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.refreshMetadata$.next(true);
+      });
+  }
+
+  public humanUser(user: UserV2): UserWithHumanType | undefined {
+    if (user.type.case === 'human') {
+      return { ...user, type: user.type };
     }
+    return undefined;
   }
 }

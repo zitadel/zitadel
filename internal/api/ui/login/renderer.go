@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -87,10 +88,10 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
-			return path.Join(r.pathPrefix, EndpointResources, file)
+			return path.Join(r.pathPrefix, EndpointResources, file) + "?v=" + build.Date().Format(time.RFC3339)
 		},
 		"resourceThemeUrl": func(file, theme string) string {
-			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
+			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file) + "?v=" + build.Date().Format(time.RFC3339)
 		},
 		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
 			return policy != nil

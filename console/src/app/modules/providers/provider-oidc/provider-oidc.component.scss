@@ -1,5 +1,7 @@
-.id-token-mapping {
-  max-width: 400px;
+.specific-oidc-option {
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
 
   .checkbox-desc {
     margin-top: 0;

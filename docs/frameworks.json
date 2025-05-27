@@ -81,6 +81,12 @@
     "external": true
   },
   {
+    "title": "FastAPI",
+    "imgSrcDark": "/docs/img/tech/fastapi.svg",
+    "docsLink": "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
+    "external": true
+  },
+  {
     "title": "NextAuth",
     "imgSrcDark": "/docs/img/tech/nextjs.svg",
     "imgSrcLight": "/docs/img/tech/nextjslight.svg",

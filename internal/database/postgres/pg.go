@@ -18,7 +18,7 @@ import (
 
 func init() {
 	config := new(Config)
-	dialect.Register(config, config, false)
+	dialect.Register(config, config, true)
 }
 
 const (
@@ -29,16 +29,15 @@ const (
 )
 
 type Config struct {
-	Host               string
-	Port               int32
-	Database           string
-	EventPushConnRatio float64
-	MaxOpenConns       uint32
-	MaxIdleConns       uint32
-	MaxConnLifetime    time.Duration
-	MaxConnIdleTime    time.Duration
-	User               User
-	Admin              AdminUser
+	Host            string
+	Port            int32
+	Database        string
+	MaxOpenConns    uint32
+	MaxIdleConns    uint32
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
+	User            User
+	Admin           AdminUser
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
 	Options string
@@ -81,13 +80,37 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 		return nil, nil, err
 	}
 
-	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
-		for _, f := range connConfig.AfterConnect {
-			if err := f(ctx, conn); err != nil {
-				return err
+	if len(connConfig.AfterConnect) > 0 {
+		config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			for _, f := range connConfig.AfterConnect {
+				if err := f(ctx, conn); err != nil {
+					return err
+				}
 			}
+			return nil
 		}
-		return nil
+	}
+
+	if len(connConfig.BeforeAcquire) > 0 {
+		config.BeforeAcquire = func(ctx context.Context, conn *pgx.Conn) bool {
+			for _, f := range connConfig.BeforeAcquire {
+				if err := f(ctx, conn); err != nil {
+					return false
+				}
+			}
+			return true
+		}
+	}
+
+	if len(connConfig.AfterRelease) > 0 {
+		config.AfterRelease = func(conn *pgx.Conn) bool {
+			for _, f := range connConfig.AfterRelease {
+				if err := f(conn); err != nil {
+					return false
+				}
+			}
+			return true
+		}
 	}
 
 	if connConfig.MaxOpenConns != 0 {
@@ -124,12 +147,8 @@ func (c *Config) Password() string {
 	return c.User.Password
 }
 
-func (c *Config) Type() string {
-	return "postgres"
-}
-
-func (c *Config) Timetravel(time.Duration) string {
-	return ""
+func (c *Config) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypePostgres
 }
 
 type User struct {

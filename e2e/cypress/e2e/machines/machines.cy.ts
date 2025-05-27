@@ -56,8 +56,8 @@ describe('machines', () => {
         loginName = loginname(machine.removeName, Cypress.env('ORGANIZATION'));
       }
       it('should delete a machine', () => {
-        const rowSelector = `tr:contains(${machine.removeName})`;
-        cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
+        const rowSelector = `tr:contains('${machine.removeName}')`;
+        cy.get(rowSelector).should('be.visible').find('[data-e2e="enabled-delete-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.enabled').type(loginName);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();

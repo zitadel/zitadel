@@ -1,30 +1,45 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, signal, Signal, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSort, Sort } from '@angular/material/sort';
+import { MatSort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { take } from 'rxjs/operators';
+import {
+  combineLatestWith,
+  defer,
+  delay,
+  distinctUntilChanged,
+  EMPTY,
+  from,
+  Observable,
+  of,
+  ReplaySubject,
+  shareReplay,
+  switchMap,
+  toArray,
+} from 'rxjs';
+import { catchError, filter, finalize, map, startWith, take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
-import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
-import { SearchQuery, Type, TypeQuery, User, UserFieldName, UserState } from 'src/app/proto/generated/zitadel/user_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { UserService } from 'src/app/services/user.service';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
+import { UserState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { UserState as UserStateV1 } from 'src/app/proto/generated/zitadel/user_pb';
 
-enum UserListSearchKey {
-  FIRST_NAME,
-  LAST_NAME,
-  DISPLAY_NAME,
-  USER_NAME,
-  EMAIL,
-}
+type Query = Exclude<
+  Exclude<MessageInitShape<typeof ListUsersRequestSchema>['queries'], undefined>[number]['query'],
+  undefined
+>;
 
 @Component({
   selector: 'cnsl-user-table',
@@ -33,23 +48,33 @@ enum UserListSearchKey {
   animations: [enterAnimations],
 })
 export class UserTableComponent implements OnInit {
-  public userSearchKey: UserListSearchKey | undefined = undefined;
-  public Type: any = Type;
-  @Input() public type: Type = Type.TYPE_HUMAN;
-  @Input() refreshOnPreviousRoutes: string[] = [];
+  protected readonly Type = Type;
+  protected readonly refresh$ = new ReplaySubject<true>(1);
+
   @Input() public canWrite$: Observable<boolean> = of(false);
   @Input() public canDelete$: Observable<boolean> = of(false);
 
-  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild(MatSort) public sort!: MatSort;
-  public INITIAL_PAGE_SIZE: number = 20;
+  protected readonly dataSize: Signal<number>;
+  protected readonly loading = signal(false);
 
-  public viewTimestamp!: Timestamp.AsObject;
-  public totalResult: number = 0;
-  public dataSource: MatTableDataSource<User.AsObject> = new MatTableDataSource<User.AsObject>();
-  public selection: SelectionModel<User.AsObject> = new SelectionModel<User.AsObject>(true, []);
-  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+  private readonly paginator$ = new ReplaySubject<PaginatorComponent>(1);
+  @ViewChild(PaginatorComponent) public set paginator(paginator: PaginatorComponent) {
+    this.paginator$.next(paginator);
+  }
+  private readonly sort$ = new ReplaySubject<MatSort>(1);
+  @ViewChild(MatSort) public set sort(sort: MatSort) {
+    this.sort$.next(sort);
+  }
+
+  protected readonly INITIAL_PAGE_SIZE = 20;
+
+  protected readonly dataSource: MatTableDataSource<User> = new MatTableDataSource<User>();
+  protected readonly selection: SelectionModel<User> = new SelectionModel<User>(true, []);
+  protected readonly users$: Observable<ListUsersResponse>;
+  protected readonly type$: Observable<Type>;
+  protected readonly searchQueries$ = new ReplaySubject<UserSearchQuery[]>(1);
+  protected readonly myUser: Signal<User | undefined>;
+
   @Input() public displayedColumnsHuman: string[] = [
     'select',
     'displayName',
@@ -70,56 +95,256 @@ export class UserTableComponent implements OnInit {
     'actions',
   ];
 
-  @Output() public changedSelection: EventEmitter<Array<User.AsObject>> = new EventEmitter();
+  @Output() public changedSelection: EventEmitter<Array<User>> = new EventEmitter();
 
-  public UserState: any = UserState;
-  public UserListSearchKey: any = UserListSearchKey;
+  protected readonly UserState = UserState;
 
-  public ActionKeysType: any = ActionKeysType;
-  public filterOpen: boolean = false;
+  protected ActionKeysType = ActionKeysType;
+  protected filterOpen: boolean = false;
 
-  private searchQueries: SearchQuery[] = [];
   constructor(
-    private router: Router,
-    public translate: TranslateService,
-    private authService: GrpcAuthService,
-    private userService: ManagementService,
-    private toast: ToastService,
-    private dialog: MatDialog,
-    private route: ActivatedRoute,
-    private _liveAnnouncer: LiveAnnouncer,
+    protected readonly router: Router,
+    public readonly translate: TranslateService,
+    private readonly userService: UserService,
+    private readonly toast: ToastService,
+    private readonly dialog: MatDialog,
+    private readonly route: ActivatedRoute,
+    private readonly destroyRef: DestroyRef,
+    private readonly authenticationService: AuthenticationService,
+    private readonly authService: GrpcAuthService,
   ) {
-    this.selection.changed.subscribe(() => {
-      this.changedSelection.emit(this.selection.selected);
-    });
+    this.type$ = this.getType$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.users$ = this.getUsers(this.type$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.myUser = toSignal(this.getMyUser());
+
+    this.dataSize = toSignal(
+      this.users$.pipe(
+        map((users) => Number(users.details?.totalResult ?? users.result.length)),
+        distinctUntilChanged(),
+      ),
+      { initialValue: 0 },
+    );
   }
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      if (!params['filter']) {
-        this.getData(this.INITIAL_PAGE_SIZE, 0, this.type, this.searchQueries);
-      }
-
-      if (params['deferredReload']) {
-        setTimeout(() => {
-          this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
-        }, 2000);
-      }
+    this.selection.changed.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.changedSelection.emit(this.selection.selected);
     });
+
+    this.users$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((users) => (this.dataSource.data = users.result));
+
+    this.route.queryParamMap
+      .pipe(
+        map((params) => params.get('deferredReload')),
+        filter(Boolean),
+        take(1),
+        delay(2000),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.refresh$.next(true));
   }
 
-  public setType(type: Type): void {
-    this.type = type;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        type: type === Type.TYPE_HUMAN ? 'human' : type === Type.TYPE_MACHINE ? 'machine' : 'human',
-      },
-      replaceUrl: true,
-      queryParamsHandling: 'merge',
-      skipLocationChange: false,
-    });
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, this.searchQueries);
+  setType(type: Type) {
+    this.router
+      .navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          type: type === Type.HUMAN ? 'human' : type === Type.MACHINE ? 'machine' : 'human',
+        },
+        replaceUrl: true,
+        queryParamsHandling: 'merge',
+        skipLocationChange: false,
+      })
+      .then();
+  }
+
+  private getMyUser() {
+    return this.userService.user$.pipe(
+      catchError((error) => {
+        this.toast.showError(error);
+        return EMPTY;
+      }),
+    );
+  }
+
+  private getType$(): Observable<Type> {
+    return this.route.queryParamMap.pipe(
+      map((params) => params.get('type')),
+      filter(Boolean),
+      map((type) => (type === 'machine' ? Type.MACHINE : Type.HUMAN)),
+      startWith(Type.HUMAN),
+      distinctUntilChanged(),
+    );
+  }
+
+  private getDirection$() {
+    return this.sort$.pipe(
+      switchMap((sort) =>
+        sort.sortChange.pipe(
+          map(({ direction }) => direction),
+          startWith(sort.direction),
+        ),
+      ),
+      distinctUntilChanged(),
+    );
+  }
+
+  private getSortingColumn$() {
+    return this.sort$.pipe(
+      switchMap((sort) =>
+        sort.sortChange.pipe(
+          map(({ active }) => active),
+          startWith(sort.active),
+        ),
+      ),
+      map((active) => {
+        switch (active) {
+          case 'displayName':
+            return UserFieldName.DISPLAY_NAME;
+          case 'username':
+            return UserFieldName.USER_NAME;
+          case 'preferredLoginName':
+            // TODO: replace with preferred username sorting once implemented
+            return UserFieldName.USER_NAME;
+          case 'email':
+            return UserFieldName.EMAIL;
+          case 'state':
+            return UserFieldName.STATE;
+          case 'creationDate':
+            return UserFieldName.CREATION_DATE;
+          default:
+            return undefined;
+        }
+      }),
+      distinctUntilChanged(),
+    );
+  }
+
+  private getQueries(type$: Observable<Type>): Observable<Query[]> {
+    const activeOrgId$ = this.getActiveOrgId();
+
+    return this.searchQueries$.pipe(
+      startWith([]),
+      combineLatestWith(type$, activeOrgId$),
+      switchMap(([queries, type, organizationId]) =>
+        from(queries).pipe(
+          map((query) => this.searchQueryToV2(query.toObject())),
+          startWith({ case: 'typeQuery' as const, value: { type } }),
+          startWith(organizationId ? { case: 'organizationIdQuery' as const, value: { organizationId } } : undefined),
+          filter(Boolean),
+          toArray(),
+        ),
+      ),
+    );
+  }
+
+  private searchQueryToV2(query: UserSearchQuery.AsObject): Query | undefined {
+    if (query.userNameQuery) {
+      return {
+        case: 'userNameQuery' as const,
+        value: {
+          userName: query.userNameQuery.userName,
+          method: query.userNameQuery.method as unknown as any,
+        },
+      };
+    } else if (query.displayNameQuery) {
+      return {
+        case: 'displayNameQuery' as const,
+        value: {
+          displayName: query.displayNameQuery.displayName,
+          method: query.displayNameQuery.method as unknown as any,
+        },
+      };
+    } else if (query.emailQuery) {
+      return {
+        case: 'emailQuery' as const,
+        value: {
+          emailAddress: query.emailQuery.emailAddress,
+          method: query.emailQuery.method as unknown as any,
+        },
+      };
+    } else if (query.stateQuery) {
+      return {
+        case: 'stateQuery' as const,
+        value: {
+          state: this.toV2State(query.stateQuery.state),
+        },
+      };
+    } else {
+      return undefined;
+    }
+  }
+
+  private toV2State(state: UserStateV1) {
+    switch (state) {
+      case UserStateV1.USER_STATE_ACTIVE:
+        return UserState.ACTIVE;
+      case UserStateV1.USER_STATE_INACTIVE:
+        return UserState.INACTIVE;
+      case UserStateV1.USER_STATE_DELETED:
+        return UserState.DELETED;
+      case UserStateV1.USER_STATE_LOCKED:
+        return UserState.LOCKED;
+      case UserStateV1.USER_STATE_INITIAL:
+        return UserState.INITIAL;
+      default:
+        throw new Error(`Invalid UserState ${state}`);
+    }
+  }
+
+  private getUsers(type$: Observable<Type>) {
+    const queries$ = this.getQueries(type$);
+    const direction$ = this.getDirection$();
+    const sortingColumn$ = this.getSortingColumn$();
+
+    const page$ = this.paginator$.pipe(switchMap((paginator) => paginator.page));
+    const pageSize$ = page$.pipe(
+      map(({ pageSize }) => pageSize),
+      startWith(this.INITIAL_PAGE_SIZE),
+      distinctUntilChanged(),
+    );
+    const pageIndex$ = page$.pipe(
+      map(({ pageIndex }) => pageIndex),
+      startWith(0),
+      distinctUntilChanged(),
+    );
+
+    return this.refresh$.pipe(
+      startWith(true),
+      combineLatestWith(queries$, direction$, sortingColumn$, pageSize$, pageIndex$),
+      switchMap(([_, queries, direction, sortingColumn, pageSize, pageIndex]) => {
+        return this.fetchUsers(queries, direction, sortingColumn, pageSize, pageIndex);
+      }),
+    );
+  }
+
+  private fetchUsers(
+    queries: Query[],
+    direction: SortDirection,
+    sortingColumn: UserFieldName | undefined,
+    pageSize: number,
+    pageIndex: number,
+  ) {
+    return defer(() => {
+      const req = {
+        query: {
+          limit: pageSize,
+          offset: BigInt(pageIndex * pageSize),
+          asc: direction === 'asc',
+        },
+        sortingColumn,
+        queries: queries.map((query) => ({ query })),
+      };
+
+      this.loading.set(true);
+      return this.userService.listUsers(req);
+    }).pipe(
+      catchError((error) => {
+        this.toast.showError(error);
+        return EMPTY;
+      }),
+      finalize(() => this.loading.set(false)),
+    );
   }
 
   public isAllSelected(): boolean {
@@ -132,138 +357,49 @@ export class UserTableComponent implements OnInit {
     this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
 
-  public changePage(event: PageEvent): void {
-    this.selection.clear();
-    this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type, this.searchQueries);
-  }
-
-  public deactivateSelectedUsers(): void {
-    Promise.all(
-      this.selection.selected
-        .filter((u) => u.state === UserState.USER_STATE_ACTIVE)
-        .map((value) => {
-          return this.userService.deactivateUser(value.id);
-        }),
-    )
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
-        this.selection.clear();
-        setTimeout(() => {
-          this.refreshPage();
-        }, 1000);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
+  public async deactivateSelectedUsers(): Promise<void> {
+    const usersToDeactivate = this.selection.selected
+      .filter((u) => u.state === UserState.ACTIVE)
+      .map((value) => {
+        return this.userService.deactivateUser(value.userId);
       });
-  }
 
-  public reactivateSelectedUsers(): void {
-    Promise.all(
-      this.selection.selected
-        .filter((u) => u.state === UserState.USER_STATE_INACTIVE)
-        .map((value) => {
-          return this.userService.reactivateUser(value.id);
-        }),
-    )
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
-        this.selection.clear();
-        setTimeout(() => {
-          this.refreshPage();
-        }, 1000);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public gotoRouterLink(rL: any): void {
-    this.router.navigate(rL);
-  }
-
-  private async getData(limit: number, offset: number, type: Type, searchQueries?: SearchQuery[]): Promise<void> {
-    this.loadingSubject.next(true);
-
-    let queryT = new SearchQuery();
-    const typeQuery = new TypeQuery();
-    typeQuery.setType(type);
-    queryT.setTypeQuery(typeQuery);
-
-    let sortingField: UserFieldName | undefined = undefined;
-    if (this.sort?.active && this.sort?.direction)
-      switch (this.sort.active) {
-        case 'displayName':
-          sortingField = UserFieldName.USER_FIELD_NAME_DISPLAY_NAME;
-          break;
-        case 'username':
-          sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
-          break;
-        case 'preferredLoginName':
-          // TODO: replace with preferred username sorting once implemented
-          sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
-          break;
-        case 'email':
-          sortingField = UserFieldName.USER_FIELD_NAME_EMAIL;
-          break;
-        case 'state':
-          sortingField = UserFieldName.USER_FIELD_NAME_STATE;
-          break;
-        case 'creationDate':
-          sortingField = UserFieldName.USER_FIELD_NAME_CREATION_DATE;
-          break;
-      }
-
-    this.userService
-      .listUsers(
-        limit,
-        offset,
-        searchQueries?.length ? [queryT, ...searchQueries] : [queryT],
-        sortingField,
-        this.sort?.direction,
-      )
-      .then((resp) => {
-        if (resp.details?.totalResult) {
-          this.totalResult = resp.details?.totalResult;
-        } else {
-          this.totalResult = 0;
-        }
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details?.viewTimestamp;
-        }
-        this.dataSource.data = resp.resultList;
-        this.loadingSubject.next(false);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-        this.loadingSubject.next(false);
-      });
-  }
-
-  public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, this.searchQueries);
-  }
-
-  public sortChange(sortState: Sort) {
-    if (sortState.direction && sortState.active) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction} ending`);
-      this.refreshPage();
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
+    try {
+      await Promise.all(usersToDeactivate);
+    } catch (error) {
+      this.toast.showError(error);
+      return;
     }
-  }
 
-  public applySearchQuery(searchQueries: SearchQuery[]): void {
+    this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
     this.selection.clear();
-    this.searchQueries = searchQueries;
-    this.getData(
-      this.paginator ? this.paginator.pageSize : this.INITIAL_PAGE_SIZE,
-      this.paginator ? this.paginator.pageIndex * this.paginator.pageSize : 0,
-      this.type,
-      searchQueries,
-    );
+    setTimeout(() => {
+      this.refresh$.next(true);
+    }, 1000);
   }
 
-  public deleteUser(user: User.AsObject): void {
+  public async reactivateSelectedUsers(): Promise<void> {
+    const usersToReactivate = this.selection.selected
+      .filter((u) => u.state === UserState.INACTIVE)
+      .map((value) => {
+        return this.userService.reactivateUser(value.userId);
+      });
+
+    try {
+      await Promise.all(usersToReactivate);
+    } catch (error) {
+      this.toast.showError(error);
+      return;
+    }
+
+    this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
+    this.selection.clear();
+    setTimeout(() => {
+      this.refresh$.next(true);
+    }, 1000);
+  }
+
+  public deleteUser(user: User): void {
     const authUserData = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -286,9 +422,10 @@ export class UserTableComponent implements OnInit {
       confirmation: user.preferredLoginName,
     };
 
-    if (user && user.id) {
-      const authUser = this.authService.userSubject.getValue();
-      const isMe = authUser?.id === user.id;
+    if (user?.userId) {
+      const authUser = this.myUser();
+      console.log('my user', authUser);
+      const isMe = authUser?.userId === user.userId;
 
       let dialogRef;
 
@@ -304,32 +441,48 @@ export class UserTableComponent implements OnInit {
         });
       }
 
-      dialogRef.afterClosed().subscribe((resp) => {
-        if (resp) {
-          this.userService
-            .removeUser(user.id)
-            .then(() => {
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
-              this.selection.clear();
-              this.toast.showInfo('USER.TOAST.DELETED', true);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-      });
+      dialogRef
+        .afterClosed()
+        .pipe(
+          filter(Boolean),
+          switchMap(() => this.userService.deleteUser(user.userId)),
+        )
+        .subscribe({
+          next: () => {
+            setTimeout(() => {
+              this.refresh$.next(true);
+            }, 1000);
+            this.selection.clear();
+            this.toast.showInfo('USER.TOAST.DELETED', true);
+          },
+          error: (err) => this.toast.showError(err),
+        });
     }
   }
 
   public get multipleActivatePossible(): boolean {
     const selected = this.selection.selected;
-    return selected ? selected.findIndex((user) => user.state !== UserState.USER_STATE_ACTIVE) > -1 : false;
+    return selected ? selected.findIndex((user) => user.state !== UserState.ACTIVE) > -1 : false;
   }
 
   public get multipleDeactivatePossible(): boolean {
     const selected = this.selection.selected;
-    return selected ? selected.findIndex((user) => user.state !== UserState.USER_STATE_INACTIVE) > -1 : false;
+    return selected ? selected.findIndex((user) => user.state !== UserState.INACTIVE) > -1 : false;
+  }
+
+  private getActiveOrgId() {
+    return this.authenticationService.authenticationChanged.pipe(
+      startWith(true),
+      filter(Boolean),
+      switchMap(() =>
+        from(this.authService.getActiveOrg()).pipe(
+          catchError((err) => {
+            this.toast.showError(err);
+            return of(undefined);
+          }),
+        ),
+      ),
+      map((org) => org?.id),
+    );
   }
 }

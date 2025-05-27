@@ -168,7 +168,7 @@ export async function token(request: TokenRequest): Promise<Tokens> {
     });
 }
 
-const authRequestBiIDTrend = new Trend('oidc_auth_request_by_id_duration', true);
+const authRequestByIDTrend = new Trend('oidc_auth_request_by_id_duration', true);
 export async function authRequestByID(id: string, tokens: any): Promise<Response> {
   const response = http.get(url(`/v2/oidc/auth_requests/${id}`), {
     headers: {
@@ -178,11 +178,11 @@ export async function authRequestByID(id: string, tokens: any): Promise<Response
   check(response, {
     'authorize status ok': (r) => r.status == 200 || fail(`auth request by failed: ${JSON.stringify(r)}`),
   });
-  authRequestBiIDTrend.add(response.timings.duration);
+  authRequestByIDTrend.add(response.timings.duration);
   return response;
 }
 
-const finalizeAuthRequestTrend = new Trend('oidc_auth_requst_by_id_duration', true);
+const finalizeAuthRequestTrend = new Trend('oidc_auth_request_finalize', true);
 export async function finalizeAuthRequest(id: string, session: any, tokens: any): Promise<Response> {
   const res = await http.post(
     url(`/v2/oidc/auth_requests/${id}`),

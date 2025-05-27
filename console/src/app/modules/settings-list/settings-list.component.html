@@ -1,82 +1,85 @@
-<cnsl-sidenav
-  *ngIf="currentSetting"
-  [title]="title"
-  [description]="description"
-  [indented]="true"
-  [(ngModel)]="currentSetting"
-  [settingsList]="settingsList"
-  queryParam="id"
->
-  <ng-container *ngIf="currentSetting === 'organizations'">
+<cnsl-sidenav [indented]="true" [setting]="setting()" (settingChange)="setting.set($event)" [settingsList]="settingsList">
+  <ng-container *ngIf="setting()?.id === 'organizations'">
     <h2>{{ 'ORG.PAGES.LIST' | translate }}</h2>
     <p class="org-desc cnsl-secondary-text">{{ 'ORG.PAGES.LISTDESCRIPTION' | translate }}</p>
 
     <cnsl-org-table></cnsl-org-table>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'features'">
+  <ng-container *ngIf="setting()?.id === 'features'">
     <cnsl-features></cnsl-features>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'complexity'">
+  <ng-container *ngIf="setting()?.id === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'age'">
+  <ng-container *ngIf="setting()?.id === 'age'">
     <cnsl-password-age-policy [serviceType]="serviceType"></cnsl-password-age-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'lockout'">
+  <ng-container *ngIf="setting()?.id === 'lockout'">
     <cnsl-password-lockout-policy [serviceType]="serviceType"></cnsl-password-lockout-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'login'">
+  <ng-container *ngIf="setting()?.id === 'login'">
     <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'verified_domains'">
+  <ng-container *ngIf="setting()?.id === 'verified_domains'">
     <cnsl-domains></cnsl-domains>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'domain' && (['iam.policy.write'] | hasRole | async) === true">
+  <ng-container *ngIf="setting()?.id === 'domain' && (['iam.policy.write'] | hasRole | async) === true">
     <cnsl-domain-policy [serviceType]="serviceType"></cnsl-domain-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'idp'">
+  <ng-container *ngIf="setting()?.id === 'idp'">
     <cnsl-idp-settings [serviceType]="serviceType"></cnsl-idp-settings>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'notifications'">
+  <ng-container *ngIf="setting()?.id === 'notifications'">
     <cnsl-notification-policy [serviceType]="serviceType"></cnsl-notification-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'smtpprovider' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'smtpprovider' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-notification-smtp-provider [serviceType]="serviceType"></cnsl-notification-smtp-provider>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'smsprovider' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'smsprovider' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-notification-sms-provider [serviceType]="serviceType"></cnsl-notification-sms-provider>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'oidc' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'oidc' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-oidc-configuration></cnsl-oidc-configuration>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'secrets' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'webkeys' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-oidc-webkeys />
+  </ng-container>
+  <ng-container *ngIf="setting()?.id === 'secrets' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-secret-generator></cnsl-secret-generator>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'security' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'security' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-security-policy></cnsl-security-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'branding'">
+  <ng-container *ngIf="setting()?.id === 'branding'">
     <cnsl-private-labeling-policy [serviceType]="serviceType"></cnsl-private-labeling-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'messagetexts'">
+  <ng-container *ngIf="setting()?.id === 'messagetexts'">
     <cnsl-message-texts [serviceType]="serviceType"></cnsl-message-texts>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'logintexts'">
+  <ng-container *ngIf="setting()?.id === 'logintexts'">
     <cnsl-login-texts [serviceType]="serviceType"></cnsl-login-texts>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'privacypolicy'">
+  <ng-container *ngIf="setting()?.id === 'privacypolicy'">
     <cnsl-privacy-policy [serviceType]="serviceType"></cnsl-privacy-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'languages' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'languages' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-language-settings></cnsl-language-settings>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'views' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'views' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-iam-views></cnsl-iam-views>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'events' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'events' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-events></cnsl-events>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'failedevents' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="setting()?.id === 'failedevents' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-iam-failed-events></cnsl-iam-failed-events>
   </ng-container>
+  <!-- todo: figure out permissions -->
+  <ng-container *ngIf="setting()?.id === 'actions'">
+    <cnsl-actions-two-actions />
+  </ng-container>
+  <ng-container *ngIf="setting()?.id === 'actions_targets'">
+    <cnsl-actions-two-targets />
+  </ng-container>
+  <ng-content></ng-content>
 </cnsl-sidenav>

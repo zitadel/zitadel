@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"time"
 
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -371,42 +372,42 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.Star
 }
 
 func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID())
+	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
 	}
-	content, redirect, err := s.command.AuthFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+	_, details, err := s.command.CreateIntent(ctx, state, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), session.PersistentParameters())
 	if err != nil {
 		return nil, err
 	}
+	content, redirect := session.GetAuth(ctx)
 	if redirect {
 		return &user.StartIdentityProviderIntentResponse{
 			Details:  object.DomainToDetailsPb(details),
 			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
 		}, nil
-	} else {
-		return &user.StartIdentityProviderIntentResponse{
-			Details: object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-				PostForm: []byte(content),
-			},
-		}, nil
 	}
+	return &user.StartIdentityProviderIntentResponse{
+		Details: object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
+			PostForm: []byte(content),
+		},
+	}, nil
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetInstance(ctx).InstanceID())
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
 	if err != nil {
 		return nil, err
 	}
-	externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
+	externalUser, userID, session, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
 	if err != nil {
 		if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
 			return nil, err
 		}
 		return nil, err
 	}
-	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
+	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, session)
 	if err != nil {
 		return nil, err
 	}
@@ -444,7 +445,7 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 	return "", nil
 }
 
-func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, map[string][]string, error) {
+func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, *ldap.Session, error) {
 	provider, err := s.command.GetProvider(ctx, idpID, "", "")
 	if err != nil {
 		return nil, "", nil, err
@@ -470,7 +471,7 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	for _, item := range session.Entry.Attributes {
 		attributes[item.Name] = item.Values
 	}
-	return externalUser, userID, attributes, nil
+	return externalUser, userID, session, nil
 }
 
 func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
@@ -483,6 +484,9 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-nme4gszsvx", "Errors.Intent.NotSucceeded")
+	}
+	if time.Now().After(intent.ExpiresAt()) {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Afb2s", "Errors.Intent.Expired")
 	}
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }

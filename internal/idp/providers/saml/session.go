@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
@@ -60,6 +61,11 @@ func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	return idp.Form(resp.content.String())
 }
 
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
+}
+
 // FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.RequestID == "" || s.Request == nil {
@@ -100,6 +106,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		}
 	}
 	return userMapper, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.Assertion == nil || s.Assertion.Conditions == nil {
+		return time.Time{}
+	}
+	return s.Assertion.Conditions.NotOnOrAfter
 }
 
 func (s *Session) transientMappingID() (string, error) {

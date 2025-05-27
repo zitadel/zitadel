@@ -30,9 +30,18 @@ type Session struct {
 	Tokens  *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
+func NewSession(provider *Provider, tokens *oidc.Tokens[*oidc.IDTokenClaims]) *Session {
+	return &Session{Provider: provider, Tokens: tokens}
+}
+
 // GetAuth implements the [idp.Session] interface.
 func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	return idp.Redirect(s.AuthURL)
+}
+
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
 }
 
 // FetchUser implements the [idp.Session] interface.
@@ -46,6 +55,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, err
 	}
 	return &User{s.Tokens.IDTokenClaims}, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.Tokens == nil || s.Tokens.IDTokenClaims == nil {
+		return time.Time{}
+	}
+	return s.Tokens.IDTokenClaims.GetExpiration()
 }
 
 func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDTokenClaims, error) {

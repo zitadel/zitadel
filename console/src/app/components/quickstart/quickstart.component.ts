@@ -4,8 +4,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
-import { listFrameworks, hasFramework, getFramework } from '@netlify/framework-info';
-import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
+import type { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 
 export type FrameworkDefinition = {

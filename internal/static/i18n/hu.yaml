@@ -536,6 +536,7 @@ Errors:
     StateMissing: A kérésből hiányzik a State paraméter
     NotStarted: Az intent nem indult el, vagy már befejeződött
     NotSucceeded: Az intent nem sikerült
+    Expired: A kérésből lejárt
     TokenCreationFailed: A token létrehozása nem sikerült
     InvalidToken: Az Intent Token érvénytelen
     OtherUser: Az intent egy másik felhasználónak szól
@@ -543,6 +544,7 @@ Errors:
     AlreadyExists: Az Auth Request már létezik
     NotExisting: Az Auth Request nem létezik
     WrongLoginClient: Az Auth Requestet egy másik bejelentkezési kliens hozta létre
+    AlreadyHandled: A hitelesítési kérelem már feldolgozva
   OIDCSession:
     RefreshTokenInvalid: Az Refresh Token érvénytelen
     Token:
@@ -553,8 +555,12 @@ Errors:
     AlreadyExists: A SAMLRequest már létezik
     NotExisting: A SAMLRequest nem létezik
     WrongLoginClient: A SAMLRequest egy másik bejelentkezési ügyfél által létrehozott
+    AlreadyHandled: A SAMLRequest már feldolgozva
   SAMLSession:
     InvalidClient: SAMLResponse nem lett kiadva ehhez az ügyfélhez
+  DeviceAuth:
+    NotFound: Az eszközengedélyezési kérelem nem létezik
+    AlreadyHandled: Az eszközengedélyezési kérelem már feldolgozva
   Feature:
     NotExisting: A funkció nem létezik
     TypeNotSupported: A funkció típusa nem támogatott

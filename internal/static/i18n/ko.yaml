@@ -537,6 +537,7 @@ Errors:
     StateMissing: 요청에 상태 매개변수가 누락되었습니다
     NotStarted: 의도가 시작되지 않았거나 이미 종료되었습니다
     NotSucceeded: 의도가 성공하지 않았습니다
+    Expired: 의도의 유효 기간이 만료되었습니다
     TokenCreationFailed: 토큰 생성 실패
     InvalidToken: 의도 토큰이 유효하지 않습니다
     OtherUser: 다른 사용자를 위한 의도입니다
@@ -544,6 +545,7 @@ Errors:
     AlreadyExists: 인증 요청이 이미 존재합니다
     NotExisting: 인증 요청이 존재하지 않습니다
     WrongLoginClient: 다른 로그인 클라이언트에 의해 생성된 인증 요청
+    AlreadyHandled: 인증 요청이 이미 처리되었습니다
   OIDCSession:
     RefreshTokenInvalid: 새로 고침 토큰이 유효하지 않습니다
     Token:
@@ -554,8 +556,12 @@ Errors:
     AlreadyExists: SAMLRequest가 이미 존재합니다
     NotExisting: SAMLRequest가 존재하지 않습니다
     WrongLoginClient: 다른 로그인 클라이언트가 생성한 SAMLRequest
+    AlreadyHandled: SAML 요청이 이미 처리되었습니다
   SAMLSession:
     InvalidClient: 이 클라이언트에 대해 SAMLResponse가 발행되지 않았습니다.
+  DeviceAuth:
+    NotFound: 장치 인증 요청이 존재하지 않습니다
+    AlreadyHandled: 장치 인증 요청이 이미 처리되었습니다
   Feature:
     NotExisting: 기능이 존재하지 않습니다
     TypeNotSupported: 기능 유형이 지원되지 않습니다

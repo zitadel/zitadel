@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
+	"net/url"
 	"regexp"
 	"testing"
 
@@ -19,6 +20,8 @@ import (
 var (
 	//go:embed testdata/oidc_client_jwt.json
 	testdataOidcClientJWT string
+	//go:embed testdata/oidc_client_jwt_loginversion.json
+	testdataOidcClientJWTLoginVersion string
 	//go:embed testdata/oidc_client_public.json
 	testdataOidcClientPublic string
 	//go:embed testdata/oidc_client_public_old_id.json
@@ -89,6 +92,44 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 					AccessTokenLifetime: 43200000000000,
 					IdTokenLifetime:     43200000000000,
 				},
+			},
+		},
+		{
+			name: "jwt client, login version",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientJWTLoginVersion}, "instanceID", "clientID", true),
+			want: &OIDCClient{
+				InstanceID:               "230690539048009730",
+				AppID:                    "236647088211886082",
+				State:                    domain.AppStateActive,
+				ClientID:                 "236647088211951618",
+				HashedSecret:             "",
+				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
+				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode, domain.OIDCGrantTypeRefreshToken},
+				ApplicationType:          domain.OIDCApplicationTypeWeb,
+				AuthMethodType:           domain.OIDCAuthMethodTypePrivateKeyJWT,
+				PostLogoutRedirectURIs:   []string{"https://example.com/logout"},
+				IsDevMode:                true,
+				AccessTokenType:          domain.OIDCTokenTypeJWT,
+				AccessTokenRoleAssertion: true,
+				IDTokenRoleAssertion:     true,
+				IDTokenUserinfoAssertion: true,
+				ClockSkew:                1000000000,
+				AdditionalOrigins:        []string{"https://example.com"},
+				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     true,
+				PublicKeys:               map[string][]byte{"236647201860747266": []byte(pubkey)},
+				ProjectRoleKeys:          []string{"role1", "role2"},
+				Settings: &OIDCSettings{
+					AccessTokenLifetime: 43200000000000,
+					IdTokenLifetime:     43200000000000,
+				},
+				LoginVersion: domain.LoginVersion1,
+				LoginBaseURI: func() *URL {
+					ret, _ := url.Parse("https://test.com/login")
+					retURL := URL(*ret)
+					return &retURL
+				}(),
 			},
 		},
 		{
@@ -227,8 +268,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")

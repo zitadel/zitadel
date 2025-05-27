@@ -64,7 +64,8 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 		return nil, err
 	}
 
-	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	orgID := authz.GetCtxData(ctx).OrgID
+	err = queries.AppendMyResourceOwnerQuery(orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +92,6 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		AwaitOpenTransactions().
 		OrderDesc().

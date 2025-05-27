@@ -384,13 +384,13 @@ func ChangeBackChannelLogoutURI(backChannelLogoutURI string) func(event *OIDCCon
 	}
 }
 
-func ChangeLoginVersion(loginVersion domain.LoginVersion) func(event *OIDCConfigChangedEvent) {
+func ChangeOIDCLoginVersion(loginVersion domain.LoginVersion) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.LoginVersion = &loginVersion
 	}
 }
 
-func ChangeLoginBaseURI(loginBaseURI string) func(event *OIDCConfigChangedEvent) {
+func ChangeOIDCLoginBaseURI(loginBaseURI string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.LoginBaseURI = &loginBaseURI
 	}

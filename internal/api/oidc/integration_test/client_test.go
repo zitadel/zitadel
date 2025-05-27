@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client"
@@ -24,8 +25,7 @@ import (
 )
 
 func TestServer_Introspect(t *testing.T) {
-	project, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	project := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
 	app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 
@@ -188,10 +188,8 @@ func assertIntrospection(
 // with clients that have different authentication methods.
 func TestServer_VerifyClient(t *testing.T) {
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	project, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
-	projectInactive, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	project := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	projectInactive := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
 
 	inactiveClient, err := Instance.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
@@ -307,7 +305,7 @@ func TestServer_VerifyClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
+			_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
 			require.NoError(t, err)
 			linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: authRequestID,

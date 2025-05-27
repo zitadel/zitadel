@@ -57,9 +57,9 @@ The following metrics must be collected for each test iteration. The metrics are
 | ZITADEL Version | Setup | The version of zitadel deployed | Semantic version or commit  |
 | ZITADEL Configuration | Setup | Configuration of zitadel which deviates from the defaults and is not secret | yaml |
 | ZITADEL feature flags | Setup | Changed feature flags | yaml |
-| Database  | Setup | Database type and version | **type**: crdb / psql **version**: semantic version |
+| Database  | Setup | Database type and version | **type**: psql **version**: semantic version |
 | Database location | Setup | Region or location of the deployment of the database. If not further specified the hoster is Google Cloud SQL | Location / Region |
-| Database specification | Setup | The description must at least clarify the following metrics: vCPU, Memory and egress bandwidth (Scale) | **vCPU**: Amount of threads ([additional info](https://cloud.google.com/compute/docs/cpu-platforms)) **memory**: GB **egress bandwidth**:Gbps **scale**: Amount of crdb nodes if crdb is used |
+| Database specification | Setup | The description must at least clarify the following metrics: vCPU, Memory and egress bandwidth (Scale) | **vCPU**: Amount of threads ([additional info](https://cloud.google.com/compute/docs/cpu-platforms)) **memory**: GB **egress bandwidth**:Gbps |
 | ZITADEL metrics during test | Result | This metric helps understanding the bottlenecks of the executed test. At least the following metrics must be provided: CPU usage Memory usage | **CPU usage** in percent **Memory usage** in percent |
 | Observed errors | Result | Errors worth mentioning, mostly unexpected errors | description |
 | Top 3 most expensive database queries | Result | The execution plan of the top 3 most expensive database queries during the test execution | database execution plan |

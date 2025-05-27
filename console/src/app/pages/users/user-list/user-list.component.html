@@ -1,5 +1,5 @@
 <div class="max-width-container">
-  <div class="enlarged-container" [ngSwitch]="type">
+  <div class="enlarged-container">
     <div class="users-title-row">
       <h1>{{ 'DESCRIPTIONS.USERS.TITLE' | translate }}</h1>
       <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/users" rel="noreferrer" target="_blank">
@@ -7,21 +7,6 @@
       </a>
     </div>
     <p class="user-list-sub cnsl-secondary-text">{{ 'DESCRIPTIONS.USERS.DESCRIPTION' | translate }}</p>
-    <ng-container *ngSwitchCase="Type.TYPE_HUMAN">
-      <cnsl-user-table
-        [type]="Type.TYPE_HUMAN"
-        [canWrite$]="['user.write$'] | hasRole"
-        [canDelete$]="['user.delete$'] | hasRole"
-      >
-      </cnsl-user-table>
-    </ng-container>
-    <ng-container *ngSwitchCase="Type.TYPE_MACHINE">
-      <cnsl-user-table
-        [type]="Type.TYPE_MACHINE"
-        [canWrite$]="['user.write$'] | hasRole"
-        [canDelete$]="['user.delete$'] | hasRole"
-      >
-      </cnsl-user-table>
-    </ng-container>
+    <cnsl-user-table [canWrite$]="['user.write$'] | hasRole" [canDelete$]="['user.delete$'] | hasRole"> </cnsl-user-table>
   </div>
 </div>

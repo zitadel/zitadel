@@ -115,3 +115,16 @@ enum ErrorReason {
   ERROR_REASON_REQUEST_URI_NOT_SUPPORTED = 15;
   ERROR_REASON_REGISTRATION_NOT_SUPPORTED = 16;
 }
+
+message DeviceAuthorizationRequest {
+  // The unique identifier of the device authorization request to be used for authorizing or denying the request.
+  string id = 1;
+  // The client_id of the application that initiated the device authorization request.
+  string client_id = 2;
+  // The scopes requested by the application.
+  repeated string scope = 3;
+  // Name of the client application.
+  string app_name = 4;
+  // Name of the project the client application is part of.
+  string project_name = 5;
+}

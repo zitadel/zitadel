@@ -325,10 +325,10 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 		changes = append(changes, project.ChangeBackChannelLogoutURI(backChannelLogoutURI))
 	}
 	if wm.LoginVersion != loginVersion {
-		changes = append(changes, project.ChangeLoginVersion(loginVersion))
+		changes = append(changes, project.ChangeOIDCLoginVersion(loginVersion))
 	}
 	if wm.LoginBaseURI != loginBaseURI {
-		changes = append(changes, project.ChangeLoginBaseURI(loginBaseURI))
+		changes = append(changes, project.ChangeOIDCLoginBaseURI(loginBaseURI))
 	}
 
 	if len(changes) == 0 {

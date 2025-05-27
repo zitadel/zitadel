@@ -14,6 +14,7 @@ Tracing:
   # for type 'otel' is used for standard [open telemetry](https://opentelemetry.io)
   # Fraction: 1.0
   # Endpoint: 'otel.collector.endpoint'
+  # ServiceName: 'ZITADEL' # Name of the service in traces
   #
   # type 'log' or '' disables tracing
   #
@@ -24,6 +25,8 @@ Tracing:
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
   # The endpoint of the otel collector endpoint
   Endpoint: "" #ZITADEL_TRACING_ENDPOINT
+  # The name of the service in traces
+  ServiceName: "ZITADEL" #ZITADEL_TRACING_SERVICENAME
 
 # Profiler enables capturing profiling data (CPU, Memory, ...) for performance analysis
 Profiler:
@@ -110,67 +113,36 @@ PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
-  # CockroachDB is the default database of ZITADEL
-  cockroach:
-    Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
-    Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
-    Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 5 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 2 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
-    MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
-    MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
-    Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
+  # Postgres is the default database of ZITADEL
+  postgres:
+    Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
+    Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
+    Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
+    Options: "" # ZITADEL_DATABASE_POSTGRES_OPTIONS
     User:
-      Username: zitadel # ZITADEL_DATABASE_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_USER_PASSWORD
+      Username: zitadel # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
+      Password: "" # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
       SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
+        Mode: disable # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
     Admin:
       # By default, ExistingDatabase is not specified in the connection string
       # If the connection resolves to a database that is not existing in your system, configure an existing one here
-      # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
-      ExistingDatabase: # ZITADEL_DATABASE_COCKROACH_ADMIN_EXISTINGDATABASE
-      Username: root # ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD
-      SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_KEY
-  # Postgres is used as soon as a value is set
-  # The values describe the possible fields to set values
-  postgres:
-    Host: # ZITADEL_DATABASE_POSTGRES_HOST
-    Port: # ZITADEL_DATABASE_POSTGRES_PORT
-    Database: # ZITADEL_DATABASE_POSTGRES_DATABASE
-    MaxOpenConns: # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
-    MaxConnLifetime: # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
-    MaxConnIdleTime: # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
-    Options: # ZITADEL_DATABASE_POSTGRES_OPTIONS
-    User:
-      Username: # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
-      SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
-    Admin:
-      # The default ExistingDatabase is postgres
-      # If your db system doesn't have a database named postgres, configure an existing database here
       # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
       ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
-      Username: # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
+      Username: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
+      Password: postgres # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
       SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
+        Mode: disable # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
 # Caches are EXPERIMENTAL. The following config may have breaking changes in the future.
 # If no config is provided, caching is disabled by default.
@@ -340,6 +312,16 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Federated logouts store the information needed to handle federated logout and their state transfer
+  FederatedLogouts:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
@@ -415,13 +397,12 @@ Projections:
     org_domain_verified_fields:
       TransactionDuration: 0s
       BulkLimit: 2000
-
-    # The Notifications projection is used for sending emails and SMS to users
+    execution_handler:
+      BulkLimit: 10
+    # The Notifications projection is used for preparing the messages (emails and SMS) to be sent to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
-      # Sending emails can take longer than 500ms
-      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_TRANSACTIONDURATION
     password_complexities:
       TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PASSWORD_COMPLEXITIES_TRANSACTIONDURATION
     lockout_policy:
@@ -446,41 +427,30 @@ Projections:
 Notifications:
   # Notifications can be processed by either a sequential mode (legacy) or a new parallel mode.
   # The parallel mode is currently only recommended for Postgres databases.
-  # For CockroachDB, the sequential mode is recommended, see: https://github.com/zitadel/zitadel/issues/9002
   # If legacy mode is enabled, the worker config below is ignored.
   LegacyEnabled: true # ZITADEL_NOTIFICATIONS_LEGACYENABLED
   # The amount of workers processing the notification request events.
   # If set to 0, no notification request events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
-  Workers: 1 # ZITADEL_NOTIFIACATIONS_WORKERS
-  # The amount of events a single worker will process in a run.
-  BulkLimit: 10 # ZITADEL_NOTIFIACATIONS_BULKLIMIT
-  # Time interval between scheduled notifications for request events
-  RequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
-  # The amount of workers processing the notification retry events.
-  # If set to 0, no notification retry events will be handled. This can be useful when running in
-  # multi binary / pod setup and allowing only certain executables to process the events.
-  RetryWorkers: 1 # ZITADEL_NOTIFIACATIONS_RETRYWORKERS
-  # Time interval between scheduled notifications for retry events
-  RetryRequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_RETRYREQUEUEEVERY
-  # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
-  # from HandleActiveInstances duration in the past until the projection's current time
-  # If set to 0 (default), every instance is always considered active
-  HandleActiveInstances: 0s # ZITADEL_NOTIFIACATIONS_HANDLEACTIVEINSTANCES
-  # The maximum duration a transaction remains open
-  # before it spots left folding additional events
-  # and updates the table.
-  TransactionDuration: 10s # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
+  Workers: 1 # ZITADEL_NOTIFICATIONS_WORKERS
+  # The maximum duration a job can do it's work before it is considered as failed.
+  TransactionDuration: 10s # ZITADEL_NOTIFICATIONS_TRANSACTIONDURATION
   # Automatically cancel the notification after the amount of failed attempts
-  MaxAttempts: 3 # ZITADEL_NOTIFIACATIONS_MAXATTEMPTS
+  MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
-  MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
-  # Failed attempts are retried after a confogired delay (with exponential backoff).
-  # Set a minimum and maximum delay and a factor for the backoff
-  MinRetryDelay: 5s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
-  MaxRetryDelay: 1m # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
-  # Any factor below 1 will be set to 1
-  RetryDelayFactor: 1.5 # ZITADEL_NOTIFIACATIONS_RETRYDELAYFACTOR
+  MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
+
+Executions:
+  # The amount of workers processing the execution request events.
+  # If set to 0, no execution request events will be handled. This can be useful when running in
+  # multi binary / pod setup and allowing only certain executables to process the events.
+  Workers: 1 # ZITADEL_EXECUTIONS_WORKERS
+  # The maximum duration a job can do it's work before it is considered as failed.
+  # This maximum duration is prioritized in case that the sum of the target's timeouts is higher,
+  # to limit the runtime of a singular execution.
+  TransactionDuration: 10s # ZITADEL_EXECUTIONS_TRANSACTIONDURATION
+  # Automatically cancel the notification if it cannot be handled within a specific time
+  MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
 
 Auth:
   # See Projections.BulkLimit
@@ -648,6 +618,16 @@ EncryptionKeys:
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
 SystemAPIUsers:
+  # - superuser:
+  #   Path: /path/to/superuser/key.pem
+  #   Memberships:
+  #     - MemberType: Organization
+  #       Roles: "ORG_OWNER"
+  #       AggregateID: "123456789012345678"
+  #     - MemberType: Project
+  #       Roles: "PROJECT_OWNER"
+
+
 # # Add keys for authentication of the systemAPI here:
 # # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
@@ -683,7 +663,7 @@ SystemDefaults:
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
     Hasher:
-      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
@@ -694,10 +674,11 @@ SystemDefaults:
       Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
       # Threads takes effect for the algorithms argon2i and argon2id
       Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
-      # Rounds takes effect for the algorithm pbkdf2
+      # Rounds takes effect for the algorithm pbkdf2 and sha2
       Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
-      # Hash takes effect for the algorithm pbkdf2
-      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      # Hash takes effect for the algorithm pbkdf2 and sha2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
+      # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
@@ -718,6 +699,9 @@ SystemDefaults:
     #   - "bcrypt"
     #   - "md5"      # md5Crypt with salt and password shuffling.
     #   - "md5plain" # md5 digest of a password without salt
+    #   - "md5salted" # md5 digest of a salted password
+    #   - "phpass"
+    #   - "sha2" # crypt(3) SHA-256 and SHA-512
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
@@ -765,6 +749,9 @@ SystemDefaults:
   DefaultQueryLimit: 100 # ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT
   # MaxQueryLimit limits the number of items that can be queried in a single v3 API search request with explicitly passing a limit.
   MaxQueryLimit: 1000 # ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT
+  # The maximum duration of the IDP intent lifetime after which the IDP intent expires and can not be retrieved or used anymore.
+  # Note that this time is measured only after the IdP intent was successful and not after the IDP intent was created.
+  MaxIdPIntentLifetime: 1h # ZITADEL_SYSTEMDEFAULTS_MAXIDPINTENTLIFETIME
 
 Actions:
   HTTP:
@@ -989,16 +976,15 @@ DefaultInstance:
   EmailTemplate: CjwhZG9jdHlwZSBodG1sPgo8aHRtbCB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbCIgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVybjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSI+CjxoZWFkPgogIDx0aXRsZT4KCiAgPC90aXRsZT4KICA8IS0tW2lmICFtc29dPjwhLS0+CiAgPG1ldGEgaHR0cC1lcXVpdj0iWC1VQS1Db21wYXRpYmxlIiBjb250ZW50PSJJRT1lZGdlIj4KICA8IS0tPCFbZW5kaWZdLS0+CiAgPG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVRGLTgiPgogIDxtZXRhIG5hbWU9InZpZXdwb3J0IiBjb250ZW50PSJ3aWR0aD1kZXZpY2Utd2lkdGgsIGluaXRpYWwtc2NhbGU9MSI+CiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KICAgICNvdXRsb29rIGEgeyBwYWRkaW5nOjA7IH0KICAgIGJvZHkgeyBtYXJnaW46MDtwYWRkaW5nOjA7LXdlYmtpdC10ZXh0LXNpemUtYWRqdXN0OjEwMCU7LW1zLXRleHQtc2l6ZS1hZGp1c3Q6MTAwJTsgfQogICAgdGFibGUsIHRkIHsgYm9yZGVyLWNvbGxhcHNlOmNvbGxhcHNlO21zby10YWJsZS1sc3BhY2U6MHB0O21zby10YWJsZS1yc3BhY2U6MHB0OyB9CiAgICBpbWcgeyBib3JkZXI6MDtoZWlnaHQ6YXV0bztsaW5lLWhlaWdodDoxMDAlOyBvdXRsaW5lOm5vbmU7dGV4dC1kZWNvcmF0aW9uOm5vbmU7LW1zLWludGVycG9sYXRpb24tbW9kZTpiaWN1YmljOyB9CiAgICBwIHsgZGlzcGxheTpibG9jazttYXJnaW46MTNweCAwOyB9CiAgPC9zdHlsZT4KICA8IS0tW2lmIG1zb10+CiAgPHhtbD4KICAgIDxvOk9mZmljZURvY3VtZW50U2V0dGluZ3M+CiAgICAgIDxvOkFsbG93UE5HLz4KICAgICAgPG86UGl4ZWxzUGVySW5jaD45NjwvbzpQaXhlbHNQZXJJbmNoPgogICAgPC9vOk9mZmljZURvY3VtZW50U2V0dGluZ3M+CiAgPC94bWw+CiAgPCFbZW5kaWZdLS0+CiAgPCEtLVtpZiBsdGUgbXNvIDExXT4KICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgogICAgLm1qLW91dGxvb2stZ3JvdXAtZml4IHsgd2lkdGg6MTAwJSAhaW1wb3J0YW50OyB9CiAgPC9zdHlsZT4KICA8IVtlbmRpZl0tLT4KCgogIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+CiAgICBAbWVkaWEgb25seSBzY3JlZW4gYW5kIChtaW4td2lkdGg6NDgwcHgpIHsKICAgICAgLm1qLWNvbHVtbi1wZXItMTAwIHsgd2lkdGg6MTAwJSAhaW1wb3J0YW50OyBtYXgtd2lkdGg6IDEwMCU7IH0KICAgICAgLm1qLWNvbHVtbi1wZXItNjAgeyB3aWR0aDo2MCUgIWltcG9ydGFudDsgbWF4LXdpZHRoOiA2MCU7IH0KICAgIH0KICA8L3N0eWxlPgoKCiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCgoKICAgIEBtZWRpYSBvbmx5IHNjcmVlbiBhbmQgKG1heC13aWR0aDo0ODBweCkgewogICAgICB0YWJsZS5tai1mdWxsLXdpZHRoLW1vYmlsZSB7IHdpZHRoOiAxMDAlICFpbXBvcnRhbnQ7IH0KICAgICAgdGQubWotZnVsbC13aWR0aC1tb2JpbGUgeyB3aWR0aDogYXV0byAhaW1wb3J0YW50OyB9CiAgICB9CgogIDwvc3R5bGU+CiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4uc2hhZG93IGEgewogICAgYm94LXNoYWRvdzogMHB4IDNweCAxcHggLTJweCByZ2JhKDAsIDAsIDAsIDAuMiksIDBweCAycHggMnB4IDBweCByZ2JhKDAsIDAsIDAsIDAuMTQpLCAwcHggMXB4IDVweCAwcHggcmdiYSgwLCAwLCAwLCAwLjEyKTsKICB9PC9zdHlsZT4KCiAge3tpZiAuRm9udFVSTH19CiAgPHN0eWxlPgogICAgQGZvbnQtZmFjZSB7CiAgICAgIGZvbnQtZmFtaWx5OiAne3suRm9udEZhY2VGYW1pbHl9fSc7CiAgICAgIGZvbnQtc3R5bGU6IG5vcm1hbDsKICAgICAgZm9udC1kaXNwbGF5OiBzd2FwOwogICAgICBzcmM6IHVybCh7ey5Gb250VVJMfX0pOwogICAgfQogIDwvc3R5bGU+CiAge3tlbmR9fQoKPC9oZWFkPgo8Ym9keSBzdHlsZT0id29yZC1zcGFjaW5nOm5vcm1hbDsiPgoKCjxkaXYKICAgICAgICBzdHlsZT0iIgo+CgogIDx0YWJsZQogICAgICAgICAgYWxpZ249ImNlbnRlciIgYm9yZGVyPSIwIiBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIHJvbGU9InByZXNlbnRhdGlvbiIgc3R5bGU9ImJhY2tncm91bmQ6e3suQmFja2dyb3VuZENvbG9yfX07YmFja2dyb3VuZC1jb2xvcjp7ey5CYWNrZ3JvdW5kQ29sb3J9fTt3aWR0aDoxMDAlO2JvcmRlci1yYWRpdXM6MTZweDsiCiAgPgogICAgPHRib2R5PgogICAgPHRyPgogICAgICA8dGQ+CgoKICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48dGFibGUgYWxpZ249ImNlbnRlciIgYm9yZGVyPSIwIiBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIGNsYXNzPSIiIHN0eWxlPSJ3aWR0aDo4MDBweDsiIHdpZHRoPSI4MDAiID48dHI+PHRkIHN0eWxlPSJsaW5lLWhlaWdodDowcHg7Zm9udC1zaXplOjBweDttc28tbGluZS1oZWlnaHQtcnVsZTpleGFjdGx5OyI+PCFbZW5kaWZdLS0+CgoKICAgICAgICA8ZGl2ICBzdHlsZT0ibWFyZ2luOjBweCBhdXRvO2JvcmRlci1yYWRpdXM6MTZweDttYXgtd2lkdGg6ODAwcHg7Ij4KCiAgICAgICAgICA8dGFibGUKICAgICAgICAgICAgICAgICAgYWxpZ249ImNlbnRlciIgYm9yZGVyPSIwIiBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIHJvbGU9InByZXNlbnRhdGlvbiIgc3R5bGU9IndpZHRoOjEwMCU7Ym9yZGVyLXJhZGl1czoxNnB4OyIKICAgICAgICAgID4KICAgICAgICAgICAgPHRib2R5PgogICAgICAgICAgICA8dHI+CiAgICAgICAgICAgICAgPHRkCiAgICAgICAgICAgICAgICAgICAgICBzdHlsZT0iZGlyZWN0aW9uOmx0cjtmb250LXNpemU6MHB4O3BhZGRpbmc6MjBweCAwO3BhZGRpbmctbGVmdDowO3RleHQtYWxpZ246Y2VudGVyOyIKICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48dGFibGUgcm9sZT0icHJlc2VudGF0aW9uIiBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCI+PHRyPjx0ZCBjbGFzcz0iIiB3aWR0aD0iODAwcHgiID48IVtlbmRpZl0tLT4KCiAgICAgICAgICAgICAgICA8dGFibGUKICAgICAgICAgICAgICAgICAgICAgICAgYWxpZ249ImNlbnRlciIgYm9yZGVyPSIwIiBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIHJvbGU9InByZXNlbnRhdGlvbiIgc3R5bGU9IndpZHRoOjEwMCU7IgogICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICA8dGJvZHk+CiAgICAgICAgICAgICAgICAgIDx0cj4KICAgICAgICAgICAgICAgICAgICA8dGQ+CgoKICAgICAgICAgICAgICAgICAgICAgIDwhLS1baWYgbXNvIHwgSUVdPjx0YWJsZSBhbGlnbj0iY2VudGVyIiBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgY2xhc3M9IiIgc3R5bGU9IndpZHRoOjgwMHB4OyIgd2lkdGg9IjgwMCIgPjx0cj48dGQgc3R5bGU9ImxpbmUtaGVpZ2h0OjBweDtmb250LXNpemU6MHB4O21zby1saW5lLWhlaWdodC1ydWxlOmV4YWN0bHk7Ij48IVtlbmRpZl0tLT4KCgogICAgICAgICAgICAgICAgICAgICAgPGRpdiAgc3R5bGU9Im1hcmdpbjowcHggYXV0bzttYXgtd2lkdGg6ODAwcHg7Ij4KCiAgICAgICAgICAgICAgICAgICAgICAgIDx0YWJsZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFsaWduPSJjZW50ZXIiIGJvcmRlcj0iMCIgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiByb2xlPSJwcmVzZW50YXRpb24iIHN0eWxlPSJ3aWR0aDoxMDAlOyIKICAgICAgICAgICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICAgICAgICAgIDx0Ym9keT4KICAgICAgICAgICAgICAgICAgICAgICAgICA8dHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU9ImRpcmVjdGlvbjpsdHI7Zm9udC1zaXplOjBweDtwYWRkaW5nOjA7dGV4dC1hbGlnbjpjZW50ZXI7IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48dGFibGUgcm9sZT0icHJlc2VudGF0aW9uIiBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCI+PHRyPjx0ZCBjbGFzcz0iIiBzdHlsZT0id2lkdGg6ODAwcHg7IiA+PCFbZW5kaWZdLS0+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3M9Im1qLWNvbHVtbi1wZXItMTAwIG1qLW91dGxvb2stZ3JvdXAtZml4IiBzdHlsZT0iZm9udC1zaXplOjA7bGluZS1oZWlnaHQ6MDt0ZXh0LWFsaWduOmxlZnQ7ZGlzcGxheTppbmxpbmUtYmxvY2s7d2lkdGg6MTAwJTtkaXJlY3Rpb246bHRyOyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwhLS1baWYgbXNvIHwgSUVdPjx0YWJsZSBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgcm9sZT0icHJlc2VudGF0aW9uIiA+PHRyPjx0ZCBzdHlsZT0idmVydGljYWwtYWxpZ246dG9wO3dpZHRoOjgwMHB4OyIgPjwhW2VuZGlmXS0tPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjbGFzcz0ibWotY29sdW1uLXBlci0xMDAgbWotb3V0bG9vay1ncm91cC1maXgiIHN0eWxlPSJmb250LXNpemU6MHB4O3RleHQtYWxpZ246bGVmdDtkaXJlY3Rpb246bHRyO2Rpc3BsYXk6aW5saW5lLWJsb2NrO3ZlcnRpY2FsLWFsaWduOnRvcDt3aWR0aDoxMDAlOyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRhYmxlCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvcmRlcj0iMCIgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiByb2xlPSJwcmVzZW50YXRpb24iIHdpZHRoPSIxMDAlIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGJvZHk+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0cj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGQgIHN0eWxlPSJ2ZXJ0aWNhbC1hbGlnbjp0b3A7cGFkZGluZzowOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB7e2lmIC5Mb2dvVVJMfX0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0YWJsZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgcm9sZT0icHJlc2VudGF0aW9uIiBzdHlsZT0iIiB3aWR0aD0iMTAwJSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRib2R5PgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0ZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYWxpZ249ImNlbnRlciIgc3R5bGU9ImZvbnQtc2l6ZTowcHg7cGFkZGluZzo1MHB4IDAgMzBweCAwO3dvcmQtYnJlYWs6YnJlYWstd29yZDsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0YWJsZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgcm9sZT0icHJlc2VudGF0aW9uIiBzdHlsZT0iYm9yZGVyLWNvbGxhcHNlOmNvbGxhcHNlO2JvcmRlci1zcGFjaW5nOjBweDsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0Ym9keT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0ZCAgc3R5bGU9IndpZHRoOjE4MHB4OyI+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGltZwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBoZWlnaHQ9ImF1dG8iIHNyYz0ie3suTG9nb1VSTH19IiBzdHlsZT0iYm9yZGVyOjA7Ym9yZGVyLXJhZGl1czo4cHg7ZGlzcGxheTpibG9jaztvdXRsaW5lOm5vbmU7dGV4dC1kZWNvcmF0aW9uOm5vbmU7aGVpZ2h0OmF1dG87d2lkdGg6MTAwJTtmb250LXNpemU6MTNweDsiIHdpZHRoPSIxODAiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAvPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RkPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3Rib2R5PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90YWJsZT4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90ZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90cj4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGJvZHk+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAge3tlbmR9fQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGJvZHk+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPCEtLVtpZiBtc28gfCBJRV0+PC90ZD48L3RyPjwvdGFibGU+PCFbZW5kaWZdLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPCEtLVtpZiBtc28gfCBJRV0+PC90ZD48L3RyPjwvdGFibGU+PCFbZW5kaWZdLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RkPgogICAgICAgICAgICAgICAgICAgICAgICAgIDwvdHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgPC90Ym9keT4KICAgICAgICAgICAgICAgICAgICAgICAgPC90YWJsZT4KCiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KCgogICAgICAgICAgICAgICAgICAgICAgPCEtLVtpZiBtc28gfCBJRV0+PC90ZD48L3RyPjwvdGFibGU+PCFbZW5kaWZdLS0+CgoKICAgICAgICAgICAgICAgICAgICA8L3RkPgogICAgICAgICAgICAgICAgICA8L3RyPgogICAgICAgICAgICAgICAgICA8L3Rib2R5PgogICAgICAgICAgICAgICAgPC90YWJsZT4KCiAgICAgICAgICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48L3RkPjwvdHI+PHRyPjx0ZCBjbGFzcz0iIiB3aWR0aD0iODAwcHgiID48IVtlbmRpZl0tLT4KCiAgICAgICAgICAgICAgICA8dGFibGUKICAgICAgICAgICAgICAgICAgICAgICAgYWxpZ249ImNlbnRlciIgYm9yZGVyPSIwIiBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIHJvbGU9InByZXNlbnRhdGlvbiIgc3R5bGU9IndpZHRoOjEwMCU7IgogICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICA8dGJvZHk+CiAgICAgICAgICAgICAgICAgIDx0cj4KICAgICAgICAgICAgICAgICAgICA8dGQ+CgoKICAgICAgICAgICAgICAgICAgICAgIDwhLS1baWYgbXNvIHwgSUVdPjx0YWJsZSBhbGlnbj0iY2VudGVyIiBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgY2xhc3M9IiIgc3R5bGU9IndpZHRoOjgwMHB4OyIgd2lkdGg9IjgwMCIgPjx0cj48dGQgc3R5bGU9ImxpbmUtaGVpZ2h0OjBweDtmb250LXNpemU6MHB4O21zby1saW5lLWhlaWdodC1ydWxlOmV4YWN0bHk7Ij48IVtlbmRpZl0tLT4KCgogICAgICAgICAgICAgICAgICAgICAgPGRpdiAgc3R5bGU9Im1hcmdpbjowcHggYXV0bzttYXgtd2lkdGg6ODAwcHg7Ij4KCiAgICAgICAgICAgICAgICAgICAgICAgIDx0YWJsZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFsaWduPSJjZW50ZXIiIGJvcmRlcj0iMCIgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIiByb2xlPSJwcmVzZW50YXRpb24iIHN0eWxlPSJ3aWR0aDoxMDAlOyIKICAgICAgICAgICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICAgICAgICAgIDx0Ym9keT4KICAgICAgICAgICAgICAgICAgICAgICAgICA8dHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU9ImRpcmVjdGlvbjpsdHI7Zm9udC1zaXplOjBweDtwYWRkaW5nOjA7dGV4dC1hbGlnbjpjZW50ZXI7IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48dGFibGUgcm9sZT0icHJlc2VudGF0aW9uIiBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCI+PHRyPjx0ZCBjbGFzcz0iIiBzdHlsZT0idmVydGljYWwtYWxpZ246dG9wO3dpZHRoOjQ4MHB4OyIgPjwhW2VuZGlmXS0tPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzPSJtai1jb2x1bW4tcGVyLTYwIG1qLW91dGxvb2stZ3JvdXAtZml4IiBzdHlsZT0iZm9udC1zaXplOjBweDt0ZXh0LWFsaWduOmxlZnQ7ZGlyZWN0aW9uOmx0cjtkaXNwbGF5OmlubGluZS1ibG9jazt2ZXJ0aWNhbC1hbGlnbjp0b3A7d2lkdGg6MTAwJTsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRhYmxlCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgcm9sZT0icHJlc2VudGF0aW9uIiB3aWR0aD0iMTAwJSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGJvZHk+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0ZCAgc3R5bGU9InZlcnRpY2FsLWFsaWduOnRvcDtwYWRkaW5nOjA7Ij4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRhYmxlCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgcm9sZT0icHJlc2VudGF0aW9uIiBzdHlsZT0iIiB3aWR0aD0iMTAwJSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGJvZHk+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhbGlnbj0iY2VudGVyIiBzdHlsZT0iZm9udC1zaXplOjBweDtwYWRkaW5nOjEwcHggMjVweDt3b3JkLWJyZWFrOmJyZWFrLXdvcmQ7IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0eWxlPSJmb250LWZhbWlseTp7ey5Gb250RmFtaWx5fX07Zm9udC1zaXplOjI0cHg7Zm9udC13ZWlnaHQ6NTAwO2xpbmUtaGVpZ2h0OjE7dGV4dC1hbGlnbjpjZW50ZXI7Y29sb3I6e3suRm9udENvbG9yfX07IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID57ey5HcmVldGluZ319PC9kaXY+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RkPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90cj4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0ZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFsaWduPSJjZW50ZXIiIHN0eWxlPSJmb250LXNpemU6MHB4O3BhZGRpbmc6MTBweCAyNXB4O3dvcmQtYnJlYWs6YnJlYWstd29yZDsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU9ImZvbnQtZmFtaWx5Ont7LkZvbnRGYW1pbHl9fTtmb250LXNpemU6MTZweDtmb250LXdlaWdodDpsaWdodDtsaW5lLWhlaWdodDoxLjU7dGV4dC1hbGlnbjpjZW50ZXI7Y29sb3I6e3suRm9udENvbG9yfX07IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID57ey5UZXh0fX08L2Rpdj4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RyPgoKCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0ZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFsaWduPSJjZW50ZXIiIHZlcnRpY2FsLWFsaWduPSJtaWRkbGUiIGNsYXNzPSJzaGFkb3ciIHN0eWxlPSJmb250LXNpemU6MHB4O3BhZGRpbmc6MTBweCAyNXB4O3dvcmQtYnJlYWs6YnJlYWstd29yZDsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRhYmxlCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib3JkZXI9IjAiIGNlbGxwYWRkaW5nPSIwIiBjZWxsc3BhY2luZz0iMCIgcm9sZT0icHJlc2VudGF0aW9uIiBzdHlsZT0iYm9yZGVyLWNvbGxhcHNlOnNlcGFyYXRlO2xpbmUtaGVpZ2h0OjEwMCU7IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0cj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRkCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYWxpZ249ImNlbnRlciIgYmdjb2xvcj0ie3suUHJpbWFyeUNvbG9yfX0iIHJvbGU9InByZXNlbnRhdGlvbiIgc3R5bGU9ImJvcmRlcjpub25lO2JvcmRlci1yYWRpdXM6NnB4O2N1cnNvcjphdXRvO21zby1wYWRkaW5nLWFsdDoxMHB4IDI1cHg7YmFja2dyb3VuZDp7ey5QcmltYXJ5Q29sb3J9fTsiIHZhbGlnbj0ibWlkZGxlIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGEKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGhyZWY9Int7LlVSTH19IiByZWw9Im5vb3BlbmVyIG5vcmVmZXJyZXIgbm90cmFjayIgc3R5bGU9ImRpc3BsYXk6aW5saW5lLWJsb2NrO2JhY2tncm91bmQ6e3suUHJpbWFyeUNvbG9yfX07Y29sb3I6I2ZmZmZmZjtmb250LWZhbWlseTp7ey5Gb250RmFtaWx5fX07Zm9udC1zaXplOjE0cHg7Zm9udC13ZWlnaHQ6NTAwO2xpbmUtaGVpZ2h0OjEyMCU7bWFyZ2luOjA7dGV4dC1kZWNvcmF0aW9uOm5vbmU7dGV4dC10cmFuc2Zvcm06bm9uZTtwYWRkaW5nOjEwcHggMjVweDttc28tcGFkZGluZy1hbHQ6MHB4O2JvcmRlci1yYWRpdXM6NnB4OyIgdGFyZ2V0PSJfYmxhbmsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAge3suQnV0dG9uVGV4dH19CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9hPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RkPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90cj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90ZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB7e2lmIC5JbmNsdWRlRm9vdGVyfX0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0cj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRkCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYWxpZ249ImNlbnRlciIgc3R5bGU9ImZvbnQtc2l6ZTowcHg7cGFkZGluZzoxMHB4IDI1cHg7cGFkZGluZy10b3A6MjBweDtwYWRkaW5nLXJpZ2h0OjIwcHg7cGFkZGluZy1ib3R0b206MjBweDtwYWRkaW5nLWxlZnQ6MjBweDt3b3JkLWJyZWFrOmJyZWFrLXdvcmQ7IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHlsZT0iYm9yZGVyLXRvcDpzb2xpZCAycHggI2RiZGJkYjtmb250LXNpemU6MXB4O21hcmdpbjowcHggYXV0bzt3aWR0aDoxMDAlOyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9wPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48dGFibGUgYWxpZ249ImNlbnRlciIgYm9yZGVyPSIwIiBjZWxscGFkZGluZz0iMCIgY2VsbHNwYWNpbmc9IjAiIHN0eWxlPSJib3JkZXItdG9wOnNvbGlkIDJweCAjZGJkYmRiO2ZvbnQtc2l6ZToxcHg7bWFyZ2luOjBweCBhdXRvO3dpZHRoOjQ0MHB4OyIgcm9sZT0icHJlc2VudGF0aW9uIiB3aWR0aD0iNDQwcHgiID48dHI+PHRkIHN0eWxlPSJoZWlnaHQ6MDtsaW5lLWhlaWdodDowOyI+ICZuYnNwOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+PC90cj48L3RhYmxlPjwhW2VuZGlmXS0tPgoKCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RyPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0cj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRkCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYWxpZ249ImNlbnRlciIgc3R5bGU9ImZvbnQtc2l6ZTowcHg7cGFkZGluZzoxNnB4O3dvcmQtYnJlYWs6YnJlYWstd29yZDsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU9ImZvbnQtZmFtaWx5Ont7LkZvbnRGYW1pbHl9fTtmb250LXNpemU6MTNweDtsaW5lLWhlaWdodDoxO3RleHQtYWxpZ246Y2VudGVyO2NvbG9yOnt7LkZvbnRDb2xvcn19OyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+e3suRm9vdGVyVGV4dH19PC9kaXY+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RkPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90cj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHt7ZW5kfX0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGJvZHk+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90YWJsZT4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90Ym9keT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48L3RkPjwvdHI+PC90YWJsZT48IVtlbmRpZl0tLT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgPC90cj4KICAgICAgICAgICAgICAgICAgICAgICAgICA8L3Rib2R5PgogICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgoKICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgoKCiAgICAgICAgICAgICAgICAgICAgICA8IS0tW2lmIG1zbyB8IElFXT48L3RkPjwvdHI+PC90YWJsZT48IVtlbmRpZl0tLT4KCgogICAgICAgICAgICAgICAgICAgIDwvdGQ+CiAgICAgICAgICAgICAgICAgIDwvdHI+CiAgICAgICAgICAgICAgICAgIDwvdGJvZHk+CiAgICAgICAgICAgICAgICA8L3RhYmxlPgoKICAgICAgICAgICAgICAgIDwhLS1baWYgbXNvIHwgSUVdPjwvdGQ+PC90cj48L3RhYmxlPjwhW2VuZGlmXS0tPgogICAgICAgICAgICAgIDwvdGQ+CiAgICAgICAgICAgIDwvdHI+CiAgICAgICAgICAgIDwvdGJvZHk+CiAgICAgICAgICA8L3RhYmxlPgoKICAgICAgICA8L2Rpdj4KCgogICAgICAgIDwhLS1baWYgbXNvIHwgSUVdPjwvdGQ+PC90cj48L3RhYmxlPjwhW2VuZGlmXS0tPgoKCiAgICAgIDwvdGQ+CiAgICA8L3RyPgogICAgPC90Ym9keT4KICA8L3RhYmxlPgoKPC9kaXY+Cgo8L2JvZHk+CjwvaHRtbD4K # ZITADEL_DEFAULTINSTANCE_EMAILTEMPLATE
 
   # WebKeys configures the OIDC token signing keys that are generated when a new instance is created.
-  # WebKeys are still in alpha, so the config is disabled here. This will prevent generation of keys for now.
-  # WebKeys:
-  #  Type: "rsa" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_TYPE
-  #  Config:
-  #    Bits: "2048" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_BITS
-  #    Hasher: "sha256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_HASHER
+  WebKeys:
+    Type: "rsa" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_TYPE
+    Config:
+     RSABits: "2048" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_BITS
+     RSAHasher: "sha256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_HASHER
   # WebKeys:
   #  Type: "ecdsa"
   #  Config:
-  #    Curve: "P256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_CURVE
+  #    EllipticCurve: "P256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_CURVE
 
   # Sets the default values for lifetime and expiration for OIDC in each newly created instance
   # This default can be overwritten for each instance during runtime
@@ -1131,7 +1117,26 @@ DefaultInstance:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
     # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
+    # UserSchema: false # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
+    # TokenExchange: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
+    ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
+    # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
+    #   - 1 # OrgByID
+    #   - 2 # ProjectGrant
+    #   - 3 # Project
+    #   - 4 # UserGrant
+    #   - 5 # OrgDomainVerified
+    # WebKey: false # ZITADEL_DEFAULTINSTANCE_FEATURES_WEBKEY
+    # DebugOIDCParentError: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
+    # OIDCSingleV1SessionTermination: false # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
+    # DisableUserTokenEvent: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DISABLEUSERTOKENEVENT
+    # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
+    # LoginV2:
+    #  Required: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
+    #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
+    # ConsoleUseV2UserApi: false # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
@@ -1321,6 +1326,8 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "session.read"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1356,6 +1363,7 @@ InternalAuthZ:
         - "action.target.read"
         - "action.execution.read"
         - "userschema.read"
+        - "session.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -1749,6 +1757,298 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+
+SystemAuthZ:
+  RolePermissionMappings:
+    - Role: "SYSTEM_OWNER"
+      Permissions:
+        - "system.instance.read"
+        - "system.instance.write"
+        - "system.instance.delete"
+        - "system.domain.read"
+        - "system.domain.write"
+        - "system.domain.delete"
+        - "system.debug.read"
+        - "system.debug.write"
+        - "system.debug.delete"
+        - "system.feature.read"
+        - "system.feature.write"
+        - "system.feature.delete"
+        - "system.limits.write"
+        - "system.limits.delete"
+        - "system.quota.write"
+        - "system.quota.delete"
+        - "system.iam.member.read"
+    - Role: "SYSTEM_OWNER_VIEWER"
+      Permissions:
+        - "system.instance.read"
+        - "system.domain.read"
+        - "system.debug.read"
+        - "system.feature.read"
+        - "system.iam.member.read"
+    - Role: "IAM_OWNER"
+      Permissions:
+        - "iam.read"
+        - "iam.write"
+        - "iam.policy.read"
+        - "iam.policy.write"
+        - "iam.policy.delete"
+        - "iam.member.read"
+        - "iam.member.write"
+        - "iam.member.delete"
+        - "iam.idp.read"
+        - "iam.idp.write"
+        - "iam.idp.delete"
+        - "iam.action.read"
+        - "iam.action.write"
+        - "iam.action.delete"
+        - "iam.flow.read"
+        - "iam.flow.write"
+        - "iam.flow.delete"
+        - "iam.feature.read"
+        - "iam.feature.write"
+        - "iam.feature.delete"
+        - "iam.restrictions.read"
+        - "iam.restrictions.write"
+        - "iam.web_key.write"
+        - "iam.web_key.delete"
+        - "iam.web_key.read"
+        - "iam.debug.write"
+        - "iam.debug.read"
+        - "org.read"
+        - "org.global.read"
+        - "org.create"
+        - "org.write"
+        - "org.delete"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.member.delete"
+        - "org.idp.read"
+        - "org.idp.write"
+        - "org.idp.delete"
+        - "org.action.read"
+        - "org.action.write"
+        - "org.action.delete"
+        - "org.flow.read"
+        - "org.flow.write"
+        - "org.flow.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
+        - "user.read"
+        - "user.global.read"
+        - "user.write"
+        - "user.delete"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
+        - "policy.read"
+        - "policy.write"
+        - "policy.delete"
+        - "project.read"
+        - "project.create"
+        - "project.write"
+        - "project.delete"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.member.delete"
+        - "project.role.read"
+        - "project.role.write"
+        - "project.role.delete"
+        - "project.app.read"
+        - "project.app.write"
+        - "project.app.delete"
+        - "project.grant.read"
+        - "project.grant.write"
+        - "project.grant.delete"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "project.grant.member.delete"
+        - "events.read"
+        - "milestones.read"
+        - "session.read"
+        - "session.delete"
+        - "action.target.read"
+        - "action.target.write"
+        - "action.target.delete"
+        - "action.execution.read"
+        - "action.execution.write"
+        - "userschema.read"
+        - "userschema.write"
+        - "userschema.delete"
+        - "session.read"
+        - "session.delete"
+    - Role: "IAM_OWNER_VIEWER"
+      Permissions:
+        - "iam.read"
+        - "iam.policy.read"
+        - "iam.member.read"
+        - "iam.idp.read"
+        - "iam.action.read"
+        - "iam.flow.read"
+        - "iam.restrictions.read"
+        - "iam.feature.read"
+        - "iam.web_key.read"
+        - "iam.debug.read"
+        - "org.read"
+        - "org.member.read"
+        - "org.idp.read"
+        - "org.action.read"
+        - "org.flow.read"
+        - "org.feature.read"
+        - "user.read"
+        - "user.global.read"
+        - "user.grant.read"
+        - "user.membership.read"
+        - "user.feature.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "events.read"
+        - "milestones.read"
+        - "action.target.read"
+        - "action.execution.read"
+        - "userschema.read"
+        - "session.read"
+    - Role: "IAM_ORG_MANAGER"
+      Permissions:
+        - "org.read"
+        - "org.global.read"
+        - "org.create"
+        - "org.write"
+        - "org.delete"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.member.delete"
+        - "org.idp.read"
+        - "org.idp.write"
+        - "org.idp.delete"
+        - "org.action.read"
+        - "org.action.write"
+        - "org.action.delete"
+        - "org.flow.read"
+        - "org.flow.write"
+        - "org.flow.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
+        - "user.read"
+        - "user.global.read"
+        - "user.write"
+        - "user.delete"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
+        - "policy.read"
+        - "policy.write"
+        - "policy.delete"
+        - "project.read"
+        - "project.create"
+        - "project.write"
+        - "project.delete"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.member.delete"
+        - "project.role.read"
+        - "project.role.write"
+        - "project.role.delete"
+        - "project.app.read"
+        - "project.app.write"
+        - "project.app.delete"
+        - "project.grant.read"
+        - "project.grant.write"
+        - "project.grant.delete"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "project.grant.member.delete"
+        - "session.delete"
+    - Role: "IAM_USER_MANAGER"
+      Permissions:
+        - "org.read"
+        - "org.global.read"
+        - "org.member.read"
+        - "org.member.delete"
+        - "user.read"
+        - "user.global.read"
+        - "user.write"
+        - "user.delete"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "user.membership.read"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.grant.read"
+        - "project.grant.write"
+        - "project.grant.delete"
+        - "project.grant.member.read"
+        - "session.delete"
+    - Role: "IAM_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "IAM_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
+    - Role: "IAM_LOGIN_CLIENT"
+      Permissions:
+        - "iam.read"
+        - "iam.policy.read"
+        - "iam.member.read"
+        - "iam.member.write"
+        - "iam.idp.read"
+        - "iam.feature.read"
+        - "iam.restrictions.read"
+        - "org.read"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.idp.read"
+        - "org.feature.read"
+        - "user.read"
+        - "user.write"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "session.read"
+        - "session.link"
+        - "session.delete"
+        - "userschema.read"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:

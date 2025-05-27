@@ -338,6 +338,8 @@ message OAuthConfig {
             description: "defines how the attribute is called where ZITADEL can get the id of the user";
         }
     ];
+    // Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
+    bool use_pkce = 7;
 }
 
 message GenericOIDCConfig {
@@ -363,6 +365,12 @@ message GenericOIDCConfig {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "true";
             description: "if true, provider information get mapped from the id token, not from the userinfo endpoint";
+        }
+    ];
+    // Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
+    bool use_pkce = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "true";
         }
     ];
 }
@@ -456,6 +464,7 @@ message LDAPConfig {
     repeated string user_filters = 7;
     google.protobuf.Duration timeout = 8;
     LDAPAttributes attributes = 9;
+    bytes root_ca = 10;
 }
 
 message SAMLConfig {
@@ -470,6 +479,9 @@ message SAMLConfig {
     // Optional name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 5;
+    // Boolean weather federated logout is enabled. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 6;
 }
 
 message AzureADConfig {

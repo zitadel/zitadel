@@ -112,9 +112,6 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain str
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	userIDs := make([]string, len(users.Users))
 	for i, user := range users.Users {
 		userIDs[i] = user.ID

@@ -78,6 +78,8 @@ message Details {
       example: "\"69629023906488334\"";
     }
   ];
+  //creation_date is the timestamp where the first operation on the object was made
+  google.protobuf.Timestamp creation_date = 4;
 }
 
 message ListDetails {

@@ -23,6 +23,7 @@ func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSet
 		Settings: loginSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.OrgID,
 		},
@@ -38,6 +39,7 @@ func (s *Server) GetPasswordComplexitySettings(ctx context.Context, req *setting
 		Settings: passwordComplexitySettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -53,6 +55,7 @@ func (s *Server) GetPasswordExpirySettings(ctx context.Context, req *settings.Ge
 		Settings: passwordExpirySettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -68,6 +71,7 @@ func (s *Server) GetBrandingSettings(ctx context.Context, req *settings.GetBrand
 		Settings: brandingSettingsToPb(current, s.assetsAPIDomain(ctx)),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -83,6 +87,7 @@ func (s *Server) GetDomainSettings(ctx context.Context, req *settings.GetDomainS
 		Settings: domainSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -98,6 +103,7 @@ func (s *Server) GetLegalAndSupportSettings(ctx context.Context, req *settings.G
 		Settings: legalAndSupportSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
@@ -113,6 +119,7 @@ func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockou
 		Settings: lockoutSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
+			CreationDate:  timestamppb.New(current.CreationDate),
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},

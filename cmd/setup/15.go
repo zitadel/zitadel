@@ -11,8 +11,7 @@ import (
 )
 
 var (
-	//go:embed 15/cockroach/*.sql
-	//go:embed 15/postgres/*.sql
+	//go:embed 15/*.sql
 	currentProjectionState embed.FS
 )
 
@@ -21,7 +20,7 @@ type CurrentProjectionState struct {
 }
 
 func (mig *CurrentProjectionState) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(currentProjectionState, "15", mig.dbClient.Type())
+	statements, err := readStatements(currentProjectionState, "15")
 	if err != nil {
 		return err
 	}

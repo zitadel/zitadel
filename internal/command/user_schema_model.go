@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-
-	"golang.org/x/exp/slices"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -80,6 +79,7 @@ func (wm *UserSchemaWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 	return query.Builder()
 }
+
 func (wm *UserSchemaWriteModel) NewUpdatedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,

@@ -43,6 +43,7 @@ func TestMain(m *testing.M) {
 
 func TestServer_AddOrganization(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
+	userId := "userID"
 
 	tests := []struct {
 		name    string
@@ -81,7 +82,19 @@ func TestServer_AddOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "admin with init",
+			name: "no admin, custom org ID",
+			ctx:  CTX,
+			req: &org.AddOrganizationRequest{
+				Name:  gofakeit.AppName(),
+				OrgId: gu.Ptr("custom-org-ID"),
+			},
+			want: &org.AddOrganizationResponse{
+				OrganizationId: "custom-org-ID",
+				CreatedAdmins:  []*org.AddOrganizationResponse_CreatedAdmin{},
+			},
+		},
+		{
+			name: "admin with init with userID passed for Human admin",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
 				Name: gofakeit.AppName(),
@@ -89,6 +102,7 @@ func TestServer_AddOrganization(t *testing.T) {
 					{
 						UserType: &org.AddOrganizationRequest_Admin_Human{
 							Human: &user.AddHumanUserRequest{
+								UserId: &userId,
 								Profile: &user.SetHumanProfile{
 									GivenName:  "firstname",
 									FamilyName: "lastname",
@@ -108,7 +122,7 @@ func TestServer_AddOrganization(t *testing.T) {
 				OrganizationId: integration.NotEmpty,
 				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
 					{
-						UserId:    integration.NotEmpty,
+						UserId:    userId,
 						EmailCode: gu.Ptr(integration.NotEmpty),
 						PhoneCode: nil,
 					},
@@ -140,7 +154,7 @@ func TestServer_AddOrganization(t *testing.T) {
 								IdpLinks: []*user.IDPLink{
 									{
 										IdpId:    idpResp.Id,
-										UserId:   "userID",
+										UserId:   userId,
 										UserName: "username",
 									},
 								},

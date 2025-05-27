@@ -1,11 +1,6 @@
 version: '3.8'
 
 services:
-  cockroach:
-    extends:
-      file: '../../../e2e/config/localhost/docker-compose.yaml'
-      service: 'db'
-  
   postgres:
     restart: 'always'
     image: 'postgres:latest'

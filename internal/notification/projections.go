@@ -2,22 +2,25 @@ package notification
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/queue"
 )
 
 var (
 	projections []*handler.Handler
-	worker      *handlers.NotificationWorker
 )
 
 func Register(
@@ -34,11 +37,15 @@ func Register(
 	otpEmailTmpl, fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
 	tokenLifetime time.Duration,
-	client *database.DB,
+	queue *queue.Queue,
 ) {
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.ShouldStart()
+	}
+
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
-	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig.LegacyEnabled))
+	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
 	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
 		ctx,
@@ -53,22 +60,25 @@ func Register(
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
-	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, es, client, c)
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.AddWorkers(handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
+	}
 }
 
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
-	worker.Start(ctx)
 }
 
 func ProjectInstance(ctx context.Context) error {
-	for _, projection := range projections {
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting notification projection")
 		_, err := projection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("notification projection done")
 	}
 	return nil
 }

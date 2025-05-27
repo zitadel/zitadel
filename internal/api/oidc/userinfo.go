@@ -20,7 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -410,5 +412,104 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		}
 	}
 
+	var function string
+	switch triggerType {
+	case domain.TriggerTypePreUserinfoCreation:
+		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreUserinfo.LocalizationKey())
+	case domain.TriggerTypePreAccessTokenCreation:
+		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreAccessToken.LocalizationKey())
+	case domain.TriggerTypeUnspecified, domain.TriggerTypePostAuthentication, domain.TriggerTypePreCreation, domain.TriggerTypePostCreation, domain.TriggerTypePreSAMLResponseCreation:
+		// added for linting, there should never be any trigger type be used here besides PreUserinfo and PreAccessToken
+		return err
+	}
+
+	if function == "" {
+		return nil
+	}
+	executionTargets, err := execution.QueryExecutionTargetsForFunction(ctx, s.query, function)
+	if err != nil {
+		return err
+	}
+	info := &ContextInfo{
+		Function:     function,
+		UserInfo:     userInfo,
+		User:         qu.User,
+		UserMetadata: qu.Metadata,
+		Org:          qu.Org,
+		UserGrants:   qu.UserGrants,
+	}
+
+	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	if err != nil {
+		return err
+	}
+	contextInfoResponse, ok := resp.(*ContextInfoResponse)
+	if !ok || contextInfoResponse == nil {
+		return nil
+	}
+	claimLogs := make([]string, 0)
+	for _, metadata := range contextInfoResponse.SetUserMetadata {
+		if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+			claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
+		}
+	}
+	for _, claim := range contextInfoResponse.AppendClaims {
+		if strings.HasPrefix(claim.Key, ClaimPrefix) {
+			continue
+		}
+		if userInfo.Claims[claim.Key] == nil {
+			userInfo.AppendClaims(claim.Key, claim.Value)
+			continue
+		}
+		claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", claim.Key))
+	}
+	claimLogs = append(claimLogs, contextInfoResponse.AppendLogClaims...)
+	if len(claimLogs) > 0 {
+		userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, function), claimLogs)
+	}
+
 	return nil
+}
+
+type ContextInfo struct {
+	Function     string               `json:"function,omitempty"`
+	UserInfo     *oidc.UserInfo       `json:"userinfo,omitempty"`
+	User         *query.User          `json:"user,omitempty"`
+	UserMetadata []query.UserMetadata `json:"user_metadata,omitempty"`
+	Org          *query.UserInfoOrg   `json:"org,omitempty"`
+	UserGrants   []query.UserGrant    `json:"user_grants,omitempty"`
+	Response     *ContextInfoResponse `json:"response,omitempty"`
+}
+
+type ContextInfoResponse struct {
+	SetUserMetadata []*domain.Metadata `json:"set_user_metadata,omitempty"`
+	AppendClaims    []*AppendClaim     `json:"append_claims,omitempty"`
+	AppendLogClaims []string           `json:"append_log_claims,omitempty"`
+}
+
+type AppendClaim struct {
+	Key   string `json:"key"`
+	Value any    `json:"value"`
+}
+
+func (c *ContextInfo) GetHTTPRequestBody() []byte {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func (c *ContextInfo) SetHTTPResponseBody(resp []byte) error {
+	if !json.Valid(resp) {
+		return zerrors.ThrowPreconditionFailed(nil, "ACTION-4m9s2", "Errors.Execution.ResponseIsNotValidJSON")
+	}
+	if c.Response == nil {
+		c.Response = &ContextInfoResponse{}
+	}
+	return json.Unmarshal(resp, c.Response)
+}
+
+func (c *ContextInfo) GetContent() any {
+	return c.Response
 }

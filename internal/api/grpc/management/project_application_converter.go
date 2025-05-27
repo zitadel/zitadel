@@ -67,15 +67,21 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) (*domain.OIDCApp,
 	}, nil
 }
 
-func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) *domain.SAMLApp {
+func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) (*domain.SAMLApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(req.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.SAMLApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
 		},
-		AppName:     req.Name,
-		Metadata:    req.GetMetadataXml(),
-		MetadataURL: req.GetMetadataUrl(),
-	}
+		AppName:      req.Name,
+		Metadata:     req.GetMetadataXml(),
+		MetadataURL:  req.GetMetadataUrl(),
+		LoginVersion: loginVersion,
+		LoginBaseURI: loginBaseURI,
+	}, nil
 }
 
 func AddAPIAppRequestToDomain(app *mgmt_pb.AddAPIAppRequest) *domain.APIApp {
@@ -125,15 +131,21 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 	}, nil
 }
 
-func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest) *domain.SAMLApp {
+func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest) (*domain.SAMLApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(app.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.SAMLApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
 		},
-		AppID:       app.AppId,
-		Metadata:    app.GetMetadataXml(),
-		MetadataURL: app.GetMetadataUrl(),
-	}
+		AppID:        app.AppId,
+		Metadata:     app.GetMetadataXml(),
+		MetadataURL:  app.GetMetadataUrl(),
+		LoginVersion: loginVersion,
+		LoginBaseURI: loginBaseURI,
+	}, nil
 }
 
 func UpdateAPIAppConfigRequestToDomain(app *mgmt_pb.UpdateAPIAppConfigRequest) *domain.APIApp {

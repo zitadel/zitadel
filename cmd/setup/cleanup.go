@@ -21,21 +21,19 @@ func NewCleanup() *cobra.Command {
 		Long:  `cleans up migration if they got stuck`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
-			Cleanup(config)
+			Cleanup(cmd.Context(), config)
 		},
 	}
 }
 
-func Cleanup(config *Config) {
-	ctx := context.Background()
-
+func Cleanup(ctx context.Context, config *Config) {
 	logging.Info("cleanup started")
 
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	es := eventstore.NewEventstore(config.Eventstore)
 
 	step, err := migration.LastStuckStep(ctx, es)

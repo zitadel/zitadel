@@ -1,25 +1,25 @@
 import CodeBlock from '@theme/CodeBlock';
 
-export const Description = ({mode, link}) => {
+export const Description = ({mode, name}) => {
     let desc
     switch (mode) {
         case "disabled":
-            desc = <>Neither {link} nor ZITADEL terminates TLS.
-                Nevertheless, {link} forwards unencrypted HTTP/2 traffic, aka h2c, to ZITADEL.</>;
+            desc = <>Neither {name} nor ZITADEL terminates TLS.
+                Nevertheless, {name} forwards unencrypted HTTP/2 traffic, aka h2c, to ZITADEL.</>;
             break;
         case "external":
-            desc = <>{link} terminates TLS and forwards the requests to ZITADEL via unencrypted h2c.
-                This example uses an unsafe self-signed certificate for {link}</>;
+            desc = <>{name} terminates TLS and forwards the requests to ZITADEL via unencrypted h2c.
+                This example uses an unsafe self-signed certificate for {name}</>;
             break;
         case "enabled":
-            desc = <>{link} terminates TLS and forwards the requests to ZITADEL via encrypted HTTP/2.
-                This example uses an unsafe self-signed certificate for {link} and the same for ZITADEL.</>;
+            desc = <>{name} terminates TLS and forwards the requests to ZITADEL via encrypted HTTP/2.
+                This example uses an unsafe self-signed certificate for {name} and the same for ZITADEL.</>;
             break;
     }
     return (
         <>
             {desc}
-            <>By executing the commands below, you will download the files necessary to run ZITADEL behind {link} with the following config:</>
+            <>By executing the commands below, you will download the files necessary to run ZITADEL behind {name} with the following config:</>
         </>)
 }
 

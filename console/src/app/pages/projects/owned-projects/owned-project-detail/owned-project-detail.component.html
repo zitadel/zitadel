@@ -66,8 +66,8 @@
 
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" [queryParam]="'id'">
-      <ng-container *ngIf="currentSetting === 'general' && project">
+    <cnsl-sidenav [(setting)]="currentSetting" [settingsList]="settingsList">
+      <ng-container *ngIf="currentSetting.id === 'general' && project">
         <ng-template cnslHasRole [hasRole]="['project.app.read:' + project.id, 'project.app.read$']">
           <cnsl-application-grid
             *ngIf="grid"
@@ -91,7 +91,7 @@
           </cnsl-card>
         </ng-template>
 
-        <ng-container *ngIf="isZitadel === false">
+        <ng-container *ngIf="!isZitadel">
           <ng-template cnslHasRole [hasRole]="['project.role.read:' + project.id, 'project.role.read']">
             <cnsl-card
               id="roles"
@@ -160,7 +160,7 @@
         </ng-container>
       </ng-container>
 
-      <ng-container *ngIf="currentSetting === 'roles'">
+      <ng-container *ngIf="currentSetting.id === 'roles'">
         <h2 class="section-h2">{{ 'PROJECT.ROLE.TITLE' | translate }}</h2>
         <p class="desc cnsl-secondary-text">{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}</p>
 
@@ -172,12 +172,12 @@
         >
         </cnsl-project-roles-table>
       </ng-container>
-      <ng-container *ngIf="currentSetting === 'projectgrants'">
+      <ng-container *ngIf="currentSetting.id === 'projectgrants'">
         <h2 class="section-h2">{{ 'PROJECT.GRANT.TITLE' | translate }}</h2>
         <p class="desc cnsl-secondary-text">{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}</p>
         <cnsl-project-grants [projectId]="projectId"></cnsl-project-grants>
       </ng-container>
-      <ng-container *ngIf="currentSetting === 'grants'">
+      <ng-container *ngIf="currentSetting.id === 'grants'">
         <h2 class="section-h2">{{ 'GRANTS.TITLE' | translate }}</h2>
         <p class="desc cnsl-secondary-text">{{ 'GRANTS.DESC' | translate }}</p>
 

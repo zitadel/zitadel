@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/saml/pkg/provider"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -14,7 +16,7 @@ import (
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 )
 
-func (s *Server) GetAuthRequest(ctx context.Context, req *saml_pb.GetSAMLRequestRequest) (*saml_pb.GetSAMLRequestResponse, error) {
+func (s *Server) GetSAMLRequest(ctx context.Context, req *saml_pb.GetSAMLRequestRequest) (*saml_pb.GetSAMLRequestResponse, error) {
 	authRequest, err := s.query.SamlRequestByID(ctx, true, req.GetSamlRequestId(), true)
 	if err != nil {
 		logging.WithError(err).Error("query samlRequest by ID")
@@ -56,12 +58,31 @@ func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *
 	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
 }
 
+func (s *Server) checkPermission(ctx context.Context, issuer string, userID string) error {
+	permission, err := s.query.CheckProjectPermissionByEntityID(ctx, issuer, userID)
+	if err != nil {
+		return err
+	}
+	if !permission.HasProjectChecked {
+		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.User.ProjectRequired")
+	}
+	if !permission.ProjectRoleChecked {
+		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.User.GrantRequired")
+	}
+	return nil
+}
+
 func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateResponseResponse, error) {
-	details, aar, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+	details, aar, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
+	responseIssuer := authReq.ResponseIssuer
+	if responseIssuer == "" {
+		responseIssuer = http_utils.DomainContext(ctx).Origin()
+	}
+	ctx = provider.ContextWithIssuer(ctx, responseIssuer)
 	url, body, err := s.idp.CreateResponse(ctx, authReq)
 	if err != nil {
 		return nil, err

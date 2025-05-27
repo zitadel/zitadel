@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/url"
 	"testing"
+	"time"
 
-	"github.com/crewjam/saml"
+	crewjam_saml "github.com/crewjam/saml"
+	goldap "github.com/go-ldap/ldap/v3"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,6 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	rep_idp "github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -39,11 +42,13 @@ func TestCommands_CreateIntent(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx        context.Context
-		idpID      string
-		successURL string
-		failureURL string
-		instanceID string
+		ctx          context.Context
+		intentID     string
+		idpID        string
+		successURL   string
+		failureURL   string
+		instanceID   string
+		idpArguments map[string]any
 	}
 	type res struct {
 		intentID string
@@ -182,6 +187,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								rep_idp.Options{},
 							)),
 					),
@@ -195,6 +201,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								nil,
 							)
 						}(),
 					),
@@ -235,6 +242,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								rep_idp.Options{},
 							)),
 					),
@@ -248,6 +256,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								map[string]interface{}{
+									"verifier": "pkceOAuthVerifier",
+								},
 							)
 						}(),
 					),
@@ -260,6 +271,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idpID:      "idp",
 				successURL: "https://success.url",
 				failureURL: "https://failure.url",
+				idpArguments: map[string]interface{}{
+					"verifier": "pkceOAuthVerifier",
+				},
 			},
 			res{
 				intentID: "id",
@@ -288,6 +302,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								rep_idp.Options{},
 							)),
 					),
@@ -301,6 +316,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								map[string]interface{}{
+									"verifier": "pkceOAuthVerifier",
+								},
 							)
 						}(),
 					),
@@ -313,6 +331,69 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idpID:      "idp",
 				successURL: "https://success.url",
 				failureURL: "https://failure.url",
+				idpArguments: map[string]interface{}{
+					"verifier": "pkceOAuthVerifier",
+				},
+			},
+			res{
+				intentID: "id",
+				details:  &domain.ObjectDetails{ResourceOwner: "instance"},
+			},
+		},
+		{
+			"push, with id",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								"auth",
+								"token",
+								"user",
+								"idAttribute",
+								nil,
+								true,
+								rep_idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							success, _ := url.Parse("https://success.url")
+							failure, _ := url.Parse("https://failure.url")
+							return idpintent.NewStartedEvent(
+								context.Background(),
+								&idpintent.NewAggregate("id", "instance").Aggregate,
+								success,
+								failure,
+								"idp",
+								map[string]interface{}{
+									"verifier": "pkceOAuthVerifier",
+								},
+							)
+						}(),
+					),
+				),
+			},
+			args{
+				ctx:        context.Background(),
+				instanceID: "instance",
+				intentID:   "id",
+				idpID:      "idp",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
+				idpArguments: map[string]interface{}{
+					"verifier": "pkceOAuthVerifier",
+				},
 			},
 			res{
 				intentID: "id",
@@ -326,7 +407,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID)
+			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.intentID, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID, tt.args.idpArguments)
 			require.ErrorIs(t, err, tt.res.err)
 			if intentWriteModel != nil {
 				assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
@@ -342,11 +423,11 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 	type fields struct {
 		eventstore   func(t *testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
+		idGenerator  id.Generator
 	}
 	type args struct {
 		ctx         context.Context
 		idpID       string
-		state       string
 		callbackURL string
 		samlRootURL string
 	}
@@ -362,17 +443,33 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 		res    res
 	}{
 		{
+			"error no id generator",
+			fields{
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore:   expectEventstore(),
+				idGenerator:  mock.NewIDGeneratorExpectError(t, zerrors.ThrowInternal(nil, "", "error id")),
+			},
+			args{
+				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				idpID:       "idp",
+				callbackURL: "url",
+			},
+			res{
+				err: zerrors.ThrowInternal(nil, "", "error id"),
+			},
+		},
+		{
 			"idp not existing",
 			fields{
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
 				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
 				idpID:       "idp",
-				state:       "state",
 				callbackURL: "url",
 			},
 			res{
@@ -402,6 +499,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								rep_idp.Options{},
 							)),
 						eventFromEventPusherWithInstanceID(
@@ -412,11 +510,11 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 						),
 					),
 				),
+				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
 				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
 				idpID:       "idp",
-				state:       "state",
 				callbackURL: "url",
 			},
 			res{
@@ -446,6 +544,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								rep_idp.Options{},
 							)),
 					),
@@ -467,19 +566,20 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								rep_idp.Options{},
 							)),
 					),
 				),
+				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
 				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
 				idpID:       "idp",
-				state:       "state",
 				callbackURL: "url",
 			},
 			res{
-				content:  "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=state",
+				content:  "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=id",
 				redirect: true,
 			},
 		},
@@ -504,6 +604,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								},
 								[]string{"openid", "profile", "User.Read"},
 								false,
+								true,
 								rep_idp.Options{},
 							)),
 						eventFromEventPusherWithInstanceID(
@@ -540,6 +641,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								},
 								[]string{"openid", "profile", "User.Read"},
 								false,
+								true,
 								rep_idp.Options{},
 							)),
 						eventFromEventPusherWithInstanceID(
@@ -561,15 +663,15 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 							)),
 					),
 				),
+				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
 				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
 				idpID:       "idp",
-				state:       "state",
 				callbackURL: "url",
 			},
 			res{
-				content:  "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=state",
+				content:  "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=id",
 				redirect: true,
 			},
 		},
@@ -579,9 +681,16 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
+				idGenerator:         tt.fields.idGenerator,
 			}
-			content, redirect, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL)
 			require.ErrorIs(t, err, tt.res.err)
+
+			var content string
+			var redirect bool
+			if err == nil {
+				content, redirect = session.GetAuth(tt.args.ctx)
+			}
 			assert.Equal(t, tt.res.redirect, redirect)
 			assert.Equal(t, tt.res.content, content)
 		})
@@ -592,11 +701,11 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 	type fields struct {
 		eventstore   func(t *testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
+		idGenerator  id.Generator
 	}
 	type args struct {
 		ctx         context.Context
 		idpID       string
-		state       string
 		callbackURL string
 		samlRootURL string
 	}
@@ -634,6 +743,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 								false,
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								rep_idp.Options{},
 							)),
 					),
@@ -654,6 +764,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 								false,
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								rep_idp.Options{},
 							)),
 					),
@@ -669,6 +780,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 									success,
 									failure,
 									"idp",
+									nil,
 								)
 							}(),
 						),
@@ -683,11 +795,11 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 						},
 					),
 				),
+				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
 				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
 				idpID:       "idp",
-				state:       "id",
 				callbackURL: "url",
 				samlRootURL: "samlurl",
 			},
@@ -705,10 +817,12 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
+				idGenerator:         tt.fields.idGenerator,
 			}
-			content, _, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL)
 			require.ErrorIs(t, err, tt.res.err)
 
+			content, _ := session.GetAuth(tt.args.ctx)
 			authURL, err := url.Parse(content)
 			require.NoError(t, err)
 
@@ -758,7 +872,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "ro", 0),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -779,7 +893,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "ro", 0),
 				idpSession: &oauth.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
@@ -813,6 +927,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 									Crypted:    []byte("accessToken"),
 								},
 								"idToken",
+								time.Time{},
 							)
 							return event
 						}(),
@@ -821,7 +936,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 				idpSession: &openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
@@ -864,7 +979,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 		ctx        context.Context
 		writeModel *IDPIntentWriteModel
 		idpUser    idp.User
-		assertion  *saml.Assertion
+		session    *saml.Session
 		userID     string
 	}
 	type res struct {
@@ -889,7 +1004,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "ro", 0),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -914,14 +1029,17 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 							},
+							time.Time{},
 						),
 					),
 				),
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
-				assertion:  &saml.Assertion{ID: "id"},
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
+				session: &saml.Session{
+					Assertion: &crewjam_saml.Assertion{ID: "id"},
+				},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
 					UserInfoProfile: oidc.UserInfoProfile{
@@ -952,14 +1070,17 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 							},
+							time.Time{},
 						),
 					),
 				),
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
-				assertion:  &saml.Assertion{ID: "id"},
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
+				session: &saml.Session{
+					Assertion: &crewjam_saml.Assertion{ID: "id"},
+				},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
 					UserInfoProfile: oidc.UserInfoProfile{
@@ -979,7 +1100,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
-			got, err := c.SucceedSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.assertion)
+			got, err := c.SucceedSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.session)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.token, got)
 		})
@@ -1019,7 +1140,7 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 				request:    "request",
 			},
 			res{},
@@ -1047,7 +1168,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 		writeModel *IDPIntentWriteModel
 		idpUser    idp.User
 		userID     string
-		attributes map[string][]string
+		session    *ldap.Session
 	}
 	type res struct {
 		token string
@@ -1071,7 +1192,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -1091,14 +1212,24 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 							"username",
 							"",
 							map[string][]string{"id": {"id"}},
+							time.Time{},
 						),
 					),
 				),
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
-				attributes: map[string][]string{"id": {"id"}},
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
+				session: &ldap.Session{
+					Entry: &goldap.Entry{
+						Attributes: []*goldap.EntryAttribute{
+							{
+								Name:   "id",
+								Values: []string{"id"},
+							},
+						},
+					},
+				},
 				idpUser: ldap.NewUser(
 					"id",
 					"",
@@ -1126,7 +1257,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
-			got, err := c.SucceedLDAPIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.attributes)
+			got, err := c.SucceedLDAPIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.session)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.token, got)
 		})
@@ -1166,7 +1297,7 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 				reason:     "reason",
 			},
 			res{

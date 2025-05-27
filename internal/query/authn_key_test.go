@@ -26,8 +26,7 @@ var (
 		` projections.authn_keys2.expiration,` +
 		` projections.authn_keys2.type,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.authn_keys2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.authn_keys2`
 	prepareAuthNKeysCols = []string{
 		"id",
 		"creation_date",
@@ -49,8 +48,7 @@ var (
 		` projections.authn_keys2.identifier,` +
 		` projections.authn_keys2.public_key,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.authn_keys2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.authn_keys2`
 	prepareAuthNKeysDataCols = []string{
 		"id",
 		"creation_date",
@@ -71,8 +69,7 @@ var (
 		` projections.authn_keys2.sequence,` +
 		` projections.authn_keys2.expiration,` +
 		` projections.authn_keys2.type` +
-		` FROM projections.authn_keys2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.authn_keys2`
 	prepareAuthNKeyCols = []string{
 		"id",
 		"creation_date",
@@ -84,8 +81,7 @@ var (
 	}
 
 	prepareAuthNKeyPublicKeyStmt = `SELECT projections.authn_keys2.public_key` +
-		` FROM projections.authn_keys2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.authn_keys2`
 	prepareAuthNKeyPublicKeyCols = []string{
 		"public_key",
 	}
@@ -471,7 +467,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -525,8 +521,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "userID")

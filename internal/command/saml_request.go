@@ -15,13 +15,14 @@ type SAMLRequest struct {
 	ID          string
 	LoginClient string
 
-	ApplicationID string
-	ACSURL        string
-	RelayState    string
-	RequestID     string
-	Binding       string
-	Issuer        string
-	Destination   string
+	ApplicationID  string
+	ACSURL         string
+	RelayState     string
+	RequestID      string
+	Binding        string
+	Issuer         string
+	Destination    string
+	ResponseIssuer string
 }
 
 type CurrentSAMLRequest struct {
@@ -56,6 +57,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 		samlRequest.Binding,
 		samlRequest.Issuer,
 		samlRequest.Destination,
+		samlRequest.ResponseIssuer,
 	))
 	if err != nil {
 		return nil, err
@@ -63,7 +65,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 	return samlRequestWriteModelToCurrentSAMLRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
+func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, projectPermissionCheck domain.ProjectPermissionCheck) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
 	writeModel, err := c.getSAMLRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -75,7 +77,9 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ttPKNdAIFT", "Errors.SAMLRequest.AlreadyHandled")
 	}
 	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
-		return nil, nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-KCd48Rxt7x", "Errors.SAMLRequest.WrongLoginClient")
+		if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
+			return nil, nil, err
+		}
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
@@ -87,6 +91,12 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 	}
 	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, nil, err
+	}
+
+	if projectPermissionCheck != nil {
+		if err := projectPermissionCheck(ctx, writeModel.Issuer, sessionWriteModel.UserID); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	if err := c.pushAppendAndReduce(ctx, writeModel, samlrequest.NewSessionLinkedEvent(
@@ -123,15 +133,16 @@ func (c *Commands) FailSAMLRequest(ctx context.Context, id string, reason domain
 func samlRequestWriteModelToCurrentSAMLRequest(writeModel *SAMLRequestWriteModel) (_ *CurrentSAMLRequest) {
 	return &CurrentSAMLRequest{
 		SAMLRequest: &SAMLRequest{
-			ID:            writeModel.AggregateID,
-			LoginClient:   writeModel.LoginClient,
-			ApplicationID: writeModel.ApplicationID,
-			ACSURL:        writeModel.ACSURL,
-			RelayState:    writeModel.RelayState,
-			RequestID:     writeModel.RequestID,
-			Binding:       writeModel.Binding,
-			Issuer:        writeModel.Issuer,
-			Destination:   writeModel.Destination,
+			ID:             writeModel.AggregateID,
+			LoginClient:    writeModel.LoginClient,
+			ApplicationID:  writeModel.ApplicationID,
+			ACSURL:         writeModel.ACSURL,
+			RelayState:     writeModel.RelayState,
+			RequestID:      writeModel.RequestID,
+			Binding:        writeModel.Binding,
+			Issuer:         writeModel.Issuer,
+			Destination:    writeModel.Destination,
+			ResponseIssuer: writeModel.ResponseIssuer,
 		},
 		SessionID:   writeModel.SessionID,
 		UserID:      writeModel.UserID,

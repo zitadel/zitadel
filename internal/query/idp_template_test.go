@@ -39,6 +39,7 @@ var (
 		` projections.idp_templates6_oauth2.user_endpoint,` +
 		` projections.idp_templates6_oauth2.scopes,` +
 		` projections.idp_templates6_oauth2.id_attribute,` +
+		` projections.idp_templates6_oauth2.use_pkce,` +
 		// oidc
 		` projections.idp_templates6_oidc.idp_id,` +
 		` projections.idp_templates6_oidc.issuer,` +
@@ -46,6 +47,7 @@ var (
 		` projections.idp_templates6_oidc.client_secret,` +
 		` projections.idp_templates6_oidc.scopes,` +
 		` projections.idp_templates6_oidc.id_token_mapping,` +
+		` projections.idp_templates6_oidc.use_pkce,` +
 		// jwt
 		` projections.idp_templates6_jwt.idp_id,` +
 		` projections.idp_templates6_jwt.issuer,` +
@@ -97,6 +99,7 @@ var (
 		` projections.idp_templates6_saml.with_signed_request,` +
 		` projections.idp_templates6_saml.name_id_format,` +
 		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
+		` projections.idp_templates6_saml.federated_logout_enabled,` +
 		// ldap
 		` projections.idp_templates6_ldap2.idp_id,` +
 		` projections.idp_templates6_ldap2.servers,` +
@@ -108,6 +111,7 @@ var (
 		` projections.idp_templates6_ldap2.user_object_classes,` +
 		` projections.idp_templates6_ldap2.user_filters,` +
 		` projections.idp_templates6_ldap2.timeout,` +
+		` projections.idp_templates6_ldap2.root_ca,` +
 		` projections.idp_templates6_ldap2.id_attribute,` +
 		` projections.idp_templates6_ldap2.first_name_attribute,` +
 		` projections.idp_templates6_ldap2.last_name_attribute,` +
@@ -140,8 +144,7 @@ var (
 		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
 		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
 		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
-		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id`
 	idpTemplateCols = []string{
 		"id",
 		"resource_owner",
@@ -166,6 +169,7 @@ var (
 		"user_endpoint",
 		"scopes",
 		"id_attribute",
+		"use_pkce",
 		// oidc config
 		"id_id",
 		"issuer",
@@ -173,6 +177,7 @@ var (
 		"client_secret",
 		"scopes",
 		"id_token_mapping",
+		"use_pkce",
 		// jwt
 		"idp_id",
 		"issuer",
@@ -224,6 +229,7 @@ var (
 		"with_signed_request",
 		"name_id_format",
 		"transient_mapping_attribute_name",
+		"federated_logout_enabled",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -235,6 +241,7 @@ var (
 		"user_object_classes",
 		"user_filters",
 		"timeout",
+		"root_ca",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -279,6 +286,7 @@ var (
 		` projections.idp_templates6_oauth2.user_endpoint,` +
 		` projections.idp_templates6_oauth2.scopes,` +
 		` projections.idp_templates6_oauth2.id_attribute,` +
+		` projections.idp_templates6_oauth2.use_pkce,` +
 		// oidc
 		` projections.idp_templates6_oidc.idp_id,` +
 		` projections.idp_templates6_oidc.issuer,` +
@@ -286,6 +294,7 @@ var (
 		` projections.idp_templates6_oidc.client_secret,` +
 		` projections.idp_templates6_oidc.scopes,` +
 		` projections.idp_templates6_oidc.id_token_mapping,` +
+		` projections.idp_templates6_oidc.use_pkce,` +
 		// jwt
 		` projections.idp_templates6_jwt.idp_id,` +
 		` projections.idp_templates6_jwt.issuer,` +
@@ -337,6 +346,7 @@ var (
 		` projections.idp_templates6_saml.with_signed_request,` +
 		` projections.idp_templates6_saml.name_id_format,` +
 		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
+		` projections.idp_templates6_saml.federated_logout_enabled,` +
 		// ldap
 		` projections.idp_templates6_ldap2.idp_id,` +
 		` projections.idp_templates6_ldap2.servers,` +
@@ -348,6 +358,7 @@ var (
 		` projections.idp_templates6_ldap2.user_object_classes,` +
 		` projections.idp_templates6_ldap2.user_filters,` +
 		` projections.idp_templates6_ldap2.timeout,` +
+		` projections.idp_templates6_ldap2.root_ca,` +
 		` projections.idp_templates6_ldap2.id_attribute,` +
 		` projections.idp_templates6_ldap2.first_name_attribute,` +
 		` projections.idp_templates6_ldap2.last_name_attribute,` +
@@ -381,8 +392,7 @@ var (
 		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
 		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
 		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
-		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id`
 	idpTemplatesCols = []string{
 		"id",
 		"resource_owner",
@@ -407,6 +417,7 @@ var (
 		"user_endpoint",
 		"scopes",
 		"id_attribute",
+		"use_pkce",
 		// oidc config
 		"id_id",
 		"issuer",
@@ -414,6 +425,7 @@ var (
 		"client_secret",
 		"scopes",
 		"id_token_mapping",
+		"use_pkce",
 		// jwt
 		"idp_id",
 		"issuer",
@@ -465,6 +477,7 @@ var (
 		"with_signed_request",
 		"name_id_format",
 		"transient_mapping_attribute_name",
+		"federated_logout_enabled",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -476,6 +489,7 @@ var (
 		"user_object_classes",
 		"user_filters",
 		"timeout",
+		"root_ca",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -560,7 +574,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"user",
 						database.TextArray[string]{"profile"},
 						"id-attribute",
+						true,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -618,7 +634,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -676,6 +694,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					UserEndpoint:          "user",
 					Scopes:                []string{"profile"},
 					IDAttribute:           "id-attribute",
+					UsePKCE:               true,
 				},
 			},
 		},
@@ -710,12 +729,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
 						"idp-id",
 						"issuer",
 						"client_id",
 						nil,
 						database.TextArray[string]{"profile"},
+						true,
 						true,
 						// jwt
 						nil,
@@ -768,7 +789,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -824,6 +847,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					ClientSecret:     nil,
 					Scopes:           []string{"profile"},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 				},
 			},
 		},
@@ -858,7 +882,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -916,7 +942,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1005,7 +1033,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1063,7 +1093,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1151,7 +1183,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1209,7 +1243,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1297,7 +1333,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1355,7 +1393,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1444,7 +1484,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1502,7 +1544,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1590,7 +1634,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1648,7 +1694,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						false,
 						domain.SAMLNameIDFormatTransient,
 						"customAttribute",
+						true,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1706,6 +1754,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					WithSignedRequest:             false,
 					NameIDFormat:                  sql.Null[domain.SAMLNameIDFormat]{V: domain.SAMLNameIDFormatTransient, Valid: true},
 					TransientMappingAttributeName: "customAttribute",
+					FederatedLogoutEnabled:        true,
 				},
 			},
 		},
@@ -1740,7 +1789,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1798,6 +1849,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						"idp-id",
 						database.TextArray[string]{"server"},
@@ -1809,6 +1861,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						database.TextArray[string]{"object"},
 						database.TextArray[string]{"filter"},
 						time.Duration(30000000000),
+						[]byte("certificate"),
 						"id",
 						"first",
 						"last",
@@ -1857,6 +1910,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Duration(30000000000),
+					RootCA:            []byte("certificate"),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "first",
@@ -1906,7 +1960,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1964,7 +2020,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2054,7 +2112,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2112,7 +2172,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2230,7 +2292,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2288,6 +2352,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							"idp-id",
 							database.TextArray[string]{"server"},
@@ -2299,6 +2364,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							database.TextArray[string]{"object"},
 							database.TextArray[string]{"filter"},
 							time.Duration(30000000000),
+							[]byte("certificate"),
 							"id",
 							"first",
 							"last",
@@ -2353,6 +2419,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							UserObjectClasses: []string{"object"},
 							UserFilters:       []string{"filter"},
 							Timeout:           time.Duration(30000000000),
+							RootCA:            []byte("certificate"),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
@@ -2405,7 +2472,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2463,7 +2532,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2554,7 +2625,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2612,6 +2685,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							"idp-id-ldap",
 							database.TextArray[string]{"server"},
@@ -2623,6 +2697,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							database.TextArray[string]{"object"},
 							database.TextArray[string]{"filter"},
 							time.Duration(30000000000),
+							[]byte("certificate"),
 							"id",
 							"first",
 							"last",
@@ -2668,7 +2743,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2726,7 +2803,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							false,
 							domain.SAMLNameIDFormatTransient,
 							"customAttribute",
+							true,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2782,7 +2861,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2840,7 +2921,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2896,7 +2979,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"user",
 							database.TextArray[string]{"profile"},
 							"id-attribute",
+							true,
 							// oidc
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2954,7 +3039,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3010,12 +3097,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
 							"idp-id-oidc",
 							"issuer",
 							"client_id",
 							nil,
 							database.TextArray[string]{"profile"},
+							true,
 							true,
 							// jwt
 							nil,
@@ -3068,7 +3157,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3124,7 +3215,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3182,7 +3275,9 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3247,6 +3342,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							UserObjectClasses: []string{"object"},
 							UserFilters:       []string{"filter"},
 							Timeout:           time.Duration(30000000000),
+							RootCA:            []byte("certificate"),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
@@ -3288,6 +3384,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							WithSignedRequest:             false,
 							NameIDFormat:                  sql.Null[domain.SAMLNameIDFormat]{V: domain.SAMLNameIDFormatTransient, Valid: true},
 							TransientMappingAttributeName: "customAttribute",
+							FederatedLogoutEnabled:        true,
 						},
 					},
 					{
@@ -3337,6 +3434,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							UserEndpoint:          "user",
 							Scopes:                []string{"profile"},
 							IDAttribute:           "id-attribute",
+							UsePKCE:               true,
 						},
 					},
 					{
@@ -3361,6 +3459,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							ClientSecret:     nil,
 							Scopes:           []string{"profile"},
 							IsIDTokenMapping: true,
+							UsePKCE:          true,
 						},
 					},
 					{
@@ -3409,7 +3508,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

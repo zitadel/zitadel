@@ -132,11 +132,9 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
-	_, err = c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3m9s2", "Errors.Project.NotFound")
+	if _, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+		return nil, err
 	}
-
 	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
 }
 
@@ -144,11 +142,9 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
-	_, err = c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3m9ss", "Errors.Project.NotFound")
+	if _, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+		return nil, err
 	}
-
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}

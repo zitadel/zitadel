@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -233,21 +234,25 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", "", nil, nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	_, err = c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
+
+	// RolePermissions need to be pushed in separate transaction.
+	// https://github.com/zitadel/zitadel/issues/9293
+	details, err := c.SynchronizeRolePermission(ctx, setup.zitadel.instanceID, setup.RolePermissionMappings)
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+	details.ResourceOwner = setup.zitadel.orgID
 
 	var token string
 	if pat != nil {
 		token = pat.Token
 	}
 
-	return setup.zitadel.instanceID, token, machineKey, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: setup.zitadel.orgID,
-	}, nil
+	return setup.zitadel.instanceID, token, machineKey, details, nil
 }
 
 func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string) context.Context {
@@ -380,7 +385,6 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LabelPolicy.ThemeMode,
 		),
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
-		prepareAddRolePermissions(instanceAgg, setup.RolePermissionMappings),
 	}
 }
 
@@ -663,7 +667,7 @@ func setupMessageTexts(validations *[]preparation.Validation, setupMessageTexts 
 
 func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareUpdateInstance(instanceAgg, name)
+	validation := c.prepareUpdateInstance(instanceAgg, strings.TrimSpace(name))
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -848,9 +852,6 @@ func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLangu
 			if err := domain.LanguageIsAllowed(false, restrictionsWM.allowedLanguages, defaultLanguage); err != nil {
 				return nil, err
 			}
-			if err != nil {
-				return nil, err
-			}
 			return []eventstore.Command{instance.NewDefaultLanguageSetEvent(ctx, &a.Aggregate, defaultLanguage)}, nil
 		}, nil
 	}
@@ -885,7 +886,12 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 }
 
 func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(id)
+	instID := strings.TrimSpace(id)
+	if instID == "" || len(instID) > 200 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-VeS2zI", "Errors.Invalid.Argument")
+	}
+
+	instanceAgg := instance.NewAggregate(instID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
 	if err != nil {
 		return nil, err

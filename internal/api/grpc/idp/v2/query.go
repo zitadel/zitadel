@@ -31,6 +31,7 @@ func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
 				Sequence:      idp.Sequence,
 				EventDate:     idp.ChangeDate,
 				ResourceOwner: idp.ResourceOwner,
+				CreationDate:  idp.CreationDate,
 			}),
 		State:  idpStateToPb(idp.State),
 		Name:   idp.Name,
@@ -288,6 +289,7 @@ func ldapConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.LDAPIDPTemplate
 			UserObjectClasses: template.UserObjectClasses,
 			UserFilters:       template.UserFilters,
 			Timeout:           timeout,
+			RootCa:            template.RootCA,
 			Attributes:        ldapAttributesToPb(template.LDAPAttributes),
 		},
 	}
@@ -334,6 +336,7 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 			WithSignedRequest:             template.WithSignedRequest,
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
+			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
 		},
 	}
 }

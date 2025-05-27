@@ -79,7 +79,7 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 func loginToClient(t *testing.T, instance *integration.Instance, clientID, redirectURI, sessionID, sessionToken string) {
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	authRequestID, err := instance.CreateOIDCAuthRequestWithDomain(iamOwnerCtx, instance.Domain, clientID, instance.Users.Get(integration.UserTypeIAMOwner).ID, redirectURI, "openid")
+	_, authRequestID, err := instance.CreateOIDCAuthRequestWithDomain(iamOwnerCtx, instance.Domain, clientID, instance.Users.Get(integration.UserTypeIAMOwner).ID, redirectURI, "openid")
 	require.NoError(t, err)
 	callback, err := instance.Client.OIDCv2.CreateCallback(iamOwnerCtx, &oidc_v2.CreateCallbackRequest{
 		AuthRequestId: authRequestID,

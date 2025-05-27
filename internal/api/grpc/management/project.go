@@ -47,7 +47,7 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	if err != nil {
 		return nil, err
 	}
-	projects, err := s.query.SearchProjects(ctx, queries)
+	projects, err := s.query.SearchProjects(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,6 @@ func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListP
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
@@ -110,7 +109,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	if err != nil {
 		return nil, err
 	}
-	projects, err := s.query.SearchProjectGrants(ctx, queries)
+	projects, err := s.query.SearchProjectGrants(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +151,6 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		AwaitOpenTransactions().
 		OrderDesc().
@@ -177,26 +175,26 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 }
 
 func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest) (*mgmt_pb.AddProjectResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), ctxData.OrgID, ctxData.UserID)
+	add := ProjectCreateToCommand(req, "", authz.GetCtxData(ctx).OrgID)
+	project, err := s.command.AddProject(ctx, add)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectResponse{
-		Id:      project.AggregateID,
-		Details: object_grpc.AddToDetailsPb(project.Sequence, project.ChangeDate, project.ResourceOwner),
+		Id:      add.AggregateID,
+		Details: object_grpc.AddToDetailsPb(project.Sequence, project.EventDate, project.ResourceOwner),
 	}, nil
 }
 
 func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRequest) (*mgmt_pb.UpdateProjectResponse, error) {
-	project, err := s.command.ChangeProject(ctx, ProjectUpdateToDomain(req), authz.GetCtxData(ctx).OrgID)
+	project, err := s.command.ChangeProject(ctx, ProjectUpdateToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			project.Sequence,
-			project.ChangeDate,
+			project.EventDate,
 			project.ResourceOwner,
 		),
 	}, nil
@@ -255,7 +253,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	if err != nil {
 		return nil, err
 	}
-	roles, err := s.query.SearchProjectRoles(ctx, true, queries)
+	roles, err := s.query.SearchProjectRoles(ctx, true, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -266,21 +264,21 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, req *mgmt_pb.AddProjectRoleRequest) (*mgmt_pb.AddProjectRoleResponse, error) {
-	role, err := s.command.AddProjectRole(ctx, AddProjectRoleRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	role, err := s.command.AddProjectRole(ctx, AddProjectRoleRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectRoleResponse{
 		Details: object_grpc.AddToDetailsPb(
 			role.Sequence,
-			role.ChangeDate,
+			role.EventDate,
 			role.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) BulkAddProjectRoles(ctx context.Context, req *mgmt_pb.BulkAddProjectRolesRequest) (*mgmt_pb.BulkAddProjectRolesResponse, error) {
-	details, err := s.command.BulkAddProjectRole(ctx, req.ProjectId, authz.GetCtxData(ctx).OrgID, BulkAddProjectRolesRequestToDomain(req))
+	details, err := s.command.BulkAddProjectRole(ctx, req.ProjectId, authz.GetCtxData(ctx).OrgID, BulkAddProjectRolesRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
@@ -290,14 +288,14 @@ func (s *Server) BulkAddProjectRoles(ctx context.Context, req *mgmt_pb.BulkAddPr
 }
 
 func (s *Server) UpdateProjectRole(ctx context.Context, req *mgmt_pb.UpdateProjectRoleRequest) (*mgmt_pb.UpdateProjectRoleResponse, error) {
-	role, err := s.command.ChangeProjectRole(ctx, UpdateProjectRoleRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	role, err := s.command.ChangeProjectRole(ctx, UpdateProjectRoleRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectRoleResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			role.Sequence,
-			role.ChangeDate,
+			role.EventDate,
 			role.ResourceOwner,
 		),
 	}, nil

@@ -10,9 +10,9 @@ The following flow shows you the different components you need to enable OIDC fo
 ![OIDC Flow](/img/guides/login-ui/oidc-flow.png)
 
 1. Your application makes an authorization request to your login UI
-2. The login UI proxies the request to the ZITADEL API. In the request to the ZITADEL API, a header to identify your client is needed.
+2. The login UI proxies the request to the ZITADEL API.
 3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
-4. Redirect to a predefined, relative URL of the login UI that includes the authrequest ID ("/login?authRequest=")
+4. Redirect to a predefined, relative URL of the login UI that includes the authrequest ID ("/login?authRequest="), configurable per application.
 5. Request to ZITADEL API to get all the information from the auth request. This is optional and only needed if you like to get all the parsed information from the authrequest-
 6. Authenticate the user in your login UI by creating and updating a session with all the checks you need.
 7. Finalize the auth request by sending the session to the request, you will get the callback URL in the response
@@ -37,10 +37,10 @@ https://login.example.com/oauth/v2/authorize?client_id=170086824411201793%40your
 The auth request includes all the relevant information for the OIDC standard and in this example we also have a login hint for the login name "minnie-mouse".
 
 You now have to proxy the auth request from your own UI to the authorize Endpoint of ZITADEL.
-Make sure to add the user id of your login UI service/machine user as a header to the request: ```x-zitadel-login-client: <userid>```
+For more information, see [OIDC Proxy](./typescript-repo#oidc-proxy) for the necessary headers.
 
 :::note
-The user id sent in the 'x-zitadel-login-client' has to match to the PAT you are sending in the request.
+The version and the optional custom URI for the available login UI is configurable under the application settings.
 :::
 
 Read more about the [Authorize Endpoint Documentation](/docs/apis/openidoauth/endpoints#authorization_endpoint)
@@ -56,7 +56,7 @@ With the ID from the redirect before you will now be able to get the information
 ```bash
 curl --request GET \
   --url https://$ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
-  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Authorization: Bearer '"$TOKEN"''
 ```
 
 Response Example:
@@ -90,14 +90,14 @@ Read the following resources for more information about the different checks:
 
 ### Finalize Auth Request
 
-To finalize the auth request and connect an existing user session with it you have to update the auth request with the session token.
+To finalize the auth request and connect an existing user session with it, you have to update the auth request with the session token.
 On the create and update user session request you will always get a session token in the response.
 
 The latest session token has to be sent to the following request:
 
 Read more about the [Finalize Auth Request Documentation](/docs/apis/resources/oidc_service_v2/oidc-service-create-callback)
 
-Make sure that the authorization header is from the same account that you originally sent in the client id header ```x-zitadel-login-client: <userid>``` on the authorize endpoint.
+Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
 curl --request POST \
   --url $ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
@@ -128,7 +128,7 @@ Example Response:
 
 ### OIDC Endpoints
 
-All OIDC relevant endpoints are provided by ZITADEL. In you login UI you just have to proxy them through and send them directly to the backend.
+All OIDC relevant endpoints are provided by ZITADEL. In your login UI you just have to proxy them through and send them directly to the backend.
 
 These are endpoints like:
 - Userinfo

@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS projections.idp_templates6_ldap2 ADD COLUMN IF NOT EXISTS root_ca BYTEA;

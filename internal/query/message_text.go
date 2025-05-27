@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"time"
 
@@ -15,7 +15,6 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -131,7 +130,7 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (text *MessageText, er
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMessageTextQuery(ctx, q.client)
+	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
@@ -167,7 +166,7 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMessageTextQuery(ctx, q.client)
+	stmt, scan := prepareMessageTextQuery()
 	eq := sq.Eq{
 		MessageTextColLanguage.identifier():    language,
 		MessageTextColType.identifier():        messageType,
@@ -249,7 +248,7 @@ func (q *Queries) readNotificationTextMessages(ctx context.Context, language str
 	return contents, nil
 }
 
-func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
+func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
 	return sq.Select(
 			MessageTextColAggregateID.identifier(),
 			MessageTextColSequence.identifier(),
@@ -266,7 +265,7 @@ func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			MessageTextColButtonText.identifier(),
 			MessageTextColFooter.identifier(),
 		).
-			From(messageTextTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(messageTextTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MessageText, error) {
 			msg := new(MessageText)
@@ -320,7 +319,7 @@ func (q *Queries) readTranslationFile(namespace i18n.Namespace, filename string)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-93njw", "Errors.TranslationFile.ReadError")
 	}
-	contents, err := ioutil.ReadAll(r)
+	contents, err := io.ReadAll(r)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-l0fse", "Errors.TranslationFile.ReadError")
 	}

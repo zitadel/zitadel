@@ -695,6 +695,12 @@ func TestServer_ListSessions(t *testing.T) {
 					return
 				}
 
+				// expected count of sessions is not equal to created dependencies
+				if !assert.Len(ttt, tt.want.Sessions, len(infos)) {
+					return
+				}
+
+				// expected count of sessions is not equal to received sessions
 				if !assert.Equal(ttt, got.Details.TotalResult, tt.want.Details.TotalResult) || !assert.Len(ttt, got.Sessions, len(tt.want.Sessions)) {
 					return
 				}
@@ -705,8 +711,17 @@ func TestServer_ListSessions(t *testing.T) {
 					tt.want.Sessions[i].CreationDate = infos[i].Details.GetChangeDate()
 					tt.want.Sessions[i].ChangeDate = infos[i].Details.GetChangeDate()
 
-					verifySession(ttt, got.Sessions[i], tt.want.Sessions[i], time.Minute, tt.wantExpirationWindow, infos[i].UserID, tt.wantFactors...)
+					// only check for contents of the session, not sorting for now
+					found := false
+					for _, session := range got.Sessions {
+						if session.Id == infos[i].ID {
+							verifySession(ttt, session, tt.want.Sessions[i], time.Minute, tt.wantExpirationWindow, infos[i].UserID, tt.wantFactors...)
+							found = true
+						}
+					}
+					assert.True(t, found)
 				}
+
 				integration.AssertListDetails(ttt, tt.want, got)
 			}, retryDuration, tick)
 		})

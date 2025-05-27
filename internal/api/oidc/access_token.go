@@ -122,7 +122,7 @@ func (s *Server) assertClientScopesForPAT(ctx context.Context, token *accessToke
 	if err != nil {
 		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := s.query.SearchProjectRoles(ctx, authz.GetFeatures(ctx).TriggerIntrospectionProjections, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := s.query.SearchProjectRoles(ctx, authz.GetFeatures(ctx).TriggerIntrospectionProjections, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
 	if err != nil {
 		return err
 	}

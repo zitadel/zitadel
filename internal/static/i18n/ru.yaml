@@ -525,6 +525,7 @@ Errors:
     StateMissing: В запросе отсутствует параметр State
     NotStarted: Намерение не начато или уже прекращено
     NotSucceeded: Намерение не увенчалось успехом
+    Epired: Намерение истекло
     TokenCreationFailed: Не удалось создать токен
     InvalidToken: Маркер намерения недействителен
     OtherUser: Намерение, предназначенное для другого пользователя
@@ -532,6 +533,7 @@ Errors:
     AlreadyExists: Запрос на аутентификацию уже существует
     NotExisting: Запрос на аутентификацию не существует
     WrongLoginClient: Запрос на аутентификацию, созданный другим клиентом входа
+    AlreadyHandled: Запрос аутентификации уже обработан
   OIDCSession:
     RefreshTokenInvalid: Маркер обновления недействителен
     Token:
@@ -542,8 +544,12 @@ Errors:
     AlreadyExists: SAMLRequest уже существует
     NotExisting: SAMLRequest не существует
     WrongLoginClient: SAMLRequest создан другим клиентом входа
+    AlreadyHandled: Запрос SAML уже обработан
   SAMLSession:
     InvalidClient: SAMLResponse не был отправлен для этого клиента
+  DeviceAuth:
+    NotFound: Запрос авторизации устройства не существует
+    AlreadyHandled: Запрос авторизации устройства уже обработан
   Feature:
     NotExisting: ункция не существует
     TypeNotSupported: Тип объекта не поддерживается

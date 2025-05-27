@@ -536,6 +536,7 @@ Errors:
     StateMissing: Paramètre d'état manquant dans la requête
     NotStarted: Intent n'a pas démarré ou s'est déjà terminé
     NotSucceeded: l'intention n'a pas abouti
+    Expired: L'intention a expiré
     TokenCreationFailed: La création du token a échoué
     InvalidToken: Le jeton d'intention n'est pas valide
     OtherUser: Intention destinée à un autre utilisateur
@@ -543,6 +544,7 @@ Errors:
     AlreadyExists: Auth Request existe déjà
     NotExisting: Auth Request n'existe pas
     WrongLoginClient: Auth Request créé par un autre client de connexion
+    AlreadyHandled: Auth Request a déjà été traitée
   OIDCSession:
     RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
     Token:
@@ -553,8 +555,12 @@ Errors:
     AlreadyExists: SAMLRequest existe déjà
     NotExisting: SAMLRequest n'existe pas
     WrongLoginClient: SAMLRequest créé par un autre client de connexion
+    AlreadyHandled: SAMLRequest a déjà été traitée
   SAMLSession:
     InvalidClient: SAMLResponse n'a pas été émise pour ce client
+  DeviceAuth:
+    NotFound: La demande d'autorisation de l'appareil n'existe pas
+    AlreadyHandled: La demande d'autorisation de l'appareil a déjà été traitée
   Feature:
     NotExisting: La fonctionnalité n'existe pas
     TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge

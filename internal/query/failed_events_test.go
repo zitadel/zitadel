@@ -19,8 +19,7 @@ var (
 		` projections.failed_events2.last_failed,` +
 		` projections.failed_events2.error,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.failed_events2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.failed_events2`
 
 	prepareFailedEventsCols = []string{
 		"projection_name",
@@ -168,7 +167,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

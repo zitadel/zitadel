@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -64,6 +63,7 @@ type OAuthIDPTemplate struct {
 	UserEndpoint          string
 	Scopes                database.TextArray[string]
 	IDAttribute           string
+	UsePKCE               bool
 }
 
 type OIDCIDPTemplate struct {
@@ -73,6 +73,7 @@ type OIDCIDPTemplate struct {
 	Issuer           string
 	Scopes           database.TextArray[string]
 	IsIDTokenMapping bool
+	UsePKCE          bool
 }
 
 type JWTIDPTemplate struct {
@@ -142,6 +143,7 @@ type LDAPIDPTemplate struct {
 	UserObjectClasses []string
 	UserFilters       []string
 	Timeout           time.Duration
+	RootCA            []byte
 	idp.LDAPAttributes
 }
 
@@ -163,6 +165,7 @@ type SAMLIDPTemplate struct {
 	WithSignedRequest             bool
 	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
 }
 
 var (
@@ -277,6 +280,10 @@ var (
 		name:  projection.OAuthIDAttributeCol,
 		table: oauthIdpTemplateTable,
 	}
+	OAuthUsePKCECol = Column{
+		name:  projection.OAuthUsePKCECol,
+		table: oauthIdpTemplateTable,
+	}
 )
 
 var (
@@ -310,6 +317,10 @@ var (
 	}
 	OIDCIDTokenMappingCol = Column{
 		name:  projection.OIDCIDTokenMappingCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCUsePKCECol = Column{
+		name:  projection.OIDCUsePKCECol,
 		table: oidcIdpTemplateTable,
 	}
 )
@@ -580,6 +591,10 @@ var (
 		name:  projection.LDAPTimeoutCol,
 		table: ldapIdpTemplateTable,
 	}
+	LDAPRootCACol = Column{
+		name:  projection.LDAPRootCACol,
+		table: ldapIdpTemplateTable,
+	}
 	LDAPIDAttributeCol = Column{
 		name:  projection.LDAPIDAttributeCol,
 		table: ldapIdpTemplateTable,
@@ -710,6 +725,10 @@ var (
 		name:  projection.SAMLTransientMappingAttributeName,
 		table: samlIdpTemplateTable,
 	}
+	SAMLFederatedLogoutEnabledCol = Column{
+		name:  projection.SAMLFederatedLogoutEnabled,
+		table: samlIdpTemplateTable,
+	}
 )
 
 // IDPTemplateByID searches for the requested id with permission check if necessary
@@ -752,7 +771,7 @@ func (q *Queries) idpTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 	if !withOwnerRemoved {
 		eq[IDPTemplateOwnerRemovedCol.identifier()] = false
 	}
-	query, scan := prepareIDPTemplateByIDQuery(ctx, q.client)
+	query, scan := prepareIDPTemplateByIDQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -773,7 +792,7 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPTemplatesQuery(ctx, q.client)
+	query, scan := prepareIDPTemplatesQuery()
 	eq := sq.Eq{
 		IDPTemplateInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -849,7 +868,7 @@ func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
+func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -874,6 +893,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthUsePKCECol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -881,6 +901,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCUsePKCECol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -932,6 +953,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			SAMLWithSignedRequestCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
+			SAMLFederatedLogoutEnabledCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -943,6 +965,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LDAPUserObjectClassesCol.identifier(),
 			LDAPUserFiltersCol.identifier(),
 			LDAPTimeoutCol.identifier(),
+			LDAPRootCACol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -975,7 +998,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
@@ -990,6 +1013,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oauthUserEndpoint := sql.NullString{}
 			oauthScopes := database.TextArray[string]{}
 			oauthIDAttribute := sql.NullString{}
+			oauthUserPKCE := sql.NullBool{}
 
 			oidcID := sql.NullString{}
 			oidcIssuer := sql.NullString{}
@@ -997,6 +1021,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
+			oidcUserPKCE := sql.NullBool{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
@@ -1048,6 +1073,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			samlWithSignedRequest := sql.NullBool{}
 			samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 			samlTransientMappingAttributeName := sql.NullString{}
+			samlFederatedLogoutEnabled := sql.NullBool{}
 
 			ldapID := sql.NullString{}
 			ldapServers := database.TextArray[string]{}
@@ -1059,6 +1085,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			ldapUserObjectClasses := database.TextArray[string]{}
 			ldapUserFilters := database.TextArray[string]{}
 			ldapTimeout := sql.NullInt64{}
+			var ldapRootCA []byte
 			ldapIDAttribute := sql.NullString{}
 			ldapFirstNameAttribute := sql.NullString{}
 			ldapLastNameAttribute := sql.NullString{}
@@ -1104,6 +1131,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oauthUserEndpoint,
 				&oauthScopes,
 				&oauthIDAttribute,
+				&oauthUserPKCE,
 				// oidc
 				&oidcID,
 				&oidcIssuer,
@@ -1111,6 +1139,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oidcClientSecret,
 				&oidcScopes,
 				&oidcIDTokenMapping,
+				&oidcUserPKCE,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
@@ -1162,6 +1191,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&samlWithSignedRequest,
 				&samlNameIDFormat,
 				&samlTransientMappingAttributeName,
+				&samlFederatedLogoutEnabled,
 				// ldap
 				&ldapID,
 				&ldapServers,
@@ -1173,6 +1203,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&ldapUserObjectClasses,
 				&ldapUserFilters,
 				&ldapTimeout,
+				&ldapRootCA,
 				&ldapIDAttribute,
 				&ldapFirstNameAttribute,
 				&ldapLastNameAttribute,
@@ -1213,6 +1244,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserEndpoint:          oauthUserEndpoint.String,
 					Scopes:                oauthScopes,
 					IDAttribute:           oauthIDAttribute.String,
+					UsePKCE:               oauthUserPKCE.Bool,
 				}
 			}
 			if oidcID.Valid {
@@ -1223,6 +1255,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Issuer:           oidcIssuer.String,
 					Scopes:           oidcScopes,
 					IsIDTokenMapping: oidcIDTokenMapping.Bool,
+					UsePKCE:          oidcUserPKCE.Bool,
 				}
 			}
 			if jwtID.Valid {
@@ -1298,6 +1331,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					WithSignedRequest:             samlWithSignedRequest.Bool,
 					NameIDFormat:                  samlNameIDFormat,
 					TransientMappingAttributeName: samlTransientMappingAttributeName.String,
+					FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,
 				}
 			}
 			if ldapID.Valid {
@@ -1312,6 +1346,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserObjectClasses: ldapUserObjectClasses,
 					UserFilters:       ldapUserFilters,
 					Timeout:           time.Duration(ldapTimeout.Int64),
+					RootCA:            ldapRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                ldapIDAttribute.String,
 						FirstNameAttribute:         ldapFirstNameAttribute.String,
@@ -1344,7 +1379,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 		}
 }
 
-func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
+//nolint:gocognit
+func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -1369,6 +1405,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthUsePKCECol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -1376,6 +1413,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCUsePKCECol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1427,6 +1465,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			SAMLWithSignedRequestCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
+			SAMLFederatedLogoutEnabledCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -1438,6 +1477,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LDAPUserObjectClassesCol.identifier(),
 			LDAPUserFiltersCol.identifier(),
 			LDAPTimeoutCol.identifier(),
+			LDAPRootCACol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -1472,7 +1512,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)
@@ -1490,6 +1530,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oauthUserEndpoint := sql.NullString{}
 				oauthScopes := database.TextArray[string]{}
 				oauthIDAttribute := sql.NullString{}
+				oauthUserPKCE := sql.NullBool{}
 
 				oidcID := sql.NullString{}
 				oidcIssuer := sql.NullString{}
@@ -1497,6 +1538,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
+				oidcUserPKCE := sql.NullBool{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
@@ -1548,6 +1590,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				samlWithSignedRequest := sql.NullBool{}
 				samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 				samlTransientMappingAttributeName := sql.NullString{}
+				samlFederatedLogoutEnabled := sql.NullBool{}
 
 				ldapID := sql.NullString{}
 				ldapServers := database.TextArray[string]{}
@@ -1559,6 +1602,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				ldapUserObjectClasses := database.TextArray[string]{}
 				ldapUserFilters := database.TextArray[string]{}
 				ldapTimeout := sql.NullInt64{}
+				var ldapRootCA []byte
 				ldapIDAttribute := sql.NullString{}
 				ldapFirstNameAttribute := sql.NullString{}
 				ldapLastNameAttribute := sql.NullString{}
@@ -1604,6 +1648,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oauthUserEndpoint,
 					&oauthScopes,
 					&oauthIDAttribute,
+					&oauthUserPKCE,
 					// oidc
 					&oidcID,
 					&oidcIssuer,
@@ -1611,6 +1656,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oidcClientSecret,
 					&oidcScopes,
 					&oidcIDTokenMapping,
+					&oidcUserPKCE,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
@@ -1662,6 +1708,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&samlWithSignedRequest,
 					&samlNameIDFormat,
 					&samlTransientMappingAttributeName,
+					&samlFederatedLogoutEnabled,
 					// ldap
 					&ldapID,
 					&ldapServers,
@@ -1673,6 +1720,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&ldapUserObjectClasses,
 					&ldapUserFilters,
 					&ldapTimeout,
+					&ldapRootCA,
 					&ldapIDAttribute,
 					&ldapFirstNameAttribute,
 					&ldapLastNameAttribute,
@@ -1712,6 +1760,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserEndpoint:          oauthUserEndpoint.String,
 						Scopes:                oauthScopes,
 						IDAttribute:           oauthIDAttribute.String,
+						UsePKCE:               oauthUserPKCE.Bool,
 					}
 				}
 				if oidcID.Valid {
@@ -1722,6 +1771,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						Issuer:           oidcIssuer.String,
 						Scopes:           oidcScopes,
 						IsIDTokenMapping: oidcIDTokenMapping.Bool,
+						UsePKCE:          oidcUserPKCE.Bool,
 					}
 				}
 				if jwtID.Valid {
@@ -1797,6 +1847,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						WithSignedRequest:             samlWithSignedRequest.Bool,
 						NameIDFormat:                  samlNameIDFormat,
 						TransientMappingAttributeName: samlTransientMappingAttributeName.String,
+						FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,
 					}
 				}
 				if ldapID.Valid {
@@ -1811,6 +1862,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserObjectClasses: ldapUserObjectClasses,
 						UserFilters:       ldapUserFilters,
 						Timeout:           time.Duration(ldapTimeout.Int64),
+						RootCA:            ldapRootCA,
 						LDAPAttributes: idp.LDAPAttributes{
 							IDAttribute:                ldapIDAttribute.String,
 							FirstNameAttribute:         ldapFirstNameAttribute.String,

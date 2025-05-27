@@ -16,16 +16,19 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/id"
+	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 )
 
 type Migration struct {
 	Source      database.Config
 	Destination database.Config
 
-	EventBulkSize uint32
+	EventBulkSize     uint32
+	MaxAuthRequestAge time.Duration
 
 	Log     *logging.Config
 	Machine *id.Config
+	Metrics metrics.Config
 }
 
 var (
@@ -39,6 +42,9 @@ func mustNewMigrationConfig(v *viper.Viper) *Migration {
 
 	err := config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
+
+	err = config.Metrics.NewMeter()
+	logging.OnError(err).Fatal("unable to set meter")
 
 	id.Configure(config.Machine)
 
@@ -71,7 +77,7 @@ func mustNewConfig(v *viper.Viper, config any) {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			database.DecodeHook,
+			database.DecodeHook(true),
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 			mapstructure.TextUnmarshallerHookFunc(),

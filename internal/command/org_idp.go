@@ -628,6 +628,7 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, writeModel *OrgO
 					provider.UserEndpoint,
 					provider.IDAttribute,
 					provider.Scopes,
+					provider.UsePKCE,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -683,6 +684,7 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, writeModel *O
 				provider.UserEndpoint,
 				provider.IDAttribute,
 				provider.Scopes,
+				provider.UsePKCE,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -731,6 +733,7 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOI
 					secret,
 					provider.Scopes,
 					provider.IsIDTokenMapping,
+					provider.UsePKCE,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -775,6 +778,7 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *Or
 				c.idpConfigEncryption,
 				provider.Scopes,
 				provider.IsIDTokenMapping,
+				provider.UsePKCE,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1512,6 +1516,11 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, writeModel *OrgLD
 		if len(provider.UserFilters) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-aAx9x1n", "Errors.Invalid.Argument")
 		}
+		if len(provider.RootCA) > 0 {
+			if err := validateRootCA(provider.RootCA); err != nil {
+				return nil, err
+			}
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1540,6 +1549,7 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, writeModel *OrgLD
 					provider.UserObjectClasses,
 					provider.UserFilters,
 					provider.Timeout,
+					provider.RootCA,
 					provider.LDAPAttributes,
 					provider.IDPOptions,
 				),
@@ -1574,6 +1584,11 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, writeModel *Or
 		if len(provider.UserFilters) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-aBx901n", "Errors.Invalid.Argument")
 		}
+		if len(provider.RootCA) > 0 {
+			if err := validateRootCA(provider.RootCA); err != nil {
+				return nil, err
+			}
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1600,6 +1615,7 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, writeModel *Or
 				provider.UserObjectClasses,
 				provider.UserFilters,
 				provider.Timeout,
+				provider.RootCA,
 				c.idpConfigEncryption,
 				provider.LDAPAttributes,
 				provider.IDPOptions,
@@ -1752,6 +1768,7 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 					provider.WithSignedRequest,
 					provider.NameIDFormat,
 					provider.TransientMappingAttributeName,
+					provider.FederatedLogoutEnabled,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -1805,6 +1822,7 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 				provider.WithSignedRequest,
 				provider.NameIDFormat,
 				provider.TransientMappingAttributeName,
+				provider.FederatedLogoutEnabled,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1850,6 +1868,7 @@ func (c *Commands) prepareRegenerateOrgSAMLProviderCertificate(a *org.Aggregate,
 				writeModel.WithSignedRequest,
 				writeModel.NameIDFormat,
 				writeModel.TransientMappingAttributeName,
+				writeModel.FederatedLogoutEnabled,
 				writeModel.Options,
 			)
 			if err != nil || event == nil {

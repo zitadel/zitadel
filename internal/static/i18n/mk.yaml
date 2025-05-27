@@ -535,6 +535,7 @@ Errors:
     StateMissing: Параметарот State недостасува во барањето
     NotStarted: Намерата не е започната или веќе завршена
     NotSucceeded: Намерата не е успешна
+    Expired: Намерата е истечена
     TokenCreationFailed: Неуспешно креирање на токен
     InvalidToken: Токенот за намера е невалиден
     OtherUser: Намерата е за друг корисник
@@ -542,6 +543,7 @@ Errors:
     AlreadyExists: Барањето за автентикација веќе постои
     NotExisting: Барањето за автентикација не постои
     WrongLoginClient: Барањето за автификација беше креирано од друг клиент за најавување
+    AlreadyHandled: Барањето за автентикација е веќе обработено
   OIDCSession:
     RefreshTokenInvalid: Токенот за освежување е неважечки
     Token:
@@ -552,8 +554,12 @@ Errors:
     AlreadyExists: SAMLRequest веќе постои
     NotExisting: SAMLRequest не постои
     WrongLoginClient: SAML Барање создадено од друг клиент за најавување
+    AlreadyHandled: SAML барањето е веќе обработено
   SAMLSession:
     InvalidClient: SAMLResponse не беше издаден за овој клиент
+  DeviceAuth:
+    NotFound: Барањето за авторизација на уредот не постои
+    AlreadyHandled: Барањето за авторизација на уредот е веќе обработено
   Feature:
     NotExisting: Функцијата не постои
     TypeNotSupported: Типот на функција не е поддржан

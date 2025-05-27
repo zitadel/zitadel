@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/user/model"
@@ -111,6 +112,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		Prompt:           PromptToBusiness(req.Prompt),
 		UILocales:        UILocalesToBusiness(req.UILocales),
 		MaxAge:           MaxAgeToBusiness(req.MaxAge),
+		Issuer:           o.contextToIssuer(ctx),
 	}
 	if req.LoginHint != "" {
 		authRequest.LoginHint = &req.LoginHint
@@ -149,7 +151,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, true)
+	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -235,6 +237,11 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
+	_, err = o.terminateSession(ctx, userID)
+	return err
+}
+
+func (o *OPStorage) terminateSession(ctx context.Context, userID string) (sessions []command.HumanSignOutSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		err = oidcError(err)
@@ -243,22 +250,22 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		logging.Error("no user agent id")
-		return zerrors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
-	sessions, err := o.repo.UserSessionsByAgentID(ctx, userAgentID)
+	sessions, err = o.repo.UserSessionsByAgentID(ctx, userAgentID)
 	if err != nil {
 		logging.WithError(err).Error("error retrieving user sessions")
-		return err
+		return nil, err
 	}
 	if len(sessions) == 0 {
-		return nil
+		return nil, nil
 	}
 	data := authz.CtxData{
 		UserID: userID,
 	}
 	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, sessions)
 	logging.OnError(err).Error("error signing out")
-	return err
+	return sessions, err
 }
 
 func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionRequest *op.EndSessionRequest) (redirectURI string, err error) {
@@ -293,7 +300,16 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	// So if any condition is not met, we handle the request as a V1 request and do a (v1) TerminateSession,
 	// which terminates all sessions of the user agent, identified by cookie.
 	if endSessionRequest.IDTokenHintClaims == nil || endSessionRequest.IDTokenHintClaims.SessionID == "" {
-		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
+		sessions, err := o.terminateSession(ctx, endSessionRequest.UserID)
+		if err != nil {
+			return "", err
+		}
+		if len(sessions) == 1 {
+			if path := o.federatedLogout(ctx, sessions[0].ID, endSessionRequest.RedirectURI); path != "" {
+				return path, nil
+			}
+		}
+		return endSessionRequest.RedirectURI, nil
 	}
 
 	// V1:
@@ -303,6 +319,9 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		err = o.terminateV1Session(ctx, endSessionRequest.UserID, endSessionRequest.IDTokenHintClaims.SessionID)
 		if err != nil {
 			return "", err
+		}
+		if path := o.federatedLogout(ctx, endSessionRequest.IDTokenHintClaims.SessionID, endSessionRequest.RedirectURI); path != "" {
+			return path, nil
 		}
 		return endSessionRequest.RedirectURI, nil
 	}
@@ -314,6 +333,39 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		return "", err
 	}
 	return v2PostLogoutRedirectURI(endSessionRequest.RedirectURI), nil
+}
+
+// federatedLogout checks whether the session has an idp session linked and the IDP template is configured for federated logout.
+// If so, it creates a federated logout request and stores it in the cache and returns the logout path.
+func (o *OPStorage) federatedLogout(ctx context.Context, sessionID string, postLogoutRedirectURI string) string {
+	session, err := o.repo.UserSessionByID(ctx, sessionID)
+	if err != nil {
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "sessionID", sessionID).
+			WithError(err).Error("error retrieving user session")
+		return ""
+	}
+	if session.SelectedIDPConfigID.String == "" {
+		return ""
+	}
+	identityProvider, err := o.query.IDPTemplateByID(ctx, false, session.SelectedIDPConfigID.String, false, nil)
+	if err != nil {
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "idpID", session.SelectedIDPConfigID.String, "sessionID", sessionID).
+			WithError(err).Error("error retrieving idp template")
+		return ""
+	}
+	if identityProvider.SAMLIDPTemplate == nil || !identityProvider.FederatedLogoutEnabled {
+		return ""
+	}
+	o.federateLogoutCache.Set(ctx, &federatedlogout.FederatedLogout{
+		InstanceID:            authz.GetInstance(ctx).InstanceID(),
+		FingerPrintID:         authz.GetCtxData(ctx).AgentID,
+		SessionID:             sessionID,
+		IDPID:                 session.SelectedIDPConfigID.String,
+		UserID:                session.UserID,
+		PostLogoutRedirectURI: postLogoutRedirectURI,
+		State:                 federatedlogout.StateCreated,
+	})
+	return login.ExternalLogoutPath(sessionID)
 }
 
 func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI string) string {
@@ -458,7 +510,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -481,7 +533,7 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -497,7 +549,7 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 	if err != nil {
 		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
 	if err != nil {
 		return err
 	}
@@ -545,11 +597,7 @@ func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authoriz
 		code:  code,
 		state: authReq.GetState(),
 	}
-	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
-	if err != nil {
-		return "", err
-	}
-	return callback, err
+	return op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
 }
 
 func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest) (string, error) {
@@ -568,6 +616,7 @@ func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest)
 		req.GetID(),
 		implicitFlowComplianceChecker(),
 		slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
+		client.client.BackChannelLogoutURI,
 	)
 	if err != nil {
 		return "", err

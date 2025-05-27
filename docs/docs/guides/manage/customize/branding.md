@@ -24,13 +24,13 @@ Upload your logo for the chosen theme, as soon as it is uploaded the preview on 
 
 ### Colors
 
-In the next part you can configure your colors. 
-Background colour is self-explanatory, the primary color will be used for buttons, links and some highlights. 
-The warn color is used for all the error messages and warnings and the font colour for texts. 
+In the next part you can configure your colors.
+Background colour is self-explanatory, the primary color will be used for buttons, links and some highlights.
+The warn color is used for all the error messages and warnings and the font colour for texts.
 
 ### Font
 
-Last step to apply to your branding is the font upload. 
+Last step to apply to your branding is the font upload.
 The best way is to upload a ttf file after a successful upload you will see it in the font part, but not in the preview.
 
 ### Advanced Settings
@@ -46,7 +46,7 @@ If you like to trigger your settings for your applications you have different po
 Send a [reserved scope](/apis/openidoauth/scopes) with your [authorization request](../../integrate/login/oidc/login-users#auth-request) to trigger your organization.
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login.
 
-You can use our [OpenID Authentication Request Playground](/apis/openidoauth/authrequest) to learn more about how to trigger an [organization's policies and branding](/apis/openidoauth/authrequest#organization-policies-and-branding).
+You can use our [OpenID Authentication Request Playground](/oidc-playground) to learn more about how to trigger an [organization's policies and branding](/oidc-playground#organization-policies-and-branding).
 
 ### 2. Setting on your Project
 

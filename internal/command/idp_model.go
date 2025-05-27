@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"net/http"
 	"reflect"
 	"slices"
@@ -44,6 +45,7 @@ type OAuthIDPWriteModel struct {
 	UserEndpoint          string
 	Scopes                []string
 	IDAttribute           string
+	UsePKCE               bool
 	idp.Options
 
 	State domain.IDPState
@@ -72,6 +74,7 @@ func (wm *OAuthIDPWriteModel) reduceAddedEvent(e *idp.OAuthIDPAddedEvent) {
 	wm.UserEndpoint = e.UserEndpoint
 	wm.Scopes = e.Scopes
 	wm.IDAttribute = e.IDAttribute
+	wm.UsePKCE = e.UsePKCE
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -101,6 +104,9 @@ func (wm *OAuthIDPWriteModel) reduceChangedEvent(e *idp.OAuthIDPChangedEvent) {
 	if e.IDAttribute != nil {
 		wm.IDAttribute = *e.IDAttribute
 	}
+	if e.UsePKCE != nil {
+		wm.UsePKCE = *e.UsePKCE
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -114,6 +120,7 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	userEndpoint,
 	idAttribute string,
 	scopes []string,
+	usePKCE bool,
 	options idp.Options,
 ) ([]idp.OAuthIDPChanges, error) {
 	changes := make([]idp.OAuthIDPChanges, 0)
@@ -146,6 +153,9 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	}
 	if wm.IDAttribute != idAttribute {
 		changes = append(changes, idp.ChangeOAuthIDAttribute(idAttribute))
+	}
+	if wm.UsePKCE != usePKCE {
+		changes = append(changes, idp.ChangeOAuthUsePKCE(usePKCE))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -207,6 +217,7 @@ type OIDCIDPWriteModel struct {
 	ClientSecret     *crypto.CryptoValue
 	Scopes           []string
 	IsIDTokenMapping bool
+	UsePKCE          bool
 	idp.Options
 
 	State domain.IDPState
@@ -247,6 +258,7 @@ func (wm *OIDCIDPWriteModel) reduceAddedEvent(e *idp.OIDCIDPAddedEvent) {
 	wm.ClientSecret = e.ClientSecret
 	wm.Scopes = e.Scopes
 	wm.IsIDTokenMapping = e.IsIDTokenMapping
+	wm.UsePKCE = e.UsePKCE
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -270,6 +282,9 @@ func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
 	if e.IsIDTokenMapping != nil {
 		wm.IsIDTokenMapping = *e.IsIDTokenMapping
 	}
+	if e.UsePKCE != nil {
+		wm.UsePKCE = *e.UsePKCE
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -280,7 +295,7 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	clientSecretString string,
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
-	idTokenMapping bool,
+	idTokenMapping, usePKCE bool,
 	options idp.Options,
 ) ([]idp.OIDCIDPChanges, error) {
 	changes := make([]idp.OIDCIDPChanges, 0)
@@ -307,6 +322,9 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	}
 	if wm.IsIDTokenMapping != idTokenMapping {
 		changes = append(changes, idp.ChangeOIDCIsIDTokenMapping(idTokenMapping))
+	}
+	if wm.UsePKCE != usePKCE {
+		changes = append(changes, idp.ChangeOIDCUsePKCE(usePKCE))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -1366,6 +1384,7 @@ type LDAPIDPWriteModel struct {
 	UserObjectClasses []string
 	UserFilters       []string
 	Timeout           time.Duration
+	RootCA            []byte
 	idp.LDAPAttributes
 	idp.Options
 
@@ -1406,6 +1425,7 @@ func (wm *LDAPIDPWriteModel) reduceAddedEvent(e *idp.LDAPIDPAddedEvent) {
 	wm.UserObjectClasses = e.UserObjectClasses
 	wm.UserFilters = e.UserFilters
 	wm.Timeout = e.Timeout
+	wm.RootCA = e.RootCA
 	wm.LDAPAttributes = e.LDAPAttributes
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
@@ -1460,6 +1480,7 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
+	rootCA []byte,
 	secretCrypto crypto.EncryptionAlgorithm,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
@@ -1500,6 +1521,9 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	}
 	if wm.Timeout != timeout {
 		changes = append(changes, idp.ChangeLDAPTimeout(timeout))
+	}
+	if !bytes.Equal(wm.RootCA, rootCA) {
+		changes = append(changes, idp.ChangeLDAPRootCA(rootCA))
 	}
 	attrs := wm.LDAPAttributes.Changes(attributes)
 	if !attrs.IsZero() {
@@ -1582,6 +1606,7 @@ func (wm *LDAPIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		wm.UserObjectClasses,
 		wm.UserFilters,
 		wm.Timeout,
+		wm.RootCA,
 		callbackURL,
 		opts...,
 	), nil
@@ -1735,6 +1760,7 @@ type SAMLIDPWriteModel struct {
 	WithSignedRequest             bool
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
 	idp.Options
 
 	State domain.IDPState
@@ -1763,6 +1789,7 @@ func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
 	wm.WithSignedRequest = e.WithSignedRequest
 	wm.NameIDFormat = e.NameIDFormat
 	wm.TransientMappingAttributeName = e.TransientMappingAttributeName
+	wm.FederatedLogoutEnabled = e.FederatedLogoutEnabled
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -1792,6 +1819,9 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 	if e.TransientMappingAttributeName != nil {
 		wm.TransientMappingAttributeName = *e.TransientMappingAttributeName
 	}
+	if e.FederatedLogoutEnabled != nil {
+		wm.FederatedLogoutEnabled = *e.FederatedLogoutEnabled
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -1805,6 +1835,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	withSignedRequest bool,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options idp.Options,
 ) ([]idp.SAMLIDPChanges, error) {
 	changes := make([]idp.SAMLIDPChanges, 0)
@@ -1835,6 +1866,9 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	}
 	if wm.TransientMappingAttributeName != transientMappingAttributeName {
 		changes = append(changes, idp.ChangeSAMLTransientMappingAttributeName(transientMappingAttributeName))
+	}
+	if wm.FederatedLogoutEnabled != federatedLogoutEnabled {
+		changes = append(changes, idp.ChangeSAMLFederatedLogoutEnabled(federatedLogoutEnabled))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -1874,6 +1908,7 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if wm.TransientMappingAttributeName != "" {
 		opts = append(opts, saml2.WithTransientMappingAttributeName(wm.TransientMappingAttributeName))
 	}
+	// TODO: ? if wm.FederatedLogoutEnabled
 	opts = append(opts, saml2.WithCustomRequestTracker(
 		requesttracker.New(
 			addRequest,

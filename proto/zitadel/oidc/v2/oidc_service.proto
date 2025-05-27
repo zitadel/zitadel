@@ -24,7 +24,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
   schemes: HTTPS;
@@ -147,6 +147,58 @@ service OIDCService {
       };
     };
   }
+
+  // Get device authorization request
+  //
+  // Get the device authorization based on the provided "user code".
+  // This will return the device authorization request, which contains the device authorization id
+  // that is required to authorize the request once the user signed in or to deny it.
+  rpc GetDeviceAuthorizationRequest(GetDeviceAuthorizationRequestRequest) returns (GetDeviceAuthorizationRequestResponse) {
+    option (google.api.http) = {
+      get: "/v2/oidc/device_authorization/{user_code}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Authorize or deny device authorization
+  //
+  // Authorize or deny the device authorization request based on the provided device authorization id.
+  rpc AuthorizeOrDenyDeviceAuthorization(AuthorizeOrDenyDeviceAuthorizationRequest) returns (AuthorizeOrDenyDeviceAuthorizationResponse) {
+    option (google.api.http) = {
+      post: "/v2/oidc/device_authorization/{device_authorization_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
 }
 
 message GetAuthRequestRequest {
@@ -217,3 +269,42 @@ message CreateCallbackResponse {
   ];
 }
 
+message GetDeviceAuthorizationRequestRequest {
+  // The user_code returned by the device authorization request and provided to the user by the device.
+  string user_code = 1 [
+    (validate.rules).string = {len: 9},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 9;
+      max_length: 9;
+      example: "\"K9LV-3DMQ\"";
+    }
+  ];
+}
+
+message GetDeviceAuthorizationRequestResponse {
+  DeviceAuthorizationRequest device_authorization_request = 1;
+}
+
+message AuthorizeOrDenyDeviceAuthorizationRequest {
+  // The device authorization id returned when submitting the user code.
+  string device_authorization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+    }
+  ];
+
+  // The decision of the user to authorize or deny the device authorization request.
+  oneof decision {
+    option (validate.required) = true;
+    // To authorize the device authorization request, the user's session must be provided.
+    Session session = 2;
+    // Deny the device authorization request.
+    Deny deny = 3;
+  }
+}
+
+message Deny{}
+
+message AuthorizeOrDenyDeviceAuthorizationResponse {}

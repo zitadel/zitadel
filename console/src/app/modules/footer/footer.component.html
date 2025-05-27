@@ -1,6 +1,6 @@
 <div class="footer-wrapper">
   <div class="footer-row">
-    <div class="footer-links" *ngIf="authService.privacypolicy | async as pP">
+    <div class="footer-links" *ngIf="authService.privacypolicy$ | async as pP">
       <a target="_blank" *ngIf="pP?.tosLink" rel="noreferrer" [href]="pP?.tosLink" external>
         <span>{{ 'FOOTER.LINKS.TOS' | translate }}</span>
         <i class="las la-external-link-alt"></i>
@@ -11,7 +11,7 @@
       </a>
     </div>
 
-    <div class="footer-socials" *ngIf="authService.labelpolicy | async as lP">
+    <div class="footer-socials" *ngIf="authService.labelpolicy$ | async as lP">
       <ng-container *ngIf="lP?.disableWatermark === false">
         <a target="_blank" rel="noreferrer" href="https://github.com/zitadel">
           <i class="text-3xl lab la-github"></i>

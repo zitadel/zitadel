@@ -53,10 +53,10 @@ The command `zitadel init` ensures the database connection is ready to use for t
 It just needs to be executed once over ZITADELs full life cycle,
 when you install ZITADEL from scratch.
 During `zitadel init`, for connecting to your database,
-ZITADEL uses the privileged and preexisting database user configured in `Database.<cockroach|postgres>.Admin.Username`.
+ZITADEL uses the privileged and preexisting database user configured in `Database.postgres.Admin.Username`.
 , `zitadel init` ensures the following:
 - If it doesn’t exist already, it creates a database with the configured database name.
-- If it doesn’t exist already, it creates the unprivileged user use configured in `Database.<cockroach|postgres>.User.Username`.
+- If it doesn’t exist already, it creates the unprivileged user use configured in `Database.postgres.User.Username`.
   Subsequent phases connect to the database with this user's credentials only.
 - If not already done, it grants the necessary permissions ZITADEL needs to the non privileged user.
 - If they don’t exist already, it creates all schemas and some basic tables.

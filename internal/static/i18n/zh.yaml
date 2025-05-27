@@ -536,6 +536,7 @@ Errors:
     StateMissing: 请求中缺少状态参数
     NotStarted: 意图没有开始或已经结束
     NotSucceeded: 意图不成功
+    Expired: 意图已过期
     TokenCreationFailed: 令牌创建失败
     InvalidToken: 意图令牌是无效的
     OtherUser: 意图是为另一个用户准备的
@@ -543,6 +544,7 @@ Errors:
     AlreadyExists: AuthRequest已经存在
     NotExisting: AuthRequest不存在
     WrongLoginClient: 其他登录客户端创建的AuthRequest
+    AlreadyHandled: 身份验证请求已被处理
   OIDCSession:
     RefreshTokenInvalid: Refresh Token 无效
     Token:
@@ -553,8 +555,12 @@ Errors:
     AlreadyExists: SAMLRequest 已存在
     NotExisting: SAMLRequest不存在
     WrongLoginClient: 其他登录客户端创建的 SAMLRequest
+    AlreadyHandled: SAML请求已被处理
   SAMLSession:
     InvalidClient: 未向该客户端发出 SAMLResponse
+  DeviceAuth:
+    NotFound: 设备授权请求不存在
+    AlreadyHandled: 设备授权请求已被处理
   Feature:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型

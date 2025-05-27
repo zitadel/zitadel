@@ -3,6 +3,7 @@ package actions
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/dop251/goja"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
@@ -34,21 +36,21 @@ func Test_isHostBlocked(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   bool
+		want   error
 	}{
 		{
 			name: "in range",
 			args: args{
 				address: mustNewURL(t, "https://192.168.5.4/hodor"),
 			},
-			want: true,
+			want: NewAddressDeniedError("192.168.5.0/24"),
 		},
 		{
 			name: "exact ip",
 			args: args{
 				address: mustNewURL(t, "http://127.0.0.1:8080/hodor"),
 			},
-			want: true,
+			want: NewAddressDeniedError("127.0.0.1"),
 		},
 		{
 			name: "address match",
@@ -60,7 +62,7 @@ func Test_isHostBlocked(t *testing.T) {
 			args: args{
 				address: mustNewURL(t, "https://test.com:42/hodor"),
 			},
-			want: true,
+			want: NewAddressDeniedError("test.com"),
 		},
 		{
 			name: "address not match",
@@ -72,7 +74,7 @@ func Test_isHostBlocked(t *testing.T) {
 			args: args{
 				address: mustNewURL(t, "https://test2.com/hodor"),
 			},
-			want: false,
+			want: nil,
 		},
 		{
 			name: "looked up ip matches",
@@ -84,7 +86,19 @@ func Test_isHostBlocked(t *testing.T) {
 			args: args{
 				address: mustNewURL(t, "https://test2.com/hodor"),
 			},
-			want: true,
+			want: NewAddressDeniedError("127.0.0.1"),
+		},
+		{
+			name: "looked up failure",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return nil, errors.New("some error")
+				},
+			},
+			args: args{
+				address: mustNewURL(t, "https://test2.com/hodor"),
+			},
+			want: zerrors.ThrowInternal(nil, "ACTIO-4m9s2", "lookup failed"),
 		},
 	}
 	for _, tt := range tests {
@@ -92,9 +106,8 @@ func Test_isHostBlocked(t *testing.T) {
 			trans := &transport{
 				lookup: tt.fields.lookup,
 			}
-			if got := trans.isHostBlocked(denyList, tt.args.address); got != tt.want {
-				t.Errorf("isHostBlocked() = %v, want %v", got, tt.want)
-			}
+			got := trans.isHostBlocked(denyList, tt.args.address)
+			assert.ErrorIs(t, got, tt.want)
 		})
 	}
 }

@@ -23,8 +23,7 @@ var (
 			" projections.personal_access_tokens3.user_id," +
 			" projections.personal_access_tokens3.expiration," +
 			" projections.personal_access_tokens3.scopes" +
-			" FROM projections.personal_access_tokens3" +
-			` AS OF SYSTEM TIME '-1 ms'`)
+			" FROM projections.personal_access_tokens3")
 	personalAccessTokenCols = []string{
 		"id",
 		"creation_date",
@@ -45,8 +44,7 @@ var (
 			" projections.personal_access_tokens3.expiration," +
 			" projections.personal_access_tokens3.scopes," +
 			" COUNT(*) OVER ()" +
-			" FROM projections.personal_access_tokens3" +
-			" AS OF SYSTEM TIME '-1 ms'")
+			" FROM projections.personal_access_tokens3")
 	personalAccessTokensCols = []string{
 		"id",
 		"creation_date",
@@ -266,7 +264,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

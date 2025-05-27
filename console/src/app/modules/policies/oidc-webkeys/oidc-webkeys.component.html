@@ -1,0 +1,19 @@
+<h2>{{ 'SETTINGS.LIST.WEB_KEYS' | translate }}</h2>
+<p>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.DESCRIPTION' | translate }}</p>
+<h3>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.TITLE' | translate }}</h3>
+<p>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.DESCRIPTION' | translate }}</p>
+<p>{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.NOTE' | translate }}</p>
+<cnsl-oidc-webkeys-table (refresh)="refresh.next(true)" (delete)="deleteWebKey($event)" [webKeys]="webKeys$ | async">
+  <button
+    *ngIf="nextWebKeyCandidate$ | async as nextWebKeyCandidate"
+    [disabled]="activateLoading()"
+    mat-raised-button
+    color="primary"
+    (click)="activateWebKey(nextWebKeyCandidate)"
+  >
+    <mat-spinner diameter="20" *ngIf="activateLoading()"></mat-spinner>
+    <span *ngIf="!activateLoading()">{{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.ACTIVATE' | translate }}</span>
+  </button>
+</cnsl-oidc-webkeys-table>
+<cnsl-oidc-webkeys-create [loading]="createLoading()" (ngSubmit)="createWebKey($event)" />
+<cnsl-oidc-webkeys-inactive-table [inactiveWebKeys]="inactiveWebKeys$ | async" />

@@ -1,14 +1,14 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, DestroyRef, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { Observable, of, Subject } from 'rxjs';
-import { filter, map, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject, switchMap } from 'rxjs';
+import { filter, map, startWith, takeUntil, tap } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
@@ -21,6 +21,7 @@ import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
 import { PosthogService } from './services/posthog.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'cnsl-root',
@@ -28,7 +29,7 @@ import { PosthogService } from './services/posthog.service';
   styleUrls: ['./app.component.scss'],
   animations: [toolbarAnimation, ...navAnimations, accountCard, routeAnimations, adminLineAnimation],
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent {
   @ViewChild('drawer') public drawer!: MatDrawer;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
@@ -47,8 +48,6 @@ export class AppComponent implements OnDestroy {
   public isDarkTheme: Observable<boolean> = of(true);
 
   public showProjectSection: boolean = false;
-
-  private destroy$: Subject<void> = new Subject();
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -70,6 +69,7 @@ export class AppComponent implements OnDestroy {
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
     private posthog: PosthogService,
+    private readonly destroyRef: DestroyRef,
   ) {
     console.log(
       '%cWait!',
@@ -199,42 +199,43 @@ export class AppComponent implements OnDestroy {
 
     this.getProjectCount();
 
-    this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
+    this.authService.activeOrgChanged.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((org) => {
       if (org) {
         this.org = org;
         this.getProjectCount();
       }
     });
 
-    this.activatedRoute.queryParams.pipe(filter((params) => !!params['org'])).subscribe((params) => {
-      const { org } = params;
-      this.authService.getActiveOrg(org);
-    });
+    this.activatedRoute.queryParamMap
+      .pipe(
+        map((params) => params.get('org')),
+        filter(Boolean),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((org) => this.authService.getActiveOrg(org));
 
-    this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
-      if (authenticated) {
-        this.authService
-          .getActiveOrg()
-          .then(async (org) => {
-            this.org = org;
-            // TODO add when console storage is implemented
-            // this.startIntroWorkflow();
-          })
-          .catch((error) => {
-            console.error(error);
-            this.router.navigate(['/users/me']);
-          });
-      }
-    });
+    this.authenticationService.authenticationChanged
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.authService.getActiveOrg()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (org) => (this.org = org),
+        error: async (err) => {
+          console.error(err);
+          return this.router.navigate(['/users/me']);
+        },
+      });
 
     this.isDarkTheme = this.themeService.isDarkTheme;
-    this.isDarkTheme.pipe(takeUntil(this.destroy$)).subscribe((dark) => {
+    this.isDarkTheme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((dark) => {
       const theme = dark ? 'dark-theme' : 'light-theme';
       this.onSetTheme(theme);
       this.setFavicon(theme);
     });
 
-    this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe((language: LangChangeEvent) => {
+    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
@@ -254,11 +255,6 @@ export class AppComponent implements OnDestroy {
   //     }, 1000);
   //   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public prepareRoute(outlet: RouterOutlet): boolean {
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
@@ -275,7 +271,7 @@ export class AppComponent implements OnDestroy {
     const currentUrl = this.router.url;
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       // We use navigateByUrl as our urls may have queryParams
-      this.router.navigateByUrl(currentUrl);
+      this.router.navigateByUrl(currentUrl).then();
     });
   }
 
@@ -283,18 +279,16 @@ export class AppComponent implements OnDestroy {
     this.translate.addLangs(supportedLanguages);
     this.translate.setDefaultLang(fallbackLanguage);
 
-    this.authService.userSubject.pipe(takeUntil(this.destroy$)).subscribe((userprofile) => {
-      if (userprofile) {
-        const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
-        const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
+    this.authService.user.pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef)).subscribe((userprofile) => {
+      const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
+      const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(supportedLanguagesRegexp)
-          ? userprofile.human.profile?.preferredLanguage
-          : fallbackLang;
-        this.translate.use(lang);
-        this.language = lang;
-        this.document.documentElement.lang = lang;
-      }
+      const lang = userprofile?.human?.profile?.preferredLanguage.match(supportedLanguagesRegexp)
+        ? userprofile.human.profile?.preferredLanguage
+        : fallbackLang;
+      this.translate.use(lang);
+      this.language = lang;
+      this.document.documentElement.lang = lang;
     });
   }
 
@@ -308,7 +302,7 @@ export class AppComponent implements OnDestroy {
   }
 
   private setFavicon(theme: string): void {
-    this.authService.labelpolicy.pipe(takeUntil(this.destroy$)).subscribe((lP) => {
+    this.authService.labelpolicy$.pipe(startWith(undefined), takeUntilDestroyed(this.destroyRef)).subscribe((lP) => {
       if (theme === 'dark-theme' && lP?.iconUrlDark) {
         // Check if asset url is stable, maybe it was deleted but still wasn't applied
         fetch(lP.iconUrlDark).then((response) => {

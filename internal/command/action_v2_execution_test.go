@@ -20,6 +20,7 @@ func existsMock(exists bool) func(method string) bool {
 		return exists
 	}
 }
+
 func TestCommands_SetExecutionRequest(t *testing.T) {
 	type fields struct {
 		eventstore        func(t *testing.T) *eventstore.Eventstore

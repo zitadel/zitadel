@@ -41,7 +41,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         }
         license: {
             name: "Apache 2.0",
-            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+            url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
         };
     };
     tags: [
@@ -307,6 +307,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: Use [ListCustomDomains](apis/resources/instance_service_v2/instance-service-list-custom-domains.api.mdx) instead to list custom domains
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
@@ -319,10 +320,12 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "List Instance Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running.";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [ListTrustedDomains](apis/resources/instance_service_v2/instance-service-list-trusted-domains.api.mdx) instead to list trusted domains
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
         option (google.api.http) = {
             post: "/trusted_domains/_search";
@@ -335,10 +338,12 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "List Instance Trusted Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [AddTrustedDomain](apis/resources/instance_service_v2/instance-service-add-trusted-domain.api.mdx) instead to add a trusted domain
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
@@ -352,10 +357,12 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "Add an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [RemoveTrustedDomain](apis/resources/instance_service_v2/instance-service-remove-trusted-domain.api.mdx) instead to remove a trusted domain
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             delete: "/trusted_domains/{domain}";
@@ -368,7 +375,8 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "Remove an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
+            deprecated: true;
         };
     }
 
@@ -1715,7 +1723,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.read"
+            permission: "iam.idp.read"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -1732,7 +1740,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.read"
+            permission: "iam.idp.read"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2092,7 +2100,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
+            permission: "iam.idp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2110,7 +2118,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
+            permission: "iam.idp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2561,7 +2569,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2578,7 +2586,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2595,7 +2603,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2612,7 +2620,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2629,7 +2637,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -2646,7 +2654,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.write"
+            permission: "iam.policy.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -3777,7 +3785,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.delete"
+            permission: "iam.policy.delete"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -3972,7 +3980,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "policy.delete"
+            permission: "iam.policy.delete"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -6124,6 +6132,8 @@ message AddGenericOAuthProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 9;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OAuth2 flow.
+    bool use_pkce = 10;
 }
 
 message AddGenericOAuthProviderResponse {
@@ -6191,6 +6201,8 @@ message UpdateGenericOAuthProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 10;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OAuth2 flow.
+    bool use_pkce = 11;
 }
 
 message UpdateGenericOAuthProviderResponse {
@@ -6234,6 +6246,8 @@ message AddGenericOIDCProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 6;
     bool is_id_token_mapping = 7;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
+    bool use_pkce = 8;
 }
 
 message AddGenericOIDCProviderResponse {
@@ -6285,6 +6299,8 @@ message UpdateGenericOIDCProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 7;
     bool is_id_token_mapping = 8;
+    // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
+    bool use_pkce = 9;
 }
 
 message UpdateGenericOIDCProviderResponse {
@@ -6834,6 +6850,8 @@ message AddLDAPProviderRequest {
     google.protobuf.Duration timeout = 10;
     zitadel.idp.v1.LDAPAttributes attributes = 11;
     zitadel.idp.v1.Options provider_options = 12;
+    // Root_ca is for self signing certificates for TLS connections to LDAP servers it is intended to be filled with a .pem file.
+    bytes root_ca = 13 [(validate.rules).bytes.max_len = 12000];
 }
 
 message AddLDAPProviderResponse {
@@ -6855,6 +6873,8 @@ message UpdateLDAPProviderRequest {
     google.protobuf.Duration timeout = 11;
     zitadel.idp.v1.LDAPAttributes attributes = 12;
     zitadel.idp.v1.Options provider_options = 13;
+    // Root_ca is for self signing certificates for TLS connections to LDAP servers it is intended to be filled with a .pem file.
+    bytes root_ca = 14 [(validate.rules).bytes.max_len = 12000];
 }
 
 message UpdateLDAPProviderResponse {
@@ -7015,6 +7035,9 @@ message AddSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 8;
+    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 9;
 }
 
 message AddSAMLProviderResponse {
@@ -7049,6 +7072,9 @@ message UpdateSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 9;
+    // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 10;
 }
 
 message UpdateSAMLProviderResponse {
@@ -8778,6 +8804,7 @@ message ListIAMMembersRequest {
     zitadel.v1.ListQuery query = 1;
     //criteria the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 2;
+    zitadel.member.v1.MemberFieldColumnName sorting_column = 3;
 }
 
 message ListIAMMembersResponse {

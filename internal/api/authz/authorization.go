@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -16,14 +17,14 @@ const (
 
 // CheckUserAuthorization verifies that:
 // - the token is active,
-// - the organisation (**either** provided by ID or verified domain) exists
+// - the organization (**either** provided by ID or verified domain) exists
 // - the user is permitted to call the requested endpoint (permission option in proto)
 // it will pass the [CtxData] and permission of the user into the ctx [context.Context]
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, systemRolePermissionMapping []RoleMapping, rolePermissionMapping []RoleMapping, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier)
+	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier, systemRolePermissionMapping)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +35,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		}, nil
 	}
 
-	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig.RolePermissionMappings, ctxData, ctxData.OrgID)
+	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, systemRolePermissionMapping, rolePermissionMapping, ctxData, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -124,4 +125,34 @@ func GetAllPermissionCtxIDs(perms []string) []string {
 		}
 	}
 	return ctxIDs
+}
+
+type SystemUserPermissions struct {
+	MemberType  MemberType `json:"member_type"`
+	AggregateID string     `json:"aggregate_id"`
+	ObjectID    string     `json:"object_id"`
+	Permissions []string   `json:"permissions"`
+}
+
+// systemMembershipsToUserPermissions converts system memberships based on roles,
+// to SystemUserPermissions, using the passed role mapping.
+func systemMembershipsToUserPermissions(memberships Memberships, roleMap []RoleMapping) []SystemUserPermissions {
+	if memberships == nil {
+		return nil
+	}
+	systemUserPermissions := make([]SystemUserPermissions, len(memberships))
+	for i, systemPerm := range memberships {
+		permissions := make([]string, 0, len(systemPerm.Roles))
+		for _, role := range systemPerm.Roles {
+			permissions = append(permissions, getPermissionsFromRole(roleMap, role)...)
+		}
+		slices.Sort(permissions)
+		permissions = slices.Compact(permissions) // remove duplicates
+
+		systemUserPermissions[i].MemberType = systemPerm.MemberType
+		systemUserPermissions[i].AggregateID = systemPerm.AggregateID
+		systemUserPermissions[i].ObjectID = systemPerm.ObjectID
+		systemUserPermissions[i].Permissions = permissions
+	}
+	return systemUserPermissions
 }

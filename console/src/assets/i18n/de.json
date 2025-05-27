@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Wähle einen Authentifizierungsflow und löse deine Aktionen bei einem spezifischen Ereignis innerhalb dieses Flows aus."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, eine neue und verbesserte Version von Actions, ist jetzt verfügbar. Die aktuelle Version ist weiterhin zugänglich, aber unsere zukünftige Entwicklung wird sich auf die neue Version konzentrieren, die schließlich die aktuelle ersetzen wird."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -183,6 +184,32 @@
         "REFRESH_TOKEN_IDLE": {
           "TITLE": "Inaktives Aktualisierungstoken",
           "DESCRIPTION": "Die maximale Inaktivitätsdauer eines Aktualisierungstokens ist die maximale Zeit, in der ein Aktualisierungstoken unbenutzt sein kann."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Verwalte deine OIDC Web Keys, um Tokens für deine ZITADEL-Instanz sicher zu signieren und zu validieren.",
+        "TABLE": {
+          "TITLE": "Aktive und zukünftige Web Keys",
+          "DESCRIPTION": "Deine aktiven und kommenden Web Keys. Das Aktivieren eines neuen Schlüssels deaktiviert den aktuellen.",
+          "NOTE": "Hinweis: Der JWKs OIDC-Endpunkt gibt eine zwischenspeicherbare Antwort zurück (Standard: 5 Min.). Vermeide es, einen Schlüssel zu früh zu aktivieren, da er möglicherweise noch nicht in Caches und Clients verfügbar ist.",
+          "ACTIVATE": "Nächsten Web Key aktivieren",
+          "ACTIVE": "Derzeit aktiv",
+          "NEXT": "Als Nächstes in der Warteschlange",
+          "FUTURE": "Zukünftig",
+          "WARNING": "Der Web Key ist weniger als 5 Minuten alt"
+        },
+        "CREATE": {
+          "TITLE": "Neuen Web Key erstellen",
+          "DESCRIPTION": "Das Erstellen eines neuen Web Keys fügt ihn zu deiner Liste hinzu. ZITADEL verwendet standardmäßig RSA2048-Schlüssel mit einem SHA256-Hasher.",
+          "KEY_TYPE": "Schlüsseltyp",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Kurve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Frühere Web Keys",
+          "DESCRIPTION": "Dies sind deine früheren Web Keys, die nicht mehr aktiv sind.",
+          "DEACTIVATED_ON": "Deaktiviert am"
         }
       },
       "MESSAGE_TEXTS": {
@@ -502,6 +529,118 @@
     "DOWNLOAD": "Herunterladen",
     "APPLY": "Anwenden"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Sie verwenden derzeit die neuen Actions V2, die sich in der Beta-Phase befinden. Version 1 ist weiterhin verfügbar, wird jedoch in Zukunft eingestellt. Bitte melden Sie Probleme oder Feedback.",
+    "EXECUTION": {
+      "TITLE": "Aktionen",
+      "DESCRIPTION": "Aktionen ermöglichen es Ihnen, benutzerdefinierten Code als Reaktion auf API-Anfragen, Ereignisse oder bestimmte Funktionen auszuführen. Verwenden Sie sie, um Zitadel zu erweitern, Arbeitsabläufe zu automatisieren und sich in andere Systeme zu integrieren.",
+      "TYPES": {
+        "request": "Anfrage",
+        "response": "Antwort",
+        "event": "Ereignisse",
+        "function": "Funktion"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Eine Aktion erstellen",
+        "UPDATE_TITLE": "Eine Aktion aktualisieren",
+        "TYPE": {
+          "DESCRIPTION": "Wählen Sie aus, wann diese Aktion ausgeführt werden soll",
+          "REQUEST": {
+            "TITLE": "Anfrage",
+            "DESCRIPTION": "Anfragen, die innerhalb von Zitadel auftreten. Dies könnte so etwas wie ein Login-Anfrageaufruf sein."
+          },
+          "RESPONSE": {
+            "TITLE": "Antwort",
+            "DESCRIPTION": "Eine Antwort auf eine Anfrage innerhalb von Zitadel. Denken Sie an die Antwort, die Sie beim Abrufen eines Benutzers erhalten."
+          },
+          "EVENTS": {
+            "TITLE": "Ereignisse",
+            "DESCRIPTION": "Ereignisse, die innerhalb von Zitadel stattfinden. Dies könnte alles sein, wie z.B. das Erstellen eines Benutzerkontos, ein erfolgreicher Login usw."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funktionen",
+            "DESCRIPTION": "Funktionen, die Sie innerhalb von Zitadel aufrufen können. Dies könnte alles sein, vom Senden einer E-Mail bis zum Erstellen eines Benutzers."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Wählen Sie aus, ob diese Aktion für alle Anfragen, einen bestimmten Dienst (z.B. Benutzerverwaltung) oder eine einzelne Anfrage (z.B. Benutzer erstellen) gelten soll.",
+          "ALL": {
+            "TITLE": "Alle",
+            "DESCRIPTION": "Wählen Sie dies aus, wenn Sie Ihre Aktion bei jeder Anfrage ausführen möchten"
+          },
+          "ALL_EVENTS": "Wähle dies aus, wenn du deine Aktion bei jedem Ereignis ausführen möchtest",
+          "SELECT_SERVICE": {
+            "TITLE": "Dienst auswählen",
+            "DESCRIPTION": "Wählen Sie einen Zitadel-Dienst für Ihre Aktion aus."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Methode auswählen",
+            "DESCRIPTION": "Wenn Sie nur bei einer bestimmten Anfrage ausführen möchten, wählen Sie sie hier aus",
+            "NOTE": "Wenn Sie keine Methode auswählen, wird Ihre Aktion bei jeder Anfrage in Ihrem ausgewählten Dienst ausgeführt."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Funktionsname",
+            "DESCRIPTION": "Wählen Sie die Funktion aus, die Sie ausführen möchten"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Gruppe festlegen",
+            "DESCRIPTION": "Wenn Sie nur bei einer Gruppe von Ereignissen ausführen möchten, legen Sie die Gruppe hier fest"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Ereignis auswählen",
+            "DESCRIPTION": "Wenn Sie nur bei einem bestimmten Ereignis ausführen möchten, geben Sie es hier an"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Sie können wählen, ob Sie ein Ziel ausführen oder es unter den gleichen Bedingungen wie andere Ziele ausführen möchten.",
+          "TARGET": {
+            "DESCRIPTION": "Das Ziel, das Sie für diese Aktion ausführen möchten"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Ausführungsbedingungen"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Bedingung",
+        "TYPE": "Typ",
+        "TARGET": "Ziel",
+        "CREATIONDATE": "Erstellungsdatum"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Ziele",
+      "DESCRIPTION": "Ein Ziel ist das Ziel des Codes, den Sie von einer Aktion ausführen möchten. Erstellen Sie hier ein Ziel und fügen Sie es Ihren Aktionen hinzu.",
+      "CREATE": {
+        "TITLE": "Ihr Ziel erstellen",
+        "DESCRIPTION": "Erstellen Sie Ihr eigenes Ziel außerhalb von Zitadel",
+        "NAME": "Name",
+        "NAME_DESCRIPTION": "Geben Sie Ihrem Ziel einen klaren, beschreibenden Namen, um es später leicht identifizieren zu können",
+        "TYPE": "Typ",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Aufruf",
+          "restAsync": "REST Asynchron"
+        },
+        "TYPES_DESCRIPTION": "Webhook, der Aufruf verarbeitet den Statuscode, aber die Antwort ist irrelevant\nCall, der Aufruf verarbeitet den Statuscode und die Antwort\nAsync, der Aufruf verarbeitet weder Statuscode noch Antwort, kann aber parallel zu anderen Zielen aufgerufen werden",
+        "ENDPOINT": "Endpunkt",
+        "ENDPOINT_DESCRIPTION": "Geben Sie den Endpunkt ein, an dem Ihr Code gehostet wird. Stellen Sie sicher, dass er für uns zugänglich ist!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Legen Sie die maximale Zeit fest, die Ihr Ziel zum Antworten hat. Wenn es länger dauert, stoppen wir die Anfrage.",
+        "INTERRUPT_ON_ERROR": "Bei Fehler unterbrechen",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stoppen Sie alle Ausführungen, wenn die Ziele einen Fehler zurückgeben",
+        "INTERRUPT_ON_ERROR_WARNING": "Achtung: „Bei Fehler unterbrechen“ stoppt Vorgänge bei einem Fehler und kann zur Sperrung führen. Testen Sie mit deaktivierter Option, um Login/Erstellung nicht zu blockieren.",
+        "AWAIT_RESPONSE": "Auf Antwort warten",
+        "AWAIT_RESPONSE_DESCRIPTION": "Wir warten auf eine Antwort, bevor wir etwas anderes tun. Nützlich, wenn Sie mehrere Ziele für eine einzelne Aktion verwenden möchten"
+      },
+      "TABLE": {
+        "NAME": "Name",
+        "ENDPOINT": "Endpunkt",
+        "CREATIONDATE": "Erstellungsdatum",
+        "REORDER": "Verschieben"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Hat die Kontrolle über die gesamte Instanz, einschließlich aller Organisationen",
     "IAM_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Instanz einschließlich aller Organisationen zu überprüfen",
@@ -509,14 +648,17 @@
     "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
     "IAM_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer aller Organisationen auszugeben",
     "IAM_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer aller Organisationen auszugeben",
+    "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeclients zu verwalten",
     "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
+    "ORG_SETTINGS_MANAGER": "Hat die Berechtigung, die Einstellungen der Organisation zu verwalten",
     "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von User grants",
     "ORG_PROJECT_PERMISSION_EDITOR": "Hat die Berechtigung, Projektberechtigungen für externe Organisationen zu verwalten",
     "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und dessen Einstellungen zu erstellen",
     "ORG_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer der Organisation auszugeben",
     "ORG_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer der Organisation auszugeben",
+    "ORG_USER_SELF_MANAGER": "Hat die Berechtigung, seinen eigenen Benutzer zu verwalten",
     "PROJECT_OWNER": "Hat die Berechtigung für das gesamte Projekt",
     "PROJECT_OWNER_VIEWER": "Hat die Leseberechtigung, das gesamte Projekt zu überprüfen",
     "PROJECT_OWNER_GLOBAL": "Hat die Berechtigung für das gesamte Projekt",
@@ -551,6 +693,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
+    "ORGID": "Organisations ID",
     "PRIMARYDOMAIN": "Primäre Domäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
@@ -787,7 +930,10 @@
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Setze ein initiales Passwort.",
       "ADDRESSANDPHONESECTION": "Telefonnummer",
-      "INITMAILDESCRIPTION": "Wenn beide Optionen ausgewählt sind, wird keine E-Mail zur Initialisierung gesendet. Wenn nur eine der Optionen ausgewählt ist, wird eine E-Mail zur Verifikation der Daten gesendet."
+      "INITMAILDESCRIPTION": "Wenn beide Optionen ausgewählt sind, wird keine E-Mail zur Initialisierung gesendet. Wenn nur eine der Optionen ausgewählt ist, wird eine E-Mail zur Verifikation der Daten gesendet.",
+      "SETUPAUTHENTICATIONLATER": "Authentifizierung später für diesen Benutzer einrichten.",
+      "INVITATION": "Eine Einladung per E-Mail für die Authentifizierungseinrichtung und E-Mail-Verifizierung senden.",
+      "INITIALPASSWORD": "Setze ein initiales Passwort für den Benutzer."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonnummer verifizieren",
@@ -809,6 +955,9 @@
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
       "PHONE_HINT": "Verwenden das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wähle das Land aus der Dropdown-Liste aus und gebe anschließend die Telefonnummer ein.",
+      "PHONE_VERIFIED": "Telefonnummer verifiziert",
+      "SEND_SMS": "Bestätigungs-SMS senden",
+      "SEND_EMAIL": "E-Mail senden",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -948,6 +1097,14 @@
       "4": "Gesperrt",
       "5": "Suspendiert",
       "6": "Initialisiert"
+    },
+    "STATEV2": {
+      "0": "Unbekannt",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Gelöscht",
+      "4": "Gesperrt",
+      "5": "Initialisiert"
     },
     "SEARCH": {
       "ADDITIONAL": "Benutzer Name (eigene Organisation)",
@@ -1340,6 +1497,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
       "OIDC": "OIDC Token Lifetime und Expiration",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Sicherheitseinstellungen",
       "EVENTS": "Events",
@@ -1355,7 +1513,8 @@
       "APPEARANCE": "Erscheinungsbild",
       "OTHER": "Anderes",
       "STORAGE": "Speicher"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1385,7 +1544,8 @@
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
-        "ko": "한국어"
+        "ko": "한국어",
+        "ro": "Română"
       }
     },
     "SMTP": {
@@ -1476,6 +1636,16 @@
       "ACTIONS_DESCRIPTION": "Aktionen v2 ermöglichen die Verwaltung von Datenausführungen und Zielen. Wenn das Flag aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sitzungsbeendigung",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
+      "DISABLEUSERTOKENEVENT": "Benutzer-Token-Ereignis deaktivieren",
+      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
+      "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Clients über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
+      "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
+      "WEBKEY": "Web-Schlüssel",
+      "WEBKEY_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
         "INHERITED": "Erben",
         "ENABLED": "Aktiviert",
@@ -1486,7 +1656,12 @@
         "ENABLED": "„Aktiviert“ wird vererbt",
         "DISABLED": "„Deaktiviert“ wird vererbt"
       },
-      "RESET": "Alle auf Erben setzen"
+      "RESET": "Alle auf Erben setzen",
+      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Konsole zur Erstellung von Benutzern",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Durch das Aktivieren wird das neue TypeScript-basierte Login-UI mit verbesserter Sicherheit, Leistung und Anpassbarkeit aktiviert.",
+      "LOGINV2_BASEURI": "Basis-URI"
     },
     "DIALOG": {
       "RESET": {
@@ -1623,7 +1798,9 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "ko": "한국어"
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1974,6 +2151,7 @@
       "ACTIVATE": "Projekt aktivieren",
       "DELETE": "Projekt löschen",
       "ORGNAME": "Name der Organisation",
+      "ORGID": "Organisations ID",
       "ORGDOMAIN": "Domain der Organisation",
       "STATE": "Status",
       "TYPE": "Typ",
@@ -2163,6 +2341,8 @@
     "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Wollen Sie wirklich fortfahren?",
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "FEDERATEDLOGOUTENABLED": "Federated Logout aktiviert",
+    "FEDERATEDLOGOUTENABLED_DESC": "Wenn aktiviert, wird der Benutzer auch vom IdP abgemeldet, wenn der Benutzer die Sitzung in ZITADEL beendet.",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC Konfiguration",
@@ -2191,7 +2371,9 @@
       "REMOVED": "Erfolgreich entfernt."
     },
     "ISIDTOKENMAPPING": "Zuordnung vom ID-Token",
-    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints."
+    "ISIDTOKENMAPPING_DESC": "Legt fest, ob für das Mapping der Provider Informationen das ID-Token verwendet werden soll, anstatt des Userinfo-Endpoints.",
+    "USEPKCE": "Verwenden Sie PKCE",
+    "USEPKCE_DESC": "Bestimmt, ob die Parameter code_challenge und code_challenge_method in der Authentifizierungsanforderung enthalten sind"
   },
   "MFA": {
     "LIST": {
@@ -2570,7 +2752,9 @@
     "nl": "Nederlands",
     "sv": "Svenska",
     "id": "Bahasa Indonesia",
-    "ko": "한국어"
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

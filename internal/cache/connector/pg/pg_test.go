@@ -78,7 +78,6 @@ func TestNewCache(t *testing.T) {
 			tt.expect(pool)
 			connector := &Connector{
 				PGXPool: pool,
-				Dialect: "postgres",
 			}
 
 			c, err := NewCache[testIndex, string, *testObject](context.Background(), cachePurpose, conf, testIndices, connector)
@@ -518,7 +517,6 @@ func prepareCache(t *testing.T, conf cache.Config) (cache.PrunerCache[testIndex,
 		WillReturnResult(pgxmock.NewResult("CREATE TABLE", 0))
 	connector := &Connector{
 		PGXPool: pool,
-		Dialect: "postgres",
 	}
 	c, err := NewCache[testIndex, string, *testObject](context.Background(), cachePurpose, conf, testIndices, connector)
 	require.NoError(t, err)
