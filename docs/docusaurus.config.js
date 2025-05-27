@@ -378,13 +378,13 @@ module.exports = {
   future: {
     v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
     experimental_faster: {
-      swcJsLoader: true,
+      swcJsLoader: false, // Disabled because of memory usage > 8GB which is a problem on vercel default runners
       swcJsMinimizer: true,
       swcHtmlMinimizer : true,
       lightningCssMinimizer: true,
-      rspackBundler: true,
       mdxCrossCompilerCache: true,
       ssgWorkerThreads: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+      rspackBundler: true,
       rspackPersistentCache: true,
     },
   },

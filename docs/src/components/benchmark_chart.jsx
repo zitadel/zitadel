@@ -1,7 +1,7 @@
 import React from "react";
 import Chart from "react-google-charts";
 
-export function BenchmarkChart({ testResults, height = '500px' }) {
+export function BenchmarkChart({ testResults = [], height = '500px' } = {}) {
     if (!Array.isArray(testResults)) {
         console.error("BenchmarkChart: testResults is not an array. Received:", testResults);
         return <p>Error: Benchmark data is not available or in the wrong format.</p>;
