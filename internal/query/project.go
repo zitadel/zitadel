@@ -157,20 +157,6 @@ func projectCheckPermission(ctx context.Context, resourceOwner string, projectID
 	return permissionCheck(ctx, domain.PermissionProjectRead, resourceOwner, projectID)
 }
 
-func projectPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectAndGrantedProjectSearchQueries) sq.SelectBuilder {
-	if !enabled {
-		return query
-	}
-	join, args := PermissionClause(
-		ctx,
-		grantedProjectColumnResourceOwner,
-		domain.PermissionProjectRead,
-		SingleOrgPermissionOption(queries.Queries),
-		OwnedRowsPermissionOption(GrantedProjectColumnID),
-	)
-	return query.JoinClause(join, args...)
-}
-
 type Project struct {
 	ID            string
 	CreationDate  time.Time
@@ -275,6 +261,20 @@ func (q *ProjectAndGrantedProjectSearchQueries) toQuery(query sq.SelectBuilder) 
 		query = q.toQuery(query)
 	}
 	return query
+}
+
+func projectPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectAndGrantedProjectSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		grantedProjectColumnResourceOwner,
+		domain.PermissionProjectRead,
+		SingleOrgPermissionOption(queries.Queries),
+		WithProjectsPermissionOption(GrantedProjectColumnID),
+	)
+	return query.JoinClause(join, args...)
 }
 
 func (q *Queries) SearchGrantedProjects(ctx context.Context, queries *ProjectAndGrantedProjectSearchQueries, permissionCheck domain.PermissionCheck) (*GrantedProjects, error) {
@@ -494,6 +494,9 @@ type GrantedProjects struct {
 func grantedProjectsCheckPermission(ctx context.Context, grantedProjects *GrantedProjects, permissionCheck domain.PermissionCheck) {
 	grantedProjects.GrantedProjects = slices.DeleteFunc(grantedProjects.GrantedProjects,
 		func(grantedProject *GrantedProject) bool {
+			if grantedProject.GrantedOrgID != "" {
+				return projectGrantCheckPermission(ctx, grantedProject.GrantedOrgID, grantedProject.ResourceOwner, permissionCheck) != nil
+			}
 			return projectCheckPermission(ctx, grantedProject.ResourceOwner, grantedProject.ProjectID, permissionCheck) != nil
 		},
 	)
