@@ -10,24 +10,46 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2beta;a
 
 message Authorization {
   // ID is the unique identifier of the authorization.
-  string id = 1;
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The unique identifier of the organization the authorization belongs to.
+  string organization_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
   // CreationDate is the timestamp when the authorization was created.
-  google.protobuf.Timestamp creation_date = 2;
+  google.protobuf.Timestamp creation_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
   // ChangeDate is the timestamp when the authorization was last updated.
   // In case the authorization was not updated, this field is equal to the creation date.
-  google.protobuf.Timestamp change_date = 3;
+  google.protobuf.Timestamp change_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
   // State is the current state of the authorization.
-  State state = 4;
-  User user = 5;
-  // Grant contains the project or project grant the user was granted the authorization for.
-  oneof grant {
-    // Project represents the project the user was granted the authorization for.
-    Project project = 6;
-    // ProjectGrant represents the project grant the user was granted the authorization for.
-    ProjectGrant project_grant = 7;
-  }
-  Organization organization = 8;
-  // Roles contains the roles the user was granted for the project or project grant.
+  State state = 5;
+  User user = 6;
+  // The granted organization ID is returned If the user is authorized to a project that was granted by another organization.
+  optional string granted_organization_id = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // The granted organization name is returned If the user is authorized to a project that was granted by another organization.
+  optional string granted_organization_name = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Some Organization\""
+    }
+  ];
+  // Roles contains the roles the user was granted for the project.
   repeated Role roles = 9;
 }
 
@@ -51,35 +73,8 @@ message User {
   // AvatarURL is the URL to the user's public avatar image.
   string avatar_url = 4;
   // The organization the user belong to.
-  // This must not correspond to the organization the authorization was granted for.
+  // This does not have to correspond with the authorizations organization.
   string organization_id = 5;
-}
-
-message Project {
-  // ID is the unique identifier of the project the user was granted the authorization for.
-  string id = 1;
-  // Name is the name of the project the user was granted the authorization for.
-  string name = 2;
-  // OrganizationID is the ID of the organization the project belongs to.
-  string organization_id = 3;
-}
-
-message ProjectGrant {
-  // ID is the unique identifier of the project grant the user was granted the authorization for.
-  string id = 1;
-  // ProjectID is the ID of the project the project grant belongs to.
-  string project_id = 2;
-  // ProjectName is the name of the project the project grant belongs to.
-  string project_name = 3;
-  // OrganizationID is the ID of the organization the project grant belongs to.
-  string organization_id = 4;
-}
-
-message Organization {
-  // ID is the unique identifier of the organization the user was granted the authorization for.
-  string id = 1;
-  // Name is the name of the organization the user was granted the authorization for.
-  string name = 2;
 }
 
 message Role {
@@ -119,18 +114,10 @@ message AuthorizationQuery {
     ProjectGrantIDQuery project_grant_id = 11;
     // Search for authorizations by the ID of the organization the authorization was granted for.
     // This can either be the organization the project or the project grant is part of.
-    OrganizationIDQuery organization_id = 12;
-    OrganizationNameQuery organization_name = 13;
+    OrganizationIDQuery granted_organization_id = 12;
+    OrganizationNameQuery granted_organization_name = 13;
     // Search for authorizations by the key of the role the user was granted.
     RoleKeyQuery role_key = 14;
-
-    // Combine multiple authorization queries with an AND operation.
-    AndQuery and = 15;
-    // Combine multiple authorization queries with an OR operation.
-    // For example, to search for authorizations of multiple OrganizationIDs.
-    OrQuery or = 16;
-    // Negate an authorization query.
-    NotQuery not = 17;
   }
 }
 

@@ -12,7 +12,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2beta;a
 // AuthorizationService provides methods to manage authorizations for users within your projects and applications.
 //
 // For managing permissions and roles for ZITADEL internal resources, like organizations, projects,
-// users, etc., please use the PermissionsService.
+// users, etc., please use the InternalPermissionsService.
 service AuthorizationsService {
   // ListAuthorizations returns all authorizations matching the request and necessary permissions.
   //
@@ -84,23 +84,13 @@ message CreateAuthorizationRequest {
     min_len: 1
     max_len: 200
   }];
-  // Grant on either the project directly or on a project grant by their IDs.
-  oneof grant {
-    option (validate.required) = true;
-
-    // Project is the ID of the project the user should be granted the authorization for.
-    string project_id = 2 [(validate.rules).string = {
-      min_len: 1
-      max_len: 200
-    }];
-    // ProjectGrant is the ID of the project grant the user should be granted the authorization for.
-    string project_grant_id = 3 [(validate.rules).string = {
-      min_len: 1
-      max_len: 200
-    }];
-  }
+  // Project ID is the ID of the project - owned or granted - the user should be authorized for.
+  string project_id = 2 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
   // RoleKeys are the keys of the roles the user should be granted.
-  repeated string role_keys = 4 [(validate.rules).repeated = {
+  repeated string role_keys = 3 [(validate.rules).repeated = {
     unique: true
     items: {
       string: {
