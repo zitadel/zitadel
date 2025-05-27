@@ -65,7 +65,7 @@ message IDFilter {
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       max_length: 200;
-      example: "\"123\"";
+      example: "\"69629023906488337\"";
     }
   ];
 }
@@ -82,6 +82,15 @@ message TimestampFilter {
     (validate.rules).enum.defined_only = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines which text equality method is used";
+    }
+  ];
+}
+
+message InIDsFilter {
+  // Defines the ids to query for.
+  repeated string ids = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
     }
   ];
 }

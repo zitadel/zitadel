@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	filter_pb "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -79,23 +80,23 @@ func keyFilterToQuery(filter *user.KeysSearchFilter) (query.SearchQuery, error) 
 	}
 }
 
-func authnKeyIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
+func authnKeyIdFilterToQuery(f *filter_pb.IDFilter) (query.SearchQuery, error) {
 	return query.NewAuthNKeyIDQuery(f.Id)
 }
 
-func authnKeyUserIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
+func authnKeyUserIdFilterToQuery(f *filter_pb.IDFilter) (query.SearchQuery, error) {
 	return query.NewAuthNKeyIdentifyerQuery(f.Id)
 }
 
-func authnKeyOrgIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
+func authnKeyOrgIdFilterToQuery(f *filter_pb.IDFilter) (query.SearchQuery, error) {
 	return query.NewAuthNKeyResourceOwnerQuery(f.Id)
 }
 
-func authnKeyCreatedFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
+func authnKeyCreatedFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQuery, error) {
 	return query.NewAuthNKeyCreationDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
-func authnKeyExpirationFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
+func authnKeyExpirationFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQuery, error) {
 	return query.NewAuthNKeyExpirationDateDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
