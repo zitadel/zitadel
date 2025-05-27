@@ -1,0 +1,38 @@
+CREATE OR REPLACE TRIGGER count_{{ .Resource }}
+    AFTER INSERT OR DELETE
+    ON {{ .Table }}
+    FOR EACH ROW
+    EXECUTE FUNCTION projections.count_resource(
+        '{{ .Resource }}',
+        '{{ .OwnerType }}', 
+        '{{ .InstanceIDColumn }}', 
+        '{{ .OwnerIDColumn }}'
+    );
+
+CREATE OR REPLACE TRIGGER truncate_{{ .Resource }}_counts
+    AFTER TRUNCATE
+    ON {{ .Table }}
+    FOR EACH STATEMENT
+    EXECUTE FUNCTION projections.delete_table_counts();
+
+-- Prevent inserts and deletes while we populate the counts.
+LOCK TABLE {{ .Table }} IN SHARE MODE;
+
+-- Populate the resource counts for the existing data in the table.
+INSERT INTO projections.resource_counts(
+	instance_id,
+    table_name,
+    owner_type,
+    owner_id,
+    resource_name,
+    amount
+)
+SELECT
+    {{ .InstanceIDColumn }},
+    '{{ .Table }}',
+    '{{ .OwnerType }}',
+    {{ .OwnerIDColumn }},
+    '{{ .Resource }}',
+    COUNT(*)
+FROM projections.users14
+GROUP BY ({{ .InstanceIDColumn }}, {{ .OwnerIDColumn }});

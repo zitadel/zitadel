@@ -4,11 +4,14 @@ package domain
 
 import (
 	"fmt"
+	"strings"
 )
 
-const _SecretGeneratorTypeName = "unspecifiedinit_codeverify_email_codeverify_phone_codeverify_domainpassword_reset_codepasswordless_init_codeapp_secretotpsmsotp_emailinvite_codesecret_generator_type_count"
+const _SecretGeneratorTypeName = "unspecifiedinit_codeverify_email_codeverify_phone_codeverify_domainpassword_reset_codepasswordless_init_codeapp_secretotpsmsotp_emailinvite_codesigning_keysecret_generator_type_count"
 
-var _SecretGeneratorTypeIndex = [...]uint8{0, 11, 20, 37, 54, 67, 86, 108, 118, 124, 133, 144, 171}
+var _SecretGeneratorTypeIndex = [...]uint8{0, 11, 20, 37, 54, 67, 86, 108, 118, 124, 133, 144, 155, 182}
+
+const _SecretGeneratorTypeLowerName = "unspecifiedinit_codeverify_email_codeverify_phone_codeverify_domainpassword_reset_codepasswordless_init_codeapp_secretotpsmsotp_emailinvite_codesigning_keysecret_generator_type_count"
 
 func (i SecretGeneratorType) String() string {
 	if i < 0 || i >= SecretGeneratorType(len(_SecretGeneratorTypeIndex)-1) {
@@ -17,21 +20,70 @@ func (i SecretGeneratorType) String() string {
 	return _SecretGeneratorTypeName[_SecretGeneratorTypeIndex[i]:_SecretGeneratorTypeIndex[i+1]]
 }
 
-var _SecretGeneratorTypeValues = []SecretGeneratorType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+// An "invalid array index" compiler error signifies that the constant values have changed.
+// Re-run the stringer command to generate them again.
+func _SecretGeneratorTypeNoOp() {
+	var x [1]struct{}
+	_ = x[SecretGeneratorTypeUnspecified-(0)]
+	_ = x[SecretGeneratorTypeInitCode-(1)]
+	_ = x[SecretGeneratorTypeVerifyEmailCode-(2)]
+	_ = x[SecretGeneratorTypeVerifyPhoneCode-(3)]
+	_ = x[SecretGeneratorTypeVerifyDomain-(4)]
+	_ = x[SecretGeneratorTypePasswordResetCode-(5)]
+	_ = x[SecretGeneratorTypePasswordlessInitCode-(6)]
+	_ = x[SecretGeneratorTypeAppSecret-(7)]
+	_ = x[SecretGeneratorTypeOTPSMS-(8)]
+	_ = x[SecretGeneratorTypeOTPEmail-(9)]
+	_ = x[SecretGeneratorTypeInviteCode-(10)]
+	_ = x[SecretGeneratorTypeSigningKey-(11)]
+	_ = x[secretGeneratorTypeCount-(12)]
+}
+
+var _SecretGeneratorTypeValues = []SecretGeneratorType{SecretGeneratorTypeUnspecified, SecretGeneratorTypeInitCode, SecretGeneratorTypeVerifyEmailCode, SecretGeneratorTypeVerifyPhoneCode, SecretGeneratorTypeVerifyDomain, SecretGeneratorTypePasswordResetCode, SecretGeneratorTypePasswordlessInitCode, SecretGeneratorTypeAppSecret, SecretGeneratorTypeOTPSMS, SecretGeneratorTypeOTPEmail, SecretGeneratorTypeInviteCode, SecretGeneratorTypeSigningKey, secretGeneratorTypeCount}
 
 var _SecretGeneratorTypeNameToValueMap = map[string]SecretGeneratorType{
-	_SecretGeneratorTypeName[0:11]:    0,
-	_SecretGeneratorTypeName[11:20]:   1,
-	_SecretGeneratorTypeName[20:37]:   2,
-	_SecretGeneratorTypeName[37:54]:   3,
-	_SecretGeneratorTypeName[54:67]:   4,
-	_SecretGeneratorTypeName[67:86]:   5,
-	_SecretGeneratorTypeName[86:108]:  6,
-	_SecretGeneratorTypeName[108:118]: 7,
-	_SecretGeneratorTypeName[118:124]: 8,
-	_SecretGeneratorTypeName[124:133]: 9,
-	_SecretGeneratorTypeName[133:144]: 10,
-	_SecretGeneratorTypeName[144:171]: 11,
+	_SecretGeneratorTypeName[0:11]:         SecretGeneratorTypeUnspecified,
+	_SecretGeneratorTypeLowerName[0:11]:    SecretGeneratorTypeUnspecified,
+	_SecretGeneratorTypeName[11:20]:        SecretGeneratorTypeInitCode,
+	_SecretGeneratorTypeLowerName[11:20]:   SecretGeneratorTypeInitCode,
+	_SecretGeneratorTypeName[20:37]:        SecretGeneratorTypeVerifyEmailCode,
+	_SecretGeneratorTypeLowerName[20:37]:   SecretGeneratorTypeVerifyEmailCode,
+	_SecretGeneratorTypeName[37:54]:        SecretGeneratorTypeVerifyPhoneCode,
+	_SecretGeneratorTypeLowerName[37:54]:   SecretGeneratorTypeVerifyPhoneCode,
+	_SecretGeneratorTypeName[54:67]:        SecretGeneratorTypeVerifyDomain,
+	_SecretGeneratorTypeLowerName[54:67]:   SecretGeneratorTypeVerifyDomain,
+	_SecretGeneratorTypeName[67:86]:        SecretGeneratorTypePasswordResetCode,
+	_SecretGeneratorTypeLowerName[67:86]:   SecretGeneratorTypePasswordResetCode,
+	_SecretGeneratorTypeName[86:108]:       SecretGeneratorTypePasswordlessInitCode,
+	_SecretGeneratorTypeLowerName[86:108]:  SecretGeneratorTypePasswordlessInitCode,
+	_SecretGeneratorTypeName[108:118]:      SecretGeneratorTypeAppSecret,
+	_SecretGeneratorTypeLowerName[108:118]: SecretGeneratorTypeAppSecret,
+	_SecretGeneratorTypeName[118:124]:      SecretGeneratorTypeOTPSMS,
+	_SecretGeneratorTypeLowerName[118:124]: SecretGeneratorTypeOTPSMS,
+	_SecretGeneratorTypeName[124:133]:      SecretGeneratorTypeOTPEmail,
+	_SecretGeneratorTypeLowerName[124:133]: SecretGeneratorTypeOTPEmail,
+	_SecretGeneratorTypeName[133:144]:      SecretGeneratorTypeInviteCode,
+	_SecretGeneratorTypeLowerName[133:144]: SecretGeneratorTypeInviteCode,
+	_SecretGeneratorTypeName[144:155]:      SecretGeneratorTypeSigningKey,
+	_SecretGeneratorTypeLowerName[144:155]: SecretGeneratorTypeSigningKey,
+	_SecretGeneratorTypeName[155:182]:      secretGeneratorTypeCount,
+	_SecretGeneratorTypeLowerName[155:182]: secretGeneratorTypeCount,
+}
+
+var _SecretGeneratorTypeNames = []string{
+	_SecretGeneratorTypeName[0:11],
+	_SecretGeneratorTypeName[11:20],
+	_SecretGeneratorTypeName[20:37],
+	_SecretGeneratorTypeName[37:54],
+	_SecretGeneratorTypeName[54:67],
+	_SecretGeneratorTypeName[67:86],
+	_SecretGeneratorTypeName[86:108],
+	_SecretGeneratorTypeName[108:118],
+	_SecretGeneratorTypeName[118:124],
+	_SecretGeneratorTypeName[124:133],
+	_SecretGeneratorTypeName[133:144],
+	_SecretGeneratorTypeName[144:155],
+	_SecretGeneratorTypeName[155:182],
 }
 
 // SecretGeneratorTypeString retrieves an enum value from the enum constants string name.
@@ -40,12 +92,23 @@ func SecretGeneratorTypeString(s string) (SecretGeneratorType, error) {
 	if val, ok := _SecretGeneratorTypeNameToValueMap[s]; ok {
 		return val, nil
 	}
+
+	if val, ok := _SecretGeneratorTypeNameToValueMap[strings.ToLower(s)]; ok {
+		return val, nil
+	}
 	return 0, fmt.Errorf("%s does not belong to SecretGeneratorType values", s)
 }
 
 // SecretGeneratorTypeValues returns all values of the enum
 func SecretGeneratorTypeValues() []SecretGeneratorType {
 	return _SecretGeneratorTypeValues
+}
+
+// SecretGeneratorTypeStrings returns a slice of all String values of the enum
+func SecretGeneratorTypeStrings() []string {
+	strs := make([]string, len(_SecretGeneratorTypeNames))
+	copy(strs, _SecretGeneratorTypeNames)
+	return strs
 }
 
 // IsASecretGeneratorType returns "true" if the value is listed in the enum definition. "false" otherwise
