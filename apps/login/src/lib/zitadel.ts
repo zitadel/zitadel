@@ -502,21 +502,6 @@ export async function verifyInviteCode({
   return userService.verifyInviteCode({ userId, verificationCode }, {});
 }
 
-export async function resendInviteCode({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
-
-  return userService.resendInviteCode({ userId }, {});
-}
-
 export async function sendEmailCode({
   serviceUrl,
   userId,
