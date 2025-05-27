@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,6 +37,27 @@ func TestProvider_BeginAuth(t *testing.T) {
 		want   want
 	}{
 		{
+			name: "missing state, error",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+			},
+			args: args{
+				state:  "",
+				params: nil,
+			},
+			want: want{
+				err: func(err error) bool {
+					return errors.Is(err, ErrMissingState)
+				},
+			},
+		},
+		{
 			name: "missing userAgentID, fallback to state",
 			fields: fields{
 				issuer:       "https://jwt.com",
@@ -66,6 +88,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				},
 			},
 			args: args{
+				state: "testState",
 				params: []idp.Parameter{
 					idp.UserAgentID("agent"),
 				},
@@ -90,7 +113,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			require.NoError(t, err)
 
 			ctx := context.Background()
-			session, err := provider.BeginAuth(ctx, "testState", tt.args.params...)
+			session, err := provider.BeginAuth(ctx, tt.args.state, tt.args.params...)
 			if tt.want.err != nil && !tt.want.err(err) {
 				a.Fail("invalid error", err)
 			}

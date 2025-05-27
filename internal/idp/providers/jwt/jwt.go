@@ -3,6 +3,7 @@ package jwt
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"net/url"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -15,6 +16,10 @@ const (
 )
 
 var _ idp.Provider = (*Provider)(nil)
+
+var (
+	ErrMissingState = errors.New("state missing")
+)
 
 // Provider is the [idp.Provider] implementation for a JWT provider
 type Provider struct {
@@ -87,6 +92,9 @@ func (p *Provider) Name() string {
 // It will create a [Session] with an AuthURL, pointing to the jwtEndpoint
 // with the authRequest and encrypted userAgent ids.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
+	if state == "" {
+		return nil, ErrMissingState
+	}
 	userAgentID := userAgentIDFromParams(state, params...)
 	redirect, err := url.Parse(p.jwtEndpoint)
 	if err != nil {
