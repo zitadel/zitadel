@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	filter_pb "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -78,23 +79,23 @@ func patFilterToQuery(filter *user.PersonalAccessTokensSearchFilter) (query.Sear
 	}
 }
 
-func authnPersonalAccessTokenIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
+func authnPersonalAccessTokenIdFilterToQuery(f *filter_pb.IDFilter) (query.SearchQuery, error) {
 	return query.NewPersonalAccessTokenIDQuery(f.Id)
 }
 
-func authnPersonalAccessTokenUserIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
+func authnPersonalAccessTokenUserIdFilterToQuery(f *filter_pb.IDFilter) (query.SearchQuery, error) {
 	return query.NewPersonalAccessTokenUserIDSearchQuery(f.Id)
 }
 
-func authnPersonalAccessTokenOrgIdFilterToQuery(f *user.IDFilter) (query.SearchQuery, error) {
+func authnPersonalAccessTokenOrgIdFilterToQuery(f *filter_pb.IDFilter) (query.SearchQuery, error) {
 	return query.NewPersonalAccessTokenResourceOwnerSearchQuery(f.Id)
 }
 
-func authnPersonalAccessTokenCreatedFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
+func authnPersonalAccessTokenCreatedFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQuery, error) {
 	return query.NewPersonalAccessTokenCreationDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
-func authnPersonalAccessTokenExpirationFilterToQuery(f *user.TimestampFilter) (query.SearchQuery, error) {
+func authnPersonalAccessTokenExpirationFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQuery, error) {
 	return query.NewPersonalAccessTokenExpirationDateDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
