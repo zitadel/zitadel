@@ -338,7 +338,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 	require.NoError(t, err)
 	otherOrgUserId := otherOrgUser.GetId()
 	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
-	onlySinceTestStartFilter := &user.PersonalAccessTokensSearchFilter{Filter: &user.PersonalAccessTokensSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
+	onlySinceTestStartFilter := &user.PersonalAccessTokensSearchFilter{Filter: &user.PersonalAccessTokensSearchFilter_CreatedDateFilter{CreatedDateFilter: &filter.TimestampFilter{
 		Timestamp: timestamppb.Now(),
 		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
 	}}}
@@ -425,7 +425,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 						onlySinceTestStartFilter,
 						{
 							Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{
-								TokenIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
+								TokenIdFilter: &filter.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
 							},
 						},
 					},
@@ -450,7 +450,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 						onlySinceTestStartFilter,
 						{
 							Filter: &user.PersonalAccessTokensSearchFilter_OrganizationIdFilter{
-								OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
+								OrganizationIdFilter: &filter.IDFilter{Id: otherOrg.OrganizationId},
 							},
 						}},
 				},
@@ -477,7 +477,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 					SortingColumn: &sortingColumnExpirationDate,
 					Filters: []*user.PersonalAccessTokensSearchFilter{
 						onlySinceTestStartFilter,
-						{Filter: &user.PersonalAccessTokensSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
+						{Filter: &user.PersonalAccessTokensSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &filter.IDFilter{Id: otherOrg.OrganizationId}}},
 					},
 				},
 			},
@@ -526,7 +526,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 					Filters: []*user.PersonalAccessTokensSearchFilter{
 						{
 							Filter: &user.PersonalAccessTokensSearchFilter_TokenIdFilter{
-								TokenIdFilter: &user.IDFilter{Id: otherUserDataPoint.Id},
+								TokenIdFilter: &filter.IDFilter{Id: otherUserDataPoint.Id},
 							},
 						},
 					},

@@ -339,7 +339,7 @@ func TestServer_ListKeys(t *testing.T) {
 	require.NoError(t, err)
 	otherOrgUserId := otherOrgUser.GetId()
 	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
-	onlySinceTestStartFilter := &user.KeysSearchFilter{Filter: &user.KeysSearchFilter_CreatedDateFilter{CreatedDateFilter: &user.TimestampFilter{
+	onlySinceTestStartFilter := &user.KeysSearchFilter{Filter: &user.KeysSearchFilter_CreatedDateFilter{CreatedDateFilter: &filter.TimestampFilter{
 		Timestamp: timestamppb.Now(),
 		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,
 	}}}
@@ -419,7 +419,7 @@ func TestServer_ListKeys(t *testing.T) {
 						onlySinceTestStartFilter,
 						{
 							Filter: &user.KeysSearchFilter_KeyIdFilter{
-								KeyIdFilter: &user.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
+								KeyIdFilter: &filter.IDFilter{Id: otherOrgDataPointExpiringSoon.Id},
 							},
 						},
 					},
@@ -444,7 +444,7 @@ func TestServer_ListKeys(t *testing.T) {
 						onlySinceTestStartFilter,
 						{
 							Filter: &user.KeysSearchFilter_OrganizationIdFilter{
-								OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId},
+								OrganizationIdFilter: &filter.IDFilter{Id: otherOrg.OrganizationId},
 							},
 						},
 					},
@@ -472,7 +472,7 @@ func TestServer_ListKeys(t *testing.T) {
 					SortingColumn: &sortingColumnExpirationDate,
 					Filters: []*user.KeysSearchFilter{
 						onlySinceTestStartFilter,
-						{Filter: &user.KeysSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &user.IDFilter{Id: otherOrg.OrganizationId}}},
+						{Filter: &user.KeysSearchFilter_OrganizationIdFilter{OrganizationIdFilter: &filter.IDFilter{Id: otherOrg.OrganizationId}}},
 					},
 				},
 			},
@@ -521,7 +521,7 @@ func TestServer_ListKeys(t *testing.T) {
 					Filters: []*user.KeysSearchFilter{
 						{
 							Filter: &user.KeysSearchFilter_KeyIdFilter{
-								KeyIdFilter: &user.IDFilter{Id: otherUserDataPoint.Id},
+								KeyIdFilter: &filter.IDFilter{Id: otherUserDataPoint.Id},
 							},
 						},
 					},
