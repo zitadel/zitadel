@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/saml/pkg/provider/key"
 
@@ -76,7 +77,7 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage crypto.KeyUsag
 		return p.certificateToCertificateAndKey(selectCertificate(certs.Certificates))
 	}
 
-	var position float64
+	var position decimal.Decimal
 	if certs.State != nil {
 		position = certs.State.Position
 	}
@@ -87,7 +88,7 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage crypto.KeyUsag
 func (p *Storage) refreshCertificate(
 	ctx context.Context,
 	usage crypto.KeyUsage,
-	position float64,
+	position decimal.Decimal,
 ) error {
 	ok, err := p.ensureIsLatestCertificate(ctx, position)
 	if err != nil {
@@ -103,12 +104,12 @@ func (p *Storage) refreshCertificate(
 	return nil
 }
 
-func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position float64) (bool, error) {
-	maxSequence, err := p.getMaxKeySequence(ctx)
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position decimal.Decimal) (bool, error) {
+	maxSequence, err := p.getMaxKeyPosition(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return position >= maxSequence, nil
+	return position.GreaterThanOrEqual(maxSequence), nil
 }
 
 func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage crypto.KeyUsage) error {
@@ -151,9 +152,9 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage cr
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (float64, error) {
-	return p.eventstore.LatestSequence(ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+func (p *Storage) getMaxKeyPosition(ctx context.Context) (decimal.Decimal, error) {
+	return p.eventstore.LatestPosition(ctx,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AwaitOpenTransactions().
 			AddQuery().
