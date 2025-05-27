@@ -206,6 +206,8 @@ The same applies to messages that are returned by multiple resources.
 For example, information about the `User` might be different when managing the user resource itself than when it's returned
 as part of an authorization or a manager role, where only limited information is needed.
 
+On the other hand, types that always follow the same pattern and are used in multiple resources, such as `IDFilter`, `TimestampFilter` or `InIDsFilter` SHOULD be globalized and reused.
+
 ##### Re-using messages
 
 Prevent reusing messages for the creation and the retrieval of a resource.
