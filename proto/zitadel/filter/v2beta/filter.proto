@@ -79,10 +79,7 @@ message TimestampFilter {
   ];
   // Define which condition the retrieved resources timestamp should match.
   TimestampFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines which text equality method is used";
-    }
+    (validate.rules).enum.defined_only = true
   ];
 }
 
