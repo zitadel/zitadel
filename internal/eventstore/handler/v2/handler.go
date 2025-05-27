@@ -60,6 +60,7 @@ type Handler struct {
 	requeueEvery     time.Duration
 	txDuration       time.Duration
 	now              nowFunc
+	queryGlobal      bool
 
 	triggeredInstancesSync sync.Map
 
@@ -143,6 +144,11 @@ type Projection interface {
 	Reducers() []AggregateReducer
 }
 
+type GlobalProjection interface {
+	Projection
+	FilterGlobalEvents()
+}
+
 func NewHandler(
 	ctx context.Context,
 	config *Config,
@@ -183,6 +189,10 @@ func NewHandler(
 			return nil, nil
 		},
 		metrics: metrics,
+	}
+
+	if _, ok := projection.(GlobalProjection); ok {
+		handler.queryGlobal = true
 	}
 
 	return handler
@@ -674,6 +684,10 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
 		}
+	}
+
+	if h.queryGlobal {
+		return builder
 	}
 
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(h.eventTypes))

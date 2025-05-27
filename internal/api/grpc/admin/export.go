@@ -736,7 +736,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
-	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
+	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}}, nil)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
@@ -763,7 +763,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			return nil, nil, nil, nil, nil, err
 		}
 
-		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}}, nil)
 		if err != nil {
 			return nil, nil, nil, nil, nil, err
 		}
@@ -945,7 +945,7 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 	if err != nil {
 		return nil, err
 	}
-	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}})
+	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}}, nil)
 	if err != nil {
 		return nil, err
 	}

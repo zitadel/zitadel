@@ -1753,12 +1753,11 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	projectResp := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+
 	type args struct {
-		ctx     context.Context
 		req     *user.DeleteUserRequest
-		prepare func(request *user.DeleteUserRequest) error
+		prepare func(*testing.T, *user.DeleteUserRequest) context.Context
 	}
 	tests := []struct {
 		name    string
@@ -1769,23 +1768,21 @@ func TestServer_DeleteUser(t *testing.T) {
 		{
 			name: "remove, not existing",
 			args: args{
-				CTX,
 				&user.DeleteUserRequest{
 					UserId: "notexisting",
 				},
-				func(request *user.DeleteUserRequest) error { return nil },
+				func(*testing.T, *user.DeleteUserRequest) context.Context { return CTX },
 			},
 			wantErr: true,
 		},
 		{
 			name: "remove human, ok",
 			args: args{
-				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1798,12 +1795,11 @@ func TestServer_DeleteUser(t *testing.T) {
 		{
 			name: "remove machine, ok",
 			args: args{
-				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1816,15 +1812,37 @@ func TestServer_DeleteUser(t *testing.T) {
 		{
 			name: "remove dependencies, ok",
 			args: args{
-				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateOrgMembership(t, CTX, request.UserId)
-					return err
+					return CTX
+				},
+			},
+			want: &user.DeleteUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "remove self, ok",
+			args: args{
+				req: &user.DeleteUserRequest{},
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
+					removeUser, err := Instance.Client.Mgmt.AddMachineUser(CTX, &mgmt.AddMachineUserRequest{
+						UserName: gofakeit.Username(),
+						Name:     gofakeit.Name(),
+					})
+					request.UserId = removeUser.UserId
+					require.NoError(t, err)
+					tokenResp, err := Instance.Client.Mgmt.AddPersonalAccessToken(CTX, &mgmt.AddPersonalAccessTokenRequest{UserId: removeUser.UserId})
+					require.NoError(t, err)
+					return integration.WithAuthorizationToken(UserCTX, tokenResp.Token)
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1837,10 +1855,8 @@ func TestServer_DeleteUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.prepare(tt.args.req)
-			require.NoError(t, err)
-
-			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
+			ctx := tt.args.prepare(t, tt.args.req)
+			got, err := Client.DeleteUser(ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -2121,22 +2137,36 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	authURL, err := url.Parse(Instance.CreateIntent(CTX, oauthIdpID).GetAuthUrl())
 	require.NoError(t, err)
 	intentID := authURL.Query().Get("state")
+	expiry := time.Now().Add(1 * time.Hour)
+	expiryFormatted := expiry.Round(time.Millisecond).UTC().Format("2006-01-02T15:04:05.999Z07:00")
 
-	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "")
+	intentUser := Instance.CreateHumanUser(IamCTX)
+	_, err = Instance.CreateUserIDPlink(IamCTX, intentUser.GetUserId(), "idpUserID", oauthIdpID, "username")
 	require.NoError(t, err)
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "user")
+
+	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "", expiry)
 	require.NoError(t, err)
-	oidcSuccessful, oidcToken, oidcChangeDate, oidcSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "")
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "user", expiry)
 	require.NoError(t, err)
-	oidcSuccessfulWithUserID, oidcWithUserIDToken, oidcWithUserIDChangeDate, oidcWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "user")
+	successfulExpiredID, expiredToken, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "user", time.Now().Add(time.Second))
+	require.NoError(t, err)
+	// make sure the intent is expired
+	time.Sleep(2 * time.Second)
+	successfulConsumedID, consumedToken, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "idpUserID", intentUser.GetUserId(), expiry)
+	require.NoError(t, err)
+	// make sure the intent is consumed
+	Instance.CreateIntentSession(t, IamCTX, intentUser.GetUserId(), successfulConsumedID, consumedToken)
+	oidcSuccessful, oidcToken, oidcChangeDate, oidcSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "", expiry)
+	require.NoError(t, err)
+	oidcSuccessfulWithUserID, oidcWithUserIDToken, oidcWithUserIDChangeDate, oidcWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "user", expiry)
 	require.NoError(t, err)
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "")
 	require.NoError(t, err)
 	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "user")
 	require.NoError(t, err)
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "")
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "", expiry)
 	require.NoError(t, err)
-	samlSuccessfulWithUserID, samlWithUserToken, samlWithUserChangeDate, samlWithUserSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "user")
+	samlSuccessfulWithUserID, samlWithUserToken, samlWithUserChangeDate, samlWithUserSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "user", expiry)
 	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
@@ -2259,6 +2289,28 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{
+			name: "retrieve successful expired intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulExpiredID,
+					IdpIntentToken: expiredToken,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "retrieve successful consumed intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulConsumedID,
+					IdpIntentToken: consumedToken,
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "retrieve successful oidc intent",
@@ -2469,7 +2521,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Saml{
 						Saml: &user.IDPSAMLAccessInformation{
-							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+							Assertion: []byte(fmt.Sprintf(`<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="id" IssueInstant="0001-01-01T00:00:00Z" Version=""><Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion" NameQualifier="" SPNameQualifier="" Format="" SPProvidedID=""></Issuer><Conditions NotBefore="0001-01-01T00:00:00Z" NotOnOrAfter="%s"></Conditions></Assertion>`, expiryFormatted)),
 						},
 					},
 					IdpId:    samlIdpID,
@@ -2518,7 +2570,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Saml{
 						Saml: &user.IDPSAMLAccessInformation{
-							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+							Assertion: []byte(fmt.Sprintf(`<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="id" IssueInstant="0001-01-01T00:00:00Z" Version=""><Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion" NameQualifier="" SPNameQualifier="" Format="" SPProvidedID=""></Issuer><Conditions NotBefore="0001-01-01T00:00:00Z" NotOnOrAfter="%s"></Conditions></Assertion>`, expiryFormatted)),
 						},
 					},
 					IdpId:    samlIdpID,
@@ -3129,6 +3181,33 @@ func TestServer_CreateInviteCode(t *testing.T) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
+				},
+			},
+			want: &user.CreateInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "recreate",
+			args: args{
+				ctx: CTX,
+				req: &user.CreateInviteCodeRequest{},
+				prepare: func(request *user.CreateInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Instance.Client.UserV2.CreateInviteCode(CTX, &user.CreateInviteCodeRequest{
+						UserId: resp.GetUserId(),
+						Verification: &user.CreateInviteCodeRequest_SendCode{
+							SendCode: &user.SendInviteCode{
+								UrlTemplate:     gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+								ApplicationName: gu.Ptr("TestApp"),
+							},
+						},
+					})
+					return err
 				},
 			},
 			want: &user.CreateInviteCodeResponse{

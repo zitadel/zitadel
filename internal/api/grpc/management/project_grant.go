@@ -31,7 +31,7 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	if err != nil {
 		return nil, err
 	}
-	grants, err := s.query.SearchProjectGrants(ctx, queries)
+	grants, err := s.query.SearchProjectGrants(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 	if err != nil {
 		return nil, err
 	}
-	grants, err := s.query.SearchProjectGrants(ctx, queries)
+	grants, err := s.query.SearchProjectGrants(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -65,16 +65,17 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 }
 
 func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGrantRequest) (*mgmt_pb.AddProjectGrantResponse, error) {
-	grant, err := s.command.AddProjectGrant(ctx, AddProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	grant := AddProjectGrantRequestToCommand(req, "", authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.AddProjectGrant(ctx, grant)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectGrantResponse{
 		GrantId: grant.GrantID,
 		Details: object_grpc.AddToDetailsPb(
-			grant.Sequence,
-			grant.ChangeDate,
-			grant.ResourceOwner,
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner,
 		),
 	}, nil
 }
@@ -94,14 +95,14 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants.UserGrants)...)
+	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToCommand(req, authz.GetCtxData(ctx).OrgID), userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectGrantResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			grant.Sequence,
-			grant.ChangeDate,
+			grant.EventDate,
 			grant.ResourceOwner,
 		),
 	}, nil

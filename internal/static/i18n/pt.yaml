@@ -535,6 +535,7 @@ Errors:
     StateMissing: O parâmetro de estado está faltando na solicitação
     NotStarted: A intenção não foi iniciada ou já foi encerrada
     NotSucceeded: A intenção não teve sucesso
+    Expired: A intenção expirou
     TokenCreationFailed: Falha na criação do token
     InvalidToken: O token da intenção é inválido
     OtherUser: Intenção destinada a outro usuário

@@ -537,6 +537,7 @@ Errors:
     StateMissing: 요청에 상태 매개변수가 누락되었습니다
     NotStarted: 의도가 시작되지 않았거나 이미 종료되었습니다
     NotSucceeded: 의도가 성공하지 않았습니다
+    Expired: 의도의 유효 기간이 만료되었습니다
     TokenCreationFailed: 토큰 생성 실패
     InvalidToken: 의도 토큰이 유효하지 않습니다
     OtherUser: 다른 사용자를 위한 의도입니다
