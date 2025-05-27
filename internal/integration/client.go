@@ -141,7 +141,7 @@ func (c *Client) pollHealth(ctx context.Context) (err error) {
 	}
 }
 
-// Deprecated: user CreateUserTypeHuman instead
+// Deprecated: use CreateUserTypeHuman instead
 func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
