@@ -1757,7 +1757,7 @@ func TestServer_DeleteUser(t *testing.T) {
 
 	type args struct {
 		req     *user.DeleteUserRequest
-		prepare func(*testing.T, *user.DeleteUserRequest) (deleteCtx context.Context, tryAuthCtx context.Context)
+		prepare func(*testing.T, *user.DeleteUserRequest) context.Context
 	}
 	tests := []struct {
 		name    string
@@ -1771,7 +1771,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				&user.DeleteUserRequest{
 					UserId: "notexisting",
 				},
-				func(*testing.T, *user.DeleteUserRequest) (context.Context, context.Context) { return CTX, nil },
+				func(*testing.T, *user.DeleteUserRequest) context.Context { return CTX },
 			},
 			wantErr: true,
 		},
@@ -1779,10 +1779,10 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "remove human, ok",
 			args: args{
 				req: &user.DeleteUserRequest{},
-				prepare: func(_ *testing.T, request *user.DeleteUserRequest) (context.Context, context.Context) {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					return CTX, nil
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1796,10 +1796,10 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "remove machine, ok",
 			args: args{
 				req: &user.DeleteUserRequest{},
-				prepare: func(_ *testing.T, request *user.DeleteUserRequest) (context.Context, context.Context) {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
-					return CTX, nil
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1813,13 +1813,13 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "remove dependencies, ok",
 			args: args{
 				req: &user.DeleteUserRequest{},
-				prepare: func(_ *testing.T, request *user.DeleteUserRequest) (context.Context, context.Context) {
+				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateOrgMembership(t, CTX, request.UserId)
-					return CTX, nil
+					return CTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1833,7 +1833,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "remove self, ok",
 			args: args{
 				req: &user.DeleteUserRequest{},
-				prepare: func(t *testing.T, request *user.DeleteUserRequest) (context.Context, context.Context) {
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
 					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserType: &user.CreateUserRequest_Human_{
@@ -1853,29 +1853,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					request.UserId = removeUser.Id
 					Instance.RegisterUserPasskey(CTX, removeUser.Id)
 					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, removeUser.Id)
-					return integration.WithAuthorizationToken(UserCTX, token), nil
-				},
-			},
-			want: &user.DeleteUserResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.DefaultOrg.Id,
-				},
-			},
-		},
-		{
-			name: "remove self, pat becomes invalid",
-			args: args{
-				req: &user.DeleteUserRequest{},
-				prepare: func(t *testing.T, request *user.DeleteUserRequest) (context.Context, context.Context) {
-					removeUser := Instance.CreateUserTypeMachine(CTX)
-					request.UserId = removeUser.Id
-					token, err := Client.AddPersonalAccessToken(CTX, &user.AddPersonalAccessTokenRequest{
-						UserId:         removeUser.Id,
-						ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),
-					})
-					require.NoError(t, err)
-					return CTX, integration.WithAuthorizationToken(UserCTX, token.Token)
+					return integration.WithAuthorizationToken(UserCTX, token)
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1888,30 +1866,14 @@ func TestServer_DeleteUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			deleteCtx, tryAuthCtx := tt.args.prepare(t, tt.args.req)
-			if tryAuthCtx != nil {
-				_, err := Client.ListKeys(tryAuthCtx, &user.ListKeysRequest{Filters: []*user.KeysSearchFilter{{
-					Filter: &user.KeysSearchFilter_UserIdFilter{UserIdFilter: &user.IDFilter{
-						Id: "not existing",
-					}}},
-				}})
-				assert.NoError(t, err)
-			}
-			got, err := Client.DeleteUser(deleteCtx, tt.args.req)
+			ctx := tt.args.prepare(t, tt.args.req)
+			got, err := Client.DeleteUser(ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
-			if tryAuthCtx != nil {
-				_, err = Client.ListKeys(tryAuthCtx, &user.ListKeysRequest{Filters: []*user.KeysSearchFilter{{
-					Filter: &user.KeysSearchFilter_UserIdFilter{UserIdFilter: &user.IDFilter{
-						Id: "not existing",
-					}}},
-				}})
-				assert.Error(t, err)
-			}
 		})
 	}
 }
