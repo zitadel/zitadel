@@ -296,6 +296,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			client: dbClient,
 		},
 	}
+	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 
 	for _, repeatableStep := range repeatableSteps {
 		setupErr = executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")

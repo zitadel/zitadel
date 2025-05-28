@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS projections.resource_counts
     parent_type TEXT,
     parent_id TEXT,
 	resource_name TEXT NOT NULL,
-    updated_at timestamptz NOT NULL DEFAULT now(),
-    amount integer NOT NULL DEFAULT 1 CHECK (amount >= 0),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    amount INTEGER NOT NULL DEFAULT 1 CHECK (amount >= 0),
     
 	PRIMARY KEY (instance_id, table_name, parent_type, parent_id)
 );
@@ -26,13 +26,13 @@ DECLARE
 	tg_table_name TEXT := TG_TABLE_SCHEMA || '.' || TG_TABLE_NAME;
 	tg_parent_type TEXT := TG_ARGV[0];
 	tg_instance_id_column TEXT := TG_ARGV[1];
-	tg_owner_id_column TEXT := TG_ARGV[2];
+	tg_parent_id_column TEXT := TG_ARGV[2];
 	tg_resource_name TEXT := TG_ARGV[3];
 	
 	tg_instance_id TEXT;
 	tg_parent_id TEXT;
 
-	select_ids TEXT := format('SELECT ($1).%I, ($1).%I', tg_instance_id_column, tg_owner_id_column)
+	select_ids TEXT := format('SELECT ($1).%I, ($1).%I', tg_instance_id_column, tg_parent_id_column)
 BEGIN
 	IF (TG_OP = 'INSERT') THEN
 		EXECUTE select_ids INTO tg_instance_id, tg_parent_id USING NEW;
@@ -74,12 +74,11 @@ BEGIN
 END
 $$;
 
--- delete_resource_counts removes all resource counts for a deleted parent.
+-- delete_parent_counts removes all resource counts for a deleted parent.
 -- 1. The type of the parent
 -- 2. The column name of the instance id
 -- 3. The column name of the owner id
--- 4. The name of the resource
-CREATE OR REPLACE FUNCTION projections.delete_resource_counts()
+CREATE OR REPLACE FUNCTION projections.delete_parent_counts()
 	RETURNS trigger
 	LANGUAGE 'plpgsql'
 AS $$
@@ -88,17 +87,17 @@ DECLARE
 	tg_table_name TEXT := TG_TABLE_SCHEMA || '.' || TG_TABLE_NAME;
 	tg_parent_type TEXT := TG_ARGV[0];
 	tg_instance_id_column TEXT := TG_ARGV[1];
-	tg_owner_id_column TEXT := TG_ARGV[2];
+	tg_parent_id_column TEXT := TG_ARGV[2];
 	
 	tg_instance_id TEXT;
 	tg_parent_id TEXT;
 
-	select_ids TEXT := format('SELECT ($1).%I, ($1).%I', tg_instance_id_column, tg_owner_id_column)
+	select_ids TEXT := format('SELECT ($1).%I, ($1).%I', tg_instance_id_column, tg_parent_id_column);
 BEGIN
 	EXECUTE select_ids INTO tg_instance_id, tg_parent_id USING OLD;
 	
 	DELETE FROM projections.resource_counts
-	WHERE instance_id = tg_instance_id
+		WHERE instance_id = tg_instance_id
 		AND table_name = tg_table_name
 		AND parent_type = tg_parent_type
 		AND parent_id = tg_parent_id;

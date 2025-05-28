@@ -1,12 +1,13 @@
+{{ template "count_trigger" -}}
 CREATE OR REPLACE TRIGGER count_{{ .Resource }}
     AFTER INSERT OR DELETE
     ON {{ .Table }}
     FOR EACH ROW
     EXECUTE FUNCTION projections.count_resource(
-        '{{ .Resource }}',
-        '{{ .OwnerType }}', 
+        '{{ .ParentType }}', 
         '{{ .InstanceIDColumn }}', 
-        '{{ .OwnerIDColumn }}'
+        '{{ .ParentIDColumn }}'
+        '{{ .Resource }}',
     );
 
 CREATE OR REPLACE TRIGGER truncate_{{ .Resource }}_counts
@@ -30,9 +31,11 @@ INSERT INTO projections.resource_counts(
 SELECT
     {{ .InstanceIDColumn }},
     '{{ .Table }}',
-    '{{ .OwnerType }}',
-    {{ .OwnerIDColumn }},
+    '{{ .ParentType }}',
+    {{ .ParentIDColumn }},
     '{{ .Resource }}',
     COUNT(*)
 FROM projections.users14
-GROUP BY ({{ .InstanceIDColumn }}, {{ .OwnerIDColumn }});
+GROUP BY ({{ .InstanceIDColumn }}, {{ .ParentIDColumn }});
+
+{{- end -}}
