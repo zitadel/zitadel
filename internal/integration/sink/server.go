@@ -27,6 +27,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
@@ -124,6 +125,25 @@ func SuccessfulLDAPIntent(instanceID, idpID, idpUserID, userID string) (string, 
 	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
 }
 
+func SuccessfulJWTIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
+	u := url.URL{
+		Scheme: "http",
+		Host:   host,
+		Path:   successfulIntentJWTPath(),
+	}
+	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
+		InstanceID: instanceID,
+		IDPID:      idpID,
+		IDPUserID:  idpUserID,
+		UserID:     userID,
+		Expiry:     expiry,
+	})
+	if err != nil {
+		return "", "", time.Time{}, uint64(0), err
+	}
+	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
+}
+
 // StartServer starts a simple HTTP server on localhost:8081
 // ZITADEL can use the server to send HTTP requests which can be
 // used to validate tests through [Subscribe]rs.
@@ -145,6 +165,7 @@ func StartServer(commands *command.Commands) (close func()) {
 		router.HandleFunc(successfulIntentOIDCPath(), successfulIntentHandler(commands, createSuccessfulOIDCIntent))
 		router.HandleFunc(successfulIntentSAMLPath(), successfulIntentHandler(commands, createSuccessfulSAMLIntent))
 		router.HandleFunc(successfulIntentLDAPPath(), successfulIntentHandler(commands, createSuccessfulLDAPIntent))
+		router.HandleFunc(successfulIntentJWTPath(), successfulIntentHandler(commands, createSuccessfulJWTIntent))
 	}
 	s := &http.Server{
 		Addr:    listenAddr,
@@ -193,6 +214,10 @@ func successfulIntentSAMLPath() string {
 
 func successfulIntentLDAPPath() string {
 	return path.Join(successfulIntentPath(), "/", "ldap")
+}
+
+func successfulIntentJWTPath() string {
+	return path.Join(successfulIntentPath(), "/", "jwt")
 }
 
 // forwarder handles incoming HTTP requests from ZITADEL and
@@ -487,6 +512,33 @@ func createSuccessfulLDAPIntent(ctx context.Context, cmd *command.Commands, req 
 		},
 	}}
 	token, err := cmd.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, req.UserID, session)
+	if err != nil {
+		return nil, err
+	}
+	return &SuccessfulIntentResponse{
+		intentID,
+		token,
+		writeModel.ChangeDate,
+		writeModel.ProcessedSequence,
+	}, nil
+}
+
+func createSuccessfulJWTIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	idpUser := &jwt.User{
+		IDTokenClaims: &oidc.IDTokenClaims{
+			TokenClaims: oidc.TokenClaims{
+				Subject: req.IDPUserID,
+			},
+		},
+	}
+	session := &jwt.Session{
+		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+			IDToken: "idToken",
+		},
+	}
+	token, err := cmd.SucceedIDPIntent(ctx, writeModel, idpUser, session, req.UserID)
 	if err != nil {
 		return nil, err
 	}

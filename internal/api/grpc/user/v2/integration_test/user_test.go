@@ -1753,8 +1753,8 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	projectResp := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+
 	type args struct {
 		req     *user.DeleteUserRequest
 		prepare func(*testing.T, *user.DeleteUserRequest) context.Context
@@ -1875,6 +1875,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	samlIdpID := Instance.AddSAMLProvider(IamCTX)
 	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
 	samlPostIdpID := Instance.AddSAMLPostProvider(IamCTX)
+	jwtIdPID := Instance.AddJWTProvider(IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderIntentRequest
@@ -2097,6 +2098,30 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "next step jwt idp",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: jwtIdPID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.ID(),
+				},
+				url:                "https://example.com/jwt",
+				parametersExisting: []string{"authRequestID", "userAgentID"},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -2134,6 +2159,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, gofakeit.AppName()).GetId()
 	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
 	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
+	jwtIdPID := Instance.AddJWTProvider(IamCTX)
 	authURL, err := url.Parse(Instance.CreateIntent(CTX, oauthIdpID).GetAuthUrl())
 	require.NoError(t, err)
 	intentID := authURL.Query().Get("state")
@@ -2167,6 +2193,10 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "", expiry)
 	require.NoError(t, err)
 	samlSuccessfulWithUserID, samlWithUserToken, samlWithUserChangeDate, samlWithUserSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "user", expiry)
+	require.NoError(t, err)
+	jwtSuccessfulID, jwtToken, jwtChangeDate, jwtSequence, err := sink.SuccessfulJWTIntent(Instance.ID(), jwtIdPID, "id", "", expiry)
+	require.NoError(t, err)
+	jwtSuccessfulWithUserID, jwtWithUserToken, jwtWithUserChangeDate, jwtWithUserSequence, err := sink.SuccessfulJWTIntent(Instance.ID(), jwtIdPID, "id", "user", expiry)
 	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
@@ -2582,6 +2612,88 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							"attributes": map[string]interface{}{
 								"attribute1": []interface{}{"value1"},
 							},
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				UserId: "user",
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful jwt intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    jwtSuccessfulID,
+					IdpIntentToken: jwtToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(jwtChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      jwtSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							IdToken: gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    jwtIdPID,
+					UserId:   "id",
+					UserName: "",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub": "id",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				AddHumanUser: &user.AddHumanUserRequest{
+					Profile: &user.SetHumanProfile{
+						PreferredLanguage: gu.Ptr("und"),
+					},
+					IdpLinks: []*user.IDPLink{
+						{IdpId: jwtIdPID, UserId: "id"},
+					},
+					Email: &user.SetHumanEmail{
+						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful jwt intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    jwtSuccessfulWithUserID,
+					IdpIntentToken: jwtWithUserToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(jwtWithUserChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      jwtWithUserSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							IdToken: gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    jwtIdPID,
+					UserId:   "id",
+					UserName: "",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub": "id",
 						})
 						require.NoError(t, err)
 						return s
@@ -3181,6 +3293,33 @@ func TestServer_CreateInviteCode(t *testing.T) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
+				},
+			},
+			want: &user.CreateInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "recreate",
+			args: args{
+				ctx: CTX,
+				req: &user.CreateInviteCodeRequest{},
+				prepare: func(request *user.CreateInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Instance.Client.UserV2.CreateInviteCode(CTX, &user.CreateInviteCodeRequest{
+						UserId: resp.GetUserId(),
+						Verification: &user.CreateInviteCodeRequest_SendCode{
+							SendCode: &user.SendInviteCode{
+								UrlTemplate:     gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+								ApplicationName: gu.Ptr("TestApp"),
+							},
+						},
+					})
+					return err
 				},
 			},
 			want: &user.CreateInviteCodeResponse{
