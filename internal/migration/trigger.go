@@ -16,7 +16,7 @@ import (
 
 const (
 	countTriggerTmpl       = "count_trigger"
-	deleteParentCountsTmpl = "delete_parent_counts"
+	deleteParentCountsTmpl = "delete_parent_counts_trigger"
 )
 
 var (
@@ -84,6 +84,31 @@ func DeleteParentCountsTrigger(
 	}
 }
 
+type triggerMigration struct {
+	triggerConfig
+	db           *database.DB
+	templateName string
+}
+
+// String implements [Migration] and [fmt.Stringer].
+func (m *triggerMigration) String() string {
+	return fmt.Sprintf("%s_%s", m.Resource, m.templateName)
+}
+
+// Execute implements [Migration]
+func (m *triggerMigration) Execute(ctx context.Context, _ eventstore.Event) error {
+	var query strings.Builder
+	err := templates.ExecuteTemplate(&query, m.templateName, m.triggerConfig)
+	if err != nil {
+		return fmt.Errorf("execute trigger template %s: %w", m, err)
+	}
+	_, err = m.db.ExecContext(ctx, query.String())
+	if err != nil {
+		return fmt.Errorf("exec trigger query %s: %w", m, err)
+	}
+	return nil
+}
+
 type triggerConfig struct {
 	Table            string `json:"table,omitempty" mapstructure:"table"`
 	ParentType       string `json:"parent_type,omitempty" mapstructure:"parent_type"`
@@ -98,28 +123,5 @@ func (c *triggerConfig) Check(lastRun map[string]any) bool {
 	if err := mapstructure.Decode(lastRun, &dst); err != nil {
 		panic(err)
 	}
-	return dst == *c
-}
-
-type triggerMigration struct {
-	triggerConfig
-	db           *database.DB
-	templateName string
-}
-
-func (m *triggerMigration) String() string {
-	return fmt.Sprintf("init_%s_%s", m.Resource, m.templateName)
-}
-
-func (m *triggerMigration) Execute(ctx context.Context, _ eventstore.Event) error {
-	var buf strings.Builder
-	err := templates.ExecuteTemplate(&buf, m.templateName, m.triggerConfig)
-	if err != nil {
-		return fmt.Errorf("execute trigger template %s_%s: %w", m.Resource, m.templateName, err)
-	}
-	_, err = m.db.ExecContext(ctx, buf.String())
-	if err != nil {
-		return fmt.Errorf("exec trigger query %s_%s: %w", m.Resource, m.templateName, err)
-	}
-	return nil
+	return dst != *c
 }

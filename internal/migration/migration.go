@@ -36,6 +36,9 @@ type errCheckerMigration interface {
 
 type RepeatableMigration interface {
 	Migration
+
+	// Check if the migration should be executed again.
+	// True will repeat the migration, false will not.
 	Check(lastRun map[string]any) bool
 }
 

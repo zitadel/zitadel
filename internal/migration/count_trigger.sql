@@ -1,4 +1,4 @@
-{{ template "count_trigger" -}}
+{{ define "count_trigger" -}}
 CREATE OR REPLACE TRIGGER count_{{ .Resource }}
     AFTER INSERT OR DELETE
     ON {{ .Table }}
@@ -6,8 +6,8 @@ CREATE OR REPLACE TRIGGER count_{{ .Resource }}
     EXECUTE FUNCTION projections.count_resource(
         '{{ .ParentType }}', 
         '{{ .InstanceIDColumn }}', 
-        '{{ .ParentIDColumn }}'
-        '{{ .Resource }}',
+        '{{ .ParentIDColumn }}',
+        '{{ .Resource }}'
     );
 
 CREATE OR REPLACE TRIGGER truncate_{{ .Resource }}_counts

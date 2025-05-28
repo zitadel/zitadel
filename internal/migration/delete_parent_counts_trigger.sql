@@ -1,6 +1,6 @@
-{{ template "delete_parent_counts" -}}
+{{ define "delete_parent_counts_trigger" -}}
 
-CREATE OR REPLACE TRIGGER delete_parent_counts
+CREATE OR REPLACE TRIGGER delete_parent_counts_trigger
     AFTER DELETE
     ON {{ .Table }}
     FOR EACH ROW
