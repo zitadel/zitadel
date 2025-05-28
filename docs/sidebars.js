@@ -15,6 +15,7 @@ const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/
 const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
+const sidebar_api_authorization_service_v2 = require("./docs/apis/resources/authorization_service_v2/sidebar.ts").default
 
 module.exports = {
   guides: [
@@ -850,11 +851,33 @@ module.exports = {
                 title: "Project Service API (Beta)",
                 slug: "/apis/resources/project_service_v2",
                 description:
-                  "This API is intended to manage projects and subresources for ZITADEL. \n"+
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
+                    "This API is intended to manage projects and subresources for ZITADEL. \n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.",
               },
               items: sidebar_api_project_service_v2,
+            }, {
+              type: "category",
+              label: "Authorization (Beta)",
+                link: {
+                    type: "generated-index",
+                    title: "Authorization Service API (Beta)",
+                    slug: "/apis/resources/authorization_service_v2",
+                    description:
+                        "This API is intended to manage user authorizations.\n" +
+                        "\n" +
+                        "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                        "\n" +
+                        "Authorizations were called user grants in the v1 auth and management APIs.\n"+
+                        "Unlike in the v1 APIs, the Authorization Service does not differentiate between owned or granted projects.\n" +
+                        "It assigns a list of roles to a user from the same or a foreign organization.\n"+
+                        "The authorization is scoped to a project that is owned by the authorization's organization or granted by a foreign organization.\n" +
+                        "Managing an authorization requires user.grant.* permissions on the target project (owned or granted) or the authorizations organization." +
+                        "The authorization's user does not need to have any permissions in order to retrieve the authorization.\n"
+                },
+              items: sidebar_api_authorization_service_v2,
+            }, {
+              type: "category",
               label: "Instance (Beta)",
               link: {
                 type: "generated-index",

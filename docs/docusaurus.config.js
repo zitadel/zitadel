@@ -380,6 +380,14 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
+          authorization_v2beta: {
+            specPath: ".artifacts/openapi/zitadel/authorization/v2beta/authorization_service.swagger.json",
+            outputDir: "docs/apis/resources/authorization_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
         },
       },
     ],
