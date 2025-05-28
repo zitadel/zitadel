@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package zitadel.analytics.v2beta;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analytics";
+
+// The TelemetryService is used to report telemetry such as usage statistics of the ZITADEL instance(s).
+// back to a central storage.
+// It is used to collect anonymized data about the usage of ZITADEL features, capabilities, and configurations.
+// ZITADEL acts as a client of the TelemetryService.
+service TelemetryService {
+  // ReportUsage is used to report the usage of ZITADEL instances.
+  // It is called periodically to report the current state of the instance.
+  // The report contains the current version of the ZITADEL system, a list of instances and their usage,
+  // and the timestamp when the report was created.
+  //
+  // The periodicity of the report can be configured in the system's running configuration.
+  //
+  // In case of a failure to report the usage, ZITADEL will retry to report the usage
+  // based on the configured retry policy and error codes.
+  // The most relevant error codes are the following:
+  // - `UNAVAILABLE`: The TelemetryService is currently unavailable, retry later.
+  // - `DEADLINE_EXCEEDED`: The request took too long to complete, retry later.
+  // - `INTERNAL`: An internal error occurred, retry later.
+  // - `ABORTED`: The request was aborted, do not retry.
+  // - `RESOURCE_EXHAUSTED`: The request was rejected due to resource exhaustion, retry later.
+  // - `FAILED_PRECONDITION`: The request failed due to a precondition, retry later.
+  // - `CANCELLED`: The request was cancelled, retry later.
+  rpc ReportUsage (ReportUsageRequest) returns (ReportUsageResponse) {}
+}
+
+message ReportUsageRequest {
+  // The current version of the ZITADEL system.
+  string version = 1;
+  // A list of instances and their usage that are being reported.
+  repeated InstanceUsage instances = 2;
+  // The timestamp when the report was created.
+  // This is the time when the report was generated, not when it was sent,
+  // which might differ in case of retries.
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message InstanceUsage {
+  // The unique identifier of the instance.
+  string id = 1;
+  // The custom domains (incl. generated ones) of the instance.
+  repeated string domains = 2;
+  // The creation date of the instance.
+  google.protobuf.Timestamp created_at = 3;
+  // The current amount of report relevant objects in the instance.
+  Counts counts = 4;
+}
+
+// Counts contains the counts of report relevant objects in the instance.
+// It is used to report the current state of the instance.
+// All fields are optional, as system owners are able to opt-out of reporting certain data.
+// If a field is not set, they opt-out of reporting that specific data.
+// If a field is set to 0, it is reported as 0.
+message Counts {
+  // Total amount of organizations in the instance.
+  optional uint32 organizations = 1;
+  // A list of users counts per organization.
+  repeated uint32 users_per_organization = 2;
+  // Total amount of human users in the instance.
+  optional uint32 human_users = 3;
+  // Total amount of machine users in the instance.
+  optional uint32 machine_users = 4;
+  // Total amount of users granted an IAM admin role.
+  optional uint32 iam_admins = 5;
+  // Total amount of external IdP providers (excl. LDAP).
+  optional uint32 external_identity_providers = 6;
+  // Total amount of external LDAP identity providers.
+  optional uint32 ldap_identity_providers = 7;
+  // Total amount of configured action executions.
+  optional uint32 action_executions = 8;
+  // Total amount of MFA enforcements.
+  optional uint32 mfa_enforcements = 9;
+  // Total amount of password complexity policies.
+  optional uint32 password_complexity_policies = 10;
+  // Total amount of password expiry policies.
+  optional uint32 password_expiry_policies = 11;
+  // Total amount of password lockout policies.
+  optional uint32 password_lockout_policies = 12;
+}
+
+message ReportUsageResponse {
+  // The timestamp when the report was reported and confirmed by the TelemetryService server.
+  google.protobuf.Timestamp reported_at = 1;
+}
