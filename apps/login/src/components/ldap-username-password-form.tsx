@@ -22,7 +22,7 @@ type Props = {
   idpId: string;
 };
 
-export function UsernamePasswordForm({
+export function LDAPUsernamePasswordForm({
   organization,
   requestId,
   idpId,

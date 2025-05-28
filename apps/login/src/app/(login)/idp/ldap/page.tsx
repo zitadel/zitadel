@@ -1,5 +1,5 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { UsernamePasswordForm } from "@/components/username-password-form";
+import { LDAPUsernamePasswordForm } from "@/components/ldap-username-password-form";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -44,11 +44,11 @@ export default async function Page(props: {
         <h1>{t("title")}</h1>
         <p className="ztdl-p">{t("description")}</p>
 
-        <UsernamePasswordForm
+        <LDAPUsernamePasswordForm
           idpId={idpId}
           requestId={requestId}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-        ></UsernamePasswordForm>
+        ></LDAPUsernamePasswordForm>
       </div>
     </DynamicTheme>
   );

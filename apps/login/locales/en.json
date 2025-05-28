@@ -64,6 +64,13 @@
       "description": "An error occurred while trying to link your account."
     }
   },
+  "ldap": {
+    "title": "LDAP Login",
+    "description": "Enter your LDAP credentials.",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Continue"
+  },
   "mfa": {
     "verify": {
       "title": "Verify your identity",
