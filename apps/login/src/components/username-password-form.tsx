@@ -1,9 +1,6 @@
 "use client";
 
-import { sendPassword } from "@/lib/server/password";
-import { create } from "@zitadel/client";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { createNewSessionForLDAP } from "@/lib/server/idp";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,17 +17,15 @@ type Inputs = {
 };
 
 type Props = {
-  loginSettings: LoginSettings | undefined;
-  loginName: string;
   organization?: string;
   requestId?: string;
+  idpId: string;
 };
 
 export function UsernamePasswordForm({
-  loginSettings,
-  loginName,
   organization,
   requestId,
+  idpId,
 }: Props) {
   const t = useTranslations("password");
 
@@ -48,13 +43,10 @@ export function UsernamePasswordForm({
     setError("");
     setLoading(true);
 
-    const response = await sendPassword({
-      loginName,
-      organization,
-      checks: create(ChecksSchema, {
-        password: { password: values.password },
-      }),
-      requestId,
+    const response = await createNewSessionForLDAP({
+      idpId: idpId,
+      username: values.loginName,
+      password: values.password,
     })
       .catch(() => {
         setError("Could not verify password");
@@ -75,7 +67,7 @@ export function UsernamePasswordForm({
   }
 
   return (
-    <form className="w-full">
+    <form className="w-full space-y-4">
       <TextInput
         type="text"
         autoComplete="username"
