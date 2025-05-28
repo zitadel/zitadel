@@ -197,3 +197,16 @@ func (s *Server) GetSecuritySettings(ctx context.Context, req *settings.GetSecur
 		Settings: securityPolicyToSettingsPb(policy),
 	}, nil
 }
+
+func (s *Server) GetHostedLoginTranslation(ctx context.Context, req *settings.GetHostedLoginTranslationRequest) (*settings.GetHostedLoginTranslationResponse, error) {
+	translation, err := s.query.GetHostedLoginTranslation(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return translation, nil
+}
+
+func (s *Server) SetHostedLoginTranslation(ctx context.Context, req *settings.SetHostedLoginTranslationRequest) (*settings.SetHostedLoginTranslationResponse, error) {
+	return nil, nil
+}

@@ -352,3 +352,16 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_GetHostedLoginTranslation(t *testing.T) {
+	res, err := Client.GetHostedLoginTranslation(AdminCTX, &settings.GetHostedLoginTranslationRequest{
+		Level:             settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+		LevelId:           Instance.ID(),
+		Locale:            "en",
+		IgnoreInheritance: false,
+	})
+
+	require.Nil(t, err)
+	require.NotEmpty(t, res)
+	require.NotEmpty(t, res.GetTranslations())
+}
