@@ -537,6 +537,7 @@ Errors:
     StateMissing: State parameter is missing in the request
     NotStarted: Intent is not started or was already terminated
     NotSucceeded: Intent has not succeeded
+    Expired: Intent has expired
     TokenCreationFailed: Token creation failed
     InvalidToken: Intent Token is invalid
     OtherUser: Intent meant for another user

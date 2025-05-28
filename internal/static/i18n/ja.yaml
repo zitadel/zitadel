@@ -537,6 +537,7 @@ Errors:
     StateMissing: リクエストに State パラメータがありません
     NotStarted: インテントが開始されなかったか、既に終了している
     NotSucceeded: インテントが成功しなかった
+    Expired: 意図の有効期限が切れました
     TokenCreationFailed: トークンの作成に失敗しました
     InvalidToken: インテントのトークンが無効である
     OtherUser: 他のユーザーを意図している

@@ -28,7 +28,7 @@ type UserV2InviteWriteModel struct {
 }
 
 func (wm *UserV2InviteWriteModel) CreationAllowed() bool {
-	return !wm.EmailVerified && !wm.AuthMethodSet
+	return !wm.AuthMethodSet
 }
 
 func newUserV2InviteWriteModel(userID, orgID string) *UserV2InviteWriteModel {

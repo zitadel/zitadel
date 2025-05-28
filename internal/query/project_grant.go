@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -104,6 +105,43 @@ type ProjectGrantSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func projectGrantsCheckPermission(ctx context.Context, projectGrants *ProjectGrants, permissionCheck domain.PermissionCheck) {
+	projectGrants.ProjectGrants = slices.DeleteFunc(projectGrants.ProjectGrants,
+		func(projectGrant *ProjectGrant) bool {
+			return projectGrantCheckPermission(ctx, projectGrant.ResourceOwner, projectGrant.GrantID, permissionCheck) != nil
+		},
+	)
+}
+
+func projectGrantCheckPermission(ctx context.Context, resourceOwner string, grantID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, grantID)
+}
+
+func projectGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectGrantSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		ProjectGrantColumnResourceOwner,
+		domain.PermissionProjectGrantRead,
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(ProjectGrantColumnGrantID),
+	)
+	return query.JoinClause(join, args...)
+}
+
+func (q *Queries) GetProjectGrantByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, id string, permissionCheck domain.PermissionCheck) (*ProjectGrant, error) {
+	projectGrant, err := q.ProjectGrantByID(ctx, shouldTriggerBulk, id)
+	if err != nil {
+		return nil, err
+	}
+	if err := projectCheckPermission(ctx, projectGrant.ResourceOwner, projectGrant.GrantID, permissionCheck); err != nil {
+		return nil, err
+	}
+	return projectGrant, nil
+}
+
 func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string) (grant *ProjectGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -154,11 +192,24 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	return grant, err
 }
 
-func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries) (grants *ProjectGrants, err error) {
+func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, permissionCheck domain.PermissionCheck) (grants *ProjectGrants, err error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	projectsGrants, err := q.searchProjectGrants(ctx, queries, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		projectGrantsCheckPermission(ctx, projectsGrants, permissionCheck)
+	}
+	return projectsGrants, nil
+}
+
+func (q *Queries) searchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, permissionCheckV2 bool) (grants *ProjectGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareProjectGrantsQuery()
+	query = projectGrantPermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	eq := sq.Eq{
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -179,6 +230,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	return grants, err
 }
 
+// SearchProjectGrantsByProjectIDAndRoleKey is used internally to remove the roles of a project grant, so no permission check necessary
 func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) (projects *ProjectGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -195,11 +247,31 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	return q.SearchProjectGrants(ctx, searchQuery)
+	return q.SearchProjectGrants(ctx, searchQuery, nil)
 }
 
 func NewProjectGrantProjectIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnProjectID, value, TextEquals)
+}
+
+func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetAllPermissionCtxIDs(permissions)
+		query, err := NewProjectGrantIDsSearchQuery(ids)
+		if err != nil {
+			return err
+		}
+		q.Queries = append(q.Queries, query)
+	}
+	return nil
+}
+
+func NewProjectGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(ProjectGrantColumnProjectID, list, ListIn)
 }
 
 func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
@@ -240,18 +312,6 @@ func (q *ProjectGrantSearchQueries) AppendGrantedOrgQuery(orgID string) error {
 		return err
 	}
 	q.Queries = append(q.Queries, query)
-	return nil
-}
-
-func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
-	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetAllPermissionCtxIDs(permissions)
-		query, err := NewProjectGrantIDsSearchQuery(ids)
-		if err != nil {
-			return err
-		}
-		q.Queries = append(q.Queries, query)
-	}
 	return nil
 }
 

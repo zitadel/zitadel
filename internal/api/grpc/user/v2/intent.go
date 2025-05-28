@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
 
 	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -71,14 +72,14 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 	if err != nil {
 		return nil, err
 	}
-	externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
+	externalUser, userID, session, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
 	if err != nil {
 		if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
 			return nil, err
 		}
 		return nil, err
 	}
-	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
+	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, session)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +117,7 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 	return "", nil
 }
 
-func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, map[string][]string, error) {
+func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, *ldap.Session, error) {
 	provider, err := s.command.GetProvider(ctx, idpID, "", "")
 	if err != nil {
 		return nil, "", nil, err
@@ -137,12 +138,7 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	if err != nil {
 		return nil, "", nil, err
 	}
-
-	attributes := make(map[string][]string, 0)
-	for _, item := range session.Entry.Attributes {
-		attributes[item.Name] = item.Values
-	}
-	return externalUser, userID, attributes, nil
+	return externalUser, userID, session, nil
 }
 
 func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
@@ -156,6 +152,9 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 	if intent.State != domain.IDPIntentStateSucceeded {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-nme4gszsvx", "Errors.Intent.NotSucceeded")
 	}
+	if time.Now().After(intent.ExpiresAt()) {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-SAf42", "Errors.Intent.Expired")
+	}
 	idpIntent, err := idpIntentToIDPIntentPb(intent, s.idpAlg)
 	if err != nil {
 		return nil, err
@@ -168,11 +167,11 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		var idpUser idp.User
 		switch p := provider.(type) {
 		case *apple.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &apple.User{})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
 		case *oauth.Provider:
 			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *oidc.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *jwt.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &jwt.User{})
 		case *azuread.Provider:
@@ -180,9 +179,9 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		case *github.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
 		case *gitlab.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *google.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &google.User{User: &oidc.User{UserInfo: &oidc_pkg.UserInfo{}}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
 		case *saml.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
 		case *ldap.Provider:

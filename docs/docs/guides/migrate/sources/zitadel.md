@@ -40,7 +40,7 @@ You need a PAT from a service user with IAM Owner permissions in both the source
 4. Go to the Default settings
 5. Add the import_user as [manager](/docs/guides/manage/console/managers) with the role "IAM Owner"
 
-Save the PAT to the environment variabel `PAT_EXPORT_TOKEN` and the source domain as `ZITADEL_EXPORT_DOMAIN` to run the following scripts.
+Save the PAT to the environment variable `PAT_EXPORT_TOKEN` and the source domain as `ZITADEL_EXPORT_DOMAIN` to run the following scripts.
 
 ### Target system
 
@@ -50,7 +50,7 @@ Save the PAT to the environment variabel `PAT_EXPORT_TOKEN` and the source domai
 4. Go to the Default settings
 5. Add the export_user as [manager](/docs/guides/manage/console/managers) with the role "IAM Owner"
 
-Save the PAT to the environment variabel `PAT_IMPORT_TOKEN` and the source domain as `ZITADEL_IMPORT_DOMAIN` to run the following scripts.
+Save the PAT to the environment variable `PAT_IMPORT_TOKEN` and the source domain as `ZITADEL_IMPORT_DOMAIN` to run the following scripts.
 
 :::warning Clean-up
 You should let the PAT expire as soon as possible.

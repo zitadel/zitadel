@@ -535,6 +535,7 @@ Errors:
     StateMissing: Параметарот State недостасува во барањето
     NotStarted: Намерата не е започната или веќе завршена
     NotSucceeded: Намерата не е успешна
+    Expired: Намерата е истечена
     TokenCreationFailed: Неуспешно креирање на токен
     InvalidToken: Токенот за намера е невалиден
     OtherUser: Намерата е за друг корисник

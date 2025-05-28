@@ -536,6 +536,7 @@ Errors:
     StateMissing: Parameter status tidak ada dalam permintaan
     NotStarted: Niat belum dimulai atau sudah dihentikan
     NotSucceeded: Niatnya belum berhasil
+    Expired: Kode sudah habis masa berlakunya
     TokenCreationFailed: Pembuatan token gagal
     InvalidToken: Token Niat tidak valid
     OtherUser: Maksudnya ditujukan untuk pengguna lain
