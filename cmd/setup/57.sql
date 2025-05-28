@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS projections.resource_counts
 (
+	id SERIAL PRIMARY KEY,
     instance_id TEXT,
     table_name TEXT,
     parent_type TEXT,
@@ -8,7 +9,7 @@ CREATE TABLE IF NOT EXISTS projections.resource_counts
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     amount INTEGER NOT NULL DEFAULT 1 CHECK (amount >= 0),
     
-	PRIMARY KEY (instance_id, table_name, parent_type, parent_id)
+	UNIQUE (instance_id, table_name, parent_type, parent_id)
 );
 
 -- count_resource is a trigger function which increases or decreases the count of a resource.
