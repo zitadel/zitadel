@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package zitadel.filter.v2beta;
+package zitadel.filter.v2;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta;filter";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/filter/v2;filter";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -25,36 +25,48 @@ enum ListFilterMethod {
 
 enum TimestampFilterMethod {
   TIMESTAMP_FILTER_METHOD_EQUALS = 0;
-  TIMESTAMP_FILTER_METHOD_GREATER = 1;
-  TIMESTAMP_FILTER_METHOD_GREATER_OR_EQUALS = 2;
-  TIMESTAMP_FILTER_METHOD_LESS = 3;
-  TIMESTAMP_FILTER_METHOD_LESS_OR_EQUALS = 4;
+  TIMESTAMP_FILTER_METHOD_AFTER = 1;
+  TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS = 2;
+  TIMESTAMP_FILTER_METHOD_BEFORE = 3;
+  TIMESTAMP_FILTER_METHOD_BEFORE_OR_EQUALS = 4;
 }
 
 message PaginationRequest {
   // Starting point for retrieval, in combination of offset used to query a set list of objects.
-  uint64 offset = 1;
+  uint64 offset = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "0";
+    }
+  ];
   // limit is the maximum amount of objects returned. The default is set to 100
   // with a maximum of 1000 in the runtime configuration.
   // If the limit exceeds the maximum configured ZITADEL will throw an error.
   // If no limit is present the default is taken.
-  uint32 limit = 2;
+  uint32 limit = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "10";
+    }
+  ];
   // Asc is the sorting order. If true the list is sorted ascending, if false
   // the list is sorted descending. The default is descending.
-  bool asc = 3;
+  bool asc = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "false";
+    }
+  ];
 }
 
 message PaginationResponse {
   // Absolute number of objects matching the query, regardless of applied limit.
   uint64 total_result = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"100\"";
+      example: "100";
     }
   ];
   // Applied limit from query, defines maximum amount of objects per request, to compare if all objects are returned.
   uint64 applied_limit = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"100\"";
+      example: "100";
     }
   ];
 }
@@ -65,7 +77,7 @@ message IDFilter {
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       max_length: 200;
-      example: "\"69629023906488337\"";
+      example: "\"123\"";
     }
   ];
 }
@@ -79,15 +91,9 @@ message TimestampFilter {
   ];
   // Define which condition the retrieved resources timestamp should match.
   TimestampFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true
-  ];
-}
-
-message InIDsFilter {
-  // Defines the ids to query for.
-  repeated string ids = 1 [
+    (validate.rules).enum.defined_only = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "[\"69629023906488334\",\"69622366012355662\"]";
+      description: "defines which text equality method is used";
     }
   ];
 }
