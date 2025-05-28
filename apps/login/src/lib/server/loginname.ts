@@ -9,7 +9,6 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkInvite } from "../verify-helper";
 import {
   getActiveIdentityProviders,
   getIDPByID,
@@ -254,37 +253,27 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       userId: session.factors?.user?.id,
     });
 
-    // this can be expected to be an invite as users created in console have a password set.
+    // always resend invite if user has no auth method set
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      // redirect to /verify invite if no auth method is set and email is not verified
-      const inviteCheck = checkInvite(
-        session,
-        humanUser,
-        session.factors.user.organizationId,
-        command.requestId,
-      );
-
-      if (inviteCheck?.redirect) {
-        return inviteCheck;
-      }
-
-      const paramsAuthenticatorSetup = new URLSearchParams({
-        loginName: session.factors?.user?.loginName,
-        userId: session.factors?.user?.id, // verify needs user id
+      const params = new URLSearchParams({
+        loginName: session.factors?.user?.loginName as string,
+        send: "true", // set this to true to request a new code immediately
+        invite: "true",
       });
 
+      if (command.requestId) {
+        params.append("requestId", command.requestId);
+      }
+
       if (command.organization || session.factors?.user?.organizationId) {
-        paramsAuthenticatorSetup.append(
+        params.append(
           "organization",
-          command.organization ?? session.factors?.user?.organizationId,
+          command.organization ??
+            (session.factors?.user?.organizationId as string),
         );
       }
 
-      if (command.requestId) {
-        paramsAuthenticatorSetup.append("requestId", command.requestId);
-      }
-
-      return { redirect: "/authenticator/set?" + paramsAuthenticatorSetup };
+      return { redirect: `/verify?` + params };
     }
 
     if (methods.authMethodTypes.length == 1) {

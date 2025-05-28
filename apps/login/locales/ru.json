@@ -174,13 +174,15 @@
   },
   "verify": {
     "userIdMissing": "Не указан userId!",
-    "success": "Пользователь успешно подтверждён.",
+    "successTitle": "Пользователь подтверждён",
+    "successDescription": "Пользователь успешно подтверждён.",
     "setupAuthenticator": "Настроить аутентификатор",
     "verify": {
       "title": "Подтверждение пользователя",
       "description": "Введите код из письма подтверждения.",
       "noCodeReceived": "Не получили код?",
       "resendCode": "Отправить код повторно",
+      "codeSent": "Код отправлен на ваш email.",
       "submit": "Продолжить"
     }
   },

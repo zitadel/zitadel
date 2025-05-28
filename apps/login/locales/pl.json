@@ -174,13 +174,15 @@
   },
   "verify": {
     "userIdMissing": "Nie podano identyfikatora użytkownika!",
-    "success": "Użytkownik został pomyślnie zweryfikowany.",
+    "successTitle": "Weryfikacja zakończona",
+    "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
     "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
     "verify": {
       "title": "Zweryfikuj użytkownika",
       "description": "Wprowadź kod z wiadomości weryfikacyjnej.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resendCode": "Wyślij kod ponownie",
+      "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
       "submit": "Kontynuuj"
     }
   },

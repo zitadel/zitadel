@@ -63,6 +63,11 @@ export function VerifyForm({
         setLoading(false);
       });
 
+    if (response && "error" in response && response?.error) {
+      setError(response.error);
+      return;
+    }
+
     return response;
   }
 

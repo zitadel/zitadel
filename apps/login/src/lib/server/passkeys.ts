@@ -5,10 +5,12 @@ import {
   getLoginSettings,
   getSession,
   getUserByID,
+  listAuthenticationMethodTypes,
   registerPasskey,
   verifyPasskeyRegistration as zitadelVerifyPasskeyRegistration,
 } from "@/lib/zitadel";
-import { create, Duration } from "@zitadel/client";
+import { create, Duration, Timestamp, timestampDate } from "@zitadel/client";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {
   RegisterPasskeyResponse,
@@ -23,7 +25,10 @@ import {
   getSessionCookieByLoginName,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkEmailVerification } from "../verify-helper";
+import {
+  checkEmailVerification,
+  checkUserVerification,
+} from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
@@ -37,9 +42,25 @@ type RegisterPasskeyCommand = {
   sessionId: string;
 };
 
+function isSessionValid(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const stillValid = session.expirationDate
+    ? timestampDate(session.expirationDate) > new Date()
+    : true;
+
+  const verifiedAt = validPassword || validPasskey;
+  const valid = !!((validPassword || validPasskey) && stillValid);
+
+  return { valid, verifiedAt };
+}
+
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
-): Promise<RegisterPasskeyResponse> {
+): Promise<RegisterPasskeyResponse | { error: string }> {
   const { sessionId } = command;
 
   const _headers = await headers();
@@ -56,6 +77,36 @@ export async function registerPasskeyLink(
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
+
+  if (!session?.session?.factors?.user?.id) {
+    return { error: "Could not determine user from session" };
+  }
+
+  const sessionValid = isSessionValid(session.session);
+
+  if (!sessionValid) {
+    const authmethods = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId: session.session.factors.user.id,
+    });
+
+    // if the user has no authmethods set, we need to check if the user was verified
+    if (authmethods.authMethodTypes.length !== 0) {
+      return {
+        error:
+          "You have to authenticate or have a valid User Verification Check",
+      };
+    }
+
+    // check if a verification was done earlier
+    const hasValidUserVerificationCheck = await checkUserVerification(
+      session.session.factors.user.id,
+    );
+
+    if (!hasValidUserVerificationCheck) {
+      return { error: "User Verification Check has to be done" };
+    }
+  }
 
   const [hostname, port] = host.split(":");
 

@@ -174,13 +174,15 @@
   },
   "verify": {
     "userIdMissing": "Keine Benutzer-ID angegeben!",
-    "success": "Erfolgreich verifiziert",
+    "successTitle": "Benutzer verifiziert",
+    "successDescription": "Der Benutzer wurde erfolgreich verifiziert.",
     "setupAuthenticator": "Authentifikator einrichten",
     "verify": {
       "title": "Benutzer verifizieren",
       "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
+      "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
       "submit": "Weiter"
     }
   },

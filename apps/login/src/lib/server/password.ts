@@ -37,6 +37,7 @@ import {
   checkEmailVerification,
   checkMFAFactors,
   checkPasswordChangeRequired,
+  checkUserVerification,
 } from "../verify-helper";
 
 type ResetPasswordCommand = {
@@ -297,6 +298,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   return { redirect: url };
 }
 
+// this function lets users with code set a password or users with valid User Verification Check
 export async function changePassword(command: {
   code?: string;
   userId: string;
@@ -316,11 +318,39 @@ export async function changePassword(command: {
   }
   const userId = user.userId;
 
+  if (user.state === UserState.INITIAL) {
+    return { error: "User Initial State is not supported" };
+  }
+
+  // check if the user has no password set in order to set a password
+  if (!command.code) {
+    const authmethods = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId,
+    });
+
+    // if the user has no authmethods set, we need to check if the user was verified
+    if (authmethods.authMethodTypes.length !== 0) {
+      return {
+        error:
+          "You have to provide a code or have a valid User Verification Check",
+      };
+    }
+
+    // check if a verification was done earlier
+    const hasValidUserVerificationCheck = await checkUserVerification(
+      user.userId,
+    );
+
+    if (!hasValidUserVerificationCheck) {
+      return { error: "User Verification Check has to be done" };
+    }
+  }
+
   return setUserPassword({
     serviceUrl,
     userId,
     password: command.password,
-    user,
     code: command.code,
   });
 }

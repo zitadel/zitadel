@@ -7,6 +7,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { checkUserVerification } from "@/lib/verify-helper";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
@@ -18,6 +19,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -92,19 +94,49 @@ export default async function Page(props: {
     });
   }
 
-  if (!sessionWithData) {
+  if (
+    !sessionWithData ||
+    !sessionWithData.factors ||
+    !sessionWithData.factors.user
+  ) {
     return <Alert>{tError("unknownContext")}</Alert>;
   }
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    organization: sessionWithData.factors?.user?.organizationId,
+    organization: sessionWithData.factors.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization: sessionWithData.factors?.user?.organizationId,
+    organization: sessionWithData.factors.user?.organizationId,
   });
+
+  // check if user was verified recently
+  const isUserVerified = await checkUserVerification(
+    sessionWithData.factors.user?.id,
+  );
+
+  if (!isUserVerified) {
+    const params = new URLSearchParams({
+      loginName: sessionWithData.factors.user.loginName as string,
+      invite: "true",
+      send: "true", // set this to true to request a new code immediately
+    });
+
+    if (requestId) {
+      params.append("requestId", requestId);
+    }
+
+    if (organization || sessionWithData.factors.user.organizationId) {
+      params.append(
+        "organization",
+        organization ?? (sessionWithData.factors.user.organizationId as string),
+      );
+    }
+
+    redirect(`/verify?` + params);
+  }
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
@@ -152,13 +184,12 @@ export default async function Page(props: {
           ></ChooseAuthenticatorToSetup>
         )}
 
-        {loginSettings?.allowExternalIdp && identityProviders && (
+        {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>
-            {identityProviders.length && (
-              <div className="py-3 flex flex-col">
-                <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
-              </div>
-            )}
+            <div className="py-3 flex flex-col">
+              <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
+            </div>
+
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}

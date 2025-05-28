@@ -83,6 +83,16 @@ export function RegisterPasskey({
       return;
     }
 
+    if ("error" in resp && resp.error) {
+      setError(resp.error);
+      return;
+    }
+
+    if (!("passkeyId" in resp)) {
+      setError("An error on registering passkey");
+      return;
+    }
+
     const passkeyId = resp.passkeyId;
     const options: CredentialCreationOptions =
       (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
@@ -92,6 +102,7 @@ export function RegisterPasskey({
       setError("An error on registering passkey");
       return;
     }
+
     options.publicKey.challenge = coerceToArrayBuffer(
       options.publicKey.challenge,
       "challenge",

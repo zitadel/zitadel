@@ -174,13 +174,15 @@
   },
   "verify": {
     "userIdMissing": "未提供用户 ID！",
-    "success": "用户验证成功。",
+    "successTitle": "用户已验证",
+    "successDescription": "用户已成功验证。",
     "setupAuthenticator": "设置认证器",
     "verify": {
       "title": "验证用户",
       "description": "输入验证邮件中的验证码。",
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
+      "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
       "submit": "继续"
     }
   },

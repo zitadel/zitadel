@@ -174,13 +174,15 @@
   },
   "verify": {
     "userIdMissing": "¡No se proporcionó userId!",
-    "success": "¡Verificación exitosa!",
+    "successTitle": "Usuario verificado",
+    "successDescription": "El usuario ha sido verificado con éxito.",
     "setupAuthenticator": "Configurar autenticador",
     "verify": {
       "title": "Verificar usuario",
       "description": "Introduce el código proporcionado en el correo electrónico de verificación.",
       "noCodeReceived": "¿No recibiste un código?",
       "resendCode": "Reenviar código",
+      "codeSent": "Se ha enviado un código a tu dirección de correo electrónico.",
       "submit": "Continuar"
     }
   },
