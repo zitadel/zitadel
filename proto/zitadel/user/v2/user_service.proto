@@ -17,6 +17,9 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/filter/v2/filter.proto";
+import "zitadel/metadata/v2/metadata.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
@@ -1237,6 +1240,84 @@ service UserService {
     };
   }
 
+  // Set User Metadata
+  //
+  // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
+  //
+  // Required permission:
+  //  - `user.write`
+  rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/metadata"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "User's not found";
+        }
+      };
+    };
+  }
+
+  // List User Metadata
+  //
+  // List metadata of an user filtered by query.
+  //
+  // Required permission:
+  //  - `user.read`
+  rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse ) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/metadata/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = { auth_option: {
+      permission: "user.read"
+    }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+  }
+
+  // Delete User Metadata
+  //
+  // Delete metadata objects from an user with a specific key.
+  //
+  // Required permission:
+  //  - `user.write`
+  rpc DeleteUserMetadata(DeleteUserMetadataRequest) returns (DeleteUserMetadataResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/metadata"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+  }
 }
 
 message AddHumanUserRequest{
@@ -2383,4 +2464,80 @@ message HumanMFAInitSkippedRequest {
 
 message HumanMFAInitSkippedResponse {
   zitadel.object.v2.Details details = 1;
+}
+
+message Metadata {
+  // Key in the metadata key/value pair.
+  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Value in the metadata key/value pair.
+  bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetUserMetadataRequest{
+  // ID of the user under which the metadata gets set.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // Metadata to bet set. The values have to be base64 encoded.
+  repeated Metadata metadata = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
+    }
+  ];
+}
+
+message SetUserMetadataResponse{
+  // The timestamp of the update of the user metadata.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListUserMetadataRequest {
+  // ID of the user under which the metadata is to be listed.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 2;
+  // Define the criteria to query for.
+  repeated zitadel.metadata.v2.MetadataSearchFilter filters = 3;
+}
+
+message ListUserMetadataResponse {
+  // Pagination of the users metadata results.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  // The user metadata requested.
+  repeated zitadel.metadata.v2.Metadata metadata = 2;
+}
+
+message DeleteUserMetadataRequest {
+  // ID of the user which metadata is to be deleted is stored on.
+  string user_id = 1;
+  // The keys for the user metadata to be deleted.
+  repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteUserMetadataResponse{
+  // The timestamp of the deletion of the user metadata.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }

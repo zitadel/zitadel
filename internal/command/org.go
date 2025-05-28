@@ -336,7 +336,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 	if err != nil {
 		return nil, err
 	}
-	err = c.checkUserExists(ctx, userID, resourceOwner)
+	_, err = c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

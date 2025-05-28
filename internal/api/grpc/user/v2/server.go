@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -28,6 +29,7 @@ type Server struct {
 	assetAPIPrefix func(context.Context) string
 
 	checkPermission domain.PermissionCheck
+	systemDefaults  systemdefaults.SystemDefaults
 }
 
 type Config struct{}
@@ -35,6 +37,7 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
+	systemDefaults systemdefaults.SystemDefaults,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpAlg crypto.EncryptionAlgorithm,
 	idpCallback func(ctx context.Context) string,
@@ -51,6 +54,7 @@ func CreateServer(
 		samlRootURL:     samlRootURL,
 		assetAPIPrefix:  assetAPIPrefix,
 		checkPermission: checkPermission,
+		systemDefaults:  systemDefaults,
 	}
 }
 
