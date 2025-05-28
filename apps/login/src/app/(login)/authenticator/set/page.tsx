@@ -184,13 +184,12 @@ export default async function Page(props: {
           ></ChooseAuthenticatorToSetup>
         )}
 
-        {loginSettings?.allowExternalIdp && identityProviders && (
+        {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>
-            {identityProviders.length && (
-              <div className="py-3 flex flex-col">
-                <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
-              </div>
-            )}
+            <div className="py-3 flex flex-col">
+              <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
+            </div>
+
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}
