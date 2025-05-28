@@ -4275,7 +4275,7 @@ service ManagementService {
 
     // Deactivate User Grant
     //
-    // Deprecated: [Deactivate an authorization](apis/resources/authorization_service_v2/authorization-service-deactivate-authorization.api.mdx) to disable a users access to an owned or granted project.
+    // Deprecated: [Deactivate an authorization](apis/resources/authorization_service_v2/authorization-service-deactivate-authorization.api.mdx) to disable a user's access to an owned or granted project.
     //
     // Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated.
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
