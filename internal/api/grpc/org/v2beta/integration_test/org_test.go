@@ -681,7 +681,7 @@ func TestServer_DeactivateReactivateNonExistentOrganization(t *testing.T) {
 	require.Contains(t, err.Error(), "Organisation not found")
 }
 
-func TestServer_AactivateOrganization(t *testing.T) {
+func TestServer_ActivateOrganization(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -990,7 +990,7 @@ func TestServer_AddOerganizationDomain(t *testing.T) {
 	}
 }
 
-func TestServer_ListOerganizationDomain(t *testing.T) {
+func TestServer_ListOrganizationDomain(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -1185,7 +1185,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 	}
 }
 
-func TestServer_AddListDeletOerganizationDomain(t *testing.T) {
+func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 	tests := []struct {
 		name     string
 		testFunc func()
