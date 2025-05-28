@@ -23,8 +23,8 @@ LOCK TABLE {{ .Table }} IN SHARE MODE;
 INSERT INTO projections.resource_counts(
 	instance_id,
     table_name,
-    owner_type,
-    owner_id,
+    parent_type,
+    parent_id,
     resource_name,
     amount
 )

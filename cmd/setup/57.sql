@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS projections.resource_counts
 (
 	id SERIAL PRIMARY KEY,
-    instance_id TEXT,
-    table_name TEXT,
-    parent_type TEXT,
-    parent_id TEXT,
+    instance_id TEXT NOT NULL,
+    table_name TEXT NOT NULL,
+    parent_type TEXT NOT NULL,
+    parent_id TEXT NOT NULL,
 	resource_name TEXT NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     amount INTEGER NOT NULL DEFAULT 1 CHECK (amount >= 0),
@@ -33,7 +33,7 @@ DECLARE
 	tg_instance_id TEXT;
 	tg_parent_id TEXT;
 
-	select_ids TEXT := format('SELECT ($1).%I, ($1).%I', tg_instance_id_column, tg_parent_id_column)
+	select_ids TEXT := format('SELECT ($1).%I, ($1).%I', tg_instance_id_column, tg_parent_id_column);
 BEGIN
 	IF (TG_OP = 'INSERT') THEN
 		EXECUTE select_ids INTO tg_instance_id, tg_parent_id USING NEW;
