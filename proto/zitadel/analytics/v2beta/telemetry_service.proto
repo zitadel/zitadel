@@ -19,15 +19,18 @@ service TelemetryService {
   // The periodicity of the report can be configured in the system's running configuration.
   //
   // In case of a failure to report the usage, ZITADEL will retry to report the usage
-  // based on the configured retry policy and error codes.
-  // The most relevant error codes are the following:
-  // - `UNAVAILABLE`: The TelemetryService is currently unavailable, retry later.
-  // - `DEADLINE_EXCEEDED`: The request took too long to complete, retry later.
-  // - `INTERNAL`: An internal error occurred, retry later.
+  // based on the configured retry policy and error type.
+  // Client side errors will not be retried, as they indicate a misconfiguration or an invalid request:
+  // - `INVALID_ARGUMENT`: The request was malformed.
+  // - `NOT_FOUND`: The TelemetryService's endpoint is likely misconfigured.
+  // Connection / transfer errors will be retried based on the retry policy configured in the system's running configuration:
+  // - `DEADLINE_EXCEEDED`: The request took too long to complete.
+  // - `RESOURCE_EXHAUSTED`: The request was rejected due to resource exhaustion.
+  // - `UNAVAILABLE`: The TelemetryService is currently unavailable.
+  // Server side errors will also be retried based on the information provided by the server:
+  // - `FAILED_PRECONDITION`: The request failed due to a precondition, do not retry.
   // - `ABORTED`: The request was aborted, do not retry.
-  // - `RESOURCE_EXHAUSTED`: The request was rejected due to resource exhaustion, retry later.
-  // - `FAILED_PRECONDITION`: The request failed due to a precondition, retry later.
-  // - `CANCELLED`: The request was cancelled, retry later.
+  // - `INTERNAL`: An internal error occurred. Check details.
   rpc ReportUsage (ReportUsageRequest) returns (ReportUsageResponse) {}
 }
 
