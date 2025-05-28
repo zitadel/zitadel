@@ -11,33 +11,6 @@ CREATE TABLE IF NOT EXISTS projections.resource_counts
 	PRIMARY KEY (instance_id, table_name, parent_type, parent_id)
 );
 
-CREATE OR REPLACE FUNCTION projections.parse_resource_count_pkey(
-	tg_schema TEXT,
-	tg_table_name TEXT,
-	tg_argv TEXT[],
-	tg_record RECORD,
-
-	instance_id OUT TEXT,
-	table_name OUT TEXT,
-	parent_type OUT projections.object_level,
-	parent_id OUT TEXT
-)
-	LANGUAGE 'plpgsql' IMMUTABLE
-AS $$
-DECLARE
-	instance_id_column TEXT := COALESCE(tg_argv[2], 'instance_id');
-	owner_id_column TEXT := COALESCE(tg_argv[3], 'resource_owner');
-BEGIN
-	table_name := TG_TABLE_SCHEMA || '.' || TG_TABLE_NAME;
-	parent_type := COALESCE(tg_argv[1], 'instance');
-
-	-- Get the ids from the RECORD
-	EXECUTE format('SELECT ($1).%I, ($1).%I', instance_id_column, owner_id_column)
-	INTO instance_id, parent_id
-	USING tg_record;
-END
-$$;
-
 -- count_resource is a trigger function which increases or decreases the count of a resource.
 -- When creating the trigger the following required arguments (TG_ARGV) can be passed:
 -- 1. The type of the parent
