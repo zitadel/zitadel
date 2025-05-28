@@ -33,6 +33,7 @@ func (*instanceRelationalProjection) Init() *old_handler.Check {
 			handler.NewColumn(InstanceColumnProjectID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnConsoleID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnConsoleAppID, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(InstanceColumnDefaultLanguage, handler.ColumnTypeText, handler.Default("")),
 		},
 			handler.NewPrimaryKey(InstanceColumnID),

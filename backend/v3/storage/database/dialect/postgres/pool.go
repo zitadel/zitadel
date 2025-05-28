@@ -13,9 +13,13 @@ type pgxPool struct {
 	*pgxpool.Pool
 }
 
-var (
-	_ database.Pool = (*pgxPool)(nil)
-)
+var _ database.Pool = (*pgxPool)(nil)
+
+func PGxPool(pool *pgxpool.Pool) *pgxPool {
+	return &pgxPool{
+		Pool: pool,
+	}
+}
 
 // Acquire implements [database.Pool].
 func (c *pgxPool) Acquire(ctx context.Context) (database.Client, error) {

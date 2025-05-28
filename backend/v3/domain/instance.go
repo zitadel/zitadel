@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/cache"
@@ -9,11 +10,11 @@ import (
 )
 
 type Instance struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt time.Time `json:"-"`
+	ID        string              `json:"id"`
+	Name      string              `json:"name"`
+	CreatedAt sql.Null[time.Time] `json:"-"`
+	UpdatedAt sql.Null[time.Time] `json:"-"`
+	DeletedAt sql.Null[time.Time] `json:"-"`
 }
 
 type instanceCacheIndex uint8
@@ -67,8 +68,9 @@ type InstanceRepository interface {
 	instanceConditions
 	instanceChanges
 
+	// TODO
 	// Member returns the member repository which is a sub repository of the instance repository.
-	Member() MemberRepository
+	// Member() MemberRepository
 
 	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
 
