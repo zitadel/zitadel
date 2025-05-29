@@ -24,7 +24,6 @@ const ConnString = "host=localhost port=5432 user=zitadel dbname=zitadel sslmode
 var (
 	dbPool       *pgxpool.Pool
 	CTX          context.Context
-	SystemCTX    context.Context
 	Instance     *integration.Instance
 	SystemClient system.SystemServiceClient
 )
@@ -39,7 +38,6 @@ func TestMain(m *testing.M) {
 		Instance = integration.NewInstance(ctx)
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		// SystemCTX = integration.WithSystemAuthorization(ctx)
 		SystemClient = integration.SystemClient()
 
 		var err error
@@ -55,7 +53,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_TestInstanceAddReduces(t *testing.T) {
-	instanceName := "newInstance"
+	instanceName := gofakeit.Name()
+	beforeAdd := time.Now()
 	_, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
 		InstanceName: instanceName,
 		Owner: &system.CreateInstanceRequest_Machine_{
@@ -66,6 +65,7 @@ func TestServer_TestInstanceAddReduces(t *testing.T) {
 			},
 		},
 	})
+	afterAdd := time.Now()
 
 	require.NoError(t, err)
 
@@ -78,7 +78,20 @@ func TestServer_TestInstanceAddReduces(t *testing.T) {
 			),
 		)
 		require.NoError(ttt, err)
+		// event instance.added
 		require.Equal(ttt, instanceName, instance.Name)
+		// event instance.default.org.set
+		require.NotNil(t, instance.DefaultOrgID)
+		// event instance.iam.project.set
+		require.NotNil(t, instance.IAMProjectID)
+		// event instance.iam.console.set
+		require.NotNil(t, instance.ConsoleAppID)
+		// event instance.default.language.set
+		require.NotNil(t, instance.DefaultLanguage)
+		// event instance.added
+		assert.WithinRange(t, instance.CreatedAt.V, beforeAdd, afterAdd)
+		// event instance.added
+		assert.WithinRange(t, instance.UpdatedAt.V, beforeAdd, afterAdd)
 	}, retryDuration, tick)
 }
 
@@ -112,6 +125,42 @@ func TestServer_TestInstanceUpdateNameReduces(t *testing.T) {
 			),
 		)
 		require.NoError(ttt, err)
+		// event instance.changed
 		require.Equal(ttt, instanceName, instance.Name)
+	}, retryDuration, tick)
+}
+
+func TestServer_TestInstanceDeleteReduces(t *testing.T) {
+	instanceName := gofakeit.Name()
+	res, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
+		InstanceName: instanceName,
+		Owner: &system.CreateInstanceRequest_Machine_{
+			Machine: &system.CreateInstanceRequest_Machine{
+				UserName:            "owner",
+				Name:                "owner",
+				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	beforeDelete := time.Now()
+	_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
+		InstanceId: res.InstanceId,
+	})
+	require.NoError(t, err)
+	afterDelete := time.Now()
+
+	instanceRepo := repository.InstanceRepository(pool)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		instance, err := instanceRepo.Get(CTX,
+			database.WithCondition(
+				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+			),
+		)
+		// event instance.removed
+		assert.WithinRange(t, instance.DeletedAt.V, beforeDelete, afterDelete)
+		require.NoError(ttt, err)
 	}, retryDuration, tick)
 }
