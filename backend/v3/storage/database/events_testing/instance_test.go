@@ -89,9 +89,10 @@ func TestServer_TestInstanceAddReduces(t *testing.T) {
 		// event instance.default.language.set
 		require.NotNil(t, instance.DefaultLanguage)
 		// event instance.added
-		assert.WithinRange(t, instance.CreatedAt.V, beforeAdd, afterAdd)
+		assert.WithinRange(t, instance.CreatedAt, beforeAdd, afterAdd)
 		// event instance.added
-		assert.WithinRange(t, instance.UpdatedAt.V, beforeAdd, afterAdd)
+		assert.WithinRange(t, instance.UpdatedAt, beforeAdd, afterAdd)
+		require.Nil(t, instance.DeletedAt)
 	}, retryDuration, tick)
 }
 
@@ -160,7 +161,7 @@ func TestServer_TestInstanceDeleteReduces(t *testing.T) {
 			),
 		)
 		// event instance.removed
-		assert.WithinRange(t, instance.DeletedAt.V, beforeDelete, afterDelete)
+		assert.WithinRange(t, *instance.DeletedAt, beforeDelete, afterDelete)
 		require.NoError(ttt, err)
 	}, retryDuration, tick)
 }

@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS zitadel.instances(
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   deleted_at TIMESTAMPTZ DEFAULT NULL
 );
-CREATE UNIQUE INDEX instance_name_index ON zitadel.instances (name);
+-- CREATE UNIQUE INDEX instance_name_index ON zitadel.instances (name);
