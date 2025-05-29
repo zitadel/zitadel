@@ -4246,7 +4246,7 @@ service ManagementService {
 
     // Update User Grant
     //
-    // Deprecated: [Update an authorization](apis/resources/authorization_service_v2/authorization-service-update-authorization.api.mdx) to update a users roles on an owned or granted project.
+    // Deprecated: [Update an authorization](apis/resources/authorization_service_v2/authorization-service-update-authorization.api.mdx) to update a user's roles on an owned or granted project.
     //
     // Update the roles of a user grant. User grants are the roles users have for a specific project and organization.
     rpc UpdateUserGrant(UpdateUserGrantRequest) returns (UpdateUserGrantResponse) {
@@ -4304,7 +4304,7 @@ service ManagementService {
 
     // Reactivate User Grant
     //
-    // Deprecated: [Activate an authorization](apis/resources/authorization_service_v2/authorization-service-activate-authorization.api.mdx) to enable a users access to an owned or granted project.
+    // Deprecated: [Activate an authorization](apis/resources/authorization_service_v2/authorization-service-activate-authorization.api.mdx) to enable a user's access to an owned or granted project.
     //
     // Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated.
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
