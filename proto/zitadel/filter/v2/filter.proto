@@ -93,7 +93,7 @@ message TimestampFilter {
   TimestampFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines which text equality method is used";
+      description: "Defines the condition (e.g., equals, before, after) that the timestamp of the retrieved resources should match.";
     }
   ];
 }
