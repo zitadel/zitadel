@@ -153,6 +153,7 @@ type Steps struct {
 	s54InstancePositionIndex                *InstancePositionIndex
 	s55ExecutionHandlerStart                *ExecutionHandlerStart
 	s56IDPTemplate6SAMLFederatedLogout      *IDPTemplate6SAMLFederatedLogout
+	s57HostedLoginTranslation               *HostedLoginTranslation
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
