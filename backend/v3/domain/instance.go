@@ -9,11 +9,16 @@ import (
 )
 
 type Instance struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt time.Time `json:"-"`
+	ID              string     `json:"id"`
+	Name            string     `json:"name"`
+	DefaultOrgID    string     `json:"default_org_id"`
+	IAMProjectID    string     `json:"iam_project_id"`
+	ConsoleClientId string     `json:"console_client_id"`
+	ConsoleAppID    string     `json:"console_app_id"`
+	DefaultLanguage string     `json:"default_language"`
+	CreatedAt       time.Time  `json:"-"`
+	UpdatedAt       time.Time  `json:"-"`
+	DeletedAt       *time.Time `json:"-"`
 }
 
 type instanceCacheIndex uint8
@@ -39,6 +44,16 @@ type instanceColumns interface {
 	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
 	NameColumn() database.Column
+	// DefaultOrgIdColumn returns the column for the default org id field
+	DefaultOrgIdColumn() database.Column
+	// IAMProjectIDColumn returns the column for the default IAM org id field
+	IAMProjectIDColumn() database.Column
+	// ConsoleClientIDColumn returns the column for the default IAM org id field
+	ConsoleClientIDColumn() database.Column
+	// ConsoleAppIDColumn returns the column for the console client id field
+	ConsoleAppIDColumn() database.Column
+	// DefaultLanguageColumn returns the column for the default language field
+	DefaultLanguageColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
@@ -67,10 +82,11 @@ type InstanceRepository interface {
 	instanceConditions
 	instanceChanges
 
+	// TODO
 	// Member returns the member repository which is a sub repository of the instance repository.
-	Member() MemberRepository
+	// Member() MemberRepository
 
-	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
+	Get(ctx context.Context, opts ...database.Condition) (*Instance, error)
 
 	Create(ctx context.Context, instance *Instance) error
 	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error

@@ -12,6 +12,7 @@ type and struct {
 
 // Write implements [Condition].
 func (a *and) Write(builder *StatementBuilder) {
+	builder.WriteString(" WHERE ")
 	if len(a.conditions) > 1 {
 		builder.WriteString("(")
 		defer builder.WriteString(")")

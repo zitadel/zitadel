@@ -55,6 +55,7 @@ var (
 	UserMetadataProjection              *handler.Handler
 	UserAuthMethodProjection            *handler.Handler
 	InstanceProjection                  *handler.Handler
+	InstanceRelationalProjection        *handler.Handler
 	SecretGeneratorProjection           *handler.Handler
 	SMTPConfigProjection                *handler.Handler
 	SMSConfigProjection                 *handler.Handler
@@ -150,6 +151,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	UserMetadataProjection = newUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
 	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
+	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
 	SecretGeneratorProjection = newSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))
 	SMTPConfigProjection = newSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["smtp_configs"]))
 	SMSConfigProjection = newSMSConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sms_config"]))
@@ -304,6 +306,7 @@ func newProjectionsList() {
 		UserMetadataProjection,
 		UserAuthMethodProjection,
 		InstanceProjection,
+		InstanceRelationalProjection,
 		SecretGeneratorProjection,
 		SMTPConfigProjection,
 		SMSConfigProjection,
