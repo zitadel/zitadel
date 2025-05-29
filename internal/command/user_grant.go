@@ -291,9 +291,9 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 	return writeModel, nil
 }
 
-func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
+func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, requireGrantID bool) (err error) {
 	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeUserGrant) {
-		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner)
+		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner, requireGrantID)
 	}
 
 	ctx, span := tracing.NewSpan(ctx)
@@ -425,7 +425,7 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 	return existingRoleKeys, nil
 }
 
-func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
+func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, requireGrantID bool) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -437,14 +437,15 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if !preConditions.UserExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
 	}
+
 	if usergrant.ProjectGrantID == "" && !preConditions.ProjectExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
 	}
-	if usergrant.ProjectGrantID != "" && !preConditions.ProjectGrantExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
-	}
 	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
+	}
+	if usergrant.ProjectGrantID != "" && !preConditions.ProjectGrantExists && requireGrantID {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
 	}
 	return nil
 }
