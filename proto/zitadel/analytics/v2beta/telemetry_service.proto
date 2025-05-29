@@ -28,9 +28,8 @@ service TelemetryService {
   // - `RESOURCE_EXHAUSTED`: The request was rejected due to resource exhaustion.
   // - `UNAVAILABLE`: The TelemetryService is currently unavailable.
   // Server side errors will also be retried based on the information provided by the server:
-  // - `FAILED_PRECONDITION`: The request failed due to a precondition, do not retry.
-  // - `ABORTED`: The request was aborted, do not retry.
-  // - `INTERNAL`: An internal error occurred. Check details.
+  // - `FAILED_PRECONDITION`: The request failed due to a precondition, e.g. the report ID does not exists or previous reporting is too old, do not retry.
+  // - `INTERNAL`: An internal error occurred. Check details and logs.
   rpc ReportUsage (ReportUsageRequest) returns (ReportUsageResponse) {}
 }
 
@@ -43,6 +42,8 @@ message ReportUsageRequest {
   // This is the time when the report was generated, not when it was sent,
   // which might differ in case of retries.
   google.protobuf.Timestamp created_at = 3;
+  // The previously returned report ID from the server to continue reporting.
+  optional string report_id = 4;
 }
 
 message InstanceUsage {
@@ -89,6 +90,7 @@ message Counts {
 }
 
 message ReportUsageResponse {
-  // The timestamp when the report was reported and confirmed by the TelemetryService server.
-  google.protobuf.Timestamp reported_at = 1;
+  // The report ID is a unique identifier for the report.
+  // It is used to identify the report in case of additional data / pagination.
+  string report_id = 1;
 }
