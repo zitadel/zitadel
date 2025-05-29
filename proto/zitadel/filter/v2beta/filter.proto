@@ -77,7 +77,7 @@ message TimestampFilter {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
-  // Define which condition the retrieved resources timestamp should match.
+  // Defines the condition (e.g., equals, before, after) that the timestamp of the retrieved resources should match.
   TimestampFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
