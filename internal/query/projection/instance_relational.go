@@ -27,14 +27,14 @@ func (*instanceRelationalProjection) Init() *old_handler.Check {
 		handler.NewTable([]*handler.InitColumn{
 			handler.NewColumn(InstanceColumnID, handler.ColumnTypeText),
 			handler.NewColumn(InstanceColumnName, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnChangeDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(InstanceColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(InstanceColumnDefaultOrgID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnProjectID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnConsoleID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnConsoleAppID, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(InstanceColumnDefaultLanguage, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(CreatedAt, handler.ColumnTypeTimestamp),
+			handler.NewColumn(UpdatedAt, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DeletedAt, handler.ColumnTypeTimestamp),
 		},
 			handler.NewPrimaryKey(InstanceColumnID),
 		),
@@ -113,7 +113,7 @@ func (p *instanceRelationalProjection) reduceInstanceChanged(event eventstore.Ev
 }
 
 func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.InstanceChangedEvent)
+	e, ok := event.(*instance.InstanceRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
 	}

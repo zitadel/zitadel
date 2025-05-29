@@ -54,7 +54,7 @@ func TestMain(m *testing.M) {
 
 func TestServer_TestInstanceAddReduces(t *testing.T) {
 	instanceName := gofakeit.Name()
-	beforeAdd := time.Now()
+	beforeCreate := time.Now()
 	_, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
 		InstanceName: instanceName,
 		Owner: &system.CreateInstanceRequest_Machine_{
@@ -65,7 +65,7 @@ func TestServer_TestInstanceAddReduces(t *testing.T) {
 			},
 		},
 	})
-	afterAdd := time.Now()
+	afterCreate := time.Now()
 
 	require.NoError(t, err)
 
@@ -73,9 +73,7 @@ func TestServer_TestInstanceAddReduces(t *testing.T) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		instance, err := instanceRepo.Get(CTX,
-			database.WithCondition(
-				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-			),
+			instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 		)
 		require.NoError(ttt, err)
 		// event instance.added
@@ -89,9 +87,9 @@ func TestServer_TestInstanceAddReduces(t *testing.T) {
 		// event instance.default.language.set
 		require.NotNil(t, instance.DefaultLanguage)
 		// event instance.added
-		assert.WithinRange(t, instance.CreatedAt, beforeAdd, afterAdd)
+		assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
 		// event instance.added
-		assert.WithinRange(t, instance.UpdatedAt, beforeAdd, afterAdd)
+		assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
 		require.Nil(t, instance.DeletedAt)
 	}, retryDuration, tick)
 }
@@ -121,9 +119,7 @@ func TestServer_TestInstanceUpdateNameReduces(t *testing.T) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		instance, err := instanceRepo.Get(CTX,
-			database.WithCondition(
-				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-			),
+			instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 		)
 		require.NoError(ttt, err)
 		// event instance.changed
@@ -145,23 +141,19 @@ func TestServer_TestInstanceDeleteReduces(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	beforeDelete := time.Now()
 	_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
 		InstanceId: res.InstanceId,
 	})
 	require.NoError(t, err)
-	afterDelete := time.Now()
 
 	instanceRepo := repository.InstanceRepository(pool)
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		instance, err := instanceRepo.Get(CTX,
-			database.WithCondition(
-				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-			),
+			instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 		)
 		// event instance.removed
-		assert.WithinRange(t, *instance.DeletedAt, beforeDelete, afterDelete)
+		require.Nil(t, instance)
 		require.NoError(ttt, err)
 	}, retryDuration, tick)
 }

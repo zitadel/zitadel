@@ -2,100 +2,130 @@ package repository_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
+	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
-	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-
-	"go.uber.org/mock/gomock"
 )
 
 func TestCreateInstance(t *testing.T) {
 	instanceRepo := repository.InstanceRepository(pool)
+	instanceId := gofakeit.Name()
+	instanceName := gofakeit.Name()
 
 	ctx := context.Background()
 	inst := domain.Instance{
-		ID:   "id",
-		Name: "name",
+		ID:              instanceId,
+		Name:            instanceName,
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientId: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
 	}
+
+	beforeCreate := time.Now()
 	err := instanceRepo.Create(ctx, &inst)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> inst = %+v\n", inst)
 	require.NoError(t, err)
+	afterCreate := time.Now()
 
-	instt, err := instanceRepo.Get(ctx,
-		database.WithCondition(
-			instanceRepo.NameCondition(database.TextOperationEqual, "name"),
-		),
+	instance, err := instanceRepo.Get(ctx,
+		instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 	)
-	// require.NoError(t, err)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> inst = %+v\n", instt)
-
-	t.Skip("tests are meant as examples and are not real tests")
-	t.Run("User filters", func(t *testing.T) {
-		client := dbmock.NewMockClient(gomock.NewController(t))
-
-		user := repository.UserRepository(client)
-		u, err := user.Get(context.Background(),
-			database.WithCondition(
-				database.And(
-					database.Or(
-						user.IDCondition("test"),
-						user.IDCondition("2"),
-					),
-					user.UsernameCondition(database.TextOperationStartsWithIgnoreCase, "test"),
-				),
-			),
-			database.WithOrderBy(user.CreatedAtColumn()),
-		)
-
-		assert.NoError(t, err)
-		assert.NotNil(t, u)
-	})
-
-	t.Run("machine and human filters", func(t *testing.T) {
-		client := dbmock.NewMockClient(gomock.NewController(t))
-
-		user := repository.UserRepository(client)
-		machine := user.Machine()
-		human := user.Human()
-		email, err := human.GetEmail(context.Background(), database.And(
-			user.UsernameCondition(database.TextOperationStartsWithIgnoreCase, "test"),
-			database.Or(
-				machine.DescriptionCondition(database.TextOperationStartsWithIgnoreCase, "test"),
-				human.EmailVerifiedCondition(true),
-				database.IsNotNull(machine.DescriptionColumn()),
-			),
-		))
-
-		assert.NoError(t, err)
-		assert.NotNil(t, email)
-	})
+	require.Equal(t, inst.ID, instance.ID)
+	require.Equal(t, inst.Name, instance.Name)
+	require.Equal(t, inst.DefaultOrgID, instance.DefaultOrgID)
+	require.Equal(t, inst.IAMProjectID, instance.IAMProjectID)
+	require.Equal(t, inst.ConsoleClientId, instance.ConsoleClientId)
+	require.Equal(t, inst.ConsoleAppID, instance.ConsoleAppID)
+	require.Equal(t, inst.DefaultLanguage, instance.DefaultLanguage)
+	assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
+	assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
+	require.Nil(t, instance.DeletedAt)
+	require.NoError(t, err)
 }
 
-// type dbInstruction string
+func TestUpdateNameInstance(t *testing.T) {
+	instanceRepo := repository.InstanceRepository(pool)
+	instanceId := gofakeit.Name()
+	instanceName := gofakeit.Name()
 
-// func TestArg(t *testing.T) {
-// 	var bla any = "asdf"
-// 	instr, ok := bla.(dbInstruction)
-// 	assert.False(t, ok)
-// 	assert.Empty(t, instr)
-// 	bla = dbInstruction("asdf")
-// 	instr, ok = bla.(dbInstruction)
-// 	assert.True(t, ok)
-// 	assert.Equal(t, instr, dbInstruction("asdf"))
-// }
+	ctx := context.Background()
+	inst := domain.Instance{
+		ID:              instanceId,
+		Name:            instanceName,
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientId: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
 
-// func TestWriteUser(t *testing.T) {
-// 	t.Skip("tests are meant as examples and are not real tests")
-// 	t.Run("update user", func(t *testing.T) {
-// 		user := repository.UserRepository(nil)
-// 		user.Human().Update(context.Background(), user.IDCondition("test"), user.SetUsername("test"))
-// 	})
-// }
+	err := instanceRepo.Create(ctx, &inst)
+	require.NoError(t, err)
+
+	_, err = instanceRepo.Get(ctx,
+		instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+	)
+	require.NoError(t, err)
+
+	// update name
+	err = instanceRepo.Update(ctx,
+		database.Condition(
+			instanceRepo.IDCondition(instanceId),
+		),
+		instanceRepo.SetName("new_name"),
+	)
+	require.NoError(t, err)
+
+	instance, err := instanceRepo.Get(ctx,
+		instanceRepo.IDCondition(instanceId),
+	)
+	require.NoError(t, err)
+	require.Equal(t, "new_name", instance.Name)
+}
+
+func TestUpdeDeleteInstance(t *testing.T) {
+	instanceRepo := repository.InstanceRepository(pool)
+	instanceId := gofakeit.Name()
+	instanceName := gofakeit.Name()
+
+	ctx := context.Background()
+	inst := domain.Instance{
+		ID:              instanceId,
+		Name:            instanceName,
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientId: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+
+	err := instanceRepo.Create(ctx, &inst)
+	require.NoError(t, err)
+
+	instance, err := instanceRepo.Get(ctx,
+		instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+	)
+	require.NotNil(t, instance)
+	require.NoError(t, err)
+
+	// delete instance
+	err = instanceRepo.Delete(ctx,
+		database.Condition(
+			instanceRepo.IDCondition(instanceId),
+		),
+	)
+	require.NoError(t, err)
+
+	instance, err = instanceRepo.Get(ctx,
+		instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+	)
+	require.NoError(t, err)
+	require.Nil(t, instance)
+}
