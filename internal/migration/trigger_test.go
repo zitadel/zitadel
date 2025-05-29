@@ -48,9 +48,11 @@ SELECT
     'instance',
     parent_id,
     'resource',
-    COUNT(*)
-FROM projections.users14
-GROUP BY (instance_id, parent_id);`
+    COUNT(*) AS amount
+FROM table
+GROUP BY (instance_id, parent_id)
+ON CONFLICT (instance_id, table_name, parent_type, parent_id) DO
+UPDATE SET updated_at = now(), amount = EXCLUDED.amount;`
 
 	expDeleteParentCountsQuery = `CREATE OR REPLACE TRIGGER delete_parent_counts_trigger
     AFTER DELETE

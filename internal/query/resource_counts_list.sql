@@ -7,4 +7,5 @@ SELECT id,
     amount
 FROM projections.resource_counts
 WHERE id > $1
+ORDER BY id
 LIMIT $2;

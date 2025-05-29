@@ -34,8 +34,10 @@ SELECT
     '{{ .ParentType }}',
     {{ .ParentIDColumn }},
     '{{ .Resource }}',
-    COUNT(*)
-FROM projections.users14
-GROUP BY ({{ .InstanceIDColumn }}, {{ .ParentIDColumn }});
+    COUNT(*) AS amount
+FROM {{ .Table }}
+GROUP BY ({{ .InstanceIDColumn }}, {{ .ParentIDColumn }})
+ON CONFLICT (instance_id, table_name, parent_type, parent_id) DO
+UPDATE SET updated_at = now(), amount = EXCLUDED.amount;
 
 {{- end -}}

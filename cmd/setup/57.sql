@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS projections.resource_counts
 (
-	id SERIAL PRIMARY KEY, -- allows for easy pagination
+    id SERIAL PRIMARY KEY, -- allows for easy pagination
     instance_id TEXT NOT NULL,
-    table_name TEXT NOT NULL,
+    table_name TEXT NOT NULL, -- needed for trigger matching, not in reports
     parent_type TEXT NOT NULL,
     parent_id TEXT NOT NULL,
-	resource_name TEXT NOT NULL,
+    resource_name TEXT NOT NULL, -- friendly name for reporting
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     amount INTEGER NOT NULL DEFAULT 1 CHECK (amount >= 0),
     

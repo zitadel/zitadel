@@ -31,7 +31,7 @@ var (
 // It also pre-populates the projections.resource_counts table with
 // the counts for the given table.
 //
-// During the count / insert operation,
+// During the population of the resource_counts table,
 // the source table is share-locked to prevent concurrent modifications.
 // Projection handlers will be halted until the lock is released.
 // SELECT statements are not blocked by the lock.
@@ -92,7 +92,7 @@ type triggerMigration struct {
 
 // String implements [Migration] and [fmt.Stringer].
 func (m *triggerMigration) String() string {
-	return fmt.Sprintf("%s_%s", m.Resource, m.templateName)
+	return fmt.Sprintf("repeatable_%s_%s", m.Resource, m.templateName)
 }
 
 // Execute implements [Migration]
@@ -100,11 +100,12 @@ func (m *triggerMigration) Execute(ctx context.Context, _ eventstore.Event) erro
 	var query strings.Builder
 	err := templates.ExecuteTemplate(&query, m.templateName, m.triggerConfig)
 	if err != nil {
-		return fmt.Errorf("execute trigger template %s: %w", m, err)
+		return fmt.Errorf("%s: execute trigger template: %w", m, err)
 	}
+	fmt.Println(query.String())
 	_, err = m.db.ExecContext(ctx, query.String())
 	if err != nil {
-		return fmt.Errorf("exec trigger query %s: %w", m, err)
+		return fmt.Errorf("%s: exec trigger query: %w", m, err)
 	}
 	return nil
 }
