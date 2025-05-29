@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS projections.resource_counts
 (
-	id SERIAL PRIMARY KEY,
+	id SERIAL PRIMARY KEY, -- allows for easy pagination
     instance_id TEXT NOT NULL,
     table_name TEXT NOT NULL,
     parent_type TEXT NOT NULL,
