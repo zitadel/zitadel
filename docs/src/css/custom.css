@@ -641,3 +641,7 @@ p strong {
 .zitadel-lifecycle-deprecated {
   text-decoration: line-through;
 }
+
+table#zitadel-versions td {
+  vertical-align: top;
+}
