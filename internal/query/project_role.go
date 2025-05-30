@@ -103,7 +103,7 @@ func projectRolePermissionCheckV2(ctx context.Context, query sq.SelectBuilder, e
 		ProjectRoleColumnResourceOwner,
 		domain.PermissionProjectRoleRead,
 		SingleOrgPermissionOption(queries.Queries),
-		OwnedRowsPermissionOption(ProjectRoleColumnKey),
+		WithProjectsPermissionOption(ProjectRoleColumnProjectID),
 	)
 	return query.JoinClause(join, args...)
 }

@@ -117,6 +117,7 @@ func projectGrantCheckPermission(ctx context.Context, resourceOwner string, gran
 	return permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, grantID)
 }
 
+// TODO: add permission check on project grant level
 func projectGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectGrantSearchQueries) sq.SelectBuilder {
 	if !enabled {
 		return query
@@ -126,7 +127,6 @@ func projectGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, 
 		ProjectGrantColumnResourceOwner,
 		domain.PermissionProjectGrantRead,
 		SingleOrgPermissionOption(queries.Queries),
-		OwnedRowsPermissionOption(ProjectGrantColumnGrantID),
 	)
 	return query.JoinClause(join, args...)
 }

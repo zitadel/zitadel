@@ -114,18 +114,20 @@ func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 type ProjectGrantPreConditionReadModel struct {
 	eventstore.WriteModel
 
-	ProjectID        string
-	GrantedOrgID     string
-	ProjectExists    bool
-	GrantedOrgExists bool
-	ExistingRoleKeys []string
+	ProjectResourceOwner string
+	ProjectID            string
+	GrantedOrgID         string
+	ProjectExists        bool
+	GrantedOrgExists     bool
+	ExistingRoleKeys     []string
 }
 
 func NewProjectGrantPreConditionReadModel(projectID, grantedOrgID, resourceOwner string) *ProjectGrantPreConditionReadModel {
 	return &ProjectGrantPreConditionReadModel{
-		WriteModel:   eventstore.WriteModel{ResourceOwner: resourceOwner},
-		ProjectID:    projectID,
-		GrantedOrgID: grantedOrgID,
+		WriteModel:           eventstore.WriteModel{},
+		ProjectResourceOwner: resourceOwner,
+		ProjectID:            projectID,
+		GrantedOrgID:         grantedOrgID,
 	}
 }
 
@@ -133,26 +135,26 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ProjectAddedEvent:
-			if wm.ResourceOwner == "" {
-				wm.ResourceOwner = e.Aggregate().ResourceOwner
+			if wm.ProjectResourceOwner == "" {
+				wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 			}
-			if wm.ResourceOwner != e.Aggregate().ResourceOwner {
+			if wm.ProjectResourceOwner != e.Aggregate().ResourceOwner {
 				continue
 			}
 			wm.ProjectExists = true
 		case *project.ProjectRemovedEvent:
-			if wm.ResourceOwner != e.Aggregate().ResourceOwner {
+			if wm.ProjectResourceOwner != e.Aggregate().ResourceOwner {
 				continue
 			}
-			wm.ResourceOwner = ""
+			wm.ProjectResourceOwner = ""
 			wm.ProjectExists = false
 		case *project.RoleAddedEvent:
-			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+			if e.Aggregate().ResourceOwner != wm.ProjectResourceOwner {
 				continue
 			}
 			wm.ExistingRoleKeys = append(wm.ExistingRoleKeys, e.Key)
 		case *project.RoleRemovedEvent:
-			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+			if e.Aggregate().ResourceOwner != wm.ProjectResourceOwner {
 				continue
 			}
 			for i, key := range wm.ExistingRoleKeys {
@@ -175,12 +177,6 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 func (wm *ProjectGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
-		AggregateTypes(org.AggregateType).
-		AggregateIDs(wm.GrantedOrgID).
-		EventTypes(
-			org.OrgAddedEventType,
-			org.OrgRemovedEventType).
-		Or().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.ProjectID).
 		EventTypes(
@@ -188,6 +184,12 @@ func (wm *ProjectGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuil
 			project.ProjectRemovedType,
 			project.RoleAddedType,
 			project.RoleRemovedType).
+		Or().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.GrantedOrgID).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgRemovedEventType).
 		Builder()
 
 	return query

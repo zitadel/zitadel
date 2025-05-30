@@ -94,5 +94,5 @@ func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, project
 	if domain.HasInvalidRoles(preConditions.ExistingRoleKeys, roles) {
 		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
-	return preConditions.ResourceOwner, nil
+	return preConditions.ProjectResourceOwner, nil
 }
