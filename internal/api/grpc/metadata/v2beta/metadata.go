@@ -47,4 +47,3 @@ func OrgMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.Search
 		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
 	}
 }
-
