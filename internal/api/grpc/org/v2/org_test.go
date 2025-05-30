@@ -50,7 +50,7 @@ func Test_addOrganizationRequestToCommand(t *testing.T) {
 				Name:         "custom org ID",
 				CustomDomain: "",
 				Admins:       []*command.OrgSetupAdmin{},
-				OrgID:        "org-ID",
+				Id:           "org-ID",
 			},
 		},
 		{

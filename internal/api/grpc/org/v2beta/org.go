@@ -212,6 +212,7 @@ func createOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRe
 		Name:         request.GetName(),
 		CustomDomain: "",
 		Admins:       admins,
+		OrgID:        request.GetId(),
 	}, nil
 }
 
