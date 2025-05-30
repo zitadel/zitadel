@@ -32,6 +32,7 @@ import { withLatestFromSynchronousFix } from 'src/app/utils/withLatestFromSynchr
 import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 type PwdForm = ReturnType<UserCreateV2Component['buildPwdForm']>;
 type AuthenticationFactor =
@@ -65,6 +66,7 @@ export class UserCreateV2Component implements OnInit {
     private readonly destroyRef: DestroyRef,
     private readonly route: ActivatedRoute,
     protected readonly location: Location,
+    private readonly authService: GrpcAuthService,
   ) {
     this.userForm = this.buildUserForm();
 
@@ -180,9 +182,12 @@ export class UserCreateV2Component implements OnInit {
   private async createUserV2Try(authenticationFactor: AuthenticationFactor) {
     this.loading.set(true);
 
+    const org = await this.authService.getActiveOrg();
+
     const userValues = this.userForm.getRawValue();
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
+      organization: { org: { case: 'orgId', value: org.id } },
       username: userValues.username,
       profile: {
         givenName: userValues.givenName,
