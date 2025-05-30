@@ -3089,7 +3089,7 @@ service ManagementService {
     // Change a project role. The key is not editable. If a key should change, remove the role and create a new one.
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/roles/{role_key}"
+            put: "/projects/{project_id}/roles/{role_key=**}"
             body: "*"
         };
 
@@ -3119,7 +3119,7 @@ service ManagementService {
     // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/roles/{role_key}"
+            delete: "/projects/{project_id}/roles/{role_key=**}"
         };
 
         option (zitadel.v1.auth_option) = {
