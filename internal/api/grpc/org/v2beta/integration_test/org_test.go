@@ -1009,6 +1009,7 @@ func TestServer_AddOerganizationDomain(t *testing.T) {
 }
 
 func TestServer_ListOrganizationDomain(t *testing.T) {
+	domain := gofakeit.URL()
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -1018,7 +1019,7 @@ func TestServer_ListOrganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "list org domain, happy path",
-			domain: gofakeit.URL(),
+			domain: domain,
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
@@ -1027,8 +1028,6 @@ func TestServer_ListOrganizationDomain(t *testing.T) {
 					return ""
 				}
 				orgId := orgs[0].Id
-
-				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1073,6 +1072,7 @@ func TestServer_ListOrganizationDomain(t *testing.T) {
 }
 
 func TestServer_DeleteOerganizationDomain(t *testing.T) {
+	domain := gofakeit.URL()
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -1082,7 +1082,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "delete org domain, happy path",
-			domain: gofakeit.URL(),
+			domain: domain,
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
@@ -1092,7 +1092,6 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 				}
 				orgId := orgs[0].Id
 
-				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
