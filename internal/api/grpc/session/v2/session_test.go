@@ -126,6 +126,26 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
+		{ // recovery code factor
+			ID:            "999",
+			CreationDate:  now,
+			ChangeDate:    now,
+			Sequence:      123,
+			State:         domain.SessionStateActive,
+			ResourceOwner: "me",
+			Creator:       "he",
+			UserFactor: query.SessionUserFactor{
+				UserID:        "345",
+				UserCheckedAt: past,
+				LoginName:     "donald",
+				DisplayName:   "donald duck",
+				ResourceOwner: "org1",
+			},
+			RecoveryCodeFactor: query.SessionRecoveryCodeFactor{
+				RecoveryCodeCheckedAt: past,
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
 	}
 
 	want := []*session.Session{
@@ -215,6 +235,25 @@ func Test_sessionsToPb(t *testing.T) {
 					OrganizationId: "org1",
 				},
 				Totp: &session.TOTPFactor{
+					VerifiedAt: timestamppb.New(past),
+				},
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
+		{ // recovery code factor
+			Id:           "999",
+			CreationDate: timestamppb.New(now),
+			ChangeDate:   timestamppb.New(now),
+			Sequence:     123,
+			Factors: &session.Factors{
+				User: &session.UserFactor{
+					VerifiedAt:     timestamppb.New(past),
+					Id:             "345",
+					LoginName:      "donald",
+					DisplayName:    "donald duck",
+					OrganizationId: "org1",
+				},
+				RecoveryCode: &session.RecoveryCodeFactor{
 					VerifiedAt: timestamppb.New(past),
 				},
 			},

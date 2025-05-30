@@ -1949,6 +1949,13 @@ message GenerateRecoveryCodesRequest {
       example: "\"163840776835432705\"";
     }
   ];
+  int32 count = 2 [
+    (validate.rules).int32 = {gte: 1},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The number of recovery codes to generate"
+      example: "5";
+    }
+  ];
 }
 
 message GenerateRecoveryCodesResponse {

@@ -1,24 +1,15 @@
 package domain
 
 import (
-	"errors"
-	"time"
-
 	"github.com/google/uuid"
-	"github.com/zitadel/passwap"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type RecoveryCode struct {
-	HashedCode string
-	CheckAt    time.Time
-}
-
 type HumanRecoveryCodes struct {
 	*ObjectDetails
 
-	Codes []RecoveryCode
+	Codes []string
 }
 
 func RecoveryCodesFromRaw(codes []string, hasher *crypto.Hasher) ([]string, error) {
@@ -58,38 +49,24 @@ func GenerateRecoveryCodes(count int, hasher *crypto.Hasher) ([]string, []string
 	return hashedCodes, rawCodes, nil
 }
 
-func ValidateRecoveryCode(code string, recoveryCodes *HumanRecoveryCodes, hasher *crypto.Hasher) (valid bool, index int, err error) {
+func ValidateRecoveryCode(code string, recoveryCodes *HumanRecoveryCodes, hasher *crypto.Hasher) (index int, err error) {
 	index = -1
 
 	if code == "" {
-		return false, index, zerrors.ThrowInvalidArgument(nil, "DOMAIN-9xrr0", "Errors.User.MFA.RecoveryCodes.InvalidCode")
+		return index, zerrors.ThrowInvalidArgument(nil, "DOMAIN-9xrr0", "Errors.User.MFA.RecoveryCodes.InvalidCode")
 	}
 
 	if recoveryCodes == nil {
-		return false, index, zerrors.ThrowInvalidArgument(nil, "DOMAIN-17bgk", "Errors.User.MFA.RecoveryCodes.InvalidCode")
+		return index, zerrors.ThrowInvalidArgument(nil, "DOMAIN-17bgk", "Errors.User.MFA.RecoveryCodes.Missing")
 	}
 
+	// check code against all recovery codes in current list and return index of first match
 	for i, recoveryCode := range recoveryCodes.Codes {
-		if !recoveryCode.CheckAt.IsZero() {
+		if _, verifyErr := hasher.Verify(recoveryCode, code); verifyErr != nil {
 			continue
 		}
-
-		hashedCode, err := hasher.Hash(code)
-		if err != nil {
-			return false, index, err
-		}
-
-		// Ignoring the updated hash value, if any, as the code can only be checked once regardless
-		_, verifyErr := hasher.Verify(recoveryCode.HashedCode, hashedCode)
-		if verifyErr != nil {
-			if errors.Is(verifyErr, passwap.ErrPasswordMismatch) {
-				continue
-			} else {
-				return false, index, zerrors.ThrowInvalidArgument(verifyErr, "DOMAIN-ecn95", "Errors.User.MFA.RecoveryCodes.InvalidCode")
-			}
-		}
-		return true, i, nil
+		return i, nil
 	}
 
-	return false, index, zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode")
+	return index, zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode")
 }

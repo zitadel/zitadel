@@ -173,9 +173,6 @@ func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds
 		resp.OtpEmail = challenge
 		cmds = append(cmds, cmd)
 	}
-	if req := challenges.GetRecoveryCode(); req != nil {
-		cmds = append(cmds, s.command.CreateRecoveryCodeChallenge())
-	}
 	return resp, cmds, nil
 }
 

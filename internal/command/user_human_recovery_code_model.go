@@ -1,8 +1,6 @@
 package command
 
 import (
-	"time"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -12,14 +10,14 @@ type HumanRecoveryCodeWriteModel struct {
 	eventstore.WriteModel
 
 	State          domain.MFAState
-	codes          []domain.RecoveryCode
-	userLocked     bool
 	FailedAttempts uint64
+	codes          []string
+	userLocked     bool
 }
 
-func (wm *HumanRecoveryCodeWriteModel) Codes() []domain.RecoveryCode {
+func (wm *HumanRecoveryCodeWriteModel) Codes() []string {
 	if wm.codes == nil {
-		return []domain.RecoveryCode{}
+		return make([]string, 0)
 	}
 	return wm.codes
 }
@@ -41,23 +39,16 @@ func (wm *HumanRecoveryCodeWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanRecoveryCodesAddedEvent:
-			recoveryCodes := make([]domain.RecoveryCode, len(e.Codes))
-			for i, code := range e.Codes {
-				recoveryCodes[i] = domain.RecoveryCode{
-					HashedCode: code,
-					CheckAt:    time.Time{},
-				}
-			}
-			wm.codes = recoveryCodes
+			wm.codes = append(wm.Codes(), e.Codes...)
 			wm.State = domain.MFAStateReady
 		case *user.HumanRecoveryCodeCheckSucceededEvent:
 			wm.FailedAttempts = 0
-			wm.codes[e.CodeIndex].CheckAt = e.CreatedAt()
+			wm.codes = append(wm.codes[:e.CodeIndex], wm.codes[e.CodeIndex+1:]...)
 		case *user.HumanRecoveryCodeCheckFailedEvent:
 			wm.FailedAttempts += 1
-		case *user.HumanRecoveryCodeRemovedEvent:
+		case *user.HumanRecoveryCodesRemovedEvent:
+			wm.codes = make([]string, 0)
 			wm.State = domain.MFAStateRemoved
-			wm.codes = nil
 		case *user.UserLockedEvent:
 			wm.userLocked = true
 		case *user.UserUnlockedEvent:

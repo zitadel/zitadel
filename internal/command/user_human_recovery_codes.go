@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -46,9 +47,13 @@ type RecoveryCodesDetails struct {
 	RawCodes []string
 }
 
-func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*RecoveryCodesDetails, error) {
+func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, count int, resourceOwner string, authRequest *domain.AuthRequest) (*RecoveryCodesDetails, error) {
 	if userID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-8f2k9", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4kje7", "Errors.User.UserIDMissing")
+	}
+
+	if count <= 0 || count > c.multifactors.RecoveryCodes.MaxCount {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.CountInvalid")
 	}
 
 	recoveryCodeWriteModel := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
@@ -56,11 +61,11 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID, resourceOw
 		return nil, err
 	}
 
-	if recoveryCodeWriteModel.State == domain.MFAStateReady {
-		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.AlreadyExists")
+	if len(recoveryCodeWriteModel.Codes())+count > c.multifactors.RecoveryCodes.MaxCount {
+		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
-	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(c.multifactors.RecoveryCodes.Count, c.secretHasher)
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(count, c.secretHasher)
 	if err != nil {
 		return nil, err
 	}
@@ -80,45 +85,6 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID, resourceOw
 		},
 		RawCodes: rawCodes,
 	}, nil
-}
-
-func (c *Commands) VerifyRecoveryCode(ctx context.Context, userID, resourceOwner, code string, authRequest *domain.AuthRequest) error {
-	if userID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing")
-	}
-	if code == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty")
-	}
-
-	writeModel := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
-		return err
-	}
-
-	if writeModel.UserLocked() {
-		return zerrors.ThrowNotFound(nil, "COMMAND-3f6gz", "Errors.User.RecoveryCodes.Locked")
-	}
-
-	userAgg := UserAggregateFromWriteModel(&writeModel.WriteModel)
-
-	recoveryCodes := c.toHumanRecoveryCode(ctx, writeModel)
-
-	valid, index, err := domain.ValidateRecoveryCode(code, recoveryCodes, c.secretHasher)
-	if err != nil {
-		return err
-	}
-
-	// TODO: handle invalid code check and lockout policy
-
-	if !valid {
-		return zerrors.ThrowInvalidArgument(err, "COMMAND-84rgg", "Errors.User.Code.Invalid")
-	}
-
-	events := []eventstore.Command{user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, index, authRequestDomainToAuthRequestInfo(authRequest))}
-
-	_, err = c.eventstore.Push(ctx, events...)
-	logging.OnError(err).Error("error creating recovery code check succeeded event")
-	return err
 }
 
 func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*domain.ObjectDetails, error) {
@@ -151,9 +117,64 @@ func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwne
 	}, nil
 }
 
-func (c *Commands) toHumanRecoveryCode(ctx context.Context, recoveryCodeWriteModel *HumanRecoveryCodeWriteModel) *domain.HumanRecoveryCodes {
-	return &domain.HumanRecoveryCodes{
-		ObjectDetails: writeModelToObjectDetails(&recoveryCodeWriteModel.WriteModel),
-		Codes:         recoveryCodeWriteModel.Codes(),
+func (c *Commands) HumanCheckRecoveryCode(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
+	commands, err := checkRecoveryCode(ctx, userID, code, resourceOwner, authRequest, c.eventstore.FilterToQueryReducer, c.secretHasher)
+	if len(commands) > 0 {
+		_, err = c.eventstore.Push(ctx, commands...)
+		logging.OnError(err).Error("failed to push recovery code check events")
 	}
+	return err
+}
+
+func checkRecoveryCode(
+	ctx context.Context,
+	userID, code, resourceOwner string,
+	authRequest *domain.AuthRequest,
+	queryReducer func(ctx context.Context, r eventstore.QueryReducer) error,
+	secretHasher *crypto.Hasher,
+) ([]eventstore.Command, error) {
+	if code == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-u0b6c", "Errors.User.UserIDMissing")
+	}
+
+	if userID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9s2", "Errors.User.UserIDMissing")
+	}
+
+	recoveryCodeWm := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
+
+	err := queryReducer(ctx, recoveryCodeWm)
+	if err != nil {
+		return nil, err
+	}
+
+	if recoveryCodeWm.UserLocked() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.MFA.RecoveryCodes.Locked")
+	}
+
+	if recoveryCodeWm.State != domain.MFAStateReady {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotReady")
+	}
+
+	index, err := domain.ValidateRecoveryCode(code, toHumanRecoveryCode(ctx, recoveryCodeWm), secretHasher)
+
+	// TODO: is recheck of new events needed here like in CheckHumanOTP?
+
+	userAgg := UserAggregateFromWriteModel(&recoveryCodeWm.WriteModel)
+	commands := make([]eventstore.Command, 0, 2)
+
+	if err == nil {
+		commands = append(commands, user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, index, nil))
+	} else {
+		commands = append(commands, user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil))
+
+		lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, recoveryCodeWm.ResourceOwner, queryReducer)
+		logging.OnError(lockoutErr).Error("failed to get lockout policy")
+
+		if lockoutPolicy != nil && lockoutPolicy.MaxOTPAttempts > 0 && recoveryCodeWm.FailedAttempts+1 >= lockoutPolicy.MaxOTPAttempts {
+			commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
+		}
+	}
+
+	return commands, err
 }

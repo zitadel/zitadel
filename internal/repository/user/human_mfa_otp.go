@@ -664,20 +664,20 @@ func NewHumanRecoveryCodesAddedEvent(
 	}
 }
 
-type HumanRecoveryCodeRemovedEvent struct {
+type HumanRecoveryCodesRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	*AuthRequestInfo
 }
 
-func (e *HumanRecoveryCodeRemovedEvent) Payload() interface{} {
+func (e *HumanRecoveryCodesRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanRecoveryCodeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *HumanRecoveryCodesRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func (e *HumanRecoveryCodeRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+func (e *HumanRecoveryCodesRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }
 
@@ -685,8 +685,8 @@ func NewHumanRecoveryCodeRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	authRequest *AuthRequestInfo,
-) *HumanRecoveryCodeRemovedEvent {
-	return &HumanRecoveryCodeRemovedEvent{
+) *HumanRecoveryCodesRemovedEvent {
+	return &HumanRecoveryCodesRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
@@ -742,6 +742,10 @@ func (e *HumanRecoveryCodeCheckFailedEvent) Payload() interface{} {
 
 func (e *HumanRecoveryCodeCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *HumanRecoveryCodeCheckFailedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
 }
 
 func NewHumanRecoveryCodeCheckFailedEvent(

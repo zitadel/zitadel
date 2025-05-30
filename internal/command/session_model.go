@@ -27,8 +27,6 @@ type OTPCode struct {
 	VerificationID string
 }
 
-type RecoveryCodeChallenge struct{}
-
 func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) *domain.WebAuthNLogin {
 	return &domain.WebAuthNLogin{
 		ObjectRoot:              human.ObjectRoot,
@@ -64,7 +62,6 @@ type SessionWriteModel struct {
 	WebAuthNChallenge     *WebAuthNChallengeModel
 	OTPSMSCodeChallenge   *OTPCode
 	OTPEmailCodeChallenge *OTPCode
-	RecoveryCodeChallenge *RecoveryCodeChallenge
 	aggregate             *eventstore.Aggregate
 }
 
@@ -111,8 +108,6 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceLifetimeSet(e)
 		case *session.TerminateEvent:
 			wm.reduceTerminate()
-		case *session.RecoveryCodeChallengedEvent:
-			wm.reduceRecoveryCodeChallenged(e)
 		case *session.RecoveryCodeCheckedEvent:
 			wm.reduceRecoveryCodeChecked(e)
 		}
@@ -138,7 +133,6 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.OTPSMSCheckedType,
 			session.OTPEmailChallengedType,
 			session.OTPEmailCheckedType,
-			session.RecoveryCodeChallengedType,
 			session.RecoveryCodeCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
@@ -236,12 +230,7 @@ func (wm *SessionWriteModel) reduceTerminate() {
 	wm.State = domain.SessionStateTerminated
 }
 
-func (wm *SessionWriteModel) reduceRecoveryCodeChallenged(e *session.RecoveryCodeChallengedEvent) {
-	wm.RecoveryCodeChallenge = &RecoveryCodeChallenge{}
-}
-
 func (wm *SessionWriteModel) reduceRecoveryCodeChecked(e *session.RecoveryCodeCheckedEvent) {
-	wm.RecoveryCodeChallenge = nil
 	wm.RecoveryCodeCheckedAt = e.CheckedAt
 }
 

@@ -216,10 +216,6 @@ func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Ti
 	s.eventCommands = append(s.eventCommands, session.NewOTPEmailCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }
 
-func (s *SessionCommands) RecoveryCodeChallenged(ctx context.Context) {
-	s.eventCommands = append(s.eventCommands, session.NewRecoveryCodeChallengedEvent(ctx, s.sessionWriteModel.aggregate))
-}
-
 func (s *SessionCommands) RecoveryCodeChecked(ctx context.Context, checkedAt time.Time) {
 	s.eventCommands = append(s.eventCommands, session.NewRecoveryCodeCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }

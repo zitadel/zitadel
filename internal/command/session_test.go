@@ -1225,6 +1225,188 @@ func TestCheckTOTP(t *testing.T) {
 	}
 }
 
+func TestCheckRecoveryCode(t *testing.T) {
+	ctx := authz.NewMockContext("instance1", "org1", "user1")
+
+	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	orgAgg := &org.NewAggregate("org1").Aggregate
+
+	hasher := mockPasswordHasher("x")
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(1, hasher)
+	require.NoError(t, err)
+	validCode := rawCodes[0]
+	invalidCode := "invalid-code"
+
+	type fields struct {
+		sessionWriteModel *SessionWriteModel
+		eventstore        func(*testing.T) *eventstore.Eventstore
+		hasher            *crypto.Hasher
+	}
+
+	tests := []struct {
+		name              string
+		code              string
+		fields            fields
+		wantEventCommands []eventstore.Command
+		wantErrorCommands []eventstore.Command
+		wantErr           error
+	}{
+		{
+			name: "missing userID",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(),
+				hasher:     hasher,
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9s2", "Errors.User.UserIDMissing"),
+		},
+		{
+			name: "filter error",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilterError(io.ErrClosedPipe),
+				),
+				hasher: hasher,
+			},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "recovery codes not ready",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(), // No codes added
+				),
+				hasher: hasher,
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotReady"),
+		},
+		{
+			name: "invalid code",
+			code: invalidCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode"),
+		},
+		{
+			name: "invalid code, locked",
+			code: invalidCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil),
+				user.NewUserLockedEvent(ctx, userAgg),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode"),
+		},
+		{
+			name: "user locked",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(ctx, userAgg),
+						),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.MFA.RecoveryCodes.Locked"),
+		},
+		{
+			name: "ok",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+				),
+				hasher: hasher,
+			},
+			wantEventCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, 0, nil),
+				session.NewRecoveryCodeCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &SessionCommands{
+				sessionWriteModel: tt.fields.sessionWriteModel,
+				eventstore:        tt.fields.eventstore(t),
+				hasher:            tt.fields.hasher,
+				now:               func() time.Time { return testNow },
+			}
+			gotCmds, err := CheckRecoveryCode(tt.code)(ctx, cmd)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantErrorCommands, gotCmds)
+			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
+		})
+	}
+}
+
 func TestCommands_TerminateSession(t *testing.T) {
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore

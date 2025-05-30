@@ -730,8 +730,8 @@ SystemDefaults:
       # This is helpful in scenarios with multiple ZITADEL environments or virtual instances
       Issuer: "ZITADEL" # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER
     RecoveryCodes:
-      # The number of recovery codes to generate for a user
-      Count: 5 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_COUNT
+      # The maximum number of recovery codes that a user can hold at any given time
+      MaxCount: 5 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_MAXCOUNT
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH

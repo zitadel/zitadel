@@ -140,6 +140,7 @@ const (
 	MFATypeU2FUserVerification
 	MFATypeOTPSMS
 	MFATypeOTPEmail
+	MFATypeRecoveryCode
 )
 
 func (m MFAType) UserAuthMethodType() UserAuthMethodType {
@@ -154,6 +155,8 @@ func (m MFAType) UserAuthMethodType() UserAuthMethodType {
 		return UserAuthMethodTypeOTPSMS
 	case MFATypeOTPEmail:
 		return UserAuthMethodTypeOTPEmail
+	case MFATypeRecoveryCode:
+		return UserAuthMethodTypeRecoveryCode
 	default:
 		return UserAuthMethodTypeUnspecified
 	}

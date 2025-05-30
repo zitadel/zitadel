@@ -26,5 +26,5 @@ type OTPConfig struct {
 }
 
 type RecoveryCodesConfig struct {
-	Count int
+	MaxCount int
 }

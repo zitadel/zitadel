@@ -64,12 +64,9 @@ message RequestChallenges {
     }
   }
 
-  message RecoveryCode {}
-
   optional WebAuthN web_auth_n = 1;
   optional OTPSMS otp_sms = 2;
   optional OTPEmail otp_email = 3;
-  optional RecoveryCode recovery_code = 4;
 }
 
 message Challenges {
@@ -85,5 +82,4 @@ message Challenges {
   optional WebAuthN web_auth_n = 1;
   optional string otp_sms = 2;
   optional string otp_email = 3;
-  optional string recovery_code = 4;
 }
