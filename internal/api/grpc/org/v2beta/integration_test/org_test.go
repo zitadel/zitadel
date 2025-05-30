@@ -912,7 +912,7 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 	}
 }
 
-func TestServer_AddOerganizationDomain(t *testing.T) {
+func TestServer_AddOrganizationDomain(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      context.Context
