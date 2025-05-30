@@ -40,6 +40,21 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 			wantErr: zerrors.ThrowUnimplementedf(nil, "ORGv2-SL2r8", "userType oneOf %T in method AddOrganization not implemented", nil),
 		},
 		{
+			name: "custom org ID",
+			args: args{
+				request: &org.CreateOrganizationRequest{
+					Name: "custom org ID",
+					Id:   gu.Ptr("org-ID"),
+				},
+			},
+			want: &command.OrgSetup{
+				Name:         "custom org ID",
+				CustomDomain: "",
+				Admins:       []*command.OrgSetupAdmin{},
+				OrgID:        "org-ID",
+			},
+		},
+		{
 			name: "user ID",
 			args: args{
 				request: &v2beta_org.CreateOrganizationRequest{

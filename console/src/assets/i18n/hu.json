@@ -2346,6 +2346,8 @@
     "REMOVE_WARN_DESCRIPTION": "Egy identity providert készülsz eltávolítani. Ez eltávolítja a felhasználóid számára elérhető IDP kiválasztását, és a már regisztrált felhasználók nem tudnak újra bejelentkezni. Biztosan folytatod?",
     "DELETE_SELECTION_TITLE": "IDP törlése",
     "DELETE_SELECTION_DESCRIPTION": "Egy identity providert készülsz törölni. A változások visszafordíthatatlanok. Biztosan folytatni akarod?",
+    "FEDERATEDLOGOUTENABLED": "Szövetséges kijelentkezés engedélyezve",
+    "FEDERATEDLOGOUTENABLED_DESC": "Ha engedélyezve van, a felhasználó ki lesz jelentkezve az IdP-ből is, ha a felhasználó megszakítja a munkamenetet a ZITADEL-ben.",
     "EMPTY": "Nincs elérhető IDP",
     "OIDC": {
       "GENERAL": "Általános információk",

@@ -539,8 +539,17 @@ message CreateOrganizationRequest{
       example: "\"ZITADEL\"";
     }
   ];
+	// Optionally set your own id unique for the organization.
+  optional string id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200 },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
   // Additional Admins for the Organization.
-  repeated Admin admins = 2;
+  repeated Admin admins = 3;
 }
 
 message CreatedAdmin {
