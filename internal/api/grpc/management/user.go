@@ -273,7 +273,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, domain.UserStateActive, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -901,6 +901,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
+
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
 	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
@@ -947,18 +948,21 @@ func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingI
 	}
 	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
 }
+
 func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
 	if membership == nil {
 		return nil
 	}
 	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
 }
+
 func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
 	if membership == nil {
 		return nil
 	}
 	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
 }
+
 func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
 	if membership == nil {
 		return nil
