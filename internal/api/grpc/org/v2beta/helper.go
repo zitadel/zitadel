@@ -165,21 +165,6 @@ func FieldNameToOrgColumn(fieldName v2beta_org.OrgFieldName) query.Column {
 	}
 }
 
-// func OrgViewToPb(org *query.Org) *v2beta_org.Organization {
-// 	return &v2beta_org.Organization{
-// 		Id:            org.ID,
-// 		State:         OrgStateToPb(org.State),
-// 		Name:          org.Name,
-// 		PrimaryDomain: org.Domain,
-// 		Details: v2beta_object.ToViewDetailsPb(
-// 			org.Sequence,
-// 			org.CreationDate,
-// 			org.ChangeDate,
-// 			org.ResourceOwner,
-// 		),
-// 	}
-// }
-
 func ListOrgDomainsRequestToModel(systemDefaults systemdefaults.SystemDefaults, request *org.ListOrganizationDomainsRequest) (*query.OrgDomainSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)
 	if err != nil {
@@ -284,4 +269,3 @@ func ListOrgMetadataToDomain(systemDefaults systemdefaults.SystemDefaults, reque
 		Queries: queries,
 	}, nil
 }
-
