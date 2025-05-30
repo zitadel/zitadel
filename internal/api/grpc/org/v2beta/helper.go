@@ -72,18 +72,33 @@ func OrgStateToPb(state domain.OrgState) v2beta_org.OrgState {
 }
 
 func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrganizationResponse, err error) {
-	admins := make([]*org.CreatedAdmin, len(createdOrg.CreatedAdmins))
-	for i, admin := range createdOrg.CreatedAdmins {
-		admins[i] = &org.CreatedAdmin{
-			UserId:    admin.ID,
-			EmailCode: admin.EmailCode,
-			PhoneCode: admin.PhoneCode,
+	admins := make([]*org.OrganizationAdmin, len(createdOrg.OrgAdmins))
+	for i, admin := range createdOrg.OrgAdmins {
+		switch admin := admin.(type) {
+		case *command.CreatedOrgAdmin:
+			admins[i] = &org.OrganizationAdmin{
+				OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+					CreatedAdmin: &org.CreatedAdmin{
+						UserId:    admin.ID,
+						EmailCode: admin.EmailCode,
+						PhoneCode: admin.PhoneCode,
+					},
+				},
+			}
+		case *command.AssignedOrgAdmin:
+			admins[i] = &org.OrganizationAdmin{
+				OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
+					AssignedAdmin: &org.AssignedAdmin{
+						UserId: admin.ID,
+					},
+				},
+			}
 		}
 	}
 	return &org.CreateOrganizationResponse{
-		CreationDate:  timestamppb.New(createdOrg.ObjectDetails.EventDate),
-		Id:            createdOrg.ObjectDetails.ResourceOwner,
-		CreatedAdmins: admins,
+		CreationDate:       timestamppb.New(createdOrg.ObjectDetails.EventDate),
+		Id:                 createdOrg.ObjectDetails.ResourceOwner,
+		OrganizationAdmins: admins,
 	}, nil
 }
 
@@ -149,6 +164,21 @@ func FieldNameToOrgColumn(fieldName v2beta_org.OrgFieldName) query.Column {
 		return query.Column{}
 	}
 }
+
+// func OrgViewToPb(org *query.Org) *v2beta_org.Organization {
+// 	return &v2beta_org.Organization{
+// 		Id:            org.ID,
+// 		State:         OrgStateToPb(org.State),
+// 		Name:          org.Name,
+// 		PrimaryDomain: org.Domain,
+// 		Details: v2beta_object.ToViewDetailsPb(
+// 			org.Sequence,
+// 			org.CreationDate,
+// 			org.ChangeDate,
+// 			org.ResourceOwner,
+// 		),
+// 	}
+// }
 
 func ListOrgDomainsRequestToModel(systemDefaults systemdefaults.SystemDefaults, request *org.ListOrganizationDomainsRequest) (*query.OrgDomainSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, request.Pagination)

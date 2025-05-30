@@ -29,6 +29,18 @@ func (s *Server) CreateOrganization(ctx context.Context, request *v2beta_org.Cre
 	return createdOrganizationToPb(createdOrg)
 }
 
+func addOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRequest) (*command.OrgSetup, error) {
+	admins, err := createOrganizationRequestAdminsToCommand(request.GetAdmins())
+	if err != nil {
+		return nil, err
+	}
+	return &command.OrgSetup{
+		Name:         request.GetName(),
+		CustomDomain: "",
+		Admins:       admins,
+	}, nil
+}
+
 func (s *Server) UpdateOrganization(ctx context.Context, request *v2beta_org.UpdateOrganizationRequest) (*v2beta_org.UpdateOrganizationResponse, error) {
 	org, err := s.command.ChangeOrg(ctx, request.Id, request.Name)
 	if err != nil {
