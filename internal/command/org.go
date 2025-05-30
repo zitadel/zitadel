@@ -212,6 +212,7 @@ func (c *orgSetupCommands) createdAdmins() []OrgAdmin {
 	users := make([]OrgAdmin, 0, len(c.admins))
 	for _, admin := range c.admins {
 		if admin.ID != "" && admin.Human == nil {
+			users = append(users, &AssignedOrgAdmin{ID: admin.ID})
 			continue
 		}
 		if admin.Human != nil {

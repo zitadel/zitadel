@@ -283,3 +283,4 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, or
 	}
 	return userIDs, nil
 }
+

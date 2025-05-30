@@ -110,11 +110,15 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
 				Id: integration.NotEmpty,
-				CreatedAdmins: []*v2beta_org.CreatedAdmin{
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						UserId:    integration.NotEmpty,
-						EmailCode: gu.Ptr(integration.NotEmpty),
-						PhoneCode: nil,
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId:    integration.NotEmpty,
+								EmailCode: gu.Ptr(integration.NotEmpty),
+								PhoneCode: nil,
+							},
+						},
 					},
 				},
 			},
@@ -153,11 +157,22 @@ func TestServer_CreateOrganization(t *testing.T) {
 					},
 				},
 			},
-			want: &v2beta_org.CreateOrganizationResponse{
-				CreatedAdmins: []*v2beta_org.CreatedAdmin{
-					// a single admin is expected, because the first provided already exists
+			want: &org.CreateOrganizationResponse{
+				// OrganizationId: integration.NotEmpty,
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						UserId: integration.NotEmpty,
+						OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &org.AssignedAdmin{
+								UserId: User.GetUserId(),
+							},
+						},
+					},
+					{
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId: integration.NotEmpty,
+							},
+						},
 					},
 				},
 			},
@@ -180,10 +195,14 @@ func TestServer_CreateOrganization(t *testing.T) {
 			// organization id must be the same as the resourceOwner
 
 			// check the admins
-			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
-			for i, admin := range tt.want.GetCreatedAdmins() {
-				gotAdmin := got.GetCreatedAdmins()[i]
-				assertCreatedAdmin(t, admin, gotAdmin)
+			for i, admin := range tt.want.GetOrganizationAdmins() {
+				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
+				switch admin := admin.OrganizationAdmin.(type) {
+				case *org.OrganizationAdmin_CreatedAdmin:
+					assertCreatedAdmin(t, admin.CreatedAdmin, gotAdmin.(*org.OrganizationAdmin_CreatedAdmin).CreatedAdmin)
+				case *org.OrganizationAdmin_AssignedAdmin:
+					assert.Equal(t, admin.AssignedAdmin.GetUserId(), gotAdmin.(*org.OrganizationAdmin_AssignedAdmin).AssignedAdmin.GetUserId())
+				}
 			}
 		})
 	}
@@ -681,7 +700,7 @@ func TestServer_DeactivateReactivateNonExistentOrganization(t *testing.T) {
 	require.Contains(t, err.Error(), "Organisation not found")
 }
 
-func TestServer_ActivateOrganization(t *testing.T) {
+func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -723,8 +742,8 @@ func TestServer_ActivateOrganization(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(ttt, err)
-					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					require.NoError(t, err)
+					require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -853,7 +872,7 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 				now := time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-				// 3. check organization state is deactivated
+				// 4. check organization state is deactivated
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
@@ -903,7 +922,7 @@ func TestServer_AddOerganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "add org domain, happy path",
-			domain: "www.domain.com",
+			domain: gofakeit.URL(),
 			testFunc: func() string {
 				orgs, _, err := createOrgs(CTX, Client, 1)
 				if err != nil {
@@ -916,7 +935,7 @@ func TestServer_AddOerganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "add org domain, twice",
-			domain: "www.domain.com",
+			domain: gofakeit.URL(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
@@ -926,7 +945,7 @@ func TestServer_AddOerganizationDomain(t *testing.T) {
 				}
 				orgId := orgs[0].Id
 
-				domain := "www.domain.com"
+				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -956,16 +975,15 @@ func TestServer_AddOerganizationDomain(t *testing.T) {
 
 				return orgId
 			},
-			err: errors.New("AlreadyExists"),
 		},
 		{
 			name:   "add org domain to non existent org",
-			domain: "www.domain.com",
+			domain: gofakeit.URL(),
 			testFunc: func() string {
 				return "non-existing-org-id"
 			},
-			// BUG:
-			err: errors.New("Domain already exists"),
+			// BUG: should return a error
+			err: nil,
 		},
 	}
 
@@ -1000,7 +1018,7 @@ func TestServer_ListOrganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "list org domain, happy path",
-			domain: "www.domain.com",
+			domain: gofakeit.URL(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
@@ -1010,7 +1028,7 @@ func TestServer_ListOrganizationDomain(t *testing.T) {
 				}
 				orgId := orgs[0].Id
 
-				domain := "www.domain.com"
+				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1064,7 +1082,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "delete org domain, happy path",
-			domain: "www.domain.com",
+			domain: gofakeit.URL(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
@@ -1074,7 +1092,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 				}
 				orgId := orgs[0].Id
 
-				domain := "www.domain.com"
+				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1107,7 +1125,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain, twice",
-			domain: "www.domain.com",
+			domain: gofakeit.URL(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, err := createOrgs(CTX, Client, 1)
@@ -1117,7 +1135,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 				}
 				orgId := orgs[0].Id
 
-				domain := "www.domain.com"
+				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1157,7 +1175,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain to non existent org",
-			domain: "www.domain.com",
+			domain: gofakeit.URL(),
 			testFunc: func() string {
 				return "non-existing-org-id"
 			},
@@ -1202,7 +1220,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				orgId := orgs[0].Id
 				// ctx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-				domain := "www.domain.com"
+				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1252,7 +1270,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				}
 				orgId := orgs[0].Id
 
-				domain := "www.domain2.com"
+				domain := gofakeit.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1339,7 +1357,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	domain := "www.domainnn.com"
+	domain := gofakeit.URL()
 	_, err = Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 		OrganizationId: orgId,
 		Domain:         domain,

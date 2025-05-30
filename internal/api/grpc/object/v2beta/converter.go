@@ -159,3 +159,4 @@ func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) do
 		return domain.OrgDomainValidationTypeUnspecified
 	}
 }
+

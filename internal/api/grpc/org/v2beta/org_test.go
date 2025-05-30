@@ -13,12 +13,13 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func Test_createOrganizationRequestToCommand(t *testing.T) {
 	type args struct {
-		request *org.CreateOrganizationRequest
+		request *v2beta_org.CreateOrganizationRequest
 	}
 	tests := []struct {
 		name    string
@@ -29,9 +30,9 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 		{
 			name: "nil user",
 			args: args{
-				request: &org.CreateOrganizationRequest{
+				request: &v2beta_org.CreateOrganizationRequest{
 					Name: "name",
-					Admins: []*org.CreateOrganizationRequest_Admin{
+					Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 						{},
 					},
 				},
@@ -41,11 +42,11 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 		{
 			name: "user ID",
 			args: args{
-				request: &org.CreateOrganizationRequest{
+				request: &v2beta_org.CreateOrganizationRequest{
 					Name: "name",
-					Admins: []*org.CreateOrganizationRequest_Admin{
+					Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 						{
-							UserType: &org.CreateOrganizationRequest_Admin_UserId{
+							UserType: &v2beta_org.CreateOrganizationRequest_Admin_UserId{
 								UserId: "userID",
 							},
 							Roles: nil,
@@ -66,11 +67,11 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 		{
 			name: "human user",
 			args: args{
-				request: &org.CreateOrganizationRequest{
+				request: &v2beta_org.CreateOrganizationRequest{
 					Name: "name",
-					Admins: []*org.CreateOrganizationRequest_Admin{
+					Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 						{
-							UserType: &org.CreateOrganizationRequest_Admin_Human{
+							UserType: &v2beta_org.CreateOrganizationRequest_Admin_Human{
 								Human: &user.AddHumanUserRequest{
 									Profile: &user.SetHumanProfile{
 										GivenName:  "firstname",
@@ -123,7 +124,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *org.CreateOrganizationResponse
+		want    *v2beta_org.CreateOrganizationResponse
 		wantErr error
 	}{
 		{
@@ -135,8 +136,8 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						EventDate:     now,
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*command.CreatedOrgAdmin{
-						{
+					OrgAdmins: []command.OrgAdmin{
+						&command.CreatedOrgAdmin{
 							ID:        "id",
 							EmailCode: gu.Ptr("emailCode"),
 							PhoneCode: gu.Ptr("phoneCode"),
@@ -147,11 +148,15 @@ func Test_createdOrganizationToPb(t *testing.T) {
 			want: &org.CreateOrganizationResponse{
 				CreationDate: timestamppb.New(now),
 				Id:           "orgID",
-				CreatedAdmins: []*org.CreatedAdmin{
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						UserId:    "id",
-						EmailCode: gu.Ptr("emailCode"),
-						PhoneCode: gu.Ptr("phoneCode"),
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId:    "id",
+								EmailCode: gu.Ptr("emailCode"),
+								PhoneCode: gu.Ptr("phoneCode"),
+							},
+						},
 					},
 				},
 			},
