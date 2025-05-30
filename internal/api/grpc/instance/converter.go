@@ -28,7 +28,7 @@ func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 		Name:    instance.Name,
 		Domains: DomainsToPb(instance.Domains),
 		Version: build.Version(),
-		State:   instance_pb.State_STATE_RUNNING, //TODO: change when delete is implemented
+		State:   instance_pb.State_STATE_RUNNING, // TODO: change when delete is implemented
 	}
 }
 
@@ -44,7 +44,7 @@ func InstanceDetailToPb(instance *query.Instance) *instance_pb.InstanceDetail {
 		Name:    instance.Name,
 		Domains: DomainsToPb(instance.Domains),
 		Version: build.Version(),
-		State:   instance_pb.State_STATE_RUNNING, //TODO: change when delete is implemented
+		State:   instance_pb.State_STATE_RUNNING, // TODO: change when delete is implemented
 	}
 }
 

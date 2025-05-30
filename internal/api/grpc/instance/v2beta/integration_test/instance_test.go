@@ -9,10 +9,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/zitadel/zitadel/internal/integration"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
 func TestDeleteInstace(t *testing.T) {
