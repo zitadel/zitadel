@@ -872,7 +872,7 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 				now := time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-				// 4. check organization state is deactivated
+				// 3. check organization state is deactivated
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
