@@ -193,7 +193,7 @@ Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [A
 ### Login V2
 
 Check out our new Login V2 version in our [typescript repository](https://github.com/zitadel/typescript) or in our [documentation](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
-[![New Login Showcase](https://github.com/user-attachments/assets/cb5c5212-128b-4dc9-b11d-cabfd3f73e26)]
+![New Login Showcase](https://github.com/user-attachments/assets/cb5c5212-128b-4dc9-b11d-cabfd3f73e26)
 
 ## Security
 
