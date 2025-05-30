@@ -43,7 +43,7 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 			args: args{
 				request: &org.CreateOrganizationRequest{
 					Name: "custom org ID",
-					Id:   "org-ID",
+					Id:   gu.Ptr("org-ID"),
 				},
 			},
 			want: &command.OrgSetup{
