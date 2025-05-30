@@ -65,7 +65,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Organization
 		******************************************************************************************************************/
-		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
+		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, OrgState: int32(queriedOrg.State), Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
 		orgs[i] = org
 	}
 
@@ -567,6 +567,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeHuman:
 			dataUser := &v1_pb.DataHumanUser{
 				UserId: user.ID,
+				State:  int32(user.State),
 				User: &management_pb.ImportHumanUserRequest{
 					UserName: user.Username,
 					Profile: &management_pb.ImportHumanUserRequest_Profile{
@@ -647,7 +648,6 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 					ExpirationDate: timestamppb.New(key.Expiration),
 					PublicKey:      key.PublicKey,
 				})
-
 			}
 		}
 
@@ -888,7 +888,6 @@ func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org 
 						break
 					}
 				}
-
 			}
 		}
 	}
@@ -940,7 +939,6 @@ func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, p
 }
 
 func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*v1_pb.DataProjectGrant, error) {
-
 	projectGrantSearchOrg, err := query.NewProjectGrantResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, err
@@ -991,7 +989,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	for _, userGrant := range queriedUserGrants.UserGrants {
 		for _, projectID := range processedProjects {
 			if projectID == userGrant.ProjectID {
-				//if usergrant is on a granted project
+				// if usergrant is on a granted project
 				if userGrant.GrantID != "" {
 					for _, grantID := range processedGrants {
 						if grantID == userGrant.GrantID {
@@ -1024,6 +1022,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	}
 	return userGrants, nil
 }
+
 func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomLoginTextsRequest, error) {
 	customTexts := make([]*management_pb.SetCustomLoginTextsRequest, 0, len(languages))
 	for _, lang := range languages {

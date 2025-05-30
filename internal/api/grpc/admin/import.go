@@ -305,7 +305,7 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
+	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), domain.OrgState(org.OrgState), []string{})
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
 		if _, err := s.query.OrgByID(ctx, true, org.OrgId); err != nil {
@@ -474,7 +474,7 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		logging.Debugf("import user: %s", user.GetUserId())
 		human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 		human.AggregateID = user.UserId
-		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, domain.UserState(user.State), passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -609,7 +609,6 @@ func importUserLinks(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 		successOrg.UserLinks = append(successOrg.UserLinks, &admin_pb.ImportDataSuccessUserLinks{UserId: userLinks.GetUserId(), IdpId: userLinks.GetIdpId(), ExternalUserId: userLinks.GetProvidedUserId(), DisplayName: userLinks.GetProvidedUserName()})
 	}
 	return nil
-
 }
 
 func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
@@ -750,6 +749,7 @@ func importActions(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 	}
 	return nil
 }
+
 func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

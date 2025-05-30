@@ -1200,7 +1200,8 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				},
 				wantID: "user1",
 			},
-		}, {
+		},
+		{
 			name: "add human (with return code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1584,7 +1585,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
 			},
-		}, {
+		},
+		{
 			name: "add human (with password and initial code), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
@@ -2996,7 +2998,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				newEncryptedCodeWithDefault: f.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     f.defaultSecretGenerators,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
+			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, domain.UserStateActive, a.passwordless, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
