@@ -700,7 +700,7 @@ func TestServer_DeactivateReactivateNonExistentOrganization(t *testing.T) {
 	require.Contains(t, err.Error(), "Organisation not found")
 }
 
-func TestServer_DeactivateReactivateOrganization(t *testing.T) {
+func TestServer_ActivateOrganization(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -742,8 +742,8 @@ func TestServer_DeactivateReactivateOrganization(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
-					require.Equal(t, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					require.NoError(ttt, err)
+					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
