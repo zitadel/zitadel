@@ -192,13 +192,14 @@ func factorsToPb(s *query.Session) *session.Factors {
 		return nil
 	}
 	return &session.Factors{
-		User:     user,
-		Password: passwordFactorToPb(s.PasswordFactor),
-		WebAuthN: webAuthNFactorToPb(s.WebAuthNFactor),
-		Intent:   intentFactorToPb(s.IntentFactor),
-		Totp:     totpFactorToPb(s.TOTPFactor),
-		OtpSms:   otpFactorToPb(s.OTPSMSFactor),
-		OtpEmail: otpFactorToPb(s.OTPEmailFactor),
+		User:         user,
+		Password:     passwordFactorToPb(s.PasswordFactor),
+		WebAuthN:     webAuthNFactorToPb(s.WebAuthNFactor),
+		Intent:       intentFactorToPb(s.IntentFactor),
+		Totp:         totpFactorToPb(s.TOTPFactor),
+		OtpSms:       otpFactorToPb(s.OTPSMSFactor),
+		OtpEmail:     otpFactorToPb(s.OTPEmailFactor),
+		RecoveryCode: recoveryCodeFactorToPb(s.RecoveryCodeFactor),
 	}
 }
 
@@ -245,6 +246,15 @@ func otpFactorToPb(factor query.SessionOTPFactor) *session.OTPFactor {
 	}
 	return &session.OTPFactor{
 		VerifiedAt: timestamppb.New(factor.OTPCheckedAt),
+	}
+}
+
+func recoveryCodeFactorToPb(factor query.SessionRecoveryCodeFactor) *session.RecoveryCodeFactor {
+	if factor.RecoveryCodeCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.RecoveryCodeFactor{
+		VerifiedAt: timestamppb.New(factor.RecoveryCodeCheckedAt),
 	}
 }
 

@@ -231,6 +231,9 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	if !session.OTPEmailFactor.OTPCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeOTPEmail)
 	}
+	if !session.RecoveryCodeFactor.RecoveryCodeCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeRecoveryCode)
+	}
 	return types
 }
 
