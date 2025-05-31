@@ -194,7 +194,6 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 				&m.Key,
 				&m.Value,
 			)
-
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return nil, zerrors.ThrowNotFound(err, "QUERY-Rph32", "Errors.Metadata.NotFound")

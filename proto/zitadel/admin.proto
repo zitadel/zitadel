@@ -1245,6 +1245,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use ListOrganization [apis/resources/org_service_v2beta/organization-service-list-organizations.api.mdx] API instead
     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search";
@@ -1264,7 +1265,8 @@ service AdminService {
                 value: {
                     description: "list of organizations matching the query";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
@@ -1279,6 +1281,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use CreateOrganization [apis/resources/org_service_v2beta/organization-service-create-organization.api.mdx] API instead
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/_setup";
@@ -1298,7 +1301,8 @@ service AdminService {
                 value: {
                     description: "org, user and user membership were created successfully";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
@@ -1313,6 +1317,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use DeleteOrganization [apis/resources/org_service_v2beta/organization-service-delete-organization.api.mdx] API instead
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}"
@@ -1330,7 +1335,8 @@ service AdminService {
                 value: {
                     description: "org removed successfully";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
