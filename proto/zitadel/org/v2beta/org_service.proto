@@ -557,6 +557,17 @@ message CreatedAdmin {
   optional string email_code = 2;
   optional string phone_code = 3;
 }
+message AssignedAdmin { string user_id = 1; }
+
+message OrganizationAdmin {
+
+    // The admins created/assigned for the Organization.
+  oneof OrganizationAdmin {
+    option (validate.required) = true;
+    CreatedAdmin created_admin = 1;
+    AssignedAdmin assigned_admin = 2;
+  }
+}
 
 message CreateOrganizationResponse{
   // The timestamp of the organization was created.
@@ -577,8 +588,8 @@ message CreateOrganizationResponse{
     }
   ];
 
-  // The admins created for the Organization
-  repeated CreatedAdmin created_admins = 3;
+  // The admins created/assigned for the Organization
+  repeated OrganizationAdmin organization_admins = 4;
 }
 
 message UpdateOrganizationRequest {
@@ -939,3 +950,4 @@ message DeleteOrganizationMetadataResponse{
     }
   ];
 }
+

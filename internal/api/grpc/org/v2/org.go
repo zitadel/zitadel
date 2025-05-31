@@ -69,12 +69,15 @@ func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admi
 }
 
 func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganizationResponse, err error) {
-	admins := make([]*org.AddOrganizationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
-	for i, admin := range createdOrg.CreatedAdmins {
-		admins[i] = &org.AddOrganizationResponse_CreatedAdmin{
-			UserId:    admin.ID,
-			EmailCode: admin.EmailCode,
-			PhoneCode: admin.PhoneCode,
+	admins := make([]*org.AddOrganizationResponse_CreatedAdmin, 0, len(createdOrg.OrgAdmins))
+	for _, admin := range createdOrg.OrgAdmins {
+		admin, ok := admin.(*command.CreatedOrgAdmin)
+		if ok {
+			admins = append(admins, &org.AddOrganizationResponse_CreatedAdmin{
+				UserId:    admin.GetID(),
+				EmailCode: admin.EmailCode,
+				PhoneCode: admin.PhoneCode,
+			})
 		}
 	}
 	return &org.AddOrganizationResponse{

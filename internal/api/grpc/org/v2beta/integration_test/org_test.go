@@ -110,11 +110,15 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
 				Id: integration.NotEmpty,
-				CreatedAdmins: []*v2beta_org.CreatedAdmin{
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						UserId:    integration.NotEmpty,
-						EmailCode: gu.Ptr(integration.NotEmpty),
-						PhoneCode: nil,
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId:    integration.NotEmpty,
+								EmailCode: gu.Ptr(integration.NotEmpty),
+								PhoneCode: nil,
+							},
+						},
 					},
 				},
 			},
@@ -153,11 +157,22 @@ func TestServer_CreateOrganization(t *testing.T) {
 					},
 				},
 			},
-			want: &v2beta_org.CreateOrganizationResponse{
-				CreatedAdmins: []*v2beta_org.CreatedAdmin{
-					// a single admin is expected, because the first provided already exists
+			want: &org.CreateOrganizationResponse{
+				// OrganizationId: integration.NotEmpty,
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						UserId: integration.NotEmpty,
+						OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &org.AssignedAdmin{
+								UserId: User.GetUserId(),
+							},
+						},
+					},
+					{
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId: integration.NotEmpty,
+							},
+						},
 					},
 				},
 			},
@@ -180,10 +195,14 @@ func TestServer_CreateOrganization(t *testing.T) {
 			// organization id must be the same as the resourceOwner
 
 			// check the admins
-			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
-			for i, admin := range tt.want.GetCreatedAdmins() {
-				gotAdmin := got.GetCreatedAdmins()[i]
-				assertCreatedAdmin(t, admin, gotAdmin)
+			for i, admin := range tt.want.GetOrganizationAdmins() {
+				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
+				switch admin := admin.OrganizationAdmin.(type) {
+				case *org.OrganizationAdmin_CreatedAdmin:
+					assertCreatedAdmin(t, admin.CreatedAdmin, gotAdmin.(*org.OrganizationAdmin_CreatedAdmin).CreatedAdmin)
+				case *org.OrganizationAdmin_AssignedAdmin:
+					assert.Equal(t, admin.AssignedAdmin.GetUserId(), gotAdmin.(*org.OrganizationAdmin_AssignedAdmin).AssignedAdmin.GetUserId())
+				}
 			}
 		})
 	}

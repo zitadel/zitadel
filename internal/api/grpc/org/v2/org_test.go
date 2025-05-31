@@ -150,8 +150,8 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						EventDate:     now,
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*command.CreatedOrgAdmin{
-						{
+					OrgAdmins: []command.OrgAdmin{
+						&command.CreatedOrgAdmin{
 							ID:        "id",
 							EmailCode: gu.Ptr("emailCode"),
 							PhoneCode: gu.Ptr("phoneCode"),
