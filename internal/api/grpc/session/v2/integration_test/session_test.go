@@ -79,6 +79,7 @@ const (
 	wantIntentFactor
 	wantOTPSMSFactor
 	wantOTPEmailFactor
+	wantRecoveryCodeFactor
 )
 
 func verifyFactors(t assert.TestingT, factors *session.Factors, window time.Duration, userID string, want []wantFactor) {
@@ -117,6 +118,10 @@ func verifyFactors(t assert.TestingT, factors *session.Factors, window time.Dura
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		case wantOTPEmailFactor:
 			pf := factors.GetOtpEmail()
+			assert.NotNil(t, pf)
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+		case wantRecoveryCodeFactor:
+			pf := factors.GetRecoveryCode()
 			assert.NotNil(t, pf)
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		}
@@ -552,6 +557,19 @@ func registerOTPEmail(ctx context.Context, t *testing.T, userID string) {
 	require.NoError(t, err)
 }
 
+func registerRecoveryCode(ctx context.Context, t *testing.T, userID string) []string {
+	_, err := Instance.Client.UserV2.RemoveRecoveryCodes(ctx, &user.RemoveRecoveryCodesRequest{
+		UserId: userID,
+	})
+	require.NoError(t, err)
+	recoveryCodes, err := Instance.Client.UserV2.GenerateRecoveryCodes(ctx, &user.GenerateRecoveryCodesRequest{
+		UserId: userID,
+		Count:  5,
+	})
+	require.NoError(t, err)
+	return recoveryCodes.GetRecoveryCodes()
+}
+
 func TestServer_SetSession_flow_totp(t *testing.T) {
 	userExisting := createFullUser(CTX)
 
@@ -834,6 +852,23 @@ func TestServer_SetSession_flow(t *testing.T) {
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
 		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantOTPEmailFactor)
+	})
+
+	t.Run("check Recovery Code", func(t *testing.T) {
+		recoveryCodes := registerRecoveryCode(userAuthCtx, t, User.GetUserId())
+		recoveryCode := recoveryCodes[0]
+
+		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+			SessionId: createResp.GetSessionId(),
+			Checks: &session.Checks{
+				RecoveryCode: &session.CheckOTP{
+					Code: recoveryCode,
+				},
+			},
+		})
+		require.NoError(t, err)
+		sessionToken = resp.GetSessionToken()
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantRecoveryCodeFactor)
 	})
 }
 

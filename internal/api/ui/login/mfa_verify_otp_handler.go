@@ -103,7 +103,6 @@ func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Reques
 	case domain.MFATypeOTPEmail:
 		actionType = authMethodOTPEmail
 		verifyCode = l.authRepo.VerifyMFAOTPEmail
-		// another type should never be passed, but just making sure
 	case domain.MFATypeRecoveryCode:
 		actionType = authMethodRecoveryCode
 		verifyCode = l.authRepo.VerifyMFARecoveryCode
