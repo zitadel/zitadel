@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -119,4 +120,45 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
+}
+
+func TestSetHostedLoginTranslation(t *testing.T) {
+	ctx := AdminCTX
+
+	translations1 := map[string]any{
+		"loginTitle": "Welcome to our service",
+	}
+
+	translations2 := map[string]any{
+		"loginTitle": "Welcome to our service!",
+	}
+
+	protoTranslations1, err := structpb.NewStruct(translations1)
+	require.Nil(t, err)
+
+	protoTranslations2, err := structpb.NewStruct(translations2)
+	require.Nil(t, err)
+
+	req := &settings.SetHostedLoginTranslationRequest{
+		Level:        settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG,
+		LevelId:      Instance.DefaultOrg.GetId(),
+		Translations: protoTranslations1,
+		Locale:       "en-US",
+	}
+
+	res, err := Client.SetHostedLoginTranslation(ctx, req)
+	require.Nil(t, err)
+	t.Log(res)
+
+	req2 := &settings.SetHostedLoginTranslationRequest{
+		Level:        settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG,
+		LevelId:      Instance.DefaultOrg.GetId(),
+		Translations: protoTranslations2,
+		Locale:       "en",
+	}
+
+	res, err = Client.SetHostedLoginTranslation(ctx, req2)
+	require.Nil(t, err)
+	t.Log(res)
+
 }

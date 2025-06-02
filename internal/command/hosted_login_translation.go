@@ -37,7 +37,7 @@ func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.
 	agg := aggregateFunc(req.GetLevelId())
 
 	lang, err := language.BCP47.Parse(req.GetLocale())
-	if err != nil {
+	if err != nil || lang.IsRoot() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-xmjATA", "Errors.Arguments.Locale.Invalid")
 	}
 	baseLang, _ := lang.Base()

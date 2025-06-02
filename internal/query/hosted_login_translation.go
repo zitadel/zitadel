@@ -5,14 +5,18 @@ import (
 	"crypto/md5"
 	"database/sql"
 	_ "embed"
+	"encoding/hex"
 	"encoding/json"
 	"time"
 
 	"dario.cat/mergo"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/v2/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	"golang.org/x/text/language"
@@ -62,12 +66,10 @@ var (
 	}
 )
 
-type HostedLoginTranslationLevelType uint
-
-const (
-	HostedLoginTranslationLevelInstance HostedLoginTranslationLevelType = iota + 1
-	HostedLoginTranslationLevelOrg
-)
+var levelTypeMapper = map[settings.ResourceOwnerType]string{
+	settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE: instance.AggregateType,
+	settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG:      org.AggregateType,
+}
 
 type HostedLoginTranslations struct {
 	SearchResponse
@@ -82,7 +84,7 @@ type HostedLoginTranslation struct {
 
 	Locale    string
 	File      map[string]any
-	LevelType HostedLoginTranslationLevelType
+	LevelType string
 	LevelID   string
 }
 
@@ -92,19 +94,26 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	inst := authz.GetInstance(ctx)
 	defaultInstLang := inst.DefaultLanguage()
 
-	lang := language.BCP47.Make(req.GetLocale())
+	lang, err := language.BCP47.Parse(req.GetLocale())
+	if err != nil || lang.IsRoot() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "QUERY-rZLAGi", "Errors.Arguments.Locale.Invalid")
+	}
+	baseLang, _ := lang.Base()
 
-	sysTranslation, err := getSystemTranslation(lang.String(), defaultInstLang.String())
+	sysTranslation, err := getSystemTranslation(baseLang.String(), defaultInstLang.String())
 
 	stmt, scan := prepareHostedLoginTranslationQuery()
 
 	eq := sq.Eq{
-		hostedLoginTranslationColInstanceID.identifier(): inst.InstanceID(),
-		hostedLoginTranslationColLocale.identifier():     lang.String(),
+		hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
+		hostedLoginTranslationColLocale.identifier():            baseLang.String(),
+		hostedLoginTranslationColResourceOwner.identifier():     req.GetLevelId(),
+		hostedLoginTranslationColResourceOwnerType.identifier(): levelTypeMapper[req.GetLevel()],
 	}
 
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
+		logging.Error(err)
 		return nil, zerrors.ThrowInternal(err, "QUERY-ZgCMux", "Errors.Query.SQLStatement")
 	}
 
@@ -114,6 +123,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		return err
 	}, query, args...)
 	if err != nil {
+		logging.Error(err)
 		return nil, zerrors.ThrowInternal(err, "QUERY-6k1zjx", "Errors.Internal")
 	}
 
@@ -123,24 +133,26 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 			continue
 		}
 
-		if tr.LevelType == HostedLoginTranslationLevelType(req.GetLevel()) {
+		if tr.LevelType == levelTypeMapper[req.GetLevel()] {
 			requestedTranslation = tr
-			break
-		}
-		otherTranslation = tr
-	}
-
-	// Case where req.GetLeve() == ORGANIZATION -> Check if we have an instance level translation
-	// If so, merge it with the translations we have
-	if otherTranslation != nil && requestedTranslation.LevelType > otherTranslation.LevelType {
-		if err := mergo.Merge(&requestedTranslation.File, otherTranslation.File); err != nil {
-			return nil, zerrors.ThrowInternal(err, "QUERY-pdgEJd", "Errors.Query.MergeTranslations")
+		} else {
+			otherTranslation = tr
 		}
 	}
 
-	// Merge the system translations
-	if err := mergo.Merge(&requestedTranslation.File, sysTranslation); err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-HdprNF", "Errors.Query.MergeTranslations")
+	if !req.GetIgnoreInheritance() {
+		// Case where req.GetLevel() == ORGANIZATION -> Check if we have an instance level translation
+		// If so, merge it with the translations we have
+		if otherTranslation != nil && requestedTranslation.LevelType > otherTranslation.LevelType {
+			if err := mergo.Merge(&requestedTranslation.File, otherTranslation.File); err != nil {
+				return nil, zerrors.ThrowInternal(err, "QUERY-pdgEJd", "Errors.Query.MergeTranslations")
+			}
+		}
+
+		// Merge the system translations
+		if err := mergo.Merge(&requestedTranslation.File, sysTranslation); err != nil {
+			return nil, zerrors.ThrowInternal(err, "QUERY-HdprNF", "Errors.Query.MergeTranslations")
+		}
 	}
 
 	protoTranslation, err := structpb.NewStruct(requestedTranslation.File)
@@ -148,12 +160,14 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		return nil, zerrors.ThrowInternal(err, "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct")
 	}
 
-	etag := md5.Sum([]byte(protoTranslation.String()))
+	hash := md5.Sum([]byte(protoTranslation.String()))
 
-	res.Etag = string(etag[:])
-	res.Translations = protoTranslation
+	res = &settings.GetHostedLoginTranslationResponse{
+		Translations: protoTranslation,
+		Etag:         hex.EncodeToString(hash[:]),
+	}
 
-	return
+	return res, nil
 }
 
 func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, error) {
@@ -190,14 +204,20 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 		func(r *sql.Rows) ([]*HostedLoginTranslation, error) {
 			translations := make([]*HostedLoginTranslation, 2)
 			for r.Next() {
+				rawTranslation := []byte{}
 				translation := &HostedLoginTranslation{}
 				err := r.Scan(
-					&translation.File,
+					&rawTranslation,
 					&translation.LevelType,
 				)
 				if err != nil {
 					return nil, err
 				}
+
+				if err := json.Unmarshal(rawTranslation, &translation.File); err != nil {
+					return nil, err
+				}
+
 				translations = append(translations, translation)
 			}
 
