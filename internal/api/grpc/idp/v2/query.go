@@ -336,6 +336,7 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 			WithSignedRequest:             template.WithSignedRequest,
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
+			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
 		},
 	}
 }

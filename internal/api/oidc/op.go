@@ -15,9 +15,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
@@ -76,6 +78,7 @@ type OPStorage struct {
 	locker                            crdb.Locker
 	assetAPIPrefix                    func(ctx context.Context) string
 	contextToIssuer                   func(context.Context) string
+	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
 }
 
 // Provider is used to overload certain [op.Provider] methods
@@ -115,12 +118,13 @@ func NewServer(
 	accessHandler *middleware.AccessInterceptor,
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
+	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, ContextToIssuer)
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, ContextToIssuer, federatedLogoutCache)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
@@ -225,7 +229,17 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, contextToIssuer func(context.Context) string) *OPStorage {
+func newStorage(
+	config Config,
+	command *command.Commands,
+	query *query.Queries,
+	repo repository.Repository,
+	encAlg crypto.EncryptionAlgorithm,
+	es *eventstore.Eventstore,
+	db *database.DB,
+	contextToIssuer func(context.Context) string,
+	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -242,6 +256,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		locker:                            crdb.NewLocker(db.DB, locksTable, signingKey),
 		assetAPIPrefix:                    assets.AssetAPI(),
 		contextToIssuer:                   contextToIssuer,
+		federateLogoutCache:               federateLogoutCache,
 	}
 }
 

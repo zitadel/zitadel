@@ -2345,6 +2345,8 @@
     "REMOVE_WARN_DESCRIPTION": "Stai per rimuovere un provider di identità. Questo rimuoverà la selezione dell'IDP disponibile per i tuoi utenti e gli utenti già registrati non potranno accedere nuovamente. Sei sicuro di continuare?",
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identità. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
+    "FEDERATEDLOGOUTENABLED": "Logout Federato Abilitato",
+    "FEDERATEDLOGOUTENABLED_DESC": "Se abilitato, l'utente verrà disconnesso anche dall'IdP se termina la sessione in ZITADEL.",
     "EMPTY": "Nessun IDP disponible",
     "OIDC": {
       "GENERAL": "Informazioni generali",
