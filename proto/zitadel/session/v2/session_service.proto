@@ -407,7 +407,7 @@ message Checks {
       description: "\"Checks the One-Time Password sent over Email and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
-  optional CheckOTP recovery_code = 8 [
+  optional CheckRecoveryCode recovery_code = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"Checks the Recovery Code and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
@@ -496,6 +496,16 @@ message CheckOTP {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       example: "\"3237642\"";
+    }
+  ];
+}
+
+message CheckRecoveryCode {
+  string code = 1 [
+    (validate.rules).string = {min_len: 1},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      example: "\"fc4b8dc0-8337-40e5-a12e-f0ee9aa9be56\"";
     }
   ];
 }
