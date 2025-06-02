@@ -22,9 +22,6 @@ func Register(
 	eventTypes []string,
 	queue *queue.Queue,
 ) {
-	// make sure the slice does not contain old values
-	projections = nil
-
 	queue.ShouldStart()
 	projections = []*handler.Handler{
 		NewEventHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), eventTypes, eventstore.AggregateTypeFromEventType, queries, queue),
