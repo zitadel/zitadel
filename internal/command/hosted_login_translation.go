@@ -70,6 +70,7 @@ func (c *Commands) setTranslation(ctx context.Context, agg eventstore.Aggregate,
 	events := []eventstore.Command{}
 	switch agg.Type {
 	case "instance":
+		events = append(events, instance.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang.String()))
 	case "org":
 		events = append(events, org.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang.String()))
 	default:

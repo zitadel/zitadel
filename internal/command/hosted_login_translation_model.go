@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -26,6 +27,11 @@ func (wm *HostedLoginTranslationWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *org.HostedLoginTranslationSetEvent:
+			wm.Language = e.Language
+			wm.Translation = e.Translation
+			wm.Level = e.Level
+			wm.LevelID = e.LevelID
+		case *instance.HostedLoginTranslationSetEvent:
 			wm.Language = e.Language
 			wm.Translation = e.Translation
 			wm.Level = e.Level
