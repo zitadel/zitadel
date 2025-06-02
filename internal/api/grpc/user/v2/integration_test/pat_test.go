@@ -563,7 +563,9 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 				got, err := Client.ListPersonalAccessTokens(tt.args.ctx, tt.args.req)
 				require.NoError(t, err)
 				assert.Len(t, got.Result, len(tt.want.Result))
-				// ignore the total result, as this is a known bug with the in-memory permission checks
+				// ignore the total result, as this is a known bug with the in-memory permission checks.
+				// The command can't know how many keys exist in the system if the SQL statement has a limit.
+				// This is fixed, once the in-memory permission checks are removed with https://github.com/zitadel/zitadel/issues/9188
 				tt.want.Pagination.TotalResult = got.Pagination.TotalResult
 				if diff := cmp.Diff(tt.want, got, protocmp.Transform()); diff != "" {
 					t.Errorf("ListPersonalAccessTokens() mismatch (-want +got):\n%s", diff)
