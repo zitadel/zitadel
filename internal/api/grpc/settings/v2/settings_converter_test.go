@@ -46,6 +46,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 			domain.SecondFactorTypeU2F,
 			domain.SecondFactorTypeOTPEmail,
 			domain.SecondFactorTypeOTPSMS,
+			domain.SecondFactorTypeRecoveryCodes,
 		},
 		MultiFactors: []domain.MultiFactorType{
 			domain.MultiFactorTypeU2FWithPIN,
@@ -76,6 +77,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_RECOVERY_CODES,
 		},
 		MultiFactors: []settings.MultiFactorType{
 			settings.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
@@ -175,6 +177,10 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		{
 			args: args{99},
 			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED,
+		},
+		{
+			args: args{domain.SecondFactorTypeRecoveryCodes},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_RECOVERY_CODES,
 		},
 	}
 	for _, tt := range tests {

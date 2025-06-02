@@ -75,6 +75,8 @@ func secondFactorTypeToPb(secondFactorType domain.SecondFactorType) settings.Sec
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL
 	case domain.SecondFactorTypeOTPSMS:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS
+	case domain.SecondFactorTypeRecoveryCodes:
+		return settings.SecondFactorType_SECOND_FACTOR_TYPE_RECOVERY_CODES
 	case domain.SecondFactorTypeUnspecified:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
 	default:
