@@ -450,16 +450,17 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if !preConditions.UserExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
 	}
-	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
-	}
-	projectIsOwned := resourceOwner == ""
+	projectIsOwned := resourceOwner == preConditions.ProjectResourceOwner
 	if projectIsOwned && !preConditions.ProjectExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
 	}
 	if !projectIsOwned && !preConditions.ProjectGrantExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
 	}
+	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
+	}
+	usergrant.ProjectGrantID = preConditions.ProjectGrantID
 	if check != nil {
 		projectOrGrantID := usergrant.ProjectID
 		if !projectIsOwned {

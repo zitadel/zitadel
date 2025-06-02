@@ -22,7 +22,7 @@ const (
 )
 
 func (u *UserGrant) IsValid() bool {
-	return (u.ProjectID != "" || u.ProjectGrantID != "") && u.UserID != ""
+	return u.ProjectID != "" && u.UserID != ""
 }
 
 func (g *UserGrant) HasInvalidRoles(validRoles []string) bool {

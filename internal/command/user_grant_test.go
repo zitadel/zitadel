@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,8 +22,8 @@ import (
 
 func TestCommandSide_AddUserGrant(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore  func(t *testing.T) *eventstore.Eventstore
+		idGenerator func(t *testing.T) id.Generator
 	}
 	type args struct {
 		ctx           context.Context
@@ -42,9 +43,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "invalid usergrant, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
@@ -60,8 +59,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "user removed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -104,8 +102,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "project removed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -153,8 +150,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "project on other org, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -195,8 +191,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "project roles not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -238,8 +233,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "project grant not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -282,8 +276,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "project grant roles not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -342,8 +335,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "project grant on other org, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -402,8 +394,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "usergrant for project, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -445,7 +436,9 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "usergrant1"),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
 			},
 			args: args{
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
@@ -472,8 +465,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		{
 			name: "usergrant for projectgrant, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -523,7 +515,9 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "usergrant1"),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
 			},
 			args: args{
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
@@ -549,25 +543,178 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "usergrant for granted resource owner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org1",
+								[]string{"rolekey1"},
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+							[]string{"rolekey1"},
+						),
+					),
+				),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:         "user1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"rolekey1"},
+					State:          domain.UserGrantStateActive,
+				},
+			},
+		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
-			}
-			got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
-		})
-	}
+	t.Run("without permission check", func(t *testing.T) {
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				r := &Commands{
+					eventstore: tt.fields.eventstore(t),
+				}
+				if tt.fields.idGenerator != nil {
+					r.idGenerator = tt.fields.idGenerator(t)
+				}
+				got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, nil)
+				if tt.res.err == nil {
+					assert.NoError(t, err)
+				}
+				if tt.res.err != nil && !tt.res.err(err) {
+					t.Errorf("got wrong err: %v ", err)
+				}
+				if tt.res.err == nil {
+					assert.Equal(t, tt.res.want, got)
+				}
+			})
+		}
+	})
+	t.Run("with succeeding permission check", func(t *testing.T) {
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				r := &Commands{
+					eventstore: tt.fields.eventstore(t),
+				}
+				if tt.fields.idGenerator != nil {
+					r.idGenerator = tt.fields.idGenerator(t)
+				}
+				// we use an empty context and only rely on the permission check implementation
+				got, err := r.AddUserGrant(context.Background(), tt.args.userGrant, tt.args.resourceOwner, func(_, _ string) error { return nil })
+				if tt.res.err == nil {
+					assert.NoError(t, err)
+				}
+				if tt.res.err != nil && !tt.res.err(err) {
+					t.Errorf("got wrong err: %v ", err)
+				}
+				if tt.res.err == nil {
+					assert.Equal(t, tt.res.want, got)
+				}
+			})
+		}
+	})
+	t.Run("with failing permission check", func(t *testing.T) {
+		r := &Commands{
+			eventstore: eventstoreExpect(
+				t,
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+					),
+					eventFromEventPusher(
+						project.NewProjectAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectname1", true, true, true,
+							domain.PrivateLabelingSettingUnspecified,
+						),
+					),
+					eventFromEventPusher(
+						project.NewRoleAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"rolekey1",
+							"rolekey",
+							"",
+						),
+					),
+				),
+			),
+		}
+		errPermissionDenied := errors.New("permission denied")
+		// we use an empty context and only rely on the permission check implementation
+		_, err := r.AddUserGrant(context.Background(), &domain.UserGrant{
+			UserID:    "user1",
+			ProjectID: "project1",
+			RoleKeys:  []string{"rolekey1"},
+		}, "org1", func(_, _ string) error { return errPermissionDenied })
+		assert.ErrorIs(t, err, errPermissionDenied)
+	})
 }
 
 func TestCommandSide_ChangeUserGrant(t *testing.T) {
@@ -1202,23 +1349,25 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
-		})
-	}
+	t.Run("without permission check", func(t *testing.T) {
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				r := &Commands{
+					eventstore: tt.fields.eventstore,
+				}
+				got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, nil)
+				if tt.res.err == nil {
+					assert.NoError(t, err)
+				}
+				if tt.res.err != nil && !tt.res.err(err) {
+					t.Errorf("got wrong err: %v ", err)
+				}
+				if tt.res.err == nil {
+					assert.Equal(t, tt.res.want, got)
+				}
+			})
+		}
+	})
 }
 
 func TestCommandSide_DeactivateUserGrant(t *testing.T) {
