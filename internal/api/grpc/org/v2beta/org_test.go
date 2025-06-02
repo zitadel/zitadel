@@ -7,19 +7,17 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func Test_createOrganizationRequestToCommand(t *testing.T) {
 	type args struct {
-		request *v2beta_org.CreateOrganizationRequest
+		request *org.CreateOrganizationRequest
 	}
 	tests := []struct {
 		name    string
@@ -30,9 +28,9 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 		{
 			name: "nil user",
 			args: args{
-				request: &v2beta_org.CreateOrganizationRequest{
+				request: &org.CreateOrganizationRequest{
 					Name: "name",
-					Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
+					Admins: []*org.CreateOrganizationRequest_Admin{
 						{},
 					},
 				},
@@ -57,11 +55,11 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 		{
 			name: "user ID",
 			args: args{
-				request: &v2beta_org.CreateOrganizationRequest{
+				request: &org.CreateOrganizationRequest{
 					Name: "name",
-					Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
+					Admins: []*org.CreateOrganizationRequest_Admin{
 						{
-							UserType: &v2beta_org.CreateOrganizationRequest_Admin_UserId{
+							UserType: &org.CreateOrganizationRequest_Admin_UserId{
 								UserId: "userID",
 							},
 							Roles: nil,
@@ -82,11 +80,11 @@ func Test_createOrganizationRequestToCommand(t *testing.T) {
 		{
 			name: "human user",
 			args: args{
-				request: &v2beta_org.CreateOrganizationRequest{
+				request: &org.CreateOrganizationRequest{
 					Name: "name",
-					Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
+					Admins: []*org.CreateOrganizationRequest_Admin{
 						{
-							UserType: &v2beta_org.CreateOrganizationRequest_Admin_Human{
+							UserType: &org.CreateOrganizationRequest_Admin_Human{
 								Human: &user.AddHumanUserRequest{
 									Profile: &user.SetHumanProfile{
 										GivenName:  "firstname",
@@ -139,7 +137,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *v2beta_org.CreateOrganizationResponse
+		want    *org.CreateOrganizationResponse
 		wantErr error
 	}{
 		{
@@ -185,4 +183,3 @@ func Test_createdOrganizationToPb(t *testing.T) {
 		})
 	}
 }
-
