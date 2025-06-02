@@ -76,9 +76,7 @@ func TestUpdateNameInstance(t *testing.T) {
 
 	// update name
 	err = instanceRepo.Update(ctx,
-		database.Condition(
-			instanceRepo.IDCondition(instanceId),
-		),
+		instanceRepo.IDCondition(instanceId),
 		instanceRepo.SetName("new_name"),
 	)
 	require.NoError(t, err)
@@ -117,9 +115,7 @@ func TestUpdeDeleteInstance(t *testing.T) {
 
 	// delete instance
 	err = instanceRepo.Delete(ctx,
-		database.Condition(
-			instanceRepo.IDCondition(instanceId),
-		),
+		instanceRepo.IDCondition(instanceId),
 	)
 	require.NoError(t, err)
 
