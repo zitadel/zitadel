@@ -48,7 +48,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 	if err := checkExplicitProjectPermission(ctx, grant.ProjectGrantID, grant.ProjectID); err != nil {
 		return nil, err
 	}
-	grant, err := s.command.AddUserGrant(ctx, grant, authz.GetCtxData(ctx).OrgID)
+	grant, err := s.command.AddUserGrant(ctx, grant, authz.GetCtxData(ctx).OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 }
 
 func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGrantRequest) (*mgmt_pb.UpdateUserGrantResponse, error) {
-	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, nil)
 	if err != nil {
 		return nil, err
 	}

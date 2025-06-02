@@ -71,3 +71,12 @@ func (c *Commands) checkPermissionUpdateProject(ctx context.Context, resourceOwn
 func (c *Commands) checkPermissionWriteProjectGrant(ctx context.Context, resourceOwner, projectGrantID string) error {
 	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantWrite, project.AggregateType)(resourceOwner, projectGrantID)
 }
+
+func (c *Commands) NewPermissionCheckUserGrantWrite(ctx context.Context) PermissionCheck {
+	return func(owningOrGrantedOrgID, projectOrGrantID string) error {
+		if owningOrGrantedOrgID == "" {
+			return zerrors.ThrowInternal(nil, "COMMAND-4n8vs", "Errors.IDMissing")
+		}
+		return c.newPermissionCheck(ctx, domain.PermissionUserGrantWrite, project.AggregateType)(owningOrGrantedOrgID, projectOrGrantID)
+	}
+}

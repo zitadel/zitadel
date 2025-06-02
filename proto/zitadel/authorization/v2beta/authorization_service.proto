@@ -348,7 +348,7 @@ message CreateAuthorizationRequest {
       example: "\"163840776835432345\"";
     }
   ];
-  // Project ID is the ID of the owned or granted project the user should be authorized for.
+  // Project ID is the ID of the project the user should be authorized for.
   string project_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -357,8 +357,18 @@ message CreateAuthorizationRequest {
       example: "\"163840776835432345\"";
     }
   ];
+  // OrganizationID is the ID of the organization on which the authorization should be created.
+  // The organization must either own the project or have a grant for the project.
+  optional string organization_id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
   // RoleKeys are the keys of the roles the user should be granted.
-  repeated string role_keys = 3 [
+  repeated string role_keys = 4 [
     (validate.rules).repeated = {
       unique: true
       items: {

@@ -15,11 +15,11 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
+func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (_ *domain.UserGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	event, addedUserGrant, err := c.addUserGrant(ctx, usergrant, resourceOwner)
+	event, addedUserGrant, err := c.addUserGrant(ctx, usergrant, resourceOwner, check)
 	if err != nil {
 		return nil, err
 	}
@@ -35,11 +35,11 @@ func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant
 	return userGrantWriteModelToUserGrant(addedUserGrant), nil
 }
 
-func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (command eventstore.Command, _ *UserGrantWriteModel, err error) {
+func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (command eventstore.Command, _ *UserGrantWriteModel, err error) {
 	if !userGrant.IsValid() {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-kVfMa", "Errors.UserGrant.Invalid")
 	}
-	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner)
+	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner, check)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -61,8 +61,8 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 	return command, addedUserGrant, nil
 }
 
-func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
-	event, changedUserGrant, err := c.changeUserGrant(ctx, userGrant, resourceOwner, false)
+func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (_ *domain.UserGrant, err error) {
+	event, changedUserGrant, err := c.changeUserGrant(ctx, userGrant, resourceOwner, false, check)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	return userGrantWriteModelToUserGrant(changedUserGrant), nil
 }
 
-func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, cascade bool) (_ eventstore.Command, _ *UserGrantWriteModel, err error) {
+func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, cascade bool, check PermissionCheck) (_ eventstore.Command, _ *UserGrantWriteModel, err error) {
 	if userGrant.AggregateID == "" {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
 	}
@@ -97,7 +97,7 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	}
 	userGrant.ProjectID = existingUserGrant.ProjectID
 	userGrant.ProjectGrantID = existingUserGrant.ProjectGrantID
-	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner)
+	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner, check)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -291,9 +291,9 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 	return writeModel, nil
 }
 
-func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, requireGrantID bool) (err error) {
+func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (err error) {
 	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeUserGrant) {
-		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner, requireGrantID)
+		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner, check)
 	}
 
 	ctx, span := tracing.NewSpan(ctx)
@@ -316,6 +316,7 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 //
 //nolint:gocognit
 func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (existingRoleKeys []string, err error) {
+	isOwnedProject := userGrant.ResourceOwner == resourceOwner
 	criteria := []map[eventstore.FieldType]any{
 		// project state query
 		{
@@ -332,13 +333,16 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			eventstore.FieldTypeObjectType:    org.OrgSearchType,
 		},
 	}
-	if userGrant.ProjectGrantID != "" {
-		criteria = append(criteria, map[eventstore.FieldType]any{
+	if !isOwnedProject {
+		projectGrantCriteria := map[eventstore.FieldType]any{
 			eventstore.FieldTypeAggregateType: project.AggregateType,
 			eventstore.FieldTypeAggregateID:   userGrant.ProjectID,
 			eventstore.FieldTypeObjectType:    project.ProjectGrantSearchType,
-			eventstore.FieldTypeObjectID:      userGrant.ProjectGrantID,
-		})
+		}
+		if userGrant.ProjectGrantID != "" {
+			projectGrantCriteria[eventstore.FieldTypeObjectID] = userGrant.ProjectGrantID
+		}
+		criteria = append(criteria, projectGrantCriteria)
 	} else {
 		criteria = append(criteria, map[eventstore.FieldType]any{
 			eventstore.FieldTypeAggregateType: project.AggregateType,
@@ -386,8 +390,13 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			case project.ProjectGrantGrantedOrgIDSearchField:
 				var orgID string
 				err := result.Value.Unmarshal(&orgID)
-				if err != nil || orgID != resourceOwner {
-					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+				if err != nil {
+					return nil, err
+				}
+				// If we didn't provide a grant ID, we can have many grants for different orgs here.
+				// If we find at least one for the usergrants org, we set existsGrant to true.
+				if orgID == resourceOwner {
+					existsGrant = true
 				}
 			case project.ProjectGrantStateSearchField:
 				var state domain.ProjectGrantState
@@ -406,7 +415,7 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			case project.ProjectGrantGrantIDSearchField:
 				var grantID string
 				err := result.Value.Unmarshal(&grantID)
-				if err != nil || grantID != userGrant.ProjectGrantID {
+				if err != nil || (userGrant.ProjectGrantID != "" && grantID != userGrant.ProjectGrantID) {
 					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-huvKF", "Errors.Project.Grant.NotFound")
 				}
 			}
@@ -419,13 +428,13 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 	if !existsGrantedOrg {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 	}
-	if userGrant.ProjectGrantID != "" && !existsGrant {
+	if !isOwnedProject && !existsGrant {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-huvKF", "Errors.Project.Grant.NotFound")
 	}
 	return existingRoleKeys, nil
 }
 
-func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, requireGrantID bool) (err error) {
+func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -437,15 +446,22 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if !preConditions.UserExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
 	}
-
-	if usergrant.ProjectGrantID == "" && !preConditions.ProjectExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
-	}
 	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
 	}
-	if usergrant.ProjectGrantID != "" && !preConditions.ProjectGrantExists && requireGrantID {
+	projectIsOwned := preConditions.ProjectResourceOwner == resourceOwner
+	if projectIsOwned && !preConditions.ProjectExists {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
+	}
+	if !projectIsOwned && !preConditions.ProjectGrantExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
+	}
+	if check != nil {
+		targetAggregate := usergrant.ProjectID
+		if !projectIsOwned {
+			targetAggregate = preConditions.ProjectGrantID
+		}
+		return check(resourceOwner, targetAggregate)
 	}
 	return nil
 }

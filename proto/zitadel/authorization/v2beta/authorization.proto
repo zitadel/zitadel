@@ -18,35 +18,57 @@ message Authorization {
       example: "\"69629012906488334\"";
     }
   ];
-  // Project ID is the ID of the project - owned or granted - the user is authorized for.
-  string project_id = 2 [(validate.rules).string = {
-    min_len: 1
-    max_len: 200
-  }];
+  // Grant contains the project or project grant the user was granted the authorization for.
+  oneof grant {
+    // Project represents the project the user was granted the authorization for.
+    Project project = 2;
+    // ProjectGrant represents the project grant the user was granted the authorization for.
+    ProjectGrant project_grant = 3;
+  }
   // The unique identifier of the organization the authorization belongs to.
-  string organization_id = 3 [
+  string organization_id = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
     }
   ];
   // CreationDate is the timestamp when the authorization was created.
-  google.protobuf.Timestamp creation_date = 4 [
+  google.protobuf.Timestamp creation_date = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
   // ChangeDate is the timestamp when the authorization was last updated.
   // In case the authorization was not updated, this field is equal to the creation date.
-  google.protobuf.Timestamp change_date = 5 [
+  google.protobuf.Timestamp change_date = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
   // State is the current state of the authorization.
-  State state = 6;
-  User user = 7;
+  State state = 7;
+  User user = 8;
   // Roles contains the roles the user was granted for the project.
-  repeated Role roles = 8;
+  repeated Role roles = 9;
+}
+
+message Project {
+  // ID is the unique identifier of the project the user was granted the authorization for.
+  string id = 1;
+  // Name is the name of the project the user was granted the authorization for.
+  string name = 2;
+  // OrganizationID is the ID of the organization the project belongs to.
+  string organization_id = 3;
+}
+
+message ProjectGrant {
+  // ID is the unique identifier of the project grant the user was granted the authorization for.
+  string id = 1;
+  // ProjectID is the ID of the project the project grant belongs to.
+  string project_id = 2;
+  // ProjectName is the name of the project the project grant belongs to.
+  string project_name = 3;
+  // OrganizationID is the ID of the organization the project grant belongs to.
+  string organization_id = 4;
 }
 
 enum State {

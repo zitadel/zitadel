@@ -2,7 +2,6 @@ package authorization
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -14,7 +13,7 @@ func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.Cre
 		ProjectID: req.ProjectId,
 		RoleKeys:  req.RoleKeys,
 	}
-	grant, err := s.command.AddUserGrant(ctx, grant, authz.GetCtxData(ctx).OrgID)
+	grant, err := s.command.AddUserGrant(ctx, grant, req.OrganizationId, s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}
