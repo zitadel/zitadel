@@ -185,3 +185,4 @@ func Test_createdOrganizationToPb(t *testing.T) {
 		})
 	}
 }
+
