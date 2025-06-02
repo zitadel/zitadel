@@ -52,6 +52,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 		name    string
 		ctx     context.Context
 		req     *v2beta_org.CreateOrganizationRequest
+		id      string
 		want    *v2beta_org.CreateOrganizationResponse
 		wantErr bool
 	}{
@@ -200,6 +201,16 @@ func TestServer_CreateOrganization(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "create with ID",
+			ctx:  CTX,
+			id:   "custom_id",
+			req: &v2beta_org.CreateOrganizationRequest{
+				Name: gofakeit.AppName(),
+				Id:   gu.Ptr("custom_id"),
+			},
+			want: &v2beta_org.CreateOrganizationResponse{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -209,6 +220,10 @@ func TestServer_CreateOrganization(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
+
+			if tt.id != "" {
+				require.Equal(t, tt.id, got.Id)
+			}
 
 			// check details
 			gotCD := got.GetCreationDate().AsTime()
@@ -299,7 +314,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	}
 }
 
-func TestServer_ListOrganization(t *testing.T) {
+func TestServer_ListOrganizations(t *testing.T) {
 	testStartTimestamp := time.Now()
 	ListOrgIinstance := integration.NewInstance(CTX)
 	listOrgIAmOwnerCtx := ListOrgIinstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1031,7 +1046,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 	}
 }
 
-func TestServer_ListOrganizationDomain(t *testing.T) {
+func TestServer_ListOrganizationDomains(t *testing.T) {
 	domain := gofakeit.URL()
 	tests := []struct {
 		name     string
@@ -1315,18 +1330,21 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				now = time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-				// 3. check organization domain deleted
-				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-					OrganizationId: orgId,
-				})
-				require.NoError(t, err)
-				found := false
-				for _, res := range queryRes.Domains {
-					if res.DomainName == domain {
-						found = true
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(t *assert.CollectT) {
+					// 3. check organization domain deleted
+					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+						OrganizationId: orgId,
+					})
+					require.NoError(t, err)
+					found := false
+					for _, res := range queryRes.Domains {
+						if res.DomainName == domain {
+							found = true
+						}
 					}
-				}
-				require.False(t, found, "deleted domain found")
+					require.False(t, found, "deleted domain found")
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				// 4. redelete organisation domain
 				_, err = Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
@@ -1342,11 +1360,11 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 5. check organization domain deleted
-				queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 					OrganizationId: orgId,
 				})
 				require.NoError(t, err)
-				found = false
+				found := false
 				for _, res := range queryRes.Domains {
 					if res.DomainName == domain {
 						found = true
@@ -1977,4 +1995,3 @@ func assertCreatedAdmin(t *testing.T, expected, got *v2beta_org.CreatedAdmin) {
 		assert.Empty(t, got.GetPhoneCode())
 	}
 }
-

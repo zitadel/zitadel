@@ -589,7 +589,7 @@ message CreateOrganizationResponse{
   ];
 
   // The admins created/assigned for the Organization
-  repeated OrganizationAdmin organization_admins = 4;
+  repeated OrganizationAdmin organization_admins = 3;
 }
 
 message UpdateOrganizationRequest {
