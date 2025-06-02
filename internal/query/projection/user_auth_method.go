@@ -295,7 +295,7 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v",
 			[]eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType, user.HumanMFAOTPRemovedType,
-				user.HumanOTPSMSRemovedType, user.HumanPhoneRemovedType, user.HumanOTPEmailRemovedType, user.HumanRecoveryCodesRemovedType	})
+				user.HumanOTPSMSRemovedType, user.HumanPhoneRemovedType, user.HumanOTPEmailRemovedType, user.HumanRecoveryCodesRemovedType})
 	}
 	conditions := []handler.Condition{
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
