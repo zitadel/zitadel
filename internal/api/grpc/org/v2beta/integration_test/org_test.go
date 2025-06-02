@@ -1288,18 +1288,21 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				now = time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-				// 3. check organization domain deleted
-				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-					OrganizationId: orgId,
-				})
-				require.NoError(t, err)
-				found := false
-				for _, res := range queryRes.Domains {
-					if res.DomainName == domain {
-						found = true
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(t *assert.CollectT) {
+					// 3. check organization domain deleted
+					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+						OrganizationId: orgId,
+					})
+					require.NoError(t, err)
+					found := false
+					for _, res := range queryRes.Domains {
+						if res.DomainName == domain {
+							found = true
+						}
 					}
-				}
-				require.False(t, found, "deleted domain found")
+					require.False(t, found, "deleted domain found")
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				// 4. redelete organisation domain
 				_, err = Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
@@ -1315,11 +1318,11 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 5. check organization domain deleted
-				queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 					OrganizationId: orgId,
 				})
 				require.NoError(t, err)
-				found = false
+				found := false
 				for _, res := range queryRes.Domains {
 					if res.DomainName == domain {
 						found = true
