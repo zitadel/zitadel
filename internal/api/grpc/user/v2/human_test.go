@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -31,14 +32,14 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 			userId: "userId",
 			human: &user.UpdateUserRequest_Human{
 				Profile: &user.UpdateUserRequest_Human_Profile{
-					GivenName: ptr("givenName"),
+					GivenName: gu.Ptr("givenName"),
 				},
 			},
 		},
 		want: &command.ChangeHuman{
 			ID: "userId",
 			Profile: &command.Profile{
-				FirstName: ptr("givenName"),
+				FirstName: gu.Ptr("givenName"),
 			},
 		},
 		wantErr: assert.NoError,
@@ -46,15 +47,15 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 		name: "all properties",
 		args: args{
 			userId:   "userId",
-			userName: ptr("userName"),
+			userName: gu.Ptr("userName"),
 			human: &user.UpdateUserRequest_Human{
 				Profile: &user.UpdateUserRequest_Human_Profile{
-					GivenName:         ptr("givenName"),
-					FamilyName:        ptr("familyName"),
-					NickName:          ptr("nickName"),
-					DisplayName:       ptr("displayName"),
-					PreferredLanguage: ptr("en-US"),
-					Gender:            ptr(user.Gender_GENDER_FEMALE),
+					GivenName:         gu.Ptr("givenName"),
+					FamilyName:        gu.Ptr("familyName"),
+					NickName:          gu.Ptr("nickName"),
+					DisplayName:       gu.Ptr("displayName"),
+					PreferredLanguage: gu.Ptr("en-US"),
+					Gender:            gu.Ptr(user.Gender_GENDER_FEMALE),
 				},
 				Email: &user.SetHumanEmail{
 					Email: "email@example.com",
@@ -83,14 +84,14 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 		},
 		want: &command.ChangeHuman{
 			ID:       "userId",
-			Username: ptr("userName"),
+			Username: gu.Ptr("userName"),
 			Profile: &command.Profile{
-				FirstName:         ptr("givenName"),
-				LastName:          ptr("familyName"),
-				NickName:          ptr("nickName"),
-				DisplayName:       ptr("displayName"),
+				FirstName:         gu.Ptr("givenName"),
+				LastName:          gu.Ptr("familyName"),
+				NickName:          gu.Ptr("nickName"),
+				DisplayName:       gu.Ptr("displayName"),
 				PreferredLanguage: &language.AmericanEnglish,
-				Gender:            ptr(domain.GenderFemale),
+				Gender:            gu.Ptr(domain.GenderFemale),
 			},
 			Email: &command.Email{
 				Address:  "email@example.com",
@@ -157,7 +158,7 @@ func Test_patchHumanUserToCommand(t *testing.T) {
 					Email: "email@example.com",
 					Verification: &user.SetHumanEmail_SendCode{
 						SendCode: &user.SendEmailVerificationCode{
-							UrlTemplate: ptr("Code: {{.Code}}"),
+							UrlTemplate: gu.Ptr("Code: {{.Code}}"),
 						},
 					},
 				},

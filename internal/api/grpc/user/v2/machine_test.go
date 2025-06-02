@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/muhlemmer/gu"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -26,28 +27,28 @@ func Test_patchMachineUserToCommand(t *testing.T) {
 		args: args{
 			userId: "userId",
 			machine: &user.UpdateUserRequest_Machine{
-				Name: ptr("name"),
+				Name: gu.Ptr("name"),
 			},
 		},
 		want: &command.ChangeMachine{
 			ID:   "userId",
-			Name: ptr("name"),
+			Name: gu.Ptr("name"),
 		},
 	}, {
 		name: "all properties",
 		args: args{
 			userId:   "userId",
-			userName: ptr("userName"),
+			userName: gu.Ptr("userName"),
 			machine: &user.UpdateUserRequest_Machine{
-				Name:        ptr("name"),
-				Description: ptr("description"),
+				Name:        gu.Ptr("name"),
+				Description: gu.Ptr("description"),
 			},
 		},
 		want: &command.ChangeMachine{
 			ID:          "userId",
-			Username:    ptr("userName"),
-			Name:        ptr("name"),
-			Description: ptr("description"),
+			Username:    gu.Ptr("userName"),
+			Name:        gu.Ptr("name"),
+			Description: gu.Ptr("description"),
 		},
 	}}
 	for _, tt := range tests {
