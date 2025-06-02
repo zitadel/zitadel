@@ -539,6 +539,10 @@ message CreateOrganizationRequest{
       example: "\"ZITADEL\"";
     }
   ];
+  // Additional Admins for the Organization.
+  
+  repeated Admin admins = 3;
+
 	// Optionally set your own id unique for the organization.
   optional string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200 },
@@ -548,8 +552,6 @@ message CreateOrganizationRequest{
       example: "\"69629012906488334\"";
     }
   ];
-  // Additional Admins for the Organization.
-  repeated Admin admins = 3;
 }
 
 message CreatedAdmin {
