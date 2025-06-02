@@ -64,10 +64,12 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 					ExpirationDate: expirationDate,
 				},
 				func(request *user.AddPersonalAccessTokenRequest) error {
-					request.UserId = userId
+					resp := Instance.CreateUserTypeHuman(IamCTX)
+					request.UserId = resp.Id
 					return nil
 				},
 			},
+			wantErr: true,
 		},
 		{
 			name: "add another pat, ok",

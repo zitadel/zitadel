@@ -30,9 +30,10 @@ func TestServer_AddKey(t *testing.T) {
 		prepare func(request *user.AddKeyRequest) error
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name         string
+		args         args
+		wantErr      bool
+		wantEmtpyKey bool
 	}{
 		{
 			name: "add key, user not existing",
@@ -46,7 +47,7 @@ func TestServer_AddKey(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "add key, ok",
+			name: "generate key pair, ok",
 			args: args{
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
@@ -58,16 +59,61 @@ func TestServer_AddKey(t *testing.T) {
 			},
 		},
 		{
-			name: "add key human, not ok",
+			name: "add valid public key, ok",
 			args: args{
 				&user.AddKeyRequest{
 					ExpirationDate: expirationDate,
+					// This is the public key of the tester system user. This must be valid.
+					PublicKey: []byte(`
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzi+FFSJL7f5yw4KTwzgM
+P34ePGycm/M+kT0M7V4Cgx5V3EaDIvTQKTLfBaEB45zb9LtjIXzDw0rXRoS2hO6t
+h+CYQCz3KCvh09C0IzxZiB2IS3H/aT+5Bx9EFY+vnAkZjccbyG5YNRvmtOlnvIeI
+H7qZ0tEwkPfF5GEZNPJPtmy3UGV7iofdVQS1xRj73+aMw5rvH4D8IdyiAC3VekIb
+pt0Vj0SUX3DwKtog337BzTiPk3aXRF0sbFhQoqdJRI8NqgZjCwjq9yfI5tyxYswn
++JGzHGdHvW3idODlmwEt5K2pasiRIWK2OGfq+w0EcltQHabuqEPgZlmhCkRdNfix
+BwIDAQAB
+-----END PUBLIC KEY-----
+`),
 				},
 				func(request *user.AddKeyRequest) error {
 					request.UserId = userId
 					return nil
 				},
 			},
+			wantEmtpyKey: true,
+		},
+		{
+			name: "add invalid public key, error",
+			args: args{
+				&user.AddKeyRequest{
+					ExpirationDate: expirationDate,
+					PublicKey: []byte(`
+-----BEGIN PUBLIC KEY-----
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+-----END PUBLIC KEY-----
+`),
+				},
+				func(request *user.AddKeyRequest) error {
+					request.UserId = userId
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "add key human, error",
+			args: args{
+				&user.AddKeyRequest{
+					ExpirationDate: expirationDate,
+				},
+				func(request *user.AddKeyRequest) error {
+					resp := Instance.CreateUserTypeHuman(IamCTX)
+					request.UserId = resp.Id
+					return nil
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "add another key, ok",
@@ -98,7 +144,11 @@ func TestServer_AddKey(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assert.NotEmpty(t, got.KeyId, "key id is empty")
-			assert.NotEmpty(t, got.KeyContent, "key content is empty")
+			if tt.wantEmtpyKey {
+				assert.Empty(t, got.KeyContent, "key content is not empty")
+			} else {
+				assert.NotEmpty(t, got.KeyContent, "key content is empty")
+			}
 			creationDate := got.CreationDate.AsTime()
 			assert.Greater(t, creationDate, now, "creation date is before the test started")
 			assert.Less(t, creationDate, time.Now(), "creation date is in the future")
