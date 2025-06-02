@@ -475,7 +475,8 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		logging.Debugf("import user: %s", user.GetUserId())
 		human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 		human.AggregateID = user.UserId
-		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, domain.UserState(user.State), passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+		setHumanToInactive := domain.UserState(user.State) == domain.UserStateInactive
+		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, setHumanToInactive, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {

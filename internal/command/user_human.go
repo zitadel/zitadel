@@ -428,7 +428,7 @@ func (h *AddHuman) shouldAddInitCode() bool {
 }
 
 // Deprecated: use commands.AddUserHuman
-func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, state domain.UserState, passwordless bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
+func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, setHumanToInactive bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -459,7 +459,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	if err != nil {
 		return nil, nil, err
 	}
-	if state == domain.UserStateInactive {
+	if setHumanToInactive {
 		deactivateUserEvent := user.NewUserDeactivatedEvent(ctx, userAgg)
 		events = append(events, deactivateUserEvent)
 	}
