@@ -201,28 +201,6 @@ module.exports = {
       runmeLinkLabel: 'Checkout via Runme'
     },
   },
-  webpack: {
-    jsLoader: (isServer) => ({
-      loader: require.resolve('swc-loader'),
-      options: {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          transform: {
-            react: {
-              runtime: 'automatic',
-            },
-          },
-          target: 'es2017',
-        },
-        module: {
-          type: isServer ? 'commonjs' : 'es6',
-        },
-      },
-    }),
-  },
   presets: [
     [
       "classic",
@@ -396,8 +374,18 @@ module.exports = {
       };
     },
   ],
-  markdown: {
-    mermaid: true,
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  future: {
+    v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+    experimental_faster: {
+      swcJsLoader: false, // Disabled because of memory usage > 8GB which is a problem on vercel default runners
+      swcJsMinimizer: true,
+      swcHtmlMinimizer : true,
+      lightningCssMinimizer: true,
+      mdxCrossCompilerCache: true,
+      ssgWorkerThreads: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+      rspackBundler: true,
+      rspackPersistentCache: true,
+    },
   },
-  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs", '@docusaurus/theme-mermaid'],
 };

@@ -3,6 +3,7 @@ package idp
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -48,6 +49,7 @@ const (
 	acsPath         = idpPrefix + "/saml/acs"
 	certificatePath = idpPrefix + "/saml/certificate"
 	sloPath         = idpPrefix + "/saml/slo"
+	jwtPath         = "/jwt"
 
 	paramIntentID         = "id"
 	paramToken            = "token"
@@ -129,6 +131,7 @@ func NewHandler(
 	router.HandleFunc(certificatePath, h.handleCertificate)
 	router.HandleFunc(acsPath, h.handleACS)
 	router.HandleFunc(sloPath, h.handleSLO)
+	router.HandleFunc(jwtPath, h.handleJWT)
 	return router
 }
 
@@ -302,6 +305,89 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session)
 	if err != nil {
 		redirectToFailureURLErr(w, r, intent, zerrors.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		return
+	}
+	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
+func (h *Handler) handleJWT(w http.ResponseWriter, r *http.Request) {
+	intentID, err := h.intentIDFromJWTRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	intent, err := h.commands.GetActiveIntent(r.Context(), intentID)
+	if err != nil {
+		if zerrors.IsNotFound(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+	idpConfig, err := h.getProvider(r.Context(), intent.IDPID)
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(r.Context(), intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+	jwtIDP, ok := idpConfig.(*jwt.Provider)
+	if !ok {
+		err := zerrors.ThrowInvalidArgument(nil, "IDP-JK23ed", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		cmdErr := h.commands.FailIDPIntent(r.Context(), intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+	h.handleJWTExtraction(w, r, intent, jwtIDP)
+}
+
+func (h *Handler) intentIDFromJWTRequest(r *http.Request) (string, error) {
+	// for compatibility of the old JWT provider we use the auth request id parameter to pass the intent id
+	intentID := r.FormValue(jwt.QueryAuthRequestID)
+	// for compatibility of the old JWT provider we use the user agent id parameter to pass the encrypted intent id
+	encryptedIntentID := r.FormValue(jwt.QueryUserAgentID)
+	if err := h.checkIntentID(intentID, encryptedIntentID); err != nil {
+		return "", err
+	}
+	return intentID, nil
+}
+
+func (h *Handler) checkIntentID(intentID, encryptedIntentID string) error {
+	if intentID == "" || encryptedIntentID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters")
+	}
+	id, err := base64.RawURLEncoding.DecodeString(encryptedIntentID)
+	if err != nil {
+		return err
+	}
+	decryptedIntentID, err := h.encryptionAlgorithm.DecryptString(id, h.encryptionAlgorithm.EncryptionKeyID())
+	if err != nil {
+		return err
+	}
+	if intentID != decryptedIntentID {
+		return zerrors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters")
+	}
+	return nil
+}
+
+func (h *Handler) handleJWTExtraction(w http.ResponseWriter, r *http.Request, intent *command.IDPIntentWriteModel, identityProvider *jwt.Provider) {
+	session := jwt.NewSessionFromRequest(identityProvider, r)
+	user, err := session.FetchUser(r.Context())
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(r.Context(), intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	userID, err := h.checkExternalUser(r.Context(), intent.IDPID, user.GetID())
+	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
+
+	token, err := h.commands.SucceedIDPIntent(r.Context(), intent, user, session, userID)
+	if err != nil {
+		redirectToFailureURLErr(w, r, intent, err)
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
