@@ -272,7 +272,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	}
 }
 
-func TestServer_ListOrganization(t *testing.T) {
+func TestServer_ListOrganizations(t *testing.T) {
 	testStartTimestamp := time.Now()
 	ListOrgIinstance := integration.NewInstance(CTX)
 	listOrgIAmOwnerCtx := ListOrgIinstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1004,7 +1004,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 	}
 }
 
-func TestServer_ListOrganizationDomain(t *testing.T) {
+func TestServer_ListOrganizationDomains(t *testing.T) {
 	domain := gofakeit.URL()
 	tests := []struct {
 		name     string
