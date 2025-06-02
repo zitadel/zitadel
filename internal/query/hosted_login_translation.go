@@ -66,9 +66,10 @@ var (
 	}
 )
 
-var levelTypeMapper = map[settings.ResourceOwnerType]string{
-	settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE: instance.AggregateType,
-	settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG:      org.AggregateType,
+var levelTypeMapper = map[settings.TranslationLevelType]string{
+	settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM:   "system",
+	settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE: instance.AggregateType,
+	settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG:      org.AggregateType,
 }
 
 type HostedLoginTranslations struct {
@@ -101,6 +102,10 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	baseLang, _ := lang.Base()
 
 	sysTranslation, err := getSystemTranslation(baseLang.String(), defaultInstLang.String())
+
+	if req.GetLevel() == settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM {
+		return getTranslationOutputMessage(sysTranslation)
+	}
 
 	stmt, scan := prepareHostedLoginTranslationQuery()
 
@@ -155,19 +160,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		}
 	}
 
-	protoTranslation, err := structpb.NewStruct(requestedTranslation.File)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct")
-	}
-
-	hash := md5.Sum([]byte(protoTranslation.String()))
-
-	res = &settings.GetHostedLoginTranslationResponse{
-		Translations: protoTranslation,
-		Etag:         hex.EncodeToString(hash[:]),
-	}
-
-	return res, nil
+	return getTranslationOutputMessage(requestedTranslation.File)
 }
 
 func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, error) {
@@ -227,4 +220,18 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 
 			return translations, nil
 		}
+}
+
+func getTranslationOutputMessage(translation map[string]any) (*settings.GetHostedLoginTranslationResponse, error) {
+	protoTranslation, err := structpb.NewStruct(translation)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct")
+	}
+
+	hash := md5.Sum([]byte(protoTranslation.String()))
+
+	return &settings.GetHostedLoginTranslationResponse{
+		Translations: protoTranslation,
+		Etag:         hex.EncodeToString(hash[:]),
+	}, nil
 }

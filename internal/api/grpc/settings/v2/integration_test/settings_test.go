@@ -140,7 +140,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 	require.Nil(t, err)
 
 	req := &settings.SetHostedLoginTranslationRequest{
-		Level:        settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG,
+		Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
 		LevelId:      Instance.DefaultOrg.GetId(),
 		Translations: protoTranslations1,
 		Locale:       "en-US",
@@ -151,7 +151,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 	t.Log(res)
 
 	req2 := &settings.SetHostedLoginTranslationRequest{
-		Level:        settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG,
+		Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
 		LevelId:      Instance.DefaultOrg.GetId(),
 		Translations: protoTranslations2,
 		Locale:       "en",

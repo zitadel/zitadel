@@ -16,11 +16,11 @@ import (
 )
 
 var (
-	level2AggregateMapper map[settings.ResourceOwnerType]func(string) eventstore.Aggregate = map[settings.ResourceOwnerType]func(string) eventstore.Aggregate{
-		settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE: func(resourceID string) eventstore.Aggregate {
+	level2AggregateMapper map[settings.TranslationLevelType]func(string) eventstore.Aggregate = map[settings.TranslationLevelType]func(string) eventstore.Aggregate{
+		settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE: func(resourceID string) eventstore.Aggregate {
 			return instance.NewAggregate(resourceID).Aggregate
 		},
-		settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG: func(resourceID string) eventstore.Aggregate {
+		settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG: func(resourceID string) eventstore.Aggregate {
 			return org.NewAggregate(resourceID).Aggregate
 		},
 	}

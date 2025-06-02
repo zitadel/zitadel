@@ -355,7 +355,7 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 
 func TestServer_GetHostedLoginTranslation(t *testing.T) {
 	req := &settings.GetHostedLoginTranslationRequest{
-		Level:             settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG,
+		Level:             settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
 		LevelId:           "322745517727619236",
 		Locale:            "en",
 		IgnoreInheritance: true,
