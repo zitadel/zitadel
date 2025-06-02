@@ -308,6 +308,13 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 			return err
 		}
 	}
+	if check != nil {
+		projectOrGrantID := usergrant.ProjectID
+		if usergrant.ProjectGrantID != "" {
+			projectOrGrantID = usergrant.ProjectGrantID
+		}
+		return check(resourceOwner, projectOrGrantID)
+	}
 	existingRoleKeys, err := c.searchUserGrantPreConditionState(ctx, usergrant, resourceOwner)
 	if err != nil {
 		return err
@@ -454,11 +461,11 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
 	}
 	if check != nil {
-		targetAggregate := usergrant.ProjectID
+		projectOrGrantID := usergrant.ProjectID
 		if !projectIsOwned {
-			targetAggregate = preConditions.ProjectGrantID
+			projectOrGrantID = preConditions.ProjectGrantID
 		}
-		return check(resourceOwner, targetAggregate)
+		return check(resourceOwner, projectOrGrantID)
 	}
 	return nil
 }

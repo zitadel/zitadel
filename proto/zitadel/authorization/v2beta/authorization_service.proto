@@ -359,7 +359,7 @@ message CreateAuthorizationRequest {
   ];
   // OrganizationID is the ID of the organization on which the authorization should be created.
   // The organization must either own the project or have a grant for the project.
-  optional string organization_id = 3 [
+  string organization_id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
