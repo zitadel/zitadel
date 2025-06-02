@@ -206,7 +206,3 @@ func (s *Server) GetHostedLoginTranslation(ctx context.Context, req *settings.Ge
 
 	return translation, nil
 }
-
-func (s *Server) SetHostedLoginTranslation(ctx context.Context, req *settings.SetHostedLoginTranslationRequest) (*settings.SetHostedLoginTranslationResponse, error) {
-	return nil, nil
-}

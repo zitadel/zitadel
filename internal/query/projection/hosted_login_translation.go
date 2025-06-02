@@ -3,8 +3,10 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -35,8 +37,42 @@ func (hltp *hostedLoginTranslationProjection) Reducers() []handler.AggregateRedu
 		{
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
-				{},
+				{
+					Event:  org.HostedLoginTranslationSet,
+					Reduce: hltp.reduceSet,
+				},
 			},
 		},
 	}
+}
+
+func (hltp *hostedLoginTranslationProjection) reduceSet(e eventstore.Event) (*handler.Statement, error) {
+	var orgEvent org.HostedLoginTranslationSetEvent
+
+	switch e := e.(type) {
+	case *org.HostedLoginTranslationSetEvent:
+		orgEvent = *e
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-AZshaa", "reduce.wrong.event.type %v", []eventstore.EventType{org.HostedLoginTranslationSet})
+	}
+
+	return handler.NewUpsertStatement(
+		&orgEvent,
+		[]handler.Column{
+			handler.NewCol(HostedLoginTranslationInstaceIDCol, nil),
+			handler.NewCol(HostedLoginTranslationAggregateIDCol, nil),
+			handler.NewCol(HostedLoginTranslationAggregateTypeCol, nil),
+			handler.NewCol(HostedLoginTranslationLocaleCol, nil),
+		},
+		[]handler.Column{
+			handler.NewCol(HostedLoginTranslationInstaceIDCol, orgEvent.Aggregate().InstanceID),
+			handler.NewCol(HostedLoginTranslationAggregateIDCol, orgEvent.Aggregate().ID),
+			handler.NewCol(HostedLoginTranslationAggregateTypeCol, orgEvent.Aggregate().Type),
+			handler.NewCol(HostedLoginTranslationCreationDateCol, handler.OnlySetValueOnInsert(HostedLoginTranslationTable, orgEvent.CreationDate())),
+			handler.NewCol(HostedLoginTranslationChangeDateCol, orgEvent.CreationDate()),
+			handler.NewCol(HostedLoginTranslationSequenceCol, orgEvent.Sequence()),
+			handler.NewCol(HostedLoginTranslationLocaleCol, orgEvent.Language),
+			handler.NewCol(HostedLoginTranslationFileCol, orgEvent.Translation),
+		},
+	), nil
 }

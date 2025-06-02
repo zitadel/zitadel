@@ -16,3 +16,12 @@ func (s *Server) SetSecuritySettings(ctx context.Context, req *settings.SetSecur
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
+
+func (s *Server) SetHostedLoginTranslation(ctx context.Context, req *settings.SetHostedLoginTranslationRequest) (*settings.SetHostedLoginTranslationResponse, error) {
+	res, err := s.command.SetHostedLoginTranslation(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
