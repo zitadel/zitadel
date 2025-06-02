@@ -67,7 +67,7 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine, setMachineUserInactive bool) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -79,10 +79,15 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (_ *domain.
 		machine.AggregateID = userID
 	}
 
-	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
+	userAgg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(userAgg, machine))
 	if err != nil {
 		return nil, err
+	}
+
+	if setMachineUserInactive {
+		deactivateUserEvent := user.NewUserDeactivatedEvent(ctx, &userAgg.Aggregate)
+		cmds = append(cmds, deactivateUserEvent)
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)

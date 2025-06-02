@@ -201,7 +201,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddMachine(tt.args.ctx, tt.args.machine)
+			got, err := r.AddMachine(tt.args.ctx, tt.args.machine, false)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
