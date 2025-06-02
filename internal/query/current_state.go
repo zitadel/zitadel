@@ -10,6 +10,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -25,7 +26,7 @@ type Stateful interface {
 type State struct {
 	LastRun time.Time
 
-	Position       float64
+	Position       decimal.Decimal
 	EventCreatedAt time.Time
 	AggregateID    string
 	AggregateType  eventstore.AggregateType
@@ -220,7 +221,7 @@ func prepareLatestState() (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
 			var (
 				creationDate sql.NullTime
 				lastUpdated  sql.NullTime
-				position     sql.NullFloat64
+				position     decimal.NullDecimal
 			)
 			err := row.Scan(
 				&creationDate,
@@ -233,7 +234,7 @@ func prepareLatestState() (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
 			return &State{
 				EventCreatedAt: creationDate.Time,
 				LastRun:        lastUpdated.Time,
-				Position:       position.Float64,
+				Position:       position.Decimal,
 			}, nil
 		}
 }
@@ -258,7 +259,7 @@ func prepareCurrentStateQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentStat
 				var (
 					lastRun         sql.NullTime
 					eventDate       sql.NullTime
-					currentPosition sql.NullFloat64
+					currentPosition decimal.NullDecimal
 					aggregateType   sql.NullString
 					aggregateID     sql.NullString
 					sequence        sql.NullInt64
@@ -279,7 +280,7 @@ func prepareCurrentStateQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentStat
 				}
 				currentState.State.EventCreatedAt = eventDate.Time
 				currentState.State.LastRun = lastRun.Time
-				currentState.Position = currentPosition.Float64
+				currentState.Position = currentPosition.Decimal
 				currentState.AggregateType = eventstore.AggregateType(aggregateType.String)
 				currentState.AggregateID = aggregateID.String
 				currentState.Sequence = uint64(sequence.Int64)
