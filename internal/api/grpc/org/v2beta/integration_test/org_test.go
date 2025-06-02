@@ -18,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	v2beta_object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -96,11 +95,11 @@ func TestServer_CreateOrganization(t *testing.T) {
 					},
 				},
 			},
-			want: &org.CreateOrganizationResponse{
-				OrganizationAdmins: []*org.OrganizationAdmin{
+			want: &v2beta_org.CreateOrganizationResponse{
+				OrganizationAdmins: []*v2beta_org.OrganizationAdmin{
 					{
-						OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
-							AssignedAdmin: &org.AssignedAdmin{
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &v2beta_org.AssignedAdmin{
 								UserId: User.GetUserId(),
 							},
 						},
@@ -134,10 +133,10 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
 				Id: integration.NotEmpty,
-				OrganizationAdmins: []*org.OrganizationAdmin{
+				OrganizationAdmins: []*v2beta_org.OrganizationAdmin{
 					{
-						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
-							CreatedAdmin: &org.CreatedAdmin{
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &v2beta_org.CreatedAdmin{
 								UserId:    integration.NotEmpty,
 								EmailCode: gu.Ptr(integration.NotEmpty),
 								PhoneCode: nil,
@@ -181,19 +180,19 @@ func TestServer_CreateOrganization(t *testing.T) {
 					},
 				},
 			},
-			want: &org.CreateOrganizationResponse{
+			want: &v2beta_org.CreateOrganizationResponse{
 				// OrganizationId: integration.NotEmpty,
-				OrganizationAdmins: []*org.OrganizationAdmin{
+				OrganizationAdmins: []*v2beta_org.OrganizationAdmin{
 					{
-						OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
-							AssignedAdmin: &org.AssignedAdmin{
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &v2beta_org.AssignedAdmin{
 								UserId: User.GetUserId(),
 							},
 						},
 					},
 					{
-						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
-							CreatedAdmin: &org.CreatedAdmin{
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &v2beta_org.CreatedAdmin{
 								UserId: integration.NotEmpty,
 							},
 						},
@@ -236,10 +235,10 @@ func TestServer_CreateOrganization(t *testing.T) {
 			for i, admin := range tt.want.GetOrganizationAdmins() {
 				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
 				switch admin := admin.OrganizationAdmin.(type) {
-				case *org.OrganizationAdmin_CreatedAdmin:
-					assertCreatedAdmin(t, admin.CreatedAdmin, gotAdmin.(*org.OrganizationAdmin_CreatedAdmin).CreatedAdmin)
-				case *org.OrganizationAdmin_AssignedAdmin:
-					assert.Equal(t, admin.AssignedAdmin.GetUserId(), gotAdmin.(*org.OrganizationAdmin_AssignedAdmin).AssignedAdmin.GetUserId())
+				case *v2beta_org.OrganizationAdmin_CreatedAdmin:
+					assertCreatedAdmin(t, admin.CreatedAdmin, gotAdmin.(*v2beta_org.OrganizationAdmin_CreatedAdmin).CreatedAdmin)
+				case *v2beta_org.OrganizationAdmin_AssignedAdmin:
+					assert.Equal(t, admin.AssignedAdmin.GetUserId(), gotAdmin.(*v2beta_org.OrganizationAdmin_AssignedAdmin).AssignedAdmin.GetUserId())
 				}
 			}
 		})
@@ -514,8 +513,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 			ctx:  listOrgIAmOwnerCtx,
 			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Filter: &org.OrganizationSearchFilter_DomainFilter{
-						DomainFilter: &org.OrgDomainFilter{
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
 							Domain: func() string {
 								listOrgRes, err := listOrgClient.ListOrganizations(listOrgIAmOwnerCtx, &v2beta_org.ListOrganizationsRequest{
 									Filter: []*v2beta_org.OrganizationSearchFilter{
@@ -549,8 +548,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 			ctx:  listOrgIAmOwnerCtx,
 			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Filter: &org.OrganizationSearchFilter_DomainFilter{
-						DomainFilter: &org.OrgDomainFilter{
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
 							Domain: func() string {
 								domain := strings.ToLower(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
 								return domain
@@ -572,8 +571,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 			ctx:  listOrgIAmOwnerCtx,
 			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Filter: &org.OrganizationSearchFilter_DomainFilter{
-						DomainFilter: &org.OrgDomainFilter{
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
 							Domain: func() string {
 								domain := strings.ToUpper(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
 								return domain
@@ -1416,7 +1415,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: orgId,
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 		},
 		{
@@ -1425,7 +1424,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: "non existent org id",
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
@@ -1436,7 +1435,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: orgId,
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
 			},
 		},
 		{
@@ -1445,7 +1444,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: "non existent org id",
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
 			},
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
@@ -1456,7 +1455,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: orgId,
 				Domain:         "non existent domain",
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			err: errors.New("Domain doesn't exist on organization"),
 		},
