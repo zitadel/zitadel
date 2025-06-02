@@ -300,7 +300,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner, orgID string, orgState domain.OrgState, claimedUserIDs []string) (_ *domain.Org, err error) {
+func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner, orgID string, setOrgInactive bool, claimedUserIDs []string) (_ *domain.Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -312,7 +312,7 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
 	}
 
-	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, orgState, claimedUserIDs)
+	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, setOrgInactive, claimedUserIDs)
 }
 
 func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
@@ -325,10 +325,10 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 		return nil, zerrors.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
 	}
 
-	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, 1, claimedUserIDs)
+	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, false, claimedUserIDs)
 }
 
-func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, resourceOwner, orgID string, orgState domain.OrgState, claimedUserIDs []string) (_ *domain.Org, err error) {
+func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, resourceOwner, orgID string, setOrgInactive bool, claimedUserIDs []string) (_ *domain.Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -346,7 +346,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 		return nil, err
 	}
 	events = append(events, orgMemberEvent)
-	if orgState == domain.OrgStateInactive {
+	if setOrgInactive {
 		deactivateOrgEvent := org.NewOrgDeactivatedEvent(ctx, orgAgg)
 		events = append(events, deactivateOrgEvent)
 	}

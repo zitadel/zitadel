@@ -621,6 +621,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeMachine:
 			machineUsers = append(machineUsers, &v1_pb.DataMachineUser{
 				UserId: user.ID,
+				State:  int32(user.State),
 				User: &management_pb.AddMachineUserRequest{
 					UserName:    user.Username,
 					Name:        user.Machine.Name,

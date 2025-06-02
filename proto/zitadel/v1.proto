@@ -177,6 +177,7 @@ message DataHumanUser {
 message DataMachineUser {
   string user_id = 1;
   zitadel.management.v1.AddMachineUserRequest user = 2;
+  int32 state = 3;
 }
 message DataAction {
   string action_id = 1;

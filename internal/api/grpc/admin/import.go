@@ -305,7 +305,8 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), domain.OrgState(org.OrgState), []string{})
+	setOrgInactive := domain.OrgState(org.OrgState) == domain.OrgStateInactive
+	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), setOrgInactive, []string{})
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
 		if _, err := s.query.OrgByID(ctx, true, org.OrgId); err != nil {
@@ -510,7 +511,8 @@ func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	}
 	for _, user := range org.GetMachineUsers() {
 		logging.Debugf("import user: %s", user.GetUserId())
-		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()))
+		setMachineUserInactive := domain.UserState(user.State) == domain.UserStateInactive
+		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()), setMachineUserInactive)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -805,6 +807,7 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	importDomainClaimedMessageTexts(ctx, s, errors, org)
 	importPasswordlessRegistrationMessageTexts(ctx, s, errors, org)
 	importInviteUserMessageTexts(ctx, s, errors, org)
+
 	if err := importHumanUsers(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode); err != nil {
 		return err
 	}

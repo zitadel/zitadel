@@ -297,7 +297,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
 	machine := AddMachineUserRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
-	objectDetails, err := s.command.AddMachine(ctx, machine)
+	objectDetails, err := s.command.AddMachine(ctx, machine, false)
 	if err != nil {
 		return nil, err
 	}
