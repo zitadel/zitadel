@@ -230,7 +230,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 			// check the admins
-			require.Len(t, tt.want.GetOrganizationAdmins(), got.GetOrganizationAdmins())
+			require.Equal(t, len(tt.want.GetOrganizationAdmins()), len(got.GetOrganizationAdmins()))
 			for i, admin := range tt.want.GetOrganizationAdmins() {
 				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
 				switch admin := admin.OrganizationAdmin.(type) {
