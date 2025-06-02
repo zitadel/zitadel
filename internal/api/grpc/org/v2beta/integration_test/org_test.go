@@ -85,6 +85,29 @@ func TestServer_CreateOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "existing user as admin",
+			ctx:  CTX,
+			req: &v2beta_org.CreateOrganizationRequest{
+				Name: gofakeit.AppName(),
+				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
+					{
+						UserType: &v2beta_org.CreateOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
+					},
+				},
+			},
+			want: &org.CreateOrganizationResponse{
+				OrganizationAdmins: []*org.OrganizationAdmin{
+					{
+						OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &org.AssignedAdmin{
+								UserId: User.GetUserId(),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "admin with init",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
