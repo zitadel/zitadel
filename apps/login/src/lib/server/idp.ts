@@ -43,6 +43,7 @@ export async function redirectToIdp(
 
   // redirect to LDAP page where username and password is requested
   if (provider === "ldap") {
+    params.set("idpId", idpId);
     redirect(`/idp/ldap?` + params.toString());
   }
 

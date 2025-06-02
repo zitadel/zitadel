@@ -49,7 +49,7 @@ export function LDAPUsernamePasswordForm({
       password: values.password,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError("Could not start LDAP flow");
         return;
       })
       .finally(() => {
