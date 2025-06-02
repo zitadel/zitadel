@@ -229,9 +229,8 @@ func TestServer_CreateOrganization(t *testing.T) {
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-			// organization id must be the same as the resourceOwner
-
 			// check the admins
+			require.Equal(t, len(tt.want.GetOrganizationAdmins()), len(got.GetOrganizationAdmins()))
 			for i, admin := range tt.want.GetOrganizationAdmins() {
 				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
 				switch admin := admin.OrganizationAdmin.(type) {
