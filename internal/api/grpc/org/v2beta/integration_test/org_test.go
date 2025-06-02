@@ -52,6 +52,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 		name    string
 		ctx     context.Context
 		req     *v2beta_org.CreateOrganizationRequest
+		id      string
 		want    *v2beta_org.CreateOrganizationResponse
 		wantErr bool
 	}{
@@ -162,6 +163,16 @@ func TestServer_CreateOrganization(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "create with ID",
+			ctx:  CTX,
+			id:   "custom_id",
+			req: &v2beta_org.CreateOrganizationRequest{
+				Name: gofakeit.AppName(),
+				Id:   gu.Ptr("custom_id"),
+			},
+			want: &v2beta_org.CreateOrganizationResponse{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -171,6 +182,10 @@ func TestServer_CreateOrganization(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
+
+			if tt.id != "" {
+				require.Equal(t, tt.id, got.Id)
+			}
 
 			// check details
 			gotCD := got.GetCreationDate().AsTime()
