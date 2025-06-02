@@ -101,10 +101,10 @@ func TestServer_SetUserMetadata(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			creationDate := time.Now().UTC()
 			if tt.dep != nil {
 				tt.dep(tt.req)
 			}
-			creationDate := time.Now().UTC()
 			got, err := Client.SetUserMetadata(tt.ctx, tt.req)
 			changeDate := time.Now().UTC()
 			if tt.wantErr {

@@ -24,7 +24,10 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 		return nil, err
 	}
 
-	setMetadata := NewUserMetadataWriteModel(userID, userResourceOwner, metadata.Key)
+	setMetadata, err := c.getUserMetadataModelByID(ctx, userID, userResourceOwner, metadata.Key)
+	if err != nil {
+		return nil, err
+	}
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
 	// return if no change in the metadata
 	if reflect.DeepEqual(setMetadata.Value, metadata.Value) {
@@ -61,7 +64,10 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 	}
 
 	events := make([]eventstore.Command, 0)
-	setMetadata := NewUserMetadataListWriteModel(userID, userResourceOwner)
+	setMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
 	for _, data := range metadatas {
 		// if no change to metadata no event has to be pushed
