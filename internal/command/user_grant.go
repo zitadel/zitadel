@@ -302,6 +302,12 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	if err := c.checkUserExists(ctx, usergrant.UserID, ""); err != nil {
 		return err
 	}
+	if usergrant.ProjectGrantID == "" {
+		usergrant.ProjectGrantID, err = c.searchProjectGrantID(ctx, usergrant.ProjectID, resourceOwner)
+		if err != nil {
+			return err
+		}
+	}
 	existingRoleKeys, err := c.searchUserGrantPreConditionState(ctx, usergrant, resourceOwner)
 	if err != nil {
 		return err
@@ -316,7 +322,6 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 //
 //nolint:gocognit
 func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (existingRoleKeys []string, err error) {
-	isOwnedProject := userGrant.ResourceOwner == resourceOwner
 	criteria := []map[eventstore.FieldType]any{
 		// project state query
 		{
@@ -333,16 +338,13 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			eventstore.FieldTypeObjectType:    org.OrgSearchType,
 		},
 	}
-	if !isOwnedProject {
-		projectGrantCriteria := map[eventstore.FieldType]any{
+	if userGrant.ProjectGrantID != "" {
+		criteria = append(criteria, map[eventstore.FieldType]any{
 			eventstore.FieldTypeAggregateType: project.AggregateType,
 			eventstore.FieldTypeAggregateID:   userGrant.ProjectID,
 			eventstore.FieldTypeObjectType:    project.ProjectGrantSearchType,
-		}
-		if userGrant.ProjectGrantID != "" {
-			projectGrantCriteria[eventstore.FieldTypeObjectID] = userGrant.ProjectGrantID
-		}
-		criteria = append(criteria, projectGrantCriteria)
+			eventstore.FieldTypeObjectID:      userGrant.ProjectGrantID,
+		})
 	} else {
 		criteria = append(criteria, map[eventstore.FieldType]any{
 			eventstore.FieldTypeAggregateType: project.AggregateType,
@@ -390,13 +392,8 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			case project.ProjectGrantGrantedOrgIDSearchField:
 				var orgID string
 				err := result.Value.Unmarshal(&orgID)
-				if err != nil {
-					return nil, err
-				}
-				// If we didn't provide a grant ID, we can have many grants for different orgs here.
-				// If we find at least one for the usergrants org, we set existsGrant to true.
-				if orgID == resourceOwner {
-					existsGrant = true
+				if err != nil || orgID != resourceOwner {
+					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 				}
 			case project.ProjectGrantStateSearchField:
 				var state domain.ProjectGrantState
@@ -415,7 +412,7 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			case project.ProjectGrantGrantIDSearchField:
 				var grantID string
 				err := result.Value.Unmarshal(&grantID)
-				if err != nil || (userGrant.ProjectGrantID != "" && grantID != userGrant.ProjectGrantID) {
+				if err != nil || grantID != userGrant.ProjectGrantID {
 					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-huvKF", "Errors.Project.Grant.NotFound")
 				}
 			}
@@ -428,7 +425,7 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 	if !existsGrantedOrg {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 	}
-	if !isOwnedProject && !existsGrant {
+	if userGrant.ProjectGrantID != "" && !existsGrant {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-huvKF", "Errors.Project.Grant.NotFound")
 	}
 	return existingRoleKeys, nil
@@ -449,7 +446,7 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
 	}
-	projectIsOwned := preConditions.ProjectResourceOwner == resourceOwner
+	projectIsOwned := resourceOwner == ""
 	if projectIsOwned && !preConditions.ProjectExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
 	}
