@@ -220,7 +220,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	if err := setup.generateIDs(c.idGenerator); err != nil {
 		return "", "", nil, nil, err
 	}
-	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.consoleAppID, c.externalDomain)
+	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.consoleAppID, c.externalDomain, setup.DefaultLanguage)
 
 	validations, pat, machineKey, err := setUpInstance(ctx, c, setup)
 	if err != nil {
@@ -254,19 +254,22 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	return setup.zitadel.instanceID, token, machineKey, details, nil
 }
 
-func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string) context.Context {
-	return authz.WithConsole(
-		authz.SetCtxData(
-			http.WithRequestedHost(
-				authz.WithInstanceID(
-					ctx,
-					instanceID),
-				externalDomain,
+func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string, defaultLanguage language.Tag) context.Context {
+	return authz.WithDefaultLanguage(
+		authz.WithConsole(
+			authz.SetCtxData(
+				http.WithRequestedHost(
+					authz.WithInstanceID(
+						ctx,
+						instanceID),
+					externalDomain,
+				),
+				authz.CtxData{ResourceOwner: instanceID},
 			),
-			authz.CtxData{ResourceOwner: instanceID},
+			projectID,
+			consoleAppID,
 		),
-		projectID,
-		consoleAppID,
+		defaultLanguage,
 	)
 }
 
