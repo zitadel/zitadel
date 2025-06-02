@@ -598,7 +598,7 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				ProjectId:             "notexisting",
 				GrantedOrganizationId: "notexisting",
 			},
-			wantErr: true,
+			wantDeletionDate: false,
 		},
 		{
 			name: "delete",
@@ -650,8 +650,8 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				instance.DeleteProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
 				return creationDate, time.Now().UTC()
 			},
-			req:     &project.DeleteProjectGrantRequest{},
-			wantErr: true,
+			req:              &project.DeleteProjectGrantRequest{},
+			wantDeletionDate: true,
 		},
 	}
 	for _, tt := range tests {

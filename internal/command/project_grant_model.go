@@ -16,13 +16,14 @@ type ProjectGrantWriteModel struct {
 	State        domain.ProjectGrantState
 }
 
-func NewProjectGrantWriteModel(grantID, projectID, resourceOwner string) *ProjectGrantWriteModel {
+func NewProjectGrantWriteModel(grantID, grantedOrgID, projectID, resourceOwner string) *ProjectGrantWriteModel {
 	return &ProjectGrantWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   projectID,
 			ResourceOwner: resourceOwner,
 		},
-		GrantID: grantID,
+		GrantID:      grantID,
+		GrantedOrgID: grantedOrgID,
 	}
 }
 
@@ -30,27 +31,28 @@ func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:
-			if e.GrantID == wm.GrantID {
+			if (wm.GrantID != "" && e.GrantID == wm.GrantID) ||
+				(wm.GrantedOrgID != "" && e.GrantedOrgID == wm.GrantedOrgID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantChangedEvent:
-			if e.GrantID == wm.GrantID {
+			if wm.GrantID != "" && e.GrantID == wm.GrantID {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantCascadeChangedEvent:
-			if e.GrantID == wm.GrantID {
+			if wm.GrantID != "" && e.GrantID == wm.GrantID {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantDeactivateEvent:
-			if e.GrantID == wm.GrantID {
+			if wm.GrantID != "" && e.GrantID == wm.GrantID {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantReactivatedEvent:
-			if e.GrantID == wm.GrantID {
+			if wm.GrantID != "" && e.GrantID == wm.GrantID {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantRemovedEvent:
-			if e.GrantID == wm.GrantID {
+			if wm.GrantID != "" && e.GrantID == wm.GrantID {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.ProjectRemovedEvent:
