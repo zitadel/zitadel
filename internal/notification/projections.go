@@ -40,6 +40,9 @@ func Register(
 	tokenLifetime time.Duration,
 	client *database.DB,
 ) {
+	// make sure the slice does not contain old values
+	projections = nil
+
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig.LegacyEnabled))
