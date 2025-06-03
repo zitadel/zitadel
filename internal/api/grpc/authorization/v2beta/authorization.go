@@ -38,16 +38,31 @@ func (s *Server) UpdateAuthorization(ctx context.Context, request *authorization
 }
 
 func (s *Server) DeleteAuthorization(ctx context.Context, request *authorization.DeleteAuthorizationRequest) (*authorization.DeleteAuthorizationResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	details, err := s.command.RemoveUserGrant(ctx, request.Id, nil, true, s.command.NewPermissionCheckUserGrantDelete(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return &authorization.DeleteAuthorizationResponse{
+		DeletionDate: timestamppb.New(details.EventDate),
+	}, nil
 }
 
 func (s *Server) ActivateAuthorization(ctx context.Context, request *authorization.ActivateAuthorizationRequest) (*authorization.ActivateAuthorizationResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	details, err := s.command.ReactivateUserGrant(ctx, request.Id, nil, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return &authorization.ActivateAuthorizationResponse{
+		ChangeDate: timestamppb.New(details.EventDate),
+	}, nil
 }
 
 func (s *Server) DeactivateAuthorization(ctx context.Context, request *authorization.DeactivateAuthorizationRequest) (*authorization.DeactivateAuthorizationResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	details, err := s.command.DeactivateUserGrant(ctx, request.Id, nil, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return &authorization.DeactivateAuthorizationResponse{
+		ChangeDate: timestamppb.New(details.EventDate),
+	}, nil
 }

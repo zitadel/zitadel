@@ -79,7 +79,7 @@ func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGra
 }
 
 func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.DeactivateUserGrantRequest) (*mgmt_pb.DeactivateUserGrantResponse, error) {
-	objectDetails, err := s.command.DeactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.DeactivateUserGrant(ctx, req.GrantId, gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.Deactivat
 }
 
 func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.ReactivateUserGrantRequest) (*mgmt_pb.ReactivateUserGrantResponse, error) {
-	objectDetails, err := s.command.ReactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.ReactivateUserGrant(ctx, req.GrantId, gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.Reactivat
 }
 
 func (s *Server) RemoveUserGrant(ctx context.Context, req *mgmt_pb.RemoveUserGrantRequest) (*mgmt_pb.RemoveUserGrantResponse, error) {
-	objectDetails, err := s.command.RemoveUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveUserGrant(ctx, req.GrantId, gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
 	if err != nil {
 		return nil, err
 	}

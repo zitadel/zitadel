@@ -13,6 +13,8 @@ import (
 
 type PermissionCheck func(resourceOwner, aggregateID string) error
 
+type UserGrantPermissionCheck func(projectID, projectGrantID string) PermissionCheck
+
 func (c *Commands) newPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
 		if aggregateID == "" {
@@ -72,11 +74,33 @@ func (c *Commands) checkPermissionWriteProjectGrant(ctx context.Context, resourc
 	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantWrite, project.AggregateType)(resourceOwner, projectGrantID)
 }
 
-func (c *Commands) NewPermissionCheckUserGrantWrite(ctx context.Context) PermissionCheck {
-	return func(owningOrGrantedOrgID, projectOrGrantID string) error {
-		if owningOrGrantedOrgID == "" {
-			return zerrors.ThrowInternal(nil, "COMMAND-4n8vs", "Errors.IDMissing")
+func (c *Commands) newUserGrantPermissionCheck(ctx context.Context, permission string) UserGrantPermissionCheck {
+	check := c.newPermissionCheck(ctx, permission, project.AggregateType)
+	return func(projectID, projectGrantID string) PermissionCheck {
+		return func(resourceOwner, _ string) error {
+			if projectGrantID != "" {
+				grantErr := check(resourceOwner, projectGrantID)
+				if grantErr != nil {
+					projectErr := check(resourceOwner, projectID)
+					if projectErr != nil {
+						return grantErr
+					}
+				}
+			} else {
+				projectErr := check(resourceOwner, projectID)
+				if projectErr != nil {
+					return projectErr
+				}
+			}
+			return nil
 		}
-		return c.newPermissionCheck(ctx, domain.PermissionUserGrantWrite, project.AggregateType)(owningOrGrantedOrgID, projectOrGrantID)
 	}
+}
+
+func (c *Commands) NewPermissionCheckUserGrantWrite(ctx context.Context) UserGrantPermissionCheck {
+	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantWrite)
+}
+
+func (c *Commands) NewPermissionCheckUserGrantDelete(ctx context.Context) UserGrantPermissionCheck {
+	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantDelete)
 }

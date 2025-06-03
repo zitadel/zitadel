@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/muhlemmer/gu"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -194,7 +195,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
-		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, _, err := c.removeUserGrant(ctx, grantID, gu.Ptr(""), true, false, nil)
 		if err != nil {
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
