@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test57(t *testing.T) {
+func Test58(t *testing.T) {
 	const query = `INSERT INTO projections.hosted_login_translations
 	(instance_id, aggregate_id, aggregate_type, creation_date, change_date, sequence, locale) VALUES
 	($1, $2, $3, $4, $5, $6, $7)`

@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 57.sql
+	//go:embed 58.sql
 	addHostedLoginTranslations string
 )
 
@@ -23,5 +23,5 @@ func (mig *HostedLoginTranslation) Execute(ctx context.Context, _ eventstore.Eve
 }
 
 func (mig *HostedLoginTranslation) String() string {
-	return "57_hosted_login_translations"
+	return "58_hosted_login_translations"
 }
