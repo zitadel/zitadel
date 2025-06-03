@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS projections.resource_counts
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     amount INTEGER NOT NULL DEFAULT 1 CHECK (amount >= 0),
     
-	UNIQUE (instance_id, table_name, parent_type, parent_id)
+	UNIQUE (instance_id, parent_type, parent_id, table_name)
 );
 
 -- count_resource is a trigger function which increases or decreases the count of a resource.
@@ -85,7 +85,6 @@ CREATE OR REPLACE FUNCTION projections.delete_parent_counts()
 AS $$
 DECLARE
 	-- trigger variables
-	tg_table_name TEXT := TG_TABLE_SCHEMA || '.' || TG_TABLE_NAME;
 	tg_parent_type TEXT := TG_ARGV[0];
 	tg_instance_id_column TEXT := TG_ARGV[1];
 	tg_parent_id_column TEXT := TG_ARGV[2];
@@ -99,7 +98,6 @@ BEGIN
 	
 	DELETE FROM projections.resource_counts
 		WHERE instance_id = tg_instance_id
-		AND table_name = tg_table_name
 		AND parent_type = tg_parent_type
 		AND parent_id = tg_parent_id;
 	
