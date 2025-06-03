@@ -92,6 +92,7 @@ type HostedLoginTranslation struct {
 func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.GetHostedLoginTranslationRequest) (res *settings.GetHostedLoginTranslationResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
 	inst := authz.GetInstance(ctx)
 	defaultInstLang := inst.DefaultLanguage()
 
@@ -102,6 +103,9 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	baseLang, _ := lang.Base()
 
 	sysTranslation, err := getSystemTranslation(baseLang.String(), defaultInstLang.String())
+	if err != nil {
+		return nil, err
+	}
 
 	if req.GetLevel() == settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM {
 		return getTranslationOutputMessage(sysTranslation)
@@ -122,7 +126,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		return nil, zerrors.ThrowInternal(err, "QUERY-ZgCMux", "Errors.Query.SQLStatement")
 	}
 
-	trs := make([]*HostedLoginTranslation, 2)
+	trs := []*HostedLoginTranslation{}
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
 		trs, err = scan(rows)
 		return err
@@ -132,7 +136,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		return nil, zerrors.ThrowInternal(err, "QUERY-6k1zjx", "Errors.Internal")
 	}
 
-	var requestedTranslation, otherTranslation *HostedLoginTranslation
+	requestedTranslation, otherTranslation := &HostedLoginTranslation{}, &HostedLoginTranslation{}
 	for _, tr := range trs {
 		if tr == nil {
 			continue
@@ -148,7 +152,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	if !req.GetIgnoreInheritance() {
 		// Case where req.GetLevel() == ORGANIZATION -> Check if we have an instance level translation
 		// If so, merge it with the translations we have
-		if otherTranslation != nil && requestedTranslation.LevelType > otherTranslation.LevelType {
+		if otherTranslation != nil && otherTranslation.LevelType == instance.AggregateType {
 			if err := mergo.Merge(&requestedTranslation.File, otherTranslation.File); err != nil {
 				return nil, zerrors.ThrowInternal(err, "QUERY-pdgEJd", "Errors.Query.MergeTranslations")
 			}
@@ -195,7 +199,7 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 			Limit(2).
 			PlaceholderFormat(sq.Dollar),
 		func(r *sql.Rows) ([]*HostedLoginTranslation, error) {
-			translations := make([]*HostedLoginTranslation, 2)
+			translations := []*HostedLoginTranslation{}
 			for r.Next() {
 				rawTranslation := []byte{}
 				translation := &HostedLoginTranslation{}

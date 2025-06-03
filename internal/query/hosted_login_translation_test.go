@@ -2,14 +2,20 @@ package query
 
 import (
 	"crypto/md5"
+	"database/sql"
+	"database/sql/driver"
 	"encoding/hex"
 	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	"golang.org/x/text/language"
 	"google.golang.org/protobuf/runtime/protoimpl"
 	"google.golang.org/protobuf/types/known/structpb"
 )
@@ -125,6 +131,209 @@ func TestGetTranslationOutput(t *testing.T) {
 			// Verify
 			require.Equal(t, tc.expectedError, err)
 			assert.Equal(t, tc.expectedResponse, res)
+		})
+	}
+}
+
+func TestGetHostedLoginTranslation(t *testing.T) {
+	query := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type
+	FROM projections.hosted_login_translations
+	WHERE projections.hosted_login_translations.aggregate_id = $1
+	AND projections.hosted_login_translations.aggregate_type = $2
+	AND projections.hosted_login_translations.instance_id = $3
+	AND projections.hosted_login_translations.locale = $4
+	LIMIT 2`
+
+	okTranslation := defaultLoginTranslations
+
+	parsedOKTranslation := map[string]map[string]any{}
+	require.Nil(t, json.Unmarshal(okTranslation, &parsedOKTranslation))
+
+	protoDefaultTranslation, err := structpb.NewStruct(parsedOKTranslation["en"])
+	require.Nil(t, err)
+
+	defaultWithDBTranslations := parsedOKTranslation["en"]
+	defaultWithDBTranslations["test"] = "translation"
+	defaultWithDBTranslations["test2"] = "translation2"
+	protoDefaultWithDBTranslation, err := structpb.NewStruct(defaultWithDBTranslations)
+	require.Nil(t, err)
+
+	nilProtoDefaultMap, err := structpb.NewStruct(nil)
+	require.Nil(t, err)
+
+	hashDefaultTranslations := md5.Sum([]byte(protoDefaultTranslation.String()))
+	hashDefaultWithDBTranslations := md5.Sum([]byte(protoDefaultWithDBTranslation.String()))
+
+	tt := []struct {
+		testName string
+
+		defaultInstanceLanguage language.Tag
+		sqlExpectations         []mock.Expectation
+
+		inputRequest *settings.GetHostedLoginTranslationRequest
+
+		expectedError  error
+		expectedResult *settings.GetHostedLoginTranslationResponse
+	}{
+		{
+			testName: "when input language is invalid should return invalid argument error",
+
+			inputRequest: &settings.GetHostedLoginTranslationRequest{},
+
+			expectedError: zerrors.ThrowInvalidArgument(nil, "QUERY-rZLAGi", "Errors.Arguments.Locale.Invalid"),
+		},
+		{
+			testName: "when input language is root should return invalid argument error",
+
+			defaultInstanceLanguage: language.English,
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "root",
+			},
+
+			expectedError: zerrors.ThrowInvalidArgument(nil, "QUERY-rZLAGi", "Errors.Arguments.Locale.Invalid"),
+		},
+		{
+			testName: "when no system translation is available should return not found error",
+
+			defaultInstanceLanguage: language.Romanian,
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "ro-RO",
+			},
+
+			expectedError: zerrors.ThrowNotFoundf(nil, "QUERY-6gb5QR", "Errors.Query.HostedLoginTranslationNotFound-%s", "ro"),
+		},
+		{
+			testName: "when requesting system translation should return it",
+
+			defaultInstanceLanguage: language.English,
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en",
+				Level:  settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM,
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Translations: protoDefaultTranslation,
+				Etag:         hex.EncodeToString(hashDefaultTranslations[:]),
+			},
+		},
+		{
+			testName: "when querying DB fails should return internal error",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					query,
+					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryErr(sql.ErrConnDone),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale:  "en",
+				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+				LevelId: "123",
+			},
+
+			expectedError: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-6k1zjx", "Errors.Internal"),
+		},
+		{
+			testName: "when querying DB returns no result should return system translations",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					query,
+					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type"},
+						[][]driver.Value{},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale:  "en",
+				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+				LevelId: "123",
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Translations: protoDefaultTranslation,
+				Etag:         hex.EncodeToString(hashDefaultTranslations[:]),
+			},
+		},
+		{
+			testName: "when querying DB returns no result and inheritance disabled should return empty result",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					query,
+					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type"},
+						[][]driver.Value{},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale:            "en",
+				Level:             settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+				LevelId:           "123",
+				IgnoreInheritance: true,
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         "d41d8cd98f00b204e9800998ecf8427e",
+				Translations: nilProtoDefaultMap,
+			},
+		},
+		{
+			testName: "when querying DB returns records should return merged result",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					query,
+					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type"},
+						[][]driver.Value{
+							{`{"test": "translation"}`, `org`},
+							{`{"test2": "translation2"}`, `instance`},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale:  "en",
+				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+				LevelId: "123",
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         hex.EncodeToString(hashDefaultWithDBTranslations[:]),
+				Translations: protoDefaultWithDBTranslation,
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Given
+			db := &database.DB{DB: mock.NewSQLMock(t, tc.sqlExpectations...).DB}
+			querier := Queries{client: db}
+
+			ctx := authz.NewMockContext("instance-id", "org-id", "user-id", tc.defaultInstanceLanguage)
+
+			// When
+			res, err := querier.GetHostedLoginTranslation(ctx, tc.inputRequest)
+
+			// Verify
+			require.Equal(t, tc.expectedError, err)
+
+			if tc.expectedError == nil {
+				assert.Equal(t, tc.expectedResult.GetEtag(), res.GetEtag())
+				assert.Equal(t, tc.expectedResult.GetTranslations().GetFields(), res.GetTranslations().GetFields())
+			}
 		})
 	}
 }
