@@ -42,7 +42,7 @@ func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.
 	}
 	baseLang, _ := lang.Base()
 
-	commands, wm, err := c.setTranslation(ctx, agg, baseLang, req.GetTranslations().AsMap())
+	commands, wm, err := c.setTranslationEvents(ctx, agg, baseLang, req.GetTranslations().AsMap())
 
 	pushedEvents, err := c.eventstore.Push(ctx, commands...)
 	if err != nil {
@@ -65,7 +65,7 @@ func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.
 	}, nil
 }
 
-func (c *Commands) setTranslation(ctx context.Context, agg eventstore.Aggregate, lang language.Base, translations map[string]any) ([]eventstore.Command, *HostedLoginTranslationWriteModel, error) {
+func (c *Commands) setTranslationEvents(ctx context.Context, agg eventstore.Aggregate, lang language.Base, translations map[string]any) ([]eventstore.Command, *HostedLoginTranslationWriteModel, error) {
 	wm := NewHostedLoginTranslationWriteModel(agg.ID)
 	events := []eventstore.Command{}
 	switch agg.Type {
