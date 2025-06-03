@@ -78,7 +78,8 @@ type Org struct {
 	ResourceOwner string
 	State         domain_pkg.OrgState
 	Sequence      uint64
-	InstanceID    string
+	// instanceID is used to create a unique cache key for the org
+	instanceID string
 
 	Name   string
 	Domain string
@@ -161,7 +162,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		ResourceOwner: foundOrg.Owner,
 		State:         domain_pkg.OrgState(foundOrg.State.State),
 		Sequence:      uint64(foundOrg.Sequence),
-		InstanceID:    foundOrg.InstanceID,
+		instanceID:    foundOrg.InstanceID,
 		Name:          foundOrg.Name,
 		Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
@@ -448,7 +449,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 				&o.ResourceOwner,
 				&o.State,
 				&o.Sequence,
-				&o.InstanceID,
+				&o.instanceID,
 				&o.Name,
 				&o.Domain,
 			)
@@ -526,9 +527,9 @@ const (
 func (o *Org) Keys(index orgIndex) []string {
 	switch index {
 	case orgIndexByID:
-		return []string{orgCacheKey(o.InstanceID, o.ID)}
+		return []string{orgCacheKey(o.instanceID, o.ID)}
 	case orgIndexByPrimaryDomain:
-		return []string{orgCacheKey(o.InstanceID, o.Domain)}
+		return []string{orgCacheKey(o.instanceID, o.Domain)}
 	case orgIndexUnspecified:
 	}
 	return nil
