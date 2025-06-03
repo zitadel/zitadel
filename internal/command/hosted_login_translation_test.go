@@ -2,6 +2,9 @@ package command
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +15,9 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestSetTranslationEvents(t *testing.T) {
@@ -81,6 +86,136 @@ func TestSetTranslationEvents(t *testing.T) {
 
 			require.Len(t, events, len(tc.expectedCommands))
 			assert.ElementsMatch(t, tc.expectedCommands, events)
+		})
+	}
+}
+
+func TestSetHostedLoginTranslation(t *testing.T) {
+	t.Parallel()
+
+	testCtx := authz.SetCtxData(context.Background(), authz.CtxData{UserID: "test-user"})
+	testCtx = service.WithService(testCtx, "test-service")
+
+	testTranslation := map[string]any{"test": "translation", "translation": "2"}
+	protoTranslation, err := structpb.NewStruct(testTranslation)
+	require.Nil(t, err)
+
+	hashTestTranslation := md5.Sum([]byte(protoTranslation.String()))
+	require.NotEmpty(t, hashTestTranslation)
+
+	tt := []struct {
+		testName string
+
+		mockPush func(*testing.T) *eventstore.Eventstore
+
+		inputReq *settings.SetHostedLoginTranslationRequest
+
+		expectedError  error
+		expectedResult *settings.SetHostedLoginTranslationResponse
+	}{
+		{
+			testName: "when level is neither instance nor org should return invalid argument error",
+			mockPush: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+			inputReq: &settings.SetHostedLoginTranslationRequest{
+				Level: settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM,
+			},
+
+			expectedError: zerrors.ThrowInvalidArgument(nil, "COMMA-YB6Sri", "Errors.Arguments.LevelType.Invalid"),
+		},
+		{
+			testName: "when locale is malformed should return invalid argument error",
+			mockPush: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+			inputReq: &settings.SetHostedLoginTranslationRequest{
+				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE,
+				LevelId: "instance-id",
+				Locale:  "123",
+			},
+
+			expectedError: zerrors.ThrowInvalidArgument(nil, "COMMA-xmjATA", "Errors.Arguments.Locale.Invalid"),
+		},
+		{
+			testName: "when locale is unknown should return invalid argument error",
+			mockPush: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+			inputReq: &settings.SetHostedLoginTranslationRequest{
+				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE,
+				LevelId: "instance-id",
+				Locale:  "root",
+			},
+
+			expectedError: zerrors.ThrowInvalidArgument(nil, "COMMA-xmjATA", "Errors.Arguments.Locale.Invalid"),
+		},
+		{
+			testName: "when event pushing fails should return internal error",
+
+			mockPush: expectEventstore(expectPushFailed(
+				errors.New("mock push failed"),
+				instance.NewHostedLoginTranslationSetEvent(
+					testCtx, &eventstore.Aggregate{
+						ID:            "instance-id",
+						Type:          instance.AggregateType,
+						ResourceOwner: "instance-id",
+						InstanceID:    "instance-id",
+						Version:       instance.AggregateVersion,
+					},
+					testTranslation,
+					"it",
+				),
+			)),
+
+			inputReq: &settings.SetHostedLoginTranslationRequest{
+				Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE,
+				LevelId:      "instance-id",
+				Locale:       "it-CH",
+				Translations: protoTranslation,
+			},
+
+			expectedError: zerrors.ThrowInternal(errors.New("mock push failed"), "COMMA-i8nqFl", "Errors.Internal"),
+		},
+		{
+			testName: "when request is valid should return expected response",
+
+			mockPush: expectEventstore(expectPush(
+				org.NewHostedLoginTranslationSetEvent(
+					testCtx, &eventstore.Aggregate{
+						ID:            "org-id",
+						Type:          org.AggregateType,
+						ResourceOwner: "org-id",
+						InstanceID:    "",
+						Version:       org.AggregateVersion,
+					},
+					testTranslation,
+					"it",
+				),
+			)),
+
+			inputReq: &settings.SetHostedLoginTranslationRequest{
+				Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+				LevelId:      "org-id",
+				Locale:       "it-CH",
+				Translations: protoTranslation,
+			},
+
+			expectedResult: &settings.SetHostedLoginTranslationResponse{
+				Etag: hex.EncodeToString(hashTestTranslation[:]),
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// Given
+			c := Commands{
+				eventstore: tc.mockPush(t),
+			}
+
+			// When
+			res, err := c.SetHostedLoginTranslation(testCtx, tc.inputReq)
+
+			// Verify
+			require.Equal(t, tc.expectedError, err)
+			assert.Equal(t, tc.expectedResult, res)
 		})
 	}
 }

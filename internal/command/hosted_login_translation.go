@@ -43,6 +43,9 @@ func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.
 	baseLang, _ := lang.Base()
 
 	commands, wm, err := c.setTranslationEvents(ctx, agg, baseLang, req.GetTranslations().AsMap())
+	if err != nil {
+		return nil, err
+	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, commands...)
 	if err != nil {
