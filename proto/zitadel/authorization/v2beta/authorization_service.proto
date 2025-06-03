@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.authorizations.v2beta;
+package zitadel.authorization.v2beta;
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";

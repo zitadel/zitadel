@@ -23,11 +23,6 @@ type Server struct {
 	checkPermission domain.PermissionCheck
 }
 
-func (s *Server) mustEmbedUnimplementedAuthorizationServiceServer() {
-	//TODO implement me
-	panic("implement me")
-}
-
 type Config struct{}
 
 func CreateServer(

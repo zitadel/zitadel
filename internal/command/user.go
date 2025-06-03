@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
-	"github.com/muhlemmer/gu"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"

@@ -2,10 +2,12 @@ package authorization
 
 import (
 	"context"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.CreateAuthorizationRequest) (*authorization.CreateAuthorizationResponse, error) {

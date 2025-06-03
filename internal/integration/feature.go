@@ -2,11 +2,13 @@ package integration
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
 func EnsureInstanceFeature(t *testing.T, ctx context.Context, instance *Instance, features *feature.SetInstanceFeaturesRequest, assertFeatures func(t *assert.CollectT, got *feature.GetInstanceFeaturesResponse)) {

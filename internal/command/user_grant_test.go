@@ -3,9 +3,9 @@ package command
 import (
 	"context"
 	"errors"
-	"github.com/muhlemmer/gu"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -22,15 +22,15 @@ import (
 )
 
 var (
-	mockedPermissionCheckErr   = errors.New("mocked permission check error")
+	errMockedPermissionCheck   = errors.New("mocked permission check error")
 	isMockedPermissionCheckErr = func(err error) bool {
-		return errors.Is(err, mockedPermissionCheckErr)
+		return errors.Is(err, errMockedPermissionCheck)
 	}
 	succeedingUserGrantPermissionCheck = func(_, _ string) PermissionCheck {
 		return func(_, _ string) error { return nil }
 	}
 	failingUserGrantPermissionCheck = func(_, _ string) PermissionCheck {
-		return func(_, _ string) error { return mockedPermissionCheckErr }
+		return func(_, _ string) error { return errMockedPermissionCheck }
 	}
 )
 
@@ -796,7 +796,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			ProjectID: "project1",
 			RoleKeys:  []string{"rolekey1"},
 		}, gu.Ptr("org1"), failingUserGrantPermissionCheck)
-		assert.ErrorIs(t, err, mockedPermissionCheckErr)
+		assert.ErrorIs(t, err, errMockedPermissionCheck)
 	})
 }
 
