@@ -257,7 +257,7 @@ func Test_OrgPrepares(t *testing.T) {
 				ResourceOwner: "ro",
 				State:         domain.OrgStateActive,
 				Sequence:      20211108,
-				InstanceID:    "instance-id",
+				instanceID:    "instance-id",
 				Name:          "org-name",
 				Domain:        "zitadel.ch",
 			},
