@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -524,7 +525,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "userID")
+				ctx := authz.NewMockContext("instanceID", "orgID", "userID", language.English)
 				got, err := q.GetAuthNKeyUser(ctx, "keyID", "userID")
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)

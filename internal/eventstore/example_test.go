@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	query_repo "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"golang.org/x/text/language"
 )
 
 // ------------------------------------------------------------
@@ -16,7 +17,7 @@ import (
 // ------------------------------------------------------------
 func NewUserAggregate(id string) *eventstore.Aggregate {
 	return eventstore.NewAggregate(
-		authz.NewMockContext("zitadel", "caos", "adlerhurst"),
+		authz.NewMockContext("zitadel", "caos", "adlerhurst", language.English),
 		id,
 		"test.user",
 		"v1",

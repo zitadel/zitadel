@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -47,7 +48,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:  authz.NewMockContext("instanceID", "", ""),
+				ctx:  authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{},
 			},
 			res{
@@ -63,7 +64,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID:    "user1",
 					Email: &Email{Address: "noemail"},
@@ -82,7 +83,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID:    "user1",
 					Email: &Email{Address: "noemail", URLTemplate: "{{"},
@@ -103,7 +104,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID: "user1",
 				},
@@ -135,7 +136,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID:    "user1",
 					Email: &Email{Address: "noemail@example.com"},
@@ -175,7 +176,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID: "user1",
 					Email: &Email{
@@ -231,7 +232,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID: "user1",
 					Email: &Email{
@@ -285,7 +286,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID: "user1",
 					Email: &Email{
@@ -328,7 +329,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUserEmail{
 					ID:    "user1",
 					Email: &Email{Address: "test@example.com", Verified: true},
@@ -394,7 +395,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				id:  "",
 			},
 			res{
@@ -411,7 +412,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				id:  "user1",
 			},
 			res{
@@ -441,7 +442,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				id:  "user1",
 			},
 			res{
@@ -499,7 +500,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				id:  "user1",
 			},
 			res{
@@ -551,7 +552,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				id:  "user1",
 			},
 			res{
@@ -603,7 +604,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				id:  "user1",
 			},
 			res{
@@ -663,7 +664,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:  authz.NewMockContext("instanceID", "", ""),
+				ctx:  authz.NewMockContext("instanceID", "", "", language.English),
 				id:   "user1",
 				code: "emailverify",
 			},
@@ -723,7 +724,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ResendSchemaUserEmailCode{
 					ID: "",
 				},
@@ -742,7 +743,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ResendSchemaUserEmailCode{
 					ID: "user1",
 				},
@@ -774,7 +775,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ResendSchemaUserEmailCode{
 					ID: "user1",
 				},
@@ -834,7 +835,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ResendSchemaUserEmailCode{
 					ID: "user1",
 				},
@@ -888,7 +889,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ResendSchemaUserEmailCode{
 					ID: "user1",
 				},
@@ -960,7 +961,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify2", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ResendSchemaUserEmailCode{
 					ID:          "user1",
 					URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
@@ -1033,7 +1034,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify2", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ResendSchemaUserEmailCode{
 					ID:          "user1",
 					URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",

@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -64,7 +65,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:  authz.NewMockContext("instanceID", "", ""),
+				ctx:  authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{},
 			},
 			res{
@@ -80,7 +81,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner: "org1",
 				},
@@ -100,7 +101,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -141,7 +142,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -182,7 +183,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -238,7 +239,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -286,7 +287,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -332,7 +333,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "org1", "id1"),
+				ctx: authz.NewMockContext("instanceID", "org1", "id1", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -376,7 +377,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				ctx: authz.NewMockContext("instanceID", "org1", "user1", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -432,7 +433,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -478,7 +479,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				ctx: authz.NewMockContext("instanceID", "org1", "user1", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -551,7 +552,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -631,7 +632,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -740,7 +741,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -850,7 +851,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -953,7 +954,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -1027,7 +1028,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &CreateSchemaUser{
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
@@ -1251,14 +1252,14 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 						),
 					),
 					expectPush(
-						schemauser.NewDeletedEvent(authz.NewMockContext("instanceID", "org1", "user1"),
+						schemauser.NewDeletedEvent(authz.NewMockContext("instanceID", "org1", "user1", language.English),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1", language.English),
 				userID: "user1",
 			},
 			res: res{
@@ -2171,7 +2172,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:  authz.NewMockContext("instanceID", "", ""),
+				ctx:  authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{},
 			},
 			res{
@@ -2202,7 +2203,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2223,7 +2224,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID:    "user1",
 					Email: &Email{Address: "noemail"},
@@ -2242,7 +2243,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID:    "user1",
 					Phone: &Phone{Number: "invalid"},
@@ -2294,7 +2295,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2363,7 +2364,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2428,7 +2429,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2496,7 +2497,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2585,7 +2586,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2656,7 +2657,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2716,7 +2717,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2774,7 +2775,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				ctx: authz.NewMockContext("instanceID", "org1", "user1", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2831,7 +2832,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				ctx: authz.NewMockContext("instanceID", "org1", "user1", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2902,7 +2903,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -2961,7 +2962,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				ctx: authz.NewMockContext("instanceID", "org1", "user1", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -3006,7 +3007,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					Email: &Email{
@@ -3081,7 +3082,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					SchemaUser: &SchemaUser{
@@ -3138,7 +3139,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				newCode:         mockEncryptedCode("emailverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					Email: &Email{
@@ -3180,7 +3181,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					Phone: &Phone{
@@ -3264,7 +3265,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					Phone: &Phone{
@@ -3349,7 +3350,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					Phone: &Phone{
@@ -3427,7 +3428,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID: "user1",
 					Phone: &Phone{
@@ -3476,7 +3477,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
+				ctx: authz.NewMockContext("instanceID", "", "", language.English),
 				user: &ChangeSchemaUser{
 					ID:    "user1",
 					Email: &Email{Address: "test@example.com", Verified: true},
