@@ -68,7 +68,7 @@ func DeleteParentCountsTrigger(
 	table string,
 	parentType domain.CountParentType,
 	instanceIDColumn string,
-	parentIDColoumn string,
+	parentIDColumn string,
 	resource string,
 ) RepeatableMigration {
 	return &triggerMigration{
@@ -76,7 +76,7 @@ func DeleteParentCountsTrigger(
 			Table:            table,
 			ParentType:       parentType.String(),
 			InstanceIDColumn: instanceIDColumn,
-			ParentIDColumn:   parentIDColoumn,
+			ParentIDColumn:   parentIDColumn,
 			Resource:         resource,
 		},
 		db:           db,
@@ -102,7 +102,6 @@ func (m *triggerMigration) Execute(ctx context.Context, _ eventstore.Event) erro
 	if err != nil {
 		return fmt.Errorf("%s: execute trigger template: %w", m, err)
 	}
-	fmt.Println(query.String())
 	_, err = m.db.ExecContext(ctx, query.String())
 	if err != nil {
 		return fmt.Errorf("%s: exec trigger query: %w", m, err)

@@ -61,7 +61,7 @@ BEGIN
 END
 $$;
 
--- delete_table_counts removes all resource counts for a TRUNCATEd table.
+-- delete_table_counts removes all resource counts for a TRUNCATED table.
 CREATE OR REPLACE FUNCTION projections.delete_table_counts()
 	RETURNS trigger
 	LANGUAGE 'plpgsql'
