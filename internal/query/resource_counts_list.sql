@@ -1,5 +1,6 @@
 SELECT id,
     instance_id,
+    table_name,
     parent_type,
     parent_id,
     resource_name,

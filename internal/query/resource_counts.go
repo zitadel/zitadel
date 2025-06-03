@@ -19,6 +19,7 @@ var (
 type ResourceCount struct {
 	ID         int // Primary key, used for pagination
 	InstanceID string
+	TableName  string
 	ParentType domain.CountParentType
 	ParentID   string
 	Resource   string
@@ -40,6 +41,7 @@ func (q *Queries) ListResourceCounts(ctx context.Context, lastID, limit int) (re
 			err := rows.Scan(
 				&count.ID,
 				&count.InstanceID,
+				&count.TableName,
 				&count.ParentType,
 				&count.ParentID,
 				&count.Resource,

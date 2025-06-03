@@ -16,7 +16,7 @@ import (
 )
 
 func TestQueries_ListResourceCounts(t *testing.T) {
-	columns := []string{"id", "instance_id", "parent_type", "parent_id", "resource_name", "updated_at", "amount"}
+	columns := []string{"id", "instance_id", "table_name", "parent_type", "parent_id", "resource_name", "updated_at", "amount"}
 	type args struct {
 		lastID int
 		limit  int
@@ -52,14 +52,15 @@ func TestQueries_ListResourceCounts(t *testing.T) {
 					WithArgs(0, 10).
 					WillReturnRows(
 						sqlmock.NewRows(columns).
-							AddRow(1, "instance_1", "instance", "parent_1", "resource_name", time.Unix(1, 2), 5).
-							AddRow(2, "instance_2", "instance", "parent_2", "resource_name", time.Unix(1, 2), 6),
+							AddRow(1, "instance_1", "table", "instance", "parent_1", "resource_name", time.Unix(1, 2), 5).
+							AddRow(2, "instance_2", "table", "instance", "parent_2", "resource_name", time.Unix(1, 2), 6),
 					)
 			},
 			wantResult: []ResourceCount{
 				{
 					ID:         1,
 					InstanceID: "instance_1",
+					TableName:  "table",
 					ParentType: domain.CountParentTypeInstance,
 					ParentID:   "parent_1",
 					Resource:   "resource_name",
@@ -69,6 +70,7 @@ func TestQueries_ListResourceCounts(t *testing.T) {
 				{
 					ID:         2,
 					InstanceID: "instance_2",
+					TableName:  "table",
 					ParentType: domain.CountParentTypeInstance,
 					ParentID:   "parent_2",
 					Resource:   "resource_name",
