@@ -364,6 +364,14 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 	return resp
 }
 
+func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *mgmt.AddPersonalAccessTokenResponse {
+	resp, err := i.Client.Mgmt.AddPersonalAccessToken(ctx, &mgmt.AddPersonalAccessTokenRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create pat")
+	return resp
+}
+
 func (i *Instance) CreateUserIDPlink(ctx context.Context, userID, externalID, idpID, username string) (*user_v2.AddIDPLinkResponse, error) {
 	return i.Client.UserV2.AddIDPLink(
 		ctx,
@@ -841,6 +849,16 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 		ProjectId: projectID,
 		UserId:    userID,
 		Roles:     []string{domain.RoleProjectOwner},
+	})
+	require.NoError(t, err)
+}
+
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
+	_, err := i.Client.Mgmt.AddProjectGrantMember(ctx, &mgmt.AddProjectGrantMemberRequest{
+		ProjectId: projectID,
+		GrantId:   grantID,
+		UserId:    userID,
+		Roles:     []string{domain.RoleProjectGrantOwner},
 	})
 	require.NoError(t, err)
 }

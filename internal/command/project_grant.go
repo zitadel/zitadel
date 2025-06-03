@@ -58,7 +58,7 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) 
 	if grant.ResourceOwner == "" {
 		grant.ResourceOwner = projectResourceOwner
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, grant.ResourceOwner, grant.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrant(ctx, grant.ResourceOwner, grant.AggregateID, grant.GrantID); err != nil {
 		return nil, err
 	}
 
@@ -100,7 +100,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *ChangeProjectG
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
 
-	if err := c.checkPermissionWriteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	projectResourceOwner, err := c.checkProjectGrantPreCondition(ctx, existingGrant.AggregateID, existingGrant.GrantedOrgID, existingGrant.ResourceOwner, grant.RoleKeys)
@@ -215,7 +215,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	if existingGrant.State != domain.ProjectGrantStateActive {
 		return details, zerrors.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotActive")
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
@@ -263,7 +263,7 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	if existingGrant.State != domain.ProjectGrantStateInactive {
 		return details, zerrors.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotInactive")
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
@@ -294,7 +294,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if !existingGrant.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
-	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	events := make([]eventstore.Command, 0)
@@ -336,7 +336,7 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 	if !existingGrant.State.Exists() {
 		return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 	}
-	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	events := make([]eventstore.Command, 0)
@@ -364,10 +364,6 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
-}
-
-func (c *Commands) checkPermissionDeleteProjectGrant(ctx context.Context, resourceOwner, projectGrantID string) error {
-	return c.checkPermission(ctx, domain.PermissionProjectGrantDelete, resourceOwner, projectGrantID)
 }
 
 func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (member *ProjectGrantWriteModel, err error) {
