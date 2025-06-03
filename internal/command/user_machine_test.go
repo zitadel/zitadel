@@ -201,7 +201,8 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddMachine(tt.args.ctx, tt.args.machine, false)
+			state := domain.UserStateInitial
+			got, err := r.AddMachine(tt.args.ctx, tt.args.machine, &state)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

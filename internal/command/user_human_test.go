@@ -2998,7 +2998,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				newEncryptedCodeWithDefault: f.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     f.defaultSecretGenerators,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, false, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
+			state := domain.UserStateInitial
+			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, &state, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
