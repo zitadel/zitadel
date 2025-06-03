@@ -789,13 +789,16 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 }
 
 func TestCommandSide_ChangeUserGrant(t *testing.T) {
+	permissionDeniedErr := errors.New("permission denied")
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		userGrant     *domain.UserGrant
-		resourceOwner string
+		ctx             context.Context
+		userGrant       *domain.UserGrant
+		resourceOwner   *string
+		permissionCheck func(_, _ string) error
+		ignoreUnchanged bool
 	}
 	type res struct {
 		want *domain.UserGrant
@@ -810,16 +813,14 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "invalid usergrant, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -828,8 +829,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "invalid permissions, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -849,7 +849,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					},
 					UserID: "user1",
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -858,8 +858,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "usergrant not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -873,7 +872,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -882,8 +881,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "usergrant not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -897,7 +895,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -906,8 +904,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "usergrant roles not changed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -929,7 +926,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -938,8 +935,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "user removed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -985,7 +981,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -994,8 +990,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "project removed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1046,7 +1041,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1055,8 +1050,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "project roles not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1101,7 +1095,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"roleKey"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1110,8 +1104,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "project grant not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1157,7 +1150,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1166,8 +1159,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "project grant roles not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1229,7 +1221,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1238,8 +1230,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "usergrant for project, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1307,7 +1298,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1325,8 +1316,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		{
 			name: "usergrant for projectgrant, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1403,7 +1393,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1419,26 +1409,320 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "usergrant for project without resource owner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey2",
+								"rolekey 2",
+								"",
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							[]string{"rolekey1", "rolekey2"},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "usergrant1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1", "rolekey2"},
+				},
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1", "rolekey2"},
+					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
+			name: "usergrant for project with passed succeeding permission check, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey2",
+								"rolekey 2",
+								"",
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							[]string{"rolekey1", "rolekey2"},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				userGrant: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "usergrant1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1", "rolekey2"},
+				},
+				resourceOwner:   gu.Ptr("org1"),
+				permissionCheck: func(_, _ string) error { return nil },
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1", "rolekey2"},
+					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
+			name: "usergrant for project with passed failing permission check, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey2",
+								"rolekey 2",
+								"",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				userGrant: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "usergrant1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1", "rolekey2"},
+				},
+				resourceOwner:   gu.Ptr("org1"),
+				permissionCheck: func(_, _ string) error { return permissionDeniedErr },
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1", "rolekey2"},
+					State:     domain.UserGrantStateActive,
+				},
+				err: func(err error) bool {
+					return errors.Is(err, permissionDeniedErr)
+				},
+			},
+		},
+		{
+			name: "usergrant roles not changed, ignore unchanged, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "usergrant1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+				},
+				resourceOwner:   gu.Ptr("org1"),
+				ignoreUnchanged: true,
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
 	}
-	t.Run("without permission check", func(t *testing.T) {
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				r := &Commands{
-					eventstore: tt.fields.eventstore,
-				}
-				got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, nil)
-				if tt.res.err == nil {
-					assert.NoError(t, err)
-				}
-				if tt.res.err != nil && !tt.res.err(err) {
-					t.Errorf("got wrong err: %v ", err)
-				}
-				if tt.res.err == nil {
-					assert.Equal(t, tt.res.want, got)
-				}
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, tt.args.ignoreUnchanged, tt.args.permissionCheck)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
 }
 
 func TestCommandSide_DeactivateUserGrant(t *testing.T) {
