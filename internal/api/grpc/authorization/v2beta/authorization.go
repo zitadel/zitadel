@@ -19,7 +19,7 @@ func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.Cre
 	}
 	return &authorization.CreateAuthorizationResponse{
 		Id:           grant.AggregateID,
-		CreationDate: timestamppb.New(grant.CreationDate),
+		CreationDate: timestamppb.New(grant.ChangeDate),
 	}, nil
 }
 

@@ -4,6 +4,8 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -15,7 +17,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (_ *domain.UserGrant, err error) {
+// AddUserGrant authorizes a user for a project with the given role keys.
+// The project must be owned by or granted to the resourceOwner.
+// If the resourceOwner is nil, the project must be owned by the project that belongs to usergrant.ProjectID.
+func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner *string, check PermissionCheck) (_ *domain.UserGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -35,11 +40,14 @@ func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant
 	return userGrantWriteModelToUserGrant(addedUserGrant), nil
 }
 
-func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (command eventstore.Command, _ *UserGrantWriteModel, err error) {
+func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner *string, check PermissionCheck) (command eventstore.Command, _ *UserGrantWriteModel, err error) {
 	if !userGrant.IsValid() {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-kVfMa", "Errors.UserGrant.Invalid")
 	}
 	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner, check)
+	if resourceOwner == nil {
+		resourceOwner = &userGrant.ResourceOwner
+	}
 	if err != nil {
 		return nil, nil, err
 	}
@@ -48,7 +56,7 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 		return nil, nil, err
 	}
 
-	addedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)
+	addedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, *resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel)
 	command = usergrant.NewUserGrantAddedEvent(
 		ctx,
@@ -97,7 +105,7 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	}
 	userGrant.ProjectID = existingUserGrant.ProjectID
 	userGrant.ProjectGrantID = existingUserGrant.ProjectGrantID
-	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner, check)
+	err = c.checkUserGrantPreCondition(ctx, userGrant, nil, check)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -291,7 +299,7 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 	return writeModel, nil
 }
 
-func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (err error) {
+func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner *string, check PermissionCheck) (err error) {
 	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeUserGrant) {
 		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner, check)
 	}
@@ -302,20 +310,35 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	if err := c.checkUserExists(ctx, usergrant.UserID, ""); err != nil {
 		return err
 	}
-	if usergrant.ProjectGrantID == "" {
-		usergrant.ProjectGrantID, err = c.searchProjectGrantID(ctx, usergrant.ProjectID, resourceOwner)
+	if usergrant.ProjectGrantID != "" || resourceOwner == nil {
+		projectOwner, grantID, err := c.searchProjectOwnerAndGrantID(ctx, usergrant.ProjectID, gu.Value(resourceOwner))
 		if err != nil {
 			return err
 		}
-	}
-	if check != nil {
-		projectOrGrantID := usergrant.ProjectID
-		if usergrant.ProjectGrantID != "" {
-			projectOrGrantID = usergrant.ProjectGrantID
+		if resourceOwner == nil {
+			resourceOwner = &projectOwner
 		}
-		return check(resourceOwner, projectOrGrantID)
+		if usergrant.ProjectGrantID == "" {
+			usergrant.ProjectGrantID = grantID
+		}
 	}
-	existingRoleKeys, err := c.searchUserGrantPreConditionState(ctx, usergrant, resourceOwner)
+	existingRoleKeys, err := c.searchUserGrantPreConditionState(ctx, usergrant, *resourceOwner)
+	if check != nil {
+		if usergrant.ProjectGrantID != "" {
+			grantErr := check(*resourceOwner, usergrant.ProjectGrantID)
+			if grantErr != nil {
+				projectErr := check(*resourceOwner, usergrant.ProjectID)
+				if projectErr != nil {
+					return grantErr
+				}
+			}
+		} else {
+			projectErr := check(*resourceOwner, usergrant.ProjectID)
+			if projectErr != nil {
+				return projectErr
+			}
+		}
+	}
 	if err != nil {
 		return err
 	}
@@ -438,7 +461,7 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 	return existingRoleKeys, nil
 }
 
-func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (err error) {
+func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner *string, check PermissionCheck) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -450,7 +473,10 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if !preConditions.UserExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
 	}
-	projectIsOwned := resourceOwner == preConditions.ProjectResourceOwner
+	projectIsOwned := resourceOwner == nil || *resourceOwner == preConditions.ProjectResourceOwner
+	if resourceOwner == nil {
+		resourceOwner = &preConditions.ProjectResourceOwner
+	}
 	if projectIsOwned && !preConditions.ProjectExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
 	}
@@ -466,7 +492,34 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 		if !projectIsOwned {
 			projectOrGrantID = preConditions.ProjectGrantID
 		}
-		return check(resourceOwner, projectOrGrantID)
+		return check(*resourceOwner, projectOrGrantID)
 	}
 	return nil
+}
+
+func (c *Commands) searchProjectOwnerAndGrantID(ctx context.Context, projectID string, grantedOrgID string) (projectOwner string, grantID string, err error) {
+	grantIDQuery := map[eventstore.FieldType]any{
+		eventstore.FieldTypeAggregateType: project.AggregateType,
+		eventstore.FieldTypeAggregateID:   projectID,
+		eventstore.FieldTypeFieldName:     project.ProjectGrantGrantedOrgIDSearchField,
+	}
+	if grantedOrgID != "" {
+		grantIDQuery[eventstore.FieldTypeValue] = grantedOrgID
+		grantIDQuery[eventstore.FieldTypeObjectType] = project.ProjectGrantSearchType
+
+	}
+	results, err := c.eventstore.Search(ctx, grantIDQuery)
+	if err != nil {
+		return "", "", err
+	}
+	for _, result := range results {
+		projectOwner = result.Aggregate.ResourceOwner
+		if grantedOrgID != "" && grantedOrgID == projectOwner {
+			return projectOwner, "", nil
+		}
+		if result.Object.Type == project.ProjectGrantSearchType {
+			return projectOwner, result.Object.ID, nil
+		}
+	}
+	return projectOwner, grantID, err
 }

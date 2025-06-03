@@ -3,6 +3,8 @@ package management
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/api/grpc/user"
@@ -48,7 +50,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 	if err := checkExplicitProjectPermission(ctx, grant.ProjectGrantID, grant.ProjectID); err != nil {
 		return nil, err
 	}
-	grant, err := s.command.AddUserGrant(ctx, grant, authz.GetCtxData(ctx).OrgID, nil)
+	grant, err := s.command.AddUserGrant(ctx, grant, gu.Ptr(authz.GetCtxData(ctx).OrgID), nil)
 	if err != nil {
 		return nil, err
 	}

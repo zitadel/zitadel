@@ -1242,7 +1242,7 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 		return nil
 	}
 	for _, grant := range userGrants {
-		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, resourceOwner, nil)
+		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, &resourceOwner, nil)
 		if err != nil {
 			return err
 		}

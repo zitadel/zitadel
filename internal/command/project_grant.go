@@ -426,23 +426,3 @@ func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grant
 	}
 	return existingProjectResourceOwner, existingRoleKeys, nil
 }
-
-func (c *Commands) searchProjectGrantID(ctx context.Context, projectID, grantedOrgID string) (grantID string, err error) {
-	grantIDQuery := map[eventstore.FieldType]any{
-		eventstore.FieldTypeAggregateType: project.AggregateType,
-		eventstore.FieldTypeAggregateID:   projectID,
-		eventstore.FieldTypeFieldName:     project.ProjectGrantGrantedOrgIDSearchField,
-		eventstore.FieldTypeValue:         grantedOrgID,
-		eventstore.FieldTypeObjectType:    project.ProjectGrantSearchType,
-	}
-	results, err := c.eventstore.Search(ctx, grantIDQuery)
-	if err != nil {
-		return "", err
-	}
-
-	if len(results) == 0 {
-		// No grant found for the given project and granted organization
-		return "", nil
-	}
-	return results[0].Object.ID, nil
-}

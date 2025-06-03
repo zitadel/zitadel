@@ -13,6 +13,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 	"google.golang.org/api/option"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -1039,7 +1040,7 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	if org.UserGrants != nil {
 		for _, grant := range org.GetUserGrants() {
 			logging.Debugf("import usergrant: %s", grant.GetProjectId()+"_"+grant.GetUserId())
-			_, err := s.command.AddUserGrant(ctx, management.AddUserGrantRequestToDomain(grant), org.GetOrgId(), nil)
+			_, err := s.command.AddUserGrant(ctx, management.AddUserGrantRequestToDomain(grant), gu.Ptr(org.GetOrgId()), nil)
 			if err != nil {
 				*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_grant", Id: org.GetOrgId() + "_" + grant.GetProjectId() + "_" + grant.GetUserId(), Message: err.Error()})
 				if isCtxTimeout(ctx) {
