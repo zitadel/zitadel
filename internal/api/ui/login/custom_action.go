@@ -169,6 +169,7 @@ const (
 	authMethodOTP          authMethod = "OTP"
 	authMethodOTPSMS       authMethod = "OTP SMS"
 	authMethodOTPEmail     authMethod = "OTP Email"
+	authMethodRecoveryCode authMethod = "recovery code"
 	authMethodU2F          authMethod = "U2F"
 	authMethodPasswordless authMethod = "passwordless"
 )
