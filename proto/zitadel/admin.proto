@@ -307,7 +307,6 @@ service AdminService {
         };
     }
 
-    // Deprecated: Use [ListCustomDomains](apis/resources/instance_service_v2/instance-service-list-custom-domains.api.mdx) instead to list custom domains
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
@@ -320,12 +319,10 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "List Instance Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running.";
-            deprecated: true;
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running."
         };
     }
 
-    // Deprecated: Use [ListTrustedDomains](apis/resources/instance_service_v2/instance-service-list-trusted-domains.api.mdx) instead to list trusted domains
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
         option (google.api.http) = {
             post: "/trusted_domains/_search";
@@ -338,12 +335,10 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "List Instance Trusted Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
-            deprecated: true;
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
     }
 
-    // Deprecated: Use [AddTrustedDomain](apis/resources/instance_service_v2/instance-service-add-trusted-domain.api.mdx) instead to add a trusted domain
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
@@ -357,12 +352,10 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "Add an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
-            deprecated: true;
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
     }
 
-    // Deprecated: Use [RemoveTrustedDomain](apis/resources/instance_service_v2/instance-service-remove-trusted-domain.api.mdx) instead to remove a trusted domain
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             delete: "/trusted_domains/{domain}";
@@ -375,8 +368,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "Remove an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.";
-            deprecated: true;
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
     }
 
@@ -1245,6 +1237,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use ListOrganization [apis/resources/org_service_v2beta/organization-service-list-organizations.api.mdx] API instead
     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search";
@@ -1264,7 +1257,8 @@ service AdminService {
                 value: {
                     description: "list of organizations matching the query";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
@@ -1279,6 +1273,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use CreateOrganization [apis/resources/org_service_v2beta/organization-service-create-organization.api.mdx] API instead
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/_setup";
@@ -1298,7 +1293,8 @@ service AdminService {
                 value: {
                     description: "org, user and user membership were created successfully";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
@@ -1313,6 +1309,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: use DeleteOrganization [apis/resources/org_service_v2beta/organization-service-delete-organization.api.mdx] API instead
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}"
@@ -1330,7 +1327,8 @@ service AdminService {
                 value: {
                     description: "org removed successfully";
                 };
-            };
+            }
+            deprecated: true;
             responses: {
                 key: "400";
                 value: {
