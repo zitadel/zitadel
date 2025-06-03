@@ -168,7 +168,7 @@ func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, err
 
 	err := json.Unmarshal(defaultLoginTranslations, &defaultTranslations)
 	if err != nil {
-		zerrors.ThrowInternal(err, "QUERY-nvx88W", "Errors.Query.UnmarshalDefaultLoginTranslations")
+		return nil, zerrors.ThrowInternal(err, "QUERY-nvx88W", "Errors.Query.UnmarshalDefaultLoginTranslations")
 	}
 
 	translation, ok := defaultTranslations[lang]
