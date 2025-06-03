@@ -161,7 +161,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		ResourceOwner: foundOrg.Owner,
 		State:         domain_pkg.OrgState(foundOrg.State.State),
 		Sequence:      uint64(foundOrg.Sequence),
-		InstanceID:    authz.GetInstance(ctx).InstanceID(),
+		InstanceID:    foundOrg.InstanceID,
 		Name:          foundOrg.Name,
 		Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
@@ -433,6 +433,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 			OrgColumnResourceOwner.identifier(),
 			OrgColumnState.identifier(),
 			OrgColumnSequence.identifier(),
+			OrgColumnInstanceID.identifier(),
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 		).
@@ -447,6 +448,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 				&o.ResourceOwner,
 				&o.State,
 				&o.Sequence,
+				&o.InstanceID,
 				&o.Name,
 				&o.Domain,
 			)
