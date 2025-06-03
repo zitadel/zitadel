@@ -95,6 +95,7 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *doma
 			cmd = user.NewUserLockedEvent(ctx, &userAgg.Aggregate)
 		case domain.UserStateDeleted:
 			// users are never imported if deleted
+		default:
 		}
 		if cmd != nil {
 			cmds = append(cmds, cmd)

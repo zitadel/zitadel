@@ -468,6 +468,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 			event = user.NewUserLockedEvent(ctx, userAgg)
 		case domain.UserStateDeleted:
 			// users are never imported if deleted
+		default:
 		}
 		if event != nil {
 			events = append(events, event)
@@ -548,6 +549,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 
 	addedHuman = NewHumanWriteModel(human.AggregateID, orgID)
 	// TODO: adlerhurst maybe we could simplify the code below
+
 	//nolint:staticcheck
 	userAgg = UserAggregateFromWriteModel(&addedHuman.WriteModel)
 
