@@ -3,6 +3,7 @@ package authorization
 import (
 	"context"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -24,8 +25,16 @@ func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.Cre
 }
 
 func (s *Server) UpdateAuthorization(ctx context.Context, request *authorization.UpdateAuthorizationRequest) (*authorization.UpdateAuthorizationResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	changedUserGrant, err := s.command.ChangeUserGrant(ctx, &domain.UserGrant{
+		ObjectRoot: models.ObjectRoot{AggregateID: request.Id},
+		RoleKeys:   request.RoleKeys,
+	}, nil, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return &authorization.UpdateAuthorizationResponse{
+		ChangeDate: timestamppb.New(changedUserGrant.ChangeDate),
+	}, nil
 }
 
 func (s *Server) DeleteAuthorization(ctx context.Context, request *authorization.DeleteAuthorizationRequest) (*authorization.DeleteAuthorizationResponse, error) {

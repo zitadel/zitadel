@@ -2,8 +2,6 @@ package command
 
 import (
 	"context"
-	"reflect"
-
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -69,10 +67,13 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 	return command, addedUserGrant, nil
 }
 
-func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, check PermissionCheck) (_ *domain.UserGrant, err error) {
-	event, changedUserGrant, err := c.changeUserGrant(ctx, userGrant, resourceOwner, false, check)
+func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner *string, ignoreUnchanged bool, check PermissionCheck) (_ *domain.UserGrant, err error) {
+	event, changedUserGrant, err := c.changeUserGrant(ctx, userGrant, resourceOwner, false, ignoreUnchanged, check)
 	if err != nil {
 		return nil, err
+	}
+	if event == nil {
+		return userGrantWriteModelToUserGrant(changedUserGrant), nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
@@ -85,32 +86,57 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	return userGrantWriteModelToUserGrant(changedUserGrant), nil
 }
 
-func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, cascade bool, check PermissionCheck) (_ eventstore.Command, _ *UserGrantWriteModel, err error) {
+func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner *string, cascade, ignoreUnchanged bool, check PermissionCheck) (_ eventstore.Command, _ *UserGrantWriteModel, err error) {
 	if userGrant.AggregateID == "" {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
 	}
-	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrant.AggregateID, userGrant.ResourceOwner)
+	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrant.AggregateID, gu.Value(resourceOwner))
 	if err != nil {
 		return nil, nil, err
 	}
-	err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
-	if err != nil {
-		return nil, nil, err
+	if check == nil {
+		// checkUserGrantPreCondition checks the permission later when we have the necessary context information
+		err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
-	if reflect.DeepEqual(existingUserGrant.RoleKeys, userGrant.RoleKeys) {
-		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Rs8fy", "Errors.UserGrant.NotChanged")
+
+	grantUnchanged := len(existingUserGrant.RoleKeys) == len(userGrant.RoleKeys)
+	if grantUnchanged {
+	outer:
+		for _, reqKey := range userGrant.RoleKeys {
+			for _, existingKey := range existingUserGrant.RoleKeys {
+				if reqKey == existingKey {
+					continue outer
+				}
+			}
+			grantUnchanged = false
+			break
+		}
 	}
+
+	if grantUnchanged {
+		if ignoreUnchanged {
+			return nil, existingUserGrant, nil
+		} else {
+			return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Rs8fy", "Errors.UserGrant.NotChanged")
+		}
+	}
+	userGrant.UserID = existingUserGrant.UserID
 	userGrant.ProjectID = existingUserGrant.ProjectID
 	userGrant.ProjectGrantID = existingUserGrant.ProjectGrantID
-	err = c.checkUserGrantPreCondition(ctx, userGrant, nil, check)
+	userGrant.ResourceOwner = existingUserGrant.ResourceOwner
+
+	err = c.checkUserGrantPreCondition(ctx, userGrant, &existingUserGrant.ResourceOwner, check)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	changedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)
+	changedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, userGrant.ResourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
 	if cascade {

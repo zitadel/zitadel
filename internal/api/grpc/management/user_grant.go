@@ -65,7 +65,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 }
 
 func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGrantRequest) (*mgmt_pb.UpdateUserGrantResponse, error) {
-	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, nil)
+	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req), gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
 	if err != nil {
 		return nil, err
 	}

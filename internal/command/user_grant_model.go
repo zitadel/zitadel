@@ -36,6 +36,7 @@ func (wm *UserGrantWriteModel) Reduce() error {
 			wm.ProjectGrantID = e.ProjectGrantID
 			wm.RoleKeys = e.RoleKeys
 			wm.State = domain.UserGrantStateActive
+			wm.ResourceOwner = e.Aggregate().ResourceOwner
 		case *usergrant.UserGrantChangedEvent:
 			wm.RoleKeys = e.RoleKeys
 		case *usergrant.UserGrantCascadeChangedEvent:
