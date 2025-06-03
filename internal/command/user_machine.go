@@ -67,7 +67,7 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine, setMachineUserInactive bool) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *domain.UserState) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -86,9 +86,19 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, setMachineU
 		return nil, err
 	}
 
-	if setMachineUserInactive {
-		deactivateUserEvent := user.NewUserDeactivatedEvent(ctx, &userAgg.Aggregate)
-		cmds = append(cmds, deactivateUserEvent)
+	if state != nil {
+		var cmd eventstore.Command
+		switch *state {
+		case domain.UserStateInactive:
+			cmd = user.NewUserDeactivatedEvent(ctx, &userAgg.Aggregate)
+		case domain.UserStateLocked:
+			cmd = user.NewUserLockedEvent(ctx, &userAgg.Aggregate)
+		case domain.UserStateDeleted:
+			// users are never imported if deleted
+		}
+		if cmd != nil {
+			cmds = append(cmds, cmd)
+		}
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
