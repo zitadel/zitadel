@@ -80,6 +80,7 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, setMachineU
 	}
 
 	userAgg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(userAgg, machine))
 	if err != nil {
 		return nil, err

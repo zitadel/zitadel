@@ -273,7 +273,8 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, false, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
+	//nolint:staticcheck
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, nil, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}

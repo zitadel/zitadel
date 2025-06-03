@@ -428,7 +428,7 @@ func (h *AddHuman) shouldAddInitCode() bool {
 }
 
 // Deprecated: use commands.AddUserHuman
-func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, setHumanToInactive bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
+func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, state *domain.UserState, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -459,9 +459,19 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	if err != nil {
 		return nil, nil, err
 	}
-	if setHumanToInactive {
-		deactivateUserEvent := user.NewUserDeactivatedEvent(ctx, userAgg)
-		events = append(events, deactivateUserEvent)
+	if state != nil {
+		var event eventstore.Command
+		switch *state {
+		case domain.UserStateInactive:
+			event = user.NewUserDeactivatedEvent(ctx, userAgg)
+		case domain.UserStateLocked:
+			event = user.NewUserLockedEvent(ctx, userAgg)
+		case domain.UserStateDeleted:
+			// users are never imported if deleted
+		}
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -538,6 +548,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 
 	addedHuman = NewHumanWriteModel(human.AggregateID, orgID)
 	// TODO: adlerhurst maybe we could simplify the code below
+	//nolint:staticcheck
 	userAgg = UserAggregateFromWriteModel(&addedHuman.WriteModel)
 
 	events = append(events, createAddHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain))

@@ -172,12 +172,12 @@ message DataOIDCApplication {
 message DataHumanUser {
   string user_id = 1;
   zitadel.management.v1.ImportHumanUserRequest user = 2;
-  int32 state = 3;
+  zitadel.user.v1.UserState state = 3;
 }
 message DataMachineUser {
   string user_id = 1;
   zitadel.management.v1.AddMachineUserRequest user = 2;
-  int32 state = 3;
+  zitadel.user.v1.UserState state = 3;
 }
 message DataAction {
   string action_id = 1;

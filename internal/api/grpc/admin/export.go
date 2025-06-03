@@ -8,7 +8,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
+	"github.com/zitadel/zitadel/internal/api/grpc/org"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
+	user_converter "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -65,7 +67,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Organization
 		******************************************************************************************************************/
-		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, OrgState: int32(queriedOrg.State), Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
+		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, OrgState: org.OrgStateToPb(queriedOrg.State), Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
 		orgs[i] = org
 	}
 
@@ -567,7 +569,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeHuman:
 			dataUser := &v1_pb.DataHumanUser{
 				UserId: user.ID,
-				State:  int32(user.State),
+				State:  user_converter.UserStateToPb(user.State),
 				User: &management_pb.ImportHumanUserRequest{
 					UserName: user.Username,
 					Profile: &management_pb.ImportHumanUserRequest_Profile{
@@ -621,7 +623,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeMachine:
 			machineUsers = append(machineUsers, &v1_pb.DataMachineUser{
 				UserId: user.ID,
-				State:  int32(user.State),
+				State:  user_converter.UserStateToPb(user.State),
 				User: &management_pb.AddMachineUserRequest{
 					UserName:    user.Username,
 					Name:        user.Machine.Name,

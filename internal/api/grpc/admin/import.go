@@ -22,6 +22,7 @@ import (
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	"github.com/zitadel/zitadel/internal/api/grpc/authn"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
+	org_converter "github.com/zitadel/zitadel/internal/api/grpc/org"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -305,7 +306,7 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	setOrgInactive := domain.OrgState(org.OrgState) == domain.OrgStateInactive
+	setOrgInactive := org_converter.OrgStateToDomain(org.OrgState) == domain.OrgStateInactive
 	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), setOrgInactive, []string{})
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
@@ -475,8 +476,9 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		logging.Debugf("import user: %s", user.GetUserId())
 		human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 		human.AggregateID = user.UserId
-		setHumanToInactive := domain.UserState(user.State) == domain.UserStateInactive
-		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, setHumanToInactive, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+		userState := domain.UserState(user.State)
+		//nolint:staticcheck
+		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, &userState, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
