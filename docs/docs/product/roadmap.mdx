@@ -132,13 +132,44 @@ For more detailed description about the different stages and the release cycle c
                     <li>
                         License Change
                     </li>
+                    <li>
+                        Login v2
+                        <ul>
+                            <li>
+                                Initial Release
+                            </li>
+                            <li>
+                                All standard authentication methods
+                            </li>
+                            <li>
+                                OIDC & SAML
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </td>
             <td scope="row">
                 [v4.x](/docs/product/roadmap#v4x)
                 <ul>
                     <li>Resource API</li>
-                    <li>Login v2 as default</li>
+                    <li>
+                        Login v2 as default
+
+                        <ul>
+                            <li>
+                                Device Authorization Flow
+                            </li>
+                            <li>
+                                LDAP IDP
+                            </li>
+                            <li>
+                                JWT IDP
+                            </li>
+                            <li>
+                                Custom Login UI Texts
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
 
             </td>
@@ -150,45 +181,6 @@ For more detailed description about the different stages and the release cycle c
                     <li>User Uniqueness on Instance Level</li>
                     <li>Remove Required Fields from User</li>
                 </ul>
-            </td>
-        </tr>
-        <tr>
-            <td colspan={4}>Zitadel Login v2</td>
-        </tr>
-        <tr>
-            <td scope="row">
-
-            </td>
-            <td scope="row">
-                <ul>
-                    <li>
-                        Initial Release
-                    </li>
-                    <li>
-                        All standard authentication methods
-                    </li>
-                    <li>
-                        OIDC & SAML
-                    </li>
-                </ul>
-            </td>
-            <td scope="row">
-                <ul>
-                    <li>
-                        Device Authorization Flow
-                    </li>
-                    <li>
-                        LDAP IDP
-                    </li>
-                    <li>
-                        JWT IDP
-                    </li>
-                    <li>
-                        Custom Login UI Texts
-                    </li>
-                </ul>
-            </td>
-            <td scope="row">
             </td>
         </tr>
         <tr>
@@ -325,6 +317,44 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
         - Users
 
         For more details read the [Github Issue](https://github.com/zitadel/zitadel/issues/6305)
+    </details>
+
+    <details>
+        <summary>Login V2</summary>
+
+        Our new login UI has been enhanced with additional features, bringing it to feature parity with Version 1.
+
+        <details>
+            <summary>Device Authorization Flow</summary>
+
+            The Device Authorization Grant is an OAuth 2.0 flow designed for devices that have limited input capabilities (like smart TVs, gaming consoles, or IoT devices) or lack a browser.
+
+            Read our docs about how to integrate your application using the [Device Authorization Flow](https://zitadel.com/docs/guides/integrate/login/oidc/device-authorization)
+        </details>
+
+        <details>
+            <summary>LDAP IDP</summary>
+
+            This feature enables users to log in using their existing LDAP (Lightweight Directory Access Protocol) credentials.
+            It integrates your system with an LDAP directory, allowing it to act as an Identity Provider (IdP) solely for authentication purposes.
+            This means users can securely access the service with their familiar LDAP username and password, streamlining the login process.
+        </details>
+
+        <details>
+            <summary>JWT IDP</summary>
+
+            This "JSON Web Token Identity Provider (JWT IdP)" feature allows you to use an existing JSON Web Token (JWT) from another system (like a Web Application Firewall managing a session) as a federated identity for authentication in new applications managed by ZITADEL.
+
+            Essentially, it enables session reuse by letting ZITADEL trust and validate a JWT issued by an external source. This allows users already authenticated in an existing system to seamlessly access new applications without re-logging in.
+
+            Read more in our docs about how to login users with [JWT IDP](https://zitadel.com/docs/guides/integrate/identity-providers/jwt_idp)
+        </details>
+
+        <details>
+            <summary>Custom Login UI Texts</summary>
+
+            This feature provides customers with the flexibility to personalize the user experience by customizing various text elements across different screens of the login UI. Administrators can modify default messages, labels, and instructions to align with their branding, provide specific guidance, or cater to unique regional or organizational needs, ensuring a more tailored and intuitive authentication process for their users.
+        </details>
     </details>
 </details>
 
