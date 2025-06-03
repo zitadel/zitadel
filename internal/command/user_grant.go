@@ -299,10 +299,10 @@ func (c *Commands) removeUserGrant(ctx context.Context, grantID string, resource
 	if err != nil {
 		return nil, nil, err
 	}
-	if ignoreNotFound && existingUserGrant.State == domain.UserGrantStateRemoved {
-		return nil, existingUserGrant, nil
-	}
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
+		if ignoreNotFound {
+			return nil, existingUserGrant, nil
+		}
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1My0t", "Errors.UserGrant.NotFound")
 	}
 	if !cascade && check == nil {

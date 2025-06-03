@@ -21,6 +21,19 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+var (
+	mockedPermissionCheckErr   = errors.New("mocked permission check error")
+	isMockedPermissionCheckErr = func(err error) bool {
+		return errors.Is(err, mockedPermissionCheckErr)
+	}
+	succeedingUserGrantPermissionCheck = func(_, _ string) PermissionCheck {
+		return func(_, _ string) error { return nil }
+	}
+	failingUserGrantPermissionCheck = func(_, _ string) PermissionCheck {
+		return func(_, _ string) error { return mockedPermissionCheckErr }
+	}
+)
+
 func TestCommandSide_AddUserGrant(t *testing.T) {
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
@@ -727,7 +740,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					r.idGenerator = tt.fields.idGenerator(t)
 				}
 				// we use an empty context and only rely on the permission check implementation
-				got, err := r.AddUserGrant(context.Background(), tt.args.userGrant, tt.args.resourceOwner, func(_, _ string) error { return nil })
+				got, err := r.AddUserGrant(context.Background(), tt.args.userGrant, tt.args.resourceOwner, succeedingUserGrantPermissionCheck)
 				if tt.res.err == nil {
 					assert.NoError(t, err)
 				}
@@ -777,19 +790,17 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			),
 		}
-		errPermissionDenied := errors.New("permission denied")
 		// we use an empty context and only rely on the permission check implementation
 		_, err := r.AddUserGrant(context.Background(), &domain.UserGrant{
 			UserID:    "user1",
 			ProjectID: "project1",
 			RoleKeys:  []string{"rolekey1"},
-		}, gu.Ptr("org1"), func(_, _ string) error { return errPermissionDenied })
-		assert.ErrorIs(t, err, errPermissionDenied)
+		}, gu.Ptr("org1"), failingUserGrantPermissionCheck)
+		assert.ErrorIs(t, err, mockedPermissionCheckErr)
 	})
 }
 
 func TestCommandSide_ChangeUserGrant(t *testing.T) {
-	permissionDeniedErr := errors.New("permission denied")
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
@@ -797,7 +808,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 		ctx             context.Context
 		userGrant       *domain.UserGrant
 		resourceOwner   *string
-		permissionCheck func(_, _ string) error
+		permissionCheck UserGrantPermissionCheck
 		ignoreUnchanged bool
 	}
 	type res struct {
@@ -1566,7 +1577,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
 				resourceOwner:   gu.Ptr("org1"),
-				permissionCheck: func(_, _ string) error { return nil },
+				permissionCheck: succeedingUserGrantPermissionCheck,
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1646,7 +1657,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
 				resourceOwner:   gu.Ptr("org1"),
-				permissionCheck: func(_, _ string) error { return permissionDeniedErr },
+				permissionCheck: failingUserGrantPermissionCheck,
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1659,9 +1670,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 					State:     domain.UserGrantStateActive,
 				},
-				err: func(err error) bool {
-					return errors.Is(err, permissionDeniedErr)
-				},
+				err: isMockedPermissionCheckErr,
 			},
 		},
 		{
@@ -1727,12 +1736,14 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 
 func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		userGrantID   string
-		resourceOwner string
+		ctx             context.Context
+		userGrantID     string
+		resourceOwner   *string
+		check           UserGrantPermissionCheck
+		ignoreNotActive bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1747,45 +1758,57 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 		{
 			name: "invalid usergrantID, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "invalid resourceOwner, error",
+			name: "not provided resourceOwner, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantDeactivatedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+						),
+					),
 				),
 			},
 			args: args{
-				ctx:         context.Background(),
+				ctx:         authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID: "usergrant1",
 			},
 			res: res{
-				err: zerrors.IsErrorInvalidArgument,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org",
+				},
 			},
 		},
 		{
 			name: "usergrant not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -1794,8 +1817,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 		{
 			name: "usergrant removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1817,21 +1839,20 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
 		},
 		{
-			name: "no permissions, permisison denied error",
+			name: "no permissions, permission denied error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
 								"user1",
 								"project1",
 								"", []string{"rolekey1"}),
@@ -1842,7 +1863,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -1851,8 +1872,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 		{
 			name: "already deactivated, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1871,17 +1891,47 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
+			name: "already deactivated, ignore, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+						eventFromEventPusher(
+							usergrant.NewUserGrantDeactivatedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				userGrantID:     "usergrant1",
+				resourceOwner:   gu.Ptr("org1"),
+				ignoreNotActive: true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org",
+				},
+			},
+		},
+		{
 			name: "deactivated, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -1901,7 +1951,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1909,13 +1959,70 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "with passed succeeding permission check, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantDeactivatedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userGrantID:   "usergrant1",
+				resourceOwner: gu.Ptr("org1"),
+				check:         succeedingUserGrantPermissionCheck,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "with passed failing permission check, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userGrantID:   "usergrant1",
+				resourceOwner: gu.Ptr("org1"),
+				check:         failingUserGrantPermissionCheck,
+			},
+			res: res{
+				err: isMockedPermissionCheckErr,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.DeactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner)
+			got, err := r.DeactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner, tt.args.ignoreNotActive, tt.args.check)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1931,12 +2038,14 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 
 func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		userGrantID   string
-		resourceOwner string
+		ctx               context.Context
+		userGrantID       string
+		resourceOwner     *string
+		ignoreNotInactive bool
+		check             UserGrantPermissionCheck
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1951,45 +2060,61 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 		{
 			name: "invalid usergrantID, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "invalid resourceOwner, error",
+			name: "not provided resourceOwner, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+						eventFromEventPusher(
+							usergrant.NewUserGrantDeactivatedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantReactivatedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+						),
+					),
 				),
 			},
 			args: args{
-				ctx:         context.Background(),
+				ctx:         authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID: "usergrant1",
 			},
 			res: res{
-				err: zerrors.IsErrorInvalidArgument,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org",
+				},
 			},
 		},
 		{
 			name: "usergrant not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -1998,8 +2123,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 		{
 			name: "usergrant removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2021,17 +2145,16 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
 		},
 		{
-			name: "no permissions, permisison denied error",
+			name: "no permissions, permission denied error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2050,7 +2173,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -2059,8 +2182,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 		{
 			name: "already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2073,19 +2195,45 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
+			name: "already active, ignore, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:               authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrantID:       "usergrant1",
+				resourceOwner:     gu.Ptr("org1"),
+				ignoreNotInactive: true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org",
+				},
+			},
+		},
+		{
 			name: "reactivated, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2109,7 +2257,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2117,13 +2265,78 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "with passed succeeding permission check, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+						eventFromEventPusher(
+							usergrant.NewUserGrantDeactivatedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantReactivatedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userGrantID:   "usergrant1",
+				resourceOwner: gu.Ptr("org1"),
+				check:         succeedingUserGrantPermissionCheck,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "with passed failing permission check, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+						eventFromEventPusher(
+							usergrant.NewUserGrantDeactivatedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org").Aggregate),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userGrantID:   "usergrant1",
+				resourceOwner: gu.Ptr("org1"),
+				check:         failingUserGrantPermissionCheck,
+			},
+			res: res{
+				err: isMockedPermissionCheckErr,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ReactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner)
+			got, err := r.ReactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner, tt.args.ignoreNotInactive, tt.args.check)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -2139,12 +2352,14 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 
 func TestCommandSide_RemoveUserGrant(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		userGrantID   string
-		resourceOwner string
+		ctx            context.Context
+		userGrantID    string
+		resourceOwner  *string
+		ignoreNotFound bool
+		check          UserGrantPermissionCheck
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -2159,13 +2374,11 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 		{
 			name: "invalid usergrantID, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -2174,25 +2387,42 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 		{
 			name: "usergrant not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
 		},
 		{
+			name: "usergrant not existing, ignore, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:            authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrantID:    "usergrant1",
+				resourceOwner:  gu.Ptr("org1"),
+				ignoreNotFound: true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
 			name: "usergrant removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2214,17 +2444,16 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
 		},
 		{
-			name: "no permissions, permisison denied error",
+			name: "no permissions, permission denied error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2243,7 +2472,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -2252,8 +2481,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 		{
 			name: "remove usergrant project, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2276,7 +2504,40 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "not provided resourceOwner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:         authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrantID: "usergrant1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2287,8 +2548,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 		{
 			name: "remove usergrant projectgrant, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
@@ -2311,7 +2571,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2319,13 +2579,73 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "with passed succeeding permission check, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"projectgrant1", []string{"rolekey1"}),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userGrantID:   "usergrant1",
+				resourceOwner: gu.Ptr("org1"),
+				check:         succeedingUserGrantPermissionCheck,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "with passed failing permission check, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"projectgrant1", []string{"rolekey1"}),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userGrantID:   "usergrant1",
+				resourceOwner: gu.Ptr("org1"),
+				check:         failingUserGrantPermissionCheck,
+			},
+			res: res{
+				err: isMockedPermissionCheckErr,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.RemoveUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner)
+			got, err := r.RemoveUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner, tt.args.ignoreNotFound, tt.args.check)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -2361,9 +2681,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 		{
 			name: "empty usergrantid list, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:           context.Background(),
