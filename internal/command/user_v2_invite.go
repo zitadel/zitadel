@@ -19,14 +19,34 @@ type CreateUserInvite struct {
 	URLTemplate     string
 	ReturnCode      bool
 	ApplicationName string
+	AuthRequestID   string
 }
 
 func (c *Commands) CreateInviteCode(ctx context.Context, invite *CreateUserInvite) (details *domain.ObjectDetails, returnCode *string, err error) {
+	return c.sendInviteCode(ctx, invite, "", false)
+}
+
+// ResendInviteCode resends the invite mail with a new code and an optional authRequestID.
+// It will reuse the applicationName from the previous code.
+func (c *Commands) ResendInviteCode(ctx context.Context, userID, resourceOwner, authRequestID string) (objectDetails *domain.ObjectDetails, err error) {
+	details, _, err := c.sendInviteCode(
+		ctx,
+		&CreateUserInvite{
+			UserID:        userID,
+			AuthRequestID: authRequestID,
+		},
+		resourceOwner,
+		true,
+	)
+	return details, err
+}
+
+func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite, resourceOwner string, requireExisting bool) (details *domain.ObjectDetails, returnCode *string, err error) {
 	invite.UserID = strings.TrimSpace(invite.UserID)
 	if invite.UserID == "" {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4jio3", "Errors.User.UserIDMissing")
 	}
-	wm, err := c.userInviteCodeWriteModel(ctx, invite.UserID, "")
+	wm, err := c.userInviteCodeWriteModel(ctx, invite.UserID, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -39,9 +59,21 @@ func (c *Commands) CreateInviteCode(ctx context.Context, invite *CreateUserInvit
 	if !wm.CreationAllowed() {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-EF34g", "Errors.User.AlreadyInitialised")
 	}
+	if requireExisting && wm.InviteCode == nil || wm.CodeReturned {
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr3gq", "Errors.User.Code.NotFound")
+	}
 	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint
 	if err != nil {
 		return nil, nil, err
+	}
+	if invite.URLTemplate == "" {
+		invite.URLTemplate = wm.URLTemplate
+	}
+	if invite.ApplicationName == "" {
+		invite.ApplicationName = wm.ApplicationName
+	}
+	if invite.AuthRequestID == "" {
+		invite.AuthRequestID = wm.AuthRequestID
 	}
 	err = c.pushAppendAndReduce(ctx, wm, user.NewHumanInviteCodeAddedEvent(
 		ctx,
@@ -51,7 +83,7 @@ func (c *Commands) CreateInviteCode(ctx context.Context, invite *CreateUserInvit
 		invite.URLTemplate,
 		invite.ReturnCode,
 		invite.ApplicationName,
-		"",
+		invite.AuthRequestID,
 	))
 	if err != nil {
 		return nil, nil, err
@@ -60,53 +92,6 @@ func (c *Commands) CreateInviteCode(ctx context.Context, invite *CreateUserInvit
 		returnCode = &code.Plain
 	}
 	return writeModelToObjectDetails(&wm.WriteModel), returnCode, nil
-}
-
-// ResendInviteCode resends the invite mail with a new code and an optional authRequestID.
-// It will reuse the applicationName from the previous code.
-func (c *Commands) ResendInviteCode(ctx context.Context, userID, resourceOwner, authRequestID string) (objectDetails *domain.ObjectDetails, err error) {
-	if userID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
-	}
-
-	existingCode, err := c.userInviteCodeWriteModel(ctx, userID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if !existingCode.UserState.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-H3b2a", "Errors.User.NotFound")
-	}
-	if err := c.checkPermissionUpdateUser(ctx, existingCode.ResourceOwner, userID); err != nil {
-		return nil, err
-	}
-	if !existingCode.CreationAllowed() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Gg42s", "Errors.User.AlreadyInitialised")
-	}
-	if existingCode.InviteCode == nil || existingCode.CodeReturned {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr3gq", "Errors.User.Code.NotFound")
-	}
-	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint
-	if err != nil {
-		return nil, err
-	}
-	if authRequestID == "" {
-		authRequestID = existingCode.AuthRequestID
-	}
-	err = c.pushAppendAndReduce(ctx, existingCode,
-		user.NewHumanInviteCodeAddedEvent(
-			ctx,
-			UserAggregateFromWriteModelCtx(ctx, &existingCode.WriteModel),
-			code.Crypted,
-			code.Expiry,
-			existingCode.URLTemplate,
-			false,
-			existingCode.ApplicationName,
-			authRequestID,
-		))
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
 func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string) (err error) {

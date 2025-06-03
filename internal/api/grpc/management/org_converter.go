@@ -26,7 +26,7 @@ func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*query.Or
 			Limit:  limit,
 			Asc:    asc,
 		},
-		//SortingColumn: //TODO: sorting
+		//  SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
 }
@@ -89,7 +89,7 @@ func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembe
 				Offset: offset,
 				Limit:  limit,
 				Asc:    asc,
-				//SortingColumn: //TODO: sorting
+				// SortingColumn: //TODO: sorting
 			},
 			Queries: queries,
 		},
