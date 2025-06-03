@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"github.com/muhlemmer/gu"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		userGrant     *domain.UserGrant
-		resourceOwner string
+		resourceOwner *string
 	}
 	type res struct {
 		want *domain.UserGrant
@@ -50,7 +51,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -93,7 +94,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -141,7 +142,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -182,7 +183,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: "org2",
+				resourceOwner: gu.Ptr("org2"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -224,7 +225,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"roleKey"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -267,7 +268,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -326,7 +327,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -385,7 +386,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1"},
 				},
-				resourceOwner: "org2",
+				resourceOwner: gu.Ptr("org2"),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -447,7 +448,77 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
+			name: "usergrant without resource owner on project, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+							[]string{"rolekey1"},
+						),
+					),
+				),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+				},
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -483,14 +554,14 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
+								&project.NewAggregate("project1", "org2").Aggregate,
 								"projectname1", true, true, true,
 								domain.PrivateLabelingSettingUnspecified,
 							),
 						),
 						eventFromEventPusher(
 							project.NewRoleAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
+								&project.NewAggregate("project1", "org2").Aggregate,
 								"rolekey1",
 								"rolekey",
 								"",
@@ -498,7 +569,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							project.NewGrantAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
+								&project.NewAggregate("project1", "org2").Aggregate,
 								"projectgrant1",
 								"org1",
 								[]string{"rolekey1"},
@@ -527,7 +598,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -607,7 +678,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: gu.Ptr("org1"),
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -712,7 +783,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			UserID:    "user1",
 			ProjectID: "project1",
 			RoleKeys:  []string{"rolekey1"},
-		}, "org1", func(_, _ string) error { return errPermissionDenied })
+		}, gu.Ptr("org1"), func(_, _ string) error { return errPermissionDenied })
 		assert.ErrorIs(t, err, errPermissionDenied)
 	})
 }

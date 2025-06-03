@@ -470,13 +470,16 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if err != nil {
 		return err
 	}
+	if usergrant.ResourceOwner == "" {
+		usergrant.ResourceOwner = preConditions.ProjectResourceOwner
+	}
+	if usergrant.ProjectGrantID == "" {
+		usergrant.ProjectGrantID = preConditions.ProjectGrantID
+	}
 	if !preConditions.UserExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
 	}
 	projectIsOwned := resourceOwner == nil || *resourceOwner == preConditions.ProjectResourceOwner
-	if resourceOwner == nil {
-		resourceOwner = &preConditions.ProjectResourceOwner
-	}
 	if projectIsOwned && !preConditions.ProjectExists {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
 	}
@@ -486,13 +489,21 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
 	}
-	usergrant.ProjectGrantID = preConditions.ProjectGrantID
 	if check != nil {
-		projectOrGrantID := usergrant.ProjectID
-		if !projectIsOwned {
-			projectOrGrantID = preConditions.ProjectGrantID
+		if usergrant.ProjectGrantID != "" {
+			grantErr := check(usergrant.ResourceOwner, usergrant.ProjectGrantID)
+			if grantErr != nil {
+				projectErr := check(usergrant.ResourceOwner, usergrant.ProjectID)
+				if projectErr != nil {
+					return grantErr
+				}
+			}
+		} else {
+			projectErr := check(usergrant.ResourceOwner, usergrant.ProjectID)
+			if projectErr != nil {
+				return projectErr
+			}
 		}
-		return check(*resourceOwner, projectOrGrantID)
 	}
 	return nil
 }
