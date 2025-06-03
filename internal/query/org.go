@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
+	es "github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -78,6 +79,8 @@ type Org struct {
 	ResourceOwner string
 	State         domain_pkg.OrgState
 	Sequence      uint64
+	// instanceID is used to create a unique cache key for the org
+	instanceID string
 
 	Name   string
 	Domain string
@@ -111,7 +114,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if org, ok := q.caches.org.Get(ctx, orgIndexByID, id); ok {
+	if org, ok := q.caches.org.Get(ctx, orgIndexByID, orgCacheKey(authz.GetInstance(ctx).InstanceID(), id)); ok {
 		return org, nil
 	}
 	defer func() {
@@ -148,6 +151,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		ResourceOwner: foundOrg.Owner,
 		State:         domain_pkg.OrgState(foundOrg.State.State),
 		Sequence:      uint64(foundOrg.Sequence),
+		instanceID:    foundOrg.InstanceID,
 		Name:          foundOrg.Name,
 		Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
@@ -184,7 +188,7 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *O
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	org, ok := q.caches.org.Get(ctx, orgIndexByPrimaryDomain, domain)
+	org, ok := q.caches.org.Get(ctx, orgIndexByPrimaryDomain, orgCacheKey(authz.GetInstance(ctx).InstanceID(), domain))
 	if ok {
 		return org, nil
 	}
@@ -417,6 +421,7 @@ func prepareOrgQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 			OrgColumnResourceOwner.identifier(),
 			OrgColumnState.identifier(),
 			OrgColumnSequence.identifier(),
+			OrgColumnInstanceID.identifier(),
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 		).
@@ -431,6 +436,7 @@ func prepareOrgQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 				&o.ResourceOwner,
 				&o.State,
 				&o.Sequence,
+				&o.instanceID,
 				&o.Name,
 				&o.Domain,
 			)
@@ -508,15 +514,21 @@ const (
 func (o *Org) Keys(index orgIndex) []string {
 	switch index {
 	case orgIndexByID:
-		return []string{o.ID}
+		return []string{orgCacheKey(o.instanceID, o.ID)}
 	case orgIndexByPrimaryDomain:
-		return []string{o.Domain}
+		return []string{orgCacheKey(o.instanceID, o.Domain)}
 	case orgIndexUnspecified:
 	}
 	return nil
 }
 
+func orgCacheKey(instanceID, key string) string {
+	return instanceID + "-" + key
+}
+
 func (c *Caches) registerOrgInvalidation() {
-	invalidate := cacheInvalidationFunc(c.org, orgIndexByID, getAggregateID)
+	invalidate := cacheInvalidationFunc(c.org, orgIndexByID, func(aggregate *es.Aggregate) string {
+		return orgCacheKey(aggregate.InstanceID, aggregate.ID)
+	})
 	projection.OrgProjection.RegisterCacheInvalidation(invalidate)
 }
