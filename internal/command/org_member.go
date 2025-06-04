@@ -28,7 +28,7 @@ func (c *Commands) AddOrgMemberCommand(a *org.Aggregate, userID string, roles ..
 				ctx, span := tracing.NewSpan(ctx)
 				defer func() { span.EndWithError(err) }()
 
-				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
+				if exists, err := ExistsUser(ctx, filter, userID, "", false); err != nil || !exists {
 					return nil, zerrors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsOrgMember(ctx, filter, a.ID, userID); err != nil || isMember {

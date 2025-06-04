@@ -116,6 +116,7 @@ Errors:
       AlreadyVerified: Phone already verified
       Empty: Phone is empty
       NotChanged: Phone not changed
+      VerifyingRemovalIsNotSupported: Verifying phone removal is not supported
     Address:
       NotFound: Address not found
       NotChanged: Address not changed

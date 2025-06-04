@@ -353,21 +353,27 @@ func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner
 	return writeModel, nil
 }
 
-func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string) (exists bool, err error) {
+func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string, machineOnly bool) (exists bool, err error) {
+	eventTypes := []eventstore.EventType{
+		user.MachineAddedEventType,
+		user.UserRemovedType,
+	}
+	if !machineOnly {
+		eventTypes = append(eventTypes,
+			user.HumanRegisteredType,
+			user.UserV1RegisteredType,
+			user.HumanAddedType,
+			user.UserV1AddedType,
+		)
+	}
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(resourceOwner).
 		OrderAsc().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(id).
-		EventTypes(
-			user.HumanRegisteredType,
-			user.UserV1RegisteredType,
-			user.HumanAddedType,
-			user.UserV1AddedType,
-			user.MachineAddedEventType,
-			user.UserRemovedType,
-		).Builder())
+		EventTypes(eventTypes...).
+		Builder())
 	if err != nil {
 		return false, err
 	}
