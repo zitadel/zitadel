@@ -25,6 +25,7 @@ type Machine struct {
 	Name            string
 	Description     string
 	AccessTokenType domain.OIDCTokenType
+	PermissionCheck PermissionCheck
 }
 
 func (m *Machine) IsZero() bool {
@@ -33,8 +34,8 @@ func (m *Machine) IsZero() bool {
 
 func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xiown2", "Errors.ResourceOwnerMissing")
+		if a.ResourceOwner == "" && machine.PermissionCheck == nil {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xiown3", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-p0p2mi", "Errors.User.UserIDMissing")
@@ -49,7 +50,7 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
 
-			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
+			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter, machine.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -141,6 +142,7 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *doma
 	}, nil
 }
 
+// Deprecated: use ChangeUserMachine instead
 func (c *Commands) ChangeMachine(ctx context.Context, machine *Machine) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, changeMachineCommand(agg, machine))
@@ -162,24 +164,21 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *Machine) (*domain
 
 func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
+		if a.ResourceOwner == "" && machine.PermissionCheck == nil {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xiown3", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-p0p3mi", "Errors.User.UserIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
+			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter, machine.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, zerrors.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 			}
-			changedEvent, hasChanged, err := writeModel.NewChangedEvent(ctx, &a.Aggregate, machine.Name, machine.Description, machine.AccessTokenType)
-			if err != nil {
-				return nil, err
-			}
+			changedEvent, hasChanged := writeModel.NewChangedEvent(ctx, &a.Aggregate, machine.Name, machine.Description, machine.AccessTokenType)
 			if !hasChanged {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.NotChanged")
 			}
@@ -191,10 +190,9 @@ func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Valid
 	}
 }
 
-func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer) (_ *MachineWriteModel, err error) {
+func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer, permissionCheck PermissionCheck) (_ *MachineWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
 	writeModel := NewMachineWriteModel(userID, resourceOwner)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
@@ -205,5 +203,10 @@ func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, fil
 	}
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
+	if permissionCheck != nil {
+		if err := permissionCheck(writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+			return nil, err
+		}
+	}
 	return writeModel, err
 }

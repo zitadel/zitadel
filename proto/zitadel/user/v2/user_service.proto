@@ -2,6 +2,14 @@ syntax = "proto3";
 
 package zitadel.user.v2;
 
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
 import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v2/auth.proto";
@@ -10,13 +18,10 @@ import "zitadel/user/v2/phone.proto";
 import "zitadel/user/v2/idp.proto";
 import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
+import "zitadel/user/v2/key.proto";
+import "zitadel/user/v2/pat.proto";
 import "zitadel/user/v2/query.proto";
-import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
-import "validate/validate.proto";
+import "zitadel/filter/v2/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
@@ -85,9 +90,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
   }
   responses: {
-    key: "403";
+    key: "400";
     value: {
-      description: "Returned when the user does not have permission to access the resource.";
+      description: "The request is malformed.";
       schema: {
         json_schema: {
           ref: "#/definitions/rpcStatus";
@@ -96,9 +101,20 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
   }
   responses: {
-    key: "404";
+    key: "401";
     value: {
-      description: "Returned when the resource does not exist.";
+      description: "Returned when the user is not authenticated.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
       schema: {
         json_schema: {
           ref: "#/definitions/rpcStatus";
@@ -110,7 +126,50 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserService {
 
+  // Create a User
+  //
+  // Create a new human or machine user in the specified organization.
+  //
+  // Required permission:
+  //   - user.write
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      // The /new path segment does not follow Zitadels API design.
+      // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
+      post: "/v2/users/new"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
   // Create a new human user
+  //
+  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a new user of type human instead.
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -125,11 +184,12 @@ service UserService {
         org_field: "organization"
       }
       http_response: {
-        success_code: 201
+        success_code: 200
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -163,6 +223,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -204,6 +270,8 @@ service UserService {
 
   // Change the user email
   //
+  // Deprecated: [Update the users email field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
+  //
   // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
@@ -218,18 +286,23 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
   // Resend code to verify user email
-  //
-  // Resend code to verify user email.
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/resend"
@@ -249,12 +322,16 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
   // Send code to verify user email
-  //
-  // Send code to verify user email.
   rpc SendEmailCode (SendEmailCodeRequest) returns (SendEmailCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/send"
@@ -274,6 +351,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -299,10 +382,18 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
   // Set the user phone
+  //
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
   //
   // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
@@ -318,18 +409,27 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
-  // Remove the user phone
+  // Delete the user phone
   //
-  // Remove the user phone
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+  //
+  // Delete the phone number of a user.
   rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/phone"
@@ -343,20 +443,23 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Delete the user phone";
-      description: "Delete the phone number of a user."
+      deprecated: true;
       responses: {
         key: "200"
         value: {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
   // Resend code to verify user phone
-  //
-  // Resend code to verify user phone.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -376,6 +479,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -401,15 +510,27 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
-  // Update User
+
+  // Update a User
   //
-  // Update all information from a user..
-  rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
+  // Partially update an existing user.
+  // If you change the users email or phone, you can specify how the ownership should be verified.
+  // If you change the users password, you can specify if the password should be changed again on the users next login.
+  //
+  // Required permission:
+  //   - user.write
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
     option (google.api.http) = {
-      put: "/v2/users/human/{user_id}"
+      patch: "/v2/users/{user_id}"
       body: "*"
     };
 
@@ -426,6 +547,62 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Update Human User
+  //
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type human instead.
+  //
+  // Update all information from a user..
+  rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
+    option (google.api.http) = {
+      put: "/v2/users/human/{user_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -451,6 +628,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -476,6 +659,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -501,6 +690,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -526,6 +721,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -550,6 +751,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -574,6 +781,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -598,6 +811,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -622,6 +841,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -670,6 +895,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -694,6 +925,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -718,6 +955,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -743,6 +986,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -767,6 +1016,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -791,6 +1046,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -814,6 +1075,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -838,6 +1105,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -861,6 +1134,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -885,6 +1164,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -908,6 +1193,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -958,6 +1249,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "Intent ID does not exist.";
+        }
+      }
     };
   }
 
@@ -983,6 +1280,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1033,6 +1336,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1058,10 +1367,18 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
   // Change password
+  //
+  // Deprecated: [Update the users password](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
   //
   // Change the password of a user with either a verification code or the current password..
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
@@ -1077,12 +1394,19 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1155,6 +1479,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1183,6 +1513,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1209,6 +1545,12 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
@@ -1234,9 +1576,289 @@ service UserService {
           description: "OK";
         }
       };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+        }
+      }
     };
   }
 
+  // Add a Users Secret
+  //
+  // Generates a client secret for the user.
+  // The client id is the users username.
+  // If the user already has a secret, it is overwritten.
+  // Only users of type machine can have a secret.
+  //
+  // Required permission:
+  //   - user.write
+  rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/secret"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The secret was successfully generated.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Remove a Users Secret
+  //
+  // Remove the current client ID and client secret from a machine user.
+  //
+  // Required permission:
+  //   - user.write
+  rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/secret"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The secret was either successfully removed or it didn't exist in the first place.";
+        }
+      };
+    };
+  }
+
+  // Add a Key
+  //
+  // Add a keys that can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
+  // Make sure you store the returned key safely, as you won't be able to read it from the Zitadel API anymore.
+  // Only users of type machine can have keys.
+  //
+  // Required permission:
+  //   - user.write
+  rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/keys"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The key was successfully created.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Remove a Key
+  //
+  // Remove a machine users key by the given key ID and an optionally given user ID.
+  //
+  // Required permission:
+  //   - user.write
+  rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/keys/{key_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The key was either successfully removed or it not found in the first place.";
+        }
+      };
+    };
+  }
+
+  // Search Keys
+  //
+  // List all matching keys. By default all keys of the instance on which the caller has permission to read the owning users are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - user.read
+  rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/keys/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all machine user keys matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+    };
+  }
+
+  // Add a Personal Access Token
+  //
+  // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
+  // Make sure you store the returned PAT safely, as you won't be able to read it from the Zitadel API anymore.
+  // Only users of type machine can have personal access tokens.
+  //
+  // Required permission:
+  //   - user.write
+  rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/pats"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The personal access token was successfully created.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Remove a Personal Access Token
+  //
+  // Removes a machine users personal access token by the given token ID and an optionally given user ID.
+  //
+  // Required permission:
+  //   - user.write
+  rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/pats/{token_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The personal access token was either successfully removed or it was not found in the first place.";
+        }
+      };
+    };
+  }
+
+  // Search Personal Access Tokens
+  //
+  // List all personal access tokens. By default all personal access tokens of the instance on which the caller has permission to read the owning users are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - user.read
+  rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/pats/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all personal access tokens matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+    };
+  }
 }
 
 message AddHumanUserRequest{
@@ -1294,6 +1916,149 @@ message AddHumanUserResponse {
   zitadel.object.v2.Details details = 2;
   optional string email_code = 3;
   optional string phone_code = 4;
+}
+
+
+message CreateUserRequest{
+  message Human {
+    // Set the users profile information.
+    SetHumanProfile profile = 1 [
+      (validate.rules).message.required = true,
+      (google.api.field_behavior) = REQUIRED
+    ];
+    // Set the users email address and optionally send a verification email.
+    SetHumanEmail email = 2 [
+      (validate.rules).message.required = true,
+      (google.api.field_behavior) = REQUIRED
+    ];
+    // Set the users phone number and optionally send a verification SMS.
+    optional SetHumanPhone phone = 3;
+    // Set the users initial password and optionally require the user to set a new password.
+    oneof password_type {
+      Password password = 4;
+      HashedPassword hashed_password = 5;
+    }
+    // Create the user with a list of links to identity providers.
+    // This can be useful in migration-scenarios.
+    // For example, if a user already has an account in an external identity provider or another Zitadel instance, an IDP link allows the user to authenticate as usual.
+    // Sessions, second factors, hardware keys registered externally are still available for authentication.
+    // Use the following endpoints to manage identity provider links:
+    // - [AddIDPLink](apis/resources/user_service_v2/user-service-add-idp-link.api.mdx)
+    // - [RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
+    repeated IDPLink idp_links = 7;
+    // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
+    // Currently no other options are supported, and if anything different is used the validation will fail.
+    optional string totp_secret = 8 [
+      (validate.rules).string = {min_len: 1 max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 200,
+        example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+      }
+    ];
+  }
+  message Machine {
+    // The machine users name is a human readable field that helps identifying the user.
+    string name = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 200,
+        example: "\"Acceptance Test User\"";
+      }
+    ];
+    // The description is a field that helps to remember the purpose of the user.
+    optional string description = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 500},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 500,
+        example: "\"The user calls the session API in the continuous integration pipeline for acceptance tests.\"";
+      }
+    ];
+  }
+  // The unique identifier of the organization the user belongs to.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // The ID is a unique identifier for the user in the instance.
+  // If not specified, it will be generated.
+  // You can set your own user id that is unique within the instance.
+  // This is useful in migration scenarios, for example if the user already has an ID in another Zitadel system.
+  // If not specified, it will be generated.
+  // It can't be changed after creation.
+  optional string user_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"163840776835432345\"";
+    }
+  ];
+
+  // The username is a unique identifier for the user in the organization.
+  // If not specified, Zitadel sets the username to the email for users of type human and to the user_id for users of type machine.
+  // It is used to identify the user in the organization and can be used for login.
+  optional string username = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"minnie-mouse\"";
+    }
+  ];
+
+  // The type of the user.
+  oneof user_type {
+    option (validate.required) = true;
+    // Users of type human are users that are meant to be used by a person.
+    // They can log in interactively using a login UI.
+    // By default, new users will receive a verification email and, if a phone is configured, a verification SMS.
+    // To make sure these messages are sent, configure and activate valid SMTP and Twilio configurations.
+    // Read more about your options for controlling this behaviour in the email and phone field documentations.
+    Human human = 4;
+    // Users of type machine are users that are meant to be used by a machine.
+    // In order to authenticate, [add a secret](apis/resources/user_service_v2/user-service-add-secret.api.mdx), [a key](apis/resources/user_service_v2/user-service-add-key.api.mdx) or [a personal access token](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) to the user.
+    // Tokens generated for new users of type machine will be of an opaque Bearer type.
+    // You can change the users token type to JWT by using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
+    Machine machine = 5;
+  }
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"organizationId\":\"69629026806489455\",\"userId\":\"163840776835432345\",\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"nickName\":\"Mini\",\"displayName\":\"Minnie Mouse\",\"preferredLanguage\":\"en\",\"gender\":\"GENDER_FEMALE\"},\"email\":{\"email\":\"mini@mouse.com\",\"sendCode\":{\"urlTemplate\":\"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"idpLinks\":[{\"idpId\":\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\",\"userId\":\"6516849804890468048461403518\",\"userName\":\"user@external.com\"}],\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
+  };
+}
+
+message CreateUserResponse {
+  // The unique identifier of the newly created user.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the user creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+
+  // The email verification code if it was requested by setting the email verification to return_code.
+  optional string email_code = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"XTA6BC\"";
+    }
+  ];
+  // The phone verification code if it was requested by setting the phone verification to return_code.
+  optional string phone_code = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"XTA6BC\"";
+    }
+  ];
 }
 
 message GetUserByIDRequest {
@@ -1550,6 +2315,142 @@ message DeleteUserResponse {
   zitadel.object.v2.Details details = 1;
 }
 
+
+message UpdateUserRequest{
+  message Human {
+    message Profile {
+      // The given name is the first name of the user.
+      // For example, it can be used to personalize notifications and login UIs.
+      optional string given_name = 1  [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
+          max_length: 200;
+          example: "\"Minnie\"";
+        }
+      ];
+      // The family name is the last name of the user.
+      // For example, it can be used to personalize user interfaces and notifications.
+      optional string family_name = 2  [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
+          max_length: 200;
+          example: "\"Mouse\"";
+        }
+      ];
+      // The nick name is the users short name.
+      // For example, it can be used to personalize user interfaces and notifications.
+      optional string nick_name = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
+          max_length: 200;
+          example: "\"Mini\"";
+        }
+      ];
+      // The display name is how a user should primarily be displayed in lists.
+      // It can also for example be used to personalize user interfaces and notifications.
+      optional string display_name = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
+          max_length: 200;
+          example: "\"Minnie Mouse\"";
+        }
+      ];
+      // The users preferred language is the language that systems should use to interact with the user.
+      // It has the format of a [BCP-47 language tag](https://datatracker.ietf.org/doc/html/rfc3066).
+      // It is used by Zitadel where no higher prioritized preferred language can be used.
+      // For example, browser settings can overwrite a users preferred_language.
+      // Notification messages and standard login UIs use the users preferred language if it is supported and allowed on the instance.
+      // Else, the default language of the instance is used.
+      optional string preferred_language = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 10},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          min_length: 1;
+          max_length: 10;
+          example: "\"en-US\"";
+        }
+      ];
+      // The users gender can for example be used to personalize user interfaces and notifications.
+      optional Gender gender = 6 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"GENDER_FEMALE\"";
+        }
+      ];
+    }
+    // Change the users profile information
+    optional Profile profile = 1;
+    // Change the users email address and/or trigger a verification email
+    optional SetHumanEmail email = 2;
+    // Change the users phone number and/or trigger a verification SMS
+    // To delete the users phone number, leave the phone field empty and omit the verification field.
+    optional SetHumanPhone phone = 3;
+    // Change the users password.
+    // You can optionally require the current password or the verification code to be correct.
+    optional SetPassword password = 4;
+  }
+  message Machine {
+    // The machine users name is a human readable field that helps identifying the user.
+    optional string name = 1 [
+      (validate.rules).string = {max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"Acceptance Test User\"";
+      }
+    ];
+    // The description is a field that helps to remember the purpose of the user.
+    optional string description = 2 [
+      (validate.rules).string = {max_len: 500},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"The user calls the session API in the continuous integration pipeline for acceptance tests.\"";
+      }
+    ];
+  }
+  // The user id is the users unique identifier in the instance.
+  // It can't be changed.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // Set a new username that is unique within the instance.
+  // Beware that active tokens and sessions are invalidated when the username is changed.
+  optional string username = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"minnie-mouse\"";
+    }
+  ];
+  // Change type specific properties of the user.
+  oneof user_type {
+    Human human = 3;
+    Machine machine = 4;
+  }
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"username\":\"minnie-mouse\",\"human\":{\"profile\":{\"givenName\":\"Minnie\",\"familyName\":\"Mouse\",\"displayName\":\"Minnie Mouse\"},\"email\":{\"email\":\"mini@mouse.com\",\"returnCode\":{}},\"phone\":{\"phone\":\"+41791234567\",\"isVerified\":true},\"password\":{\"password\":{\"password\":\"Secr3tP4ssw0rd!\",\"changeRequired\":true},\"verificationCode\":\"SKJd342k\"},\"totpSecret\":\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"}}";
+  };
+}
+
+message UpdateUserResponse {
+  // The timestamp of the change of the user.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // In case the email verification was set to return_code, the code will be returned
+  optional string email_code = 2;
+  // In case the phone verification was set to return_code, the code will be returned
+  optional string phone_code = 3;
+}
+
 message UpdateHumanUserRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1594,7 +2495,6 @@ message DeactivateUserRequest {
 message DeactivateUserResponse {
   zitadel.object.v2.Details details = 1;
 }
-
 
 message ReactivateUserRequest {
   string user_id = 1 [
@@ -2383,4 +3283,238 @@ message HumanMFAInitSkippedRequest {
 
 message HumanMFAInitSkippedResponse {
   zitadel.object.v2.Details details = 1;
+}
+
+message AddSecretRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message AddSecretResponse {
+  // The timestamp of the secret creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The client secret.
+  // Store this secret in a secure place.
+  // It is not possible to retrieve it again.
+  string client_secret = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"WoYLHB23HAZaCSxeMJGEzbu8urHICVdFp2IegVr6Q5U4lZHKAtRvmaalNDWfCuHV\"";
+    }
+  ];
+}
+
+message RemoveSecretRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message RemoveSecretResponse {
+  // The timestamp of the secret deletion.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message AddKeyRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // The date the key will expire and no logins will be possible anymore.
+  google.protobuf.Timestamp expiration_date = 2 [
+    (validate.rules).timestamp.required = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2519-04-01T08:45:00.000000Z\"";
+    }
+  ];
+  // Optionally provide a public key of your own generated RSA private key.
+  bytes public_key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+    }
+  ];
+}
+
+message AddKeyResponse {
+  // The timestamp of the key creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The keys ID.
+  string key_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // The key which is usable to authenticate against the API.
+  bytes key_content = 3;
+}
+
+
+message RemoveKeyRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // The keys ID.
+  string key_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message RemoveKeyResponse {
+  // The timestamp of the key deletion.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message ListKeysRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional KeyFieldName sorting_column = 2 [
+    (validate.rules).enum = {defined_only: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"KEY_FIELD_NAME_CREATED_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated KeysSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":10,\"asc\":false},\"sortingColumn\":\"KEY_FIELD_NAME_CREATED_DATE\",\"filters\":[{\"andFilter\":{\"filters\":[{\"organizationIdFilter\":{\"organizationId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"notFilter\":{\"filter\":{\"userIdFilter\":{\"userId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}}},{\"orFilter\":{\"filters\":[{\"keyIdFilter\":{\"keyId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"keyIdFilter\":{\"keyId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}]}}]}}]}";
+  };
+}
+
+message ListKeysResponse {
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated Key result = 2;
+}
+
+message AddPersonalAccessTokenRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // The timestamp when the token will expire.
+  google.protobuf.Timestamp expiration_date = 2 [
+    (validate.rules).timestamp.required = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2519-04-01T08:45:00.000000Z\"";
+    }
+  ];
+}
+
+message AddPersonalAccessTokenResponse {
+  // The timestamp of the personal access token creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The tokens ID.
+  string token_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // The personal access token that can be used to authenticate against the API
+  string token = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"";
+    }
+  ];
+}
+
+message RemovePersonalAccessTokenRequest {
+  // The users resource ID.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // The tokens ID.
+  string token_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message RemovePersonalAccessTokenResponse {
+  // The timestamp of the personal access token deletion.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+
+message ListPersonalAccessTokensRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional PersonalAccessTokenFieldName sorting_column = 2 [
+    (validate.rules).enum = {defined_only: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATED_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated PersonalAccessTokensSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":10,\"asc\":false},\"sortingColumn\":\"PERSONAL_ACCESS_TOKEN_FIELD_NAME_CREATED_DATE\",\"filters\":[{\"andFilter\":{\"filters\":[{\"organizationIdFilter\":{\"organizationId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"notFilter\":{\"filter\":{\"userIdFilter\":{\"userId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}}},{\"orFilter\":{\"filters\":[{\"personalAccessTokenIdFilter\":{\"personalAccessTokenId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"personalAccessTokenIdFilter\":{\"personalAccessTokenId\":\"163840776835432345\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}}]}}]}}]}";
+  };
+}
+
+message ListPersonalAccessTokensResponse {
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated PersonalAccessToken result = 2;
 }

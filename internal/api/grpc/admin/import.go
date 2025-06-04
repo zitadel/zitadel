@@ -515,7 +515,7 @@ func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	for _, user := range org.GetMachineUsers() {
 		logging.Debugf("import user: %s", user.GetUserId())
 		userState := domain.UserState(user.State)
-		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()), &userState)
+		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()), &userState, nil)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
