@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -302,16 +303,17 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 		ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
 		existingGrant.GrantID,
 		existingGrant.GrantedOrgID,
-	),
-	)
+	))
 
 	for _, userGrantID := range cascadeUserGrantIDs {
-		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, userGrantID, gu.Ptr(""), true, true, nil)
 		if err != nil {
 			logging.WithFields("id", "COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
-		events = append(events, event)
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -348,12 +350,14 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 	)
 
 	for _, userGrantID := range cascadeUserGrantIDs {
-		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, userGrantID, gu.Ptr(""), true, true, nil)
 		if err != nil {
 			logging.WithFields("id", "COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
-		events = append(events, event)
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {

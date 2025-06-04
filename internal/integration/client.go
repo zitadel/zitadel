@@ -23,6 +23,7 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
+	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -50,31 +51,32 @@ import (
 )
 
 type Client struct {
-	CC             *grpc.ClientConn
-	Admin          admin.AdminServiceClient
-	Mgmt           mgmt.ManagementServiceClient
-	Auth           auth.AuthServiceClient
-	UserV2beta     user_v2beta.UserServiceClient
-	UserV2         user_v2.UserServiceClient
-	SessionV2beta  session_v2beta.SessionServiceClient
-	SessionV2      session.SessionServiceClient
-	SettingsV2beta settings_v2beta.SettingsServiceClient
-	SettingsV2     settings.SettingsServiceClient
-	OIDCv2beta     oidc_pb_v2beta.OIDCServiceClient
-	OIDCv2         oidc_pb.OIDCServiceClient
-	OrgV2beta      org_v2beta.OrganizationServiceClient
-	OrgV2          org.OrganizationServiceClient
-	ActionV2beta   action.ActionServiceClient
-	FeatureV2beta  feature_v2beta.FeatureServiceClient
-	FeatureV2      feature.FeatureServiceClient
-	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
-	WebKeyV2Beta   webkey_v2beta.WebKeyServiceClient
-	IDPv2          idp_pb.IdentityProviderServiceClient
-	UserV3Alpha    user_v3alpha.ZITADELUsersClient
-	SAMLv2         saml_pb.SAMLServiceClient
-	SCIM           *scim.Client
-	Projectv2Beta  project_v2beta.ProjectServiceClient
-	InstanceV2Beta instance.InstanceServiceClient
+	CC                  *grpc.ClientConn
+	Admin               admin.AdminServiceClient
+	Mgmt                mgmt.ManagementServiceClient
+	Auth                auth.AuthServiceClient
+	UserV2beta          user_v2beta.UserServiceClient
+	UserV2              user_v2.UserServiceClient
+	SessionV2beta       session_v2beta.SessionServiceClient
+	SessionV2           session.SessionServiceClient
+	SettingsV2beta      settings_v2beta.SettingsServiceClient
+	SettingsV2          settings.SettingsServiceClient
+	OIDCv2beta          oidc_pb_v2beta.OIDCServiceClient
+	OIDCv2              oidc_pb.OIDCServiceClient
+	OrgV2beta           org_v2beta.OrganizationServiceClient
+	OrgV2               org.OrganizationServiceClient
+	ActionV2beta        action.ActionServiceClient
+	FeatureV2beta       feature_v2beta.FeatureServiceClient
+	FeatureV2           feature.FeatureServiceClient
+	UserSchemaV3        userschema_v3alpha.ZITADELUserSchemasClient
+	WebKeyV2Beta        webkey_v2beta.WebKeyServiceClient
+	IDPv2               idp_pb.IdentityProviderServiceClient
+	UserV3Alpha         user_v3alpha.ZITADELUsersClient
+	SAMLv2              saml_pb.SAMLServiceClient
+	SCIM                *scim.Client
+	Projectv2Beta       project_v2beta.ProjectServiceClient
+	InstanceV2Beta      instance.InstanceServiceClient
+	AuthorizationV2Beta authorization.AuthorizationServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -89,31 +91,32 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		return nil, err
 	}
 	client := &Client{
-		CC:             cc,
-		Admin:          admin.NewAdminServiceClient(cc),
-		Mgmt:           mgmt.NewManagementServiceClient(cc),
-		Auth:           auth.NewAuthServiceClient(cc),
-		UserV2beta:     user_v2beta.NewUserServiceClient(cc),
-		UserV2:         user_v2.NewUserServiceClient(cc),
-		SessionV2beta:  session_v2beta.NewSessionServiceClient(cc),
-		SessionV2:      session.NewSessionServiceClient(cc),
-		SettingsV2beta: settings_v2beta.NewSettingsServiceClient(cc),
-		SettingsV2:     settings.NewSettingsServiceClient(cc),
-		OIDCv2beta:     oidc_pb_v2beta.NewOIDCServiceClient(cc),
-		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
-		OrgV2:          org.NewOrganizationServiceClient(cc),
-		ActionV2beta:   action.NewActionServiceClient(cc),
-		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
-		FeatureV2:      feature.NewFeatureServiceClient(cc),
-		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
-		WebKeyV2Beta:   webkey_v2beta.NewWebKeyServiceClient(cc),
-		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
-		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
-		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
-		SCIM:           scim.NewScimClient(target),
-		Projectv2Beta:  project_v2beta.NewProjectServiceClient(cc),
-		InstanceV2Beta: instance.NewInstanceServiceClient(cc),
+		CC:                  cc,
+		Admin:               admin.NewAdminServiceClient(cc),
+		Mgmt:                mgmt.NewManagementServiceClient(cc),
+		Auth:                auth.NewAuthServiceClient(cc),
+		UserV2beta:          user_v2beta.NewUserServiceClient(cc),
+		UserV2:              user_v2.NewUserServiceClient(cc),
+		SessionV2beta:       session_v2beta.NewSessionServiceClient(cc),
+		SessionV2:           session.NewSessionServiceClient(cc),
+		SettingsV2beta:      settings_v2beta.NewSettingsServiceClient(cc),
+		SettingsV2:          settings.NewSettingsServiceClient(cc),
+		OIDCv2beta:          oidc_pb_v2beta.NewOIDCServiceClient(cc),
+		OIDCv2:              oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2beta:           org_v2beta.NewOrganizationServiceClient(cc),
+		OrgV2:               org.NewOrganizationServiceClient(cc),
+		ActionV2beta:        action.NewActionServiceClient(cc),
+		FeatureV2beta:       feature_v2beta.NewFeatureServiceClient(cc),
+		FeatureV2:           feature.NewFeatureServiceClient(cc),
+		UserSchemaV3:        userschema_v3alpha.NewZITADELUserSchemasClient(cc),
+		WebKeyV2Beta:        webkey_v2beta.NewWebKeyServiceClient(cc),
+		IDPv2:               idp_pb.NewIdentityProviderServiceClient(cc),
+		UserV3Alpha:         user_v3alpha.NewZITADELUsersClient(cc),
+		SAMLv2:              saml_pb.NewSAMLServiceClient(cc),
+		SCIM:                scim.NewScimClient(target),
+		Projectv2Beta:       project_v2beta.NewProjectServiceClient(cc),
+		InstanceV2Beta:      instance.NewInstanceServiceClient(cc),
+		AuthorizationV2Beta: authorization.NewAuthorizationServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -644,14 +647,6 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
-	/*
-		mustAwait(func() error {
-			_, err := i.Client.Mgmt.GetProviderByID(ctx, &mgmt.GetProviderByIDRequest{
-				Id: resp.GetId(),
-			})
-			return err
-		})
-	*/
 	return resp
 }
 

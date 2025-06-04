@@ -294,11 +294,14 @@ func (i *Instance) createWebAuthNClient() {
 	i.WebAuthN = webauthn.NewClient(i.Config.WebAuthNName, i.Domain, http_util.BuildOrigin(i.Host(), i.Config.Secure))
 }
 
+// Deprecated: WithAuthorization is misleading, as we have Zitadel resources called authorization now.
+// It is aliased to WithAuthorizationToken, which sets the Authorization header with a Bearer token.
+// Use WithAuthorizationToken directly instead.
 func (i *Instance) WithAuthorization(ctx context.Context, u UserType) context.Context {
-	return i.WithInstanceAuthorization(ctx, u)
+	return i.WithAuthorizationToken(ctx, u)
 }
 
-func (i *Instance) WithInstanceAuthorization(ctx context.Context, u UserType) context.Context {
+func (i *Instance) WithAuthorizationToken(ctx context.Context, u UserType) context.Context {
 	return WithAuthorizationToken(ctx, i.Users.Get(u).Token)
 }
 
