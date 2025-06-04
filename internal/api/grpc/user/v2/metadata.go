@@ -5,7 +5,6 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -49,8 +48,7 @@ func (s *Server) listUserMetadataRequestToModel(req *user.ListUserMetadataReques
 }
 
 func (s *Server) SetUserMetadata(ctx context.Context, req *user.SetUserMetadataRequest) (*user.SetUserMetadataResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetUserMetadata(ctx, req.UserId, ctxData.OrgID, setUserMetadataToDomain(req)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.UserId, "", setUserMetadataToDomain(req)...)
 	if err != nil {
 		return nil, err
 	}

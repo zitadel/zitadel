@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_SetUserMetadata(t *testing.T) {
-	iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name    string
@@ -32,7 +32,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "missing permission",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateHumanUser(CTX).GetUserId()
+				req.UserId = Instance.CreateUserTypeHuman(CTX).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -41,9 +41,9 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "set user metadata",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateHumanUser(CTX).GetUserId()
+				req.UserId = Instance.CreateUserTypeHuman(CTX).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -52,9 +52,9 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "set user metadata, multiple",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateHumanUser(CTX).GetUserId()
+				req.UserId = Instance.CreateUserTypeHuman(CTX).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{
@@ -67,7 +67,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "set user metadata on non existent user",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			req: &user.SetUserMetadataRequest{
 				UserId:   "notexisting",
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -78,8 +78,8 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "update user metadata",
 			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateHumanUser(iamOwnerCtx).GetUserId()
-				Instance.SetUserMetadata(iamOwnerCtx, req.UserId, "key1", "value1")
+				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
+				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))}},
@@ -90,8 +90,8 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "update user metadata with same value",
 			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateHumanUser(iamOwnerCtx).GetUserId()
-				Instance.SetUserMetadata(iamOwnerCtx, req.UserId, "key1", "value1")
+				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
+				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -150,7 +150,7 @@ func TestServer_ListUserMetadata(t *testing.T) {
 			args: args{
 				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
 				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
-					userID := Instance.CreateHumanUser(iamOwnerCTX).GetUserId()
+					userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 					request.UserId = userID
 					Instance.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
 				},
@@ -163,7 +163,7 @@ func TestServer_ListUserMetadata(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCTX,
 				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
-					userID := Instance.CreateHumanUser(iamOwnerCTX).GetUserId()
+					userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 					request.UserId = userID
 					metadataResp := Instance.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
 
@@ -191,7 +191,7 @@ func TestServer_ListUserMetadata(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCTX,
 				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
-					userID := Instance.CreateHumanUser(iamOwnerCTX).GetUserId()
+					userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 					request.UserId = userID
 					key := "key1"
 					response.Metadata[0] = setUserMetadata(iamOwnerCTX, userID, key, "value1")
@@ -220,7 +220,7 @@ func TestServer_ListUserMetadata(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCTX,
 				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
-					userID := Instance.CreateHumanUser(iamOwnerCTX).GetUserId()
+					userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 					request.UserId = userID
 
 					response.Metadata[2] = setUserMetadata(iamOwnerCTX, userID, "key1", "value1")
@@ -280,7 +280,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 }
 
 func TestServer_DeleteUserMetadata(t *testing.T) {
-	iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name             string
@@ -292,7 +292,7 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 	}{
 		{
 			name: "empty id",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			req: &user.DeleteUserMetadataRequest{
 				UserId: "",
 			},
@@ -300,7 +300,7 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 		},
 		{
 			name: "delete, user not existing",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			req: &user.DeleteUserMetadataRequest{
 				UserId: "notexisting",
 			},
@@ -308,13 +308,13 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 		},
 		{
 			name: "delete",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userID := Instance.CreateHumanUser(iamOwnerCtx).GetUserId()
+				userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 				request.UserId = userID
 				key := "key1"
-				Instance.SetUserMetadata(iamOwnerCtx, userID, key, "value1")
+				Instance.SetUserMetadata(iamOwnerCTX, userID, key, "value1")
 				request.Keys = []string{key}
 				return creationDate, time.Time{}
 			},
@@ -323,14 +323,14 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 		},
 		{
 			name: "delete, empty list",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userID := Instance.CreateHumanUser(iamOwnerCtx).GetUserId()
+				userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 				request.UserId = userID
 				key := "key1"
-				Instance.SetUserMetadata(iamOwnerCtx, userID, key, "value1")
-				Instance.DeleteUserMetadata(iamOwnerCtx, userID, key)
+				Instance.SetUserMetadata(iamOwnerCTX, userID, key, "value1")
+				Instance.DeleteUserMetadata(iamOwnerCTX, userID, key)
 				return creationDate, time.Now().UTC()
 			},
 			req:     &user.DeleteUserMetadataRequest{},
@@ -338,14 +338,14 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 		},
 		{
 			name: "delete, already removed",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userID := Instance.CreateHumanUser(iamOwnerCtx).GetUserId()
+				userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 				request.UserId = userID
 				key := "key1"
-				Instance.SetUserMetadata(iamOwnerCtx, userID, key, "value1")
-				Instance.DeleteUserMetadata(iamOwnerCtx, userID, key)
+				Instance.SetUserMetadata(iamOwnerCTX, userID, key, "value1")
+				Instance.DeleteUserMetadata(iamOwnerCTX, userID, key)
 				request.Keys = []string{key}
 				return creationDate, time.Now().UTC()
 			},
@@ -354,17 +354,17 @@ func TestServer_DeleteUserMetadata(t *testing.T) {
 		},
 		{
 			name: "delete, multiple",
-			ctx:  iamOwnerCtx,
+			ctx:  iamOwnerCTX,
 			prepare: func(request *user.DeleteUserMetadataRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userID := Instance.CreateHumanUser(iamOwnerCtx).GetUserId()
+				userID := Instance.CreateUserTypeHuman(iamOwnerCTX).GetId()
 				request.UserId = userID
 				key1 := "key1"
-				Instance.SetUserMetadata(iamOwnerCtx, userID, key1, "value1")
+				Instance.SetUserMetadata(iamOwnerCTX, userID, key1, "value1")
 				key2 := "key2"
-				Instance.SetUserMetadata(iamOwnerCtx, userID, key2, "value1")
+				Instance.SetUserMetadata(iamOwnerCTX, userID, key2, "value1")
 				key3 := "key3"
-				Instance.SetUserMetadata(iamOwnerCtx, userID, key3, "value1")
+				Instance.SetUserMetadata(iamOwnerCTX, userID, key3, "value1")
 				request.Keys = []string{key1, key2, key3}
 				return creationDate, time.Time{}
 			},
