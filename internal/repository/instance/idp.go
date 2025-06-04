@@ -1024,6 +1024,7 @@ func NewSAMLIDPAddedEvent(
 	withSignedRequest bool,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options idp.Options,
 ) *SAMLIDPAddedEvent {
 	return &SAMLIDPAddedEvent{
@@ -1042,6 +1043,7 @@ func NewSAMLIDPAddedEvent(
 			withSignedRequest,
 			nameIDFormat,
 			transientMappingAttributeName,
+			federatedLogoutEnabled,
 			options,
 		),
 	}

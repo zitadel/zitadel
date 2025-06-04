@@ -132,16 +132,20 @@ func usersCheckPermission(ctx context.Context, users *Users, permissionCheck dom
 	)
 }
 
-func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *UserSearchQueries) sq.SelectBuilder {
+func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery) sq.SelectBuilder {
+	return userPermissionCheckV2WithCustomColumns(ctx, query, enabled, filters, UserResourceOwnerCol, UserIDCol)
+}
+
+func userPermissionCheckV2WithCustomColumns(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery, userResourceOwnerCol, userID Column) sq.SelectBuilder {
 	if !enabled {
 		return query
 	}
 	join, args := PermissionClause(
 		ctx,
-		UserResourceOwnerCol,
+		userResourceOwnerCol,
 		domain.PermissionUserRead,
-		SingleOrgPermissionOption(queries.Queries),
-		OwnedRowsPermissionOption(UserIDCol),
+		SingleOrgPermissionOption(filters),
+		OwnedRowsPermissionOption(userID),
 	)
 	return query.JoinClause(join, args...)
 }
@@ -637,7 +641,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery()
-	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries)
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -776,11 +780,11 @@ func NewUserVerifiedPhoneSearchQuery(value string, comparison TextComparison) (S
 	return NewTextQuery(NotifyVerifiedPhoneCol, value, comparison)
 }
 
-func NewUserStateSearchQuery(value int32) (SearchQuery, error) {
+func NewUserStateSearchQuery(value domain.UserState) (SearchQuery, error) {
 	return NewNumberQuery(UserStateCol, value, NumberEquals)
 }
 
-func NewUserTypeSearchQuery(value int32) (SearchQuery, error) {
+func NewUserTypeSearchQuery(value domain.UserType) (SearchQuery, error) {
 	return NewNumberQuery(UserTypeCol, value, NumberEquals)
 }
 

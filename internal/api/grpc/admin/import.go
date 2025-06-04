@@ -510,7 +510,7 @@ func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	}
 	for _, user := range org.GetMachineUsers() {
 		logging.Debugf("import user: %s", user.GetUserId())
-		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()))
+		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()), nil)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -621,7 +621,7 @@ func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	}
 	for _, project := range org.GetProjects() {
 		logging.Debugf("import project: %s", project.GetProjectId())
-		_, err := s.command.AddProjectWithID(ctx, management.ProjectCreateToDomain(project.GetProject()), org.GetOrgId(), project.GetProjectId())
+		_, err := s.command.AddProject(ctx, management.ProjectCreateToCommand(project.GetProject(), project.GetProjectId(), org.GetOrgId()))
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project", Id: project.GetProjectId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -761,7 +761,7 @@ func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 		logging.Debugf("import projectroles: %s", role.ProjectId+"_"+role.RoleKey)
 
 		// TBD: why not command.BulkAddProjectRole?
-		_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToDomain(role), org.GetOrgId())
+		_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToCommand(role, org.GetOrgId()))
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_role", Id: role.ProjectId + "_" + role.RoleKey, Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -1023,7 +1023,7 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	if org.ProjectGrants != nil {
 		for _, grant := range org.GetProjectGrants() {
 			logging.Debugf("import projectgrant: %s", grant.GetGrantId()+"_"+grant.GetProjectGrant().GetProjectId()+"_"+grant.GetProjectGrant().GetGrantedOrgId())
-			_, err := s.command.AddProjectGrantWithID(ctx, management.AddProjectGrantRequestToDomain(grant.GetProjectGrant()), grant.GetGrantId(), org.GetOrgId())
+			_, err := s.command.AddProjectGrant(ctx, management.AddProjectGrantRequestToCommand(grant.GetProjectGrant(), grant.GetGrantId(), org.GetOrgId()))
 			if err != nil {
 				*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectGrant().GetProjectId() + "_" + grant.GetProjectGrant().GetGrantedOrgId(), Message: err.Error()})
 				if isCtxTimeout(ctx) {
