@@ -21,7 +21,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectGrantRolePrefix, c.zitadelRoles)) > 0 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-m9gKK", "Errors.Project.Grant.Member.Invalid")
 	}
-	err = c.checkUserExists(ctx, member.UserID, "")
+	_, err = c.checkUserExists(ctx, member.UserID, "")
 	if err != nil {
 		return nil, err
 	}

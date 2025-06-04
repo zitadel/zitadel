@@ -97,7 +97,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, authz.GetCtxData(ctx).UserID, queries, false)
+	res, err := s.query.SearchUserMetadata(ctx, true, authz.GetCtxData(ctx).UserID, queries, nil)
 	if err != nil {
 		return nil, err
 	}

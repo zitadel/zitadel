@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"sync"
 	"testing"
@@ -229,6 +230,28 @@ func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *
 	})
 	logging.OnError(err).Panic("create human user")
 	i.TriggerUserByID(ctx, resp.GetUserId())
+	return resp
+}
+
+func (i *Instance) SetUserMetadata(ctx context.Context, id, key, value string) *user_v2.SetUserMetadataResponse {
+	resp, err := i.Client.UserV2.SetUserMetadata(ctx, &user_v2.SetUserMetadataRequest{
+		UserId: id,
+		Metadata: []*user_v2.Metadata{{
+			Key:   key,
+			Value: []byte(base64.StdEncoding.EncodeToString([]byte(value))),
+		},
+		},
+	})
+	logging.OnError(err).Panic("set user metadata")
+	return resp
+}
+
+func (i *Instance) DeleteUserMetadata(ctx context.Context, id, key string) *user_v2.DeleteUserMetadataResponse {
+	resp, err := i.Client.UserV2.DeleteUserMetadata(ctx, &user_v2.DeleteUserMetadataRequest{
+		UserId: id,
+		Keys:   []string{key},
+	})
+	logging.OnError(err).Panic("delete user metadata")
 	return resp
 }
 

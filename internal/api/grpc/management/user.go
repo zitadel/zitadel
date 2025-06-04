@@ -142,7 +142,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, false)
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, nil)
 	if err != nil {
 		return nil, err
 	}
