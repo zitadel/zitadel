@@ -9,6 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -16,8 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
-	"golang.org/x/text/language"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestSetTranslationEvents(t *testing.T) {

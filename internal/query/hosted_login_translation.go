@@ -12,6 +12,9 @@ import (
 	"dario.cat/mergo"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
+	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -19,8 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
-	"golang.org/x/text/language"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -42,18 +43,6 @@ var (
 	}
 	hostedLoginTranslationColResourceOwnerType = Column{
 		name:  projection.HostedLoginTranslationAggregateTypeCol,
-		table: hostedLoginTranslationTable,
-	}
-	hostedLoginTranslationColCreationDate = Column{
-		name:  projection.HostedLoginTranslationCreationDateCol,
-		table: hostedLoginTranslationTable,
-	}
-	hostedLoginTranslationColChangeDate = Column{
-		name:  projection.HostedLoginTranslationChangeDateCol,
-		table: hostedLoginTranslationTable,
-	}
-	hostedLoginTranslationColSequence = Column{
-		name:  projection.HostedLoginTranslationSequenceCol,
 		table: hostedLoginTranslationTable,
 	}
 	hostedLoginTranslationColLocale = Column{

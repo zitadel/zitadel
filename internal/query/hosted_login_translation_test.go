@@ -10,14 +10,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+	"google.golang.org/protobuf/runtime/protoimpl"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
-	"golang.org/x/text/language"
-	"google.golang.org/protobuf/runtime/protoimpl"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func jsonSyntaxErrorGenerator(notAMap []byte) error {

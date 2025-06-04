@@ -5,14 +5,15 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 
+	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
-	"golang.org/x/text/language"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
