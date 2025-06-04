@@ -355,7 +355,9 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 			logging.WithFields("id", "COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
-		events = append(events, event)
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
