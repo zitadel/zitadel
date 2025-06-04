@@ -4,18 +4,20 @@ package authorization_test
 
 import (
 	"context"
-	"github.com/muhlemmer/gu"
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	"testing"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/integration"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
+	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_CreateAuthorization(t *testing.T) {
@@ -38,7 +40,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -54,7 +56,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -71,7 +73,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateOrgMembership(t, IAMCTX, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -88,7 +90,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -105,7 +107,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -121,7 +123,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 
@@ -138,7 +140,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 
@@ -159,7 +161,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -178,7 +180,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -197,7 +199,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 
@@ -217,7 +219,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrg.OrganizationId}), request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 
@@ -274,7 +276,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					request.RoleKeys = []string{projectRole1}
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -299,7 +301,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					request.RoleKeys = []string{projectRole1, projectRole2, gofakeit.AppName()}
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -325,7 +327,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					request.RoleKeys = []string{projectRole1, projectRole2}
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -355,8 +357,8 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectRole1}
 					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -379,14 +381,14 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
 						OrganizationId: &Instance.DefaultOrg.Id,
-						RoleKeys:       []string{projectRole1, projectRole2, projectRole3},
+						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					request.RoleKeys = []string{projectRole1}
+					request.RoleKeys = []string{projectId, projectRole3, projectRole3}
 					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -413,16 +415,16 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
+					request.Id = preparedAuthorization.Id
+					request.RoleKeys = []string{projectRole1}
+					callingUser := Instance.CreateMachineUser(IAMCTX)
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
 					_, err = Instance.Client.Projectv2Beta.DeleteProjectGrant(IAMCTX, &project.DeleteProjectGrantRequest{
 						ProjectId:             projectId,
 						GrantedOrganizationId: Instance.DefaultOrg.Id,
 					})
 					require.NoError(t, err)
-					request.Id = preparedAuthorization.Id
-					request.RoleKeys = []string{projectRole1}
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -482,7 +484,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -506,14 +508,14 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
 			},
 		},
 		{
-			name: "delete authorization, granted project, user membership on project owning org, ok",
+			name: "delete authorization, granted project, user membership on project owning org, error",
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
@@ -535,11 +537,12 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
 			},
+			wantErr: true,
 		},
 		{
 			name: "delete authorization, granted project, user membership on project granted org, ok",
@@ -563,8 +566,8 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -592,7 +595,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -652,7 +655,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -676,14 +679,14 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
 			},
 		},
 		{
-			name: "deactivate authorization, granted project, user membership on project owning org, ok",
+			name: "deactivate authorization, granted project, user membership on project owning org, error",
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
@@ -705,11 +708,12 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
 			},
+			wantErr: true,
 		},
 		{
 			name: "deactivate authorization, granted project, user membership on project granted org, ok",
@@ -733,8 +737,8 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -762,7 +766,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -822,7 +826,11 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
+						Id: preparedAuthorization.Id,
+					})
+					require.NoError(t, err)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -846,14 +854,18 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
+						Id: preparedAuthorization.Id,
+					})
+					require.NoError(t, err)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
 			},
 		},
 		{
-			name: "activate authorization, granted project, user membership on project owning org, ok",
+			name: "activate authorization, granted project, user membership on project owning org, error",
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
@@ -875,11 +887,16 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
+						Id: preparedAuthorization.Id,
+					})
+					require.NoError(t, err)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
 			},
+			wantErr: true,
 		},
 		{
 			name: "activate authorization, granted project, user membership on project granted org, ok",
@@ -903,8 +920,12 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
+					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
+						Id: preparedAuthorization.Id,
+					})
+					require.NoError(t, err)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -928,7 +949,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					request.Id = preparedAuthorization.Id
 					callingUser := Instance.CreateMachineUser(IAMCTX)
 					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{UserId: callingUser.UserId})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
