@@ -67,7 +67,18 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *domain.UserState) (_ *domain.ObjectDetails, err error) {
+type addMachineOption func(context.Context, *Machine) error
+
+func AddMachineWithUsernameToIDFallback() addMachineOption {
+	return func(ctx context.Context, m *Machine) error {
+		if m.Username == "" {
+			m.Username = m.AggregateID
+		}
+		return nil
+	}
+}
+
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *domain.UserState, check PermissionCheck, options ...addMachineOption) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -79,9 +90,18 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *doma
 		machine.AggregateID = userID
 	}
 
-	userAgg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
-	//nolint:staticcheck
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(userAgg, machine))
+	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
+	for _, option := range options {
+		if err = option(ctx, machine); err != nil {
+			return nil, err
+		}
+	}
+	if check != nil {
+		if err = check(machine.ResourceOwner, machine.AggregateID); err != nil {
+			return nil, err
+		}
+	}
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
 		return nil, err
 	}
@@ -90,9 +110,9 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *doma
 		var cmd eventstore.Command
 		switch *state {
 		case domain.UserStateInactive:
-			cmd = user.NewUserDeactivatedEvent(ctx, &userAgg.Aggregate)
+			cmd = user.NewUserDeactivatedEvent(ctx, &agg.Aggregate)
 		case domain.UserStateLocked:
-			cmd = user.NewUserLockedEvent(ctx, &userAgg.Aggregate)
+			cmd = user.NewUserLockedEvent(ctx, &agg.Aggregate)
 		case domain.UserStateDeleted:
 		// users are never imported if deleted
 		case domain.UserStateActive:
