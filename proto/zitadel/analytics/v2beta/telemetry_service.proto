@@ -3,6 +3,7 @@ syntax = "proto3";
 package zitadel.analytics.v2beta;
 
 import "google/protobuf/timestamp.proto";
+import "zitadel/analytics/v2beta/telemetry.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analytics";
 
@@ -11,8 +12,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analyt
 // It is used to collect anonymized data about the usage of ZITADEL features, capabilities, and configurations.
 // ZITADEL acts as a client of the TelemetryService.
 //
-// Reports are sent periodically based on the system's running configuration.
-// The content of the reports, respectively the data collected, can be configured in the system's running configuration.
+// Reports are sent periodically based on the system's runtime configuration.
+// The content of the reports, respectively the data collected, can be configured in the system's runtime configuration.
 //
 // All endpoints follow the same error and retry handling:
 // In case of a failure to report the usage, ZITADEL will retry to report the usage
@@ -20,7 +21,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analyt
 // - Client side errors will not be retried, as they indicate a misconfiguration or an invalid request:
 //   - `INVALID_ARGUMENT`: The request was malformed.
 //   - `NOT_FOUND`: The TelemetryService's endpoint is likely misconfigured.
-// - Connection / transfer errors will be retried based on the retry policy configured in the system's running configuration:
+// - Connection / transfer errors will be retried based on the retry policy configured in the system's runtime configuration:
 //   - `DEADLINE_EXCEEDED`: The request took too long to complete, it will be retried.
 //   - `RESOURCE_EXHAUSTED`: The request was rejected due to resource exhaustion, it will be retried after a backoff period.
 //   - `UNAVAILABLE`: The TelemetryService is currently unavailable, it will be retried after a backoff period.
@@ -32,12 +33,14 @@ service TelemetryService {
 
   // ReportBaseInformation is used to report the base information of the ZITADEL system,
   // including the version, instances, their creation date and domains.
+  // The response contains a report ID to link it to the resource counts or other reports.
+  // The report ID is only valid for the same system ID.
   rpc ReportBaseInformation (ReportBaseInformationRequest) returns (ReportBaseInformationResponse) {}
 
   // ReportResourceCounts is used to report the resource counts such as amount of organizations
   // or users per organization and much more.
   // Since the resource counts can be reported in multiple batches,
-  // the request contains a report ID to continue reporting.
+  // the response contains a report ID to continue reporting.
   // The report ID is only valid for the same system ID.
   rpc ReportResourceCounts (ReportResourceCountsRequest) returns (ReportResourceCountsResponse) {}
 }
@@ -51,16 +54,12 @@ message ReportBaseInformationRequest {
   repeated InstanceInformation instances = 3;
 }
 
-message InstanceInformation {
-  // The unique identifier of the instance.
-  string id = 1;
-  // The custom domains (incl. generated ones) of the instance.
-  repeated string domains = 2;
-  // The creation date of the instance.
-  google.protobuf.Timestamp created_at = 3;
+message ReportBaseInformationResponse {
+  // The report ID is a unique identifier for the report.
+  // It is used to identify the report to be able to link it to the resource counts or other reports.
+  // Note that the report ID is only valid for the same system ID.
+  string report_id = 1;
 }
-
-message ReportBaseInformationResponse {}
 
 message ReportResourceCountsRequest {
   // The system ID is a unique identifier for the ZITADEL system.
@@ -68,34 +67,8 @@ message ReportResourceCountsRequest {
   // The previously returned report ID from the server to continue reporting.
   // Note that the report ID is only valid for the same system ID.
   optional string report_id = 2;
-  // The ID of the instance for which the resource counts are reported.
-  string instance_id = 3;
-  // The parent type of the resource counts (e.g. organization or instance).
-  // For example, reporting the amount of users per organization would use
-  // `COUNT_PARENT_TYPE_ORGANIZATION` as parent type and the organization ID as parent ID.
-  CountParentType parent_type = 4;
-  // The parent ID of the resource counts (e.g. organization or instance ID).
-  // For example, reporting the amount of users per organization would use
-  // `COUNT_PARENT_TYPE_ORGANIZATION` as parent type and the organization ID as parent ID.
-  string parent_id = 5;
-  // The resource counts to report, e.g. amount of `users`, `organizations`, etc.
-  string resource_name = 6;
-  // The name of the table in the database, which was used to calculate the counts.
-  // This can be used to deduplicate counts in case of multiple reports.
-  // For example, if the counts were calculated from the `users14` table,
-  // the table name would be `users14`, where there could also be a `users15` table
-  // reported at the same time as the system is rolling out a new version.
-  string table_name = 7;
-  // The timestamp when the count was last updated.
-  google.protobuf.Timestamp updated_at = 8;
-  // The actual amount of the resource.
-  uint32 amount = 9;
-}
-
-enum CountParentType {
-  COUNT_PARENT_TYPE_UNSPECIFIED = 0;
-  COUNT_PARENT_TYPE_INSTANCE = 1;
-  COUNT_PARENT_TYPE_ORGANIZATION = 2;
+  // A list of resource counts to report.
+  repeated ResourceCount resource_counts = 3;
 }
 
 message ReportResourceCountsResponse {
