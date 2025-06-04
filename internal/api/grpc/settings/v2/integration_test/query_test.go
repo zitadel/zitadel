@@ -16,6 +16,9 @@ import (
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -354,17 +357,73 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 }
 
 func TestServer_GetHostedLoginTranslation(t *testing.T) {
-	req := &settings.GetHostedLoginTranslationRequest{
-		Level:             settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-		LevelId:           "322745517727619236",
-		Locale:            "en",
-		IgnoreInheritance: true,
-	}
-	instID := Instance.ID()
-	t.Log(instID)
-	res, err := Client.GetHostedLoginTranslation(AdminCTX, req)
+	// Given
+	translations := map[string]any{"loginTitle": gofakeit.Slogan()}
 
+	protoTranslations, err := structpb.NewStruct(translations)
 	require.Nil(t, err)
-	require.NotEmpty(t, res)
-	require.NotEmpty(t, res.GetTranslations())
+
+	setupRequest := &settings.SetHostedLoginTranslationRequest{
+		Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+		LevelId:      Instance.DefaultOrg.GetId(),
+		Translations: protoTranslations,
+		Locale:       gofakeit.LanguageBCP(),
+	}
+	savedTranslation, err := Client.SetHostedLoginTranslation(AdminCTX, setupRequest)
+	require.Nil(t, err)
+
+	tt := []struct {
+		testName     string
+		inputCtx     context.Context
+		inputRequest *settings.GetHostedLoginTranslationRequest
+
+		expectedErrorCode codes.Code
+		expectedErrorMsg  string
+		expectedResponse  *settings.GetHostedLoginTranslationResponse
+	}{
+		{
+			testName:          "when unauthN context should return unauthN error",
+			inputCtx:          CTX,
+			inputRequest:      &settings.GetHostedLoginTranslationRequest{LevelId: "unusued", Locale: "en-US"},
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName:          "when unauthZ context should return unauthZ error",
+			inputCtx:          OrgOwnerCtx,
+			inputRequest:      &settings.GetHostedLoginTranslationRequest{LevelId: "unusued", Locale: "en-US"},
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+		},
+		{
+			testName: "when authZ request should save to db and return etag",
+			inputCtx: AdminCTX,
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+				LevelId: Instance.DefaultOrg.GetId(),
+				Locale:  setupRequest.GetLocale(),
+			},
+			expectedResponse: &settings.GetHostedLoginTranslationResponse{
+				Etag:         savedTranslation.GetEtag(),
+				Translations: protoTranslations,
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// When
+			res, err := Client.GetHostedLoginTranslation(tc.inputCtx, tc.inputRequest)
+
+			// Then
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+			if tc.expectedErrorMsg == "" {
+				require.NoError(t, err)
+				assert.NotEmpty(t, res.GetEtag())
+				assert.NotEmpty(t, res.GetTranslations().GetFields())
+			}
+		})
+	}
 }
