@@ -6,11 +6,27 @@ now := $(shell date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/
 VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
+LOGIN_REMOTE_URL := https://github.com/zitadel/typescript.git
+LOGIN_REMOTE := login
+LOGIN_BRANCH := main
 
 GOCOVERDIR = tmp/coverage
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
+
+.PHONY: help
+help:
+	@echo "Available targets:"
+	@echo "  compile                - Compile the ZITADEL binary and console"
+	@echo "  docker_image           - Build the Docker image for ZITADEL"
+	@echo "  clean                  - Clean up generated files"
+	@echo "  core_unit_test         - Run unit tests for the core"
+	@echo "  core_integration_test  - Run integration tests for the core"
+	@echo "  console_lint           - Lint the console code"
+	@echo "  core_lint              - Lint the core code"
+	@echo "  pull-from-login        - Pull changes from login repo into the login subfolder"
+	@echo "  push-to-login          - Push changes from the login subfolder to the login repo"
 
 .PHONY: compile
 compile: core_build console_build compile_pipeline
@@ -165,3 +181,18 @@ core_lint:
 		--config ./.golangci.yaml \
 		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
+
+.PHONY: check-remotes
+check-remotes:
+	@git remote -v | grep $(LOGIN_REMOTE) || \
+	 (echo "Remote '$(LOGIN_REMOTE)' not found. Please run:" && \
+	  echo "git remote add $(LOGIN_REMOTE) $(LOGIN_REMOTE_URL)" && exit 1)
+
+.PHONY: pull-from-login
+pull-from-login: check-remotes
+	git fetch $(LOGIN_REMOTE)
+	git subtree pull --prefix=login $(LOGIN_REMOTE) $(LOGIN_BRANCH) --squash
+
+.PHONY: push-to-login
+push-to-login: check-remotes
+	git subtree push --prefix=login $(LOGIN_REMOTE) $(LOGIN_BRANCH)
