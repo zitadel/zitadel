@@ -269,6 +269,14 @@ func (i *Instance) CreateUserTypeMachine(ctx context.Context) *user_v2.CreateUse
 	return resp
 }
 
+func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *user_v2.AddPersonalAccessTokenResponse {
+	resp, err := i.Client.UserV2.AddPersonalAccessToken(ctx, &user_v2.AddPersonalAccessTokenRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create pat")
+	return resp
+}
+
 // TriggerUserByID makes sure the user projection gets triggered after creation.
 func (i *Instance) TriggerUserByID(ctx context.Context, users ...string) {
 	var wg sync.WaitGroup
@@ -401,14 +409,6 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 	})
 	logging.OnError(err).Panic("create human user")
 	i.TriggerUserByID(ctx, resp.GetUserId())
-	return resp
-}
-
-func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *mgmt.AddPersonalAccessTokenResponse {
-	resp, err := i.Client.Mgmt.AddPersonalAccessToken(ctx, &mgmt.AddPersonalAccessTokenRequest{
-		UserId: userID,
-	})
-	logging.OnError(err).Panic("create pat")
 	return resp
 }
 
