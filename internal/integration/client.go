@@ -269,6 +269,14 @@ func (i *Instance) CreateUserTypeMachine(ctx context.Context) *user_v2.CreateUse
 	return resp
 }
 
+func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *user_v2.AddPersonalAccessTokenResponse {
+	resp, err := i.Client.UserV2.AddPersonalAccessToken(ctx, &user_v2.AddPersonalAccessTokenRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create pat")
+	return resp
+}
+
 // TriggerUserByID makes sure the user projection gets triggered after creation.
 func (i *Instance) TriggerUserByID(ctx context.Context, users ...string) {
 	var wg sync.WaitGroup
@@ -899,6 +907,16 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 		ProjectId: projectID,
 		UserId:    userID,
 		Roles:     []string{domain.RoleProjectOwner},
+	})
+	require.NoError(t, err)
+}
+
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
+	_, err := i.Client.Mgmt.AddProjectGrantMember(ctx, &mgmt.AddProjectGrantMemberRequest{
+		ProjectId: projectID,
+		GrantId:   grantID,
+		UserId:    userID,
+		Roles:     []string{domain.RoleProjectGrantOwner},
 	})
 	require.NoError(t, err)
 }
