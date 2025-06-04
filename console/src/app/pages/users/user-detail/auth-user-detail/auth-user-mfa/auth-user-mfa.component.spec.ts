@@ -21,11 +21,11 @@ describe('AuthUserMfaComponent', () => {
     public getOtpEmailDisabled$() {
       return this.otpEmailDisabled$;
     }
-    
+
     public getOtpDisabled$() {
       return this.otpDisabled$;
     }
-    
+
     public getOtpSmsDisabled$() {
       return this.otpSmsDisabled$;
     }
@@ -40,23 +40,35 @@ describe('AuthUserMfaComponent', () => {
   beforeEach(waitForAsync(() => {
     // Create stubs for required services
     serviceStub = {
-      listMyMultiFactors: jasmine.createSpy('listMyMultiFactors').and.returnValue(Promise.resolve({
-        result: [
-          { type: {case: 'otp'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor,
-          { type: {case: 'otpSms'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor' } as AuthFactor,
-          { type: {case: 'otpEmail'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor,
-        ]
-      })),
-      getMyLoginPolicy: jasmine.createSpy('getMyLoginPolicy').and.returnValue(Promise.resolve({
-        policy: {
-          secondFactorsList: [
-            SecondFactorType.SECOND_FACTOR_TYPE_OTP,
-            SecondFactorType.SECOND_FACTOR_TYPE_U2F,
-            SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL,
-            SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS
-          ]
-        }
-      })),
+      listMyMultiFactors: jasmine.createSpy('listMyMultiFactors').and.returnValue(
+        Promise.resolve({
+          result: [
+            { type: { case: 'otp' }, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor' } as AuthFactor,
+            {
+              type: { case: 'otpSms' },
+              state: AuthFactorState.READY,
+              $typeName: 'zitadel.user.v1.AuthFactor',
+            } as AuthFactor,
+            {
+              type: { case: 'otpEmail' },
+              state: AuthFactorState.READY,
+              $typeName: 'zitadel.user.v1.AuthFactor',
+            } as AuthFactor,
+          ],
+        }),
+      ),
+      getMyLoginPolicy: jasmine.createSpy('getMyLoginPolicy').and.returnValue(
+        Promise.resolve({
+          policy: {
+            secondFactorsList: [
+              SecondFactorType.SECOND_FACTOR_TYPE_OTP,
+              SecondFactorType.SECOND_FACTOR_TYPE_U2F,
+              SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL,
+              SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS,
+            ],
+          },
+        }),
+      ),
       removeMyMultiFactorOTP: jasmine.createSpy('removeMyMultiFactorOTP').and.returnValue(Promise.resolve()),
       removeMyMultiFactorU2F: jasmine.createSpy('removeMyMultiFactorU2F').and.returnValue(Promise.resolve()),
       removeMyAuthFactorOTPEmail: jasmine.createSpy('removeMyAuthFactorOTPEmail').and.returnValue(Promise.resolve()),
@@ -71,8 +83,8 @@ describe('AuthUserMfaComponent', () => {
     dialogStub = {
       // Opened dialog returns a truthy value after closing
       open: jasmine.createSpy('open').and.returnValue({
-        afterClosed: () => of(true)
-      })
+        afterClosed: () => of(true),
+      }),
     };
 
     TestBed.configureTestingModule({
@@ -82,7 +94,7 @@ describe('AuthUserMfaComponent', () => {
         { provide: NewAuthService, useValue: serviceStub },
         { provide: ToastService, useValue: toastStub },
         { provide: MatDialog, useValue: dialogStub },
-      ]
+      ],
     }).compileComponents();
   }));
 
@@ -108,20 +120,24 @@ describe('AuthUserMfaComponent', () => {
     expect(component.dataSource.data.length).toBe(3);
 
     // Use the public getter methods to access protected properties
-    component.getOtpDisabled$().subscribe(value => {
+    component.getOtpDisabled$().subscribe((value) => {
       expect(value).toBeTrue();
     });
-    component.getOtpSmsDisabled$().subscribe(value => {
+    component.getOtpSmsDisabled$().subscribe((value) => {
       expect(value).toBeTrue();
     });
-    component.getOtpEmailDisabled$().subscribe(value => {
+    component.getOtpEmailDisabled$().subscribe((value) => {
       expect(value).toBeTrue();
     });
   });
 
   it('should call deleteMFA and remove OTP factor', async () => {
     // OTP is set
-    const factor = { type: {case: 'otp'}, state: AuthFactorState.READY, $typeName: 'zitadel.user.v1.AuthFactor'} as AuthFactor;
+    const factor = {
+      type: { case: 'otp' },
+      state: AuthFactorState.READY,
+      $typeName: 'zitadel.user.v1.AuthFactor',
+    } as AuthFactor;
     await component.deleteMFA(factor);
 
     // Verify that the service method for OTP removal was called

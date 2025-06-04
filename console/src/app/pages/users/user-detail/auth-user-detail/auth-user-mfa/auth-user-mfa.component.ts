@@ -103,14 +103,10 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     this.service.getMyLoginPolicy().then((resp) => {
       if (resp && resp.policy) {
         const secondFactors = resp.policy?.secondFactors;
-          this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.OTP, this.otpAvailable$);
-          this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.U2F, this.u2fAvailable$);
-          this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.OTP_EMAIL, this.otpEmailAvailable$);
-          this.displayAuthFactorBasedOnPolicy(
-            secondFactors, SecondFactorType.OTP_SMS, this.otpSmsAvailable$);
+        this.displayAuthFactorBasedOnPolicy(secondFactors, SecondFactorType.OTP, this.otpAvailable$);
+        this.displayAuthFactorBasedOnPolicy(secondFactors, SecondFactorType.U2F, this.u2fAvailable$);
+        this.displayAuthFactorBasedOnPolicy(secondFactors, SecondFactorType.OTP_EMAIL, this.otpEmailAvailable$);
+        this.displayAuthFactorBasedOnPolicy(secondFactors, SecondFactorType.OTP_SMS, this.otpSmsAvailable$);
       }
     });
   }
@@ -187,19 +183,15 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     });
   }
 
-  private disableAuthFactor(
-    mfas: AuthFactor[],
-    key: string,
-    subject: BehaviorSubject<boolean>
-  ): void {
-    subject.next(mfas.some(mfa => mfa.type.case === key));
+  private disableAuthFactor(mfas: AuthFactor[], key: string, subject: BehaviorSubject<boolean>): void {
+    subject.next(mfas.some((mfa) => mfa.type.case === key));
   }
 
   private displayAuthFactorBasedOnPolicy(
     factors: SecondFactorType[],
     factor: SecondFactorType,
-    subject: BehaviorSubject<boolean>
+    subject: BehaviorSubject<boolean>,
   ): void {
-    subject.next(factors.some(f => f === factor));
+    subject.next(factors.some((f) => f === factor));
   }
 }

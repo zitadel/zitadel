@@ -42,14 +42,13 @@ export class NewAuthService {
   public listMyMetadata(): Promise<ListMyMetadataResponse> {
     return this.grpcService.authNew.listMyMetadata({});
   }
-  
+
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse> {
     return this.grpcService.authNew.listMyAuthFactors(create(ListMyAuthFactorsRequestSchema), null);
   }
 
   public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse> {
-    return this.grpcService.authNew
-      .removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema), null);
+    return this.grpcService.authNew.removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema), null);
   }
 
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse> {
@@ -57,17 +56,15 @@ export class NewAuthService {
   }
 
   public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse> {
-    return this.grpcService.authNew
-      .removeMyAuthFactorOTP(create(RemoveMyAuthFactorOTPRequestSchema), null);
+    return this.grpcService.authNew.removeMyAuthFactorOTP(create(RemoveMyAuthFactorOTPRequestSchema), null);
   }
 
   public removeMyMultiFactorU2F(tokenId: string): Promise<RemoveMyAuthFactorU2FResponse> {
-    return this.grpcService.authNew.removeMyAuthFactorU2F(create(RemoveMyAuthFactorU2FRequestSchema, {tokenId}), null);
+    return this.grpcService.authNew.removeMyAuthFactorU2F(create(RemoveMyAuthFactorU2FRequestSchema, { tokenId }), null);
   }
 
   public removeMyAuthFactorOTPEmail(): Promise<RemoveMyAuthFactorOTPEmailResponse> {
-    return this.grpcService.authNew
-      .removeMyAuthFactorOTPEmail(create(RemoveMyAuthFactorOTPEmailRequestSchema), null);
+    return this.grpcService.authNew.removeMyAuthFactorOTPEmail(create(RemoveMyAuthFactorOTPEmailRequestSchema), null);
   }
 
   public getMyPasswordComplexityPolicy(): Promise<GetMyPasswordComplexityPolicyResponse> {

@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 
 @Component({
-  template: `<input appInputDirective />`
+  template: `<input appInputDirective />`,
 })
 class TestHostComponent {}
 
@@ -31,11 +31,11 @@ describe('InputDirective', () => {
         { provide: MAT_INPUT_VALUE_ACCESSOR, useValue: null },
         {
           provide: AutofillMonitor,
-          useValue: { monitor: () => of(), stopMonitoring: () => {} }
+          useValue: { monitor: () => of(), stopMonitoring: () => {} },
         },
         NgZone,
-        { provide: MatFormField, useValue: null }
-      ]
+        { provide: MatFormField, useValue: null },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestHostComponent);

@@ -116,7 +116,8 @@
         *ngIf="data.otpEmail$ | async"
         [disabled]="data.otpEmailDisabled$ | async"
         mat-stroked-button
-        (click)="selectType(AuthFactorType.OTPEMAIL)">
+        (click)="selectType(AuthFactorType.OTPEMAIL)"
+      >
         <div class="otp-btn">
           <div class="icon-row">
             <svg

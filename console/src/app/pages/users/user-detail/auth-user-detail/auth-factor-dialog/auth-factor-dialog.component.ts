@@ -18,14 +18,14 @@ export enum AuthFactorType {
 }
 
 export type AddAuthFactorDialogData = {
-  otp$: Observable<boolean>,
-  u2f$: Observable<boolean>,
-  otpSms$: Observable<boolean>,
-  otpEmail$: Observable<boolean>,
-  otpDisabled$: Observable<boolean>,
-  otpSmsDisabled$: Observable<boolean>,
-  otpEmailDisabled$: Observable<boolean>,
-  phoneVerified: boolean,
+  otp$: Observable<boolean>;
+  u2f$: Observable<boolean>;
+  otpSms$: Observable<boolean>;
+  otpEmail$: Observable<boolean>;
+  otpDisabled$: Observable<boolean>;
+  otpSmsDisabled$: Observable<boolean>;
+  otpEmailDisabled$: Observable<boolean>;
+  phoneVerified: boolean;
 };
 
 @Component({
