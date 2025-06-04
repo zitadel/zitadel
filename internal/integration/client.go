@@ -142,6 +142,7 @@ func (c *Client) pollHealth(ctx context.Context) (err error) {
 	}
 }
 
+// Deprecated: use CreateUserTypeHuman instead
 func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
@@ -173,6 +174,7 @@ func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserRes
 	return resp
 }
 
+// Deprecated: user CreateUserTypeHuman instead
 func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
@@ -198,6 +200,7 @@ func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHuman
 	return resp
 }
 
+// Deprecated: user CreateUserTypeHuman instead
 func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
@@ -249,6 +252,43 @@ func (i *Instance) DeleteUserMetadata(ctx context.Context, id, key string) *user
 		Keys:   []string{key},
 	})
 	logging.OnError(err).Panic("delete user metadata")
+	return resp
+}
+
+func (i *Instance) CreateUserTypeHuman(ctx context.Context) *user_v2.CreateUserResponse {
+	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
+		OrganizationId: i.DefaultOrg.GetId(),
+		UserType: &user_v2.CreateUserRequest_Human_{
+			Human: &user_v2.CreateUserRequest_Human{
+				Profile: &user_v2.SetHumanProfile{
+					GivenName:  "Mickey",
+					FamilyName: "Mouse",
+				},
+				Email: &user_v2.SetHumanEmail{
+					Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+					Verification: &user_v2.SetHumanEmail_ReturnCode{
+						ReturnCode: &user_v2.ReturnEmailVerificationCode{},
+					},
+				},
+			},
+		},
+	})
+	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetId())
+	return resp
+}
+
+func (i *Instance) CreateUserTypeMachine(ctx context.Context) *user_v2.CreateUserResponse {
+	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
+		OrganizationId: i.DefaultOrg.GetId(),
+		UserType: &user_v2.CreateUserRequest_Machine_{
+			Machine: &user_v2.CreateUserRequest_Machine{
+				Name: "machine",
+			},
+		},
+	})
+	logging.OnError(err).Panic("create machine user")
+	i.TriggerUserByID(ctx, resp.GetId())
 	return resp
 }
 
@@ -704,6 +744,24 @@ func (i *Instance) AddLDAPProvider(ctx context.Context) string {
 		},
 	})
 	logging.OnError(err).Panic("create ldap idp")
+	return resp.GetId()
+}
+
+func (i *Instance) AddJWTProvider(ctx context.Context) string {
+	resp, err := i.Client.Admin.AddJWTProvider(ctx, &admin.AddJWTProviderRequest{
+		Name:         "jwt-idp",
+		Issuer:       "https://example.com",
+		JwtEndpoint:  "https://example.com/jwt",
+		KeysEndpoint: "https://example.com/keys",
+		HeaderName:   "Authorization",
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	logging.OnError(err).Panic("create jwt idp")
 	return resp.GetId()
 }
 
