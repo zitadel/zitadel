@@ -555,10 +555,9 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	addedHuman = NewHumanWriteModel(human.AggregateID, orgID)
-	// TODO: adlerhurst maybe we could simplify the code below
 
-	//nolint:contextcheck
-	userAgg = UserAggregateFromWriteModel(&addedHuman.WriteModel)
+	// TODO: adlerhurst maybe we could simplify the code below
+	userAgg = UserAggregateFromWriteModelCtx(ctx, &addedHuman.WriteModel)
 
 	events = append(events, createAddHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain))
 
