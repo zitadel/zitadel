@@ -883,6 +883,7 @@ module.exports = {
               items: sidebar_api_project_service_v2,
             },
             {
+              type: "category",
               label: "Instance (Beta)",
               link: {
                 type: "generated-index",
