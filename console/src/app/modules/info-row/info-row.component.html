@@ -280,7 +280,7 @@
       <p class="info-row-title">{{ 'APP.OIDC.INFO.CLIENTID' | translate }}</p>
       <div class="copy-row" *ngIf="app.oidcConfig?.clientId">
         <button
-          *ngIf=" app.oidcConfig?.clientId as clientId"
+          *ngIf="app.oidcConfig?.clientId as clientId"
           [disabled]="copied === clientId"
           [matTooltip]="(copied !== clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
           cnslCopyToClipboard
