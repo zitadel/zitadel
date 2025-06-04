@@ -26,6 +26,7 @@ service AuthorizationService {
   // Required permissions:
   //   - "user.grant.read"
   //   - no permissions required for listing own authorizations
+  /*
   rpc ListAuthorizations(ListAuthorizationsRequest) returns (ListAuthorizationsResponse) {
     option (google.api.http) = {
       // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
@@ -54,38 +55,7 @@ service AuthorizationService {
       };
     };
   }
-
-  // Get Authorization
-  //
-  // GetAuthorization returns the authorization by its ID.
-  //
-  // Required permissions:
-  //   - "user.grant.read"
-  //   - no permissions required for getting own authorization
-  rpc GetAuthorization(GetAuthorizationRequest) returns (GetAuthorizationResponse) {
-    option (google.api.http) = {
-      get: "/v2beta/authorizations/{id}"
-    };
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200";
-        value: {
-          description: "The authorization with the given ID";
-        };
-      };
-      responses: {
-        key: "404";
-        value: {
-          description: "authorization not found";
-        };
-      };
-    };
-  }
+  */
 
   // Create Authorization
   //
@@ -320,22 +290,6 @@ message ListAuthorizationsResponse {
   // Details contains the pagination information.
   zitadel.filter.v2.PaginationResponse pagination = 1;
   repeated Authorization result = 2;
-}
-
-message GetAuthorizationRequest {
-  // ID is the unique identifier of the authorization.
-  string id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"163840776835432345\"";
-    }
-  ];
-}
-
-message GetAuthorizationResponse {
-  Authorization authorization = 1;
 }
 
 message CreateAuthorizationRequest {
