@@ -169,6 +169,12 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 
+	userResp := instance.CreateMachineUser(iamOwnerCtx)
+	patResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userResp.GetUserId())
+	projectResp := createProject(iamOwnerCtx, instance, t, instance.DefaultOrg.GetId(), false, false)
+	instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetUserId())
+	projectOwnerCtx := integration.WithAuthorizationToken(CTX, patResp.Token)
+
 	type want struct {
 		creationDate bool
 	}
@@ -205,6 +211,33 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			},
 			req:     &project.CreateProjectGrantRequest{},
 			wantErr: true,
+		},
+		{
+			name: "project owner, other project",
+			ctx:  projectOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+
+				request.ProjectId = projectResp.GetId()
+				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
+			},
+			req:     &project.CreateProjectGrantRequest{},
+			wantErr: true,
+		},
+		{
+			name: "project owner, ok",
+			ctx:  projectOwnerCtx,
+			prepare: func(request *project.CreateProjectGrantRequest) {
+				request.ProjectId = projectResp.GetId()
+
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
+			},
+			req: &project.CreateProjectGrantRequest{},
+			want: want{
+				creationDate: true,
+			},
 		},
 		{
 			name: "organization owner, other org",
@@ -405,6 +438,13 @@ func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 
+	userResp := instance.CreateMachineUser(iamOwnerCtx)
+	patResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userResp.GetUserId())
+	projectID := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false).GetId()
+	instance.CreateProjectGrant(iamOwnerCtx, t, projectID, orgResp.GetOrganizationId())
+	instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectID, orgResp.GetOrganizationId(), userResp.GetUserId())
+	projectGrantOwnerCtx := integration.WithAuthorizationToken(CTX, patResp.Token)
+
 	type args struct {
 		ctx context.Context
 		req *project.UpdateProjectGrantRequest
@@ -455,6 +495,25 @@ func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 				req: &project.UpdateProjectGrantRequest{
 					RoleKeys: []string{"nopermission"},
 				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "project grant owner, no permission",
+			prepare: func(request *project.UpdateProjectGrantRequest) {
+				roles := []string{gofakeit.Animal(), gofakeit.Animal(), gofakeit.Animal()}
+				request.ProjectId = projectID
+				request.GrantedOrganizationId = orgResp.GetOrganizationId()
+
+				for _, role := range roles {
+					instance.AddProjectRole(iamOwnerCtx, t, projectID, role, role, "")
+				}
+
+				request.RoleKeys = roles
+			},
+			args: args{
+				ctx: projectGrantOwnerCtx,
+				req: &project.UpdateProjectGrantRequest{},
 			},
 			wantErr: true,
 		},
@@ -598,7 +657,7 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				ProjectId:             "notexisting",
 				GrantedOrganizationId: "notexisting",
 			},
-			wantErr: true,
+			wantDeletionDate: false,
 		},
 		{
 			name: "delete",
@@ -650,8 +709,8 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				instance.DeleteProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
 				return creationDate, time.Now().UTC()
 			},
-			req:     &project.DeleteProjectGrantRequest{},
-			wantErr: true,
+			req:              &project.DeleteProjectGrantRequest{},
+			wantDeletionDate: true,
 		},
 	}
 	for _, tt := range tests {
