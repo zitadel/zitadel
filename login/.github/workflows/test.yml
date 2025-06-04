@@ -1,0 +1,123 @@
+name: Quality
+
+on:
+  pull_request:
+  # schedule:
+    # Every morning at 6:00 AM CET
+    # - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      target-env:
+        description: 'Zitadel target environment to run the acceptance tests against.'
+        required: true
+        type: choice
+        options:
+          - 'qa'
+          - 'prod'
+
+jobs:
+  matrix:
+    # If the workflow is triggered by a schedule event, only the acceptance tests run against QA and Prod.
+    name: Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Matrix
+        id: matrix
+        run: |
+          if [ -n "${{ github.event.schedule }}" ]; then
+            echo 'matrix=["test:acceptance:qa", "test:acceptance:prod"]' >> $GITHUB_OUTPUT
+          elif [ -n "${{ github.event.inputs.target-env }}" ]; then
+            echo 'matrix=["test:acceptance:${{ github.event.inputs.target-env }}"]' >> $GITHUB_OUTPUT
+          else
+            echo 'matrix=["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]' >> $GITHUB_OUTPUT
+          fi
+
+  quality:
+    name: Ensure Quality
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    permissions:
+      contents: "read"
+
+    needs:
+      - matrix
+
+    strategy:
+      fail-fast: false
+      matrix:
+        command: ${{ fromJson( needs.matrix.outputs.matrix ) }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1.45.0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+        # We can cache the Playwright binary independently from the pnpm cache, because we install it separately.
+        # After pnpm install --frozen-lockfile, we can get the version so we only have to download the binary once per version.
+      - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
+        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
+
+      - name: Setup Playwright binary cache
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-binary-${{ env.PLAYWRIGHT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-binary-
+        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+        if: ${{ startsWith(matrix.command, 'test:acceptance') && steps.playwright-cache.outputs.cache-hit != 'true' }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        if: ${{ matrix.command == 'test:acceptance' }}
+
+      - name: Run ZITADEL
+        run: ZITADEL_DEV_UID=root pnpm run-sink
+        if: ${{ matrix.command == 'test:acceptance' }}
+
+      - name: Create Cloud Env File
+        run: |
+          if [ "${{ matrix.command }}" == "test:acceptance:prod" ]; then
+            echo "${{ secrets.ENV_FILE_CONTENT_ACCEPTANCE_PROD }}" | tee apps/login/.env.local acceptance/tests/.env.local > /dev/null
+          else
+            echo "${{ secrets.ENV_FILE_CONTENT_ACCEPTANCE_QA }}" | tee apps/login/.env.local acceptance/tests/.env.local > /dev/null
+          fi
+        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
+
+      - name: Create Production Build
+        run: pnpm build
+        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
+
+      - name: Run SAML SP
+        run: ZITADEL_DEV_UID=root pnpm run-samlsp
+        if: ${{ matrix.command == 'test:acceptance' }}
+
+      - name: Run OIDC RP
+        run: ZITADEL_DEV_UID=root pnpm run-oidcrp
+        if: ${{ matrix.command == 'test:acceptance' }}
+
+      - name: Check
+        id: check
+        run: pnpm ${{ contains(matrix.command, 'test:acceptance') && 'test:acceptance' || matrix.command }}
