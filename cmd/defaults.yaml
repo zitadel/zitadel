@@ -312,6 +312,16 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Federated logouts store the information needed to handle federated logout and their state transfer
+  FederatedLogouts:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
@@ -387,7 +397,8 @@ Projections:
     org_domain_verified_fields:
       TransactionDuration: 0s
       BulkLimit: 2000
-
+    execution_handler:
+      BulkLimit: 10
     # The Notifications projection is used for preparing the messages (emails and SMS) to be sent to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
@@ -652,7 +663,7 @@ SystemDefaults:
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
     Hasher:
-      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
@@ -663,10 +674,11 @@ SystemDefaults:
       Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
       # Threads takes effect for the algorithms argon2i and argon2id
       Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
-      # Rounds takes effect for the algorithm pbkdf2
+      # Rounds takes effect for the algorithm pbkdf2 and sha2
       Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
-      # Hash takes effect for the algorithm pbkdf2
-      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      # Hash takes effect for the algorithm pbkdf2 and sha2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
+      # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
@@ -688,6 +700,8 @@ SystemDefaults:
     #   - "md5"      # md5Crypt with salt and password shuffling.
     #   - "md5plain" # md5 digest of a password without salt
     #   - "md5salted" # md5 digest of a salted password
+    #   - "phpass"
+    #   - "sha2" # crypt(3) SHA-256 and SHA-512
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:

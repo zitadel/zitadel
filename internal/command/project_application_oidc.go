@@ -132,7 +132,7 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
-	if err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+	if _, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
 		return nil, err
 	}
 	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
@@ -142,7 +142,7 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
-	if err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+	if _, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
 		return nil, err
 	}
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {

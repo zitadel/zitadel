@@ -1,0 +1,63 @@
+---
+title: Release Cycle
+sidebar_label: Release Cycle
+---
+
+We release a new major version of our software every three months. This predictable schedule allows us to introduce significant features and enhancements in a structured way.
+
+This cadence provides enough time for thorough development and rigorous testing. Before each stable release, we engage with our community and customers to test and stabilize the new version. This ensures high quality and reliability. For our customers, this approach creates a clear and manageable upgrade path.
+
+While major changes are reserved for these three-month releases, we address urgent needs by backporting smaller updates, such as critical bug and security fixes, to earlier versions. This allows us to provide essential updates without altering the predictable rhythm of our major release cycle.
+
+
+![Release Cycle](/img/product/release-cycle.png)
+
+## Preparation
+
+The first quarter of our cycle is for Preparation and Planning, where we create the blueprint for the upcoming major release.
+During this time, we define the core architecture, map out the implementation strategy, and finalize the design for the new features.
+
+
+## Implementation
+
+The second month is the Implementation and Development Phase, where our engineers build the features defined in the planning stage.
+
+During this period, we focus on writing the code for the new enhancements.
+We also integrate accepted contributions from our community and create the necessary documentation alongside the development work.
+This phase concludes when the new version is feature-complete and ready to enter the testing phase.
+
+## Release Candidate (RC)
+
+The first month of the third quarter is for the Release Candidate (RC) and Stabilization Phase.
+At the beginning of this month, we publish a Release Candidate version.
+This is a feature-complete version that we believe is ready for public release, made available to our customers and community for widespread testing.
+
+This phase is critical for ensuring the quality of the final release. We have two main objectives:
+- **Community Feedback and Bug Fixing**: This is when we rely on your feedback. By testing the RC in your own environments, you help us find and fix bugs and other issues we may have missed. Your active participation is crucial for stabilizing the new version.
+- **Enhanced Internal Testing**: While the community provides feedback, our internal teams conduct enhanced quality assurance. This includes in-depth feature validation, rigorous testing of upgrade paths from previous versions, and comprehensive performance and benchmark testing.
+
+The goal of this phase is to use both community feedback and internal testing to ensure the new release is robust, bug-free, and performs well, so our customers can upgrade with confidence.
+
+## General Availability (GA) / Stable
+
+Following the month-long Release Candidate and Stabilization phase, we publish the official General Availability (GA) / Stable Release.
+This is the final, production-ready version of our software that has been thoroughly tested by both our internal teams and the community.
+
+This release is available to everyone, and we recommend that customers begin reviewing the official upgrade path for their production environments.
+The deployment of this new major version to our cloud services also happens at this time.
+
+**Ongoing Maintenance: Minor and Patch Releases**
+Once a major version becomes stable, we provide ongoing support through back-porting. This means we carefully select and apply critical updates from our main development track to the stable release, ensuring it remains secure and reliable. These updates are delivered in two ways:
+
+- Minor Releases: These include simple features and enhancements from the next release cycle that are safe to add, requiring no major refactoring or large database migrations.
+- Patch Releases: These are focused exclusively on high-priority bug and security fixes to address critical issues promptly.
+
+This process ensures that you can benefit from the stability of a major release while still receiving important updates and fixes in a timely manner.
+
+## Deprecated
+
+Each major version is actively supported for a full release cycle after its launch. This means that approximately six months after its initial stable release, a version enters its deprecation period.
+
+Once a version is deprecated, we strongly encourage all self-hosted customers to upgrade to a newer version as soon as possible to continue receiving the latest features, improvements, and bug fixes.
+
+For our enterprise customers, we may offer extended support by providing critical security fixes for a deprecated version beyond the standard six-month lifecycle. This extended support is evaluated on a case-by-case basis to ensure a secure and manageable transition for large-scale deployments.

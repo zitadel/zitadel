@@ -167,21 +167,21 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		var idpUser idp.User
 		switch p := provider.(type) {
 		case *apple.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &apple.User{})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
 		case *oauth.Provider:
 			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *oidc.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *jwt.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &jwt.User{})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
 		case *azuread.Provider:
 			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *github.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
 		case *gitlab.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *google.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &google.User{User: &oidc.User{UserInfo: &oidc_pkg.UserInfo{}}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
 		case *saml.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
 		case *ldap.Provider:
