@@ -109,7 +109,7 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 }
 
 func (s *Server) DeactivateProjectGrant(ctx context.Context, req *mgmt_pb.DeactivateProjectGrantRequest) (*mgmt_pb.DeactivateProjectGrantResponse, error) {
-	details, err := s.command.DeactivateProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.DeactivateProjectGrant(ctx, req.ProjectId, req.GrantId, "", authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *Server) DeactivateProjectGrant(ctx context.Context, req *mgmt_pb.Deacti
 }
 
 func (s *Server) ReactivateProjectGrant(ctx context.Context, req *mgmt_pb.ReactivateProjectGrantRequest) (*mgmt_pb.ReactivateProjectGrantResponse, error) {
-	details, err := s.command.ReactivateProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ReactivateProjectGrant(ctx, req.ProjectId, req.GrantId, "", authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
