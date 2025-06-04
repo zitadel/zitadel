@@ -18,6 +18,7 @@ type Org struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Owner        string
+	InstanceID   string
 }
 
 func NewOrg(id string) *Org {
@@ -60,6 +61,7 @@ func (rm *Org) Reduce(events ...*eventstore.StorageEvent) error {
 		}
 		rm.Sequence = event.Sequence
 		rm.ChangeDate = event.CreatedAt
+		rm.InstanceID = event.Aggregate.Instance
 	}
 	if err := rm.State.Reduce(events...); err != nil {
 		return err
