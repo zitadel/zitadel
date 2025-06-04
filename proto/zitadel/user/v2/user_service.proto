@@ -1862,7 +1862,7 @@ service UserService {
   }
   // Set User Metadata
   //
-  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove metadata entries, use [DeleteUserMetadata](link to docs). For HTTP requests, make sure the bytes array value is base64 encoded.
+  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove metadata entries, use [DeleteUserMetadata](apis/resources/user_service_v2/user-service-delete-user-metadata.api.mdx). For HTTP requests, make sure the bytes array value is base64 encoded.
   //
   // Required permission:
   //  - `user.write`
