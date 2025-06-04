@@ -184,7 +184,6 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
-            "guides/manage/customize/user-schema",
             "guides/manage/user/scim2",
           ],
         },
@@ -614,6 +613,20 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Product Information",
+      collapsed: true,
+      items: [
+        "product/roadmap",
+        "product/release-cycle",
+        {
+          type: "link",
+          label: "Changelog",
+          href: "https://zitadel.com/changelog",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Support",
       collapsed: true,
       items: [
@@ -792,18 +805,6 @@ module.exports = {
                   "This API is intended to manage organizations for ZITADEL. \n",
               },
               items: sidebar_api_org_service_v2,
-            },
-            {
-              type: "category",
-              label: "Organization (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Organization Service beta API",
-                slug: "/apis/resources/org_service/v2beta",
-                description:
-                  "This API is intended to manage organizations for ZITADEL. \n",
-              },
-              items: sidebar_api_org_service_v2beta,
             },
             {
               type: "category",

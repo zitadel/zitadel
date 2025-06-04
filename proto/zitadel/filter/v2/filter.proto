@@ -77,7 +77,7 @@ message IDFilter {
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       max_length: 200;
-      example: "\"123\"";
+      example: "\"69629023906488337\"";
     }
   ];
 }
@@ -89,11 +89,8 @@ message TimestampFilter {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
-  // Define which condition the retrieved resources timestamp should match.
+  // Defines the condition (e.g., equals, before, after) that the timestamp of the retrieved resources should match.
   TimestampFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Defines the condition (e.g., equals, before, after) that the timestamp of the retrieved resources should match.";
-    }
+    (validate.rules).enum.defined_only = true
   ];
 }

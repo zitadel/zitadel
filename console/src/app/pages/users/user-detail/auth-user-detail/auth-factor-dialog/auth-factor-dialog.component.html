@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>
-  <span class="title">{{ 'USER.MFA.DIALOG.ADD_MFA_TITLE' | translate }} {{ data?.number }}</span>
+  <span class="title">{{ 'USER.MFA.DIALOG.ADD_MFA_TITLE' | translate }}</span>
 </h1>
 <div mat-dialog-content>
   <ng-container *ngIf="selectedType === undefined">
@@ -7,6 +7,7 @@
 
     <div class="type-selection">
       <button
+        *ngIf="data.otp$ | async"
         mat-stroked-button
         [disabled]="data.otpDisabled$ | async"
         (click)="selectType(AuthFactorType.OTP)"
@@ -56,7 +57,7 @@
           <span>{{ 'USER.MFA.OTP' | translate }}</span>
         </div>
       </button>
-      <button mat-stroked-button (click)="selectType(AuthFactorType.U2F)">
+      <button *ngIf="data.u2f$ | async" mat-stroked-button (click)="selectType(AuthFactorType.U2F)">
         <div class="u2f-btn">
           <div class="icon-row">
             <svg
@@ -78,6 +79,7 @@
         </div>
       </button>
       <button
+        *ngIf="data.otpSms$ | async"
         [disabled]="!data.phoneVerified || (data.otpSmsDisabled$ | async)"
         mat-stroked-button
         (click)="selectType(AuthFactorType.OTPSMS)"
@@ -110,7 +112,12 @@
           </div>
         </div>
       </button>
-      <button [disabled]="data.otpEmailDisabled$ | async" mat-stroked-button (click)="selectType(AuthFactorType.OTPEMAIL)">
+      <button
+        *ngIf="data.otpEmail$ | async"
+        [disabled]="data.otpEmailDisabled$ | async"
+        mat-stroked-button
+        (click)="selectType(AuthFactorType.OTPEMAIL)"
+      >
         <div class="otp-btn">
           <div class="icon-row">
             <svg

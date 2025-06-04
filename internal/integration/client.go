@@ -144,6 +144,7 @@ func (c *Client) pollHealth(ctx context.Context) (err error) {
 	}
 }
 
+// Deprecated: use CreateUserTypeHuman instead
 func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
@@ -175,6 +176,7 @@ func (i *Instance) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserRes
 	return resp
 }
 
+// Deprecated: user CreateUserTypeHuman instead
 func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
@@ -200,6 +202,7 @@ func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHuman
 	return resp
 }
 
+// Deprecated: user CreateUserTypeHuman instead
 func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
@@ -229,6 +232,51 @@ func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *
 	})
 	logging.OnError(err).Panic("create human user")
 	i.TriggerUserByID(ctx, resp.GetUserId())
+	return resp
+}
+
+func (i *Instance) CreateUserTypeHuman(ctx context.Context) *user_v2.CreateUserResponse {
+	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
+		OrganizationId: i.DefaultOrg.GetId(),
+		UserType: &user_v2.CreateUserRequest_Human_{
+			Human: &user_v2.CreateUserRequest_Human{
+				Profile: &user_v2.SetHumanProfile{
+					GivenName:  "Mickey",
+					FamilyName: "Mouse",
+				},
+				Email: &user_v2.SetHumanEmail{
+					Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+					Verification: &user_v2.SetHumanEmail_ReturnCode{
+						ReturnCode: &user_v2.ReturnEmailVerificationCode{},
+					},
+				},
+			},
+		},
+	})
+	logging.OnError(err).Panic("create human user")
+	i.TriggerUserByID(ctx, resp.GetId())
+	return resp
+}
+
+func (i *Instance) CreateUserTypeMachine(ctx context.Context) *user_v2.CreateUserResponse {
+	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
+		OrganizationId: i.DefaultOrg.GetId(),
+		UserType: &user_v2.CreateUserRequest_Machine_{
+			Machine: &user_v2.CreateUserRequest_Machine{
+				Name: "machine",
+			},
+		},
+	})
+	logging.OnError(err).Panic("create machine user")
+	i.TriggerUserByID(ctx, resp.GetId())
+	return resp
+}
+
+func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *user_v2.AddPersonalAccessTokenResponse {
+	resp, err := i.Client.UserV2.AddPersonalAccessToken(ctx, &user_v2.AddPersonalAccessTokenRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create pat")
 	return resp
 }
 
@@ -854,6 +902,16 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 		ProjectId: projectID,
 		UserId:    userID,
 		Roles:     []string{domain.RoleProjectOwner},
+	})
+	require.NoError(t, err)
+}
+
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
+	_, err := i.Client.Mgmt.AddProjectGrantMember(ctx, &mgmt.AddProjectGrantMemberRequest{
+		ProjectId: projectID,
+		GrantId:   grantID,
+		UserId:    userID,
+		Roles:     []string{domain.RoleProjectGrantOwner},
 	})
 	require.NoError(t, err)
 }

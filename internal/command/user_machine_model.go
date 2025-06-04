@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -106,9 +105,8 @@ func (wm *MachineWriteModel) NewChangedEvent(
 	name,
 	description string,
 	accessTokenType domain.OIDCTokenType,
-) (*user.MachineChangedEvent, bool, error) {
+) (*user.MachineChangedEvent, bool) {
 	changes := make([]user.MachineChanges, 0)
-	var err error
 
 	if wm.Name != name {
 		changes = append(changes, user.ChangeName(name))
@@ -120,11 +118,8 @@ func (wm *MachineWriteModel) NewChangedEvent(
 		changes = append(changes, user.ChangeAccessTokenType(accessTokenType))
 	}
 	if len(changes) == 0 {
-		return nil, false, nil
+		return nil, false
 	}
-	changeEvent, err := user.NewMachineChangedEvent(ctx, aggregate, changes)
-	if err != nil {
-		return nil, false, err
-	}
-	return changeEvent, true, nil
+	changeEvent := user.NewMachineChangedEvent(ctx, aggregate, changes)
+	return changeEvent, true
 }
