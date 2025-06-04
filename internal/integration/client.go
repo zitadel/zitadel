@@ -556,7 +556,7 @@ func (i *Instance) AddGenericOAuthProviderWithOptions(ctx context.Context, name 
 
 	return resp
 }
-  
+
 func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) *mgmt.AddGenericOAuthProviderResponse {
 	resp, err := i.Client.Mgmt.AddGenericOAuthProvider(ctx, &mgmt.AddGenericOAuthProviderRequest{
 		Name:                  name,
@@ -576,14 +576,6 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
-	/*
-		mustAwait(func() error {
-			_, err := i.Client.Mgmt.GetProviderByID(ctx, &mgmt.GetProviderByIDRequest{
-				Id: resp.GetId(),
-			})
-			return err
-		})
-	*/
 	return resp
 }
 
