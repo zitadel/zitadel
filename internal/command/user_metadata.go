@@ -1,8 +1,8 @@
 package command
 
 import (
+	"bytes"
 	"context"
-	"reflect"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -30,7 +30,7 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 	}
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
 	// return if no change in the metadata
-	if reflect.DeepEqual(setMetadata.Value, metadata.Value) {
+	if bytes.Equal(setMetadata.Value, metadata.Value) {
 		return writeModelToUserMetadata(setMetadata), nil
 	}
 
@@ -71,7 +71,7 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
 	for _, data := range metadatas {
 		// if no change to metadata no event has to be pushed
-		if existingValue, ok := setMetadata.metadataList[data.Key]; ok && reflect.DeepEqual(existingValue, data.Value) {
+		if existingValue, ok := setMetadata.metadataList[data.Key]; ok && bytes.Equal(existingValue, data.Value) {
 			continue
 		}
 		event, err := c.setUserMetadata(ctx, userAgg, data)

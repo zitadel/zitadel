@@ -1862,7 +1862,7 @@ service UserService {
   }
   // Set User Metadata
   //
-  // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
+  // Sets a list of key value pairs authoritatively. This means, passing an empty list deletes all metadata on the user. For HTTP requests, make sure the bytes array value is base64 encoded.
   //
   // Required permission:
   //  - `user.write`
@@ -1885,7 +1885,7 @@ service UserService {
       responses: {
         key: "400"
         value: {
-          description: "User's not found";
+          description: "User not found";
         }
       };
     };
@@ -1897,13 +1897,13 @@ service UserService {
   //
   // Required permission:
   //  - `user.read`
-  rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse ) {
+  rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/metadata/search"
       body: "*"
     };
 
-    option (zitadel.protoc_gen_zitadel.v2.options) = { auth_option: {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {auth_option: {
       permission: "user.read"
     }
     };
@@ -2033,6 +2033,13 @@ message CreateUserRequest{
         min_length: 1,
         max_length: 200,
         example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+      }
+    ];
+
+    // Metadata to bet set. The values have to be base64 encoded.
+    repeated Metadata metadata = 9 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
       }
     ];
   }
