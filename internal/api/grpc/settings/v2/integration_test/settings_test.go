@@ -4,9 +4,13 @@ package settings_test
 
 import (
 	"context"
+	"crypto/md5"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -123,42 +127,62 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 }
 
 func TestSetHostedLoginTranslation(t *testing.T) {
-	ctx := AdminCTX
+	translations := map[string]any{"loginTitle": "Welcome to our service"}
 
-	translations1 := map[string]any{
-		"loginTitle": "Welcome to our service",
-	}
-
-	translations2 := map[string]any{
-		"loginTitle": "Welcome to our service!",
-	}
-
-	protoTranslations1, err := structpb.NewStruct(translations1)
+	protoTranslations, err := structpb.NewStruct(translations)
 	require.Nil(t, err)
 
-	protoTranslations2, err := structpb.NewStruct(translations2)
-	require.Nil(t, err)
+	hash := md5.Sum([]byte(protoTranslations.String()))
 
-	req := &settings.SetHostedLoginTranslationRequest{
-		Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-		LevelId:      Instance.DefaultOrg.GetId(),
-		Translations: protoTranslations1,
-		Locale:       "en-US",
+	tt := []struct {
+		testName     string
+		inputCtx     context.Context
+		inputRequest *settings.SetHostedLoginTranslationRequest
+
+		expectedErrorCode codes.Code
+		expectedErrorMsg  string
+		expectedResponse  *settings.SetHostedLoginTranslationResponse
+	}{
+		{
+			testName:          "when unauthN context should return unauthN error",
+			inputCtx:          CTX,
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName:          "when unauthZ context should return unauthZ error",
+			inputCtx:          UserTypeLoginCtx,
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+		},
+		{
+			testName: "when authZ request should save to db and return etag",
+			inputCtx: AdminCTX,
+			inputRequest: &settings.SetHostedLoginTranslationRequest{
+				Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
+				LevelId:      Instance.DefaultOrg.GetId(),
+				Translations: protoTranslations,
+				Locale:       "en-US",
+			},
+			expectedResponse: &settings.SetHostedLoginTranslationResponse{
+				Etag: string(hash[:]),
+			},
+		},
 	}
 
-	res, err := Client.SetHostedLoginTranslation(ctx, req)
-	require.Nil(t, err)
-	t.Log(res)
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// When
+			res, err := Client.SetHostedLoginTranslation(tc.inputCtx, tc.inputRequest)
 
-	req2 := &settings.SetHostedLoginTranslationRequest{
-		Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-		LevelId:      Instance.DefaultOrg.GetId(),
-		Translations: protoTranslations2,
-		Locale:       "en",
+			// Then
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+			if tc.expectedErrorMsg == "" {
+				require.NoError(t, err)
+				assert.NotEmpty(t, res.GetEtag())
+			}
+		})
 	}
-
-	res, err = Client.SetHostedLoginTranslation(ctx, req2)
-	require.Nil(t, err)
-	t.Log(res)
-
 }

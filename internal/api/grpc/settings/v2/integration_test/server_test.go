@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	CTX, AdminCTX context.Context
-	Instance      *integration.Instance
-	Client        settings.SettingsServiceClient
+	CTX, AdminCTX, UserTypeLoginCtx context.Context
+	Instance                        *integration.Instance
+	Client                          settings.SettingsServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -27,6 +27,8 @@ func TestMain(m *testing.M) {
 
 		CTX = ctx
 		AdminCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		UserTypeLoginCtx = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+
 		Client = Instance.Client.SettingsV2
 		return m.Run()
 	}())
