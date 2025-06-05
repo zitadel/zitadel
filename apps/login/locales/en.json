@@ -10,7 +10,7 @@
   },
   "logout": {
     "title": "Logout",
-    "description": "Click the accounts you want to clear",
+    "description": "Click an account to end the session",
     "noResults": "No accounts found",
     "clear": "Clear",
     "success": {
