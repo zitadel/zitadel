@@ -13,6 +13,7 @@
     "description": "Seleziona l'account che desideri uscire",
     "noResults": "Nessun account trovato",
     "clear": "Rimuovi",
+    "verifiedAt": "Ultima attività: {time}",
     "success": {
       "title": "Uscita riuscita",
       "description": "Hai effettuato l'uscita con successo."

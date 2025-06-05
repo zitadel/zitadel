@@ -70,7 +70,10 @@ export function SessionClearItem({
         </span>
         {valid ? (
           <span className="text-xs opacity-80 text-ellipsis">
-            {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
+            {verifiedAt &&
+              t("verfiedAt", {
+                time: moment(timestampDate(verifiedAt)).fromNow(),
+              })}
           </span>
         ) : (
           verifiedAt && (

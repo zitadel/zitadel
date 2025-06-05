@@ -13,6 +13,7 @@
     "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
     "noResults": "Keine Konten gefunden",
     "clear": "Entfernen",
+    "verifiedAt": "Zuletzt aktiv: {time}",
     "success": {
       "title": "Logout erfolgreich",
       "description": "Sie haben sich erfolgreich abgemeldet."

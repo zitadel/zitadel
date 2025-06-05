@@ -13,6 +13,7 @@
     "description": "Wybierz konto, które chcesz usunąć",
     "noResults": "Nie znaleziono kont",
     "clear": "Usuń",
+    "verifiedAt": "Ostatnia aktywność: {time}",
     "success": {
       "title": "Wylogowanie udane",
       "description": "Pomyślnie się wylogowałeś."
