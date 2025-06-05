@@ -7,6 +7,7 @@ import {
   getLegalAndSupportSettings,
   getLoginSettings,
   getPasswordComplexitySettings,
+  retrieveIDPIntent,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -19,7 +20,15 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
 
-  let { firstname, lastname, email, organization, requestId } = searchParams;
+  let {
+    firstname,
+    lastname,
+    email,
+    organization,
+    requestId,
+    idpIntentId,
+    idpIntentToken,
+  } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -31,6 +40,17 @@ export default async function Page(props: {
     if (org) {
       organization = org.id;
     }
+  }
+
+  let idpIntent;
+  if (idpIntentId && idpIntentToken) {
+    idpIntent = await retrieveIDPIntent({
+      serviceUrl,
+      id: idpIntentId,
+      token: idpIntentToken,
+    });
+
+    const { idpInformation, userId } = idpIntent;
   }
 
   const legal = await getLegalAndSupportSettings({

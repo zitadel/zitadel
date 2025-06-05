@@ -24,6 +24,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
@@ -205,6 +206,7 @@ export default async function Page(props: {
       }
     }
 
+    // if addHumanUser is provided in the intent, expect that it can be created otherwise show an error
     if (addHumanUser) {
       let addHumanUserWithOrganization: AddHumanUserRequest;
       if (orgToRegisterOn) {
@@ -240,6 +242,16 @@ export default async function Page(props: {
             ? (error as ConnectError).message
             : "Could not create user",
         );
+      }
+    } else {
+      // if no user was found, we will create a new user manually / redirect to the registration page
+      if (options.isCreationAllowed) {
+        const registerParams = new URLSearchParams({
+          idpIntentId: id,
+          idpIntentToken: token,
+          organization: organization ?? "",
+        });
+        return redirect(`/register?${registerParams})}`);
       }
     }
 
