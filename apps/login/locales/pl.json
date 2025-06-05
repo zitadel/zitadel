@@ -12,7 +12,11 @@
     "title": "Wyloguj się",
     "description": "Wybierz konto, które chcesz usunąć",
     "noResults": "Nie znaleziono kont",
-    "clear": "Usuń"
+    "clear": "Usuń",
+    "success": {
+      "title": "Wylogowanie udane",
+      "description": "Pomyślnie się wylogowałeś."
+    }
   },
   "loginname": {
     "title": "Witamy ponownie!",

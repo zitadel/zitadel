@@ -1,7 +1,7 @@
 "use client";
 
 import { sendLoginname } from "@/lib/server/loginname";
-import { cleanupSession, continueWithSession } from "@/lib/server/session";
+import { clearSession, continueWithSession } from "@/lib/server/session";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -43,9 +43,9 @@ export function SessionItem({
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function clearSession(id: string) {
+  async function clearSessionId(id: string) {
     setLoading(true);
-    const response = await cleanupSession({
+    const response = await clearSession({
       sessionId: id,
     })
       .catch((error) => {
@@ -145,7 +145,7 @@ export function SessionItem({
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            clearSession(session.id).then(() => {
+            clearSessionId(session.id).then(() => {
               reload();
             });
           }}

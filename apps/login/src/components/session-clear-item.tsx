@@ -1,6 +1,6 @@
 "use client";
 
-import { cleanupSession } from "@/lib/server/session";
+import { clearSession } from "@/lib/server/session";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
@@ -24,9 +24,9 @@ export function SessionClearItem({
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function clearSession(id: string) {
+  async function clearSessionId(id: string) {
     setLoading(true);
-    const response = await cleanupSession({
+    const response = await clearSession({
       sessionId: id,
     })
       .catch((error) => {
@@ -49,7 +49,7 @@ export function SessionClearItem({
   return (
     <button
       onClick={async () => {
-        clearSession(session.id).then(() => {
+        clearSessionId(session.id).then(() => {
           reload();
         });
       }}

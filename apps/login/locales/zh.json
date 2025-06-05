@@ -12,7 +12,11 @@
     "title": "注销",
     "description": "选择您想注销的账户",
     "noResults": "未找到账户",
-    "clear": "清除"
+    "clear": "清除",
+    "success": {
+      "title": "注销成功",
+      "description": "您已成功注销。"
+    }
   },
   "loginname": {
     "title": "欢迎回来！",

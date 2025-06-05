@@ -12,7 +12,11 @@
     "title": "Logout",
     "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
     "noResults": "Keine Konten gefunden",
-    "clear": "Entfernen"
+    "clear": "Entfernen",
+    "success": {
+      "title": "Logout erfolgreich",
+      "description": "Sie haben sich erfolgreich abgemeldet."
+    }
   },
   "loginname": {
     "title": "Willkommen zurück!",

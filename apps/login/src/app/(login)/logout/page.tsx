@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsClearList } from "@/components/sessions-clear-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -35,6 +35,7 @@ export default async function Page(props: {
 
   const organization = searchParams?.organization;
   const postLogoutRedirectUri = searchParams?.post_logout_redirect_uri;
+  const loginHint = searchParams?.login_hint;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -71,7 +72,9 @@ export default async function Page(props: {
         <div className="flex flex-col w-full space-y-2">
           <SessionsClearList
             sessions={sessions}
+            loginHint={loginHint}
             postLogoutRedirectUri={postLogoutRedirectUri}
+            organization={organization ?? defaultOrganization}
           />
         </div>
       </div>

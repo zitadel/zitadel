@@ -12,7 +12,11 @@
     "title": "Esci",
     "description": "Seleziona l'account che desideri uscire",
     "noResults": "Nessun account trovato",
-    "clear": "Rimuovi"
+    "clear": "Rimuovi",
+    "success": {
+      "title": "Uscita riuscita",
+      "description": "Hai effettuato l'uscita con successo."
+    }
   },
   "loginname": {
     "title": "Bentornato!",

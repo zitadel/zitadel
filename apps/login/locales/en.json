@@ -12,7 +12,11 @@
     "title": "Logout",
     "description": "Click the accounts you want to clear",
     "noResults": "No accounts found",
-    "clear": "Clear"
+    "clear": "Clear",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
+    }
   },
   "loginname": {
     "title": "Welcome back!",

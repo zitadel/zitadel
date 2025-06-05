@@ -12,7 +12,11 @@
     "title": "Cerrar sesión",
     "description": "Selecciona la cuenta que deseas eliminar",
     "noResults": "No se encontraron cuentas",
-    "clear": "Eliminar"
+    "clear": "Eliminar",
+    "success": {
+      "title": "Cierre de sesión exitoso",
+      "description": "Has cerrado sesión correctamente."
+    }
   },
   "loginname": {
     "title": "¡Bienvenido de nuevo!",
