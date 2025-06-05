@@ -8,6 +8,17 @@
     "addAnother": "Add another account",
     "noResults": "No accounts found"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Click an account to end the session",
+    "noResults": "No accounts found",
+    "clear": "End Session",
+    "verifiedAt": "Last active: {time}",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
+    }
+  },
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login data.",

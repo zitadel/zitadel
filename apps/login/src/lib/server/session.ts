@@ -202,30 +202,6 @@ export async function clearSession(options: ClearSessionOptions) {
 
   const { sessionId } = options;
 
-  const session = await getSessionCookieById({ sessionId });
-
-  const deletedSession = await deleteSession({
-    serviceUrl,
-    sessionId: session.id,
-    sessionToken: session.token,
-  });
-
-  const securitySettings = await getSecuritySettings({ serviceUrl });
-  const sameSite = securitySettings?.embeddedIframe?.enabled ? "none" : true;
-
-  if (deletedSession) {
-    return removeSessionFromCookie({ session, sameSite });
-  }
-}
-
-type CleanupSessionCommand = {
-  sessionId: string;
-};
-
-export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const deleteResponse = await deleteSession({
