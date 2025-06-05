@@ -558,6 +558,18 @@ message CreatedAdmin {
   optional string phone_code = 3;
 }
 
+message AssignedAdmin {
+  string user_id = 1;
+}
+
+message OrganizationAdmin {
+  // The admins created/assigned for the Organization.
+  oneof OrganizationAdmin {
+    CreatedAdmin created_admin = 1;
+    AssignedAdmin assigned_admin = 2;
+  }
+}
+
 message CreateOrganizationResponse{
   // The timestamp of the organization was created.
   google.protobuf.Timestamp creation_date = 1 [
@@ -577,8 +589,8 @@ message CreateOrganizationResponse{
     }
   ];
 
-  // The admins created for the Organization
-  repeated CreatedAdmin created_admins = 3;
+  // The admins created/assigned for the Organization
+  repeated OrganizationAdmin organization_admins = 3;
 }
 
 message UpdateOrganizationRequest {
@@ -939,3 +951,5 @@ message DeleteOrganizationMetadataResponse{
     }
   ];
 }
+
+
