@@ -12,7 +12,7 @@
     "title": "Logout",
     "description": "Click an account to end the session",
     "noResults": "No accounts found",
-    "clear": "Clear",
+    "clear": "End Session",
     "verifiedAt": "Last active: {time}",
     "success": {
       "title": "Logout successful",
