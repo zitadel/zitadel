@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
+import { NotificationPolicyComponent } from './notification-policy.component';
 
 describe('PasswordComplexityPolicyComponent', () => {
-  let component: PasswordComplexityPolicyComponent;
-  let fixture: ComponentFixture<PasswordComplexityPolicyComponent>;
+  let component: NotificationPolicyComponent;
+  let fixture: ComponentFixture<NotificationPolicyComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [PasswordComplexityPolicyComponent],
+      declarations: [NotificationPolicyComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PasswordComplexityPolicyComponent);
+    fixture = TestBed.createComponent(NotificationPolicyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

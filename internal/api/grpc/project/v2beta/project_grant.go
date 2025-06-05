@@ -56,13 +56,13 @@ func projectGrantUpdateToCommand(req *project_pb.UpdateProjectGrantRequest) *com
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
 		},
-		GrantID:  req.GrantedOrganizationId,
-		RoleKeys: req.RoleKeys,
+		GrantedOrgID: req.GrantedOrganizationId,
+		RoleKeys:     req.RoleKeys,
 	}
 }
 
 func (s *Server) DeactivateProjectGrant(ctx context.Context, req *project_pb.DeactivateProjectGrantRequest) (*project_pb.DeactivateProjectGrantResponse, error) {
-	details, err := s.command.DeactivateProjectGrant(ctx, req.ProjectId, req.GrantedOrganizationId, "")
+	details, err := s.command.DeactivateProjectGrant(ctx, req.ProjectId, "", req.GrantedOrganizationId, "")
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *Server) DeactivateProjectGrant(ctx context.Context, req *project_pb.Dea
 }
 
 func (s *Server) ActivateProjectGrant(ctx context.Context, req *project_pb.ActivateProjectGrantRequest) (*project_pb.ActivateProjectGrantResponse, error) {
-	details, err := s.command.ReactivateProjectGrant(ctx, req.ProjectId, req.GrantedOrganizationId, "")
+	details, err := s.command.ReactivateProjectGrant(ctx, req.ProjectId, "", req.GrantedOrganizationId, "")
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (s *Server) DeleteProjectGrant(ctx context.Context, req *project_pb.DeleteP
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantedOrganizationId, "", userGrantIDs...)
+	details, err := s.command.DeleteProjectGrant(ctx, req.ProjectId, "", req.GrantedOrganizationId, "", userGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
