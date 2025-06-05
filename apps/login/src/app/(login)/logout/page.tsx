@@ -35,7 +35,8 @@ export default async function Page(props: {
 
   const organization = searchParams?.organization;
   const postLogoutRedirectUri = searchParams?.post_logout_redirect_uri;
-  const loginHint = searchParams?.login_hint;
+  const logoutHint = searchParams?.logout_hint;
+  const UILocales = searchParams?.ui_locales; // TODO implement with new translation service
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -72,7 +73,7 @@ export default async function Page(props: {
         <div className="flex flex-col w-full space-y-2">
           <SessionsClearList
             sessions={sessions}
-            loginHint={loginHint}
+            logoutHint={logoutHint}
             postLogoutRedirectUri={postLogoutRedirectUri}
             organization={organization ?? defaultOrganization}
           />

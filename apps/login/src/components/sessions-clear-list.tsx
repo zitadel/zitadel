@@ -12,13 +12,13 @@ import { SessionClearItem } from "./session-clear-item";
 type Props = {
   sessions: Session[];
   postLogoutRedirectUri?: string;
-  loginHint?: string;
+  logoutHint?: string;
   organization?: string;
 };
 
 export function SessionsClearList({
   sessions,
-  loginHint,
+  logoutHint,
   postLogoutRedirectUri,
   organization,
 }: Props) {
@@ -27,10 +27,10 @@ export function SessionsClearList({
   const router = useRouter();
 
   async function clearHintedSession() {
-    console.log("Clearing session for login hint:", loginHint);
+    console.log("Clearing session for login hint:", logoutHint);
     // If a login hint is provided, we logout that specific session
     const sessionIdToBeCleared = sessions.find((session) => {
-      return session.factors?.user?.loginName === loginHint;
+      return session.factors?.user?.loginName === logoutHint;
     })?.id;
 
     if (sessionIdToBeCleared) {
@@ -42,7 +42,7 @@ export function SessionsClearList({
       });
 
       if (!clearSessionResponse) {
-        console.error("Failed to clear session for login hint:", loginHint);
+        console.error("Failed to clear session for login hint:", logoutHint);
       }
 
       if (postLogoutRedirectUri) {
@@ -57,12 +57,12 @@ export function SessionsClearList({
 
       return router.push("/logout/success?" + params);
     } else {
-      console.warn(`No session found for login hint: ${loginHint}`);
+      console.warn(`No session found for login hint: ${logoutHint}`);
     }
   }
 
   useEffect(() => {
-    if (loginHint) {
+    if (logoutHint) {
       clearHintedSession();
     }
   }, []);
