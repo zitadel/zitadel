@@ -20,7 +20,7 @@ type ReplaceLoginNames3View struct {
 
 func (mig *ReplaceLoginNames3View) Execute(ctx context.Context, _ eventstore.Event) error {
 	var exists bool
-	err := mig.dbClient.QueryRow(func(r *sql.Row) error {
+	err := mig.dbClient.QueryRowContext(ctx, func(r *sql.Row) error {
 		return r.Scan(&exists)
 	}, "SELECT exists(SELECT 1 from information_schema.views WHERE table_schema = 'projections' AND table_name = 'login_names3')")
 
