@@ -120,7 +120,8 @@ func (u *user) Create(ctx context.Context, user *domain.User) error {
 func (u *user) Delete(ctx context.Context, condition database.Condition) error {
 	u.builder.WriteString("DELETE FROM users")
 	u.writeCondition(condition)
-	return u.client.Exec(ctx, u.builder.String(), u.builder.Args()...)
+	_, err := u.client.Exec(ctx, u.builder.String(), u.builder.Args()...)
+	return err
 }
 
 // -------------------------------------------------------------

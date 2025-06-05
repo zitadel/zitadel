@@ -46,7 +46,8 @@ func (h userHuman) Update(ctx context.Context, condition database.Condition, cha
 
 	stmt := h.builder.String()
 
-	return h.client.Exec(ctx, stmt, h.builder.Args()...)
+	_, err := h.client.Exec(ctx, stmt, h.builder.Args()...)
+	return err
 }
 
 // -------------------------------------------------------------

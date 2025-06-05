@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -37,12 +38,31 @@ func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain
 
 	i.builder.WriteString(queryInstanceStmt)
 
-	isNotDeletedCondition := database.IsNull(i.DeletedAtColumn())
-	opts = append(opts, isNotDeletedCondition)
+	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	andCondition.Write(&i.builder)
 
 	return scanInstance(i.client.QueryRow(ctx, i.builder.String(), i.builder.Args()...))
+}
+
+// List implements [domain.InstanceRepository].
+// func (i *instance) List(ctx context.Context, opts ...database.QueryOption) (*domain.Instance, error) {
+func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*domain.Instance, error) {
+	i.builder = database.StatementBuilder{}
+
+	i.builder.WriteString(queryInstanceStmt)
+
+	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
+	andCondition := database.And(opts...)
+	andCondition.Write(&i.builder)
+
+	rows, err := i.client.Query(ctx, i.builder.String(), i.builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return scanInstances(rows)
 }
 
 const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language)` +
@@ -52,14 +72,35 @@ const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org
 // Create implements [domain.InstanceRepository].
 func (i *instance) Create(ctx context.Context, instance *domain.Instance) error {
 	i.builder = database.StatementBuilder{}
-	i.builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientId, instance.ConsoleAppID, instance.DefaultLanguage)
+	i.builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
 	i.builder.WriteString(createInstanceStmt)
 
-	return i.client.QueryRow(ctx, i.builder.String(), i.builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
+	err := i.client.QueryRow(ctx, i.builder.String(), i.builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			// constraint violation
+			if pgErr.Code == "23514" {
+				if pgErr.ConstraintName == "instances_name_check" {
+					return errors.New("instnace name not provided")
+				}
+				if pgErr.ConstraintName == "instances_id_check" {
+					return errors.New("instnace id not provided")
+				}
+			}
+			// duplicate
+			if pgErr.Code == "23505" {
+				if pgErr.ConstraintName == "instances_pkey" {
+					return errors.New("instnace id already exists")
+				}
+			}
+		}
+	}
+	return err
 }
 
 // Update implements [domain.InstanceRepository].
-func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
+func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	i.builder = database.StatementBuilder{}
 	i.builder.WriteString(`UPDATE zitadel.instances SET `)
 	database.Changes(changes).Write(&i.builder)
@@ -67,7 +108,8 @@ func (i instance) Update(ctx context.Context, condition database.Condition, chan
 
 	stmt := i.builder.String()
 
-	return i.client.Exec(ctx, stmt, i.builder.Args()...)
+	rowsAffected, err := i.client.Exec(ctx, stmt, i.builder.Args()...)
+	return rowsAffected, err
 }
 
 // Delete implements [domain.InstanceRepository].
@@ -80,7 +122,8 @@ func (i instance) Delete(ctx context.Context, condition database.Condition) erro
 	i.builder.AppendArgs(time.Now())
 
 	i.writeCondition(condition)
-	return i.client.Exec(ctx, i.builder.String(), i.builder.Args()...)
+	_, err := i.client.Exec(ctx, i.builder.String(), i.builder.Args()...)
+	return err
 }
 
 // -------------------------------------------------------------
@@ -126,7 +169,7 @@ func (instance) CreatedAtColumn() database.Column {
 }
 
 // DefaultOrgIdColumn implements [domain.instanceColumns].
-func (instance) DefaultOrgIdColumn() database.Column {
+func (instance) DefaultOrgIDColumn() database.Column {
 	return database.NewColumn("default_org_id")
 }
 
@@ -175,7 +218,7 @@ func scanInstance(scanner database.Scanner) (*domain.Instance, error) {
 		&instance.Name,
 		&instance.DefaultOrgID,
 		&instance.IAMProjectID,
-		&instance.ConsoleClientId,
+		&instance.ConsoleClientID,
 		&instance.ConsoleAppID,
 		&instance.DefaultLanguage,
 		&instance.CreatedAt,
@@ -193,4 +236,31 @@ func scanInstance(scanner database.Scanner) (*domain.Instance, error) {
 	}
 
 	return &instance, nil
+}
+
+func scanInstances(rows database.Rows) ([]*domain.Instance, error) {
+	instances := make([]*domain.Instance, 0)
+	for rows.Next() {
+
+		var instance domain.Instance
+		err := rows.Scan(
+			&instance.ID,
+			&instance.Name,
+			&instance.DefaultOrgID,
+			&instance.IAMProjectID,
+			&instance.ConsoleClientID,
+			&instance.ConsoleAppID,
+			&instance.DefaultLanguage,
+			&instance.CreatedAt,
+			&instance.UpdatedAt,
+			&instance.DeletedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		instances = append(instances, &instance)
+
+	}
+	return instances, nil
 }

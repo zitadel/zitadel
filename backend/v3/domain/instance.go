@@ -9,16 +9,16 @@ import (
 )
 
 type Instance struct {
-	ID              string     `json:"id"`
-	Name            string     `json:"name"`
-	DefaultOrgID    string     `json:"default_org_id"`
-	IAMProjectID    string     `json:"iam_project_id"`
-	ConsoleClientId string     `json:"console_client_id"`
-	ConsoleAppID    string     `json:"console_app_id"`
-	DefaultLanguage string     `json:"default_language"`
-	CreatedAt       time.Time  `json:"-"`
-	UpdatedAt       time.Time  `json:"-"`
-	DeletedAt       *time.Time `json:"-"`
+	ID              string     `json:"id,omitempty" db:"id"`
+	Name            string     `json:"name,omitempty" db:"name"`
+	DefaultOrgID    string     `json:"default_org_id,omitempty" db:"default_org_id"`
+	IAMProjectID    string     `json:"iam_project_id,omitempty" db:"iam_project_id"`
+	ConsoleClientID string     `json:"console_client_id,omitempty" db:"console_client_id"`
+	ConsoleAppID    string     `json:"console_app_id,omitempty" db:"console_app_id"`
+	DefaultLanguage string     `json:"default_language,omitempty" db:"default_language"`
+	CreatedAt       time.Time  `json:"-,omitempty" db:"created_at"`
+	UpdatedAt       time.Time  `json:"-,omitempty" db:"updated_at"`
+	DeletedAt       *time.Time `json:"-,omitempty" db:"deleted_at"`
 }
 
 type instanceCacheIndex uint8
@@ -44,8 +44,8 @@ type instanceColumns interface {
 	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
 	NameColumn() database.Column
-	// DefaultOrgIdColumn returns the column for the default org id field
-	DefaultOrgIdColumn() database.Column
+	// DefaultOrgIDColumn returns the column for the default org id field
+	DefaultOrgIDColumn() database.Column
 	// IAMProjectIDColumn returns the column for the default IAM org id field
 	IAMProjectIDColumn() database.Column
 	// ConsoleClientIDColumn returns the column for the default IAM org id field
@@ -87,9 +87,10 @@ type InstanceRepository interface {
 	// Member() MemberRepository
 
 	Get(ctx context.Context, opts ...database.Condition) (*Instance, error)
+	List(ctx context.Context, opts ...database.Condition) ([]*Instance, error)
 
 	Create(ctx context.Context, instance *Instance) error
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
+	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, condition database.Condition) error
 }
 

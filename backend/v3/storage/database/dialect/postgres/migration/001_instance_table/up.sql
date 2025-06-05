@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS zitadel.instances(
-  id TEXT NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
+  id TEXT NOT NULL CHECK (id <> '') PRIMARY KEY,
+  name TEXT NOT NULL CHECK (name <> ''),
   default_org_id TEXT, -- NOT NULL,
   iam_project_id TEXT, -- NOT NULL,
   console_client_id TEXT, -- NOT NULL,

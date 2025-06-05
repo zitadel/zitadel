@@ -45,9 +45,9 @@ func (c *pgxPool) QueryRow(ctx context.Context, sql string, args ...any) databas
 
 // Exec implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
-func (c *pgxPool) Exec(ctx context.Context, sql string, args ...any) error {
-	_, err := c.Pool.Exec(ctx, sql, args...)
-	return err
+func (c *pgxPool) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
+	res, err := c.Pool.Exec(ctx, sql, args...)
+	return res.RowsAffected(), err
 }
 
 // Begin implements [database.Pool].

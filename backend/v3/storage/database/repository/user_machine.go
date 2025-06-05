@@ -18,13 +18,14 @@ var _ domain.MachineRepository = (*userMachine)(nil)
 // -------------------------------------------------------------
 
 // Update implements [domain.MachineRepository].
-func (m userMachine) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (err error) {
+func (m userMachine) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
 	m.builder.WriteString("UPDATE user_machines SET ")
 	database.Changes(changes).Write(&m.builder)
 	m.writeCondition(condition)
 	m.writeReturning()
 
-	return m.client.Exec(ctx, m.builder.String(), m.builder.Args()...)
+	_, err := m.client.Exec(ctx, m.builder.String(), m.builder.Args()...)
+	return err
 }
 
 // -------------------------------------------------------------

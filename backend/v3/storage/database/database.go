@@ -31,7 +31,7 @@ type Querier interface {
 
 // Executor is a database client that can execute statements.
 type Executor interface {
-	Exec(ctx context.Context, stmt string, args ...any) error
+	Exec(ctx context.Context, stmt string, args ...any) (int64, error)
 }
 
 // QueryExecutor is a database client that can execute queries and statements.
