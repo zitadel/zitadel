@@ -43,12 +43,12 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsup",
+    "build": "pnpm exec tsup",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
-    "test:unit": "vitest",
-    "test:unit:watch": "vitest --watch",
-    "dev": "tsup --watch --dts",
+    "test:unit": "pnpm exec vitest",
+    "test:unit:watch": "pnpm exec vitest --watch",
+    "dev": "pnpm exec tsup --watch --dts",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
