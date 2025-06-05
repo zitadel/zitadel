@@ -722,6 +722,7 @@ module.exports = {
               },
               items: sidebar_api_system,
             },
+              "apis/migration_v1_to_v2"
           ],
         },
         {
