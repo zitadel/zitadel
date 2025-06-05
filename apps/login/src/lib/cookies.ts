@@ -141,7 +141,7 @@ export async function removeSessionFromCookie<T>({
   session: SessionCookie<T>;
   cleanup?: boolean;
   sameSite?: boolean | "lax" | "strict" | "none" | undefined;
-}): Promise<any> {
+}) {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 

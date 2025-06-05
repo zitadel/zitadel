@@ -27,6 +27,7 @@ export function SessionsClearList({
   const router = useRouter();
 
   async function clearHintedSession() {
+    console.log("Clearing session for login hint:", loginHint);
     // If a login hint is provided, we logout that specific session
     const sessionIdToBeCleared = sessions.find((session) => {
       return session.factors?.user?.loginName === loginHint;
@@ -35,6 +36,9 @@ export function SessionsClearList({
     if (sessionIdToBeCleared) {
       const clearSessionResponse = await clearSession({
         sessionId: sessionIdToBeCleared,
+      }).catch((error) => {
+        console.error("Error clearing session:", error);
+        return;
       });
 
       if (!clearSessionResponse) {
@@ -58,7 +62,9 @@ export function SessionsClearList({
   }
 
   useEffect(() => {
-    clearHintedSession();
+    if (loginHint) {
+      clearHintedSession();
+    }
   }, []);
 
   return sessions ? (
