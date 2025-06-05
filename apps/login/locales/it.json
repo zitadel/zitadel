@@ -8,6 +8,17 @@
     "addAnother": "Aggiungi un altro account",
     "noResults": "Nessun account trovato"
   },
+  "logout": {
+    "title": "Esci",
+    "description": "Seleziona l'account che desideri uscire",
+    "noResults": "Nessun account trovato",
+    "clear": "Elimina sessione",
+    "verifiedAt": "Ultima attività: {time}",
+    "success": {
+      "title": "Uscita riuscita",
+      "description": "Hai effettuato l'uscita con successo."
+    }
+  },
   "loginname": {
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
