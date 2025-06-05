@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -33,7 +34,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 }
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
-	member, err := s.command.AddInstanceMember(ctx, req.UserId, req.Roles...)
+	member, err := s.command.AddInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), req.UserId, req.Roles...)
 	if err != nil {
 		return nil, err
 	}

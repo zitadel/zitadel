@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -11,18 +12,50 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (_ *domain.Member, err error) {
+type AddProjectMember struct {
+	ResourceOwner string
+	ProjectID     string
+	UserID        string
+	Roles         []string
+}
+
+func (i *AddProjectMember) IsValid(zitadelRoles []authz.RoleMapping) error {
+	if i.ProjectID == "" || i.UserID == "" || len(i.Roles) == 0 {
+		return zerrors.ThrowInvalidArgument(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
+	}
+	if len(domain.CheckForInvalidRoles(i.Roles, domain.ProjectRolePrefix, zitadelRoles)) > 0 {
+		return zerrors.ThrowInvalidArgument(nil, "PROJECT-3m9ds", "Errors.Project.Member.Invalid")
+	}
+	return nil
+}
+
+func (c *Commands) AddProjectMember(ctx context.Context, member *AddProjectMember) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	addedMember := NewProjectMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
-	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
-	event, err := c.addProjectMember(ctx, projectAgg, addedMember, member)
+	if err := member.IsValid(c.zitadelRoles); err != nil {
+		return nil, err
+	}
+	_, err = c.checkUserExists(ctx, member.UserID, "")
 	if err != nil {
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	addedMember, err := c.projectMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if addedMember.State == domain.MemberStateActive {
+		return nil, zerrors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx,
+		project.NewProjectMemberAddedEvent(ctx,
+			ProjectAggregateFromWriteModel(&addedMember.WriteModel),
+			member.UserID,
+			member.Roles...,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -31,49 +64,39 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 		return nil, err
 	}
 
-	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
+	return writeModelToObjectDetails(&addedMember.WriteModel), nil
 }
 
-func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (_ eventstore.Command, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+type ChangeProjectMember struct {
+	ResourceOwner string
+	ProjectID     string
+	UserID        string
+	Roles         []string
+}
 
-	if !member.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
+func (i *ChangeProjectMember) IsValid(zitadelRoles []authz.RoleMapping) error {
+	if i.ProjectID == "" || i.UserID == "" || len(i.Roles) == 0 {
+		return zerrors.ThrowInvalidArgument(nil, "PROJECT-LiaZi", "Errors.Project.Member.Invalid")
 	}
-	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-3m9ds", "Errors.Project.Member.Invalid")
+	if len(domain.CheckForInvalidRoles(i.Roles, domain.ProjectRolePrefix, zitadelRoles)) > 0 {
+		return zerrors.ThrowInvalidArgument(nil, "PROJECT-3m9d", "Errors.Project.Member.Invalid")
 	}
-
-	_, err = c.checkUserExists(ctx, addedMember.UserID, "")
-	if err != nil {
-		return nil, err
-	}
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
-	if err != nil {
-		return nil, err
-	}
-	if addedMember.State == domain.MemberStateActive {
-		return nil, zerrors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
-	}
-
-	return project.NewProjectMemberAddedEvent(ctx, projectAgg, member.UserID, member.Roles...), nil
+	return nil
 }
 
 // ChangeProjectMember updates an existing member
-func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
-	if !member.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-LiaZi", "Errors.Project.Member.Invalid")
-	}
-	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-3m9d", "Errors.Project.Member.Invalid")
-	}
-
-	existingMember, err := c.projectMemberWriteModelByID(ctx, member.AggregateID, member.UserID, resourceOwner)
-	if err != nil {
+func (c *Commands) ChangeProjectMember(ctx context.Context, member *ChangeProjectMember) (*domain.ObjectDetails, error) {
+	if err := member.IsValid(c.zitadelRoles); err != nil {
 		return nil, err
 	}
 
+	existingMember, err := c.projectMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !existingMember.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.NotFound")
+	}
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
 	}
@@ -88,33 +111,32 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Membe
 		return nil, err
 	}
 
-	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
+	return writeModelToObjectDetails(&existingMember.WriteModel), nil
 }
 
 func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
 	}
-	m, err := c.projectMemberWriteModelByID(ctx, projectID, userID, resourceOwner)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return nil, err
+	existingMember, err := c.projectMemberWriteModelByID(ctx, projectID, userID, resourceOwner)
+	if existingMember.State == domain.MemberStateUnspecified || existingMember.State == domain.MemberStateRemoved {
+
 	}
-	if zerrors.IsNotFound(err) {
-		// empty response because we have no data that match the request
+	if !existingMember.State.Exists() {
 		return &domain.ObjectDetails{}, nil
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
 	removeEvent := c.removeProjectMember(ctx, projectAgg, userID, false)
 	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(m, pushedEvents...)
+	err = AppendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&m.WriteModel), nil
+	return writeModelToObjectDetails(&existingMember.WriteModel), nil
 }
 
 func (c *Commands) removeProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
@@ -136,10 +158,6 @@ func (c *Commands) projectMemberWriteModelByID(ctx context.Context, projectID, u
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
-	}
-
-	if writeModel.State == domain.MemberStateUnspecified || writeModel.State == domain.MemberStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.NotFound")
 	}
 
 	return writeModel, nil

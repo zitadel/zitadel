@@ -22,9 +22,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx    context.Context
-		userID string
-		roles  []string
+		instanceID string
+		userID     string
+		roles      []string
 	}
 	type res struct {
 		want *domain.Member
@@ -43,9 +43,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					t,
 				),
 			},
-			args: args{
-				ctx: context.Background(),
-			},
+			args: args{},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
 			},
@@ -58,7 +56,6 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
 				roles:  []string{"IAM_OWNER"},
 			},
@@ -80,9 +77,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-				roles:  []string{"IAM_OWNER"},
+				instanceID: "",
+				userID:     "user1",
+				roles:      []string{"IAM_OWNER"},
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -125,9 +122,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-				roles:  []string{"IAM_OWNER"},
+				instanceID: "",
+				userID:     "user1",
+				roles:      []string{"IAM_OWNER"},
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -170,9 +167,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
-				userID: "user1",
-				roles:  []string{"IAM_OWNER"},
+				instanceID: "INSTANCE",
+				userID:     "user1",
+				roles:      []string{"IAM_OWNER"},
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -216,9 +213,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
-				userID: "user1",
-				roles:  []string{"IAM_OWNER"},
+				instanceID: "INSTANCE",
+				userID:     "user1",
+				roles:      []string{"IAM_OWNER"},
 			},
 			res: res{
 				want: &domain.Member{
@@ -239,7 +236,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddInstanceMember(tt.args.ctx, tt.args.userID, tt.args.roles...)
+			got, err := r.AddInstanceMember(context.Background(), tt.args.instanceID, tt.args.userID, tt.args.roles...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

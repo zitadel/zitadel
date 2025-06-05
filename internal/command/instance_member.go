@@ -4,7 +4,6 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -69,8 +68,8 @@ func IsInstanceMember(ctx context.Context, filter preparation.FilterToQueryReduc
 	return isMember, nil
 }
 
-func (c *Commands) AddInstanceMember(ctx context.Context, userID string, roles ...string) (*domain.Member, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+func (c *Commands) AddInstanceMember(ctx context.Context, instanceID, userID string, roles ...string) (*domain.Member, error) {
+	instanceAgg := instance.NewAggregate(instanceID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, userID, roles...))
 	if err != nil {
 		return nil, err

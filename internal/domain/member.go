@@ -42,3 +42,7 @@ const (
 func (f MemberState) Valid() bool {
 	return f >= 0 && f < memberStateCount
 }
+
+func (f MemberState) Exists() bool {
+	return f != MemberStateRemoved && f != MemberStateUnspecified
+}
