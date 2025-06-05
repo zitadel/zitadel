@@ -4,7 +4,7 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,

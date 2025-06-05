@@ -4,7 +4,7 @@ import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { headers } from "next/headers";
 import { getSessionCookieById } from "./cookies";
-import { getServiceUrlFromHeaders } from "./service";
+import { getServiceUrlFromHeaders } from "./service-url";
 import { getSession } from "./zitadel";
 
 const transport = async (serviceUrl: string, token: string) => {

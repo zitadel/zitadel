@@ -20,7 +20,10 @@ export type Cookie = {
 
 type SessionCookie<T> = Cookie & T;
 
-async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
+async function setSessionHttpOnlyCookie<T>(
+  sessions: SessionCookie<T>[],
+  sameSite: boolean | "lax" | "strict" | "none" = true,
+) {
   const cookiesList = await cookies();
 
   return cookiesList.set({
@@ -28,6 +31,8 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
     value: JSON.stringify(sessions),
     httpOnly: true,
     path: "/",
+    sameSite: process.env.NODE_ENV === "production" ? sameSite : "lax",
+    secure: process.env.NODE_ENV === "production",
   });
 }
 
@@ -42,10 +47,15 @@ export async function setLanguageCookie(language: string) {
   });
 }
 
-export async function addSessionToCookie<T>(
-  session: SessionCookie<T>,
-  cleanup: boolean = false,
-): Promise<any> {
+export async function addSessionToCookie<T>({
+  session,
+  cleanup,
+  sameSite,
+}: {
+  session: SessionCookie<T>;
+  cleanup?: boolean;
+  sameSite?: boolean | "lax" | "strict" | "none" | undefined;
+}): Promise<any> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -79,17 +89,23 @@ export async function addSessionToCookie<T>(
         ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
         : true,
     );
-    return setSessionHttpOnlyCookie(filteredSessions);
+    return setSessionHttpOnlyCookie(filteredSessions, sameSite);
   } else {
-    return setSessionHttpOnlyCookie(currentSessions);
+    return setSessionHttpOnlyCookie(currentSessions, sameSite);
   }
 }
 
-export async function updateSessionCookie<T>(
-  id: string,
-  session: SessionCookie<T>,
-  cleanup: boolean = false,
-): Promise<any> {
+export async function updateSessionCookie<T>({
+  id,
+  session,
+  cleanup,
+  sameSite,
+}: {
+  id: string;
+  session: SessionCookie<T>;
+  cleanup?: boolean;
+  sameSite?: boolean | "lax" | "strict" | "none" | undefined;
+}): Promise<any> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -108,19 +124,24 @@ export async function updateSessionCookie<T>(
           ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
           : true,
       );
-      return setSessionHttpOnlyCookie(filteredSessions);
+      return setSessionHttpOnlyCookie(filteredSessions, sameSite);
     } else {
-      return setSessionHttpOnlyCookie(sessions);
+      return setSessionHttpOnlyCookie(sessions, sameSite);
     }
   } else {
     throw "updateSessionCookie<T>: session id now found";
   }
 }
 
-export async function removeSessionFromCookie<T>(
-  session: SessionCookie<T>,
-  cleanup: boolean = false,
-): Promise<any> {
+export async function removeSessionFromCookie<T>({
+  session,
+  cleanup,
+  sameSite,
+}: {
+  session: SessionCookie<T>;
+  cleanup?: boolean;
+  sameSite?: boolean | "lax" | "strict" | "none" | undefined;
+}): Promise<any> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -136,9 +157,9 @@ export async function removeSessionFromCookie<T>(
         ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
         : true,
     );
-    return setSessionHttpOnlyCookie(filteredSessions);
+    return setSessionHttpOnlyCookie(filteredSessions, sameSite);
   } else {
-    return setSessionHttpOnlyCookie(reducedSessions);
+    return setSessionHttpOnlyCookie(reducedSessions, sameSite);
   }
 }
 

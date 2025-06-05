@@ -172,17 +172,23 @@
   "signedin": {
     "title": "Witaj {user}!",
     "description": "Jesteś zalogowany.",
-    "continue": "Kontynuuj"
+    "continue": "Kontynuuj",
+    "error": {
+      "title": "Błąd",
+      "description": "Nie można załadować danych. Sprawdź połączenie z internetem lub spróbuj ponownie później."
+    }
   },
   "verify": {
     "userIdMissing": "Nie podano identyfikatora użytkownika!",
-    "success": "Użytkownik został pomyślnie zweryfikowany.",
+    "successTitle": "Weryfikacja zakończona",
+    "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
     "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
     "verify": {
       "title": "Zweryfikuj użytkownika",
       "description": "Wprowadź kod z wiadomości weryfikacyjnej.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resendCode": "Wyślij kod ponownie",
+      "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
       "submit": "Kontynuuj"
     }
   },
@@ -193,7 +199,29 @@
     "allSetup": "Już skonfigurowałeś metodę uwierzytelniania!",
     "linkWithIDP": "lub połącz z dostawcą tożsamości"
   },
+  "device": {
+    "usercode": {
+      "title": "Kod urządzenia",
+      "description": "Wprowadź kod.",
+      "submit": "Kontynuuj"
+    },
+    "request": {
+      "title": "{appName} chce się połączyć:",
+      "description": "{appName} będzie miało dostęp do:",
+      "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "submit": "Zezwól",
+      "deny": "Odmów"
+    },
+    "scope": {
+      "openid": "Zweryfikuj swoją tożsamość.",
+      "email": "Uzyskaj dostęp do swojego adresu e-mail.",
+      "profile": "Uzyskaj dostęp do pełnych informacji o swoim profilu.",
+      "offline_access": "Zezwól na dostęp offline do swojego konta."
+    }
+  },
   "error": {
+    "noUserCode": "Nie podano kodu użytkownika!",
+    "noDeviceRequest": "Nie znaleziono żądania urządzenia.",
     "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",

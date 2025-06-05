@@ -4,7 +4,7 @@ import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,

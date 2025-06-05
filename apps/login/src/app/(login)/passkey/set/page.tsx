@@ -2,7 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterPasskey } from "@/components/register-passkey";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";

@@ -1,69 +1,29 @@
+import { Alert, AlertType } from "@/components/alert";
 import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
-import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
-  createCallback,
-  createResponse,
+  getMostRecentCookieWithLoginname,
+  getSessionCookieById,
+} from "@/lib/cookies";
+import { completeDeviceAuthorization } from "@/lib/server/device";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { loadMostRecentSession } from "@/lib/session";
+import {
   getBrandingSettings,
   getLoginSettings,
   getSession,
 } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
-import {
-  CreateCallbackRequestSchema,
-  SessionSchema,
-} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
-import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-async function loadSession(
+async function loadSessionById(
   serviceUrl: string,
-
-  loginName: string,
-  requestId?: string,
+  sessionId: string,
+  organization?: string,
 ) {
-  const recent = await getMostRecentCookieWithLoginname({ loginName });
-
-  if (requestId && requestId.startsWith("oidc_")) {
-    return createCallback({
-      serviceUrl,
-      req: create(CreateCallbackRequestSchema, {
-        authRequestId: requestId,
-        callbackKind: {
-          case: "session",
-          value: create(SessionSchema, {
-            sessionId: recent.id,
-            sessionToken: recent.token,
-          }),
-        },
-      }),
-    }).then(({ callbackUrl }) => {
-      return redirect(callbackUrl);
-    });
-  } else if (requestId && requestId.startsWith("saml_")) {
-    return createResponse({
-      serviceUrl,
-      req: create(CreateResponseRequestSchema, {
-        samlRequestId: requestId.replace("saml_", ""),
-        responseKind: {
-          case: "session",
-          value: {
-            sessionId: recent.id,
-            sessionToken: recent.token,
-          },
-        },
-      }),
-    }).then(({ url }) => {
-      return redirect(url);
-    });
-  }
-
+  const recent = await getSessionCookieById({ sessionId, organization });
   return getSession({
     serviceUrl,
     sessionId: recent.id,
@@ -83,13 +43,44 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const { loginName, requestId, organization } = searchParams;
-  const sessionFactors = await loadSession(serviceUrl, loginName, requestId);
+  const { loginName, requestId, organization, sessionId } = searchParams;
 
   const branding = await getBrandingSettings({
     serviceUrl,
     organization,
   });
+
+  // complete device authorization flow if device requestId is present
+  if (requestId && requestId.startsWith("device_")) {
+    const cookie = sessionId
+      ? await getSessionCookieById({ sessionId, organization })
+      : await getMostRecentCookieWithLoginname({
+          loginName: loginName,
+          organization: organization,
+        });
+
+    await completeDeviceAuthorization(requestId.replace("device_", ""), {
+      sessionId: cookie.id,
+      sessionToken: cookie.token,
+    }).catch((err) => {
+      return (
+        <DynamicTheme branding={branding}>
+          <div className="flex flex-col items-center space-y-4">
+            <h1>{t("error.title")}</h1>
+            <p className="ztdl-p mb-6 block">{t("error.description")}</p>
+            <Alert>{err.message}</Alert>
+          </div>
+        </DynamicTheme>
+      );
+    });
+  }
+
+  const sessionFactors = sessionId
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadMostRecentSession({
+        serviceUrl,
+        sessionParams: { loginName, organization },
+      });
 
   let loginSettings;
   if (!requestId) {
@@ -110,12 +101,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         <UserAvatar
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
           displayName={sessionFactors?.factors?.user?.displayName}
-          showDropdown
+          showDropdown={!(requestId && requestId.startsWith("device_"))}
           searchParams={searchParams}
         />
 
-        {sessionFactors?.id && (
-          <SelfServiceMenu sessionId={sessionFactors?.id} />
+        {requestId && requestId.startsWith("device_") && (
+          <Alert type={AlertType.INFO}>
+            You can now close this window and return to the device where you
+            started the authorization process to continue.
+          </Alert>
         )}
 
         {loginSettings?.defaultRedirectUri && (

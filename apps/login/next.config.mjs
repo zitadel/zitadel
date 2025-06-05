@@ -1,4 +1,5 @@
 import createNextIntlPlugin from "next-intl/plugin";
+import { DEFAULT_CSP } from "./constants/csp.js";
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -29,9 +30,9 @@ const secureHeaders = [
   // script-src va.vercel-scripts.com for analytics/vercel scripts
   {
     key: "Content-Security-Policy",
-    value:
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com; connect-src 'self'; child-src; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; img-src 'self' https://vercel.com;",
+    value: `${DEFAULT_CSP} frame-ancestors 'none'`,
   },
+  { key: "X-Frame-Options", value: "deny" },
 ];
 
 const imageRemotePatterns = [

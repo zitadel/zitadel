@@ -4,6 +4,7 @@ import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 import {
   createSessionForUserIdAndIdpIntent,
   createSessionFromChecks,
+  getSecuritySettings,
   getSession,
   setSession,
 } from "@/lib/zitadel";
@@ -20,7 +21,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 
 type CustomCookieData = {
   id: string;
@@ -65,7 +66,7 @@ export async function createSessionAndUpdateCookie(command: {
       serviceUrl,
       sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
-    }).then((response) => {
+    }).then(async (response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
@@ -91,9 +92,14 @@ export async function createSessionAndUpdateCookie(command: {
             response.session.factors.user.organizationId;
         }
 
-        return addSessionToCookie(sessionCookie).then(() => {
-          return response.session as Session;
-        });
+        const securitySettings = await getSecuritySettings({ serviceUrl });
+        const sameSite = securitySettings?.embeddedIframe?.enabled
+          ? "none"
+          : true;
+
+        await addSessionToCookie({ session: sessionCookie, sameSite });
+
+        return response.session as Session;
       } else {
         throw "could not get session or session does not have loginName";
       }
@@ -167,7 +173,10 @@ export async function createSessionForIdpAndUpdateCookie(
     sessionCookie.organization = session.factors.user.organizationId;
   }
 
-  return addSessionToCookie(sessionCookie).then(() => {
+  const securitySettings = await getSecuritySettings({ serviceUrl });
+  const sameSite = securitySettings?.embeddedIframe?.enabled ? "none" : true;
+
+  return addSessionToCookie({ session: sessionCookie, sameSite }).then(() => {
     return session as Session;
   });
 }
@@ -217,32 +226,44 @@ export async function setSessionAndUpdateCookie(
           serviceUrl,
           sessionId: sessionCookie.id,
           sessionToken: sessionCookie.token,
-        }).then((response) => {
-          if (response?.session && response.session.factors?.user?.loginName) {
-            const { session } = response;
-            const newCookie: CustomCookieData = {
-              id: sessionCookie.id,
-              token: updatedSession.sessionToken,
-              creationTs: sessionCookie.creationTs,
-              expirationTs: sessionCookie.expirationTs,
-              // just overwrite the changeDate with the new one
-              changeTs: updatedSession.details?.changeDate
-                ? `${timestampMs(updatedSession.details.changeDate)}`
-                : "",
-              loginName: session.factors?.user?.loginName ?? "",
-              organization: session.factors?.user?.organizationId ?? "",
-            };
-
-            if (sessionCookie.requestId) {
-              newCookie.requestId = sessionCookie.requestId;
-            }
-
-            return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
-              return { challenges: updatedSession.challenges, ...session };
-            });
-          } else {
+        }).then(async (response) => {
+          if (
+            !response?.session ||
+            !response.session.factors?.user?.loginName
+          ) {
             throw "could not get session or session does not have loginName";
           }
+
+          const { session } = response;
+          const newCookie: CustomCookieData = {
+            id: sessionCookie.id,
+            token: updatedSession.sessionToken,
+            creationTs: sessionCookie.creationTs,
+            expirationTs: sessionCookie.expirationTs,
+            // just overwrite the changeDate with the new one
+            changeTs: updatedSession.details?.changeDate
+              ? `${timestampMs(updatedSession.details.changeDate)}`
+              : "",
+            loginName: session.factors?.user?.loginName ?? "",
+            organization: session.factors?.user?.organizationId ?? "",
+          };
+
+          if (sessionCookie.requestId) {
+            newCookie.requestId = sessionCookie.requestId;
+          }
+
+          const securitySettings = await getSecuritySettings({ serviceUrl });
+          const sameSite = securitySettings?.embeddedIframe?.enabled
+            ? "none"
+            : true;
+
+          return updateSessionCookie({
+            id: sessionCookie.id,
+            session: newCookie,
+            sameSite,
+          }).then(() => {
+            return { challenges: updatedSession.challenges, ...session };
+          });
         });
       } else {
         throw "Session not be set";

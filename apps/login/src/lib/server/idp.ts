@@ -8,7 +8,7 @@ import {
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 

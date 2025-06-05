@@ -4,7 +4,7 @@ import { linkingFailed } from "@/components/idps/pages/linking-failed";
 import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   addHuman,
   addIDPLink,

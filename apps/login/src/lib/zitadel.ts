@@ -29,11 +29,7 @@ import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
-import {
-  SendInviteCodeSchema,
-  User,
-  UserState,
-} from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   ResendEmailCodeRequest,
@@ -87,6 +83,21 @@ export async function getLoginSettings({
 
   const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
+export async function getSecuritySettings({
+  serviceUrl,
+}: {
+  serviceUrl: string;
+}) {
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, serviceUrl);
+
+  const callback = settingsService
+    .getSecuritySettings({})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
@@ -489,21 +500,6 @@ export async function verifyInviteCode({
   );
 
   return userService.verifyInviteCode({ userId, verificationCode }, {});
-}
-
-export async function resendInviteCode({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
-
-  return userService.resendInviteCode({ userId }, {});
 }
 
 export async function sendEmailCode({
@@ -929,6 +925,45 @@ export async function getAuthRequest({
   });
 }
 
+export async function getDeviceAuthorizationRequest({
+  serviceUrl,
+  userCode,
+}: {
+  serviceUrl: string;
+  userCode: string;
+}) {
+  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+
+  return oidcService.getDeviceAuthorizationRequest({
+    userCode,
+  });
+}
+
+export async function authorizeOrDenyDeviceAuthorization({
+  serviceUrl,
+  deviceAuthorizationId,
+  session,
+}: {
+  serviceUrl: string;
+  deviceAuthorizationId: string;
+  session?: { sessionId: string; sessionToken: string };
+}) {
+  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+
+  return oidcService.authorizeOrDenyDeviceAuthorization({
+    deviceAuthorizationId,
+    decision: session
+      ? {
+          case: "session",
+          value: session,
+        }
+      : {
+          case: "deny",
+          value: {},
+        },
+  });
+}
+
 export async function createCallback({
   serviceUrl,
   req,
@@ -1116,13 +1151,11 @@ export async function setUserPassword({
   serviceUrl,
   userId,
   password,
-  user,
   code,
 }: {
   serviceUrl: string;
   userId: string;
   password: string;
-  user: User;
   code?: string;
 }) {
   let payload = create(SetPasswordRequestSchema, {
@@ -1131,22 +1164,6 @@ export async function setUserPassword({
       password,
     },
   });
-
-  // check if the user has no password set in order to set a password
-  if (!code) {
-    const authmethods = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
-    });
-
-    // if the user has no authmethods set, we can set a password otherwise we need a code
-    if (
-      !(authmethods.authMethodTypes.length === 0) &&
-      user.state !== UserState.INITIAL
-    ) {
-      return { error: "Provide a code to set a password" };
-    }
-  }
 
   if (code) {
     payload = {

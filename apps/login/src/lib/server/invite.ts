@@ -3,7 +3,7 @@
 import { addHumanUser, createInviteCode } from "@/lib/zitadel";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
-import { getServiceUrlFromHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service-url";
 
 type InviteUserCommand = {
   email: string;

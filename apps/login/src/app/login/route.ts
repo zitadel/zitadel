@@ -1,9 +1,9 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
-import { loginWithOIDCandSession } from "@/lib/oidc";
-import { loginWithSAMLandSession } from "@/lib/saml";
+import { loginWithOIDCAndSession } from "@/lib/oidc";
+import { loginWithSAMLAndSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { constructUrl, getServiceUrlFromHeaders } from "@/lib/service";
+import { constructUrl, getServiceUrlFromHeaders } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
 import {
   createCallback,
@@ -12,6 +12,7 @@ import {
   getAuthRequest,
   getOrgsByDomain,
   getSAMLRequest,
+  getSecuritySettings,
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
@@ -25,6 +26,7 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { DEFAULT_CSP } from "../../../constants/csp";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
@@ -107,7 +109,7 @@ export async function GET(request: NextRequest) {
   if (requestId && sessionId) {
     if (requestId.startsWith("oidc_")) {
       // this finishes the login process for OIDC
-      return loginWithOIDCandSession({
+      return loginWithOIDCAndSession({
         serviceUrl,
         authRequest: requestId.replace("oidc_", ""),
         sessionId,
@@ -117,7 +119,7 @@ export async function GET(request: NextRequest) {
       });
     } else if (requestId.startsWith("saml_")) {
       // this finishes the login process for SAML
-      return loginWithSAMLandSession({
+      return loginWithSAMLAndSession({
         serviceUrl,
         samlRequest: requestId.replace("saml_", ""),
         sessionId,
@@ -293,17 +295,32 @@ export async function GET(request: NextRequest) {
          * This means that the user should not be prompted to enter their password again.
          * Instead, the server attempts to silently authenticate the user using an existing session or other authentication mechanisms that do not require user interaction
          **/
+        const securitySettings = await getSecuritySettings({
+          serviceUrl,
+        });
+
         const selectedSession = await findValidSession({
           serviceUrl,
           sessions,
           authRequest,
         });
 
-        if (!selectedSession || !selectedSession.id) {
-          return NextResponse.json(
-            { error: "No active session found" },
-            { status: 400 },
+        const noSessionResponse = NextResponse.json(
+          { error: "No active session found" },
+          { status: 400 },
+        );
+
+        if (securitySettings?.embeddedIframe?.enabled) {
+          securitySettings.embeddedIframe.allowedOrigins;
+          noSessionResponse.headers.set(
+            "Content-Security-Policy",
+            `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
           );
+          noSessionResponse.headers.delete("X-Frame-Options");
+        }
+
+        if (!selectedSession || !selectedSession.id) {
+          return noSessionResponse;
         }
 
         const cookie = sessionCookies.find(
@@ -311,10 +328,7 @@ export async function GET(request: NextRequest) {
         );
 
         if (!cookie || !cookie.id || !cookie.token) {
-          return NextResponse.json(
-            { error: "No active session found" },
-            { status: 400 },
-          );
+          return noSessionResponse;
         }
 
         const session = {
@@ -332,7 +346,19 @@ export async function GET(request: NextRequest) {
             },
           }),
         });
-        return NextResponse.redirect(callbackUrl);
+
+        const callbackResponse = NextResponse.redirect(callbackUrl);
+
+        if (securitySettings?.embeddedIframe?.enabled) {
+          securitySettings.embeddedIframe.allowedOrigins;
+          callbackResponse.headers.set(
+            "Content-Security-Policy",
+            `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+          );
+          callbackResponse.headers.delete("X-Frame-Options");
+        }
+
+        return callbackResponse;
       } else {
         // check for loginHint, userId hint and valid sessions
         let selectedSession = await findValidSession({
@@ -499,7 +525,9 @@ export async function GET(request: NextRequest) {
         requestId: `saml_${samlRequest.id}`,
       });
     }
-  } else {
+  }
+  // Device Authorization does not need to start here as it is handled on the /device endpoint
+  else {
     return NextResponse.json(
       { error: "No authRequest nor samlRequest provided" },
       { status: 500 },

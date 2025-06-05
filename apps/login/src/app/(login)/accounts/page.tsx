@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
   getDefaultOrg,

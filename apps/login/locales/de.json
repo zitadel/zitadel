@@ -172,17 +172,23 @@
   "signedin": {
     "title": "Willkommen {user}!",
     "description": "Sie sind angemeldet.",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "error": {
+      "title": "Fehler",
+      "description": "Ein Fehler ist aufgetreten."
+    }
   },
   "verify": {
     "userIdMissing": "Keine Benutzer-ID angegeben!",
-    "success": "Erfolgreich verifiziert",
+    "successTitle": "Benutzer verifiziert",
+    "successDescription": "Der Benutzer wurde erfolgreich verifiziert.",
     "setupAuthenticator": "Authentifikator einrichten",
     "verify": {
       "title": "Benutzer verifizieren",
       "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
+      "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
       "submit": "Weiter"
     }
   },
@@ -193,7 +199,29 @@
     "allSetup": "Sie haben bereits einen Authentifikator eingerichtet!",
     "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter"
   },
+  "device": {
+    "usercode": {
+      "title": "Gerätecode",
+      "description": "Geben Sie den Code ein.",
+      "submit": "Weiter"
+    },
+    "request": {
+      "title": "{appName} möchte eine Verbindung herstellen:",
+      "disclaimer": "{appName} hat Zugriff auf:",
+      "description": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
+      "submit": "Zulassen",
+      "deny": "Ablehnen"
+    },
+    "scope": {
+      "openid": "Überprüfen Ihrer Identität.",
+      "email": "Zugriff auf Ihre E-Mail-Adresse.",
+      "profile": "Zugriff auf Ihre vollständigen Profilinformationen.",
+      "offline_access": "Erlauben Sie den Offline-Zugriff auf Ihr Konto."
+    }
+  },
   "error": {
+    "noUserCode": "Kein Benutzercode angegeben!",
+    "noDeviceRequest": " Es wurde keine Geräteanforderung gefunden. Bitte überprüfen Sie die URL.",
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
     "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",

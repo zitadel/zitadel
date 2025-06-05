@@ -2,7 +2,7 @@ import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { PasswordForm } from "@/components/password-form";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,

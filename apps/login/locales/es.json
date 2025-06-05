@@ -172,17 +172,23 @@
   "signedin": {
     "title": "¡Bienvenido {user}!",
     "description": "Has iniciado sesión.",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "error": {
+      "title": "Error",
+      "description": "Ocurrió un error al iniciar sesión."
+    }
   },
   "verify": {
     "userIdMissing": "¡No se proporcionó userId!",
-    "success": "¡Verificación exitosa!",
+    "successTitle": "Usuario verificado",
+    "successDescription": "El usuario ha sido verificado con éxito.",
     "setupAuthenticator": "Configurar autenticador",
     "verify": {
       "title": "Verificar usuario",
       "description": "Introduce el código proporcionado en el correo electrónico de verificación.",
       "noCodeReceived": "¿No recibiste un código?",
       "resendCode": "Reenviar código",
+      "codeSent": "Se ha enviado un código a tu dirección de correo electrónico.",
       "submit": "Continuar"
     }
   },
@@ -193,7 +199,29 @@
     "allSetup": "¡Ya has configurado un autenticador!",
     "linkWithIDP": "o vincúlalo con un proveedor de identidad"
   },
+  "device": {
+    "usercode": {
+      "title": "Código del dispositivo",
+      "description": "Introduce el código.",
+      "submit": "Continuar"
+    },
+    "request": {
+      "title": "{appName} desea conectarse:",
+      "description": "{appName} tendrá acceso a:",
+      "disclaimer": "Al hacer clic en Permitir, autorizas a {appName} y a Zitadel a usar tu información de acuerdo con sus respectivos términos de servicio y políticas de privacidad. Puedes revocar este acceso en cualquier momento.",
+      "submit": "Permitir",
+      "deny": "Denegar"
+    },
+    "scope": {
+      "openid": "Verifica tu identidad.",
+      "email": "Accede a tu dirección de correo electrónico.",
+      "profile": "Accede a la información completa de tu perfil.",
+      "offline_access": "Permitir acceso sin conexión a tu cuenta."
+    }
+  },
   "error": {
+    "noUserCode": "¡No se proporcionó código de usuario!",
+    "noDeviceRequest": "No se encontró ninguna solicitud de dispositivo.",
     "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",
     "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
     "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",

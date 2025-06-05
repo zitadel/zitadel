@@ -1,6 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
   getDefaultOrg,

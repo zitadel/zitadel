@@ -172,17 +172,23 @@
   "signedin": {
     "title": "欢迎 {user}！",
     "description": "您已登录。",
-    "continue": "继续"
+    "continue": "继续",
+    "error": {
+      "title": "错误",
+      "description": "登录时发生错误。"
+    }
   },
   "verify": {
     "userIdMissing": "未提供用户 ID！",
-    "success": "用户验证成功。",
+    "successTitle": "用户已验证",
+    "successDescription": "用户已成功验证。",
     "setupAuthenticator": "设置认证器",
     "verify": {
       "title": "验证用户",
       "description": "输入验证邮件中的验证码。",
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
+      "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
       "submit": "继续"
     }
   },
@@ -193,7 +199,29 @@
     "allSetup": "您已经设置好了一个认证器！",
     "linkWithIDP": "或将其与身份提供者关联"
   },
+  "device": {
+    "usercode": {
+      "title": "设备代码",
+      "description": "输入代码。",
+      "submit": "继续"
+    },
+    "request": {
+      "title": "{appName} 想要连接：",
+      "description": "{appName} 将访问：",
+      "disclaimer": "点击“允许”即表示您允许此应用程序和 Zitadel 根据其各自的服务条款和隐私政策使用您的信息。您可以随时撤销此访问权限。",
+      "submit": "允许",
+      "deny": "拒绝"
+    },
+    "scope": {
+      "openid": "验证您的身份。",
+      "email": "访问您的电子邮件地址。",
+      "profile": "访问您的完整个人资料信息。",
+      "offline_access": "允许离线访问您的账户。"
+    }
+  },
   "error": {
+    "noUserCode": "未提供用户代码！",
+    "noDeviceRequest": "没有找到设备请求。",
     "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
     "sessionExpired": "当前会话已过期，请重新登录。",
     "failedLoading": "加载数据失败，请再试一次。",
