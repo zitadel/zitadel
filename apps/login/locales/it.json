@@ -12,7 +12,7 @@
     "title": "Esci",
     "description": "Seleziona l'account che desideri uscire",
     "noResults": "Nessun account trovato",
-    "clear": "Rimuovi",
+    "clear": "Elimina sessione",
     "verifiedAt": "Ultima attività: {time}",
     "success": {
       "title": "Uscita riuscita",

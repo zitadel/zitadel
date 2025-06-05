@@ -12,7 +12,7 @@
     "title": "Logout",
     "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
     "noResults": "Keine Konten gefunden",
-    "clear": "Entfernen",
+    "clear": "Session beenden",
     "verifiedAt": "Zuletzt aktiv: {time}",
     "success": {
       "title": "Logout erfolgreich",

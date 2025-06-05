@@ -12,7 +12,7 @@
     "title": "Cerrar sesión",
     "description": "Selecciona la cuenta que deseas eliminar",
     "noResults": "No se encontraron cuentas",
-    "clear": "Eliminar",
+    "clear": "Eliminar sesión",
     "verifiedAt": "Última actividad: {time}",
     "success": {
       "title": "Cierre de sesión exitoso",

@@ -12,7 +12,7 @@
     "title": "Wyloguj się",
     "description": "Wybierz konto, które chcesz usunąć",
     "noResults": "Nie znaleziono kont",
-    "clear": "Usuń",
+    "clear": "Usuń sesję",
     "verifiedAt": "Ostatnia aktywność: {time}",
     "success": {
       "title": "Wylogowanie udane",
