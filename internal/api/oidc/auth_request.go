@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -31,6 +32,8 @@ import (
 const (
 	LoginClientHeader            = "x-zitadel-login-client"
 	LoginPostLogoutRedirectParam = "post_logout_redirect"
+	LoginLogoutHintParam         = "logout_hint"
+	LoginUILocalesParam          = "ui_locales"
 	LoginPath                    = "/login"
 	LogoutPath                   = "/logout"
 	LogoutDonePath               = "/logout/done"
@@ -289,9 +292,13 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		redirectURI := v2PostLogoutRedirectURI(endSessionRequest.RedirectURI)
 		// if no base uri is set, fallback to the default configured in the runtime config
 		if authz.GetFeatures(ctx).LoginV2.BaseURI == nil || authz.GetFeatures(ctx).LoginV2.BaseURI.String() == "" {
-			return o.defaultLogoutURLV2 + redirectURI, nil
+			defaultURI, err := url.Parse(o.defaultLogoutURLV2)
+			if err != nil {
+				return "", err
+			}
+			return buildLoginV2LogoutURL(defaultURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
 		}
-		return buildLoginV2LogoutURL(authz.GetFeatures(ctx).LoginV2.BaseURI, redirectURI), nil
+		return buildLoginV2LogoutURL(authz.GetFeatures(ctx).LoginV2.BaseURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
 	}
 
 	// V1:
@@ -368,10 +375,20 @@ func (o *OPStorage) federatedLogout(ctx context.Context, sessionID string, postL
 	return login.ExternalLogoutPath(sessionID)
 }
 
-func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI string) string {
+func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI, logoutHint string, uiLocales []language.Tag) string {
 	baseURI.JoinPath(LogoutPath)
 	q := baseURI.Query()
 	q.Set(LoginPostLogoutRedirectParam, redirectURI)
+	if logoutHint != "" {
+		q.Set(LoginLogoutHintParam, logoutHint)
+	}
+	if len(uiLocales) > 0 {
+		var locales []string
+		for _, locale := range uiLocales {
+			locales = append(locales, locale.String())
+		}
+		q.Set(LoginUILocalesParam, strings.Join(locales, " "))
+	}
 	baseURI.RawQuery = q.Encode()
 	return baseURI.String()
 }
