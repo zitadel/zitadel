@@ -557,13 +557,14 @@ message CreatedAdmin {
   optional string email_code = 2;
   optional string phone_code = 3;
 }
-message AssignedAdmin { string user_id = 1; }
+
+message AssignedAdmin {
+  string user_id = 1;
+}
 
 message OrganizationAdmin {
-
-    // The admins created/assigned for the Organization.
+  // The admins created/assigned for the Organization.
   oneof OrganizationAdmin {
-    option (validate.required) = true;
     CreatedAdmin created_admin = 1;
     AssignedAdmin assigned_admin = 2;
   }
