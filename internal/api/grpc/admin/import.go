@@ -476,7 +476,8 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		logging.Debugf("import user: %s", user.GetUserId())
 		human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 		human.AggregateID = user.UserId
-		userState := domain.UserState(user.State)
+		userState := user.State.ToDomain()
+
 		//nolint:staticcheck
 		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, &userState, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 		if err != nil {
@@ -514,7 +515,7 @@ func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	}
 	for _, user := range org.GetMachineUsers() {
 		logging.Debugf("import user: %s", user.GetUserId())
-		userState := domain.UserState(user.State)
+		userState := user.State.ToDomain()
 		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()), &userState, nil)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
