@@ -53,6 +53,7 @@ export function SignInWithIdp({
       [IdentityProviderType.GITLAB]: SignInWithGitlab,
       [IdentityProviderType.GITLAB_SELF_HOSTED]: SignInWithGitlab,
       [IdentityProviderType.SAML]: SignInWithGeneric,
+      [IdentityProviderType.JWT]: SignInWithGeneric,
     };
 
     const Component = components[type];
