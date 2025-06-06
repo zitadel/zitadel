@@ -19,12 +19,13 @@ var _ domain.MachineRepository = (*userMachine)(nil)
 
 // Update implements [domain.MachineRepository].
 func (m userMachine) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
-	m.builder.WriteString("UPDATE user_machines SET ")
-	database.Changes(changes).Write(&m.builder)
-	m.writeCondition(condition)
+	builder := database.StatementBuilder{}
+	builder.WriteString("UPDATE user_machines SET ")
+	database.Changes(changes).Write(&builder)
+	m.writeCondition(builder, condition)
 	m.writeReturning()
 
-	_, err := m.client.Exec(ctx, m.builder.String(), m.builder.Args()...)
+	_, err := m.client.Exec(ctx, builder.String(), builder.Args()...)
 	return err
 }
 
@@ -60,6 +61,7 @@ func (m userMachine) columns() database.Columns {
 }
 
 func (m *userMachine) writeReturning() {
-	m.builder.WriteString(" RETURNING ")
-	m.columns().Write(&m.builder)
+	builder := database.StatementBuilder{}
+	builder.WriteString(" RETURNING ")
+	m.columns().Write(&builder)
 }

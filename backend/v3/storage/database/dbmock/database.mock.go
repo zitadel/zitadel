@@ -157,15 +157,16 @@ func (c *MockPoolCloseCall) DoAndReturn(f func(context.Context) error) *MockPool
 }
 
 // Exec mocks base method.
-func (m *MockPool) Exec(arg0 context.Context, arg1 string, arg2 ...any) error {
+func (m *MockPool) Exec(arg0 context.Context, arg1 string, arg2 ...any) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Exec", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Exec indicates an expected call of Exec.
@@ -182,19 +183,19 @@ type MockPoolExecCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockPoolExecCall) Return(arg0 error) *MockPoolExecCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockPoolExecCall) Return(arg0 int64, arg1 error) *MockPoolExecCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockPoolExecCall) Do(f func(context.Context, string, ...any) error) *MockPoolExecCall {
+func (c *MockPoolExecCall) Do(f func(context.Context, string, ...any) (int64, error)) *MockPoolExecCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockPoolExecCall) DoAndReturn(f func(context.Context, string, ...any) error) *MockPoolExecCall {
+func (c *MockPoolExecCall) DoAndReturn(f func(context.Context, string, ...any) (int64, error)) *MockPoolExecCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -387,15 +388,16 @@ func (c *MockClientBeginCall) DoAndReturn(f func(context.Context, *database.Tran
 }
 
 // Exec mocks base method.
-func (m *MockClient) Exec(arg0 context.Context, arg1 string, arg2 ...any) error {
+func (m *MockClient) Exec(arg0 context.Context, arg1 string, arg2 ...any) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Exec", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Exec indicates an expected call of Exec.
@@ -412,19 +414,19 @@ type MockClientExecCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockClientExecCall) Return(arg0 error) *MockClientExecCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockClientExecCall) Return(arg0 int64, arg1 error) *MockClientExecCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockClientExecCall) Do(f func(context.Context, string, ...any) error) *MockClientExecCall {
+func (c *MockClientExecCall) Do(f func(context.Context, string, ...any) (int64, error)) *MockClientExecCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockClientExecCall) DoAndReturn(f func(context.Context, string, ...any) error) *MockClientExecCall {
+func (c *MockClientExecCall) DoAndReturn(f func(context.Context, string, ...any) (int64, error)) *MockClientExecCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -975,15 +977,16 @@ func (c *MockTransactionEndCall) DoAndReturn(f func(context.Context, error) erro
 }
 
 // Exec mocks base method.
-func (m *MockTransaction) Exec(arg0 context.Context, arg1 string, arg2 ...any) error {
+func (m *MockTransaction) Exec(arg0 context.Context, arg1 string, arg2 ...any) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Exec", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Exec indicates an expected call of Exec.
@@ -1000,19 +1003,19 @@ type MockTransactionExecCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockTransactionExecCall) Return(arg0 error) *MockTransactionExecCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockTransactionExecCall) Return(arg0 int64, arg1 error) *MockTransactionExecCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockTransactionExecCall) Do(f func(context.Context, string, ...any) error) *MockTransactionExecCall {
+func (c *MockTransactionExecCall) Do(f func(context.Context, string, ...any) (int64, error)) *MockTransactionExecCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockTransactionExecCall) DoAndReturn(f func(context.Context, string, ...any) error) *MockTransactionExecCall {
+func (c *MockTransactionExecCall) DoAndReturn(f func(context.Context, string, ...any) (int64, error)) *MockTransactionExecCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

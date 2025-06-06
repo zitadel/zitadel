@@ -33,30 +33,30 @@ const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, cons
 
 // Get implements [domain.InstanceRepository].
 func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain.Instance, error) {
-	i.builder = database.StatementBuilder{}
+	builder := database.StatementBuilder{}
 
-	i.builder.WriteString(queryInstanceStmt)
+	builder.WriteString(queryInstanceStmt)
 
 	// return only non deleted isntances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
-	andCondition.Write(&i.builder)
+	andCondition.Write(&builder)
 
-	return scanInstance(i.client.QueryRow(ctx, i.builder.String(), i.builder.Args()...))
+	return scanInstance(i.client.QueryRow(ctx, builder.String(), builder.Args()...))
 }
 
 // List implements [domain.InstanceRepository].
 func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*domain.Instance, error) {
-	i.builder = database.StatementBuilder{}
+	builder := database.StatementBuilder{}
 
-	i.builder.WriteString(queryInstanceStmt)
+	builder.WriteString(queryInstanceStmt)
 
 	// return only non deleted isntances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
-	andCondition.Write(&i.builder)
+	andCondition.Write(&builder)
 
-	rows, err := i.client.Query(ctx, i.builder.String(), i.builder.Args()...)
+	rows, err := i.client.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
@@ -71,11 +71,11 @@ const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org
 
 // Create implements [domain.InstanceRepository].
 func (i *instance) Create(ctx context.Context, instance *domain.Instance) error {
-	i.builder = database.StatementBuilder{}
-	i.builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
-	i.builder.WriteString(createInstanceStmt)
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
+	builder.WriteString(createInstanceStmt)
 
-	err := i.client.QueryRow(ctx, i.builder.String(), i.builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
+	err := i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -101,14 +101,14 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 
 // Update implements [domain.InstanceRepository].
 func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
-	i.builder = database.StatementBuilder{}
-	i.builder.WriteString(`UPDATE zitadel.instances SET `)
-	database.Changes(changes).Write(&i.builder)
-	i.writeCondition(condition)
+	builder := database.StatementBuilder{}
+	builder.WriteString(`UPDATE zitadel.instances SET `)
+	database.Changes(changes).Write(&builder)
+	i.writeCondition(&builder, condition)
 
-	stmt := i.builder.String()
+	stmt := builder.String()
 
-	rowsAffected, err := i.client.Exec(ctx, stmt, i.builder.Args()...)
+	rowsAffected, err := i.client.Exec(ctx, stmt, builder.Args()...)
 	return rowsAffected, err
 }
 
@@ -117,12 +117,12 @@ func (i instance) Delete(ctx context.Context, condition database.Condition) erro
 	if condition == nil {
 		return errors.New("Delete must contain a condition") // (otherwise ALL instances will be deleted)
 	}
-	i.builder = database.StatementBuilder{}
-	i.builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
-	i.builder.AppendArgs(time.Now())
+	builder := database.StatementBuilder{}
+	builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
+	builder.AppendArgs(time.Now())
 
-	i.writeCondition(condition)
-	_, err := i.client.Exec(ctx, i.builder.String(), i.builder.Args()...)
+	i.writeCondition(&builder, condition)
+	_, err := i.client.Exec(ctx, builder.String(), builder.Args()...)
 	return err
 }
 
@@ -203,12 +203,15 @@ func (instance) DeletedAtColumn() database.Column {
 	return database.NewColumn("deleted_at")
 }
 
-func (i *instance) writeCondition(condition database.Condition) {
+func (i *instance) writeCondition(
+	builder *database.StatementBuilder,
+	condition database.Condition,
+) {
 	if condition == nil {
 		return
 	}
-	i.builder.WriteString(" WHERE ")
-	condition.Write(&i.builder)
+	builder.WriteString(" WHERE ")
+	condition.Write(builder)
 }
 
 func scanInstance(scanner database.Scanner) (*domain.Instance, error) {
