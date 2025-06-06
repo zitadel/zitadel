@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { Alert } from "./alert";
+import { Alert, AlertType } from "./alert";
 import {
   AuthenticationMethod,
   AuthenticationMethodRadio,
@@ -38,6 +38,7 @@ type Props = {
   organization?: string;
   requestId?: string;
   loginSettings?: LoginSettings;
+  idpCount: number;
 };
 
 export function RegisterForm({
@@ -48,6 +49,7 @@ export function RegisterForm({
   organization,
   requestId,
   loginSettings,
+  idpCount = 0,
 }: Props) {
   const t = useTranslations("register");
 
@@ -178,11 +180,18 @@ export function RegisterForm({
           </div>
         )}
 
+      {(!loginSettings?.allowUsernamePassword ||
+        loginSettings?.passkeysType != PasskeysType.ALLOWED) &&
+        !idpCount && (
+          <Alert type={AlertType.INFO}>{t("noMethodAvailableWarning")}</Alert>
+        )}
+
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>
         </div>
       )}
+
       <div className="mt-8 flex w-full flex-row items-center justify-between">
         <BackButton data-testid="back-button" />
         <Button
