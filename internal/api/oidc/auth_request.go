@@ -383,9 +383,9 @@ func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI, logoutHint string, uiL
 		q.Set(LoginLogoutHintParam, logoutHint)
 	}
 	if len(uiLocales) > 0 {
-		var locales []string
-		for _, locale := range uiLocales {
-			locales = append(locales, locale.String())
+		locales := make([]string, len(uiLocales))
+		for i, locale := range uiLocales {
+			locales[i] = locale.String()
 		}
 		q.Set(LoginUILocalesParam, strings.Join(locales, " "))
 	}
