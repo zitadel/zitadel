@@ -139,7 +139,7 @@ func TestCreateInstance(t *testing.T) {
 	}
 }
 
-func TestUpdateNameInstance(t *testing.T) {
+func TestUpdateInstance(t *testing.T) {
 	tests := []struct {
 		name         string
 		testFunc     func() *domain.Instance
@@ -491,10 +491,9 @@ func TestListInstance(t *testing.T) {
 
 func TestDeleteInstance(t *testing.T) {
 	type test struct {
-		name               string
-		testFunc           func()
-		conditionClauses   database.Condition
-		noInstanceReturned bool
+		name             string
+		testFunc         func()
+		conditionClauses database.Condition
 	}
 	tests := []test{
 		func() test {
@@ -529,6 +528,14 @@ func TestDeleteInstance(t *testing.T) {
 					}
 				},
 				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+			}
+		}(),
+		func() test {
+			instanceRepo := repository.InstanceRepository(pool)
+			non_existent_instance_name := gofakeit.Name()
+			return test{
+				name:             "delete non existent instance",
+				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, non_existent_instance_name),
 			}
 		}(),
 		func() test {

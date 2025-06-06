@@ -40,7 +40,7 @@ func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain
 	// return only non deleted isntances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
-	andCondition.Write(&builder)
+	i.writeCondition(&builder, andCondition)
 
 	return scanInstance(i.client.QueryRow(ctx, builder.String(), builder.Args()...))
 }
@@ -54,7 +54,7 @@ func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*dom
 	// return only non deleted isntances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
-	andCondition.Write(&builder)
+	i.writeCondition(&builder, andCondition)
 
 	rows, err := i.client.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
