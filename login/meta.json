@@ -1,0 +1,4 @@
+{
+  "name": "ZITADEL typescript Monorepo with Changesets",
+  "description": "ZITADEL typescript monorepo preconfigured to publish packages via Changesets"
+}
