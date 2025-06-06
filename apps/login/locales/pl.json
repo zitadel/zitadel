@@ -8,6 +8,17 @@
     "addAnother": "Dodaj kolejne konto",
     "noResults": "Nie znaleziono kont"
   },
+  "logout": {
+    "title": "Wyloguj się",
+    "description": "Wybierz konto, które chcesz usunąć",
+    "noResults": "Nie znaleziono kont",
+    "clear": "Usuń sesję",
+    "verifiedAt": "Ostatnia aktywność: {time}",
+    "success": {
+      "title": "Wylogowanie udane",
+      "description": "Pomyślnie się wylogowałeś."
+    }
+  },
   "loginname": {
     "title": "Witamy ponownie!",
     "description": "Wprowadź dane logowania.",

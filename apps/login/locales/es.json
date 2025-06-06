@@ -8,6 +8,17 @@
     "addAnother": "Agregar otra cuenta",
     "noResults": "No se encontraron cuentas"
   },
+  "logout": {
+    "title": "Cerrar sesión",
+    "description": "Selecciona la cuenta que deseas eliminar",
+    "noResults": "No se encontraron cuentas",
+    "clear": "Eliminar sesión",
+    "verifiedAt": "Última actividad: {time}",
+    "success": {
+      "title": "Cierre de sesión exitoso",
+      "description": "Has cerrado sesión correctamente."
+    }
+  },
   "loginname": {
     "title": "¡Bienvenido de nuevo!",
     "description": "Introduce tus datos de acceso.",

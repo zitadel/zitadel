@@ -8,6 +8,17 @@
     "addAnother": "添加另一个账户",
     "noResults": "未找到账户"
   },
+  "logout": {
+    "title": "注销",
+    "description": "选择您想注销的账户",
+    "noResults": "未找到账户",
+    "clear": "注销会话",
+    "verifiedAt": "最后活动时间：{time}",
+    "success": {
+      "title": "注销成功",
+      "description": "您已成功注销。"
+    }
+  },
   "loginname": {
     "title": "欢迎回来！",
     "description": "请输入您的登录信息。",
