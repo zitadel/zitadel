@@ -32,12 +32,12 @@ const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, cons
 	` FROM zitadel.instances`
 
 // Get implements [domain.InstanceRepository].
-// func (i *instance) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Instance, error) {
 func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain.Instance, error) {
 	i.builder = database.StatementBuilder{}
 
 	i.builder.WriteString(queryInstanceStmt)
 
+	// return only non deleted isntances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	andCondition.Write(&i.builder)
@@ -46,12 +46,12 @@ func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain
 }
 
 // List implements [domain.InstanceRepository].
-// func (i *instance) List(ctx context.Context, opts ...database.QueryOption) (*domain.Instance, error) {
 func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*domain.Instance, error) {
 	i.builder = database.StatementBuilder{}
 
 	i.builder.WriteString(queryInstanceStmt)
 
+	// return only non deleted isntances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	andCondition.Write(&i.builder)

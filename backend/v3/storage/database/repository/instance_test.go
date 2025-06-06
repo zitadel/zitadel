@@ -296,115 +296,337 @@ func TestGetInstance(t *testing.T) {
 }
 
 func TestListInstance(t *testing.T) {
-	tests := []struct {
-		name     string
-		testFunc func() *domain.Instance
-
+	type test struct {
+		name               string
+		testFunc           func() ([]*domain.Instance, database.PoolTest, func())
+		conditionClauses   []database.Condition
 		noInstanceReturned bool
-	}{
+	}
+	tests := []test{
 		{
-			name: "happy path",
-			testFunc: func() *domain.Instance {
-				instanceRepo := repository.InstanceRepository(pool)
-				instanceId := gofakeit.Name()
-				instanceName := gofakeit.Name()
-
+			name: "happy path single instance",
+			testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
 				ctx := context.Background()
-				inst := domain.Instance{
-					ID:              instanceId,
-					Name:            instanceName,
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+				pool, stop, err := newEmbeededDB()
+				assert.NoError(t, err)
+
+				instanceRepo := repository.InstanceRepository(pool)
+				noOfInstances := 1
+				instances := make([]*domain.Instance, noOfInstances)
+				for i := range noOfInstances {
+
+					instanceId := gofakeit.Name()
+					instanceName := gofakeit.Name()
+
+					inst := domain.Instance{
+						ID:              instanceId,
+						Name:            instanceName,
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+
+					// create instance
+					err := instanceRepo.Create(ctx, &inst)
+					assert.NoError(t, err)
+
+					instances[i] = &inst
 				}
 
-				// create instance
-				err := instanceRepo.Create(ctx, &inst)
-				assert.NoError(t, err)
-				return &inst
+				return instances, pool, stop
 			},
 		},
 		{
-			name: "get non existent instance",
-			testFunc: func() *domain.Instance {
-				instanceId := gofakeit.Name()
+			name: "happy path multiple instance",
+			testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
+				ctx := context.Background()
+				pool, stop, err := newEmbeededDB()
+				assert.NoError(t, err)
 
-				inst := domain.Instance{
-					ID: instanceId,
+				instanceRepo := repository.InstanceRepository(pool)
+				noOfInstances := 5
+				instances := make([]*domain.Instance, noOfInstances)
+				for i := range noOfInstances {
+
+					instanceId := gofakeit.Name()
+					instanceName := gofakeit.Name()
+
+					inst := domain.Instance{
+						ID:              instanceId,
+						Name:            instanceName,
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+
+					// create instance
+					err := instanceRepo.Create(ctx, &inst)
+					assert.NoError(t, err)
+
+					instances[i] = &inst
 				}
-				return &inst
+
+				return instances, pool, stop
 			},
-			noInstanceReturned: true,
 		},
+		func() test {
+			instanceRepo := repository.InstanceRepository(pool)
+			instanceId := gofakeit.Name()
+			return test{
+				name: "instance filter on id",
+				testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
+					ctx := context.Background()
+
+					noOfInstances := 1
+					instances := make([]*domain.Instance, noOfInstances)
+					for i := range noOfInstances {
+
+						instanceName := gofakeit.Name()
+
+						inst := domain.Instance{
+							ID:              instanceId,
+							Name:            instanceName,
+							DefaultOrgID:    "defaultOrgId",
+							IAMProjectID:    "iamProject",
+							ConsoleClientID: "consoleCLient",
+							ConsoleAppID:    "consoleApp",
+							DefaultLanguage: "defaultLanguage",
+						}
+
+						// create instance
+						err := instanceRepo.Create(ctx, &inst)
+						assert.NoError(t, err)
+
+						instances[i] = &inst
+					}
+
+					return instances, nil, nil
+				},
+				conditionClauses: []database.Condition{instanceRepo.IDCondition(instanceId)},
+			}
+		}(),
+		func() test {
+			instanceRepo := repository.InstanceRepository(pool)
+			instanceName := gofakeit.Name()
+			return test{
+				name: "multiple instance filter on name",
+				testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
+					ctx := context.Background()
+
+					noOfInstances := 5
+					instances := make([]*domain.Instance, noOfInstances)
+					for i := range noOfInstances {
+
+						instanceId := gofakeit.Name()
+
+						inst := domain.Instance{
+							ID:              instanceId,
+							Name:            instanceName,
+							DefaultOrgID:    "defaultOrgId",
+							IAMProjectID:    "iamProject",
+							ConsoleClientID: "consoleCLient",
+							ConsoleAppID:    "consoleApp",
+							DefaultLanguage: "defaultLanguage",
+						}
+
+						// create instance
+						err := instanceRepo.Create(ctx, &inst)
+						assert.NoError(t, err)
+
+						instances[i] = &inst
+					}
+
+					return instances, nil, nil
+				},
+				conditionClauses: []database.Condition{instanceRepo.NameCondition(database.TextOperationEqual, instanceName)},
+			}
+		}(),
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+
+			var instances []*domain.Instance
+
+			pool := pool
+			if tt.testFunc != nil {
+				var stop func()
+				var pool_ database.PoolTest
+				instances, pool_, stop = tt.testFunc()
+				if pool_ != nil {
+					pool = pool_
+					defer stop()
+				}
+			}
+			instanceRepo := repository.InstanceRepository(pool)
+
+			// check instance values
+			returnedInstances, err := instanceRepo.List(ctx,
+				tt.conditionClauses...,
+			)
+			assert.NoError(t, err)
+			if tt.noInstanceReturned {
+				assert.Nil(t, returnedInstances)
+				return
+			}
+
+			assert.Equal(t, len(instances), len(returnedInstances))
+			for i, instance := range instances {
+				assert.Equal(t, returnedInstances[i].ID, instance.ID)
+				assert.Equal(t, returnedInstances[i].Name, instance.Name)
+				assert.Equal(t, returnedInstances[i].DefaultOrgID, instance.DefaultOrgID)
+				assert.Equal(t, returnedInstances[i].IAMProjectID, instance.IAMProjectID)
+				assert.Equal(t, returnedInstances[i].ConsoleClientID, instance.ConsoleClientID)
+				assert.Equal(t, returnedInstances[i].ConsoleAppID, instance.ConsoleAppID)
+				assert.Equal(t, returnedInstances[i].DefaultLanguage, instance.DefaultLanguage)
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestDeleteInstance(t *testing.T) {
+	type test struct {
+		name               string
+		testFunc           func()
+		conditionClauses   database.Condition
+		noInstanceReturned bool
+	}
+	tests := []test{
+		func() test {
+			instanceRepo := repository.InstanceRepository(pool)
+			instanceName := gofakeit.Name()
+			return test{
+				name: "happy path delete single instance",
+				testFunc: func() {
+					ctx := context.Background()
+
+					noOfInstances := 1
+					instances := make([]*domain.Instance, noOfInstances)
+					for i := range noOfInstances {
+
+						instanceId := gofakeit.Name()
+
+						inst := domain.Instance{
+							ID:              instanceId,
+							Name:            instanceName,
+							DefaultOrgID:    "defaultOrgId",
+							IAMProjectID:    "iamProject",
+							ConsoleClientID: "consoleCLient",
+							ConsoleAppID:    "consoleApp",
+							DefaultLanguage: "defaultLanguage",
+						}
+
+						// create instance
+						err := instanceRepo.Create(ctx, &inst)
+						assert.NoError(t, err)
+
+						instances[i] = &inst
+					}
+				},
+				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+			}
+		}(),
+		func() test {
+			instanceRepo := repository.InstanceRepository(pool)
+			instanceName := gofakeit.Name()
+			return test{
+				name: "multiple instance filter on name",
+				testFunc: func() {
+					ctx := context.Background()
+
+					noOfInstances := 5
+					instances := make([]*domain.Instance, noOfInstances)
+					for i := range noOfInstances {
+
+						instanceId := gofakeit.Name()
+
+						inst := domain.Instance{
+							ID:              instanceId,
+							Name:            instanceName,
+							DefaultOrgID:    "defaultOrgId",
+							IAMProjectID:    "iamProject",
+							ConsoleClientID: "consoleCLient",
+							ConsoleAppID:    "consoleApp",
+							DefaultLanguage: "defaultLanguage",
+						}
+
+						// create instance
+						err := instanceRepo.Create(ctx, &inst)
+						assert.NoError(t, err)
+
+						instances[i] = &inst
+					}
+				},
+				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+			}
+		}(),
+		func() test {
+			instanceRepo := repository.InstanceRepository(pool)
+			instanceName := gofakeit.Name()
+			return test{
+				name: "deleted already deleted instance",
+				testFunc: func() {
+					ctx := context.Background()
+
+					noOfInstances := 1
+					instances := make([]*domain.Instance, noOfInstances)
+					for i := range noOfInstances {
+
+						instanceId := gofakeit.Name()
+
+						inst := domain.Instance{
+							ID:              instanceId,
+							Name:            instanceName,
+							DefaultOrgID:    "defaultOrgId",
+							IAMProjectID:    "iamProject",
+							ConsoleClientID: "consoleCLient",
+							ConsoleAppID:    "consoleApp",
+							DefaultLanguage: "defaultLanguage",
+						}
+
+						// create instance
+						err := instanceRepo.Create(ctx, &inst)
+						assert.NoError(t, err)
+
+						instances[i] = &inst
+					}
+
+					// delete instance
+					err := instanceRepo.Delete(ctx,
+						instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+					)
+					assert.NoError(t, err)
+				},
+				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
 			instanceRepo := repository.InstanceRepository(pool)
 
-			var instance *domain.Instance
 			if tt.testFunc != nil {
-				instance = tt.testFunc()
+				tt.testFunc()
 			}
 
-			// check instance values
-			returnedInstance, err := instanceRepo.List(ctx,
-				instanceRepo.IDCondition(instance.ID),
+			// delete instance
+			err := instanceRepo.Delete(ctx,
+				tt.conditionClauses,
 			)
 			assert.NoError(t, err)
-			if tt.noInstanceReturned {
-				assert.Nil(t, returnedInstance)
-				return
-			}
 
-			assert.Equal(t, returnedInstance.ID, instance.ID)
-			assert.Equal(t, returnedInstance.Name, instance.Name)
-			assert.Equal(t, returnedInstance.DefaultOrgID, instance.DefaultOrgID)
-			assert.Equal(t, returnedInstance.IAMProjectID, instance.IAMProjectID)
-			assert.Equal(t, returnedInstance.ConsoleClientID, instance.ConsoleClientID)
-			assert.Equal(t, returnedInstance.ConsoleAppID, instance.ConsoleAppID)
-			assert.Equal(t, returnedInstance.DefaultLanguage, instance.DefaultLanguage)
+			// check instance was deleted
+			instance, err := instanceRepo.Get(ctx,
+				tt.conditionClauses,
+			)
 			assert.NoError(t, err)
+			assert.Nil(t, instance)
 		})
 	}
-}
-
-func TestUpdateDeleteInstance(t *testing.T) {
-	instanceRepo := repository.InstanceRepository(pool)
-	instanceId := gofakeit.Name()
-	instanceName := gofakeit.Name()
-
-	ctx := context.Background()
-	inst := domain.Instance{
-		ID:              instanceId,
-		Name:            instanceName,
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-
-	err := instanceRepo.Create(ctx, &inst)
-	assert.NoError(t, err)
-
-	instance, err := instanceRepo.Get(ctx,
-		instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-	)
-	assert.NotNil(t, instance)
-	assert.NoError(t, err)
-
-	// delete instance
-	err = instanceRepo.Delete(ctx,
-		instanceRepo.IDCondition(instanceId),
-	)
-	assert.NoError(t, err)
-
-	instance, err = instanceRepo.Get(ctx,
-		instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-	)
-	assert.NoError(t, err)
-	assert.Nil(t, instance)
 }

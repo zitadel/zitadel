@@ -14,6 +14,11 @@ type Pool interface {
 	Close(ctx context.Context) error
 }
 
+type PoolTest interface {
+	Pool
+	MigrateTest(ctx context.Context) error
+}
+
 // Client is a single database connection which can be released back to the pool.
 type Client interface {
 	Beginner

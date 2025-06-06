@@ -80,3 +80,20 @@ func (c *pgxPool) Migrate(ctx context.Context) error {
 	isMigrated = err == nil
 	return err
 }
+
+// Migrate implements [database.PoolTest].
+func (c *pgxPool) MigrateTest(ctx context.Context) error {
+	// allow multiple migrations
+	// if isMigrated {
+	// 	return nil
+	// }
+
+	client, err := c.Pool.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = migration.Migrate(ctx, client.Conn())
+	isMigrated = err == nil
+	return err
+}
