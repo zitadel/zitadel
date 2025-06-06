@@ -35,5 +35,3 @@ CREATE OR REPLACE VIEW projections.login_names3 AS
             AND u.resource_owner = d.resource_owner 
             AND u.instance_id = d.instance_id
 ;
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS login_names3_policies_is_default_owner_idx ON projections.login_names3_policies (instance_id, is_default, resource_owner) INCLUDE (must_be_domain);
