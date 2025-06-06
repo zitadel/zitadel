@@ -1,0 +1,73 @@
+---
+title: Migrate from v1 APIs to v2 APIs
+---
+
+This guide gives you an overview for migrating from our v1 API to the new and improved v2 API.
+This upgrade introduces some significant architectural changes designed to make your development experience smoother, more intuitive, and efficient.
+
+## The v1 Approach: Use-Case Based APIs
+Our v1 API was structured around use cases, meaning we provided distinct APIs tailored to different user roles:
+
+- Auth API: For authenticated users.
+- Management API: For administrators of an organization.
+- Admin API: For administrators of an instance.
+- System API: For managing multiple instances.
+While this approach served its initial purpose, it presented a few challenges.
+Developers often found it difficult to determine which specific API endpoint to use for their needs.
+Additionally, this model sometimes led to redundant implementations of similar functionalities across different APIs – for example, listing users might have existed in slightly different forms for an instance context versus an organization context.
+This often required more extensive reading of documentation and further explanation to ensure correct usage.
+
+## The v2 Approach: A Resource-Based API
+With our v2 API, we introduce a resource-based architecture.
+This means instead of organizing by user type, we now structure our API around logical resources, such as:
+- Users API
+- Instance API
+- Organization API
+- And more...
+A key improvement in v2 is how context and permissions are handled.
+The data you receive from an endpoint will now automatically be scoped based on the role and permissions of the authenticated user.
+
+For example:
+- An instance administrator calling a GET /users endpoint will receive a list of all users within that instance.
+- An organization administrator calling the exact same GET /users endpoint will receive a list of users belonging only to their specific organization.
+
+## Why the Change
+The primary goals behind this architectural shift are to make our API:
+- More Intuitive: Finding the right endpoint should feel natural. If you want to interact with users, you look at the Users API.
+- Self-Explanatory: The structure itself guides you, reducing the need to sift through extensive documentation to understand which API "hat" you need to wear.
+- Developer-Friendly: A cleaner, more consistent API surface means faster integration and less room for confusion.
+
+We're confident that these changes will significantly enhance your experience working with our platform.
+The following sections will detail the specific resources that have been migrated and outline any changes you'll need to be aware of.
+
+## Resource Migration
+
+This section details the migrated resources, including any breaking changes and other important considerations for your transition from v1 to v2.
+
+### General Changes
+
+### Instances
+
+### Organizations
+
+### Users
+
+When migrating your user management from v1 to v2, the most significant updates involve user states and the initial onboarding process:
+
+- **Unified User Creation Endpoint**:
+  - A significant simplification in v2 is the consolidation of user creation. There is now one primary endpoint for creating users, regardless of whether they are human or machine users.
+  - You can use this single endpoint to provision both human users (individuals interacting with your application) and machine users (e.g., service accounts, API clients), typically by specifying the user type in the request payload.
+- **No More "Initial" State**:
+  - In v1, new users without a password or verified email were automatically assigned an initial state. This default assumption wasn't always ideal.
+  - In v2, this initial state has been removed. All newly created users are now active by default, regardless of their initial attributes.
+- **New Onboarding Process**:
+  - To enable users to set up their accounts, you can now send them an invitation code. This allows them to securely add their authentication methods.
+- **Flexible Email Verification**:
+  - v2 provides more control over email verification:
+    - You can choose at user creation whether an email verification code should be sent automatically.
+    - Alternatively, the API can return the verification code directly to you, empowering you to send a customized verification email.
+
+[Users API v2 Documentation](http://localhost:3000/docs/apis/resources/user_service_v2)
+
+### Projects
+
