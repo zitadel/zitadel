@@ -40,7 +40,7 @@ func (m *SystemFeatures) isEmpty() bool {
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {
 	if f.isEmpty() {
-		return nil, zerrors.ThrowInternal(nil, "COMMAND-Oop8a", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Oop8a", "Errors.NoChangesFound")
 	}
 	wm := NewSystemFeaturesWriteModel()
 	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
