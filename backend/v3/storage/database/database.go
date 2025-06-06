@@ -14,6 +14,11 @@ type Pool interface {
 	Close(ctx context.Context) error
 }
 
+type PoolTest interface {
+	Pool
+	MigrateTest(ctx context.Context) error
+}
+
 // Client is a single database connection which can be released back to the pool.
 type Client interface {
 	Beginner
@@ -31,7 +36,7 @@ type Querier interface {
 
 // Executor is a database client that can execute statements.
 type Executor interface {
-	Exec(ctx context.Context, stmt string, args ...any) error
+	Exec(ctx context.Context, stmt string, args ...any) (int64, error)
 }
 
 // QueryExecutor is a database client that can execute queries and statements.
