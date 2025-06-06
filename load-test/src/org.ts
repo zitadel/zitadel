@@ -13,7 +13,7 @@ export function createOrg(accessToken: string): Promise<Org> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest(
       'POST',
-      url('/v2beta/organizations'),
+      url('/v2/organizations'),
       JSON.stringify({
         name: `load-test-${new Date(Date.now()).toISOString()}`,
       }),

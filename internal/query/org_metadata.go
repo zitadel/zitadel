@@ -103,7 +103,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -133,7 +133,7 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	query, scan := prepareOrgMetadataListQuery()
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {

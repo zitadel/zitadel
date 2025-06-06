@@ -115,7 +115,7 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
