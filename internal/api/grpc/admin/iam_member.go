@@ -34,35 +34,35 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 }
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
-	member, err := s.command.AddInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), req.UserId, req.Roles...)
+	member, err := s.command.AddInstanceMember(ctx, AddIAMMemberToCommand(req, authz.GetInstance(ctx).InstanceID()))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddIAMMemberResponse{
 		Details: object.AddToDetailsPb(
 			member.Sequence,
-			member.ChangeDate,
+			member.EventDate,
 			member.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMemberRequest) (*admin_pb.UpdateIAMMemberResponse, error) {
-	member, err := s.command.ChangeInstanceMember(ctx, UpdateIAMMemberToDomain(req))
+	member, err := s.command.ChangeInstanceMember(ctx, UpdateIAMMemberToCommand(req, authz.GetInstance(ctx).InstanceID()))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateIAMMemberResponse{
 		Details: object.ChangeToDetailsPb(
 			member.Sequence,
-			member.ChangeDate,
+			member.EventDate,
 			member.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) RemoveIAMMember(ctx context.Context, req *admin_pb.RemoveIAMMemberRequest) (*admin_pb.RemoveIAMMemberResponse, error) {
-	objectDetails, err := s.command.RemoveInstanceMember(ctx, req.UserId)
+	objectDetails, err := s.command.RemoveInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), req.UserId)
 	if err != nil {
 		return nil, err
 	}

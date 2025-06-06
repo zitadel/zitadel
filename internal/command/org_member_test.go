@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -287,17 +286,14 @@ func TestIsMember(t *testing.T) {
 
 func TestCommandSide_AddOrgMember(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(t *testing.T) *eventstore.Eventstore
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx    context.Context
-		userID string
-		orgID  string
-		roles  []string
+		member *AddOrgMember
 	}
 	type res struct {
-		want *domain.Member
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -309,13 +305,12 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				member: &AddOrgMember{
+					OrgID: "org1",
+				},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -324,15 +319,14 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "org1",
+					UserID: "user1",
+					Roles:  []string{"ORG_OWNER"},
+				},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -341,8 +335,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -352,10 +345,11 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-				roles:  []string{domain.RoleOrgOwner},
+				member: &AddOrgMember{
+					OrgID:  "org1",
+					UserID: "user1",
+					Roles:  []string{"ORG_OWNER"},
+				},
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -364,8 +358,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "member already exists, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -398,10 +391,11 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "org1",
+					UserID: "user1",
+					Roles:  []string{"ORG_OWNER"},
+				},
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -410,8 +404,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "member add uniqueconstraint err, already exists",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -444,10 +437,11 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "org1",
+					UserID: "user1",
+					Roles:  []string{"ORG_OWNER"},
+				},
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -456,8 +450,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "member add, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -490,19 +483,15 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "org1",
+					UserID: "user1",
+					Roles:  []string{"ORG_OWNER"},
+				},
 			},
 			res: res{
-				want: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "org1",
-						AggregateID:   "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{domain.RoleOrgOwner},
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -510,10 +499,10 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				eventstore:   tt.fields.eventstore(t),
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddOrgMember(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.roles...)
+			got, err := r.AddOrgMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -521,7 +510,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -529,15 +518,14 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 
 func TestCommandSide_ChangeOrgMember(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(t *testing.T) *eventstore.Eventstore
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx    context.Context
-		member *domain.Member
+		member *ChangeOrgMember
 	}
 	type res struct {
-		want *domain.Member
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -549,16 +537,11 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
+				member: &ChangeOrgMember{
+					OrgID: "org1",
 				},
 			},
 			res: res{
@@ -568,16 +551,11 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
+				member: &ChangeOrgMember{
+					OrgID:  "org1",
 					UserID: "user1",
 					Roles:  []string{"PROJECT_OWNER"},
 				},
@@ -589,8 +567,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 		{
 			name: "member not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -600,11 +577,8 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
+				member: &ChangeOrgMember{
+					OrgID:  "org1",
 					UserID: "user1",
 					Roles:  []string{"ORG_OWNER"},
 				},
@@ -616,8 +590,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 		{
 			name: "member not changed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMemberAddedEvent(context.Background(),
@@ -635,11 +608,8 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
+				member: &ChangeOrgMember{
+					OrgID:  "org1",
 					UserID: "user1",
 					Roles:  []string{"ORG_OWNER"},
 				},
@@ -651,8 +621,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 		{
 			name: "member change, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMemberAddedEvent(context.Background(),
@@ -680,23 +649,15 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
+				member: &ChangeOrgMember{
+					OrgID:  "org1",
 					UserID: "user1",
 					Roles:  []string{"ORG_OWNER", "ORG_OWNER_VIEWER"},
 				},
 			},
 			res: res{
-				want: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "org1",
-						AggregateID:   "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{"ORG_OWNER", "ORG_OWNER_VIEWER"},
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -704,10 +665,10 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				eventstore:   tt.fields.eventstore(t),
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.ChangeOrgMember(tt.args.ctx, tt.args.member)
+			got, err := r.ChangeOrgMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -715,7 +676,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -723,7 +684,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 
 func TestCommandSide_RemoveOrgMember(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -744,9 +705,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 		{
 			name: "invalid member projectid missing, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -761,9 +720,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 		{
 			name: "invalid member userid missing, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -778,8 +735,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 		{
 			name: "member not existing, empty object details result",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -796,8 +752,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 		{
 			name: "member remove, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectMemberAddedEvent(context.Background(),
@@ -831,7 +786,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.RemoveProjectMember(tt.args.ctx, tt.args.projectID, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {

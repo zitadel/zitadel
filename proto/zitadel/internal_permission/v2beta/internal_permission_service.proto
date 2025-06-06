@@ -236,7 +236,7 @@ service InternalPermissionService {
   //   - "project.grant.member.write" for project grant administrators
   rpc UpdateAdministrator(UpdateAdministratorRequest) returns (UpdateAdministratorResponse) {
     option (google.api.http) = {
-      post: "/v2beta/administrators/{id}"
+      post: "/v2beta/administrators/{user_id}"
       body: "*"
     };
 
@@ -275,7 +275,7 @@ service InternalPermissionService {
   //   - "project.grant.member.delete" for project grant administrators
   rpc DeleteAdministrator(DeleteAdministratorRequest) returns (DeleteAdministratorResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/administrators/{id}"
+      delete: "/v2beta/administrators/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -332,23 +332,13 @@ message CreateAdministratorRequest {
     max_len: 200
   }];
   // Resource is the type of the resource the administrator roles should be granted for.
-  oneof resource {
-    option (validate.required) = true;
+  ResourceType resource = 2;
 
-    // Instance is the resource type for granting administrator privileges on the instance level.
-    bool instance = 2 [(validate.rules).bool = {const: true}];
-    // OrganizationID is required to grant administrator privileges for a specific organization.
-    string organization_id = 3;
-    // ProjectID is required to grant administrator privileges for a specific project.
-    string project_id = 4;
-    // ProjectGrantID is required to grant administrator privileges for a specific project grant.
-    string project_grant_id = 5;
-  }
   // Roles are the roles that should be granted to the user for the specified resource.
   // Note that roles are currently specific to the resource type.
   // This means that if you want to grant a user the administrator role for an organization and a project,
   // you need to create two administrator roles.
-  repeated string roles = 6 [(validate.rules).repeated = {
+  repeated string roles = 3 [(validate.rules).repeated = {
     unique: true
     items: {
       string: {
@@ -359,22 +349,46 @@ message CreateAdministratorRequest {
   }];
 }
 
+message ResourceType {
+  message ProjectGrant {
+    // ProjectID is required to grant administrator privileges for a specific project.
+    string project_id = 1;
+    // ProjectGrantID is required to grant administrator privileges for a specific project grant.
+    string project_grant_id = 2;
+  }
+
+  // Resource is the type of the resource the administrator roles should be granted for.
+  oneof resource {
+    option (validate.required) = true;
+
+    // Instance is the resource type for granting administrator privileges on the instance level.
+    bool instance = 1 [(validate.rules).bool = {const: true}];
+    // OrganizationID is required to grant administrator privileges for a specific organization.
+    string organization_id = 2;
+    // ProjectID is required to grant administrator privileges for a specific project.
+    string project_id = 3;
+    // ProjectGrantID is required to grant administrator privileges for a specific project grant.
+    ProjectGrant project_grant = 4;
+  }
+}
+
 message CreateAdministratorResponse {
-  // ID is the unique identifier of the newly created administrator role.
-  string id = 1;
   // CreationDate is the timestamp when the administrator role was created.
-  google.protobuf.Timestamp creation_date = 2;
+  google.protobuf.Timestamp creation_date = 1;
 }
 
 message UpdateAdministratorRequest {
-  // AdministratorID is the ID of the administrator role that should be updated.
-  string id = 1 [(validate.rules).string = {
+  // UserID is the ID of the user who should have his administrator roles update.
+  string user_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
+  // Resource is the type of the resource the administrator roles should be granted for.
+  ResourceType resource = 2;
+
   // Roles are the roles that the user should be granted.
   // Note that any role previously granted to the user and not present in the list will be revoked.
-  repeated string roles = 2 [(validate.rules).repeated = {
+  repeated string roles = 3 [(validate.rules).repeated = {
     unique: true
     items: {
       string: {
@@ -391,11 +405,13 @@ message UpdateAdministratorResponse {
 }
 
 message DeleteAdministratorRequest {
-  // AdministratorID is the ID of the administrator role the user should be removed from.
-  string id = 1 [(validate.rules).string = {
+  // UserID is the ID of the user who should have his administrator roles removed.
+  string user_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
+  // Resource is the type of the resource the administrator roles should be removed for.
+  ResourceType resource = 2;
 }
 
 message DeleteAdministratorResponse {

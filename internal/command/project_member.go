@@ -45,6 +45,9 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *AddProjectMembe
 	if err != nil {
 		return nil, err
 	}
+	if err := c.checkPermissionUpdateProjectMember(ctx, addedMember.ResourceOwner, addedMember.AggregateID); err != nil {
+		return nil, err
+	}
 	if addedMember.State == domain.MemberStateActive {
 		return nil, zerrors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
 	}
@@ -92,6 +95,9 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *ChangeProjec
 
 	existingMember, err := c.projectMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.ResourceOwner)
 	if err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionUpdateProjectMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID); err != nil {
 		return nil, err
 	}
 	if !existingMember.State.Exists() {

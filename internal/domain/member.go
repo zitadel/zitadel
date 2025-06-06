@@ -25,10 +25,6 @@ func (i *Member) IsValid() bool {
 	return i.AggregateID != "" && i.UserID != "" && len(i.Roles) != 0
 }
 
-func (i *Member) IsIAMValid() bool {
-	return i.UserID != "" && len(i.Roles) != 0
-}
-
 type MemberState int32
 
 const (
