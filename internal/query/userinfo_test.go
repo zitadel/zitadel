@@ -432,7 +432,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
 
 				got, err := q.GetOIDCUserInfo(ctx, tt.args.userID, tt.args.roleAudience, tt.args.roleOrgIDs...)
 				require.ErrorIs(t, err, tt.wantErr)
@@ -478,7 +478,7 @@ func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
 				gotProjectID, gotProjectRoleAssertion, err := q.GetOIDCUserinfoClientByID(ctx, "clientID")
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.wantProjectID, gotProjectID)

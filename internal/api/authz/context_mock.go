@@ -1,10 +1,14 @@
 package authz
 
-import "context"
+import (
+	"context"
 
-func NewMockContext(instanceID, orgID, userID string) context.Context {
+	"golang.org/x/text/language"
+)
+
+func NewMockContext(instanceID, orgID, userID string, language language.Tag) context.Context {
 	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
-	return context.WithValue(ctx, instanceKey, &instance{id: instanceID})
+	return context.WithValue(ctx, instanceKey, &instance{id: instanceID, defaultLanguage: language})
 }
 
 func NewMockContextWithAgent(instanceID, orgID, userID, agentID string) context.Context {

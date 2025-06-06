@@ -14,9 +14,9 @@ type SQLMock struct {
 	mock sqlmock.Sqlmock
 }
 
-type expectation func(m sqlmock.Sqlmock)
+type Expectation func(m sqlmock.Sqlmock)
 
-func NewSQLMock(t *testing.T, expectations ...expectation) *SQLMock {
+func NewSQLMock(t *testing.T, expectations ...Expectation) *SQLMock {
 	db, mock, err := sqlmock.New(
 		sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
 		sqlmock.ValueConverterOption(new(TypeConverter)),
@@ -45,7 +45,7 @@ func (m *SQLMock) Assert(t *testing.T) {
 	m.DB.Close()
 }
 
-func ExpectBegin(err error) expectation {
+func ExpectBegin(err error) Expectation {
 	return func(m sqlmock.Sqlmock) {
 		e := m.ExpectBegin()
 		if err != nil {
@@ -54,7 +54,7 @@ func ExpectBegin(err error) expectation {
 	}
 }
 
-func ExpectCommit(err error) expectation {
+func ExpectCommit(err error) Expectation {
 	return func(m sqlmock.Sqlmock) {
 		e := m.ExpectCommit()
 		if err != nil {
@@ -89,7 +89,7 @@ func WithExecRowsAffected(affected driver.RowsAffected) ExecOpt {
 	}
 }
 
-func ExcpectExec(stmt string, opts ...ExecOpt) expectation {
+func ExcpectExec(stmt string, opts ...ExecOpt) Expectation {
 	return func(m sqlmock.Sqlmock) {
 		e := m.ExpectExec(stmt)
 		for _, opt := range opts {
@@ -122,7 +122,7 @@ func WithQueryResult(columns []string, rows [][]driver.Value) QueryOpt {
 	}
 }
 
-func ExpectQuery(stmt string, opts ...QueryOpt) expectation {
+func ExpectQuery(stmt string, opts ...QueryOpt) Expectation {
 	return func(m sqlmock.Sqlmock) {
 		e := m.ExpectQuery(stmt)
 		for _, opt := range opts {

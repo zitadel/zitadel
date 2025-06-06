@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -112,7 +113,7 @@ func TestQueries_ActiveSAMLServiceProviderByID(t *testing.T) {
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
 				got, err := q.ActiveSAMLServiceProviderByID(ctx, "entityID")
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)

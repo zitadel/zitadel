@@ -10,6 +10,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -330,7 +331,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 		{
 			name: "default request",
 			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
+				ctx: authz.NewMockContext("123", "456", "789", language.English),
 				req: &session.ListSessionsRequest{},
 			},
 			want: &query.SessionsSearchQueries{
@@ -345,7 +346,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 		{
 			name: "default request with sorting column",
 			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
+				ctx: authz.NewMockContext("123", "456", "789", language.English),
 				req: &session.ListSessionsRequest{
 					SortingColumn: session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE,
 				},
@@ -420,7 +421,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 		{
 			name: "invalid argument error",
 			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
+				ctx: authz.NewMockContext("123", "456", "789", language.English),
 				req: &session.ListSessionsRequest{
 					Query: &object.ListQuery{
 						Offset: 10,
@@ -463,14 +464,14 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 		{
 			name: "no queries",
 			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
+				ctx: authz.NewMockContext("123", "456", "789", language.English),
 			},
 			want: []query.SearchQuery{},
 		},
 		{
 			name: "invalid argument",
 			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
+				ctx: authz.NewMockContext("123", "456", "789", language.English),
 				queries: []*session.SearchQuery{
 					{Query: nil},
 				},
@@ -480,7 +481,7 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 		{
 			name: "creator and sessions",
 			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
+				ctx: authz.NewMockContext("123", "456", "789", language.English),
 				queries: []*session.SearchQuery{
 					{Query: &session.SearchQuery_IdsQuery{
 						IdsQuery: &session.IDsQuery{

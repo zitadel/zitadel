@@ -12,6 +12,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -207,7 +208,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 					},
 					checkPermission: tt.permissionCheck,
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
 
 				got, err := q.AuthRequestByID(ctx, tt.args.shouldTriggerBulk, tt.args.id, tt.args.checkLoginClient)
 				require.ErrorIs(t, err, tt.wantErr)

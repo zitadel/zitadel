@@ -1,0 +1,108 @@
+package projection
+
+import (
+	"context"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+const (
+	HostedLoginTranslationTable = "projections.hosted_login_translations"
+
+	HostedLoginTranslationInstaceIDCol     = "instance_id"
+	HostedLoginTranslationCreationDateCol  = "creation_date"
+	HostedLoginTranslationChangeDateCol    = "change_date"
+	HostedLoginTranslationAggregateIDCol   = "aggregate_id"
+	HostedLoginTranslationAggregateTypeCol = "aggregate_type"
+	HostedLoginTranslationSequenceCol      = "sequence"
+	HostedLoginTranslationLocaleCol        = "locale"
+	HostedLoginTranslationFileCol          = "file"
+)
+
+type hostedLoginTranslationProjection struct{}
+
+func newHostedLoginTranslationProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(hostedLoginTranslationProjection))
+}
+
+func (hltp *hostedLoginTranslationProjection) Name() string {
+	return HostedLoginTranslationTable
+}
+
+func (hltp *hostedLoginTranslationProjection) Reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
+		{
+			Aggregate: org.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  org.HostedLoginTranslationSet,
+					Reduce: hltp.reduceSet,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  instance.HostedLoginTranslationSet,
+					Reduce: hltp.reduceSet,
+				},
+			},
+		},
+	}
+}
+
+func (hltp *hostedLoginTranslationProjection) reduceSet(e eventstore.Event) (*handler.Statement, error) {
+
+	switch e := e.(type) {
+	case *org.HostedLoginTranslationSetEvent:
+		orgEvent := *e
+		return handler.NewUpsertStatement(
+			&orgEvent,
+			[]handler.Column{
+				handler.NewCol(HostedLoginTranslationInstaceIDCol, nil),
+				handler.NewCol(HostedLoginTranslationAggregateIDCol, nil),
+				handler.NewCol(HostedLoginTranslationAggregateTypeCol, nil),
+				handler.NewCol(HostedLoginTranslationLocaleCol, nil),
+			},
+			[]handler.Column{
+				handler.NewCol(HostedLoginTranslationInstaceIDCol, orgEvent.Aggregate().InstanceID),
+				handler.NewCol(HostedLoginTranslationAggregateIDCol, orgEvent.Aggregate().ID),
+				handler.NewCol(HostedLoginTranslationAggregateTypeCol, orgEvent.Aggregate().Type),
+				handler.NewCol(HostedLoginTranslationCreationDateCol, handler.OnlySetValueOnInsert(HostedLoginTranslationTable, orgEvent.CreationDate())),
+				handler.NewCol(HostedLoginTranslationChangeDateCol, orgEvent.CreationDate()),
+				handler.NewCol(HostedLoginTranslationSequenceCol, orgEvent.Sequence()),
+				handler.NewCol(HostedLoginTranslationLocaleCol, orgEvent.Language),
+				handler.NewCol(HostedLoginTranslationFileCol, orgEvent.Translation),
+			},
+		), nil
+	case *instance.HostedLoginTranslationSetEvent:
+		instanceEvent := *e
+		return handler.NewUpsertStatement(
+			&instanceEvent,
+			[]handler.Column{
+				handler.NewCol(HostedLoginTranslationInstaceIDCol, nil),
+				handler.NewCol(HostedLoginTranslationAggregateIDCol, nil),
+				handler.NewCol(HostedLoginTranslationAggregateTypeCol, nil),
+				handler.NewCol(HostedLoginTranslationLocaleCol, nil),
+			},
+			[]handler.Column{
+				handler.NewCol(HostedLoginTranslationInstaceIDCol, instanceEvent.Aggregate().InstanceID),
+				handler.NewCol(HostedLoginTranslationAggregateIDCol, instanceEvent.Aggregate().ID),
+				handler.NewCol(HostedLoginTranslationAggregateTypeCol, instanceEvent.Aggregate().Type),
+				handler.NewCol(HostedLoginTranslationCreationDateCol, handler.OnlySetValueOnInsert(HostedLoginTranslationTable, instanceEvent.CreationDate())),
+				handler.NewCol(HostedLoginTranslationChangeDateCol, instanceEvent.CreationDate()),
+				handler.NewCol(HostedLoginTranslationSequenceCol, instanceEvent.Sequence()),
+				handler.NewCol(HostedLoginTranslationLocaleCol, instanceEvent.Language),
+				handler.NewCol(HostedLoginTranslationFileCol, instanceEvent.Translation),
+			},
+		), nil
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-AZshaa", "reduce.wrong.event.type %v", []eventstore.EventType{org.HostedLoginTranslationSet})
+	}
+
+}

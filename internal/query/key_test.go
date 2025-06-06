@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -434,7 +435,7 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 			if tt.encryption != nil {
 				q.keyEncryptionAlgorithm = tt.encryption(t)
 			}
-			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
 			key, err := q.GetPublicKeyByID(ctx, "keyID")
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
