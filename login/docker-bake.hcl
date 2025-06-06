@@ -1,37 +1,44 @@
-variable "tags" {
+variable "release_tags" {
   default = ["zitadel-login:local"]
 }
 
-variable "login-context" {
-  default = "."
-}
-
 group "default" {
-  targets = ["login-docker-image"]
+  targets = ["login-generate"]
 }
 
-target "typescript-base" {
-    context = "${login-context}"
-    dockerfile = "bake/base.Dockerfile"
+target "login-base" {
+  context = "."
+  dockerfile = "dockerfiles/login-base.Dockerfile"
 }
 
-target "proto" {
-  context = "${login-context}"
-  dockerfile = "bake/proto.Dockerfile"
-  output = ["type=local,dest=./packages/zitadel-proto"]
+target "download-protos" {
+    dockerfile = "dockerfiles/download-protos.Dockerfile"
+    contexts = {
+      base = "target:login-base"
+    }
+}
+
+target "core-mock" {
+  dockerfile = "dockerfiles/core-mock.Dockerfile"
   contexts = {
-    base = "target:typescript-base"
+    protos = "target:download-protos"
   }
 }
 
-target "login-docker-image" {
-  context = "${login-context}"
-  dockerfile = "bake/login-for-docker.Dockerfile"
-  tags = "${tags}"
+target "login-generate" {
+  dockerfile = "dockerfiles/login-generate.Dockerfile"
+  contexts = {
+    base = "target:login-base"
+  }
+}
+
+target "login-image" {
+  dockerfile = "dockerfiles/login-image.Dockerfile"
+  tags = "${release_tags}"
   args = {
     NODE_ENV = "production"
   }
   contexts = {
-    proto = "target:proto"
+      generated = "target:login-generate"
   }
 }

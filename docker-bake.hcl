@@ -1,27 +1,14 @@
-variable "login-context" {
-  default = "./login"
+include = ["login/docker-bake.hcl"]
+
+target "local-protos" {
+  inherits = ["download-protos"]
+  dockerfile = "dockerfiles/protos.Dockerfile"
 }
 
-group "default" {
-  targets = ["login-docker-image-local-protos"]
-}
-
-target "typescript-base" {
-  context = "./login"
-}
-
-target "typescript-proto" {
-  dockerfile = "bake/typescript-proto.Dockerfile"
-  output = ["type=local,dest=./login/packages/zitadel-proto"]
+target "login-generate" {
+  inherits = ["login-generate"]
+  dockerfile = "dockerfiles/login-generate.Dockerfile"
   contexts = {
-    typescript-base    = "target:typescript-base"
-    proto = "./proto"
-  }
-}
-
-target "login-docker-image-local-protos" {
-  inherits = ["login-docker-image"]
-  contexts = {
-    proto = "target:typescript-proto"
+    protos = "./proto
   }
 }

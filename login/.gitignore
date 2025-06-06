@@ -7,13 +7,9 @@ dist
 dist-ssr
 *.local
 .env
-apps/login/.env.local
-apps/login/.env.acceptance
 .cache
 server/dist
 public/dist
-.turbo
-packages/zitadel-server/src/app/proto
 .vscode
 .idea
 .vercel

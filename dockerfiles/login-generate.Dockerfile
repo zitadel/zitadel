@@ -1,4 +1,4 @@
-FROM typescript-base
+FROM base
 
 COPY --from=proto . /proto
 
