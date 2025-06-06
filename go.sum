@@ -802,8 +802,8 @@ github.com/zitadel/exifremove v0.1.0 h1:qD50ezWsfeeqfcvs79QyyjVfK+snN12v0U0deaU8
 github.com/zitadel/exifremove v0.1.0/go.mod h1:rzKJ3woL/Rz2KthVBiSBKIBptNTvgmk9PLaeUKTm+ek=
 github.com/zitadel/logging v0.6.2 h1:MW2kDDR0ieQynPZ0KIZPrh9ote2WkxfBif5QoARDQcU=
 github.com/zitadel/logging v0.6.2/go.mod h1:z6VWLWUkJpnNVDSLzrPSQSQyttysKZ6bCRongw0ROK4=
-github.com/zitadel/oidc/v3 v3.37.0 h1:nYATWlnP7f18XiAbw6upUruBaqfB1kUrXrSTf1EYGO8=
-github.com/zitadel/oidc/v3 v3.37.0/go.mod h1:/xDan4OUQhguJ4Ur73OOJrtugvR164OMnidXP9xfVNw=
+github.com/zitadel/oidc/v3 v3.39.0 h1:WK3eNqmgshiYo1oEqONfXXbPbve+Qzgjl8KhKDFUvxc=
+github.com/zitadel/oidc/v3 v3.39.0/go.mod h1:JwdgdU/WxkmBtWuE8/pEjAbDTWXxJGqBix/gUoeEig4=
 github.com/zitadel/passwap v0.9.0 h1:QvDK8OHKdb73C0m+mwXvu87UJSBqix3oFwTVENHdv80=
 github.com/zitadel/passwap v0.9.0/go.mod h1:6QzwFjDkIr3FfudzSogTOx5Ydhq4046dRJtDM/kX+G8=
 github.com/zitadel/saml v0.3.5 h1:L1RKWS5y66cGepVxUGjx/WSBOtrtSpRA/J3nn5BJLOY=
