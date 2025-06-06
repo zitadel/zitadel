@@ -34,4 +34,3 @@ CREATE OR REPLACE VIEW projections.login_names3 AS
             p.must_be_domain 
             AND u.resource_owner = d.resource_owner 
             AND u.instance_id = d.instance_id
-;

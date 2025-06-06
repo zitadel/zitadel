@@ -3,15 +3,17 @@ package setup
 import (
 	"context"
 	"database/sql"
-	_ "embed"
+	"embed"
+	"fmt"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
-	//go:embed 58.sql
-	replaceLoginNames3View string
+	//go:embed 58/*.sql
+	replaceLoginNames3View embed.FS
 )
 
 type ReplaceLoginNames3View struct {
@@ -28,12 +30,17 @@ func (mig *ReplaceLoginNames3View) Execute(ctx context.Context, _ eventstore.Eve
 		return err
 	}
 
-	_, err = mig.dbClient.ExecContext(ctx, replaceLoginNames3View)
+	statements, err := readStatements(replaceLoginNames3View, "58")
 	if err != nil {
 		return err
 	}
-	_, err = mig.dbClient.ExecContext(ctx, "CREATE INDEX CONCURRENTLY IF NOT EXISTS login_names3_policies_is_default_owner_idx ON projections.login_names3_policies (instance_id, is_default, resource_owner) INCLUDE (must_be_domain)")
-	return err
+	for _, stmt := range statements {
+		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
+			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
+		}
+	}
+	return nil
 }
 
 func (mig *ReplaceLoginNames3View) String() string {
