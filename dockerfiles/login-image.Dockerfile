@@ -1,9 +1,7 @@
-# BUILD STAGE
-FROM proto AS build-for-docker
+FROM generated AS build-for-docker
 
 RUN NEXT_PUBLIC_BASE_PATH=/ui/v2/login pnpm build:docker
 
-# RUNTIME
 FROM node:20-alpine
 
 WORKDIR /app
