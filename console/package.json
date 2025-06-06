@@ -26,7 +26,7 @@
     "@angular/service-worker": "^16.2.12",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-web": "^2.0.0",
-    "@ctrl/ngx-codemirror": "^6.1.0",
+    "@ctrl/ngx-codemirror": "^7.0.0",
     "@fortawesome/angular-fontawesome": "^0.13.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
