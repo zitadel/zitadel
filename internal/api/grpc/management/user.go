@@ -273,7 +273,8 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
+	//nolint:staticcheck
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, nil, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -297,7 +298,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
 	machine := AddMachineUserRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
-	objectDetails, err := s.command.AddMachine(ctx, machine, nil)
+	objectDetails, err := s.command.AddMachine(ctx, machine, nil, nil)
 	if err != nil {
 		return nil, err
 	}

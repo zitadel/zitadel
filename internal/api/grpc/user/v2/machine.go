@@ -25,6 +25,7 @@ func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.Crea
 	details, err := s.command.AddMachine(
 		ctx,
 		cmd,
+		nil,
 		s.command.NewPermissionCheckUserWrite(ctx),
 		command.AddMachineWithUsernameToIDFallback(),
 	)
