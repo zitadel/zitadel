@@ -387,7 +387,7 @@ export type AddHumanUserData = {
   firstName: string;
   lastName: string;
   email: string;
-  password: string | undefined;
+  password?: string;
   organization: string | undefined;
 };
 

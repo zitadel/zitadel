@@ -1,0 +1,143 @@
+"use client";
+
+import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import { Alert } from "./alert";
+import { AuthenticationMethod, methods } from "./authentication-method-radio";
+import { BackButton } from "./back-button";
+import { Button, ButtonVariants } from "./button";
+import { TextInput } from "./input";
+import { Spinner } from "./spinner";
+
+type Inputs =
+  | {
+      firstname: string;
+      lastname: string;
+      email: string;
+    }
+  | FieldValues;
+
+type Props = {
+  organization?: string;
+  requestId?: string;
+  idpInformation?: IDPInformation;
+};
+
+export function RegisterFormIDPIncomplete({
+  organization,
+  requestId,
+  idpInformation,
+}: Props) {
+  const t = useTranslations("register");
+
+  const { register, handleSubmit, formState } = useForm<Inputs>({
+    mode: "onBlur",
+    defaultValues: {
+      email: idpInformation?.rawInformation?.email ?? "",
+      firstName: idpInformation?.rawInformation?.firstname ?? "",
+      lastname: idpInformation?.rawInformation?.lastname ?? "",
+    },
+  });
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
+  const [error, setError] = useState<string>("");
+
+  const router = useRouter();
+
+  async function submitAndRegister(values: Inputs) {
+    setLoading(true);
+    const response = await registerUserAndLinkToIDP({
+      email: values.email,
+      firstName: values.firstname,
+      lastName: values.lastname,
+      organization: organization,
+      requestId: requestId,
+    })
+      .catch(() => {
+        setError("Could not register user");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
+
+    if (response && "redirect" in response && response.redirect) {
+      return router.push(response.redirect);
+    }
+
+    return response;
+  }
+
+  const { errors } = formState;
+
+  return (
+    <form className="w-full">
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="">
+          <TextInput
+            type="firstname"
+            autoComplete="firstname"
+            required
+            {...register("firstname", { required: "This field is required" })}
+            label="First name"
+            error={errors.firstname?.message as string}
+            data-testid="firstname-text-input"
+          />
+        </div>
+        <div className="">
+          <TextInput
+            type="lastname"
+            autoComplete="lastname"
+            required
+            {...register("lastname", { required: "This field is required" })}
+            label="Last name"
+            error={errors.lastname?.message as string}
+            data-testid="lastname-text-input"
+          />
+        </div>
+        <div className="col-span-2">
+          <TextInput
+            type="email"
+            autoComplete="email"
+            required
+            {...register("email", { required: "This field is required" })}
+            label="E-mail"
+            error={errors.email?.message as string}
+            data-testid="email-text-input"
+          />
+        </div>
+      </div>
+
+      <p className="mt-4 ztdl-p mb-6 block text-left">{t("completeData")}</p>
+
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
+
+      <div className="mt-8 flex w-full flex-row items-center justify-between">
+        <BackButton data-testid="back-button" />
+        <Button
+          type="submit"
+          variant={ButtonVariants.Primary}
+          disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
+          onClick={handleSubmit(submitAndRegister)}
+          data-testid="submit-button"
+        >
+          {loading && <Spinner className="h-5 w-5 mr-2" />}
+          {t("submit")}
+        </Button>
+      </div>
+    </form>
+  );
+}

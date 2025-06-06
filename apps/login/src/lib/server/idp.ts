@@ -122,12 +122,12 @@ export async function createNewSessionFromIdpIntent(
     organization: userResponse.user.details?.resourceOwner,
   });
 
-  const session = await createSessionForIdpAndUpdateCookie(
-    command.userId,
-    command.idpIntent,
-    command.requestId,
-    loginSettings?.externalLoginCheckLifetime,
-  );
+  const session = await createSessionForIdpAndUpdateCookie({
+    userId: command.userId,
+    idpIntent: command.idpIntent,
+    requestId: command.requestId,
+    lifetime: loginSettings?.externalLoginCheckLifetime,
+  });
 
   if (!session || !session.factors?.user) {
     return { error: "Could not create session" };

@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { IdpSignin } from "@/components/idp-signin";
+import { completeIDP } from "@/components/idps/pages/complete-idp";
 import { linkingFailed } from "@/components/idps/pages/linking-failed";
 import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
@@ -24,7 +25,6 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
@@ -177,9 +177,10 @@ export default async function Page(props: {
     }
   }
 
-  if (options?.isAutoCreation) {
+  let newUser;
+  // automatic creation of a user is allowed and data is complete
+  if (options?.isAutoCreation && addHumanUser) {
     let orgToRegisterOn: string | undefined = organization;
-    let newUser;
 
     if (
       !orgToRegisterOn &&
@@ -206,70 +207,68 @@ export default async function Page(props: {
       }
     }
 
-    // if addHumanUser is provided in the intent, expect that it can be created otherwise show an error
-    if (addHumanUser) {
-      let addHumanUserWithOrganization: AddHumanUserRequest;
-      if (orgToRegisterOn) {
-        const organizationSchema = create(OrganizationSchema, {
-          org: { case: "orgId", value: orgToRegisterOn },
-        });
+    let addHumanUserWithOrganization: AddHumanUserRequest;
+    if (orgToRegisterOn) {
+      const organizationSchema = create(OrganizationSchema, {
+        org: { case: "orgId", value: orgToRegisterOn },
+      });
 
-        addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
-          ...addHumanUser,
-          organization: organizationSchema,
-        });
-      } else {
-        addHumanUserWithOrganization = create(
-          AddHumanUserRequestSchema,
-          addHumanUser,
-        );
-      }
-
-      try {
-        newUser = await addHuman({
-          serviceUrl,
-          request: addHumanUserWithOrganization,
-        });
-      } catch (error: unknown) {
-        console.error(
-          "An error occurred while creating the user:",
-          error,
-          addHumanUser,
-        );
-        return loginFailed(
-          branding,
-          (error as ConnectError).message
-            ? (error as ConnectError).message
-            : "Could not create user",
-        );
-      }
+      addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
+        ...addHumanUser,
+        organization: organizationSchema,
+      });
     } else {
-      // if no user was found, we will create a new user manually / redirect to the registration page
-      if (options.isCreationAllowed) {
-        const registerParams = new URLSearchParams({
-          idpIntentId: id,
-          idpIntentToken: token,
-          organization: organization ?? "",
-        });
-        return redirect(`/register?${registerParams})}`);
-      }
-    }
-
-    if (newUser) {
-      return (
-        <DynamicTheme branding={branding}>
-          <div className="flex flex-col items-center space-y-4">
-            <h1>{t("registerSuccess.title")}</h1>
-            <p className="ztdl-p">{t("registerSuccess.description")}</p>
-            <IdpSignin
-              userId={newUser.userId}
-              idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-              requestId={requestId}
-            />
-          </div>
-        </DynamicTheme>
+      addHumanUserWithOrganization = create(
+        AddHumanUserRequestSchema,
+        addHumanUser,
       );
     }
+
+    try {
+      newUser = await addHuman({
+        serviceUrl,
+        request: addHumanUserWithOrganization,
+      });
+    } catch (error: unknown) {
+      console.error(
+        "An error occurred while creating the user:",
+        error,
+        addHumanUser,
+      );
+      return loginFailed(
+        branding,
+        (error as ConnectError).message
+          ? (error as ConnectError).message
+          : "Could not create user",
+      );
+    }
+  }
+
+  // if no user was found, we will create a new user manually / redirect to the registration page
+  if (options?.isCreationAllowed) {
+    return completeIDP({
+      branding,
+      idpInformation,
+      organization,
+      requestId,
+      userId,
+    });
+  }
+
+  if (newUser) {
+    return (
+      <DynamicTheme branding={branding}>
+        <div className="flex flex-col items-center space-y-4">
+          <h1>{t("registerSuccess.title")}</h1>
+          <p className="ztdl-p">{t("registerSuccess.description")}</p>
+          <IdpSignin
+            userId={newUser.userId}
+            idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+            requestId={requestId}
+          />
+        </div>
+      </DynamicTheme>
+    );
   }
 
   // return login failed if no linking or creation is allowed and no user was found
