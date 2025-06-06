@@ -1,0 +1,15 @@
+.lgn-login-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.lgn-login-profile-empty {
+    opacity: 0.7;
+}
+
+.lgn-loginname-empty {
+    color: #666;
+    font-style: italic;
+} 
