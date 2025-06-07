@@ -1,13 +1,4 @@
-FROM node:20-alpine AS base
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-RUN corepack enable
-
-RUN apk add --no-cache libc6-compat bash git
-
-WORKDIR /app
+FROM login-dev-base AS login-dev-dependencies
 
 COPY \
   turbo.json \
@@ -25,10 +16,9 @@ COPY packages/zitadel-proto/package.json ./packages/zitadel-proto/
 COPY packages/zitadel-tailwind-config/package.json ./packages/zitadel-tailwind-config/
 COPY packages/zitadel-tsconfig/package.json ./packages/zitadel-tsconfig/
 COPY apps/login/package.json ./apps/login/
+COPY apps/login/cypress/package.json ./apps/login/cypress/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
-
-COPY . .
 
 ENTRYPOINT ["pnpm"]

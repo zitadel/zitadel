@@ -13,6 +13,7 @@
     "start:built": "pnpm exec turbo run start:built",
     "test:unit": "pnpm exec turbo run test:unit -- --passWithNoTests",
     "test:integration": "pnpm exec turbo run test:integration",
+    "test:integration:run": "pnpm exec turbo run test:integration:run",
     "test:acceptance": "pnpm exec playwright test",
     "test:watch": "pnpm exec turbo run test:watch",
     "dev": "pnpm exec turbo run dev --no-cache --continue",

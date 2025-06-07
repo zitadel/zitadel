@@ -1,0 +1,22 @@
+{
+  "name": "login-integration-testsuite",
+  "private": true,
+  "scripts": {
+    "test:integration": "pnpm exec concurrently --names 'mock,test' --success command-test --kill-others 'pnpm:mock' 'env-cmd -f ./.env.integration start-server-and-test start http://localhost:3000 \"test:integration:run\"'",
+    "test:integration:watch:run": "pnpm exec concurrently --names 'mock,test' --kill-others 'pnpm:mock' 'env-cmd -f ./.env.integration start-server-and-test dev http://localhost:3000 \"pnpm nodemon -e js,jsx,ts,tsx,css,scss --ignore \\\"__test__/**\\\" --exec \\\"pnpm test:integration:run\\\"\"'",
+    "test:integration:watch:open": "pnpm exec concurrently --names 'mock,test' --kill-others 'pnpm:mock' 'env-cmd -f ./.env.integration start-server-and-test dev http://localhost:3000 \"pnpm nodemon -e js,jsx,ts,tsx,css,scss --ignore \\\"__test__/**\\\" --exec \\\"pnpm test:integration:open\\\"\"'",
+    "test:integration:run": "pnpm exec cypress run --config-file ./cypress/cypress.config.ts --quiet",
+    "test:integration:open": "pnpm exec cypress open --config-file ./cypress/cypress.config.ts",
+    "mock": "pnpm mock:stop && docker run --rm --name zitadel-mock-grpc-server --publish 22220:22220 --publish 22222:22222 ${CORE_MOCK_TAG:-zitadel-core-mock:local}",
+    "mock:stop": "docker rm --force zitadel-mock-grpc-server 2>/dev/null || true"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "concurrently": "^9.1.2",
+    "cypress": "^14.3.2",
+    "env-cmd": "^10.0.0",
+    "nodemon": "^3.1.9",
+    "start-server-and-test": "^2.0.11",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,44 +1,65 @@
-variable "release_tags" {
-  default = ["zitadel-login:local"]
-}
-
 group "default" {
-  targets = ["login-generate"]
+  targets = ["typescript-proto-client"]
 }
 
-target "login-base" {
-  context = "."
-  dockerfile = "dockerfiles/login-base.Dockerfile"
+target "login-platform" {
+  dockerfile = "dockerfiles/login-platform.Dockerfile"
 }
 
-target "download-protos" {
-    dockerfile = "dockerfiles/download-protos.Dockerfile"
-    contexts = {
-      base = "target:login-base"
-    }
+target "login-dev-base" {
+  dockerfile = "dockerfiles/login-dev-base.Dockerfile"
+  contexts = {
+      login-platform = "target:login-platform"
+  }
+}
+
+target "login-dev-dependencies" {
+  dockerfile = "dockerfiles/login-dev-dependencies.Dockerfile"
+  contexts = {
+    login-dev-base = "target:login-dev-base"
+  }
+}
+
+# proto-files is only used to build core-mock against which the integration tests run.
+# To build the proto-client, we use buf to generate and download the client code directly.
+target "proto-files" {
+  dockerfile = "dockerfiles/proto-files.Dockerfile"
+  contexts = {
+    login-dev-base = "target:login-dev-dependencies"
+  }
 }
 
 target "core-mock" {
-  dockerfile = "dockerfiles/core-mock.Dockerfile"
+  context = "apps/login/mock"
+  dockerfile = "Dockerfile"
   contexts = {
-    protos = "target:download-protos"
+    protos = "target:proto-files"
   }
 }
 
-target "login-generate" {
-  dockerfile = "dockerfiles/login-generate.Dockerfile"
+target "login-integration-testsuite" {
+  context = "apps/login/cypress"
   contexts = {
-    base = "target:login-base"
+      login-dev-dependencies = "target:login-dev-dependencies"
   }
 }
 
+target "typescript-proto-client" {
+  dockerfile = "dockerfiles/typescript-proto-client.Dockerfile"
+  contexts = {
+    # We directly generate and download the client server-side with buf, so we don't need the proto files
+    login-dev-base = "target:login-dev-dependencies"
+  }
+}
+
+# We run integration and acceptance tests against the next standalone server for docker.
 target "login-image" {
   dockerfile = "dockerfiles/login-image.Dockerfile"
-  tags = "${release_tags}"
   args = {
     NODE_ENV = "production"
   }
   contexts = {
-      generated = "target:login-generate"
+      login-platform = "target:login-platform"
+      login-dev-base = "target:login-dev-dependencies"
   }
 }

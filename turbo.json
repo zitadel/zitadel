@@ -26,6 +26,7 @@
     "start:built": {},
     "test:unit": {},
     "test:integration": {},
+    "test:integration:run": {},
     "test:watch": {
       "persistent": true
     },
