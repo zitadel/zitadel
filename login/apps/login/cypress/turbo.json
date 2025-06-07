@@ -1,0 +1,14 @@
+{
+  "extends": ["///"],
+  "tasks": {
+    "test": {
+      "dependsOn": ["@zitadel/client#build"]
+    },
+    "test:integration": {
+      "dependsOn": ["@zitadel/client#build"]
+    },
+    "test:integration:run": {
+      "dependsOn": ["@zitadel/client#build"]
+    }
+  }
+}

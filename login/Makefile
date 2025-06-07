@@ -1,73 +1,102 @@
-LOGIN_BASE_TAG ?= "zitadel-login-base:local"
+LOGIN_DEPENDENCIES_TAG ?= "zitadel-login-dev-dependencies:local"
+LOGIN_IMAGE_TAG ?= "zitadel-login:local"
 CORE_MOCK_TAG ?= "zitadel-core-mock:local"
+LOGIN_INTEGRATION_TESTSUITE_TAG ?= "zitadel-login-integration-testsuite:local"
+CORE_MOCK_CONTAINER_NAME ?= zitadel-mock-grpc-server
+LOGIN_CONTAINER_NAME ?= zitadel-login
+
 XDG_CACHE_HOME ?= $(HOME)/.cache
-CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
+export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
 .PHONY: help
 help:
 	@echo "Makefile for the login service"
 	@echo "Available targets:"
-	@echo "  help              - Show this help message"
-	@echo "  lint              - Run linting and formatting checks"
-	@echo "  lint-force        - Force run linting and formatting checks"
-	@echo "  unit              - Run unit tests"
-	@echo "  unit-force        - Force run unit tests"
-	@echo "  integration       - Run integration tests"
-	@echo "  integration-force - Force run integration tests"
-	@echo "  login-image       - Build the login image"
-	@echo "  quality           - Run all quality checks (lint, unit, integration)"
-	@echo "  ci                - Run all CI tasks. Run it with the -j flag to parallelize. make -j ci"
+	@echo "  help              	     - Show this help message"
+	@echo "  login                   - Start the login service"
+	@echo "  login-lint              - Run linting and formatting checks"
+	@echo "  login-lint-force        - Force run linting and formatting checks"
+	@echo "  login-unit              - Run unit tests"
+	@echo "  login-unit-force        - Force run unit tests"
+	@echo "  login-integration       - Run integration tests"
+	@echo "  login-integration-force - Force run integration tests"
+	@echo "  login-image             - Build the login image"
+	@echo "  login-quality           - Run all quality checks (login-lint, unit, integration)"
+	@echo "  login-ci                - Run all CI tasks. Run it with the -j flag to parallelize. make -j ci"
+	@echo "  show-cache              - Show cached digests and exit codes"
+	@echo "  clean-cache             - Remove the cache directory"
+	@echo "  core-mock               - Start the core mock server"
+	@echo "  core-mock-stop          - Stop the core mock server"
 
-.PHONY: lint-force
-lint-force:
-	docker run --rm $(LOGIN_BASE_TAG) lint
-	docker run --rm $(LOGIN_BASE_TAG) format --check
 
-.PHONY: lint
-lint:
-	$(call run_or_skip,lint-force,lint,$(LOGIN_BASE_TAG))
+.PHONY: login-lint-force
+login-lint-force: login-dev-dependencies
+	docker run --rm $(LOGIN_DEPENDENCIES_TAG) lint
+	docker run --rm $(LOGIN_DEPENDENCIES_TAG) format --check
 
-unit-run: login-base
-	docker run --rm $(LOGIN_BASE_TAG) test:unit
+.PHONY: login-lint
+login-lint:
+	./scripts/run_or_skip.sh login-lint-force $(LOGIN_DEPENDENCIES_TAG)
 
-.PHONY: unit-force
-unit-force:
-	docker run --rm $(LOGIN_BASE_TAG) test:unit
+.PHONY: login-unit-force
+login-unit-force: login-dev-dependencies
+	docker run --rm $(LOGIN_DEPENDENCIES_TAG) test:unit
 
-.PHONY: unit
-unit:
-	$(call run_or_skip,unit-force,unit,$(LOGIN_BASE_TAG))
+.PHONY: login-unit
+login-unit:
+	./scripts/run_or_skip.sh login-unit-force $(LOGIN_DEPENDENCIES_TAG)
 
-.PHONY: integration-force
-integration-force:
-	docker run --rm $(CORE_MOCK_TAG) test:integration
+.PHONY: login-integration-force
+login-integration-force: login core-mock login-integration-testsuite
+	docker run --rm $(LOGIN_INTEGRATION_TESTSUITE_TAG)
+	$(MAKE) core-mock-stop
 
-.PHONY: integration
-integration:
-	$(call run_or_skip,integration-force,integration,$(CORE_MOCK_TAG))
+.PHONY: login-integration
+login-integration:
+	./scripts/run_or_skip.sh login-integration-force '$(LOGIN_DEPENDENCIES_TAG);$(CORE_MOCK_TAG);$(LOGIN_INTEGRATION_TESTSUITE_TAG)'
+
+.PHONY: login-quality
+login-quality: core-mock-build login-quality-after-build
+login-quality-after-build: login-lint login-unit login-integration
+	@:
+
+.PHONY: login-ci
+login-ci: core-mock-build login-ci-after-build
+login-ci-after-build: login-quality-after-build login-image
+	@:
+
+login-dev-dependencies:
+	docker buildx bake login-dev-dependencies --set login-dev-dependencies.tags=$(LOGIN_DEPENDENCIES_TAG);
 
 .PHONY: login-image
 login-image:
-	docker buildx bake login-image
+	docker buildx bake login-image --set login-image.tags=$(LOGIN_IMAGE_TAG);
 
-.PHONY: quality
-quality: lint unit integration
+.PHONY: login
+login: login-image login-stop
+	docker run --detach --rm --name $(LOGIN_CONTAINER_NAME) --publish 3000:3000 $(LOGIN_IMAGE_TAG)
 
-.PHONY: ci
-ci: core-mock ci-after-build
-ci-after-build: quality login-image
-	@:
+login-stop:
+	docker rm --force $(LOGIN_CONTAINER_NAME) 2>/dev/null || true
 
-login-base:
-	docker buildx bake login-base --set login-base.tags=$(LOGIN_BASE_TAG);
+core-mock-build:
+	docker buildx bake core-mock --set core-mock.tags=$(CORE_MOCK_TAG);
 
-core-mock:
-	docker buildx bake core-mock --set login-base.tags=$(CORE_MOCK_TAG);
+login-integration-testsuite: login-dev-dependencies
+	docker buildx bake login-integration-testsuite --set login-integration-testsuite.tags=$(LOGIN_INTEGRATION_TESTSUITE_TAG)
+
+.PHONY: core-mock
+core-mock: core-mock-build core-mock-stop
+	docker run --detach --rm --name $(CORE_MOCK_CONTAINER_NAME) --publish 22221:22221 --publish 22222:22222 $(CORE_MOCK_TAG)
+
+.PHONY: core-mock-stop
+core-mock-stop:
+	docker rm --force $(CORE_MOCK_CONTAINER_NAME) 2>/dev/null || true
 
 .PHONY: clean-cache
 clean-cache:
 	@echo "Removing cache directory: $(CACHE_DIR)"
-	@rm -rf "$(CACHE_DIR)"
+	rm -rf "$(CACHE_DIR)"
 
 .PHONY: show-cache
 show-cache:
@@ -75,30 +104,3 @@ show-cache:
 	@find "$(CACHE_DIR)" -type f 2>/dev/null | while read file; do \
 		echo "$$file: $$(cat $$file)"; \
 	done
-
-# run_or_skip: runs a task only if the Docker image has changed and caches the result
-# $(1): Taskname (e.g. "lint-force")
-# $(2): Cache-ID (e.g. "lint")
-# $(3): Docker-Image (e.g. "zitadel-login-base:local")
-define run_or_skip
-	@digest_file="$(CACHE_DIR)/$(2).$(3)"; \
-	mkdir -p $(CACHE_DIR); \
-	if [ -f "$$digest_file" ]; then \
-		digest_before=$$(cut -d',' -f1 "$$digest_file"); \
-		status_before=$$(cut -d',' -f2 "$$digest_file"); \
-	else \
-		digest_before=""; \
-		status_before=1; \
-	fi; \
-	current_digest=$$(docker image inspect $(3) --format='{{.Id}}'); \
-	if [ "$$digest_before" = "$$current_digest" ]; then \
-		echo "Skipping $(1) – image unchanged, returning cached status $$status_before"; \
-		exit $$status_before; \
-	else \
-		echo "Running $(1)..."; \
-		$(MAKE) $(1); \
-		status=$$?; \
-		echo "$$current_digest,$$status" > "$$digest_file"; \
-		exit $$status; \
-	fi
-endef

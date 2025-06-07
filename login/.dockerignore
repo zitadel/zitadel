@@ -21,3 +21,9 @@ public/dist
 /playwright/.cache/
 /out
 /docker
+
+Makefile
+docker-bake.hcl
+*.md
+.gitignore
+scripts
