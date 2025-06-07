@@ -1,4 +1,3 @@
 packages:
   - "apps/*"
-  - "apps/login/cypress"
   - "packages/*"
