@@ -189,9 +189,6 @@ importers:
       autoprefixer:
         specifier: 10.4.21
         version: 10.4.21(postcss@8.5.3)
-      concurrently:
-        specifier: ^9.1.2
-        version: 9.1.2
       grpc-tools:
         specifier: 1.13.0
         version: 1.13.0
@@ -223,7 +220,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  apps/login/cypress:
+  apps/login-integration-testsuite:
     devDependencies:
       '@types/node':
         specifier: ^22.14.1
@@ -2027,10 +2024,6 @@ packages:
 
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
-    engines: {node: '>= 8'}
-
-  cross-spawn@7.0.5:
-    resolution: {integrity: sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug==}
     engines: {node: '>= 8'}
 
   cross-spawn@7.0.6:
@@ -6492,12 +6485,6 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  cross-spawn@7.0.5:
-    dependencies:
-      path-key: 3.1.1
-      shebang-command: 2.0.0
-      which: 2.0.2
-
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -6740,7 +6727,7 @@ snapshots:
   env-cmd@10.1.0:
     dependencies:
       commander: 4.1.1
-      cross-spawn: 7.0.5
+      cross-spawn: 7.0.6
 
   environment@1.1.0: {}
 

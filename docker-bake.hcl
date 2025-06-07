@@ -6,17 +6,25 @@ target "login-platform" {
   dockerfile = "dockerfiles/login-platform.Dockerfile"
 }
 
-target "login-dev-base" {
-  dockerfile = "dockerfiles/login-dev-base.Dockerfile"
+target "login-base" {
+  dockerfile = "dockerfiles/login-base.Dockerfile"
   contexts = {
       login-platform = "target:login-platform"
   }
 }
 
-target "login-dev-dependencies" {
-  dockerfile = "dockerfiles/login-dev-dependencies.Dockerfile"
+target "login-dependencies" {
+  dockerfile = "dockerfiles/login-dependencies.Dockerfile"
   contexts = {
-    login-dev-base = "target:login-dev-base"
+    login-base = "target:login-base"
+  }
+}
+
+target "typescript-proto-client" {
+  dockerfile = "dockerfiles/typescript-proto-client.Dockerfile"
+  contexts = {
+    # We directly generate and download the client server-side with buf, so we don't need the proto files
+    login-base = "target:login-dependencies"
   }
 }
 
@@ -25,41 +33,29 @@ target "login-dev-dependencies" {
 target "proto-files" {
   dockerfile = "dockerfiles/proto-files.Dockerfile"
   contexts = {
-    login-dev-base = "target:login-dev-dependencies"
+    login-base = "target:login-dependencies"
   }
 }
 
 target "core-mock" {
-  context = "apps/login/mock"
-  dockerfile = "Dockerfile"
+  context = "apps/core-mock"
   contexts = {
     protos = "target:proto-files"
   }
 }
 
 target "login-integration-testsuite" {
-  context = "apps/login/cypress"
-  contexts = {
-      login-dev-dependencies = "target:login-dev-dependencies"
-  }
-}
-
-target "typescript-proto-client" {
-  dockerfile = "dockerfiles/typescript-proto-client.Dockerfile"
-  contexts = {
-    # We directly generate and download the client server-side with buf, so we don't need the proto files
-    login-dev-base = "target:login-dev-dependencies"
-  }
+  dockerfile = "dockerfiles/login-integration-testsuite.Dockerfile"
 }
 
 # We run integration and acceptance tests against the next standalone server for docker.
-target "login-image" {
-  dockerfile = "dockerfiles/login-image.Dockerfile"
+target "login-standalone" {
+  dockerfile = "dockerfiles/login-standalone.Dockerfile"
   args = {
     NODE_ENV = "production"
   }
   contexts = {
       login-platform = "target:login-platform"
-      login-dev-base = "target:login-dev-dependencies"
+      login-base = "target:login-dependencies"
   }
 }
