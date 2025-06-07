@@ -31,6 +31,7 @@ import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
 import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { UserGroupsModule } from 'src/app/modules/user-groups/user-groups.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
@@ -128,6 +129,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     MachineKeysModule,
     InfoSectionModule,
     MatSelectModule,
+    UserGroupsModule,
   ],
 })
 export class UserDetailModule {}
