@@ -16,13 +16,13 @@ services:
       - ZITADEL_SERVICE_USER_TOKEN="yolo"
       - EMAIL_VERIFICATION=true
       - DEBUG=true
-      - NEXT_PUBLIC_BASE_PATH=""
+      - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
 
   integration-testsuite:
     image: ${LOGIN_INTEGRATION_TESTSUITE_TAG:-zitadel-login-integration-testsuite:local}
     container_name: integration-testsuite
     environment:
-      - LOGIN_BASE_URL=http://login:3000
+      - LOGIN_BASE_URL=http://login:3000/ui/v2/login
       - CYPRESS_CORE_MOCK_STUBS_URL=http://core-mock:22220/v1/stubs
     depends_on:
       login:

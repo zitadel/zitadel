@@ -15,7 +15,7 @@ login-help:
 	@echo "  login-unit              - Run unit tests. FORCE=true prevents skipping."
 	@echo "  login-integration       - Run integration tests. FORCE=true prevents skipping."
 	@echo "  login-standalone-build  - Build the docker image for production login containers."
-	@echo "  login-quality           - Run all quality checks (login-lint, unit, integration)."
+	@echo "  login-quality           - Run all quality checks (login-lint, login-unit, login-integration)."
 	@echo "  login-ci                - Run all CI tasks. Run it with the -j flag to parallelize: make -j ci."
 	@echo "  show-cache-keys         - Show all cache keys with image ids and exit codes."
 	@echo "  clean-cache-keys        - Remove all cache keys."
