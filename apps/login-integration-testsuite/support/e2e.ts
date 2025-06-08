@@ -1,20 +1,29 @@
-// ***********************************************************
-// This example support/e2e.ts is processed and
-// loaded automatically before your test files.
-//
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
-// ***********************************************************
+const url = Cypress.env('CORE_MOCK_STUBS_URL') || "http://localhost:22220/v1/stubs"
 
-// Import commands.js using ES2015 syntax:
-import "./commands";
+function removeStub(service: string, method: string) {
+  return cy.request({
+    url,
+    method: "DELETE",
+    qs: {
+      service,
+      method,
+    },
+  });
+}
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+export function stub(service: string, method: string, out?: any) {
+  removeStub(service, method);
+  return cy.request({
+    url,
+    method: "POST",
+    body: {
+      stubs: [
+        {
+          service,
+          method,
+          out,
+        },
+      ],
+    },
+  });
+}

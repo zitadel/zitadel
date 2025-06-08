@@ -12,6 +12,7 @@ fi
 
 MAKE_TARGET=$1
 IMAGES=$2
+FORCE=${FORCE:-false}
 
 DIGEST_FILE="$CACHE_DIR/$MAKE_TARGET.digests"
 mkdir -p "$CACHE_DIR"
@@ -31,14 +32,18 @@ OLD_DIGEST=$(cat "$DIGEST_FILE" 2>/dev/null || echo "")
 OLD_STATUS=$(echo "$OLD_DIGEST" | cut -d ';' -f1)
 OLD_IDS=$(echo "$OLD_DIGEST" | cut -d ';' -f2-9)
 if [[ "$OLD_IDS" == "$(get_image_ids)" ]]; then
-    echo "Skipping $MAKE_TARGET – all images unchanged, returning cached status $OLD_STATUS"
-    exit $OLD_STATUS
-else
-    echo "Running $MAKE_TARGET..."
-    set +e
-    make $MAKE_TARGET
-    STATUS=$?
-    set -e
-    echo "${STATUS};$(get_image_ids)" > $DIGEST_FILE
-    exit $STATUS
+    if [[ "$FORCE" == "true" ]]; then
+        echo "\$FORCE=$FORCE - Running $MAKE_TARGET despite unchanged images."
+    else
+        echo "Skipping $MAKE_TARGET – all images unchanged, returning cached status $OLD_STATUS"
+        exit $OLD_STATUS
+    fi
 fi
+
+echo "Running $MAKE_TARGET..."
+set +e
+make -j $MAKE_TARGET
+STATUS=$?
+set -e
+echo "${STATUS};$(get_image_ids)" > $DIGEST_FILE
+exit $STATUS

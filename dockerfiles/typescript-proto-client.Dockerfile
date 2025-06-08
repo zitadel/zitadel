@@ -3,4 +3,4 @@ COPY packages/zitadel-proto packages/zitadel-proto
 RUN pnpm generate
 
 FROM scratch
-COPY --from=zitadel-proto /app/packages/zitadel-proto /
+COPY --from=zitadel-proto /build/packages/zitadel-proto /

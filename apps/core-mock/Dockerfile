@@ -6,4 +6,4 @@ COPY mocked-services.cfg .
 COPY initial-stubs initial-stubs
 COPY --from=protos . .
 
-ENTRYPOINT [ "sh", "-c", "grpc-mock -v 1 -protos $(tr '\n' ',' < ./mocked-services.cfg) -stub-dir ./initial-stubs" ]
+ENTRYPOINT [ "sh", "-c", "grpc-mock -v 1 -proto $(tr '\n' ',' < ./mocked-services.cfg) -stub-dir ./initial-stubs" ]
