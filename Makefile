@@ -6,17 +6,14 @@ LOGIN_INTEGRATION_TESTSUITE_TAG ?= "zitadel-login-integration-testsuite:local"
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
-.PHONY: help
-help:
+.PHONY: login-help
+login-help:
 	@echo "Makefile for the login service"
 	@echo "Available targets:"
-	@echo "  help              	     - Show this help message."
+	@echo "  login-help              - Show this help message."
 	@echo "  login-lint              - Run linting and formatting checks. FORCE=true prevents skipping."
-	@echo "  login-lint-force        - Force run linting and formatting checks."
 	@echo "  login-unit              - Run unit tests. FORCE=true prevents skipping."
-	@echo "  login-unit-force        - Force run unit tests."
 	@echo "  login-integration       - Run integration tests. FORCE=true prevents skipping."
-	@echo "  login-integration-force - Force run integration tests."
 	@echo "  login-standalone-build  - Build the docker image for production login containers."
 	@echo "  login-quality           - Run all quality checks (login-lint, unit, integration)."
 	@echo "  login-ci                - Run all CI tasks. Run it with the -j flag to parallelize: make -j ci."
@@ -24,30 +21,27 @@ help:
 	@echo "  clean-cache-keys        - Remove all cache keys."
 
 
-.PHONY: login-lint-force
-login-lint-force: login-dependencies
+login-lint-run: login-dependencies
 	docker run --rm $(LOGIN_DEPENDENCIES_TAG) lint
 	docker run --rm $(LOGIN_DEPENDENCIES_TAG) format --check
 
 .PHONY: login-lint
 login-lint:
-	./scripts/run_or_skip.sh login-lint-force $(LOGIN_DEPENDENCIES_TAG)
+	./scripts/run_or_skip.sh login-lint-run $(LOGIN_DEPENDENCIES_TAG)
 
-.PHONY: login-unit-force
-login-unit-force: login-dependencies
+login-unit-run: login-dependencies
 	docker run --rm $(LOGIN_DEPENDENCIES_TAG) test:unit
 
 .PHONY: login-unit
 login-unit:
-	./scripts/run_or_skip.sh login-unit-force $(LOGIN_DEPENDENCIES_TAG)
+	./scripts/run_or_skip.sh login-unit-run $(LOGIN_DEPENDENCIES_TAG)
 
-.PHONY: login-integration-force
-login-integration-force: login-standalone-build core-mock-build login-integration-testsuite-build
+login-integration-run: login-standalone-build core-mock-build login-integration-testsuite-build
 	docker compose --file ./apps/login-integration-testsuite/docker-compose.yaml run --rm integration-testsuite
 
 .PHONY: login-integration
 login-integration:
-	./scripts/run_or_skip.sh login-integration-force '$(LOGIN_IMAGE_TAG);$(LOGIN_INTEGRATION_TESTSUITE_TAG);$(CORE_MOCK_TAG)'
+	./scripts/run_or_skip.sh login-integration-run '$(LOGIN_IMAGE_TAG);$(LOGIN_INTEGRATION_TESTSUITE_TAG);$(CORE_MOCK_TAG)'
 
 .PHONY: login-quality
 login-quality: core-mock-build login-quality-after-build
