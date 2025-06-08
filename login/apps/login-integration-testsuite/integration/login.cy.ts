@@ -1,4 +1,4 @@
-import { stub } from "../support/mock";
+import { stub } from "../support/e2e";
 
 describe("login", () => {
   beforeEach(() => {

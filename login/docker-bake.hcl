@@ -46,6 +46,9 @@ target "core-mock" {
 
 target "login-integration-testsuite" {
   dockerfile = "dockerfiles/login-integration-testsuite.Dockerfile"
+  contexts = {
+    login-base = "target:login-base"
+  }
 }
 
 # We run integration and acceptance tests against the next standalone server for docker.
