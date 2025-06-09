@@ -43,7 +43,7 @@ export function LanguageSwitcher() {
         >
           {selected.name}
           <ChevronDownIcon
-            className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
+            className="group pointer-events-none absolute top-2.5 right-2.5 size-4"
             aria-hidden="true"
           />
         </ListboxButton>
@@ -61,7 +61,7 @@ export function LanguageSwitcher() {
               value={lang}
               className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-black/10 dark:data-[focus]:bg-white/10"
             >
-              <CheckIcon className="invisible size-4 fill-white group-data-[selected]:visible" />
+              <CheckIcon className="invisible size-4 group-data-[selected]:visible" />
               <div className="text-sm/6 text-black dark:text-white">
                 {lang.name}
               </div>

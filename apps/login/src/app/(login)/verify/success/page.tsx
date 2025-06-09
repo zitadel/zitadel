@@ -1,34 +1,15 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getLoginSettings,
-  getSession,
   getUserByID,
 } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
-
-async function loadSessionById(
-  serviceUrl: string,
-  sessionId: string,
-  organization?: string,
-) {
-  const recent = await getSessionCookieById({ sessionId, organization });
-  return getSession({
-    serviceUrl,
-    sessionId: recent.id,
-    sessionToken: recent.token,
-  }).then((response) => {
-    if (response?.session) {
-      return response.session;
-    }
-  });
-}
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;

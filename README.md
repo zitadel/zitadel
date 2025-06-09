@@ -65,7 +65,7 @@ You can already use the current state, and extend it with your needs.
   - [x] Apple
   - [x] Generic OIDC
   - [x] Generic OAuth
-  - [ ] Generic JWT
+  - [x] Generic JWT
   - [ ] LDAP
   - [ ] SAML SP
 - Multifactor Registration an Login
@@ -73,7 +73,7 @@ You can already use the current state, and extend it with your needs.
   - [x] TOTP
   - [x] OTP: Email Code
   - [x] OTP: SMS Code
-- [ ] Password Change/Reset
+- [x] Password Change/Reset
 - [x] Domain Discovery
 - [x] Branding
 - OIDC Standard

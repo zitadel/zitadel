@@ -24,6 +24,8 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
       return "oauth";
     case IdentityProviderType.OIDC:
       return "oidc";
+    case IdentityProviderType.JWT:
+      return "jwt";
     default:
       throw new Error("Unknown identity provider type");
   }
@@ -63,6 +65,9 @@ export function idpTypeToIdentityProviderType(
 
     case IDPType.IDP_TYPE_OIDC:
       return IdentityProviderType.OIDC;
+
+    case IDPType.IDP_TYPE_JWT:
+      return IdentityProviderType.JWT;
 
     default:
       throw new Error("Unknown identity provider type");

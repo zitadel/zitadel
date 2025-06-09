@@ -120,7 +120,7 @@ export default async function Page(props: {
   }
 
   // search for potential user via username, then link
-  if (options?.isLinkingAllowed) {
+  if (options?.autoLinking) {
     let foundUser;
     const email = addHumanUser?.email?.email;
 
@@ -176,7 +176,7 @@ export default async function Page(props: {
     }
   }
 
-  if (options?.isCreationAllowed && options.isAutoCreation) {
+  if (options?.isAutoCreation) {
     let orgToRegisterOn: string | undefined = organization;
     let newUser;
 
