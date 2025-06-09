@@ -84,7 +84,6 @@ type WorkerConfig struct {
 	TransactionDuration time.Duration
 	MaxTtl              time.Duration
 	MaxAttempts         uint8
-	EnableMetrics       bool
 }
 
 // nowFunc makes [time.Now] mockable
