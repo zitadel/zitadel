@@ -49,10 +49,6 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n9df", "Errors.Project.App.Invalid")
 	}
 
-	if samlApp.Metadata == nil && samlApp.MetadataURL == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SAML-podix9", "Errors.Project.App.SAMLMetadataMissing")
-	}
-
 	if samlApp.MetadataURL != "" {
 		data, err := xml.ReadMetadataFromURL(c.httpClient, samlApp.MetadataURL)
 		if err != nil {

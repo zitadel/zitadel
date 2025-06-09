@@ -24,6 +24,21 @@ func TestCreateApplication(t *testing.T) {
 	pNotInCtx := instance.CreateProject(iamOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
 
 	baseURI := "http://example.com"
+
+	samlMetadata := []byte(`<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+                     validUntil="2022-08-26T14:08:16Z"
+                     cacheDuration="PT604800S"
+                     entityID="https://test.com/saml/metadata">
+    <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                                     Location="https://test.com/saml/acs"
+                                     index="1" />
+        
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>
+`)
 	tt := []struct {
 		testName        string
 		creationRequest *app.CreateApplicationRequest
@@ -113,6 +128,50 @@ func TestCreateApplication(t *testing.T) {
 			},
 
 			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_OidcResponse{}),
+		},
+		{
+			testName: "when project for SAML app creation is not found should return failed precondition error",
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: pNotInCtx.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
+					SamlRequest: &app.CreateSAMLApplicationRequest{
+						Metadata: &app.CreateSAMLApplicationRequest_MetadataUrl{
+							MetadataUrl: "http://example.com/metas",
+						},
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedErrorType: codes.FailedPrecondition,
+		},
+		{
+			testName: "when CreateSAMLApp request is valid should create app and return no error",
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: p.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
+					SamlRequest: &app.CreateSAMLApplicationRequest{
+						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
+							MetadataXml: samlMetadata,
+						},
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_SamlResponse{}),
 		},
 	}
 

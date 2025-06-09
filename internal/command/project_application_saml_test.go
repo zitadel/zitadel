@@ -135,6 +135,36 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
+			name: "empty metas, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				samlApp: &domain.SAMLApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppName:  "app",
+					EntityID: "https://test.com/saml/metadata",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "create saml app, metadata not parsable",
 			fields: fields{
 				eventstore: expectEventstore(

@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 
-	"github.com/zitadel/logging"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -55,8 +54,23 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 			},
 		}, nil
 	case *app.CreateApplicationRequest_SamlRequest:
-		logging.Info("I'm SAML")
-		return nil, nil
+		samlAppRequest, err := convert.CreateSAMLAppRequestToDomain(req.GetName(), req.GetProjectId(), req.GetSamlRequest())
+		if err != nil {
+			return nil, err
+		}
+
+		samlApp, err := s.command.AddSAMLApplication(ctx, samlAppRequest, authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &app.CreateApplicationResponse{
+			AppId:        samlApp.AppID,
+			CreationDate: timestamppb.New(samlApp.ChangeDate),
+			CreationResponseType: &app.CreateApplicationResponse_SamlResponse{
+				SamlResponse: &app.CreateSAMLApplicationResponse{},
+			},
+		}, nil
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "APP-0iiN46", "unknown app type")
 	}
