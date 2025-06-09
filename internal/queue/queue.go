@@ -30,16 +30,16 @@ type Config struct {
 }
 
 func NewQueue(config *Config) (_ *Queue, err error) {
-
+	middleware := []rivertype.Middleware{otelriver.NewMiddleware(&otelriver.MiddlewareConfig{
+		MeterProvider: metrics.GetMetricsProvider(),
+	})}
 	return &Queue{
 		driver: riverpgxv5.New(config.Client.Pool),
 		config: &river.Config{
 			Workers:    river.NewWorkers(),
 			Queues:     make(map[string]river.QueueConfig),
 			JobTimeout: -1,
-			Middleware: []rivertype.Middleware{otelriver.NewMiddleware(&otelriver.MiddlewareConfig{
-				MeterProvider: metrics.GetMetricsProvider(),
-			})},
+			Middleware: middleware,
 		},
 	}, nil
 }
