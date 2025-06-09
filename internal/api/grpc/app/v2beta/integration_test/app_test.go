@@ -23,6 +23,7 @@ func TestCreateApplication(t *testing.T) {
 	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
 	pNotInCtx := instance.CreateProject(iamOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
 
+	baseURI := "http://example.com"
 	tt := []struct {
 		testName        string
 		creationRequest *app.CreateApplicationRequest
@@ -56,6 +57,63 @@ func TestCreateApplication(t *testing.T) {
 			},
 			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_ApiResponse{}),
 		},
+		{
+			testName: "when project for OIDC app creation is not found should return failed precondition error",
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: pNotInCtx.GetId(),
+				Name:      "App Name",
+				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
+					OidcRequest: &app.CreateOIDCApplicationRequest{
+						RedirectUris:           []string{"http://example.com"},
+						ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+						GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+						AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+						AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+						PostLogoutRedirectUris: []string{"http://example.com/home"},
+						Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+						AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+						BackChannelLogoutUri:   "http://example.com/logout",
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedErrorType: codes.FailedPrecondition,
+		},
+		{
+			testName: "when CreateOIDCApp request is valid should create app and return no error",
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: p.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
+					OidcRequest: &app.CreateOIDCApplicationRequest{
+						RedirectUris:           []string{"http://example.com"},
+						ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+						GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+						AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+						AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+						PostLogoutRedirectUris: []string{"http://example.com/home"},
+						Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+						AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+						BackChannelLogoutUri:   "http://example.com/logout",
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_OidcResponse{}),
+		},
 	}
 
 	for _, tc := range tt {
@@ -69,7 +127,6 @@ func TestCreateApplication(t *testing.T) {
 				assert.NotEmpty(t, res.GetAppId())
 				assert.NotEmpty(t, res.GetCreationDate())
 			}
-
 		})
 	}
 }

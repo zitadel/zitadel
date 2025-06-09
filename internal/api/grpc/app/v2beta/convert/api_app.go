@@ -1,4 +1,4 @@
-package app
+package convert
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
