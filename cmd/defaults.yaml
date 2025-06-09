@@ -439,8 +439,6 @@ Notifications:
   MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
-  # Enable open telemetry metrics for the notifications
-  EnableMetrics: false # ZITADEL_NOTIFICATIONS_ENABLEMETRICS
 
 Executions:
   # The amount of workers processing the execution request events.

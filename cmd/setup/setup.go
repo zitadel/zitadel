@@ -527,8 +527,7 @@ func startCommandsQueries(
 	logging.OnError(err).Fatal("unable to start commands")
 
 	q, err := queue.NewQueue(&queue.Config{
-		Client:        dbClient,
-		EnableMetrics: config.Notifications.EnableMetrics,
+		Client: dbClient,
 	})
 	logging.OnError(err).Fatal("unable to init queue")
 
