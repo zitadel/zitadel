@@ -1,0 +1,42 @@
+package app
+
+import (
+	"context"
+
+	"github.com/zitadel/logging"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+)
+
+func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicationRequest) (*app.CreateApplicationResponse, error) {
+	switch t := req.GetCreationRequestType().(type) {
+	case *app.CreateApplicationRequest_ApiRequest:
+		apiApp, err := s.command.AddAPIApplication(ctx, CreateAPIApplicationRequestToDomain(req.GetName(), req.GetProjectId(), t.ApiRequest), authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &app.CreateApplicationResponse{
+			AppId:        apiApp.AppID,
+			CreationDate: timestamppb.New(apiApp.CreationDate),
+			CreationResponseType: &app.CreateApplicationResponse_ApiResponse{
+				ApiResponse: &app.CreateAPIApplicationResponse{
+					ClientId:     apiApp.ClientID,
+					ClientSecret: apiApp.ClientSecretString,
+				},
+			},
+		}, nil
+
+	case *app.CreateApplicationRequest_OidcRequest:
+		logging.Info("I'm OIDC")
+		return nil, nil
+	case *app.CreateApplicationRequest_SamlRequest:
+		logging.Info("I'm SAML")
+		return nil, nil
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "APP-0iiN46", "unknown app type")
+	}
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package zitadel.app.v2beta;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
+
+enum APIAuthMethodType {
+    API_AUTH_METHOD_TYPE_BASIC = 0;
+    API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT = 1;
+}
