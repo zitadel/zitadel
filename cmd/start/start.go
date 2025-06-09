@@ -275,7 +275,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
 	q, err := queue.NewQueue(&queue.Config{
-		Client: dbClient,
+		Client:        dbClient,
+		EnableMetrics: config.Notifications.EnableMetrics,
 	})
 	if err != nil {
 		return err
