@@ -6,17 +6,33 @@ target "login-platform" {
   dockerfile = "dockerfiles/login-platform.Dockerfile"
 }
 
-target "login-base" {
-  dockerfile = "dockerfiles/login-base.Dockerfile"
+target "login-pnpm" {
+  dockerfile = "dockerfiles/login-pnpm.Dockerfile"
   contexts = {
-      login-platform = "target:login-platform"
+    login-platform = "target:login-platform"
   }
 }
 
-target "login-dependencies" {
-  dockerfile = "dockerfiles/login-dependencies.Dockerfile"
+target "login-dev-base" {
+  dockerfile = "dockerfiles/login-dev-base.Dockerfile"
   contexts = {
-    login-base = "target:login-base"
+      login-pnpm = "target:login-pnpm"
+  }
+}
+
+target "login-lint" {
+  dockerfile = "dockerfiles/login-lint.Dockerfile"
+  contexts = {
+    login-dev-base = "target:login-dev-base"
+  }
+}
+
+target "login-test-unit" {
+  dockerfile = "dockerfiles/login-test-unit.Dockerfile"
+  contexts = {
+    login-pnpm = "target:login-pnpm"
+    login-dev-base = "target:login-dev-base"
+    typescript-proto-client = "target:typescript-proto-client"
   }
 }
 
@@ -24,7 +40,7 @@ target "typescript-proto-client" {
   dockerfile = "dockerfiles/typescript-proto-client.Dockerfile"
   contexts = {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
-    login-base = "target:login-dependencies"
+    login-pnpm = "target:login-pnpm"
   }
 }
 
@@ -33,7 +49,7 @@ target "typescript-proto-client" {
 target "proto-files" {
   dockerfile = "dockerfiles/proto-files.Dockerfile"
   contexts = {
-    login-base = "target:login-dependencies"
+    login-pnpm = "target:login-pnpm"
   }
 }
 
@@ -44,12 +60,21 @@ target "core-mock" {
   }
 }
 
-target "login-integration-testsuite" {
-  dockerfile = "dockerfiles/login-integration-testsuite.Dockerfile"
+target "login-test-integration" {
+  dockerfile = "dockerfiles/login-test-integration.Dockerfile"
   contexts = {
-    login-base = "target:login-base"
+    login-pnpm = "target:login-pnpm"
   }
 }
+
+target "login-test-acceptance" {
+  context = "apps/login-test-acceptance"
+  contexts = {
+    login-pnpm = "target:login-pnpm"
+    login-test-acceptance-setup = "login-test-acceptance-setup:latest"
+  }
+}
+
 
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
@@ -59,6 +84,6 @@ target "login-standalone" {
   }
   contexts = {
       login-platform = "target:login-platform"
-      login-base = "target:login-dependencies"
+      login-pnpm = "target:login-pnpm"
   }
 }

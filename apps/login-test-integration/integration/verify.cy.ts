@@ -1,6 +1,6 @@
 import { stub } from "../support/e2e";
 
-describe("verify invite", () => {
+describe("verify email", () => {
   beforeEach(() => {
     stub("zitadel.org.v2.OrganizationService", "ListOrganizations", {
       data: {
@@ -13,9 +13,11 @@ describe("verify invite", () => {
 
     stub("zitadel.user.v2.UserService", "ListAuthenticationMethodTypes", {
       data: {
-        authMethodTypes: [], // user with no auth methods was invited
+        authMethodTypes: [1], // set one method such that we know that the user was not invited
       },
     });
+
+    stub("zitadel.user.v2.UserService", "SendEmailCode");
 
     stub("zitadel.user.v2.UserService", "GetUserByID", {
       data: {
@@ -38,7 +40,7 @@ describe("verify invite", () => {
             },
             email: {
               email: "john@zitadel.com",
-              isVerified: false,
+              isVerified: false, // email is not verified yet
             },
           },
         },
@@ -53,8 +55,7 @@ describe("verify invite", () => {
           resourceOwner: "220516472055706145",
         },
         sessionId: "221394658884845598",
-        sessionToken:
-          "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
+        sessionToken: "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
         challenges: undefined,
       },
     });
@@ -79,36 +80,16 @@ describe("verify invite", () => {
         },
       },
     });
-
-    stub("zitadel.settings.v2.SettingsService", "GetLoginSettings", {
-      data: {
-        settings: {
-          passkeysType: 1,
-          allowUsernamePassword: true,
-        },
-      },
-    });
   });
 
-  it.only("shows authenticators after successful invite verification", () => {
-    stub("zitadel.user.v2.UserService", "VerifyInviteCode");
-
-    cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
-    cy.location("pathname", { timeout: 10_000 }).should(
-      "eq",
-      "/authenticator/set",
-    );
-  });
-
-  it("shows an error if invite code validation failed", () => {
-    stub("zitadel.user.v2.UserService", "VerifyInviteCode", {
+  it("shows an error if email code validation failed", () => {
+    stub("zitadel.user.v2.UserService", "VerifyEmail", {
       code: 3,
       error: "error validating code",
     });
-
     // TODO: Avoid uncaught exception in application
     cy.once("uncaught:exception", () => false);
-    cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
-    cy.contains("Could not verify invite", { timeout: 10_000 });
+    cy.visit("/verify?userId=221394658884845598&code=abc");
+    cy.contains("Could not verify email", { timeout: 10_000 });
   });
 });

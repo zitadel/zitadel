@@ -1,0 +1,22 @@
+{
+  "name": "login-test-acceptance",
+  "private": true,
+  "scripts": {
+    "test:acceptance": "pnpm exec playwright test",
+    "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup",
+    "run-sink": "docker compose -f ./acceptance/docker-compose.yaml up -d sink",
+    "run-samlsp": "docker compose -f ./acceptance/saml/docker-compose.yaml up -d",
+    "run-samlidp": "docker compose -f ./acceptance/idp/saml/docker-compose.yaml up -d",
+    "run-oidcrp": "docker compose -f ./acceptance/oidc/docker-compose.yaml up -d",
+    "run-oidcop": "docker compose -f ./acceptance/idp/oidc/docker-compose.yaml up -d",
+    "stop": "docker compose -f ./acceptance/docker-compose.yaml stop"
+  },
+  "devDependencies": {
+    "@otplib/core": "^12.0.0",
+    "@otplib/plugin-thirty-two": "^12.0.0",
+    "@otplib/plugin-crypto": "^12.0.0",
+    "@faker-js/faker": "^9.7.0",
+    "@playwright/test": "^1.52.0",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,7 +1,8 @@
 services:
   zitadel:
     user: "${ZITADEL_DEV_UID}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164}"
+    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
+    pull_policy: always
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -16,7 +17,7 @@ services:
 
   db:
     restart: "always"
-    image: postgres:17.0-alpine3.19
+    image: ${LOGIN_TEST_ACCEPTANCE_POSTGES_TAG:-postgres:17.0-alpine3.19}
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
@@ -41,7 +42,10 @@ services:
   setup:
     user: "${ZITADEL_DEV_UID}"
     container_name: setup
-    build: .
+    build:
+      context: .
+      tags:
+        - ${LOGIN_TEST_ACCEPTANCE_SETUP_TAG:-zitadel-login-test-acceptance-setup:local}
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
@@ -59,7 +63,7 @@ services:
         condition: "service_completed_successfully"
 
   sink:
-    image: golang:1.24-alpine
+    image: ${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
     container_name: sink
     command: go run /sink/main.go -port '3333' -email '/email' -sms '/sms' -notification '/notification'
     ports:
@@ -69,3 +73,10 @@ services:
     depends_on:
       setup:
         condition: "service_completed_successfully"
+
+  login-test-acceptance:
+    image: "${LOGIN_TEST_ACCEPTANCE_TAG:-zitadel-login-test-acceptance:local}"
+    container_name: login-test-acceptance
+    depends_on:
+      sink:
+        condition: service_started
