@@ -5,16 +5,16 @@
   "scripts": {
     "generate": "pnpm exec turbo run generate",
     "build": "pnpm exec turbo run build",
-    "build:docker": "rm -rf ./out ./docker && pnpm exec turbo run build --filter=./packages/zitadel-client && pnpm exec turbo prune @zitadel/login --docker && mkdir -p ./docker && cd ./docker && cp -r ../out/json/* . && pnpm install --frozen-lockfile && cp -r ../out/full/* . && pnpm exec turbo run build:standalone && cd ..",
     "build:packages": "pnpm exec turbo run build --filter=./packages/*",
     "build:apps": "pnpm exec turbo run build --filter=./apps/*",
     "test": "pnpm exec turbo run test",
     "start": "pnpm exec turbo run start",
     "start:built": "pnpm exec turbo run start:built",
     "test:unit": "pnpm exec turbo run test:unit -- --passWithNoTests",
+    "test:unit:standalone": "pnpm exec turbo run test:unit:standalone",
     "test:integration": "pnpm exec turbo run test:integration",
     "test:integration:run": "pnpm exec turbo run test:integration:run",
-    "test:acceptance": "pnpm exec playwright test",
+    "test:acceptance": "pnpm exec turbo run test:integration:acceptance",
     "test:watch": "pnpm exec turbo run test:watch",
     "dev": "pnpm exec turbo run dev --no-cache --continue",
     "lint": "pnpm exec turbo run lint",
@@ -24,14 +24,7 @@
     "format": "pnpm exec prettier --check \"**/*.{ts,tsx,md}\"",
     "changeset": "pnpm exec changeset",
     "version-packages": "pnpm exec changeset version",
-    "release": "pnpm exec turbo run build --filter=login^... && pnpm exec changeset publish",
-    "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup",
-    "run-sink": "docker compose -f ./acceptance/docker-compose.yaml up -d sink",
-    "run-samlsp": "docker compose -f ./acceptance/saml/docker-compose.yaml up -d",
-    "run-samlidp": "docker compose -f ./acceptance/idp/saml/docker-compose.yaml up -d",
-    "run-oidcrp": "docker compose -f ./acceptance/oidc/docker-compose.yaml up -d",
-    "run-oidcop": "docker compose -f ./acceptance/idp/oidc/docker-compose.yaml up -d",
-    "stop": "docker compose -f ./acceptance/docker-compose.yaml stop"
+    "release": "pnpm exec turbo run build --filter=login^... && pnpm exec changeset publish"
   },
   "pnpm": {
     "overrides": {
@@ -39,13 +32,7 @@
     }
   },
   "devDependencies": {
-    "@otplib/core": "^12.0.0",
-    "@otplib/plugin-thirty-two": "^12.0.0",
-    "@otplib/plugin-crypto": "^12.0.0",
-    "@faker-js/faker": "^9.7.0",
     "@changesets/cli": "^2.29.2",
-    "@playwright/test": "^1.52.0",
-    "@types/node": "^22.14.1",
     "@vitejs/plugin-react": "^4.4.1",
     "@zitadel/prettier-config": "workspace:*",
     "axios": "^1.8.4",

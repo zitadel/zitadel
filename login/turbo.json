@@ -25,6 +25,7 @@
     "start": {},
     "start:built": {},
     "test:unit": {},
+    "test:unit:standalone": {},
     "test:integration": {},
     "test:integration:run": {},
     "test:watch": {

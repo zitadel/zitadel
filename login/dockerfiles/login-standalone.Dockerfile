@@ -1,8 +1,9 @@
-FROM login-base AS prune-for-docker
+FROM login-pnpm AS prune-for-docker
 RUN pnpm install turbo --global
 COPY . .
 RUN turbo prune @zitadel/login --docker
-FROM login-base AS installer
+
+FROM login-pnpm AS installer
 COPY --from=prune-for-docker /build/out/json/ .
 RUN pnpm install --frozen-lockfile
 COPY --from=prune-for-docker /build/out/full/ .

@@ -1,13 +1,13 @@
 services:
   core-mock:
-    image: ${CORE_MOCK_TAG:-zitadel-core-mock:local}
+    image: "${CORE_MOCK_TAG:-zitadel-core-mock:local}"
     container_name: core-mock
     ports:
       - 22220:22220
       - 22222:22222
 
   login:
-    image: ${LOGIN_IMAGE_TAG:-zitadel-login:local}
+    image: "${LOGIN_IMAGE_TAG:-zitadel-login:local}"
     container_name: login
     ports:
       - 3000:3000
@@ -18,9 +18,9 @@ services:
       - DEBUG=true
       - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
 
-  integration-testsuite:
-    image: ${LOGIN_INTEGRATION_TESTSUITE_TAG:-zitadel-login-integration-testsuite:local}
-    container_name: integration-testsuite
+  login-test-integration:
+    image: "${LOGIN_TEST_INTEGRATION_TAG:-zitadel-login-test-integration:local}"
+    container_name: login-test-integration
     environment:
       - LOGIN_BASE_URL=http://login:3000/ui/v2/login
       - CYPRESS_CORE_MOCK_STUBS_URL=http://core-mock:22220/v1/stubs

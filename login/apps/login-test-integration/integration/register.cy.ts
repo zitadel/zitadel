@@ -33,8 +33,7 @@ describe("register", () => {
           resourceOwner: "220516472055706145",
         },
         sessionId: "221394658884845598",
-        sessionToken:
-          "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
+        sessionToken: "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
         challenges: undefined,
       },
     });
@@ -65,12 +64,10 @@ describe("register", () => {
     cy.visit("/register");
     cy.get('input[data-testid="firstname-text-input"]').focus().type("John");
     cy.get('input[data-testid="lastname-text-input"]').focus().type("Doe");
-    cy.get('input[data-testid="email-text-input"]')
-      .focus()
-      .type("john@zitadel.com");
+    cy.get('input[data-testid="email-text-input"]').focus().type("john@zitadel.com");
     cy.get('input[type="checkbox"][value="privacypolicy"]').check();
     cy.get('input[type="checkbox"][value="tos"]').check();
     cy.get('button[type="submit"]').click();
-    cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey/set");
+    cy.location("pathname", { timeout: 10_000 }).should("eq", "/ui/v2/login/passkey/set");
   });
 });

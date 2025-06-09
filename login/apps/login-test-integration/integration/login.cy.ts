@@ -18,8 +18,7 @@ describe("login", () => {
           resourceOwner: "220516472055706145",
         },
         sessionId: "221394658884845598",
-        sessionToken:
-          "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
+        sessionToken: "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
         challenges: undefined,
       },
     });
@@ -96,7 +95,7 @@ describe("login", () => {
     });
     it("should redirect a user with password authentication to /password", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.location("pathname", { timeout: 10_000 }).should("eq", "/password");
+      cy.location("pathname", { timeout: 10_000 }).should("eq", "/ui/v2/login/password");
     });
     describe("with passkey prompt", () => {
       beforeEach(() => {
@@ -107,8 +106,7 @@ describe("login", () => {
               changeDate: "2023-07-04T07:58:20.126Z",
               resourceOwner: "220516472055706145",
             },
-            sessionToken:
-              "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
+            sessionToken: "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
             challenges: undefined,
           },
         });
@@ -168,7 +166,7 @@ describe("login", () => {
 
     it("should redirect a user with passwordless authentication to /passkey", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey");
+      cy.location("pathname", { timeout: 10_000 }).should("eq", "/ui/v2/login/passkey");
     });
   });
 });

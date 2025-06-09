@@ -1,4 +1,4 @@
-const url = Cypress.env('CORE_MOCK_STUBS_URL') || "http://localhost:22220/v1/stubs"
+const url = Cypress.env("CORE_MOCK_STUBS_URL") || "http://localhost:22220/v1/stubs";
 
 function removeStub(service: string, method: string) {
   return cy.request({
