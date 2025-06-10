@@ -200,21 +200,15 @@ var (
 
 	userLoginNamesTable         = loginNameTable.setAlias("login_names")
 	userLoginNamesUserIDCol     = LoginNameUserIDCol.setTable(userLoginNamesTable)
-	userLoginNamesNameCol       = LoginNameNameCol.setTable(userLoginNamesTable)
 	userLoginNamesInstanceIDCol = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
 	userLoginNamesListCol       = Column{
-		name:  "loginnames",
+		name:  "login_names",
 		table: userLoginNamesTable,
 	}
-	userLoginNamesLowerListCol = Column{
-		name:  "loginnames_lower",
+	userPreferredLoginNameCol = Column{
+		name:  "preferred_login_name",
 		table: userLoginNamesTable,
 	}
-	userPreferredLoginNameTable         = loginNameTable.setAlias("preferred_login_name")
-	userPreferredLoginNameUserIDCol     = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameCol           = LoginNameNameCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameIsPrimaryCol  = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameInstanceIDCol = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
 )
 
 var (
@@ -459,7 +453,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ..
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -483,7 +477,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...S
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -507,7 +501,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -593,7 +587,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -611,7 +605,7 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return 0, zerrors.ThrowInternal(err, "QUERY-w3Dx", "Errors.Query.SQLStatment")
+		return 0, zerrors.ThrowInternal(err, "QUERY-w3Dx", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -646,7 +640,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -693,7 +687,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return false, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
+		return false, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -792,12 +786,8 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 	return NewTextQuery(userPreferredLoginNameCol, value, comparison)
 }
 
-func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(userLoginNamesLowerListCol, strings.ToLower(value), TextListContains)
-}
-
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	// linking queries for the subselect
+	// linking queries for the sub select
 	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
 	if err != nil {
 		return nil, err
@@ -828,30 +818,16 @@ func triggerUserProjections(ctx context.Context) {
 	triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
 }
 
-func prepareLoginNamesQuery() (string, []interface{}, error) {
-	return sq.Select(
-		userLoginNamesUserIDCol.identifier(),
-		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
-		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesLowerListCol.name,
-		userLoginNamesInstanceIDCol.identifier(),
-	).From(userLoginNamesTable.identifier()).
-		GroupBy(
-			userLoginNamesUserIDCol.identifier(),
-			userLoginNamesInstanceIDCol.identifier(),
-		).ToSql()
-}
-
-func preparePreferredLoginNamesQuery() (string, []interface{}, error) {
-	return sq.Select(
-		userPreferredLoginNameUserIDCol.identifier(),
-		userPreferredLoginNameCol.identifier(),
-		userPreferredLoginNameInstanceIDCol.identifier(),
-	).From(userPreferredLoginNameTable.identifier()).
-		Where(sq.Eq{
-			userPreferredLoginNameIsPrimaryCol.identifier(): true,
-		},
-		).ToSql()
-}
+var joinLoginNames = `LEFT JOIN LATERAL (` +
+	`SELECT` +
+	` ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names,` +
+	` MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name` +
+	` FROM` +
+	` projections.login_names3 AS ln` +
+	` WHERE` +
+	` ln.user_id = ` + UserIDCol.identifier() +
+	` AND ln.instance_id = ` + UserInstanceIDCol.identifier() +
+	`) AS login_names ON TRUE`
 
 func scanUser(row *sql.Row) (*User, error) {
 	u := new(User)
@@ -949,64 +925,6 @@ func scanUser(row *sql.Row) (*User, error) {
 		}
 	}
 	return u, nil
-}
-
-func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	return sq.Select(
-			UserIDCol.identifier(),
-			UserCreationDateCol.identifier(),
-			UserChangeDateCol.identifier(),
-			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
-			UserStateCol.identifier(),
-			UserTypeCol.identifier(),
-			UserUsernameCol.identifier(),
-			userLoginNamesListCol.identifier(),
-			userPreferredLoginNameCol.identifier(),
-			HumanUserIDCol.identifier(),
-			HumanFirstNameCol.identifier(),
-			HumanLastNameCol.identifier(),
-			HumanNickNameCol.identifier(),
-			HumanDisplayNameCol.identifier(),
-			HumanPreferredLanguageCol.identifier(),
-			HumanGenderCol.identifier(),
-			HumanAvatarURLCol.identifier(),
-			HumanEmailCol.identifier(),
-			HumanIsEmailVerifiedCol.identifier(),
-			HumanPhoneCol.identifier(),
-			HumanIsPhoneVerifiedCol.identifier(),
-			HumanPasswordChangeRequiredCol.identifier(),
-			HumanPasswordChangedCol.identifier(),
-			HumanMFAInitSkippedCol.identifier(),
-			MachineUserIDCol.identifier(),
-			MachineNameCol.identifier(),
-			MachineDescriptionCol.identifier(),
-			MachineSecretCol.identifier(),
-			MachineAccessTokenTypeCol.identifier(),
-			countColumn.identifier(),
-		).
-			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
-			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
-				userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
-				loginNamesArgs...).
-			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
-				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
-				preferredLoginNameArgs...).
-			PlaceholderFormat(sq.Dollar),
-
-		scanUser
 }
 
 func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) {
@@ -1170,14 +1088,6 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 }
 
 func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1208,14 +1118,7 @@ func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, er
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(NotifyUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
-				userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
-				loginNamesArgs...).
-			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
-				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
-				preferredLoginNameArgs...).
+			JoinClause(joinLoginNames).
 			PlaceholderFormat(sq.Dollar),
 		scanNotifyUser
 }
@@ -1359,14 +1262,6 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 }
 
 func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1401,14 +1296,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
-				userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
-				loginNamesArgs...).
-			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
-				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
-				preferredLoginNameArgs...).
+			JoinClause(joinLoginNames).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {
 			users := make([]*User, 0)
