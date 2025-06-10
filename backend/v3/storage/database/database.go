@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5"
 )
 
 // Pool is a connection pool. e.g. pgxpool
@@ -57,8 +59,5 @@ type Row interface {
 
 // Rows is an abstraction of sql.Rows.
 type Rows interface {
-	Row
-	Next() bool
-	Close() error
-	Err() error
+	pgx.Rows
 }

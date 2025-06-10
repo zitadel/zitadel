@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -42,11 +43,17 @@ func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain
 	andCondition := database.And(opts...)
 	i.writeCondition(&builder, andCondition)
 
-	return scanInstance(i.client.QueryRow(ctx, builder.String(), builder.Args()...))
+	rows, err := i.client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return scanInstance(rows)
 }
 
 // List implements [domain.InstanceRepository].
-func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*domain.Instance, error) {
+func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]domain.Instance, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryInstanceStmt)
@@ -214,20 +221,8 @@ func (i *instance) writeCondition(
 	condition.Write(builder)
 }
 
-func scanInstance(scanner database.Scanner) (*domain.Instance, error) {
-	var instance domain.Instance
-	err := scanner.Scan(
-		&instance.ID,
-		&instance.Name,
-		&instance.DefaultOrgID,
-		&instance.IAMProjectID,
-		&instance.ConsoleClientID,
-		&instance.ConsoleAppID,
-		&instance.DefaultLanguage,
-		&instance.CreatedAt,
-		&instance.UpdatedAt,
-		&instance.DeletedAt,
-	)
+func scanInstance(rows database.Rows) (*domain.Instance, error) {
+	instance, err := pgx.CollectOneRow[domain.Instance](rows, pgx.RowToStructByNameLax[domain.Instance])
 	if err != nil {
 		// if no results returned, this is not a error
 		// it just means the instance was not found
@@ -241,29 +236,16 @@ func scanInstance(scanner database.Scanner) (*domain.Instance, error) {
 	return &instance, nil
 }
 
-func scanInstances(rows database.Rows) ([]*domain.Instance, error) {
-	instances := make([]*domain.Instance, 0)
-	for rows.Next() {
-
-		var instance domain.Instance
-		err := rows.Scan(
-			&instance.ID,
-			&instance.Name,
-			&instance.DefaultOrgID,
-			&instance.IAMProjectID,
-			&instance.ConsoleClientID,
-			&instance.ConsoleAppID,
-			&instance.DefaultLanguage,
-			&instance.CreatedAt,
-			&instance.UpdatedAt,
-			&instance.DeletedAt,
-		)
-		if err != nil {
-			return nil, err
+func scanInstances(rows database.Rows) ([]domain.Instance, error) {
+	instances, err := pgx.CollectRows[domain.Instance](rows, pgx.RowToStructByNameLax[domain.Instance])
+	if err != nil {
+		// if no results returned, this is not a error
+		// it just means the instance was not found
+		// the caller should check if the returned instance is nil
+		if err.Error() == "no rows in result set" {
+			return nil, nil
 		}
-
-		instances = append(instances, &instance)
-
+		return nil, err
 	}
 	return instances, nil
 }
