@@ -219,6 +219,15 @@ func TestPatchApplication(t *testing.T) {
 	})
 	require.Nil(t, appNameChangeErr)
 
+	appForAPIConfigChange, appAPIConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: p.GetId(),
+		Name:      gofakeit.AppName(),
+		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
+			ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+		},
+	})
+	require.Nil(t, appAPIConfigChangeErr)
+
 	tt := []struct {
 		testName     string
 		patchRequest *app.PatchApplicationRequest
@@ -248,6 +257,32 @@ func TestPatchApplication(t *testing.T) {
 				PatchRequestType: &app.PatchApplicationRequest_ApplicationNameRequest{
 					ApplicationNameRequest: &app.PatchApplicationNameRequest{
 						Name: "New name",
+					},
+				},
+			},
+		},
+
+		{
+			testName: "when app for API config change request is not found should return not found error",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     pNotInCtx.GetId(),
+				ApplicationId: appForAPIConfigChange.GetAppId(),
+				PatchRequestType: &app.PatchApplicationRequest_ApiConfigurationRequest{
+					ApiConfigurationRequest: &app.PatchAPIApplicationConfigurationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+					},
+				},
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when request for API config change is valid should return updated timestamp",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: appForAPIConfigChange.GetAppId(),
+				PatchRequestType: &app.PatchApplicationRequest_ApiConfigurationRequest{
+					ApiConfigurationRequest: &app.PatchAPIApplicationConfigurationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 					},
 				},
 			},

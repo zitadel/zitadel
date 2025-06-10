@@ -12,11 +12,11 @@ func CreateAPIApplicationRequestToDomain(name, projectID string, app *app.Create
 			AggregateID: projectID,
 		},
 		AppName:        name,
-		AuthMethodType: APIAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		AuthMethodType: apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
 	}
 }
 
-func APIAuthMethodTypeToDomain(authType app.APIAuthMethodType) domain.APIAuthMethodType {
+func apiAuthMethodTypeToDomain(authType app.APIAuthMethodType) domain.APIAuthMethodType {
 	switch authType {
 	case app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC:
 		return domain.APIAuthMethodTypeBasic
@@ -24,5 +24,15 @@ func APIAuthMethodTypeToDomain(authType app.APIAuthMethodType) domain.APIAuthMet
 		return domain.APIAuthMethodTypePrivateKeyJWT
 	default:
 		return domain.APIAuthMethodTypeBasic
+	}
+}
+
+func PatchAPIApplicationConfigurationRequestToDomain(appID, projectID string, app *app.PatchAPIApplicationConfigurationRequest) *domain.APIApp {
+	return &domain.APIApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projectID,
+		},
+		AppID:          appID,
+		AuthMethodType: apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
 	}
 }

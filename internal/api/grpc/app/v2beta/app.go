@@ -99,6 +99,14 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 		}, nil
 
 	case *app.PatchApplicationRequest_ApiConfigurationRequest:
+		updatedAPIApp, err := s.command.ChangeAPIApplication(ctx, convert.PatchAPIApplicationConfigurationRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.ApiConfigurationRequest), authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &app.PatchApplicationResponse{
+			ChangeDate: timestamppb.New(updatedAPIApp.ChangeDate),
+		}, nil
 
 	case *app.PatchApplicationRequest_OidcConfigurationRequest:
 
