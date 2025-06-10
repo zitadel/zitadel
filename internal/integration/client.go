@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration/scim"
@@ -297,7 +298,8 @@ func (i *Instance) CreateUserTypeMachine(ctx context.Context) *user_v2.CreateUse
 
 func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *user_v2.AddPersonalAccessTokenResponse {
 	resp, err := i.Client.UserV2.AddPersonalAccessToken(ctx, &user_v2.AddPersonalAccessTokenRequest{
-		UserId: userID,
+		UserId:         userID,
+		ExpirationDate: timestamppb.New(time.Now().Add(30 * time.Minute)),
 	})
 	logging.OnError(err).Panic("create pat")
 	return resp
