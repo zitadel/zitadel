@@ -12,6 +12,7 @@ Our v1 API was structured around use cases, meaning we provided distinct APIs ta
 - Management API: For administrators of an organization.
 - Admin API: For administrators of an instance.
 - System API: For managing multiple instances.
+
 While this approach served its initial purpose, it presented a few challenges.
 Developers often found it difficult to determine which specific API endpoint to use for their needs.
 Additionally, this model sometimes led to redundant implementations of similar functionalities across different APIs – for example, listing users might have existed in slightly different forms for an instance context versus an organization context.
@@ -24,6 +25,7 @@ This means instead of organizing by user type, we now structure our API around l
 - Instance API
 - Organization API
 - And more...
+
 A key improvement in v2 is how context and permissions are handled.
 The data you receive from an endpoint will now automatically be scoped based on the role and permissions of the authenticated user.
 
