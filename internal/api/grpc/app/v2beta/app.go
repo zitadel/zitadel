@@ -53,6 +53,7 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 				},
 			},
 		}, nil
+
 	case *app.CreateApplicationRequest_SamlRequest:
 		samlAppRequest, err := convert.CreateSAMLAppRequestToDomain(req.GetName(), req.GetProjectId(), req.GetSamlRequest())
 		if err != nil {
@@ -74,4 +75,8 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "APP-0iiN46", "unknown app type")
 	}
+}
+
+func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplicationRequest) (*app.PatchApplicationResponse, error) {
+	return nil, nil
 }
