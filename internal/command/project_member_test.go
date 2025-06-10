@@ -17,8 +17,9 @@ import (
 
 func TestCommandSide_AddProjectMember(t *testing.T) {
 	type fields struct {
-		eventstore   func(t *testing.T) *eventstore.Eventstore
-		zitadelRoles []authz.RoleMapping
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		member *AddProjectMember
@@ -36,7 +37,8 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &AddProjectMember{
@@ -51,7 +53,8 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &AddProjectMember{
@@ -71,6 +74,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleProjectOwner,
@@ -111,6 +115,19 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							project.NewProjectAddedEvent(
+								context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							project.NewProjectMemberAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"user1",
@@ -118,6 +135,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleProjectOwner,
@@ -156,6 +174,19 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(
+								context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
 					expectFilter(),
 					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internal"),
 						project.NewProjectMemberAddedEvent(context.Background(),
@@ -165,6 +196,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleProjectOwner,
@@ -203,6 +235,19 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(
+								context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
 					expectFilter(),
 					expectPush(
 						project.NewProjectMemberAddedEvent(context.Background(),
@@ -212,6 +257,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleProjectOwner,
@@ -231,13 +277,67 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 			},
+		}, {
+			name: "member add, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(
+								context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: domain.RoleProjectOwner,
+					},
+				},
+			},
+			args: args{
+				member: &AddProjectMember{
+					ResourceOwner: "org1",
+					ProjectID:     "project1",
+					UserID:        "user1",
+					Roles:         []string{"PROJECT_OWNER"},
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				zitadelRoles: tt.fields.zitadelRoles,
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.AddProjectMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
@@ -255,8 +355,9 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 
 func TestCommandSide_ChangeProjectMember(t *testing.T) {
 	type fields struct {
-		eventstore   func(t *testing.T) *eventstore.Eventstore
-		zitadelRoles []authz.RoleMapping
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		member *ChangeProjectMember
@@ -274,7 +375,8 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &ChangeProjectMember{
@@ -289,7 +391,8 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &ChangeProjectMember{
@@ -309,6 +412,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleProjectOwner,
@@ -341,6 +445,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleProjectOwner,
@@ -380,6 +485,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleProjectOwner,
@@ -403,12 +509,49 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "member change, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectMemberAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"user1",
+								[]string{"PROJECT_OWNER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: domain.RoleProjectOwner,
+					},
+					{
+						Role: "PROJECT_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &ChangeProjectMember{
+					ResourceOwner: "org1",
+					ProjectID:     "project1",
+					UserID:        "user1",
+					Roles:         []string{"PROJECT_OWNER", "PROJECT_VIEWER"},
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				zitadelRoles: tt.fields.zitadelRoles,
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ChangeProjectMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
@@ -426,7 +569,8 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 
 func TestCommandSide_RemoveProjectMember(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		projectID     string
@@ -446,7 +590,8 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 		{
 			name: "invalid member projectid missing, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				projectID:     "",
@@ -460,7 +605,8 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 		{
 			name: "invalid member userid missing, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				projectID:     "project1",
@@ -477,6 +623,7 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				projectID:     "project1",
@@ -484,7 +631,9 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
@@ -507,6 +656,7 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				projectID:     "project1",
@@ -519,11 +669,37 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "member remove, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectMemberAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"user1",
+								[]string{"PROJECT_OWNER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				projectID:     "project1",
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveProjectMember(context.Background(), tt.args.projectID, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {

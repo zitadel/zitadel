@@ -88,13 +88,9 @@ func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMem
 	if err != nil {
 		return nil, err
 	}
-
-	addedMember, err := c.instanceMemberWriteModelByID(ctx, member.InstanceID, member.UserID)
+	addedMember := NewInstanceMemberWriteModel(member.InstanceID, member.UserID)
 	if err != nil {
 		return nil, err
-	}
-	if addedMember.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-D8JxR", "Errors.AlreadyExists")
 	}
 	err = AppendAndReduce(addedMember, events...)
 	if err != nil {
@@ -162,6 +158,9 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, instanceID, userID 
 	}
 	existingMember, err := c.instanceMemberWriteModelByID(ctx, instanceID, userID)
 	if err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionDeleteInstanceMember(ctx, instanceID); err != nil {
 		return nil, err
 	}
 	if !existingMember.State.Exists() {

@@ -33,6 +33,12 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			req: &internal_permission.CreateAdministratorRequest{
 				UserId: "",
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_Instance{
+						Instance: true,
+					},
+				},
+				Roles: []string{"IAM_OWNER"},
 			},
 			wantErr: true,
 		},
@@ -41,6 +47,29 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			req: &internal_permission.CreateAdministratorRequest{
 				UserId: "notexisting",
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_Instance{
+						Instance: true,
+					},
+				},
+				Roles: []string{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "not existing roles",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx)
+				request.UserId = userResp.GetId()
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_Instance{
+						Instance: true,
+					},
+				},
+				Roles: []string{"notexisting"},
 			},
 			wantErr: true,
 		},
@@ -82,6 +111,23 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			},
 		},
 		{
+			name: "org, not existing",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx)
+				request.UserId = userResp.GetId()
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_OrganizationId{
+						OrganizationId: "notexisting",
+					},
+				},
+				Roles: []string{"ORG_OWNER"},
+			},
+			wantErr: true,
+		},
+		{
 			name: "org, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
@@ -99,6 +145,23 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			want: want{
 				creationDate: true,
 			},
+		},
+		{
+			name: "project, not existing",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx)
+				request.UserId = userResp.GetId()
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_ProjectId{
+						ProjectId: "notexisting",
+					},
+				},
+				Roles: []string{"PROJECT_OWNER"},
+			},
+			wantErr: true,
 		},
 		{
 			name: "project, ok",
@@ -120,6 +183,27 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			want: want{
 				creationDate: true,
 			},
+		},
+		{
+			name: "project grant, not existing",
+			ctx:  iamOwnerCtx,
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				request.UserId = userResp.GetId()
+				request.Resource = &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_ProjectGrant_{
+						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
+							ProjectId:      projectResp.GetId(),
+							ProjectGrantId: "notexisting",
+						},
+					},
+				}
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Roles: []string{"PROJECT_GRANT_OWNER"},
+			},
+			wantErr: true,
 		},
 		{
 			name: "project grant, ok",
@@ -150,6 +234,9 @@ func TestServer_CreateAdministrator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.prepare != nil {
+				tt.prepare(tt.req)
+			}
 			creationDate := time.Now().UTC()
 			got, err := instance.Client.InternalPermissionv2Beta.CreateAdministrator(tt.ctx, tt.req)
 			changeDate := time.Now().UTC()
@@ -168,15 +255,15 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)
-	patProjectResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
 	instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userProjectResp.GetUserId())
+	patProjectResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userProjectResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectResp.Token)
 
 	instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 	userProjectGrantResp := instance.CreateMachineUser(iamOwnerCtx)
+	instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
-	instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userProjectResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectGrantResp.Token)
 
 	type want struct {
@@ -400,6 +487,9 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.prepare != nil {
+				tt.prepare(tt.req)
+			}
 			creationDate := time.Now().UTC()
 			got, err := instance.Client.InternalPermissionv2Beta.CreateAdministrator(tt.ctx, tt.req)
 			changeDate := time.Now().UTC()

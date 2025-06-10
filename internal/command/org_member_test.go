@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -286,8 +285,9 @@ func TestIsMember(t *testing.T) {
 
 func TestCommandSide_AddOrgMember(t *testing.T) {
 	type fields struct {
-		eventstore   func(t *testing.T) *eventstore.Eventstore
-		zitadelRoles []authz.RoleMapping
+		checkPermission domain.PermissionCheck
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
 	}
 	type args struct {
 		member *AddOrgMember
@@ -305,7 +305,17 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &AddOrgMember{
@@ -319,7 +329,17 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &AddOrgMember{
@@ -336,8 +356,17 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 			name: "user not existing, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org",
+							),
+						),
+					),
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleOrgOwner,
@@ -359,6 +388,14 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 			name: "member already exists, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org",
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -384,6 +421,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleOrgOwner,
@@ -405,6 +443,14 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 			name: "member add uniqueconstraint err, already exists",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org",
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -430,6 +476,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleOrgOwner,
@@ -451,6 +498,14 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 			name: "member add, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org",
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -476,6 +531,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleOrgOwner,
@@ -495,12 +551,44 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "member add, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: domain.RoleOrgOwner,
+					},
+				},
+			},
+			args: args{
+				member: &AddOrgMember{
+					OrgID:  "org1",
+					UserID: "user1",
+					Roles:  []string{"ORG_OWNER"},
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				zitadelRoles: tt.fields.zitadelRoles,
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.AddOrgMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
@@ -518,8 +606,9 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 
 func TestCommandSide_ChangeOrgMember(t *testing.T) {
 	type fields struct {
-		eventstore   func(t *testing.T) *eventstore.Eventstore
-		zitadelRoles []authz.RoleMapping
+		checkPermission domain.PermissionCheck
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
 	}
 	type args struct {
 		member *ChangeOrgMember
@@ -537,7 +626,8 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &ChangeOrgMember{
@@ -551,7 +641,8 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &ChangeOrgMember{
@@ -570,6 +661,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleOrgOwner,
@@ -588,7 +680,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 			},
 		},
 		{
-			name: "member not changed, precondition error",
+			name: "member not changed, no change",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -601,6 +693,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleOrgOwner,
@@ -615,7 +708,9 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
@@ -639,6 +734,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "ORG_OWNER",
@@ -661,12 +757,48 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "member change, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewMemberAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"user1",
+								[]string{"ORG_OWNER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "ORG_OWNER",
+					},
+					{
+						Role: "ORG_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &ChangeOrgMember{
+					OrgID:  "org1",
+					UserID: "user1",
+					Roles:  []string{"ORG_OWNER", "ORG_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				zitadelRoles: tt.fields.zitadelRoles,
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ChangeOrgMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
@@ -684,13 +816,13 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 
 func TestCommandSide_RemoveOrgMember(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx           context.Context
-		projectID     string
-		userID        string
-		resourceOwner string
+		ctx    context.Context
+		orgID  string
+		userID string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -703,15 +835,15 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid member projectid missing, error",
+			name: "invalid member orgID missing, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				projectID:     "",
-				userID:        "user1",
-				resourceOwner: "org1",
+				ctx:    context.Background(),
+				orgID:  "",
+				userID: "user1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -720,13 +852,13 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 		{
 			name: "invalid member userid missing, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				projectID:     "project1",
-				userID:        "",
-				resourceOwner: "org1",
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -738,15 +870,17 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				projectID:     "project1",
-				userID:        "user1",
-				resourceOwner: "org1",
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
@@ -755,26 +889,26 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							project.NewProjectMemberAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
+							org.NewMemberAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
 								"user1",
 								[]string{"PROJECT_OWNER"}...,
 							),
 						),
 					),
 					expectPush(
-						project.NewProjectMemberRemovedEvent(context.Background(),
-							&project.NewAggregate("project1", "org1").Aggregate,
+						org.NewMemberRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
 							"user1",
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				projectID:     "project1",
-				userID:        "user1",
-				resourceOwner: "org1",
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -782,13 +916,39 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "member remove, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewMemberAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"user1",
+								[]string{"PROJECT_OWNER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.RemoveProjectMember(tt.args.ctx, tt.args.projectID, tt.args.userID, tt.args.resourceOwner)
+			got, err := r.RemoveOrgMember(tt.args.ctx, tt.args.orgID, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

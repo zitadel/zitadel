@@ -28,9 +28,6 @@ func (c *Commands) AddOrgMemberCommand(a *org.Aggregate, userID string, roles ..
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
 				ctx, span := tracing.NewSpan(ctx)
 				defer func() { span.EndWithError(err) }()
-				if err := c.checkPermissionUpdateOrgMember(ctx, a.ResourceOwner, a.ID); err != nil {
-					return nil, err
-				}
 
 				if exists, err := ExistsUser(ctx, filter, userID, "", false); err != nil || !exists {
 					return nil, zerrors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
@@ -89,6 +86,12 @@ type AddOrgMember struct {
 func (c *Commands) AddOrgMember(ctx context.Context, member *AddOrgMember) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+	if err := c.checkOrgExists(ctx, member.OrgID); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionUpdateOrgMember(ctx, member.OrgID, member.OrgID); err != nil {
+		return nil, err
+	}
 	orgAgg := org.NewAggregate(member.OrgID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddOrgMemberCommand(orgAgg, member.UserID, member.Roles...))
 	if err != nil {
@@ -181,12 +184,18 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *ChangeOrgMember)
 }
 
 func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*domain.ObjectDetails, error) {
+	if orgID == "" || userID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-LiaZi", "Errors.Org.MemberInvalid")
+	}
 	existingMember, err := c.orgMemberWriteModelByID(ctx, orgID, userID)
 	if err != nil {
 		return nil, err
 	}
 	if !existingMember.State.Exists() {
 		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+	}
+	if err := c.checkPermissionDeleteOrgMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID); err != nil {
+		return nil, err
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx,

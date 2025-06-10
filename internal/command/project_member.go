@@ -40,15 +40,26 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *AddProjectMembe
 	if err != nil {
 		return nil, err
 	}
-
+	projectResourceOwner, err := c.checkProjectExists(ctx, member.ProjectID, member.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	// resourceowner of the member if not provided is the resourceowner of the project
+	if member.ResourceOwner == "" {
+		member.ResourceOwner = projectResourceOwner
+	}
 	addedMember, err := c.projectMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
+	// error if provided resourceowner is not equal to the resourceowner of the project
+	if projectResourceOwner != addedMember.ResourceOwner {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
+	}
 	if err := c.checkPermissionUpdateProjectMember(ctx, addedMember.ResourceOwner, addedMember.AggregateID); err != nil {
 		return nil, err
 	}
-	if addedMember.State == domain.MemberStateActive {
+	if addedMember.State.Exists() {
 		return nil, zerrors.ThrowAlreadyExists(nil, "PROJECT-PtXi1", "Errors.Project.Member.AlreadyExists")
 	}
 
@@ -125,11 +136,14 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
 	}
 	existingMember, err := c.projectMemberWriteModelByID(ctx, projectID, userID, resourceOwner)
-	if existingMember.State == domain.MemberStateUnspecified || existingMember.State == domain.MemberStateRemoved {
-
+	if err != nil {
+		return nil, err
 	}
 	if !existingMember.State.Exists() {
-		return &domain.ObjectDetails{}, nil
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
+	}
+	if err := c.checkPermissionDeleteProjectMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID); err != nil {
+		return nil, err
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)

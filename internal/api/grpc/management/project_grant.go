@@ -204,7 +204,7 @@ func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.Upda
 }
 
 func (s *Server) RemoveProjectGrantMember(ctx context.Context, req *mgmt_pb.RemoveProjectGrantMemberRequest) (*mgmt_pb.RemoveProjectGrantMemberResponse, error) {
-	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId)
+	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

@@ -17,8 +17,9 @@ import (
 
 func TestCommandSide_AddInstanceMember(t *testing.T) {
 	type fields struct {
-		eventstore   func(t *testing.T) *eventstore.Eventstore
-		zitadelRoles []authz.RoleMapping
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		member *AddInstanceMember
@@ -36,19 +37,21 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &AddInstanceMember{},
 			},
 			res: res{
-				err: zerrors.IsErrorInvalidArgument,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &AddInstanceMember{
@@ -67,6 +70,7 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "IAM_OWNER",
@@ -113,6 +117,7 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "IAM_OWNER",
@@ -159,6 +164,7 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "IAM_OWNER",
@@ -206,6 +212,7 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "IAM_OWNER",
@@ -225,12 +232,35 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "member add, no permission",
+			fields: fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER"},
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				zitadelRoles: tt.fields.zitadelRoles,
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.AddInstanceMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
@@ -248,8 +278,9 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 
 func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 	type fields struct {
-		eventstore   func(t *testing.T) *eventstore.Eventstore
-		zitadelRoles []authz.RoleMapping
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		member *ChangeInstanceMember
@@ -267,7 +298,8 @@ func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 		{
 			name: "invalid member, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &ChangeInstanceMember{},
@@ -279,7 +311,8 @@ func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 		{
 			name: "invalid roles, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				member: &ChangeInstanceMember{
@@ -298,6 +331,7 @@ func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "IAM_OWNER",
@@ -329,6 +363,7 @@ func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleIAMOwner,
@@ -367,6 +402,44 @@ func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER",
+					},
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &ChangeInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER", "IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "member change, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_OWNER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "IAM_OWNER",
@@ -384,17 +457,16 @@ func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "INSTANCE",
-				},
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				zitadelRoles: tt.fields.zitadelRoles,
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ChangeInstanceMember(context.Background(), tt.args.member)
 			if tt.res.err == nil {
@@ -412,7 +484,8 @@ func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 
 func TestCommandSide_RemoveInstanceMember(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		instanceID string
@@ -431,7 +504,8 @@ func TestCommandSide_RemoveInstanceMember(t *testing.T) {
 		{
 			name: "invalid member userid missing, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				instanceID: "INSTANCE",
@@ -447,13 +521,16 @@ func TestCommandSide_RemoveInstanceMember(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				instanceID: "INSTANCE",
 				userID:     "user1",
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
 			},
 		},
 		{
@@ -476,6 +553,7 @@ func TestCommandSide_RemoveInstanceMember(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				instanceID: "INSTANCE",
@@ -487,11 +565,36 @@ func TestCommandSide_RemoveInstanceMember(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "member remove, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_OWNER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				instanceID: "INSTANCE",
+				userID:     "user1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveInstanceMember(context.Background(), tt.args.instanceID, tt.args.userID)
 			if tt.res.err == nil {
