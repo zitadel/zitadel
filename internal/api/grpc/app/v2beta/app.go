@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
@@ -78,5 +79,34 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 }
 
 func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplicationRequest) (*app.PatchApplicationResponse, error) {
+	switch t := req.GetPatchRequestType().(type) {
+	case *app.PatchApplicationRequest_ApplicationNameRequest:
+		updatedDetails, err := s.command.ChangeApplication(
+			ctx,
+			req.GetProjectId(),
+			&domain.ChangeApp{
+				AppID:   req.GetApplicationId(),
+				AppName: t.ApplicationNameRequest.GetName(),
+			},
+			authz.GetCtxData(ctx).OrgID,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		return &app.PatchApplicationResponse{
+			ChangeDate: timestamppb.New(updatedDetails.EventDate),
+		}, nil
+
+	case *app.PatchApplicationRequest_ApiConfigurationRequest:
+
+	case *app.PatchApplicationRequest_OidcConfigurationRequest:
+
+	case *app.PatchApplicationRequest_SamlConfigurationRequest:
+
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "APP-0iiN46", "unknown app type")
+	}
+
 	return nil, nil
 }

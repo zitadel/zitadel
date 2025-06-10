@@ -14,9 +14,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
 func TestCreateApplication(t *testing.T) {
+	t.Parallel()
+
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	orgNotInCtx := instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
@@ -183,8 +187,80 @@ func TestCreateApplication(t *testing.T) {
 			if tc.expectedErrorType == codes.OK {
 				resType := fmt.Sprintf("%T", res.GetCreationResponseType())
 				assert.Equal(t, tc.expectedResponseType, resType)
-				assert.NotEmpty(t, res.GetAppId())
-				assert.NotEmpty(t, res.GetCreationDate())
+				assert.NotZero(t, res.GetAppId())
+				assert.NotZero(t, res.GetCreationDate())
+			}
+		})
+	}
+}
+
+func TestPatchApplication(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	orgNotInCtx := instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
+	pNotInCtx := instance.CreateProject(iamOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
+
+	t.Cleanup(func() {
+		instance.Client.Projectv2Beta.DeleteProject(iamOwnerCtx, &project.DeleteProjectRequest{
+			Id: p.GetId(),
+		})
+		instance.Client.OrgV2beta.DeleteOrganization(iamOwnerCtx, &org.DeleteOrganizationRequest{
+			Id: orgNotInCtx.GetOrganizationId(),
+		})
+	})
+
+	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: p.GetId(),
+		Name:      gofakeit.AppName(),
+		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
+			ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+		},
+	})
+	require.Nil(t, appNameChangeErr)
+
+	tt := []struct {
+		testName     string
+		patchRequest *app.PatchApplicationRequest
+
+		expectedErrorType codes.Code
+	}{
+		{
+			testName: "when app for app name change request is not found should return not found error",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     pNotInCtx.GetId(),
+				ApplicationId: appForNameChange.GetAppId(),
+
+				PatchRequestType: &app.PatchApplicationRequest_ApplicationNameRequest{
+					ApplicationNameRequest: &app.PatchApplicationNameRequest{
+						Name: "New name",
+					},
+				},
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when request for app name change is valid should return updated timestamp",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: appForNameChange.GetAppId(),
+
+				PatchRequestType: &app.PatchApplicationRequest_ApplicationNameRequest{
+					ApplicationNameRequest: &app.PatchApplicationNameRequest{
+						Name: "New name",
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			res, err := instance.Client.AppV2Beta.PatchApplication(iamOwnerCtx, tc.patchRequest)
+
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetChangeDate())
 			}
 		})
 	}
