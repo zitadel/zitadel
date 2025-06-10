@@ -1,5 +1,6 @@
 "use client";
 
+import { registerUserAndLinkToIDP } from "@/lib/server/register";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -23,13 +24,20 @@ type Inputs =
 type Props = {
   organization?: string;
   requestId?: string;
-  idpInformation?: IDPInformation;
+  idpIntent: {
+    idpIntentId: string;
+    idpIntentToken: string;
+  };
+  idpInformation: IDPInformation;
+  userId: string;
 };
 
 export function RegisterFormIDPIncomplete({
   organization,
   requestId,
+  idpIntent,
   idpInformation,
+  userId,
 }: Props) {
   const t = useTranslations("register");
 
@@ -51,11 +59,13 @@ export function RegisterFormIDPIncomplete({
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
     const response = await registerUserAndLinkToIDP({
+      userId: userId,
       email: values.email,
       firstName: values.firstname,
       lastName: values.lastname,
       organization: organization,
       requestId: requestId,
+      idpIntent: idpIntent,
     })
       .catch(() => {
         setError("Could not register user");
@@ -130,7 +140,7 @@ export function RegisterFormIDPIncomplete({
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
+          disabled={loading || !formState.isValid}
           onClick={handleSubmit(submitAndRegister)}
           data-testid="submit-button"
         >

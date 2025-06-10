@@ -248,6 +248,7 @@ export default async function Page(props: {
   if (options?.isCreationAllowed) {
     return completeIDP({
       branding,
+      idpIntent: { idpIntentId: id, idpIntentToken: token },
       idpInformation,
       organization,
       requestId,

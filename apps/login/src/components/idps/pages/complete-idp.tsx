@@ -10,12 +10,17 @@ export async function completeIDP({
   requestId,
   organization,
   branding,
+  idpIntent,
 }: {
   userId: string;
   idpInformation: IDPInformation;
   requestId?: string;
   organization?: string;
   branding?: BrandingSettings;
+  idpIntent: {
+    idpIntentId: string;
+    idpIntentToken: string;
+  };
 }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
@@ -31,6 +36,7 @@ export async function completeIDP({
           idpInformation={idpInformation}
           requestId={requestId}
           organization={organization}
+          idpIntent={idpIntent}
         />
       </div>
     </DynamicTheme>
