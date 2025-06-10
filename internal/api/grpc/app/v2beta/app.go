@@ -109,6 +109,18 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 		}, nil
 
 	case *app.PatchApplicationRequest_OidcConfigurationRequest:
+		oidcApp, err := convert.PatchOIDCAppConfigRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.OidcConfigurationRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		updatedOIDCApp, err := s.command.ChangeOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+		return &app.PatchApplicationResponse{
+			ChangeDate: timestamppb.New(updatedOIDCApp.ChangeDate),
+		}, nil
 
 	case *app.PatchApplicationRequest_SamlConfigurationRequest:
 

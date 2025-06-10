@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -204,12 +205,7 @@ func ContainsOIDCGrantTypes(shouldContain, list []OIDCGrantType) bool {
 }
 
 func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) bool {
-	for _, gt := range grantTypes {
-		if gt == grantType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(grantTypes, grantType)
 }
 
 func (a *OIDCApp) FillCompliance() {

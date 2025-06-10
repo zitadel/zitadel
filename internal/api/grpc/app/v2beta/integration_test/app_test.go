@@ -201,6 +201,8 @@ func TestPatchApplication(t *testing.T) {
 	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
 	pNotInCtx := instance.CreateProject(iamOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
 
+	baseURI := "http://example.com"
+
 	t.Cleanup(func() {
 		instance.Client.Projectv2Beta.DeleteProject(iamOwnerCtx, &project.DeleteProjectRequest{
 			Id: p.GetId(),
@@ -210,23 +212,51 @@ func TestPatchApplication(t *testing.T) {
 		})
 	})
 
-	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
-		Name:      gofakeit.AppName(),
-		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
-			ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
+		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	}
+	reqForAPIAppCreation := reqForAppNameCreation
+
+	reqForOIDCAppCreation := &app.CreateApplicationRequest_OidcRequest{
+		OidcRequest: &app.CreateOIDCApplicationRequest{
+			RedirectUris:           []string{"http://example.com"},
+			ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+			GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+			AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+			AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+			PostLogoutRedirectUris: []string{"http://example.com/home"},
+			Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+			AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+			BackChannelLogoutUri:   "http://example.com/logout",
+			LoginVersion: &app.LoginVersion{
+				Version: &app.LoginVersion_LoginV2{
+					LoginV2: &app.LoginV2{
+						BaseUri: &baseURI,
+					},
+				},
+			},
 		},
+	}
+	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
 
 	appForAPIConfigChange, appAPIConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
-		Name:      gofakeit.AppName(),
-		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
-			ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
-		},
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForAPIAppCreation,
 	})
 	require.Nil(t, appAPIConfigChangeErr)
+
+	appForOIDCConfigChange, appOIDCConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForOIDCAppCreation,
+	})
+	require.Nil(t, appOIDCConfigChangeErr)
 
 	tt := []struct {
 		testName     string
@@ -283,6 +313,32 @@ func TestPatchApplication(t *testing.T) {
 				PatchRequestType: &app.PatchApplicationRequest_ApiConfigurationRequest{
 					ApiConfigurationRequest: &app.PatchAPIApplicationConfigurationRequest{
 						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+					},
+				},
+			},
+		},
+
+		{
+			testName: "when app for OIDC config change request is not found should return not found error",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     pNotInCtx.GetId(),
+				ApplicationId: appForOIDCConfigChange.GetAppId(),
+				PatchRequestType: &app.PatchApplicationRequest_OidcConfigurationRequest{
+					OidcConfigurationRequest: &app.PatchOIDCApplicationConfigurationRequest{
+						PostLogoutRedirectUris: []string{"http://example.com/home2"},
+					},
+				},
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when request for OIDC config change is valid should return updated timestamp",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: appForOIDCConfigChange.GetAppId(),
+				PatchRequestType: &app.PatchApplicationRequest_OidcConfigurationRequest{
+					OidcConfigurationRequest: &app.PatchOIDCApplicationConfigurationRequest{
+						PostLogoutRedirectUris: []string{"http://example.com/home2"},
 					},
 				},
 			},

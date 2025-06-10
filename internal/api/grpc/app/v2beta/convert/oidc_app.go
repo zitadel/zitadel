@@ -131,3 +131,33 @@ func ComplianceProblemsToLocalizedMessages(complianceProblems []string) []*app.C
 
 	return converted
 }
+
+func PatchOIDCAppConfigRequestToDomain(appID, projectID string, app *app.PatchOIDCApplicationConfigurationRequest) (*domain.OIDCApp, error) {
+	loginVersion, loginBaseURI, err := LoginVersionToDomain(app.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
+	return &domain.OIDCApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projectID,
+		},
+		AppID:                    appID,
+		RedirectUris:             app.RedirectUris,
+		ResponseTypes:            OIDCResponseTypesToDomain(app.ResponseTypes),
+		GrantTypes:               OIDCGrantTypesToDomain(app.GrantTypes),
+		ApplicationType:          OIDCApplicationTypeToDomain(app.AppType),
+		AuthMethodType:           OIDCAuthMethodTypeToDomain(app.AuthMethodType),
+		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
+		DevMode:                  app.DevMode,
+		AccessTokenType:          OIDCTokenTypeToDomain(app.AccessTokenType),
+		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
+		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
+		ClockSkew:                app.ClockSkew.AsDuration(),
+		AdditionalOrigins:        app.AdditionalOrigins,
+		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
+		BackChannelLogoutURI:     app.BackChannelLogoutUri,
+		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
+	}, nil
+}
