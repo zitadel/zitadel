@@ -18,18 +18,8 @@ import (
 	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
-func TestCreateApplication(t *testing.T) {
-	t.Parallel()
-
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-
-	orgNotInCtx := instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
-	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
-	pNotInCtx := instance.CreateProject(iamOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
-
-	baseURI := "http://example.com"
-
-	samlMetadata := []byte(`<?xml version="1.0"?>
+const (
+	samlMetadataString = `<?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
                      validUntil="2022-08-26T14:08:16Z"
                      cacheDuration="PT604800S"
@@ -42,7 +32,23 @@ func TestCreateApplication(t *testing.T) {
         
     </md:SPSSODescriptor>
 </md:EntityDescriptor>
-`)
+`
+)
+
+var (
+	baseURI      = "http://example.com"
+	samlMetadata = []byte(samlMetadataString)
+)
+
+func TestCreateApplication(t *testing.T) {
+	t.Parallel()
+
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	orgNotInCtx := instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
+	pNotInCtx := instance.CreateProject(iamOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
+
 	tt := []struct {
 		testName        string
 		creationRequest *app.CreateApplicationRequest
@@ -237,6 +243,22 @@ func TestPatchApplication(t *testing.T) {
 			},
 		},
 	}
+
+	reqForSAMLAppCreation := &app.CreateApplicationRequest_SamlRequest{
+		SamlRequest: &app.CreateSAMLApplicationRequest{
+			Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
+				MetadataXml: samlMetadata,
+			},
+			LoginVersion: &app.LoginVersion{
+				Version: &app.LoginVersion_LoginV2{
+					LoginV2: &app.LoginV2{
+						BaseUri: &baseURI,
+					},
+				},
+			},
+		},
+	}
+
 	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
@@ -257,6 +279,13 @@ func TestPatchApplication(t *testing.T) {
 		CreationRequestType: reqForOIDCAppCreation,
 	})
 	require.Nil(t, appOIDCConfigChangeErr)
+
+	appForSAMLConfigChange, appSAMLConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForSAMLAppCreation,
+	})
+	require.Nil(t, appSAMLConfigChangeErr)
 
 	tt := []struct {
 		testName     string
@@ -339,6 +368,38 @@ func TestPatchApplication(t *testing.T) {
 				PatchRequestType: &app.PatchApplicationRequest_OidcConfigurationRequest{
 					OidcConfigurationRequest: &app.PatchOIDCApplicationConfigurationRequest{
 						PostLogoutRedirectUris: []string{"http://example.com/home2"},
+					},
+				},
+			},
+		},
+
+		{
+			testName: "when app for SAML config change request is not found should return not found error",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     pNotInCtx.GetId(),
+				ApplicationId: appForSAMLConfigChange.GetAppId(),
+				PatchRequestType: &app.PatchApplicationRequest_SamlConfigurationRequest{
+					SamlConfigurationRequest: &app.PatchSAMLApplicationConfigurationRequest{
+						Metadata: &app.PatchSAMLApplicationConfigurationRequest_MetadataXml{
+							MetadataXml: samlMetadata,
+						},
+						LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
+					},
+				},
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when request for SAML config change is valid should return updated timestamp",
+			patchRequest: &app.PatchApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: appForSAMLConfigChange.GetAppId(),
+				PatchRequestType: &app.PatchApplicationRequest_SamlConfigurationRequest{
+					SamlConfigurationRequest: &app.PatchSAMLApplicationConfigurationRequest{
+						Metadata: &app.PatchSAMLApplicationConfigurationRequest_MetadataXml{
+							MetadataXml: samlMetadata,
+						},
+						LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
 					},
 				},
 			},

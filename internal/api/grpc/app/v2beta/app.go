@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -79,6 +80,8 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 }
 
 func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplicationRequest) (*app.PatchApplicationResponse, error) {
+	var changedTime time.Time
+
 	switch t := req.GetPatchRequestType().(type) {
 	case *app.PatchApplicationRequest_ApplicationNameRequest:
 		updatedDetails, err := s.command.ChangeApplication(
@@ -94,9 +97,7 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 			return nil, err
 		}
 
-		return &app.PatchApplicationResponse{
-			ChangeDate: timestamppb.New(updatedDetails.EventDate),
-		}, nil
+		changedTime = updatedDetails.EventDate
 
 	case *app.PatchApplicationRequest_ApiConfigurationRequest:
 		updatedAPIApp, err := s.command.ChangeAPIApplication(ctx, convert.PatchAPIApplicationConfigurationRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.ApiConfigurationRequest), authz.GetCtxData(ctx).OrgID)
@@ -104,9 +105,7 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 			return nil, err
 		}
 
-		return &app.PatchApplicationResponse{
-			ChangeDate: timestamppb.New(updatedAPIApp.ChangeDate),
-		}, nil
+		changedTime = updatedAPIApp.ChangeDate
 
 	case *app.PatchApplicationRequest_OidcConfigurationRequest:
 		oidcApp, err := convert.PatchOIDCAppConfigRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.OidcConfigurationRequest)
@@ -118,15 +117,27 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 		if err != nil {
 			return nil, err
 		}
-		return &app.PatchApplicationResponse{
-			ChangeDate: timestamppb.New(updatedOIDCApp.ChangeDate),
-		}, nil
+
+		changedTime = updatedOIDCApp.ChangeDate
 
 	case *app.PatchApplicationRequest_SamlConfigurationRequest:
+		samlApp, err := convert.PatchSAMLAppConfigRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.SamlConfigurationRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		updatedSAMLApp, err := s.command.ChangeSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+
+		changedTime = updatedSAMLApp.ChangeDate
 
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "APP-0iiN46", "unknown app type")
 	}
 
-	return nil, nil
+	return &app.PatchApplicationResponse{
+		ChangeDate: timestamppb.New(changedTime),
+	}, nil
 }

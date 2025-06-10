@@ -22,3 +22,20 @@ func CreateSAMLAppRequestToDomain(name, projectID string, req *app.CreateSAMLApp
 		LoginBaseURI: loginBaseURI,
 	}, nil
 }
+
+func PatchSAMLAppConfigRequestToDomain(appID, projectID string, app *app.PatchSAMLApplicationConfigurationRequest) (*domain.SAMLApp, error) {
+	loginVersion, loginBaseURI, err := LoginVersionToDomain(app.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
+	return &domain.SAMLApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projectID,
+		},
+		AppID:        appID,
+		Metadata:     app.GetMetadataXml(),
+		MetadataURL:  app.GetMetadataUrl(),
+		LoginVersion: loginVersion,
+		LoginBaseURI: loginBaseURI,
+	}, nil
+}
