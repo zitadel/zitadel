@@ -242,10 +242,9 @@ export default async function Page(props: {
           : "Could not create user",
       );
     }
-  }
+  } else if (options?.isCreationAllowed) {
+    // if no user was found, we will create a new user manually / redirect to the registration page
 
-  // if no user was found, we will create a new user manually / redirect to the registration page
-  if (options?.isCreationAllowed) {
     return completeIDP({
       branding,
       idpIntent: { idpIntentId: id, idpIntentToken: token },

@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Collegamento account fallito",
       "description": "Si è verificato un errore durante il tentativo di collegare il tuo account."
+    },
+    "completeRegister": {
+      "title": "Completa la registrazione",
+      "description": "Completa la registrazione del tuo account."
     }
   },
   "mfa": {

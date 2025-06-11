@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Error al vincular la cuenta",
       "description": "Ocurrió un error al intentar vincular tu cuenta."
+    },
+    "completeRegister": {
+      "title": "Completar registro",
+      "description": "Para completar el registro, debes establecer una contraseña."
     }
   },
   "mfa": {

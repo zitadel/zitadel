@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Powiązanie konta nie powiodło się",
       "description": "Wystąpił błąd podczas próby powiązania konta."
+    },
+    "completeRegister": {
+      "title": "Ukończ rejestrację",
+      "description": "Ukończ rejestrację swojego konta."
     }
   },
   "mfa": {

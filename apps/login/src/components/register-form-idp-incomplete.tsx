@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
-import { AuthenticationMethod, methods } from "./authentication-method-radio";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -51,7 +50,6 @@ export function RegisterFormIDPIncomplete({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
@@ -126,8 +124,6 @@ export function RegisterFormIDPIncomplete({
           />
         </div>
       </div>
-
-      <p className="mt-4 ztdl-p mb-6 block text-left">{t("completeData")}</p>
 
       {error && (
         <div className="py-4">

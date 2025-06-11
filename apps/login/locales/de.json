@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Konto-Verknüpfung fehlgeschlagen",
       "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
+    },
+    "completeRegister": {
+      "title": "Registrierung abschließen",
+      "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
     }
   },
   "mfa": {

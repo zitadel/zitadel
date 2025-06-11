@@ -167,17 +167,22 @@ export function RegisterForm({
           onChange={setTosAndPolicyAccepted}
         />
       )}
-      <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
       {/* show chooser if both methods are allowed */}
       {loginSettings &&
         loginSettings.allowUsernamePassword &&
         loginSettings.passkeysType == PasskeysType.ALLOWED && (
-          <div className="pb-4">
-            <AuthenticationMethodRadio
-              selected={selected}
-              selectionChanged={setSelected}
-            />
-          </div>
+          <>
+            <p className="mt-4 ztdl-p mb-6 block text-left">
+              {t("selectMethod")}
+            </p>
+
+            <div className="pb-4">
+              <AuthenticationMethodRadio
+                selected={selected}
+                selectionChanged={setSelected}
+              />
+            </div>
+          </>
         )}
 
       {(!loginSettings?.allowUsernamePassword ||

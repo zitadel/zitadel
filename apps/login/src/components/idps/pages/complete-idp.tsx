@@ -28,8 +28,8 @@ export async function completeIDP({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("loginSuccess.title")}</h1>
-        <p className="ztdl-p">{t("loginSuccess.description")}</p>
+        <h1>{t("completeRegister.title")}</h1>
+        <p className="ztdl-p">{t("completeRegister.description")}</p>
 
         <RegisterFormIDPIncomplete
           userId={userId}
