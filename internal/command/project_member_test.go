@@ -461,7 +461,9 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{

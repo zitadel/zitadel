@@ -56,11 +56,11 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 	if projectGrantResourceOwner != addedMember.ResourceOwner {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
 	}
-	if err := c.checkPermissionUpdateProjectGrantMember(ctx, addedMember.ResourceOwner, addedMember.AggregateID, addedMember.GrantID); err != nil {
-		return nil, err
-	}
 	if addedMember.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-37fug", "Errors.AlreadyExists")
+	}
+	if err := c.checkPermissionUpdateProjectGrantMember(ctx, addedMember.ResourceOwner, addedMember.AggregateID, addedMember.GrantID); err != nil {
+		return nil, err
 	}
 
 	pushedEvents, err := c.eventstore.Push(

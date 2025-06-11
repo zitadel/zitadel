@@ -108,14 +108,14 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *ChangeProjec
 	if err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionUpdateProjectMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID); err != nil {
-		return nil, err
-	}
 	if !existingMember.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.NotFound")
 	}
+	if err := c.checkPermissionUpdateProjectMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID); err != nil {
+		return nil, err
+	}
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
+		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))

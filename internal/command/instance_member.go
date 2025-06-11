@@ -132,7 +132,7 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *ChangeInsta
 		return nil, err
 	}
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-LiaZi", "Errors.IAM.Member.RolesNotChanged")
+		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
 		instance.NewMemberChangedEvent(ctx,
@@ -167,9 +167,12 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, instanceID, userID 
 		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx,
-		c.removeInstanceMember(ctx, instanceAgg, userID, false),
+		c.removeInstanceMember(ctx,
+			InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel),
+			userID,
+			false,
+		),
 	)
 	if err != nil {
 		return nil, err

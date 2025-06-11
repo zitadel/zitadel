@@ -18,15 +18,12 @@ import (
 
 func TestAddMember(t *testing.T) {
 	type args struct {
-		a            *org.Aggregate
-		userID       string
-		roles        []string
+		member       *AddOrgMember
 		zitadelRoles []authz.RoleMapping
 		filter       preparation.FilterToQueryReducer
 	}
 
 	ctx := context.Background()
-	agg := org.NewAggregate("test")
 
 	tests := []struct {
 		name string
@@ -36,8 +33,10 @@ func TestAddMember(t *testing.T) {
 		{
 			name: "no user id",
 			args: args{
-				a:      agg,
-				userID: "",
+				member: &AddOrgMember{
+					OrgID:  "test",
+					UserID: "",
+				},
 			},
 			want: Want{
 				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
@@ -46,19 +45,23 @@ func TestAddMember(t *testing.T) {
 		{
 			name: "no roles",
 			args: args{
-				a:      agg,
-				userID: "12342",
+				member: &AddOrgMember{
+					OrgID:  "test",
+					UserID: "12342",
+				},
 			},
 			want: Want{
-				ValidationErr: zerrors.ThrowInvalidArgument(nil, "V2-PfYhb", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
 			},
 		},
 		{
 			name: "TODO: invalid roles",
 			args: args{
-				a:      agg,
-				userID: "123",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "test",
+					UserID: "12342",
+					Roles:  []string{"ORG_OWNER"},
+				},
 			},
 			want: Want{
 				ValidationErr: zerrors.ThrowInvalidArgument(nil, "Org-4N8es", ""),
@@ -67,9 +70,11 @@ func TestAddMember(t *testing.T) {
 		{
 			name: "user not exists",
 			args: args{
-				a:      agg,
-				userID: "userID",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "test",
+					UserID: "userID",
+					Roles:  []string{"ORG_OWNER"},
+				},
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "ORG_OWNER",
@@ -87,9 +92,11 @@ func TestAddMember(t *testing.T) {
 		{
 			name: "already member",
 			args: args{
-				a:      agg,
-				userID: "userID",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "test",
+					UserID: "userID",
+					Roles:  []string{"ORG_OWNER"},
+				},
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "ORG_OWNER",
@@ -127,9 +134,11 @@ func TestAddMember(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				a:      agg,
-				userID: "userID",
-				roles:  []string{"ORG_OWNER"},
+				member: &AddOrgMember{
+					OrgID:  "test",
+					UserID: "userID",
+					Roles:  []string{"ORG_OWNER"},
+				},
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "ORG_OWNER",
@@ -156,14 +165,14 @@ func TestAddMember(t *testing.T) {
 			},
 			want: Want{
 				Commands: []eventstore.Command{
-					org.NewMemberAddedEvent(ctx, &agg.Aggregate, "userID", "ORG_OWNER"),
+					org.NewMemberAddedEvent(ctx, &org.NewAggregate("test").Aggregate, "userID", "ORG_OWNER"),
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, context.Background(), (&Commands{zitadelRoles: tt.args.zitadelRoles}).AddOrgMemberCommand(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), (&Commands{zitadelRoles: tt.args.zitadelRoles}).AddOrgMemberCommand(tt.args.member), tt.args.filter, tt.want)
 		})
 	}
 }

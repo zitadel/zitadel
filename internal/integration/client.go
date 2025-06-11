@@ -930,10 +930,24 @@ func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, u
 	require.NoError(t, err)
 }
 
+func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, userID string) {
+	_, err := i.Client.Admin.RemoveIAMMember(ctx, &admin.RemoveIAMMemberRequest{
+		UserId: userID,
+	})
+	require.NoError(t, err)
+}
+
 func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, userID string) {
 	_, err := i.Client.Mgmt.AddOrgMember(ctx, &mgmt.AddOrgMemberRequest{
 		UserId: userID,
 		Roles:  []string{domain.RoleOrgOwner},
+	})
+	require.NoError(t, err)
+}
+
+func (i *Instance) DeleteOrgMembership(t *testing.T, ctx context.Context, userID string) {
+	_, err := i.Client.Mgmt.RemoveOrgMember(ctx, &mgmt.RemoveOrgMemberRequest{
+		UserId: userID,
 	})
 	require.NoError(t, err)
 }
@@ -947,12 +961,29 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 	require.NoError(t, err)
 }
 
+func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
+	_, err := i.Client.Mgmt.RemoveProjectMember(ctx, &mgmt.RemoveProjectMemberRequest{
+		ProjectId: projectID,
+		UserId:    userID,
+	})
+	require.NoError(t, err)
+}
+
 func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
 	_, err := i.Client.Mgmt.AddProjectGrantMember(ctx, &mgmt.AddProjectGrantMemberRequest{
 		ProjectId: projectID,
 		GrantId:   grantID,
 		UserId:    userID,
 		Roles:     []string{domain.RoleProjectGrantOwner},
+	})
+	require.NoError(t, err)
+}
+
+func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
+	_, err := i.Client.Mgmt.RemoveProjectGrantMember(ctx, &mgmt.RemoveProjectGrantMemberRequest{
+		ProjectId: projectID,
+		GrantId:   grantID,
+		UserId:    userID,
 	})
 	require.NoError(t, err)
 }

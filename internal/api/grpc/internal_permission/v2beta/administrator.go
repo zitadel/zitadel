@@ -94,7 +94,7 @@ func createAdministratorProjectGrantToCommand(req *internal_permission.ResourceT
 func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permission.UpdateAdministratorRequest) (*internal_permission.UpdateAdministratorResponse, error) {
 	var changeDate *timestamppb.Timestamp
 
-	switch resource := req.GetResource().Resource.(type) {
+	switch resource := req.GetResource().GetResource().(type) {
 	case *internal_permission.ResourceType_Instance:
 		if resource.Instance {
 			member, err := s.command.ChangeInstanceMember(ctx, updateAdministratorInstanceToCommand(authz.GetInstance(ctx).InstanceID(), req.UserId, req.Roles))
@@ -129,6 +129,8 @@ func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permissi
 		if !member.EventDate.IsZero() {
 			changeDate = timestamppb.New(member.EventDate)
 		}
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-TODO", "Errors.Invalid.Argument")
 	}
 
 	return &internal_permission.UpdateAdministratorResponse{
@@ -172,7 +174,7 @@ func updateAdministratorProjectGrantToCommand(req *internal_permission.ResourceT
 func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permission.DeleteAdministratorRequest) (*internal_permission.DeleteAdministratorResponse, error) {
 	var deletionDate *timestamppb.Timestamp
 
-	switch resource := req.GetResource().Resource.(type) {
+	switch resource := req.GetResource().GetResource().(type) {
 	case *internal_permission.ResourceType_Instance:
 		if resource.Instance {
 			member, err := s.command.RemoveInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), req.UserId)
@@ -207,6 +209,8 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permissi
 		if !member.EventDate.IsZero() {
 			deletionDate = timestamppb.New(member.EventDate)
 		}
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-TODO", "Errors.Invalid.Argument")
 	}
 
 	return &internal_permission.DeleteAdministratorResponse{
