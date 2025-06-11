@@ -10,6 +10,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/app/v2beta/login.proto";
 import "zitadel/app/v2beta/oidc.proto";
+import "zitadel/app/v2beta/api.proto";
 import "zitadel/app/v2beta/app.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
@@ -168,6 +169,35 @@ service AppService {
             }
         };
     }
+
+    // Get Application
+    //
+    // Retrieves the application matching the provided ID.
+    //
+    // The user needs to be owner of the project and have project.app.read permission
+    //
+    // Required permissions:
+    //   - `project.app.read`
+    rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The fetched app.";
+                }
+            };
+        };
+
+        option (google.api.http) = {
+            get: "/v2beta/apps/{application_id}"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
 }
 
 message CreateApplicationRequest {
@@ -204,7 +234,6 @@ message CreateApplicationResponse {
         CreateAPIApplicationResponse api_response = 5;
     }
 }
-
 
 message CreateOIDCApplicationRequest {
     repeated string redirect_uris = 1 [
@@ -300,11 +329,6 @@ message CreateOIDCApplicationRequest {
 }
 
 message CreateOIDCApplicationResponse {
-    message OIDCApplicationLocalizedMessage {
-        string key = 1;
-        string localized_message = 2;
-    }
-
     string client_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1035496534033449\"";
@@ -318,7 +342,7 @@ message CreateOIDCApplicationResponse {
         }
     ];
     bool none_compliant = 3;
-    repeated OIDCApplicationLocalizedMessage compliance_problems = 4;
+    repeated OIDCLocalizedMessage compliance_problems = 4;
 }
 
 message CreateSAMLApplicationRequest {
@@ -505,4 +529,20 @@ message PatchOIDCApplicationConfigurationRequest {
 
 message PatchAPIApplicationConfigurationRequest {
     APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
+}
+
+message GetApplicationRequest {
+    string application_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"45984352431\"";
+        }
+    ];
+}
+
+message GetApplicationResponse {
+    Application app = 1;
 }

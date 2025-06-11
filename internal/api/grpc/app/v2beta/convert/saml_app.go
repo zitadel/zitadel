@@ -3,11 +3,12 @@ package convert
 import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
 func CreateSAMLAppRequestToDomain(name, projectID string, req *app.CreateSAMLApplicationRequest) (*domain.SAMLApp, error) {
-	loginVersion, loginBaseURI, err := LoginVersionToDomain(req.GetLoginVersion())
+	loginVersion, loginBaseURI, err := loginVersionToDomain(req.GetLoginVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +25,7 @@ func CreateSAMLAppRequestToDomain(name, projectID string, req *app.CreateSAMLApp
 }
 
 func PatchSAMLAppConfigRequestToDomain(appID, projectID string, app *app.PatchSAMLApplicationConfigurationRequest) (*domain.SAMLApp, error) {
-	loginVersion, loginBaseURI, err := LoginVersionToDomain(app.GetLoginVersion())
+	loginVersion, loginBaseURI, err := loginVersionToDomain(app.GetLoginVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -38,4 +39,13 @@ func PatchSAMLAppConfigRequestToDomain(appID, projectID string, app *app.PatchSA
 		LoginVersion: loginVersion,
 		LoginBaseURI: loginBaseURI,
 	}, nil
+}
+
+func appSAMLConfigToPb(samlApp *query.SAMLApp) app.ApplicationConfig {
+	return &app.Application_SamlConfig{
+		SamlConfig: &app.SAMLConfig{
+			Metadata:     &app.SAMLConfig_MetadataXml{MetadataXml: samlApp.Metadata},
+			LoginVersion: loginVersionToPb(samlApp.LoginVersion, samlApp.LoginBaseURI),
+		},
+	}
 }

@@ -1,13 +1,16 @@
 package convert
 
 import (
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
 func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApplicationRequest) (*domain.OIDCApp, error) {
-	loginVersion, loginBaseURI, err := LoginVersionToDomain(req.GetLoginVersion())
+	loginVersion, loginBaseURI, err := loginVersionToDomain(req.GetLoginVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -16,15 +19,15 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApp
 			AggregateID: projectID,
 		},
 		AppName:                  name,
-		OIDCVersion:              OIDCVersionToDomain(req.GetVersion()),
+		OIDCVersion:              oidcVersionToDomain(req.GetVersion()),
 		RedirectUris:             req.GetRedirectUris(),
-		ResponseTypes:            OIDCResponseTypesToDomain(req.GetResponseTypes()),
-		GrantTypes:               OIDCGrantTypesToDomain(req.GetGrantTypes()),
-		ApplicationType:          OIDCApplicationTypeToDomain(req.GetAppType()),
-		AuthMethodType:           OIDCAuthMethodTypeToDomain(req.GetAuthMethodType()),
+		ResponseTypes:            oidcResponseTypesToDomain(req.GetResponseTypes()),
+		GrantTypes:               oidcGrantTypesToDomain(req.GetGrantTypes()),
+		ApplicationType:          oidcApplicationTypeToDomain(req.GetAppType()),
+		AuthMethodType:           oidcAuthMethodTypeToDomain(req.GetAuthMethodType()),
 		PostLogoutRedirectUris:   req.GetPostLogoutRedirectUris(),
 		DevMode:                  req.GetDevMode(),
-		AccessTokenType:          OIDCTokenTypeToDomain(req.GetAccessTokenType()),
+		AccessTokenType:          oidcTokenTypeToDomain(req.GetAccessTokenType()),
 		AccessTokenRoleAssertion: req.GetAccessTokenRoleAssertion(),
 		IDTokenRoleAssertion:     req.GetIdTokenRoleAssertion(),
 		IDTokenUserinfoAssertion: req.GetIdTokenUserinfoAssertion(),
@@ -37,7 +40,37 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApp
 	}, nil
 }
 
-func OIDCVersionToDomain(version app.OIDCVersion) domain.OIDCVersion {
+func PatchOIDCAppConfigRequestToDomain(appID, projectID string, app *app.PatchOIDCApplicationConfigurationRequest) (*domain.OIDCApp, error) {
+	loginVersion, loginBaseURI, err := loginVersionToDomain(app.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
+	return &domain.OIDCApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: projectID,
+		},
+		AppID:                    appID,
+		RedirectUris:             app.RedirectUris,
+		ResponseTypes:            oidcResponseTypesToDomain(app.ResponseTypes),
+		GrantTypes:               oidcGrantTypesToDomain(app.GrantTypes),
+		ApplicationType:          oidcApplicationTypeToDomain(app.AppType),
+		AuthMethodType:           oidcAuthMethodTypeToDomain(app.AuthMethodType),
+		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
+		DevMode:                  app.DevMode,
+		AccessTokenType:          oidcTokenTypeToDomain(app.AccessTokenType),
+		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
+		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
+		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
+		ClockSkew:                app.ClockSkew.AsDuration(),
+		AdditionalOrigins:        app.AdditionalOrigins,
+		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
+		BackChannelLogoutURI:     app.BackChannelLogoutUri,
+		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
+	}, nil
+}
+
+func oidcVersionToDomain(version app.OIDCVersion) domain.OIDCVersion {
 	switch version {
 	case app.OIDCVersion_OIDC_VERSION_1_0:
 		return domain.OIDCVersionV1
@@ -45,7 +78,7 @@ func OIDCVersionToDomain(version app.OIDCVersion) domain.OIDCVersion {
 	return domain.OIDCVersionV1
 }
 
-func OIDCResponseTypesToDomain(responseTypes []app.OIDCResponseType) []domain.OIDCResponseType {
+func oidcResponseTypesToDomain(responseTypes []app.OIDCResponseType) []domain.OIDCResponseType {
 	if len(responseTypes) == 0 {
 		return []domain.OIDCResponseType{domain.OIDCResponseTypeCode}
 	}
@@ -63,7 +96,7 @@ func OIDCResponseTypesToDomain(responseTypes []app.OIDCResponseType) []domain.OI
 	return oidcResponseTypes
 }
 
-func OIDCGrantTypesToDomain(grantTypes []app.OIDCGrantType) []domain.OIDCGrantType {
+func oidcGrantTypesToDomain(grantTypes []app.OIDCGrantType) []domain.OIDCGrantType {
 	if len(grantTypes) == 0 {
 		return []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode}
 	}
@@ -85,7 +118,7 @@ func OIDCGrantTypesToDomain(grantTypes []app.OIDCGrantType) []domain.OIDCGrantTy
 	return oidcGrantTypes
 }
 
-func OIDCApplicationTypeToDomain(appType app.OIDCAppType) domain.OIDCApplicationType {
+func oidcApplicationTypeToDomain(appType app.OIDCAppType) domain.OIDCApplicationType {
 	switch appType {
 	case app.OIDCAppType_OIDC_APP_TYPE_WEB:
 		return domain.OIDCApplicationTypeWeb
@@ -97,7 +130,7 @@ func OIDCApplicationTypeToDomain(appType app.OIDCAppType) domain.OIDCApplication
 	return domain.OIDCApplicationTypeWeb
 }
 
-func OIDCAuthMethodTypeToDomain(authType app.OIDCAuthMethodType) domain.OIDCAuthMethodType {
+func oidcAuthMethodTypeToDomain(authType app.OIDCAuthMethodType) domain.OIDCAuthMethodType {
 	switch authType {
 	case app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC:
 		return domain.OIDCAuthMethodTypeBasic
@@ -112,7 +145,7 @@ func OIDCAuthMethodTypeToDomain(authType app.OIDCAuthMethodType) domain.OIDCAuth
 	}
 }
 
-func OIDCTokenTypeToDomain(tokenType app.OIDCTokenType) domain.OIDCTokenType {
+func oidcTokenTypeToDomain(tokenType app.OIDCTokenType) domain.OIDCTokenType {
 	switch tokenType {
 	case app.OIDCTokenType_OIDC_TOKEN_TYPE_BEARER:
 		return domain.OIDCTokenTypeBearer
@@ -123,41 +156,120 @@ func OIDCTokenTypeToDomain(tokenType app.OIDCTokenType) domain.OIDCTokenType {
 	}
 }
 
-func ComplianceProblemsToLocalizedMessages(complianceProblems []string) []*app.CreateOIDCApplicationResponse_OIDCApplicationLocalizedMessage {
-	converted := make([]*app.CreateOIDCApplicationResponse_OIDCApplicationLocalizedMessage, len(complianceProblems))
+func ComplianceProblemsToLocalizedMessages(complianceProblems []string) []*app.OIDCLocalizedMessage {
+	converted := make([]*app.OIDCLocalizedMessage, len(complianceProblems))
 	for i, p := range complianceProblems {
-		converted[i] = &app.CreateOIDCApplicationResponse_OIDCApplicationLocalizedMessage{Key: p}
+		converted[i] = &app.OIDCLocalizedMessage{Key: p}
 	}
 
 	return converted
 }
 
-func PatchOIDCAppConfigRequestToDomain(appID, projectID string, app *app.PatchOIDCApplicationConfigurationRequest) (*domain.OIDCApp, error) {
-	loginVersion, loginBaseURI, err := LoginVersionToDomain(app.GetLoginVersion())
-	if err != nil {
-		return nil, err
-	}
-	return &domain.OIDCApp{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: projectID,
+func appOIDCConfigToPb(oidcApp *query.OIDCApp) *app.Application_OidcConfig {
+	return &app.Application_OidcConfig{
+		OidcConfig: &app.OIDCConfig{
+			RedirectUris:             oidcApp.RedirectURIs,
+			ResponseTypes:            oidcResponseTypesFromModel(oidcApp.ResponseTypes),
+			GrantTypes:               oidcGrantTypesFromModel(oidcApp.GrantTypes),
+			AppType:                  oidcApplicationTypeToPb(oidcApp.AppType),
+			ClientId:                 oidcApp.ClientID,
+			AuthMethodType:           oidcAuthMethodTypeToPb(oidcApp.AuthMethodType),
+			PostLogoutRedirectUris:   oidcApp.PostLogoutRedirectURIs,
+			Version:                  oidcVersionToPb(domain.OIDCVersion(oidcApp.Version)),
+			NoneCompliant:            len(oidcApp.ComplianceProblems) != 0,
+			ComplianceProblems:       ComplianceProblemsToLocalizedMessages(oidcApp.ComplianceProblems),
+			DevMode:                  oidcApp.IsDevMode,
+			AccessTokenType:          oidcTokenTypeToPb(oidcApp.AccessTokenType),
+			AccessTokenRoleAssertion: oidcApp.AssertAccessTokenRole,
+			IdTokenRoleAssertion:     oidcApp.AssertIDTokenRole,
+			IdTokenUserinfoAssertion: oidcApp.AssertIDTokenUserinfo,
+			ClockSkew:                durationpb.New(oidcApp.ClockSkew),
+			AdditionalOrigins:        oidcApp.AdditionalOrigins,
+			AllowedOrigins:           oidcApp.AllowedOrigins,
+			SkipNativeAppSuccessPage: oidcApp.SkipNativeAppSuccessPage,
+			BackChannelLogoutUri:     oidcApp.BackChannelLogoutURI,
+			LoginVersion:             loginVersionToPb(oidcApp.LoginVersion, oidcApp.LoginBaseURI),
 		},
-		AppID:                    appID,
-		RedirectUris:             app.RedirectUris,
-		ResponseTypes:            OIDCResponseTypesToDomain(app.ResponseTypes),
-		GrantTypes:               OIDCGrantTypesToDomain(app.GrantTypes),
-		ApplicationType:          OIDCApplicationTypeToDomain(app.AppType),
-		AuthMethodType:           OIDCAuthMethodTypeToDomain(app.AuthMethodType),
-		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
-		DevMode:                  app.DevMode,
-		AccessTokenType:          OIDCTokenTypeToDomain(app.AccessTokenType),
-		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
-		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
-		ClockSkew:                app.ClockSkew.AsDuration(),
-		AdditionalOrigins:        app.AdditionalOrigins,
-		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
-		BackChannelLogoutURI:     app.BackChannelLogoutUri,
-		LoginVersion:             loginVersion,
-		LoginBaseURI:             loginBaseURI,
-	}, nil
+	}
+}
+
+func oidcResponseTypesFromModel(responseTypes []domain.OIDCResponseType) []app.OIDCResponseType {
+	oidcResponseTypes := make([]app.OIDCResponseType, len(responseTypes))
+	for i, responseType := range responseTypes {
+		switch responseType {
+		case domain.OIDCResponseTypeCode:
+			oidcResponseTypes[i] = app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE
+		case domain.OIDCResponseTypeIDToken:
+			oidcResponseTypes[i] = app.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN
+		case domain.OIDCResponseTypeIDTokenToken:
+			oidcResponseTypes[i] = app.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN
+		}
+	}
+	return oidcResponseTypes
+}
+
+func oidcGrantTypesFromModel(grantTypes []domain.OIDCGrantType) []app.OIDCGrantType {
+	oidcGrantTypes := make([]app.OIDCGrantType, len(grantTypes))
+	for i, grantType := range grantTypes {
+		switch grantType {
+		case domain.OIDCGrantTypeAuthorizationCode:
+			oidcGrantTypes[i] = app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE
+		case domain.OIDCGrantTypeImplicit:
+			oidcGrantTypes[i] = app.OIDCGrantType_OIDC_GRANT_TYPE_IMPLICIT
+		case domain.OIDCGrantTypeRefreshToken:
+			oidcGrantTypes[i] = app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN
+		case domain.OIDCGrantTypeDeviceCode:
+			oidcGrantTypes[i] = app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE
+		case domain.OIDCGrantTypeTokenExchange:
+			oidcGrantTypes[i] = app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE
+		}
+	}
+	return oidcGrantTypes
+}
+
+func oidcApplicationTypeToPb(appType domain.OIDCApplicationType) app.OIDCAppType {
+	switch appType {
+	case domain.OIDCApplicationTypeWeb:
+		return app.OIDCAppType_OIDC_APP_TYPE_WEB
+	case domain.OIDCApplicationTypeUserAgent:
+		return app.OIDCAppType_OIDC_APP_TYPE_USER_AGENT
+	case domain.OIDCApplicationTypeNative:
+		return app.OIDCAppType_OIDC_APP_TYPE_NATIVE
+	default:
+		return app.OIDCAppType_OIDC_APP_TYPE_WEB
+	}
+}
+
+func oidcAuthMethodTypeToPb(authType domain.OIDCAuthMethodType) app.OIDCAuthMethodType {
+	switch authType {
+	case domain.OIDCAuthMethodTypeBasic:
+		return app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC
+	case domain.OIDCAuthMethodTypePost:
+		return app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_POST
+	case domain.OIDCAuthMethodTypeNone:
+		return app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE
+	case domain.OIDCAuthMethodTypePrivateKeyJWT:
+		return app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT
+	default:
+		return app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC
+	}
+}
+
+func oidcVersionToPb(version domain.OIDCVersion) app.OIDCVersion {
+	switch version {
+	case domain.OIDCVersionV1:
+		return app.OIDCVersion_OIDC_VERSION_1_0
+	}
+	return app.OIDCVersion_OIDC_VERSION_1_0
+}
+
+func oidcTokenTypeToPb(tokenType domain.OIDCTokenType) app.OIDCTokenType {
+	switch tokenType {
+	case domain.OIDCTokenTypeBearer:
+		return app.OIDCTokenType_OIDC_TOKEN_TYPE_BEARER
+	case domain.OIDCTokenTypeJWT:
+		return app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT
+	default:
+		return app.OIDCTokenType_OIDC_TOKEN_TYPE_BEARER
+	}
 }

@@ -1,9 +1,57 @@
 syntax = "proto3";
 
 package zitadel.app.v2beta;
+
+import "zitadel/app/v2beta/oidc.proto";
+import "zitadel/app/v2beta/saml.proto";
+import "zitadel/app/v2beta/api.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
 
-enum APIAuthMethodType {
-    API_AUTH_METHOD_TYPE_BASIC = 0;
-    API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT = 1;
+
+message Application {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+
+    // The timestamp of the app creation.
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    // The timestamp of the app update.
+    google.protobuf.Timestamp change_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    AppState state = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the application";
+        }
+    ];
+    string name = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Console\"";
+        }
+    ];
+    oneof config {
+        OIDCConfig oidc_config = 6;
+        APIConfig api_config = 7;
+        SAMLConfig saml_config = 8;
+    }
+}
+
+enum AppState {
+    APP_STATE_UNSPECIFIED = 0;
+    APP_STATE_ACTIVE = 1;
+    APP_STATE_INACTIVE = 2;
 }
