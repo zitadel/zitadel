@@ -18,12 +18,12 @@ import (
 	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
-const (
-	samlMetadataString = `<?xml version="1.0"?>
+func samlMetadataGen(entityID string) []byte {
+	str := fmt.Sprintf(`<?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
                      validUntil="2022-08-26T14:08:16Z"
                      cacheDuration="PT604800S"
-                     entityID="https://test.com/saml/metadata">
+                     entityID="%s">
     <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
@@ -32,12 +32,14 @@ const (
         
     </md:SPSSODescriptor>
 </md:EntityDescriptor>
-`
-)
+`,
+		entityID)
+
+	return []byte(str)
+}
 
 var (
-	baseURI      = "http://example.com"
-	samlMetadata = []byte(samlMetadataString)
+	baseURI = "http://example.com"
 )
 
 func TestCreateApplication(t *testing.T) {
@@ -169,7 +171,7 @@ func TestCreateApplication(t *testing.T) {
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
 						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
-							MetadataXml: samlMetadata,
+							MetadataXml: samlMetadataGen(gofakeit.URL()),
 						},
 						LoginVersion: &app.LoginVersion{
 							Version: &app.LoginVersion_LoginV2{
@@ -187,6 +189,7 @@ func TestCreateApplication(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
 			res, err := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, tc.creationRequest)
 
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
@@ -201,6 +204,8 @@ func TestCreateApplication(t *testing.T) {
 }
 
 func TestPatchApplication(t *testing.T) {
+	t.Parallel()
+
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	orgNotInCtx := instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
@@ -244,10 +249,11 @@ func TestPatchApplication(t *testing.T) {
 		},
 	}
 
+	samlMetas := samlMetadataGen(gofakeit.URL())
 	reqForSAMLAppCreation := &app.CreateApplicationRequest_SamlRequest{
 		SamlRequest: &app.CreateSAMLApplicationRequest{
 			Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
-				MetadataXml: samlMetadata,
+				MetadataXml: samlMetas,
 			},
 			LoginVersion: &app.LoginVersion{
 				Version: &app.LoginVersion_LoginV2{
@@ -381,7 +387,7 @@ func TestPatchApplication(t *testing.T) {
 				PatchRequestType: &app.PatchApplicationRequest_SamlConfigurationRequest{
 					SamlConfigurationRequest: &app.PatchSAMLApplicationConfigurationRequest{
 						Metadata: &app.PatchSAMLApplicationConfigurationRequest_MetadataXml{
-							MetadataXml: samlMetadata,
+							MetadataXml: samlMetas,
 						},
 						LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
 					},
@@ -397,7 +403,7 @@ func TestPatchApplication(t *testing.T) {
 				PatchRequestType: &app.PatchApplicationRequest_SamlConfigurationRequest{
 					SamlConfigurationRequest: &app.PatchSAMLApplicationConfigurationRequest{
 						Metadata: &app.PatchSAMLApplicationConfigurationRequest_MetadataXml{
-							MetadataXml: samlMetadata,
+							MetadataXml: samlMetas,
 						},
 						LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
 					},
@@ -408,6 +414,7 @@ func TestPatchApplication(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
 			res, err := instance.Client.AppV2Beta.PatchApplication(iamOwnerCtx, tc.patchRequest)
 
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
