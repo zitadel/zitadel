@@ -9,8 +9,10 @@ type Config struct {
 }
 
 type TelemetryConfig struct {
-	ResourceCount struct {
-		Enabled  bool
-		BulkSize int
-	}
+	ResourceCount ResourceCount
+}
+
+type ResourceCount struct {
+	Enabled  bool
+	BulkSize int
 }

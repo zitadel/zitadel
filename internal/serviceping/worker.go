@@ -2,6 +2,7 @@ package serviceping
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
@@ -25,37 +26,80 @@ const (
 	QueueName = "service_ping_report"
 )
 
-type ReportType uint
+var (
+	ErrInvalidReportType = errors.New("invalid report type")
+
+	_ river.Worker[*ServicePingReport] = (*Worker)(nil)
+)
 
 type Worker struct {
 	river.WorkerDefaults[*ServicePingReport]
 
 	reportClient analytics.TelemetryServiceClient
-	db           *query.Queries
-	queue        *queue.Queue
+	db           Queries
+	queue        Queue
 
 	config   *Config
 	systemID string
+	version  string
 
 	//now    nowFunc
 }
 
-// Work implements [river.Worker].
+type Queries interface {
+	SearchInstances(ctx context.Context, queries *query.InstanceSearchQueries) (*query.Instances, error)
+	ListResourceCounts(ctx context.Context, lastID int, size int) ([]query.ResourceCount, error)
+}
+
+type Queue interface {
+	Insert(ctx context.Context, args river.JobArgs, opts ...queue.InsertOpt) error
+}
+
+func NewWorker(
+	reportClient analytics.TelemetryServiceClient,
+	queries *query.Queries,
+	q *queue.Queue,
+	config *Config,
+	systemID string,
+) *Worker {
+	return &Worker{
+		reportClient: reportClient,
+		db:           queries,
+		queue:        q,
+		config:       config,
+		systemID:     systemID,
+		version:      build.Version(),
+	}
+}
+
+// Register implements the [queue.Worker] interface.
+func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueConfig) {
+	river.AddWorker[*ServicePingReport](workers, w)
+	queues[QueueName] = river.QueueConfig{
+		//MaxWorkers: int(w.config.Workers),
+		MaxWorkers: 1,
+	}
+}
+
+// Work implements the [river.Worker] interface.
 func (w *Worker) Work(ctx context.Context, job *river.Job[*ServicePingReport]) (err error) {
 	defer func() {
 		err = w.handleClientError(err)
 	}()
-	switch job.Args.TestState {
-	case 0:
+	switch job.Args.ReportType {
+	case ReportTypeBaseInformation:
 		reportID, err := w.reportBaseInformation(ctx)
 		if err != nil {
 			return err
 		}
 		return w.createReportJobs(ctx, reportID)
-	case 1:
+	case ReportTypeResourceCounts:
 		return w.reportResourceCounts(ctx, job.Args.ReportID)
+	default:
+		logging.WithFields("reportType", job.Args.ReportType, "reportID", job.Args.ReportID).
+			Error("unknown job type")
+		return river.JobCancel(ErrInvalidReportType)
 	}
-	return nil
 }
 
 func (w *Worker) reportBaseInformation(ctx context.Context) (string, error) {
@@ -64,16 +108,15 @@ func (w *Worker) reportBaseInformation(ctx context.Context) (string, error) {
 		return "", err
 	}
 	instanceInformation := instanceInformationToPb(instances)
-
 	resp, err := w.reportClient.ReportBaseInformation(ctx, &analytics.ReportBaseInformationRequest{
 		SystemId:  w.systemID,
-		Version:   build.Version(),
+		Version:   w.version,
 		Instances: instanceInformation,
 	})
 	if err != nil {
 		return "", err
 	}
-	return resp.ReportId, nil
+	return resp.GetReportId(), nil
 }
 
 func (w *Worker) reportResourceCounts(ctx context.Context, reportID string) error {
@@ -93,12 +136,14 @@ func (w *Worker) reportResourceCounts(ctx context.Context, reportID string) erro
 			if len(counts) == 0 {
 				return nil
 			}
-			resourceCounts := resourceCountsToPb(counts)
-			resp, err := w.reportClient.ReportResourceCounts(ctx, &analytics.ReportResourceCountsRequest{
+			request := &analytics.ReportResourceCountsRequest{
 				SystemId:       w.systemID,
-				ReportId:       gu.Ptr(reportID),
-				ResourceCounts: resourceCounts,
-			})
+				ResourceCounts: resourceCountsToPb(counts),
+			}
+			if reportID != "" {
+				request.ReportId = gu.Ptr(reportID)
+			}
+			resp, err := w.reportClient.ReportResourceCounts(ctx, request)
 			if err != nil {
 				return err
 			}
@@ -141,55 +186,21 @@ func (w *Worker) handleClientError(err error) error {
 	}
 }
 
-type ServicePingReport struct {
-	ReportID  string
-	TestState int
-}
-
-func (r *ServicePingReport) Kind() string {
-	return "service_ping_report"
-}
-
-func NewWorker(
-	reportClient analytics.TelemetryServiceClient,
-	queries *query.Queries,
-	q *queue.Queue,
-	config *Config,
-	systemID string,
-
-) *Worker {
-	return &Worker{
-		reportClient: reportClient,
-		db:           queries,
-		queue:        q,
-		config:       config,
-		systemID:     systemID,
-	}
-}
-
-var _ river.Worker[*ServicePingReport] = (*Worker)(nil)
-
-func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueConfig) {
-	river.AddWorker[*ServicePingReport](workers, w)
-	queues[QueueName] = river.QueueConfig{
-		//MaxWorkers: int(w.config.Workers),
-		MaxWorkers: 1,
-	}
-}
-
 func (w *Worker) createReportJobs(ctx context.Context, reportID string) error {
+	errs := make([]error, 0)
 	if w.config.Telemetry.ResourceCount.Enabled {
-		err := w.addReportJob(ctx, reportID, 1)
-		logging.WithFields("reportID", reportID, "telemetry", "resourceCount").
-			OnError(err).Error("failed to add report job")
+		err := w.addReportJob(ctx, reportID, ReportTypeResourceCounts)
+		if err != nil {
+			errs = append(errs, err)
+		}
 	}
-	return nil
+	return errors.Join(errs...)
 }
 
-func (w *Worker) addReportJob(ctx context.Context, reportID string, state int) error {
+func (w *Worker) addReportJob(ctx context.Context, reportID string, reportType ReportType) error {
 	job := &ServicePingReport{
-		ReportID:  reportID,
-		TestState: state,
+		ReportID:   reportID,
+		ReportType: reportType,
 	}
 	return w.queue.Insert(ctx, job,
 		queue.WithQueueName(QueueName),
@@ -243,10 +254,14 @@ func StartWorker(
 	return nil
 }
 
-type mockReportClient struct{}
+type mockReportClient struct {
+	err error
+}
 
 func (m mockReportClient) ReportBaseInformation(ctx context.Context, in *analytics.ReportBaseInformationRequest, opts ...grpc.CallOption) (*analytics.ReportBaseInformationResponse, error) {
-	fmt.Println(proto.MarshalTextString(in))
+	if m.err != nil {
+		return nil, m.err
+	}
 	reportID, err := id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return nil, err
