@@ -491,34 +491,6 @@ func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, to
 	return refreshToken.UserID, refreshToken.ID, nil
 }
 
-func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {
-	for _, scope := range scopes {
-		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
-			return scopes, nil
-		}
-	}
-
-	project, err := o.query.ProjectByOIDCClientID(ctx, clientID)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
-	}
-	if !project.ProjectRoleAssertion {
-		return scopes, nil
-	}
-	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
-	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
-	if err != nil {
-		return nil, err
-	}
-	for _, role := range roles.ProjectRoles {
-		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
-	}
-	return scopes, nil
-}
-
 func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, project *query.Project, scopes []string) ([]string, error) {
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
