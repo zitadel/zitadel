@@ -476,35 +476,6 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *
 	return app, err
 }
 
-func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	stmt, scan := prepareAppQuery(true)
-	eq := sq.Eq{
-		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		AppColumnState.identifier():      domain.AppStateActive,
-		ProjectColumnState.identifier():  domain.ProjectStateActive,
-		OrgColumnState.identifier():      domain.OrgStateActive,
-	}
-	query, args, err := stmt.Where(sq.And{
-		eq,
-		sq.Or{
-			sq.Eq{AppOIDCConfigColumnClientID.identifier(): clientID},
-			sq.Eq{AppAPIConfigColumnClientID.identifier(): clientID},
-		},
-	}).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		app, err = scan(row)
-		return err
-	}, query, args...)
-	return app, err
-}
-
 func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool) (apps *Apps, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
