@@ -1,0 +1,31 @@
+<h1 mat-dialog-title>
+  <span class="title">{{ 'USER.GROUPS.ADD' | translate }}</span>
+</h1>
+
+<div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ 'ORG_DETAIL.GROUP.DESCRIPTION' | translate }}</p>
+
+  <cnsl-search-group-autocomplete
+    class="block"
+    [groups]="group ? [group] : []"
+    (selectionChanged)="selectGroups($event)"
+  >
+  </cnsl-search-group-autocomplete>
+
+</div>
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CANCEL' | translate }}
+  </button>
+
+  <button
+    [disabled]="groupIds.length === 0"
+    color="primary"
+    mat-raised-button
+    class="ok-button"
+    (click)="closeDialogWithSuccess()"
+    data-e2e="confirm-add-member-button"
+  >
+    {{ 'ACTIONS.ADD' | translate }}
+  </button>
+</div>

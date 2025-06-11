@@ -1,0 +1,102 @@
+@mixin user-grants-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .user-grants-table-left-actions {
+    display: flex;
+    align-items: center;
+
+    .user-grant-type-button {
+      border: none;
+      background: none;
+      text-align: left;
+      padding: 0.75rem 0;
+      opacity: 0.6;
+      font-size: 15px;
+      cursor: pointer;
+      color: map-get($foreground, text);
+
+      &:not(:last-child) {
+        margin-right: 1rem;
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &.active {
+        font-weight: 600;
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.no-break {
+  white-space: nowrap;
+}
+
+.user {
+  text-decoration: none;
+  color: inherit;
+}
+
+th {
+  .search-button {
+    visibility: hidden;
+    width: 30px;
+
+    .icon {
+      font-size: 1.2rem;
+    }
+  }
+
+  &:hover,
+  &.search-active {
+    .search-button {
+      visibility: visible;
+    }
+  }
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  max-width: 400px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 3px 0;
+}
+
+.fill-space {
+  flex: 1;
+}
+
+.role-data {
+  min-width: 180px;
+}
+
+.user-grants-tr-actions {
+  width: 50px;
+}
+
+.date-block {
+  margin: 0.5rem 0;
+  display: block;
+  min-width: 120px;
+
+  .date-sub {
+    font-size: 13px;
+    display: block;
+  }
+}
+
+.filtername {
+  flex: 1;
+  margin-right: 1rem;
+
+  .filterinput {
+    height: 36px;
+    transform: translateY(1px);
+  }
+}

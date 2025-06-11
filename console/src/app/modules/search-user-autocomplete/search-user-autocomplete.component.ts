@@ -156,6 +156,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
     if (index >= 0) {
       this.users.splice(index, 1);
       this.selectionChanged.emit(this.users);
+      this.filteredUsers.push(user);
     }
   }
 

@@ -32,6 +32,7 @@ const (
 	ScopeProjectRolePrefix          = "urn:zitadel:iam:org:project:role:"
 	ScopeProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
 	ClaimProjectRoles               = "urn:zitadel:iam:org:project:roles"
+	ClaimProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
 	ClaimProjectRolesFormat         = "urn:zitadel:iam:org:project:%s:roles"
 	ScopeUserMetaData               = "urn:zitadel:iam:user:metadata"
 	ClaimUserMetaData               = ScopeUserMetaData
@@ -42,6 +43,9 @@ const (
 	ClaimActionLogFormat            = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
+
+	ScopeIAMGroups = "groups"
+	ClaimGroups    = ScopeIAMGroups
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
@@ -333,6 +337,10 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if user.State != domain.UserStateActive {
 		return zerrors.ThrowUnauthenticated(nil, "OIDC-S3tha", "Errors.Users.NotActive")
 	}
+	group, err := o.query.GroupByUserID(ctx, true, userID)
+	if err != nil {
+		return err
+	}
 	var allRoles bool
 	roles := make([]string, 0)
 	for _, scope := range scopes {
@@ -357,6 +365,8 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 			}
 		case ScopeProjectsRoles:
 			allRoles = true
+		case ScopeIAMGroups:
+			setGroupInfoV2(group, userInfo)
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
@@ -446,6 +456,11 @@ func (o *OPStorage) setUserInfoResourceOwner(ctx context.Context, userInfo *oidc
 
 func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	if roles != nil && len(roles.projects) > 0 {
+		for requestAudID, _ := range roles.requestAudIDs {
+			if roles, ok := roles.projects[requestAudID]; ok {
+				userInfo.AppendClaims(ClaimProjectsRoles, roles)
+			}
+		}
 		if roles, ok := roles.projects[roles.requestProjectID]; ok {
 			userInfo.AppendClaims(ClaimProjectRoles, roles)
 		}
@@ -618,6 +633,12 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 			for claim, value := range resourceOwnerClaims {
 				claims = appendClaim(claims, claim, value)
 			}
+		case ScopeIAMGroups:
+			userGroups, err := o.assertUserGroupV2(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			claims = appendClaim(claims, ClaimGroups, userGroups)
 		case ScopeProjectsRoles:
 			allRoles = true
 		}
@@ -652,6 +673,12 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	}
 
 	if projectRoles != nil && len(projectRoles.projects) > 0 {
+		// if roles, ok := projectRoles.projects[projectRoles.requestProjectID]; ok {
+		for requestAudID, _ := range projectRoles.requestAudIDs {
+			if roles, ok := projectRoles.projects[requestAudID]; ok {
+				claims = appendClaim(claims, ClaimProjectsRoles, roles)
+			}
+		}
 		if roles, ok := projectRoles.projects[projectRoles.requestProjectID]; ok {
 			claims = appendClaim(claims, ClaimProjectRoles, roles)
 		}
@@ -837,7 +864,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	// no specific roles were requested, so convert any grants into roles
 	for _, grant := range grants.UserGrants {
 		for _, role := range grant.Roles {
-			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID, false)
 		}
 	}
 	return grants, roles, nil
@@ -875,7 +902,15 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 func checkGrantedRoles(roles *projectsRoles, grant query.UserGrant, requestedRole string, isRequested bool) {
 	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
-			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested)
+			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested, false)
+		}
+	}
+}
+
+func checkGrantedGroupRoles(roles *projectsRoles, grant query.GroupGrant, requestedRole string, isRequested bool) {
+	for _, grantedRole := range grant.Roles {
+		if requestedRole == grantedRole {
+			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested, false)
 		}
 	}
 }
@@ -886,6 +921,8 @@ type projectsRoles struct {
 	projects map[string]projectRoles
 
 	requestProjectID string
+
+	requestAudIDs map[string]bool
 }
 
 func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles []string) *projectsRoles {
@@ -902,13 +939,78 @@ func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles 
 	// no specific roles were requested, so convert any grants into roles
 	for _, grant := range grants {
 		for _, role := range grant.Roles {
-			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID, false)
 		}
 	}
 	return roles
 }
 
-func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequested bool) {
+/* GroupGrant V1 Implemantation, Will clean later.
+func newProjectGroupRoles(projectID string, group []query.OIDCGroupInfo, requestedRoles []string) *projectsRoles {
+	roles := new(projectsRoles)
+	// if specific roles where requested, check if they are granted and append them in the roles list
+	if len(requestedRoles) > 0 {
+		for _, requestedRole := range requestedRoles {
+			for _, group_grants := range group {
+				for _, grant := range group_grants.GroupGrants {
+					checkGrantedGroupRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+				}
+			}
+		}
+		return roles
+	}
+	// no specific roles were requested, so convert any grants into roles
+	for _, group_grants := range group {
+		for _, grant := range group_grants.GroupGrants {
+			for _, role := range grant.Roles {
+				roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+			}
+		}
+	}
+	return roles
+}
+*/
+
+// newProjectRolesV2 with group grant.
+func newProjectRolesV2(projectID string, grants []query.UserGrant, groups *query.OIDCGroupInfos, requestedRoles []string, roleAudience []string) *projectsRoles {
+	roles := new(projectsRoles)
+	// if specific roles where requested, check if they are granted and append them in the roles list
+	if len(requestedRoles) > 0 {
+		for _, requestedRole := range requestedRoles {
+			for _, grant := range grants {
+				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+			}
+			// Add group grants to roles
+			for _, group_grants := range groups.Group {
+				for _, grant := range group_grants.GroupGrants {
+					checkGrantedGroupRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+				}
+			}
+		}
+		// return roles
+	}
+
+	// no specific roles were requested, so convert any grants into roles
+	for _, grant := range grants {
+		for _, role := range grant.Roles {
+			for _, projectAud := range roleAudience {
+				roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID, grant.ProjectID == projectAud)
+			}
+		}
+	}
+	for _, group_grants := range groups.Group {
+		for _, grant := range group_grants.GroupGrants {
+			for _, role := range grant.Roles {
+				for _, projectAud := range roleAudience {
+					roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID, grant.ProjectID == projectAud)
+				}
+			}
+		}
+	}
+	return roles
+}
+
+func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequested bool, isAudienceReq bool) {
 	if p.projects == nil {
 		p.projects = make(map[string]projectRoles, 1)
 	}
@@ -917,6 +1019,12 @@ func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequeste
 	}
 	if isRequested {
 		p.requestProjectID = projectID
+	}
+	if p.requestAudIDs == nil {
+		p.requestAudIDs = make(map[string]bool, 1)
+	}
+	if isAudienceReq {
+		p.requestAudIDs[projectID] = true
 	}
 	p.projects[projectID].Add(roleKey, orgID, domain)
 }
@@ -1066,4 +1174,20 @@ func (s *Server) checkOrgScopes(ctx context.Context, resourceOwner string, scope
 		}
 		return false
 	}), nil
+}
+
+// func (o *OPStorage) assertUserGroup(ctx context.Context, userID string) ([]string, error) {
+// 	user, err := o.query.GetUserByID(ctx, true, userID)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return user.GroupIDs, nil
+// }
+
+func (o *OPStorage) assertUserGroupV2(ctx context.Context, userID string) ([]string, error) {
+	grp, err := o.query.GroupByUserID(ctx, true, userID)
+	if err != nil {
+		return nil, err
+	}
+	return fetchGroupName(grp), nil
 }

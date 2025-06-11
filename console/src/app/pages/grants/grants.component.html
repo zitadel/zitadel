@@ -7,25 +7,61 @@
       </a>
     </div>
     <p class="sub cnsl-secondary-text max-width-description">{{ 'DESCRIPTIONS.AUTHORIZATIONS.DESCRIPTION' | translate }}</p>
-    <cnsl-user-grants
-      *ngIf="grantContext === UserGrantContext.NONE"
-      [displayedColumns]="[
-        'select',
-        'user',
-        'org',
-        'projectId',
-        'type',
-        'creationDate',
-        'changeDate',
-        'state',
-        'roleNamesList',
-        'actions',
-      ]"
-      [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
-      [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
-      [refreshOnPreviousRoutes]="['/grant-create']"
-    >
-    </cnsl-user-grants>
+    <div leftActions class="user-toggle-group">
+      <cnsl-nav-toggle
+        label="{{ 'DESCRIPTIONS.AUTHORIZATIONS.USER.TITLE' | translate }}"
+        (clicked)="setType('default')"
+        [active]="listType === 'default'"
+      ></cnsl-nav-toggle>
+      <cnsl-nav-toggle
+        label="{{ 'DESCRIPTIONS.AUTHORIZATIONS.GROUP.TITLE' | translate }}"
+        (clicked)="setType('group')"
+        [active]="listType === 'group'"
+      ></cnsl-nav-toggle>
+    </div>
+    <div class="enlarged-container" [ngSwitch]="listType">
+      <ng-container *ngSwitchCase="'default'">
+        <cnsl-user-grants
+          *ngIf="grantContext === UserGrantContext.NONE"
+          [displayedColumns]="[
+            'select',
+            'user',
+            'org',
+            'projectId',
+            'type',
+            'creationDate',
+            'changeDate',
+            'state',
+            'roleNamesList',
+            'actions',
+          ]"
+          [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
+          [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
+          [refreshOnPreviousRoutes]="['/grant-create']"
+        >
+        </cnsl-user-grants>
+      </ng-container>
+      <ng-container *ngSwitchCase="'group'">
+        <cnsl-group-grants
+          *ngIf="grantContext === UserGrantContext.NONE"
+          [displayedColumns]="[
+            'select',
+            'groupName',
+            'org',
+            'projectId',
+            'creationDate',
+            'changeDate',
+            'state',
+            'roleNamesList',
+            'actions',
+          ]"
+          [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
+          [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
+          [refreshOnPreviousRoutes]="['/grant-create']"
+        >
+        </cnsl-group-grants>
+      </ng-container>
+    </div>
 
     <cnsl-user-grants
       *ngIf="grantContext === UserGrantContext.OWNED_PROJECT"
