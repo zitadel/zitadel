@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package zitadel.org.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2beta;org";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+import "google/protobuf/timestamp.proto";
+
+message Organization {
+  // Unique identifier of the organization.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // The timestamp of the organization was created.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+
+  //  The timestamp of the verification of the organization domain.
+  google.protobuf.Timestamp changed_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+
+  // Current state of the organization, for example active, inactive and deleted.
+  OrgState state = 4;
+
+  // Name of the organization.
+  string name = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ZITADEL\"";
+    }
+  ];
+  // Primary domain used in the organization.
+  string primary_domain = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"zitadel.cloud\"";
+    }
+  ];
+}
+
+enum OrgState {
+  ORG_STATE_UNSPECIFIED = 0;
+  ORG_STATE_ACTIVE = 1;
+  ORG_STATE_INACTIVE = 2;
+  ORG_STATE_REMOVED = 3;
+}
+
+enum OrgFieldName {
+    ORG_FIELD_NAME_UNSPECIFIED = 0;
+    ORG_FIELD_NAME_NAME = 1;
+    ORG_FIELD_NAME_CREATION_DATE = 2;
+}
+
+message OrganizationSearchFilter{
+    oneof filter {
+        option (validate.required) = true;
+
+        OrgNameFilter name_filter = 1;
+        OrgDomainFilter domain_filter = 2;
+        OrgStateFilter state_filter = 3;
+        OrgIDFilter id_filter = 4;
+    }
+}
+message OrgNameFilter {
+    // Organization name.
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+  // Defines which text equality method is used.
+    zitadel.object.v2beta.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true
+    ];
+}
+
+message OrgDomainFilter {
+    // The domain.
+    string domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
+        }
+    ];
+  // Defines which text equality method is used.
+    zitadel.object.v2beta.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true
+    ];
+}
+
+message OrgStateFilter {
+    // Current state of the organization.
+    OrgState state = 1 [
+        (validate.rules).enum.defined_only = true
+    ];
+}
+
+message OrgIDFilter {
+    // The Organization id.
+    string id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+// from proto/zitadel/org.proto
+message DomainSearchFilter {
+    oneof filter {
+        option (validate.required) = true;
+        DomainNameFilter domain_name_filter = 1;
+    }
+}
+
+// from proto/zitadel/org.proto
+message DomainNameFilter {
+    // The domain.
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
+        }
+    ];
+  // Defines which text equality method is used.
+    zitadel.object.v2beta.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true
+    ];
+}
+
+// from proto/zitadel/org.proto
+message Domain {
+    // The Organization id.
+    string organization_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    // The domain name.
+    string domain_name = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.com\"";
+        }
+    ];
+    // Defines if the domain is verified.
+    bool is_verified = 3;
+    // Defines if the domain is the primary domain.
+    bool is_primary = 4;
+    // Defines the protocol the domain was validated with.
+    DomainValidationType validation_type = 5;
+}
+
+// from proto/zitadel/org.proto
+enum DomainValidationType {
+    DOMAIN_VALIDATION_TYPE_UNSPECIFIED = 0;
+    DOMAIN_VALIDATION_TYPE_HTTP = 1;
+    DOMAIN_VALIDATION_TYPE_DNS = 2;
+}

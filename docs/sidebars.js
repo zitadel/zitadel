@@ -10,6 +10,7 @@ const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
 const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
+const sidebar_api_org_service_v2beta = require("./docs/apis/resources/org_service_v2beta/sidebar.ts").default
 const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
 const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
 const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
@@ -182,7 +183,6 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
-            "guides/manage/customize/user-schema",
             "guides/manage/user/scim2",
           ],
         },
@@ -612,6 +612,20 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Product Information",
+      collapsed: true,
+      items: [
+        "product/roadmap",
+        "product/release-cycle",
+        {
+          type: "link",
+          label: "Changelog",
+          href: "https://zitadel.com/changelog",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Support",
       collapsed: true,
       items: [
@@ -841,35 +855,6 @@ module.exports = {
                     "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
               },
               items: sidebar_api_actions_v2,
-            },
-            {
-              type: "category",
-              label: "Project (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Project Service API (Beta)",
-                slug: "/apis/resources/project_service_v2",
-                description:
-                  "This API is intended to manage projects and subresources for ZITADEL. \n"+
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
-              },
-              items: sidebar_api_project_service_v2,
-              label: "Instance (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Instance Service API (Beta)",
-                slug: "/apis/resources/instance_service_v2",
-                description:
-                    "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
-                    "\n" +
-                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
-                    "\n" +
-                    "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
-                    "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
-                    ,
-              },
-              items: sidebar_api_instance_service_v2,
             },
           ],
         },
