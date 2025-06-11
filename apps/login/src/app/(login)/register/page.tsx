@@ -12,6 +12,7 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -84,20 +85,24 @@ export default async function Page(props: {
 
         {!organization && <Alert>{tError("unknownContext")}</Alert>}
 
-        {legal && passwordComplexitySettings && organization && (
-          <RegisterForm
-            idpCount={
-              !loginSettings?.allowExternalIdp ? 0 : identityProviders.length
-            }
-            legal={legal}
-            organization={organization}
-            firstname={firstname}
-            lastname={lastname}
-            email={email}
-            requestId={requestId}
-            loginSettings={loginSettings}
-          ></RegisterForm>
-        )}
+        {legal &&
+          passwordComplexitySettings &&
+          organization &&
+          (loginSettings.allowUsernamePassword ||
+            loginSettings.passkeysType == PasskeysType.ALLOWED) && (
+            <RegisterForm
+              idpCount={
+                !loginSettings?.allowExternalIdp ? 0 : identityProviders.length
+              }
+              legal={legal}
+              organization={organization}
+              firstname={firstname}
+              lastname={lastname}
+              email={email}
+              requestId={requestId}
+              loginSettings={loginSettings}
+            ></RegisterForm>
+          )}
 
         {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>

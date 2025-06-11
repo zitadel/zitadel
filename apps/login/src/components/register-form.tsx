@@ -185,10 +185,12 @@ export function RegisterForm({
           </>
         )}
 
-      {(!loginSettings?.allowUsernamePassword ||
-        loginSettings?.passkeysType != PasskeysType.ALLOWED) &&
-        !idpCount && (
-          <Alert type={AlertType.INFO}>{t("noMethodAvailableWarning")}</Alert>
+      {!loginSettings?.allowUsernamePassword &&
+        loginSettings?.passkeysType != PasskeysType.ALLOWED &&
+        (!loginSettings?.allowExternalIdp || !idpCount) && (
+          <div className="py-4">
+            <Alert type={AlertType.INFO}>{t("noMethodAvailableWarning")}</Alert>
+          </div>
         )}
 
       {error && (
