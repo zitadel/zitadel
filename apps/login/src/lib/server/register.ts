@@ -4,7 +4,12 @@ import {
   createSessionAndUpdateCookie,
   createSessionForIdpAndUpdateCookie,
 } from "@/lib/server/cookie";
-import { addHumanUser, getLoginSettings, getUserByID } from "@/lib/zitadel";
+import {
+  addHumanUser,
+  addIDPLink,
+  getLoginSettings,
+  getUserByID,
+} from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -21,7 +26,7 @@ type RegisterUserCommand = {
   firstName: string;
   lastName: string;
   password?: string;
-  organization?: string;
+  organization: string;
   requestId?: string;
 };
 
@@ -141,13 +146,15 @@ type RegisterUserAndLinkToIDPommand = {
   email: string;
   firstName: string;
   lastName: string;
-  organization?: string;
+  organization: string;
   requestId?: string;
   idpIntent: {
     idpIntentId: string;
     idpIntentToken: string;
   };
-  userId: string;
+  idpUserId: string;
+  idpId: string;
+  idpUserName: string;
 };
 
 export type registerUserAndLinkToIDPResponse = {
@@ -185,9 +192,23 @@ export async function registerUserAndLinkToIDP(
 
   // TODO: addIDPLink to addResponse
 
+  const idpLink = await addIDPLink({
+    serviceUrl,
+    idp: {
+      id: command.idpId,
+      userId: command.idpUserId,
+      userName: command.idpUserName,
+    },
+    userId: addResponse.userId,
+  });
+
+  if (!idpLink) {
+    return { error: "Could not link IDP to user" };
+  }
+
   const session = await createSessionForIdpAndUpdateCookie({
     requestId: command.requestId,
-    userId: command.userId,
+    userId: addResponse.userId, // the user we just created
     idpIntent: command.idpIntent,
     lifetime: loginSettings?.externalLoginCheckLifetime,
   });

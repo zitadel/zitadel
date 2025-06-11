@@ -1,21 +1,25 @@
 import { RegisterFormIDPIncomplete } from "@/components/register-form-idp-incomplete";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { DynamicTheme } from "../../dynamic-theme";
 
 export async function completeIDP({
-  userId,
-  idpInformation,
+  idpUserId,
+  idpId,
+  idpUserName,
+  addHumanUser,
   requestId,
   organization,
   branding,
   idpIntent,
 }: {
-  userId: string;
-  idpInformation: IDPInformation;
+  idpUserId: string;
+  idpId: string;
+  idpUserName: string;
+  addHumanUser?: AddHumanUserRequest;
   requestId?: string;
-  organization?: string;
+  organization: string;
   branding?: BrandingSettings;
   idpIntent: {
     idpIntentId: string;
@@ -32,8 +36,14 @@ export async function completeIDP({
         <p className="ztdl-p">{t("completeRegister.description")}</p>
 
         <RegisterFormIDPIncomplete
-          userId={userId}
-          idpInformation={idpInformation}
+          idpUserId={idpUserId}
+          idpId={idpId}
+          idpUserName={idpUserName}
+          defaultValues={{
+            email: addHumanUser?.email?.email || "",
+            firstname: addHumanUser?.profile?.givenName || "",
+            lastname: addHumanUser?.profile?.familyName || "",
+          }}
           requestId={requestId}
           organization={organization}
           idpIntent={idpIntent}

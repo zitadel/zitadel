@@ -10,6 +10,7 @@ import {
   addHuman,
   addIDPLink,
   getBrandingSettings,
+  getDefaultOrg,
   getIDPByID,
   getLoginSettings,
   getOrgsByDomain,
@@ -19,6 +20,7 @@ import {
 import { ConnectError, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
@@ -28,6 +30,41 @@ import { headers } from "next/headers";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
+async function resolveOrganizationForUser({
+  organization,
+  addHumanUser,
+  serviceUrl,
+}: {
+  organization?: string;
+  addHumanUser?: { username?: string };
+  serviceUrl: string;
+}): Promise<string | undefined> {
+  if (organization) return organization;
+
+  if (addHumanUser?.username && ORG_SUFFIX_REGEX.test(addHumanUser.username)) {
+    const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
+    const suffix = matched?.[1] ?? "";
+
+    const orgs = await getOrgsByDomain({
+      serviceUrl,
+      domain: suffix,
+    });
+    const orgToCheckForDiscovery =
+      orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+
+    if (orgToCheckForDiscovery) {
+      const orgLoginSettings = await getLoginSettings({
+        serviceUrl,
+        organization: orgToCheckForDiscovery,
+      });
+      if (orgLoginSettings?.allowDomainDiscovery) {
+        return orgToCheckForDiscovery;
+      }
+    }
+  }
+  return undefined;
+}
+
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;
@@ -36,7 +73,7 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
-  const { id, token, requestId, organization, link } = searchParams;
+  let { id, token, requestId, organization, link } = searchParams;
   const { provider } = params;
 
   const _headers = await headers();
@@ -46,6 +83,15 @@ export default async function Page(props: {
     serviceUrl,
     organization,
   });
+
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+    });
+    if (org) {
+      organization = org.id;
+    }
+  }
 
   if (!provider || !id || !token) {
     return loginFailed(branding, "IDP context missing");
@@ -180,32 +226,11 @@ export default async function Page(props: {
   let newUser;
   // automatic creation of a user is allowed and data is complete
   if (options?.isAutoCreation && addHumanUser) {
-    let orgToRegisterOn: string | undefined = organization;
-
-    if (
-      !orgToRegisterOn &&
-      addHumanUser?.username && // username or email?
-      ORG_SUFFIX_REGEX.test(addHumanUser.username)
-    ) {
-      const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
-      const suffix = matched?.[1] ?? "";
-
-      // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain({
-        serviceUrl,
-        domain: suffix,
-      });
-      const orgToCheckForDiscovery =
-        orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
-
-      const orgLoginSettings = await getLoginSettings({
-        serviceUrl,
-        organization: orgToCheckForDiscovery,
-      });
-      if (orgLoginSettings?.allowDomainDiscovery) {
-        orgToRegisterOn = orgToCheckForDiscovery;
-      }
-    }
+    const orgToRegisterOn = await resolveOrganizationForUser({
+      organization,
+      addHumanUser,
+      serviceUrl,
+    });
 
     let addHumanUserWithOrganization: AddHumanUserRequest;
     if (orgToRegisterOn) {
@@ -244,14 +269,25 @@ export default async function Page(props: {
     }
   } else if (options?.isCreationAllowed) {
     // if no user was found, we will create a new user manually / redirect to the registration page
+    const orgToRegisterOn = await resolveOrganizationForUser({
+      organization,
+      addHumanUser,
+      serviceUrl,
+    });
+
+    if (!orgToRegisterOn) {
+      return loginFailed(branding, "No organization found for registration");
+    }
 
     return completeIDP({
       branding,
       idpIntent: { idpIntentId: id, idpIntentToken: token },
-      idpInformation,
-      organization,
+      addHumanUser,
+      organization: orgToRegisterOn,
       requestId,
-      userId,
+      idpUserId: idpInformation?.userId,
+      idpId: idpInformation?.idpId,
+      idpUserName: idpInformation?.userName,
     });
   }
 

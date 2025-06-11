@@ -1,3 +1,4 @@
+import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
@@ -9,7 +10,6 @@ import {
   getLegalAndSupportSettings,
   getLoginSettings,
   getPasswordComplexitySettings,
-  retrieveIDPIntent,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -21,16 +21,9 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
-  let {
-    firstname,
-    lastname,
-    email,
-    organization,
-    requestId,
-    idpIntentId,
-    idpIntentToken,
-  } = searchParams;
+  let { firstname, lastname, email, organization, requestId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -42,17 +35,6 @@ export default async function Page(props: {
     if (org) {
       organization = org.id;
     }
-  }
-
-  let idpIntent;
-  if (idpIntentId && idpIntentToken) {
-    idpIntent = await retrieveIDPIntent({
-      serviceUrl,
-      id: idpIntentId,
-      token: idpIntentToken,
-    });
-
-    const { idpInformation, userId } = idpIntent;
   }
 
   const legal = await getLegalAndSupportSettings({
@@ -100,7 +82,9 @@ export default async function Page(props: {
         <h1>{t("title")}</h1>
         <p className="ztdl-p">{t("description")}</p>
 
-        {legal && passwordComplexitySettings && (
+        {!organization && <Alert>{tError("unknownContext")}</Alert>}
+
+        {legal && passwordComplexitySettings && organization && (
           <RegisterForm
             idpCount={
               !loginSettings?.allowExternalIdp ? 0 : identityProviders.length

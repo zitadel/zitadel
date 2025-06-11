@@ -10,7 +10,7 @@ type InviteUserCommand = {
   firstName: string;
   lastName: string;
   password?: string;
-  organization?: string;
+  organization: string;
   requestId?: string;
 };
 

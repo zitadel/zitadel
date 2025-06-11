@@ -35,7 +35,7 @@ type Props = {
   firstname?: string;
   lastname?: string;
   email?: string;
-  organization?: string;
+  organization: string;
   requestId?: string;
   loginSettings?: LoginSettings;
   idpCount: number;

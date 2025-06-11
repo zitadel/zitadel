@@ -1,7 +1,6 @@
 "use client";
 
 import { registerUserAndLinkToIDP } from "@/lib/server/register";
-import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,31 +20,39 @@ type Inputs =
   | FieldValues;
 
 type Props = {
-  organization?: string;
+  organization: string;
   requestId?: string;
   idpIntent: {
     idpIntentId: string;
     idpIntentToken: string;
   };
-  idpInformation: IDPInformation;
-  userId: string;
+  defaultValues?: {
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+  };
+  idpUserId: string;
+  idpId: string;
+  idpUserName: string;
 };
 
 export function RegisterFormIDPIncomplete({
   organization,
   requestId,
   idpIntent,
-  idpInformation,
-  userId,
+  defaultValues,
+  idpUserId,
+  idpId,
+  idpUserName,
 }: Props) {
   const t = useTranslations("register");
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
-      email: idpInformation?.rawInformation?.email ?? "",
-      firstName: idpInformation?.rawInformation?.firstname ?? "",
-      lastname: idpInformation?.rawInformation?.lastname ?? "",
+      email: defaultValues?.email ?? "",
+      firstname: defaultValues?.firstname ?? "",
+      lastname: defaultValues?.lastname ?? "",
     },
   });
 
@@ -57,7 +64,9 @@ export function RegisterFormIDPIncomplete({
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
     const response = await registerUserAndLinkToIDP({
-      userId: userId,
+      idpId: idpId,
+      idpUserName: idpUserName,
+      idpUserId: idpUserId,
       email: values.email,
       firstName: values.firstname,
       lastName: values.lastname,
