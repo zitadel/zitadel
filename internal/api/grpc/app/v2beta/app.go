@@ -141,3 +141,14 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 		ChangeDate: timestamppb.New(changedTime),
 	}, nil
 }
+
+func (s *Server) DeleteApplication(ctx context.Context, req *app.DeleteApplicationRequest) (*app.DeleteApplicationResponse, error) {
+	details, err := s.command.RemoveApplication(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &app.DeleteApplicationResponse{
+		DeletionDate: timestamppb.New(details.EventDate),
+	}, nil
+}

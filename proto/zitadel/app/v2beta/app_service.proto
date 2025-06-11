@@ -198,6 +198,36 @@ service AppService {
             }
         };
     }
+
+    // Delete Application
+    //
+    // Deletes the application belonging to the input project and matching the provided
+    // application ID
+    //
+    // The user needs to be owner of the project and have project.app.delete permission
+    //
+    // Required permissions:
+    //   - `project.app.delete`
+    rpc DeleteApplication(DeleteApplicationRequest) returns (DeleteApplicationResponse) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/apps/{application_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                description: "The time of deletion.";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
 }
 
 message CreateApplicationRequest {
@@ -545,4 +575,17 @@ message GetApplicationRequest {
 
 message GetApplicationResponse {
     Application app = 1;
+}
+
+message DeleteApplicationRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string application_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteApplicationResponse {
+    google.protobuf.Timestamp deletion_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
 }
