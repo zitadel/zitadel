@@ -56,34 +56,49 @@ This limit defines the total number of organizations you can create to manage yo
 This is the total number of users that can be added to any single organization.
 The count includes both human and machine accounts.
 
+### Administrator Users
+
+This limit applies to users assigned an administrative role at the instance level, giving them broad oversight and management capabilities.
+It counts all instance-wide administrators, from users with full, unrestricted access (IAM_OWNER) to those with view-only administrative permissions (IAM_OWNER_VIEWER), or any other role.
+You are billed for the total number of administrator users on your account at the time the invoice is created.
+
 ### SCIM Connections
 
 Automate user provisioning by connecting your identity sources to Zitadel. 
 This limit defines how many different SCIM clients you can configure to send user data to your instance, enabling automatic creation, updates, and deactivation of users.
 
-### Active Identity Providers
+### Identity Providers (Social Login, Enterprise Login, etc.)
 
-### Active external identity providers
+We count all configured external identity providers, with the one exception of LDAP connections. 
+This includes social logins (like Google, GitHub, and Apple) as well as generic providers using protocols like OpenID Connect, OAuth, and SAML.
 
-To calculate the monthly amount we take the sum of activated external identity providers over all instances on each day and calculate the average over a given month, rounded up to the next integer.
-Excluded are configured identity providers that are not activated.
+### LDAP Identity Providers
 
-### Action minutes
+We count each configured LDAP connection separately from other identity providers. 
+Your bill is based on the total number of these LDAP providers connected to your account at the time the invoice is created.
 
-Action minutes mean execution time, rounded up to 1 second, of custom code execution via a customer defined Action.
+### Actions
 
-### Audit trail history (events)
+Your subscription plan determines the number of "Actions" you can configure. For billing, we count the total number of actions you have configured at the time your invoice is created.
+
+### Policies
+
+Policies are rules that enforce security behaviors, like password complexity or requiring multi-factor authentication (MFA).
+
+Your bill is not based on the number of policies you create, but on how many times they are actively enforced/activated.
+We calculate your usage by summing up every policy that is enabled within each of your organizations at the end of the billing cycle.
+
+List of policies:
+- Force MFA / Factors
+- Password Complexity
+- Password Expiry
+- User Lockout
+
+### Audit trail history / Audit Logs (events)
 
 Audit trail history (events) means past events that can be retrieved via API or GUI.
 Typically all changes to any object in within ZITADEL are saved as events and can be used for audit trail and analytics purposes.
 The number of past events that can be retrieved may be limited by your subscription.
-
-
-
-### Administrator Users
-
-This limit applies to users assigned an administrative role at the instance level, giving them broad oversight and management capabilities. 
-It counts all instance-wide administrators, from users with full, unrestricted access (IAM_OWNER) to those with view-only administrative permissions (IAM_OWNER_VIEWER), or any other role.
 
 ## Payment cycle
 
