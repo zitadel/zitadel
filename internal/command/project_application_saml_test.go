@@ -842,7 +842,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				eventstore: tt.fields.eventstore(t),
 				httpClient: tt.fields.httpClient,
 			}
-			got, err := r.ChangeSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
+			got, err := r.PatchSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

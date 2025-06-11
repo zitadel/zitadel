@@ -1098,7 +1098,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ChangeOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
+			got, err := r.PatchOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

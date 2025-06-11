@@ -84,7 +84,7 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 
 	switch t := req.GetPatchRequestType().(type) {
 	case *app.PatchApplicationRequest_ApplicationNameRequest:
-		updatedDetails, err := s.command.ChangeApplication(
+		updatedDetails, err := s.command.PatchApplication(
 			ctx,
 			req.GetProjectId(),
 			&domain.ChangeApp{
@@ -100,7 +100,7 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 		changedTime = updatedDetails.EventDate
 
 	case *app.PatchApplicationRequest_ApiConfigurationRequest:
-		updatedAPIApp, err := s.command.ChangeAPIApplication(ctx, convert.PatchAPIApplicationConfigurationRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.ApiConfigurationRequest), authz.GetCtxData(ctx).OrgID)
+		updatedAPIApp, err := s.command.PatchAPIApplication(ctx, convert.PatchAPIApplicationConfigurationRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.ApiConfigurationRequest), authz.GetCtxData(ctx).OrgID)
 		if err != nil {
 			return nil, err
 		}
@@ -113,7 +113,7 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 			return nil, err
 		}
 
-		updatedOIDCApp, err := s.command.ChangeOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
+		updatedOIDCApp, err := s.command.PatchOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +126,7 @@ func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplication
 			return nil, err
 		}
 
-		updatedSAMLApp, err := s.command.ChangeSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
+		updatedSAMLApp, err := s.command.PatchSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
 		if err != nil {
 			return nil, err
 		}

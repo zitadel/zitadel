@@ -182,7 +182,7 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeApplication(tt.args.ctx, tt.args.projectID, tt.args.app, tt.args.resourceOwner)
+			got, err := r.PatchApplication(tt.args.ctx, tt.args.projectID, tt.args.app, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

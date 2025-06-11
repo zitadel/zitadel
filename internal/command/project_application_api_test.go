@@ -605,7 +605,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 					ClientSecret: emptyConfig,
 				},
 			}
-			got, err := r.ChangeAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
+			got, err := r.PatchAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
