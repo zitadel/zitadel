@@ -31,7 +31,7 @@ type Props = {
   email: string;
   firstname: string;
   lastname: string;
-  organization?: string;
+  organization: string;
   requestId?: string;
 };
 
