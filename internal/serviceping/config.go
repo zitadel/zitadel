@@ -1,15 +1,16 @@
 package serviceping
 
 type Config struct {
-	Enabled   bool
-	Endpoint  string
-	Interval  string
-	Telemetry TelemetryConfig
+	Enabled     bool
+	Endpoint    string
+	Interval    string
+	MaxAttempts uint8
+	Telemetry   TelemetryConfig
 }
 
 type TelemetryConfig struct {
 	ResourceCount struct {
 		Enabled  bool
-		BulkSize uint
+		BulkSize int
 	}
 }

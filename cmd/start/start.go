@@ -17,6 +17,8 @@ import (
 	"github.com/common-nighthawk/go-figure"
 	"github.com/fatih/color"
 	"github.com/gorilla/mux"
+	"github.com/riverqueue/river"
+	"github.com/robfig/cron/v3"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -98,6 +100,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
+	"github.com/zitadel/zitadel/internal/serviceping"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -276,6 +279,18 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
+		// TODO: make dynamic
+		PeriodicJobs: []*river.PeriodicJob{
+			river.NewPeriodicJob(
+				cron.Every(2*time.Minute),
+				func() (river.JobArgs, *river.InsertOpts) {
+					return &serviceping.ServicePingReport{}, &river.InsertOpts{
+						Queue: serviceping.QueueName,
+					}
+				},
+				&river.PeriodicJobOpts{RunOnStart: false},
+			),
+		},
 	})
 	if err != nil {
 		return err
@@ -315,6 +330,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		q,
 	)
 	execution.Start(ctx)
+
+	serviceping.StartWorker(ctx, q, queries, eventstoreClient, config.ServicePing)
 
 	if err = q.Start(ctx); err != nil {
 		return err
