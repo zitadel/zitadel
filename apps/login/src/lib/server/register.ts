@@ -190,8 +190,6 @@ export async function registerUserAndLinkToIDP(
     organization: command.organization,
   });
 
-  // TODO: addIDPLink to addResponse
-
   const idpLink = await addIDPLink({
     serviceUrl,
     idp: {
