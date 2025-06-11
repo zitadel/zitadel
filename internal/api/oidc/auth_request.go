@@ -24,7 +24,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -216,11 +215,11 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 	return o.repo.SaveAuthCode(ctx, id, code, userAgentID)
 }
 
-func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
+func (o *OPStorage) DeleteAuthRequest(context.Context, string) error {
 	panic(o.panicErr("DeleteAuthRequest"))
 }
 
-func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (string, time.Time, error) {
+func (o *OPStorage) CreateAccessToken(context.Context, op.TokenRequest) (string, time.Time, error) {
 	panic(o.panicErr("CreateAccessToken"))
 }
 
@@ -541,22 +540,6 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return scopes, nil
-}
-
-func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID, projectID string) error {
-	token.Audience = append(token.Audience, clientID)
-	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
-	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
-	if err != nil {
-		return err
-	}
-	for _, role := range roles.ProjectRoles {
-		token.Scopes = append(token.Scopes, ScopeProjectRolePrefix+role.Key)
-	}
-	return nil
 }
 
 func setContextUserSystem(ctx context.Context) context.Context {

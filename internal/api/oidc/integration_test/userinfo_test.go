@@ -39,10 +39,6 @@ func TestServer_UserInfo(t *testing.T) {
 		webKey  bool
 	}{
 		{
-			name:   "legacy enabled",
-			legacy: true,
-		},
-		{
 			name:    "legacy disabled, trigger disabled",
 			legacy:  false,
 			trigger: false,
