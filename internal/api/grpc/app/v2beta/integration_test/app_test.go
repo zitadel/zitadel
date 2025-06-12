@@ -595,18 +595,100 @@ func TestReactivateApplication(t *testing.T) {
 		})
 	}
 }
-			deleteRequest: &app.ReactivateApplicationRequest{
+
+func TestRegenerateClientSecret(t *testing.T) {
+	t.Parallel()
+
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
+
+	t.Cleanup(func() {
+		instance.Client.Projectv2Beta.DeleteProject(iamOwnerCtx, &project.DeleteProjectRequest{
+			Id: p.GetId(),
+		})
+	})
+
+	reqForApiAppCreation := &app.CreateApplicationRequest_ApiRequest{
+		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	}
+
+	apiAppToRegen, apiAppCreateErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForApiAppCreation,
+	})
+	require.Nil(t, apiAppCreateErr)
+
+	reqForOIDCAppCreation := &app.CreateApplicationRequest_OidcRequest{
+		OidcRequest: &app.CreateOIDCApplicationRequest{
+			RedirectUris:           []string{"http://example.com"},
+			ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+			GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+			AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+			AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+			PostLogoutRedirectUris: []string{"http://example.com/home"},
+			Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+			AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+			BackChannelLogoutUri:   "http://example.com/logout",
+			LoginVersion: &app.LoginVersion{
+				Version: &app.LoginVersion_LoginV2{
+					LoginV2: &app.LoginV2{
+						BaseUri: &baseURI,
+					},
+				},
+			},
+		},
+	}
+
+	oidcAppToRegen, oidcAppCreateErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForOIDCAppCreation,
+	})
+	require.Nil(t, oidcAppCreateErr)
+
+	tt := []struct {
+		testName     string
+		regenRequest *app.RegenerateClientSecretRequest
+
+		expectedErrorType codes.Code
+		oldSecret         string
+	}{
+		{
+			testName: "when app to regen is not expected type should return invalid argument error",
+			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     p.GetId(),
 				ApplicationId: gofakeit.Sentence(2),
+			},
+			expectedErrorType: codes.InvalidArgument,
+		},
+		{
+			testName: "when app to regen is not found should return not found error",
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: gofakeit.Sentence(2),
+				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
 			expectedErrorType: codes.NotFound,
 		},
 		{
-			testName: "when app to reactivate is found should return deactivation time",
-			deleteRequest: &app.ReactivateApplicationRequest{
+			testName: "when API app to regen is found should return different secret",
+			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     p.GetId(),
-				ApplicationId: appToReactivate.GetAppId(),
+				ApplicationId: apiAppToRegen.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
+			oldSecret: apiAppToRegen.GetApiResponse().GetClientSecret(),
+		},
+		{
+			testName: "when OIDC app to regen is found should return different secret",
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: oidcAppToRegen.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
+			},
+			oldSecret: oidcAppToRegen.GetOidcResponse().GetClientSecret(),
 		},
 	}
 
@@ -615,13 +697,15 @@ func TestReactivateApplication(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := instance.Client.AppV2Beta.ReactivateApplication(iamOwnerCtx, tc.deleteRequest)
+			res, err := instance.Client.AppV2Beta.RegenerateClientSecret(iamOwnerCtx, tc.regenRequest)
 
 			// Then
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
 			if tc.expectedErrorType == codes.OK {
-				assert.NotZero(t, res.GetReactivationDate())
+				assert.NotZero(t, res.GetCreationDate())
+				assert.NotEqual(t, tc.oldSecret, res.GetClientSecret())
 			}
 		})
 	}
+
 }

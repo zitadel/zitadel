@@ -176,3 +176,35 @@ func (s *Server) ReactivateApplication(ctx context.Context, req *app.ReactivateA
 	}, nil
 
 }
+
+func (s *Server) RegenerateClientSecret(ctx context.Context, req *app.RegenerateClientSecretRequest) (*app.RegenerateClientSecretResponse, error) {
+	var secret string
+	var changeDate time.Time
+
+	switch req.GetAppType().(type) {
+	case *app.RegenerateClientSecretRequest_IsApi:
+		config, err := s.command.ChangeAPIApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+		secret = config.ClientSecretString
+		changeDate = config.ChangeDate
+
+	case *app.RegenerateClientSecretRequest_IsOidc:
+		config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+
+		secret = config.ClientSecretString
+		changeDate = config.ChangeDate
+
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "APP-aLWIzw", "unknown app type")
+	}
+
+	return &app.RegenerateClientSecretResponse{
+		ClientSecret: secret,
+		CreationDate: timestamppb.New(changeDate),
+	}, nil
+}

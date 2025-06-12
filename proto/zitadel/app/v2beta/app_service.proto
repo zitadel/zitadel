@@ -290,6 +290,37 @@ service AppService {
             }
         };
     }
+
+
+    // Regenerate Client Secret
+    //
+    // Regenerates the client secret of an API or OIDC application that belongs to the input project.
+    // 
+    // The user needs to be owner of the project and have project.app.write permission
+    //
+    // Required permissions:
+    //   - `project.app.write`
+    rpc RegenerateClientSecret(RegenerateClientSecretRequest) returns (RegenerateClientSecretResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/apps/{application_id}/config/generate_client_secret"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                description: "The regenerated client secret.";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
 }
 
 message CreateApplicationRequest {
@@ -672,6 +703,32 @@ message ReactivateApplicationRequest{
 
 message ReactivateApplicationResponse{
     google.protobuf.Timestamp reactivation_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message RegenerateClientSecretRequest{
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string application_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof app_type {
+        option (validate.required) = true;
+        bool is_oidc = 3;
+        bool is_api = 4;
+    }
+}
+
+message RegenerateClientSecretResponse{
+    string client_secret = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjoq34589uasgh\"";
+            description: "generated secret for the client";
+        }
+    ];
+
+    // The timestamp of the creation of the new client secret
+    google.protobuf.Timestamp creation_date = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "\"2025-01-23T10:34:18.051Z\"";
         }
