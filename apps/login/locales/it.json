@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Collegamento account fallito",
       "description": "Si è verificato un errore durante il tentativo di collegare il tuo account."
+    },
+    "completeRegister": {
+      "title": "Completa la registrazione",
+      "description": "Completa la registrazione del tuo account."
     }
   },
   "mfa": {
@@ -149,11 +153,13 @@
     },
     "title": "Registrati",
     "description": "Crea il tuo account ZITADEL.",
+    "noMethodAvailableWarning": "Nessun metodo di autenticazione disponibile. Contatta l'amministratore di sistema per assistenza.",
     "selectMethod": "Seleziona il metodo con cui desideri autenticarti",
     "agreeTo": "Per registrarti devi accettare i termini e le condizioni",
     "termsOfService": "Termini di Servizio",
     "privacyPolicy": "Informativa sulla Privacy",
     "submit": "Continua",
+    "orUseIDP": "o usa un Identity Provider",
     "password": {
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",

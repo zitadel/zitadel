@@ -109,15 +109,20 @@ export async function createSessionAndUpdateCookie(command: {
   }
 }
 
-export async function createSessionForIdpAndUpdateCookie(
-  userId: string,
+export async function createSessionForIdpAndUpdateCookie({
+  userId,
+  idpIntent,
+  requestId,
+  lifetime,
+}: {
+  userId: string;
   idpIntent: {
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
-  },
-  requestId: string | undefined,
-  lifetime?: Duration,
-): Promise<Session> {
+  };
+  requestId: string | undefined;
+  lifetime?: Duration;
+}): Promise<Session> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 

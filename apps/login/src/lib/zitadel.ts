@@ -1,7 +1,10 @@
 import { Client, create, Duration } from "@zitadel/client";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
-import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import {
+  OrganizationSchema,
+  TextQueryMethod,
+} from "@zitadel/proto/zitadel/object/v2/object_pb";
 import {
   CreateCallbackRequest,
   OIDCService,
@@ -32,6 +35,7 @@ import {
 import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
+  AddHumanUserRequestSchema,
   ResendEmailCodeRequest,
   ResendEmailCodeRequestSchema,
   SendEmailCodeRequestSchema,
@@ -387,8 +391,8 @@ export type AddHumanUserData = {
   firstName: string;
   lastName: string;
   email: string;
-  password: string | undefined;
-  organization: string | undefined;
+  password?: string;
+  organization: string;
 };
 
 export async function addHumanUser({
@@ -404,23 +408,36 @@ export async function addHumanUser({
     serviceUrl,
   );
 
-  return userService.addHumanUser({
-    email: {
-      email,
-      verification: {
-        case: "isVerified",
-        value: false,
+  let addHumanUserRequest: AddHumanUserRequest = create(
+    AddHumanUserRequestSchema,
+    {
+      email: {
+        email,
+        verification: {
+          case: "isVerified",
+          value: false,
+        },
       },
+      username: email,
+      profile: { givenName: firstName, familyName: lastName },
+      passwordType: password
+        ? { case: "password", value: { password } }
+        : undefined,
     },
-    username: email,
-    profile: { givenName: firstName, familyName: lastName },
-    organization: organization
-      ? { org: { case: "orgId", value: organization } }
-      : undefined,
-    passwordType: password
-      ? { case: "password", value: { password } }
-      : undefined,
-  });
+  );
+
+  if (organization) {
+    const organizationSchema = create(OrganizationSchema, {
+      org: { case: "orgId", value: organization },
+    });
+
+    addHumanUserRequest = {
+      ...addHumanUserRequest,
+      organization: organizationSchema,
+    };
+  }
+
+  return userService.addHumanUser(addHumanUserRequest);
 }
 
 export async function addHuman({

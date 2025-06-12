@@ -1,7 +1,15 @@
 "use server";
 
-import { createSessionAndUpdateCookie } from "@/lib/server/cookie";
-import { addHumanUser, getLoginSettings, getUserByID } from "@/lib/zitadel";
+import {
+  createSessionAndUpdateCookie,
+  createSessionForIdpAndUpdateCookie,
+} from "@/lib/server/cookie";
+import {
+  addHumanUser,
+  addIDPLink,
+  getLoginSettings,
+  getUserByID,
+} from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -18,7 +26,7 @@ type RegisterUserCommand = {
   firstName: string;
   lastName: string;
   password?: string;
-  organization?: string;
+  organization: string;
   requestId?: string;
 };
 
@@ -132,4 +140,94 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return { redirect: url };
   }
+}
+
+type RegisterUserAndLinkToIDPommand = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  organization: string;
+  requestId?: string;
+  idpIntent: {
+    idpIntentId: string;
+    idpIntentToken: string;
+  };
+  idpUserId: string;
+  idpId: string;
+  idpUserName: string;
+};
+
+export type registerUserAndLinkToIDPResponse = {
+  userId: string;
+  sessionId: string;
+  factors: Factors | undefined;
+};
+export async function registerUserAndLinkToIDP(
+  command: RegisterUserAndLinkToIDPommand,
+) {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const addResponse = await addHumanUser({
+    serviceUrl,
+    email: command.email,
+    firstName: command.firstName,
+    lastName: command.lastName,
+    organization: command.organization,
+  });
+
+  if (!addResponse) {
+    return { error: "Could not create user" };
+  }
+
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization: command.organization,
+  });
+
+  const idpLink = await addIDPLink({
+    serviceUrl,
+    idp: {
+      id: command.idpId,
+      userId: command.idpUserId,
+      userName: command.idpUserName,
+    },
+    userId: addResponse.userId,
+  });
+
+  if (!idpLink) {
+    return { error: "Could not link IDP to user" };
+  }
+
+  const session = await createSessionForIdpAndUpdateCookie({
+    requestId: command.requestId,
+    userId: addResponse.userId, // the user we just created
+    idpIntent: command.idpIntent,
+    lifetime: loginSettings?.externalLoginCheckLifetime,
+  });
+
+  if (!session || !session.factors?.user) {
+    return { error: "Could not create session" };
+  }
+
+  const url = await getNextUrl(
+    command.requestId && session.id
+      ? {
+          sessionId: session.id,
+          requestId: command.requestId,
+          organization: session.factors.user.organizationId,
+        }
+      : {
+          loginName: session.factors.user.loginName,
+          organization: session.factors.user.organizationId,
+        },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  return { redirect: url };
 }

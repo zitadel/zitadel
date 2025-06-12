@@ -1,6 +1,6 @@
 "use client";
 
-import { inviteUser } from "@/lib/server/invite";
+import { registerUserAndLinkToIDP } from "@/lib/server/register";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,26 +20,39 @@ type Inputs =
   | FieldValues;
 
 type Props = {
-  firstname?: string;
-  lastname?: string;
-  email?: string;
-  organization?: string;
+  organization: string;
+  requestId?: string;
+  idpIntent: {
+    idpIntentId: string;
+    idpIntentToken: string;
+  };
+  defaultValues?: {
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+  };
+  idpUserId: string;
+  idpId: string;
+  idpUserName: string;
 };
 
-export function InviteForm({
-  email,
-  firstname,
-  lastname,
+export function RegisterFormIDPIncomplete({
   organization,
+  requestId,
+  idpIntent,
+  defaultValues,
+  idpUserId,
+  idpId,
+  idpUserName,
 }: Props) {
   const t = useTranslations("register");
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
-      email: email ?? "",
-      firstName: firstname ?? "",
-      lastname: lastname ?? "",
+      email: defaultValues?.email ?? "",
+      firstname: defaultValues?.firstname ?? "",
+      lastname: defaultValues?.lastname ?? "",
     },
   });
 
@@ -48,39 +61,37 @@ export function InviteForm({
 
   const router = useRouter();
 
-  async function submitAndContinue(values: Inputs) {
+  async function submitAndRegister(values: Inputs) {
     setLoading(true);
-    const response = await inviteUser({
+    const response = await registerUserAndLinkToIDP({
+      idpId: idpId,
+      idpUserName: idpUserName,
+      idpUserId: idpUserId,
       email: values.email,
       firstName: values.firstname,
       lastName: values.lastname,
       organization: organization,
+      requestId: requestId,
+      idpIntent: idpIntent,
     })
       .catch(() => {
-        setError("Could not create invitation Code");
+        setError("Could not register user");
         return;
       })
       .finally(() => {
         setLoading(false);
       });
 
-    if (response && typeof response === "object" && "error" in response) {
+    if (response && "error" in response && response.error) {
       setError(response.error);
       return;
     }
 
-    if (!response) {
-      setError("Could not create invitation Code");
-      return;
+    if (response && "redirect" in response && response.redirect) {
+      return router.push(response.redirect);
     }
 
-    const params = new URLSearchParams({});
-
-    if (response) {
-      params.append("userId", response);
-    }
-
-    return router.push(`/invite/success?` + params);
+    return response;
   }
 
   const { errors } = formState;
@@ -88,16 +99,6 @@ export function InviteForm({
   return (
     <form className="w-full">
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="col-span-2">
-          <TextInput
-            type="email"
-            autoComplete="email"
-            required
-            {...register("email", { required: "This field is required" })}
-            label="E-mail"
-            error={errors.email?.message as string}
-          />
-        </div>
         <div className="">
           <TextInput
             type="firstname"
@@ -106,6 +107,7 @@ export function InviteForm({
             {...register("firstname", { required: "This field is required" })}
             label="First name"
             error={errors.firstname?.message as string}
+            data-testid="firstname-text-input"
           />
         </div>
         <div className="">
@@ -116,6 +118,18 @@ export function InviteForm({
             {...register("lastname", { required: "This field is required" })}
             label="Last name"
             error={errors.lastname?.message as string}
+            data-testid="lastname-text-input"
+          />
+        </div>
+        <div className="col-span-2">
+          <TextInput
+            type="email"
+            autoComplete="email"
+            required
+            {...register("email", { required: "This field is required" })}
+            label="E-mail"
+            error={errors.email?.message as string}
+            data-testid="email-text-input"
           />
         </div>
       </div>
@@ -127,12 +141,13 @@ export function InviteForm({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton />
+        <BackButton data-testid="back-button" />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitAndContinue)}
+          onClick={handleSubmit(submitAndRegister)}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("submit")}
