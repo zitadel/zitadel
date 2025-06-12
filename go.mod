@@ -60,9 +60,10 @@ require (
 	github.com/pquerna/otp v1.4.0
 	github.com/rakyll/statik v0.1.7
 	github.com/redis/go-redis/v9 v9.7.3
-	github.com/riverqueue/river v0.19.0
-	github.com/riverqueue/river/riverdriver v0.19.0
-	github.com/riverqueue/river/rivertype v0.19.0
+	github.com/riverqueue/river v0.22.0
+	github.com/riverqueue/river/riverdriver v0.22.0
+	github.com/riverqueue/river/rivertype v0.22.0
+	github.com/riverqueue/rivercontrib/otelriver v0.5.0
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shopspring/decimal v1.4.0
@@ -94,8 +95,8 @@ require (
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 	golang.org/x/net v0.37.0
 	golang.org/x/oauth2 v0.28.0
-	golang.org/x/sync v0.12.0
-	golang.org/x/text v0.23.0
+	golang.org/x/sync v0.13.0
+	golang.org/x/text v0.24.0
 	google.golang.org/api v0.227.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250313205543-e70fdf4c4cb4
 	google.golang.org/grpc v1.71.0
@@ -143,7 +144,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
-	github.com/riverqueue/river/rivershared v0.19.0 // indirect
+	github.com/riverqueue/river/rivershared v0.22.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
@@ -216,7 +217,7 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/riverqueue/river/riverdriver/riverpgxv5 v0.19.0
+	github.com/riverqueue/river/riverdriver/riverpgxv5 v0.22.0
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/russellhaering/goxmldsig v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.3
