@@ -1,6 +1,6 @@
 //go:build integration
 
-package instance_test
+package events_test
 
 import (
 	"context"
@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
@@ -27,6 +29,7 @@ var (
 	CTX          context.Context
 	Instance     *integration.Instance
 	SystemClient system.SystemServiceClient
+	OrgClient    org.OrganizationServiceClient
 )
 
 var pool database.Pool
@@ -40,9 +43,23 @@ func TestMain(m *testing.M) {
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
+		OrgClient = Instance.Client.OrgV2
 
 		var err error
-		dbPool, err = pgxpool.New(context.Background(), ConnString)
+		dbConfig, err := pgxpool.ParseConfig(ConnString)
+		if err != nil {
+			panic(err)
+		}
+		dbConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+			orgState, err := conn.LoadType(ctx, "zitadel.organization_state")
+			if err != nil {
+				return err
+			}
+			conn.TypeMap().RegisterType(orgState)
+			return nil
+		}
+
+		dbPool, err = pgxpool.NewWithConfig(context.Background(), dbConfig)
 		if err != nil {
 			panic(err)
 		}
