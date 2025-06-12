@@ -463,3 +463,66 @@ func TestDeleteApplication(t *testing.T) {
 		})
 	}
 }
+
+func TestDeactivateApplication(t *testing.T) {
+	t.Parallel()
+
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
+
+	t.Cleanup(func() {
+		instance.Client.Projectv2Beta.DeleteProject(iamOwnerCtx, &project.DeleteProjectRequest{
+			Id: p.GetId(),
+		})
+	})
+
+	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
+		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	}
+
+	appToDeactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForAppNameCreation,
+	})
+	require.Nil(t, appCreateErr)
+
+	tt := []struct {
+		testName      string
+		deleteRequest *app.DeactivateApplicationRequest
+
+		expectedErrorType codes.Code
+	}{
+		{
+			testName: "when app to deactivate is not found should return not found error",
+			deleteRequest: &app.DeactivateApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: gofakeit.Sentence(2),
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when app to deactivate is found should return deactivation time",
+			deleteRequest: &app.DeactivateApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: appToDeactivate.GetAppId(),
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			res, err := instance.Client.AppV2Beta.DeactivateApplication(iamOwnerCtx, tc.deleteRequest)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetDeactivationDate())
+			}
+		})
+	}
+}

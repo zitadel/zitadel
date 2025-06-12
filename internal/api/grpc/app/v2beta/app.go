@@ -152,3 +152,15 @@ func (s *Server) DeleteApplication(ctx context.Context, req *app.DeleteApplicati
 		DeletionDate: timestamppb.New(details.EventDate),
 	}, nil
 }
+
+func (s *Server) DeactivateApplication(ctx context.Context, req *app.DeactivateApplicationRequest) (*app.DeactivateApplicationResponse, error) {
+	details, err := s.command.DeactivateApplication(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &app.DeactivateApplicationResponse{
+		DeactivationDate: timestamppb.New(details.EventDate),
+	}, nil
+
+}
