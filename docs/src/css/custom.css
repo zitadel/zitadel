@@ -645,3 +645,7 @@ p strong {
 table#zitadel-versions td {
   vertical-align: top;
 }
+
+.hidden {
+  display: none !important;
+}
