@@ -1622,8 +1622,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organizație implicită de conectare",
       "LOGINDEFAULTORG_DESCRIPTION": "UI-ul de conectare va utiliza setările organizației implicite (și nu din instanță) dacă nu este setat niciun context de organizație",
-      "OIDCLEGACYINTROSPECTION": "Introspecție OIDC Legacy",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Am refactorizat recent endpointul de introspecție din motive de performanță. Această caracteristică poate fi utilizată pentru a reveni la implementarea legacy dacă apar erori neașteptate.",
       "OIDCTOKENEXCHANGE": "Schimb de token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Activați tipul de grant experimental urn:ietf:params:oauth:grant-type:token-exchange pentru endpointul token OIDC. Schimbul de tokenuri poate fi utilizat pentru a solicita tokenuri cu o rază de acțiune mai mică sau pentru a impersona alți utilizatori. Consultați politica de securitate pentru a permite impersonarea pe o instanță.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Proiecții de introspecție OIDC Trigger",

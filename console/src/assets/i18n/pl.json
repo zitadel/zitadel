@@ -1623,8 +1623,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Domyślna Organizacja Logowania",
       "LOGINDEFAULTORG_DESCRIPTION": "Jeśli nie ustawiono kontekstu organizacji, interfejs logowania będzie używać ustawień domyślnej organizacji (a nie instancji)",
-      "OIDCLEGACYINTROSPECTION": "Starsza Introspekcja OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Ostatnio przeprojektowaliśmy punkt końcowy introspekcji ze względów wydajnościowych. Ta funkcja może być używana do cofnięcia do starszej implementacji, jeśli wystąpią nieoczekiwane błędy.",
       "OIDCTOKENEXCHANGE": "Wymiana Tokenów OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Włącz eksperymentalny typ grantu urn:ietf:params:oauth:grant-type:token-exchange dla punktu końcowego tokena OIDC. Wymiana tokenów może być używana do żądania tokenów o mniejszym zakresie lub podszywania się za innych użytkowników. Aby zezwolić na podszywanie się na instancji, zapoznaj się z polityką bezpieczeństwa.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projekcje Introspekcji Wyzwalane przez OIDC",
