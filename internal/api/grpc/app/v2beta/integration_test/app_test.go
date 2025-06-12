@@ -526,3 +526,102 @@ func TestDeactivateApplication(t *testing.T) {
 		})
 	}
 }
+
+func TestReactivateApplication(t *testing.T) {
+	t.Parallel()
+
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
+
+	t.Cleanup(func() {
+		instance.Client.Projectv2Beta.DeleteProject(iamOwnerCtx, &project.DeleteProjectRequest{
+			Id: p.GetId(),
+		})
+	})
+
+	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
+		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	}
+
+	appToReactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForAppNameCreation,
+	})
+	require.Nil(t, appCreateErr)
+
+	_, appDeactivateErr := instance.Client.AppV2Beta.DeactivateApplication(iamOwnerCtx, &app.DeactivateApplicationRequest{
+		ProjectId:     p.GetId(),
+		ApplicationId: appToReactivate.GetAppId(),
+	})
+	require.Nil(t, appDeactivateErr)
+
+	tt := []struct {
+		testName          string
+		reactivateRequest *app.ReactivateApplicationRequest
+
+		expectedErrorType codes.Code
+	}{
+		{
+			testName: "when app to reactivate is not found should return not found error",
+			reactivateRequest: &app.ReactivateApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: gofakeit.Sentence(2),
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when app to reactivate is found should return deactivation time",
+			reactivateRequest: &app.ReactivateApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: appToReactivate.GetAppId(),
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			res, err := instance.Client.AppV2Beta.ReactivateApplication(iamOwnerCtx, tc.reactivateRequest)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetReactivationDate())
+			}
+		})
+	}
+}
+			deleteRequest: &app.ReactivateApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: gofakeit.Sentence(2),
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when app to reactivate is found should return deactivation time",
+			deleteRequest: &app.ReactivateApplicationRequest{
+				ProjectId:     p.GetId(),
+				ApplicationId: appToReactivate.GetAppId(),
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			res, err := instance.Client.AppV2Beta.ReactivateApplication(iamOwnerCtx, tc.deleteRequest)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetReactivationDate())
+			}
+		})
+	}
+}

@@ -164,3 +164,15 @@ func (s *Server) DeactivateApplication(ctx context.Context, req *app.DeactivateA
 	}, nil
 
 }
+
+func (s *Server) ReactivateApplication(ctx context.Context, req *app.ReactivateApplicationRequest) (*app.ReactivateApplicationResponse, error) {
+	details, err := s.command.ReactivateApplication(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &app.ReactivateApplicationResponse{
+		ReactivationDate: timestamppb.New(details.EventDate),
+	}, nil
+
+}
