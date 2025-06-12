@@ -57,7 +57,6 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemResetEventType,
 			feature_v2.SystemLoginDefaultOrgEventType,
 			feature_v2.SystemTriggerIntrospectionProjectionsEventType,
-			feature_v2.SystemLegacyIntrospectionEventType,
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
@@ -88,8 +87,6 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.LoginDefaultOrg.set(level, event.Value)
 	case feature.KeyTriggerIntrospectionProjections:
 		features.TriggerIntrospectionProjections.set(level, event.Value)
-	case feature.KeyLegacyIntrospection:
-		features.LegacyIntrospection.set(level, event.Value)
 	case feature.KeyUserSchema:
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:

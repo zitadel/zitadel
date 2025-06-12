@@ -12,8 +12,8 @@ const (
 	KeyUnspecified Key = iota
 	KeyLoginDefaultOrg
 	KeyTriggerIntrospectionProjections
-	KeyLegacyIntrospection // Removed
-	KeyUserSchema
+	// KeyLegacyIntrospection (reserving the spot)
+	KeyUserSchema Key = iota + 1
 	KeyTokenExchange
 	KeyActionsDeprecated
 	KeyImprovedPerformance
