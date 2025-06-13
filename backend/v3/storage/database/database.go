@@ -61,3 +61,11 @@ type Row interface {
 type Rows interface {
 	pgx.Rows
 }
+
+// Collector is an interface for collecting rows into a specific type.
+type Collector[T any] interface {
+	// Collect collects a single row into the specified type.
+	Collect(Row) (T, error)
+	// CollectRows collects multiple rows into a slice of the specified type.
+	CollectRows(Rows) ([]T, error)
+}
