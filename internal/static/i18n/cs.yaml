@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefon již ověřen
       Empty: Telefon je prázdný
       NotChanged: Telefon nezměněn
+      VerifyingRemovalIsNotSupported: Ověření odstranění telefonu není podporováno
     Address:
       NotFound: Adresa nenalezena
       NotChanged: Adresa nezměněna
@@ -534,6 +535,7 @@ Errors:
     StateMissing: V požadavku chybí parametr stavu
     NotStarted: Záměr nebyl zahájen nebo již byl ukončen
     NotSucceeded: Záměr nebyl úspěšný
+    Expired: Záměr vypršel
     TokenCreationFailed: Vytvoření tokenu selhalo
     InvalidToken: Token záměru je neplatný
     OtherUser: Záměr určený pro jiného uživatele

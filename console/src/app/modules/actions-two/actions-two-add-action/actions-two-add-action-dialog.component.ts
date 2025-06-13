@@ -10,12 +10,7 @@ import {
 } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
 import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
 import { CommonModule } from '@angular/common';
-import {
-  Condition,
-  Execution,
-  ExecutionTargetType,
-  ExecutionTargetTypeSchema,
-} from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Condition, Execution } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { Subject } from 'rxjs';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 
@@ -27,11 +22,8 @@ enum Page {
 
 export type CorrectlyTypedCondition = Condition & { conditionType: Extract<Condition['conditionType'], { case: string }> };
 
-type CorrectlyTypedTargets = { type: Extract<ExecutionTargetType['type'], { case: 'target' }> };
-
-export type CorrectlyTypedExecution = Omit<Execution, 'targets' | 'condition'> & {
+export type CorrectlyTypedExecution = Omit<Execution, 'condition'> & {
   condition: CorrectlyTypedCondition;
-  targets: CorrectlyTypedTargets[];
 };
 
 export const correctlyTypeExecution = (execution: Execution): CorrectlyTypedExecution => {
@@ -48,9 +40,6 @@ export const correctlyTypeExecution = (execution: Execution): CorrectlyTypedExec
   return {
     ...execution,
     condition,
-    targets: execution.targets
-      .map(({ type }) => ({ type }))
-      .filter((target): target is CorrectlyTypedTargets => target.type.case === 'target'),
   };
 };
 
@@ -81,7 +70,7 @@ export class ActionTwoAddActionDialogComponent {
 
   protected readonly typeSignal = signal<ConditionType>('request');
   protected readonly conditionSignal = signal<MessageInitShape<typeof SetExecutionRequestSchema>['condition']>(undefined);
-  protected readonly targetsSignal = signal<MessageInitShape<typeof ExecutionTargetTypeSchema>[]>([]);
+  protected readonly targetsSignal = signal<string[]>([]);
 
   protected readonly continueSubject = new Subject<void>();
 
@@ -112,7 +101,7 @@ export class ActionTwoAddActionDialogComponent {
     this.targetsSignal.set(data.execution.targets);
     this.typeSignal.set(data.execution.condition.conditionType.case);
     this.conditionSignal.set(data.execution.condition);
-    this.preselectedTargetIds = data.execution.targets.map((target) => target.type.value);
+    this.preselectedTargetIds = data.execution.targets;
 
     this.page.set(Page.Target); // Set the initial page based on the provided execution data
   }

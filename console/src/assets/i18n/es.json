@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flujos",
         "DESCRIPTION": "Elige un flujo de autenticación y activa tu acción en un evento específico dentro de este flujo."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, una nueva y mejorada versión de Actions, ya está disponible. La versión actual sigue siendo accesible, pero nuestro desarrollo futuro se centrará en la nueva, que acabará reemplazando la versión actual."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,13 +530,14 @@
     "APPLY": "Aplicar"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Actualmente estás usando la nueva versión Actions V2, que está en fase beta. La versión anterior 1 todavía está disponible, pero será descontinuada en el futuro. Por favor, informa de cualquier problema o comentario.",
     "EXECUTION": {
       "TITLE": "Acciones",
       "DESCRIPTION": "Las acciones te permiten ejecutar código personalizado en respuesta a solicitudes de API, eventos o funciones específicas. Úsalas para extender Zitadel, automatizar flujos de trabajo e integrarte con otros sistemas.",
       "TYPES": {
         "request": "Solicitud",
         "response": "Respuesta",
-        "events": "Eventos",
+        "event": "Eventos",
         "function": "Función"
       },
       "DIALOG": {
@@ -566,6 +568,7 @@
             "TITLE": "Todas",
             "DESCRIPTION": "Selecciona esto si quieres ejecutar tu acción en cada solicitud"
           },
+          "ALL_EVENTS": "Selecciona esto si quieres ejecutar tu acción en cada evento",
           "SELECT_SERVICE": {
             "TITLE": "Seleccionar servicio",
             "DESCRIPTION": "Elige un servicio de Zitadel para tu acción."
@@ -619,6 +622,7 @@
           "restCall": "Llamada REST",
           "restAsync": "REST Asíncrono"
         },
+        "TYPES_DESCRIPTION": "Webhook, la llamada maneja el código de estado pero la respuesta es irrelevante\nCall, la llamada maneja el código de estado y la respuesta\nAsync, la llamada no maneja ni el código de estado ni la respuesta, pero puede ser llamada en paralelo con otros objetivos",
         "ENDPOINT": "Punto de conexión",
         "ENDPOINT_DESCRIPTION": "Introduce el punto de conexión donde se aloja tu código. ¡Asegúrate de que sea accesible para nosotros!",
         "TIMEOUT": "Tiempo de espera",
@@ -689,6 +693,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nombre de usuario",
     "ORGNAME": "Nombre de organización",
+    "ORGID": "ID de organización",
     "PRIMARYDOMAIN": "Dominio primario",
     "PROJECTNAME": "Nombre de proyecto",
     "RESOURCEOWNER": "Propietario del recurso",
@@ -1509,7 +1514,8 @@
       "APPEARANCE": "Apariencia",
       "OTHER": "Otros",
       "STORAGE": "Datos"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2146,6 +2152,7 @@
       "ACTIVATE": "Activar proyecto",
       "DELETE": "Borrar proyecto",
       "ORGNAME": "Nombre de organización",
+      "ORGID": "ID de organización",
       "ORGDOMAIN": "Dominio de organización",
       "STATE": "Estado",
       "TYPE": "Tipo",
@@ -2334,6 +2341,8 @@
     "REMOVE_WARN_DESCRIPTION": "Está a punto de eliminar un proveedor de identidad. Esto eliminará la selección del IDP disponible para sus usuarios y los usuarios ya registrados no podrán volver a iniciar sesión. ¿Estás seguro de continuar?",
     "DELETE_SELECTION_TITLE": "Borrar IDP",
     "DELETE_SELECTION_DESCRIPTION": "Estás a punto de borrar un proveedor de identidad. Los cambios resultantes son irrevocables. ¿Estás seguro de que quieres hacer esto?",
+    "FEDERATEDLOGOUTENABLED": "Cierre de sesión federado habilitado",
+    "FEDERATEDLOGOUTENABLED_DESC": "Si está habilitado, el usuario también será desconectado del IdP si finaliza la sesión en ZITADEL.",
     "EMPTY": "No hay IDP disponible",
     "OIDC": {
       "GENERAL": "Información general",

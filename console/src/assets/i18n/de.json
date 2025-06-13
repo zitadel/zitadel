@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Wähle einen Authentifizierungsflow und löse deine Aktionen bei einem spezifischen Ereignis innerhalb dieses Flows aus."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, eine neue und verbesserte Version von Actions, ist jetzt verfügbar. Die aktuelle Version ist weiterhin zugänglich, aber unsere zukünftige Entwicklung wird sich auf die neue Version konzentrieren, die schließlich die aktuelle ersetzen wird."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,13 +530,14 @@
     "APPLY": "Anwenden"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Sie verwenden derzeit die neuen Actions V2, die sich in der Beta-Phase befinden. Version 1 ist weiterhin verfügbar, wird jedoch in Zukunft eingestellt. Bitte melden Sie Probleme oder Feedback.",
     "EXECUTION": {
       "TITLE": "Aktionen",
       "DESCRIPTION": "Aktionen ermöglichen es Ihnen, benutzerdefinierten Code als Reaktion auf API-Anfragen, Ereignisse oder bestimmte Funktionen auszuführen. Verwenden Sie sie, um Zitadel zu erweitern, Arbeitsabläufe zu automatisieren und sich in andere Systeme zu integrieren.",
       "TYPES": {
         "request": "Anfrage",
         "response": "Antwort",
-        "events": "Ereignisse",
+        "event": "Ereignisse",
         "function": "Funktion"
       },
       "DIALOG": {
@@ -566,6 +568,7 @@
             "TITLE": "Alle",
             "DESCRIPTION": "Wählen Sie dies aus, wenn Sie Ihre Aktion bei jeder Anfrage ausführen möchten"
           },
+          "ALL_EVENTS": "Wähle dies aus, wenn du deine Aktion bei jedem Ereignis ausführen möchtest",
           "SELECT_SERVICE": {
             "TITLE": "Dienst auswählen",
             "DESCRIPTION": "Wählen Sie einen Zitadel-Dienst für Ihre Aktion aus."
@@ -619,6 +622,7 @@
           "restCall": "REST Aufruf",
           "restAsync": "REST Asynchron"
         },
+        "TYPES_DESCRIPTION": "Webhook, der Aufruf verarbeitet den Statuscode, aber die Antwort ist irrelevant\nCall, der Aufruf verarbeitet den Statuscode und die Antwort\nAsync, der Aufruf verarbeitet weder Statuscode noch Antwort, kann aber parallel zu anderen Zielen aufgerufen werden",
         "ENDPOINT": "Endpunkt",
         "ENDPOINT_DESCRIPTION": "Geben Sie den Endpunkt ein, an dem Ihr Code gehostet wird. Stellen Sie sicher, dass er für uns zugänglich ist!",
         "TIMEOUT": "Timeout",
@@ -689,6 +693,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
+    "ORGID": "Organisations ID",
     "PRIMARYDOMAIN": "Primäre Domäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
@@ -1508,7 +1513,8 @@
       "APPEARANCE": "Erscheinungsbild",
       "OTHER": "Anderes",
       "STORAGE": "Speicher"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2145,6 +2151,7 @@
       "ACTIVATE": "Projekt aktivieren",
       "DELETE": "Projekt löschen",
       "ORGNAME": "Name der Organisation",
+      "ORGID": "Organisations ID",
       "ORGDOMAIN": "Domain der Organisation",
       "STATE": "Status",
       "TYPE": "Typ",
@@ -2334,6 +2341,8 @@
     "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Wollen Sie wirklich fortfahren?",
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "FEDERATEDLOGOUTENABLED": "Federated Logout aktiviert",
+    "FEDERATEDLOGOUTENABLED_DESC": "Wenn aktiviert, wird der Benutzer auch vom IdP abgemeldet, wenn der Benutzer die Sitzung in ZITADEL beendet.",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC Konfiguration",

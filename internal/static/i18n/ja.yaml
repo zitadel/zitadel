@@ -116,6 +116,7 @@ Errors:
       AlreadyVerified: 電話番号はすでに認証済みです
       Empty: 電話番号が空です
       NotChanged: 電話番号が変更されていません
+      VerifyingRemovalIsNotSupported: 電話番号の削除を検証することはできません
     Address:
       NotFound: 住所が見つかりません
       NotChanged: 住所は変更されていません
@@ -537,6 +538,7 @@ Errors:
     StateMissing: リクエストに State パラメータがありません
     NotStarted: インテントが開始されなかったか、既に終了している
     NotSucceeded: インテントが成功しなかった
+    Expired: 意図の有効期限が切れました
     TokenCreationFailed: トークンの作成に失敗しました
     InvalidToken: インテントのトークンが無効である
     OtherUser: 他のユーザーを意図している

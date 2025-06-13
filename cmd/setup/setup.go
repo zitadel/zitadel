@@ -198,7 +198,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s35AddPositionToIndexEsWm = &AddPositionToIndexEsWm{dbClient: dbClient}
 	steps.s36FillV2Milestones = &FillV3Milestones{dbClient: dbClient, eventstore: eventstoreClient}
 	steps.s37Apps7OIDConfigsBackChannelLogoutURI = &Apps7OIDConfigsBackChannelLogoutURI{dbClient: dbClient}
-	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: dbClient, esClient: eventstoreClient}
+	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: dbClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: dbClient}
 	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: dbClient}
 	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: dbClient}
@@ -212,6 +212,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s51IDPTemplate6RootCA = &IDPTemplate6RootCA{dbClient: dbClient}
 	steps.s52IDPTemplate6LDAP2 = &IDPTemplate6LDAP2{dbClient: dbClient}
 	steps.s53InitPermittedOrgsFunction = &InitPermittedOrgsFunction53{dbClient: dbClient}
+	steps.s54InstancePositionIndex = &InstancePositionIndex{dbClient: dbClient}
+	steps.s55ExecutionHandlerStart = &ExecutionHandlerStart{dbClient: dbClient}
+	steps.s56IDPTemplate6SAMLFederatedLogout = &IDPTemplate6SAMLFederatedLogout{dbClient: dbClient}
+	steps.s57CreateResourceCounts = &CreateResourceCounts{dbClient: dbClient}
+	steps.s58ReplaceLoginNames3View = &ReplaceLoginNames3View{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -254,6 +259,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s51IDPTemplate6RootCA,
 		steps.s52IDPTemplate6LDAP2,
 		steps.s53InitPermittedOrgsFunction,
+		steps.s54InstancePositionIndex,
+		steps.s55ExecutionHandlerStart,
+		steps.s56IDPTemplate6SAMLFederatedLogout,
+		steps.s57CreateResourceCounts,
+		steps.s58ReplaceLoginNames3View,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -293,6 +303,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			client: dbClient,
 		},
 	}
+	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 
 	for _, repeatableStep := range repeatableSteps {
 		setupErr = executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
