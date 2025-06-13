@@ -3,7 +3,6 @@
 package events_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -11,147 +10,182 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
-// const ConnString = "host=localhost port=5432 user=zitadel dbname=zitadel sslmode=disable"
-
-// var (
-// 	dbPool       *pgxpool.Pool
-// 	CTX          context.Context
-// 	Organization     *integration.Organization
-// 	SystemClient system.SystemServiceClient
-// )
-
-// var pool database.Pool
-
-// func TestMain(m *testing.M) {
-// 	os.Exit(func() int {
-// 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
-// 		defer cancel()
-
-// 		Organization = integration.NewOrganization(ctx)
-
-// 		CTX = Organization.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		SystemClient = integration.SystemClient()
-
-// 		var err error
-// 		dbPool, err = pgxpool.New(context.Background(), ConnString)
-// 		if err != nil {
-// 			panic(err)
-// 		}
-
-// 		pool = postgres.PGxPool(dbPool)
-
-// 		return m.Run()
-// 	}())
-// }
-
 func TestServer_TestOrganizationAddReduces(t *testing.T) {
+	beforeCreate := time.Now()
 	orgName := gofakeit.Name()
-	// beforeCreate := time.Now()
 
 	_, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
 		Name: orgName,
 	})
 	require.NoError(t, err)
-	// afterCreate := time.Now()
+	afterCreate := time.Now()
 
 	orgRepo := repository.OrgRepository(pool)
-	organization, err := orgRepo.Get(CTX,
-		orgRepo.NameCondition(database.TextOperationEqual, orgName),
-	)
-	require.NoError(t, err)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> organization = %+v\n", organization)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		organization, err := orgRepo.Get(CTX,
 			orgRepo.NameCondition(database.TextOperationEqual, orgName),
 		)
-		require.NoError(ttt, err)
-		fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> organization = %+v\n", organization)
-		// // event instance.added
-		// require.Equal(ttt, instanceName, organization.Name)
-		// // event instance.default.org.set
-		// require.NotNil(t, organization.DefaultOrgID)
-		// // event instance.iam.project.set
-		// require.NotNil(t, organization.IAMProjectID)
-		// // event instance.iam.console.set
-		// require.NotNil(t, organization.ConsoleAppID)
-		// // event instance.default.language.set
-		// require.NotNil(t, organization.DefaultLanguage)
-		// // event instance.added
-		// assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
-		// // event instance.added
-		// assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
-		// require.Nil(t, organization.DeletedAt)
+		require.NoError(t, err)
+
+		activeState := domain.State[0]
+
+		// event org.added
+		require.NotNil(t, organization.ID)
+		require.Equal(t, orgName, organization.Name)
+		require.NotNil(t, organization.InstanceID)
+		require.Equal(t, activeState, organization.State)
+		assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
+		assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
+		require.Nil(t, organization.DeletedAt)
 	}, retryDuration, tick)
 }
 
-// func TestServer_TestOrganizationUpdateNameReduces(t *testing.T) {
-// 	instanceName := gofakeit.Name()
-// 	res, err := SystemClient.CreateOrganization(CTX, &system.CreateOrganizationRequest{
-// 		OrganizationName: instanceName,
-// 		Owner: &system.CreateOrganizationRequest_Machine_{
-// 			Machine: &system.CreateOrganizationRequest_Machine{
-// 				UserName:            "owner",
-// 				Name:                "owner",
-// 				PersonalAccessToken: &system.CreateOrganizationRequest_PersonalAccessToken{},
-// 			},
-// 		},
-// 	})
-// 	require.NoError(t, err)
+func TestServer_TestOrganizationChangeReduces(t *testing.T) {
+	beforeCreate := time.Now()
+	orgName := gofakeit.Name()
 
-// 	instanceName += "new"
-// 	_, err = SystemClient.UpdateOrganization(CTX, &system.UpdateOrganizationRequest{
-// 		OrganizationId:   res.OrganizationId,
-// 		OrganizationName: instanceName,
-// 	})
-// 	require.NoError(t, err)
+	// 1. create org
+	_, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		Name: orgName,
+	})
+	require.NoError(t, err)
 
-// 	instanceRepo := repository.OrganizationRepository(pool)
-// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-// 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
-// 		instance, err := instanceRepo.Get(CTX,
-// 			instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-// 		)
-// 		require.NoError(ttt, err)
-// 		// event instance.changed
-// 		require.Equal(ttt, instanceName, instance.Name)
-// 	}, retryDuration, tick)
-// }
+	// 2. update org name
+	orgName = orgName + "_new"
+	_, err = MgmtClient.UpdateOrg(CTX, &management.UpdateOrgRequest{
+		Name: orgName,
+	})
+	require.NoError(t, err)
+	afterCreate := time.Now()
 
-// func TestServer_TestOrganizationDeleteReduces(t *testing.T) {
-// 	instanceName := gofakeit.Name()
-// 	res, err := SystemClient.CreateOrganization(CTX, &system.CreateOrganizationRequest{
-// 		OrganizationName: instanceName,
-// 		Owner: &system.CreateOrganizationRequest_Machine_{
-// 			Machine: &system.CreateOrganizationRequest_Machine{
-// 				UserName:            "owner",
-// 				Name:                "owner",
-// 				PersonalAccessToken: &system.CreateOrganizationRequest_PersonalAccessToken{},
-// 			},
-// 		},
-// 	})
-// 	require.NoError(t, err)
+	orgRepo := repository.OrgRepository(pool)
 
-// 	_, err = SystemClient.RemoveOrganization(CTX, &system.RemoveOrganizationRequest{
-// 		OrganizationId: res.OrganizationId,
-// 	})
-// 	require.NoError(t, err)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
+		organization, err := orgRepo.Get(CTX,
+			orgRepo.NameCondition(database.TextOperationEqual, orgName),
+		)
+		require.NoError(t, err)
 
-// 	instanceRepo := repository.OrganizationRepository(pool)
-// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-// 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
-// 		instance, err := instanceRepo.Get(CTX,
-// 			instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-// 		)
-// 		// event instance.removed
-// 		require.Nil(t, instance)
-// 		require.NoError(ttt, err)
-// 	}, retryDuration, tick)
-// }
+		// event org.changed
+		require.Equal(t, orgName, organization.Name)
+		assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
+	}, retryDuration, tick)
+}
+
+func TestServer_TestOrganizationDeactivateReduces(t *testing.T) {
+	beforeCreate := time.Now()
+	orgName := gofakeit.Name()
+
+	// 1. create org
+	organization, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		Name: orgName,
+	})
+	require.NoError(t, err)
+
+	// 2. deactivate org name
+	_ = Instance.DeactivateOrganization(CTX, organization.OrganizationId)
+	require.NoError(t, err)
+	afterCreate := time.Now()
+
+	orgRepo := repository.OrgRepository(pool)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
+		organization, err := orgRepo.Get(CTX,
+			orgRepo.NameCondition(database.TextOperationEqual, orgName),
+		)
+		require.NoError(t, err)
+
+		deactiveState := domain.State[1]
+
+		// event org.deactivate
+		require.Equal(t, orgName, organization.Name)
+		require.Equal(t, deactiveState, organization.State)
+		assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
+	}, retryDuration, tick)
+}
+
+func TestServer_TestOrganizationActivateReduces(t *testing.T) {
+	beforeCreate := time.Now()
+	orgName := gofakeit.Name()
+
+	// 1. create org
+	organization, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		Name: orgName,
+	})
+	require.NoError(t, err)
+
+	// 2. deactivate org name
+	_ = Instance.DeactivateOrganization(CTX, organization.OrganizationId)
+	require.NoError(t, err)
+
+	// 2. activate org name
+	_ = Instance.ReactivateOrganization(CTX, organization.OrganizationId)
+	require.NoError(t, err)
+	afterCreate := time.Now()
+
+	orgRepo := repository.OrgRepository(pool)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
+		organization, err := orgRepo.Get(CTX,
+			orgRepo.NameCondition(database.TextOperationEqual, orgName),
+		)
+		require.NoError(t, err)
+
+		deactiveState := domain.State[1]
+
+		// event org.reactivate
+		require.Equal(t, orgName, organization.Name)
+		require.Equal(t, deactiveState, organization.State)
+		assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
+	}, retryDuration, tick)
+}
+
+func TestServer_TestOrganizationRemoveReduces(t *testing.T) {
+	orgName := gofakeit.Name()
+
+	// 1. create org
+	organization, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		Name: orgName,
+	})
+	require.NoError(t, err)
+
+	// 2. check org retrivable
+	orgRepo := repository.OrgRepository(pool)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
+		organization, err := orgRepo.Get(CTX,
+			orgRepo.NameCondition(database.TextOperationEqual, orgName),
+		)
+		require.NoError(t, err)
+
+		require.Equal(t, orgName, organization.Name)
+	}, retryDuration, tick)
+
+	// 3. delete org
+	_ = Instance.RemoveOrganization(CTX, organization.OrganizationId)
+	require.NoError(t, err)
+
+	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
+		organization, err := orgRepo.Get(CTX,
+			orgRepo.NameCondition(database.TextOperationEqual, orgName),
+		)
+		require.NoError(t, err)
+
+		// event org.remove
+		require.Nil(t, organization)
+	}, retryDuration, tick)
+}

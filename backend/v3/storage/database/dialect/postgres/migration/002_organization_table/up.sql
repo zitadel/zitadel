@@ -8,7 +8,7 @@ CREATE TABLE zitadel.organizations(
   name TEXT NOT NULL,
   instance_id TEXT NOT NULL,
   state zitadel.organization_state NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-  deleted_at TIMESTAMP DEFAULT NULL
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ DEFAULT NULL
 );

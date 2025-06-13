@@ -138,10 +138,13 @@ func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstor
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BApK5", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
 	}
+
+	// need to convert old state (int) to new state (enum)
+	state := repoDomain.State[domain.OrgStateInactive-1]
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(State, domain.OrgStateInactive),
+			handler.NewCol(State, state),
 			handler.NewCol(UpdatedAt, e.CreationDate()),
 		},
 		[]handler.Condition{
@@ -197,6 +200,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalRemoved(event eventstore.Ev
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(UpdatedAt, e.CreationDate()),
 			handler.NewCol(DeletedAt, e.CreationDate()),
 		},
 		[]handler.Condition{
