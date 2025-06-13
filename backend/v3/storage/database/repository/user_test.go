@@ -5,11 +5,10 @@ package repository_test
 // 	"testing"
 
 // 	"github.com/stretchr/testify/assert"
-// 	"go.uber.org/mock/gomock"
-
 // 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 // 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 // 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+// 	"go.uber.org/mock/gomock"
 // )
 
 // func TestQueryUser(t *testing.T) {
@@ -75,3 +74,4 @@ package repository_test
 // 		user.Human().Update(context.Background(), user.IDCondition("test"), user.SetUsername("test"))
 // 	})
 // }
+
