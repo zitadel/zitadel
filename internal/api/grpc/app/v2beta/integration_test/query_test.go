@@ -129,21 +129,24 @@ func TestGetApplication(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			// When
-			res, err := instance.Client.AppV2Beta.GetApplication(iamOwnerCtx, tc.inputRequest)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 30*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// When
+				res, err := instance.Client.AppV2Beta.GetApplication(iamOwnerCtx, tc.inputRequest)
 
-			// Then
-			require.Equal(t, tc.expectedErrorType, status.Code(err))
-			if tc.expectedErrorType == codes.OK {
+				// Then
+				require.Equal(t, tc.expectedErrorType, status.Code(err))
+				if tc.expectedErrorType == codes.OK {
 
-				assert.Equal(t, tc.expectedAppID, res.GetApp().GetId())
-				assert.Equal(t, tc.expectedAppName, res.GetApp().GetName())
-				assert.NotZero(t, res.GetApp().GetCreationDate())
-				assert.NotZero(t, res.GetApp().GetChangeDate())
+					assert.Equal(t, tc.expectedAppID, res.GetApp().GetId())
+					assert.Equal(t, tc.expectedAppName, res.GetApp().GetName())
+					assert.NotZero(t, res.GetApp().GetCreationDate())
+					assert.NotZero(t, res.GetApp().GetChangeDate())
 
-				appType := fmt.Sprintf("%T", res.GetApp().GetConfig())
-				assert.Equal(t, tc.expectedApplicationType, appType)
-			}
+					appType := fmt.Sprintf("%T", res.GetApp().GetConfig())
+					assert.Equal(t, tc.expectedApplicationType, appType)
+				}
+			}, retryDuration, tick)
 		})
 	}
 }
