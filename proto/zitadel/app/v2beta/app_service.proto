@@ -14,6 +14,7 @@ import "zitadel/app/v2beta/api.proto";
 import "zitadel/app/v2beta/app.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/filter/v2/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
 
@@ -311,6 +312,37 @@ service AppService {
                 key: "200";
                 value: {
                 description: "The regenerated client secret.";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // List Applications
+    //
+    // Returns a list of applications matching the input parameters that belong to the provided
+    // project.
+    //
+    // The user needs to be owner of the project and have project.app.read permission
+    //
+    // Required permissions:
+    //   - `project.app.read`
+    rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/apps/search"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The matching applications";
                 }
             };
         };
@@ -733,4 +765,23 @@ message RegenerateClientSecretResponse{
         example: "\"2025-01-23T10:34:18.051Z\"";
         }
     ];
+}
+
+message ListApplicationsRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    // Pagination and sorting.
+    zitadel.filter.v2.PaginationRequest pagination = 2;
+
+    //criteria the client is looking for
+    repeated ApplicationQuery queries = 3;
+
+    AppSorting sort_by = 4;
+}
+
+message ListApplicationsResponse {
+    repeated Application app = 1;
+
+    // Contains the total number of apps matching the query and the applied limit.
+    zitadel.filter.v2.PaginationResponse pagination = 2;
 }

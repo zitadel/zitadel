@@ -5,8 +5,11 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
@@ -18,6 +21,61 @@ func AppToPb(query_app *query.App) *app.Application {
 		State:        appStateToPb(query_app.State),
 		Name:         query_app.Name,
 		Config:       appConfigToPb(query_app),
+	}
+}
+
+func AppsToPb(queryApps []*query.App) []*app.Application {
+	pbApps := make([]*app.Application, len(queryApps))
+
+	for i, queryApp := range queryApps {
+		pbApps[i] = AppToPb(queryApp)
+	}
+
+	return pbApps
+}
+
+func ListApplicationsRequestToModel(sysDefaults systemdefaults.SystemDefaults, req *app.ListApplicationsRequest) (*query.AppSearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(sysDefaults, req.GetPagination())
+	if err != nil {
+		return nil, err
+	}
+
+	queries, err := appQueriesToModel(req.GetQueries())
+	if err != nil {
+		return nil, err
+	}
+	projectQuery, err := query.NewAppProjectIDSearchQuery(req.GetProjectId())
+	if err != nil {
+		return nil, err
+	}
+
+	queries = append(queries, projectQuery)
+	return &query.AppSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: appSortingToColumn(req.GetSortBy()),
+		},
+
+		Queries: queries,
+	}, nil
+}
+
+func appSortingToColumn(sortingCriteria app.AppSorting) query.Column {
+	switch sortingCriteria {
+	case app.AppSorting_APP_SORT_BY_CHANGE_DATE:
+		return query.AppColumnChangeDate
+	case app.AppSorting_APP_SORT_BY_CREATION_DATE:
+		return query.AppColumnCreationDate
+	case app.AppSorting_APP_SORT_BY_NAME:
+		return query.AppColumnName
+	case app.AppSorting_APP_SORT_BY_STATE:
+		return query.AppColumnState
+	case app.AppSorting_APP_SORT_BY_ID:
+		fallthrough
+	default:
+		return query.AppColumnID
 	}
 }
 
@@ -66,5 +124,25 @@ func loginVersionToPb(version domain.LoginVersion, baseURI *string) *app.LoginVe
 		return &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: baseURI}}}
 	default:
 		return nil
+	}
+}
+
+func appQueriesToModel(queries []*app.ApplicationQuery) (toReturn []query.SearchQuery, err error) {
+	toReturn = make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		toReturn[i], err = appQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return toReturn, nil
+}
+
+func appQueryToModel(appQuery *app.ApplicationQuery) (query.SearchQuery, error) {
+	switch q := appQuery.GetQuery().(type) {
+	case *app.ApplicationQuery_NameQuery:
+		return query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(q.NameQuery.GetMethod()), q.NameQuery.Name)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid")
 	}
 }

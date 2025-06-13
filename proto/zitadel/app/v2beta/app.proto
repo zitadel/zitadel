@@ -5,12 +5,13 @@ package zitadel.app.v2beta;
 import "zitadel/app/v2beta/oidc.proto";
 import "zitadel/app/v2beta/saml.proto";
 import "zitadel/app/v2beta/api.proto";
+import "zitadel/filter/v2/filter.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
-
 
 message Application {
     string id = 1 [
@@ -54,4 +55,35 @@ enum AppState {
     APP_STATE_UNSPECIFIED = 0;
     APP_STATE_ACTIVE = 1;
     APP_STATE_INACTIVE = 2;
+}
+
+enum AppSorting {
+    APP_SORT_BY_ID = 0;
+    APP_SORT_BY_NAME = 1;
+    APP_SORT_BY_STATE = 2;
+    APP_SORT_BY_CREATION_DATE = 3;
+    APP_SORT_BY_CHANGE_DATE = 4;
+}
+
+message ApplicationQuery {
+    oneof query {
+        option (validate.required) = true;
+        ApplicationNameQuery name_query = 1;
+    }
+}
+
+message ApplicationNameQuery {
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Conso\""
+        }
+    ];
+
+    zitadel.filter.v2.TextFilterMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
 }

@@ -4,7 +4,9 @@ package instance_test
 
 import (
 	"fmt"
+	"sort"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
@@ -14,6 +16,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 )
 
 func TestGetApplication(t *testing.T) {
@@ -142,4 +145,241 @@ func TestGetApplication(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestListApplications(t *testing.T) {
+	t.Parallel()
+
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
+
+	t.Cleanup(func() {
+		instance.DeleteProject(iamOwnerCtx, t, p.GetId())
+	})
+
+	apiAppName := gofakeit.AppName()
+	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: p.GetId(),
+		Name:      apiAppName,
+		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
+			ApiRequest: &app.CreateAPIApplicationRequest{
+				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+			},
+		},
+	})
+	require.Nil(t, errAPIAppCreation)
+
+	samlAppName := gofakeit.AppName()
+	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: p.GetId(),
+		Name:      samlAppName,
+		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
+			SamlRequest: &app.CreateSAMLApplicationRequest{
+				LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
+				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(gofakeit.URL())},
+			},
+		},
+	})
+	require.Nil(t, errSAMLAppCreation)
+
+	oidcAppName := gofakeit.AppName()
+	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: p.GetId(),
+		Name:      oidcAppName,
+		CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
+			OidcRequest: &app.CreateOIDCApplicationRequest{
+				RedirectUris:           []string{"http://example.com"},
+				ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+				GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+				AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+				AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+				PostLogoutRedirectUris: []string{"http://example.com/home"},
+				Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+				AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+				BackChannelLogoutUri:   "http://example.com/logout",
+				LoginVersion:           &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: &baseURI}}},
+			},
+		},
+	})
+	require.Nil(t, errOIDCAppCreation)
+
+	// Sorting
+	appsSortedByName := appSortedByName{
+		{name: apiAppName, app: createdApiApp},
+		{name: samlAppName, app: createdSAMLApp},
+		{name: oidcAppName, app: createdOIDCApp},
+	}
+	sort.Sort(appsSortedByName)
+
+	appsSortedByID := appSortedByID{
+		{name: apiAppName, app: createdApiApp},
+		{name: samlAppName, app: createdSAMLApp},
+		{name: oidcAppName, app: createdOIDCApp},
+	}
+	sort.Sort(appsSortedByID)
+
+	appsSortedByCreationDate := appSortedByCreateTime{
+		{name: apiAppName, app: createdApiApp},
+		{name: samlAppName, app: createdSAMLApp},
+		{name: oidcAppName, app: createdOIDCApp},
+	}
+	sort.Sort(appsSortedByCreationDate)
+
+	tt := []struct {
+		testName     string
+		inputRequest *app.ListApplicationsRequest
+
+		expectedErrorType   codes.Code
+		expectedOrderedList []appWithName
+		expectedOrderedKeys func(keys []appWithName) any
+		actualOrderedKeys   func(keys []*app.Application) any
+	}{
+		{
+			testName: "when sorting by name should return apps sorted by name in descending order",
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId:  p.GetId(),
+				SortBy:     app.AppSorting_APP_SORT_BY_NAME,
+				Pagination: &filter.PaginationRequest{Asc: true},
+			},
+
+			expectedOrderedList: appsSortedByName,
+			expectedOrderedKeys: func(apps []appWithName) any {
+				names := make([]string, len(apps))
+				for i, a := range apps {
+					names[i] = a.name
+				}
+
+				return names
+			},
+			actualOrderedKeys: func(apps []*app.Application) any {
+				names := make([]string, len(apps))
+				for i, a := range apps {
+					names[i] = a.GetName()
+				}
+
+				return names
+			},
+		},
+		{
+			testName: "when sorting by id should return apps sorted by id in descending order",
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId:  p.GetId(),
+				SortBy:     app.AppSorting_APP_SORT_BY_ID,
+				Pagination: &filter.PaginationRequest{Asc: true},
+			},
+			expectedOrderedList: appsSortedByID,
+			expectedOrderedKeys: func(apps []appWithName) any {
+				ids := make([]string, len(apps))
+				for i, a := range apps {
+					ids[i] = a.app.GetAppId()
+				}
+
+				return ids
+			},
+			actualOrderedKeys: func(apps []*app.Application) any {
+				ids := make([]string, len(apps))
+				for i, a := range apps {
+					ids[i] = a.GetId()
+				}
+
+				return ids
+			},
+		},
+		{
+			testName: "when sorting by creation date should return apps sorted by creation date in descending order",
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId:  p.GetId(),
+				SortBy:     app.AppSorting_APP_SORT_BY_CREATION_DATE,
+				Pagination: &filter.PaginationRequest{Asc: true},
+			},
+			expectedOrderedList: appsSortedByCreationDate,
+			expectedOrderedKeys: func(apps []appWithName) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.app.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+			actualOrderedKeys: func(apps []*app.Application) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 30*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// When
+				res, err := instance.Client.AppV2Beta.ListApplications(iamOwnerCtx, tc.inputRequest)
+
+				// Then
+				require.Equal(ttt, tc.expectedErrorType, status.Code(err))
+
+				if err == nil {
+					assert.Len(ttt, res.GetApp(), len(tc.expectedOrderedList))
+					actualOrderedKeys := tc.actualOrderedKeys(res.GetApp())
+					expectedOrderedKeys := tc.expectedOrderedKeys(tc.expectedOrderedList)
+					assert.ElementsMatch(ttt, expectedOrderedKeys, actualOrderedKeys)
+				}
+			}, retryDuration, tick)
+		})
+	}
+}
+
+type appWithName struct {
+	app  *app.CreateApplicationResponse
+	name string
+}
+
+type appSortedByName []appWithName
+
+func (al appSortedByName) Len() int {
+	return len(al)
+}
+
+func (al appSortedByName) Less(i, j int) bool {
+	return al[i].name <= al[j].name
+}
+
+func (al appSortedByName) Swap(i, j int) {
+	al[i], al[j] = al[j], al[i]
+}
+
+type appSortedByID []appWithName
+
+func (al appSortedByID) Len() int {
+	return len(al)
+}
+
+func (al appSortedByID) Less(i, j int) bool {
+	return al[i].app.GetAppId() <= al[j].app.GetAppId()
+}
+
+func (al appSortedByID) Swap(i, j int) {
+	al[i], al[j] = al[j], al[i]
+}
+
+type appSortedByCreateTime []appWithName
+
+func (al appSortedByCreateTime) Len() int {
+	return len(al)
+}
+
+func (al appSortedByCreateTime) Less(i, j int) bool {
+	ti := al[i].app.GetCreationDate().AsTime()
+	tj := al[j].app.GetCreationDate().AsTime()
+
+	return ti.Before(tj)
+}
+
+func (al appSortedByCreateTime) Swap(i, j int) {
+	al[i], al[j] = al[j], al[i]
 }
