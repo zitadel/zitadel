@@ -171,6 +171,9 @@ func TestServer_TestOrganizationRemoveReduces(t *testing.T) {
 		)
 		require.NoError(t, err)
 
+		if organization == nil {
+			require.Fail(t, "this error is here becuase of a race condition")
+		}
 		require.Equal(t, orgName, organization.Name)
 	}, retryDuration, tick)
 
