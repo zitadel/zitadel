@@ -1498,8 +1498,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Masuk Organisasi Default",
       "LOGINDEFAULTORG_DESCRIPTION": "UI login akan menggunakan pengaturan organisasi default (dan bukan dari instance) jika tidak ada konteks organisasi yang ditetapkan",
-      "OIDCLEGACYINTROSPECTION": "Introspeksi Warisan OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Kami baru-baru ini memfaktorkan ulang titik akhir introspeksi untuk alasan kinerja. Fitur ini dapat digunakan untuk melakukan rollback ke implementasi lama jika muncul bug yang tidak terduga.",
       "OIDCTOKENEXCHANGE": "Pertukaran Token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktifkan jenis pemberian urn:ietf:params:oauth:grant-type:token-exchange eksperimental untuk titik akhir token OIDC. Pertukaran token dapat digunakan untuk meminta token dengan cakupan yang lebih kecil atau menyamar sebagai pengguna lain. Lihat kebijakan keamanan untuk mengizinkan peniruan identitas pada sebuah instans.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Memicu Proyeksi Introspeksi",

@@ -78,14 +78,6 @@ func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantProjectID, id, TextEquals)
 }
 
-func NewUserGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
-	for i, value := range ids {
-		list[i] = value
-	}
-	return NewListQuery(UserGrantProjectID, list, ListIn)
-}
-
 func NewUserGrantProjectOwnerSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ProjectColumnResourceOwner, id, TextEquals)
 }

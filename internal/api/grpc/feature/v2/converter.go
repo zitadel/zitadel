@@ -20,7 +20,6 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 	return &command.SystemFeatures{
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
-		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
@@ -37,7 +36,6 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		Details:                             object.DomainToDetailsPb(f.Details),
 		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
 		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
-		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
@@ -57,7 +55,6 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 	return &command.InstanceFeatures{
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
-		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
@@ -77,7 +74,6 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		Details:                             object.DomainToDetailsPb(f.Details),
 		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
 		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
-		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),

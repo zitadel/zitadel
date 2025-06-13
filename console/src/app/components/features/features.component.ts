@@ -33,7 +33,6 @@ const FEATURE_KEYS = [
   'enableBackChannelLogout',
   // 'improvedPerformance',
   'loginDefaultOrg',
-  'oidcLegacyIntrospection',
   'oidcSingleV1SessionTermination',
   'oidcTokenExchange',
   'oidcTriggerIntrospectionProjections',

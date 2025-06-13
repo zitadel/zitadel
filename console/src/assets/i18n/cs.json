@@ -1624,8 +1624,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Výchozí organizace pro přihlášení",
       "LOGINDEFAULTORG_DESCRIPTION": "Přihlašovací rozhraní použije nastavení výchozí organizace (a ne z instance), pokud není nastaven žádný kontext organizace.",
-      "OIDCLEGACYINTROSPECTION": "Dědictví OIDC introspekce",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nedávno jsme přepracovali bod introspekce z výkonnostních důvodů. Tato funkce lze použít k rollbacku na dědickou implementaci, pokud se objeví neočekávané chyby.",
       "OIDCTOKENEXCHANGE": "Výměna tokenů OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Povolit experimentální typ udělení urn:ietf:params:oauth:grant-type:token-exchange pro bod tokenového bodu OIDC. Výměna tokenů lze použít k žádosti o tokeny s menším rozsahem nebo k impersonaci jiných uživatelů. Podívejte se na bezpečnostní politiku, abyste umožnili impersonaci na instanci.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Spouštěče projekcí introspekce OIDC",

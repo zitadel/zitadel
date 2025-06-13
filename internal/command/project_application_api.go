@@ -226,37 +226,6 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	return result, err
 }
 
-func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, secret string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	app, err := c.getAPIAppWriteModel(ctx, projectID, appID, "")
-	if err != nil {
-		return err
-	}
-	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NotExisting")
-	}
-	if !app.IsAPI() {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI")
-	}
-	if app.HashedSecret == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D3t5g", "Errors.Project.App.APIConfigInvalid")
-	}
-
-	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
-	spanPasswordComparison.EndWithError(err)
-	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
-	}
-	if updated != "" {
-		c.apiUpdateSecret(ctx, projectAgg, app.AppID, updated)
-	}
-	return nil
-}
-
 func (c *Commands) APIUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {
 	agg := project_repo.NewAggregate(projectID, resourceOwner)
 	c.apiUpdateSecret(ctx, &agg.Aggregate, appID, updated)

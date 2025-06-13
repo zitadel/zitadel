@@ -18,7 +18,6 @@ import (
 type InstanceFeatures struct {
 	LoginDefaultOrg                 *bool
 	TriggerIntrospectionProjections *bool
-	LegacyIntrospection             *bool
 	UserSchema                      *bool
 	TokenExchange                   *bool
 	ImprovedPerformance             []feature.ImprovedPerformanceType
@@ -35,7 +34,6 @@ type InstanceFeatures struct {
 func (m *InstanceFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
 		m.TriggerIntrospectionProjections == nil &&
-		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
 		// nil check to allow unset improvements
