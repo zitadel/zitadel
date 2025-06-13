@@ -46,7 +46,7 @@ func (opts *QueryOpts) WriteOrderBy(builder *StatementBuilder) {
 		return
 	}
 	builder.WriteString(" ORDER BY ")
-	Columns(opts.OrderBy).Write(builder)
+	opts.OrderBy.Write(builder)
 }
 
 func (opts *QueryOpts) WriteLimit(builder *StatementBuilder) {
