@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: 手机号码已经验证
       Empty: 电话号码是空的
       NotChanged: 电话号码没有改变
+      VerifyingRemovalIsNotSupported: 验证手机号码删除不受支持
     Address:
       NotFound: 找不到地址
       NotChanged: 地址没有改变
@@ -536,6 +537,7 @@ Errors:
     StateMissing: 请求中缺少状态参数
     NotStarted: 意图没有开始或已经结束
     NotSucceeded: 意图不成功
+    Expired: 意图已过期
     TokenCreationFailed: 令牌创建失败
     InvalidToken: 意图令牌是无效的
     OtherUser: 意图是为另一个用户准备的

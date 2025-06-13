@@ -16,6 +16,7 @@ const (
 	RoleIAMOwner             = "IAM_OWNER"
 	RoleProjectOwner         = "PROJECT_OWNER"
 	RoleProjectOwnerGlobal   = "PROJECT_OWNER_GLOBAL"
+	RoleProjectGrantOwner    = "PROJECT_GRANT_OWNER"
 	RoleSelfManagementGlobal = "SELF_MANAGEMENT_GLOBAL"
 )
 

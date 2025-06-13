@@ -57,10 +57,12 @@ type Features struct {
 	ConsoleUseV2UserApi             bool                      `json:"console_use_v2_user_api,omitempty"`
 }
 
+/* Note: do not generate the stringer or enumer for this type, is it breaks existing events */
+
 type ImprovedPerformanceType int32
 
 const (
-	ImprovedPerformanceTypeUnknown = iota
+	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
 	ImprovedPerformanceTypeOrgByID
 	ImprovedPerformanceTypeProjectGrant
 	ImprovedPerformanceTypeProject

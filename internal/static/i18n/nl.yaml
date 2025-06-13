@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefoon is al geverifieerd
       Empty: Telefoon is leeg
       NotChanged: Telefoon niet veranderd
+      VerifyingRemovalIsNotSupported: Verwijderen van verificatie is niet ondersteund
     Address:
       NotFound: Adres niet gevonden
       NotChanged: Adres niet veranderd
@@ -536,6 +537,7 @@ Errors:
     StateMissing: Staat parameter ontbreekt in het verzoek
     NotStarted: Intentie is niet gestart of was al beëindigd
     NotSucceeded: Intentie is niet geslaagd
+    Expired: Intentie is verlopen
     TokenCreationFailed: Token aanmaken mislukt
     InvalidToken: Intentie Token is ongeldig
     OtherUser: Intentie bedoeld voor een andere gebruiker

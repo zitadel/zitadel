@@ -201,28 +201,6 @@ module.exports = {
       runmeLinkLabel: 'Checkout via Runme'
     },
   },
-  webpack: {
-    jsLoader: (isServer) => ({
-      loader: require.resolve('swc-loader'),
-      options: {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          transform: {
-            react: {
-              runtime: 'automatic',
-            },
-          },
-          target: 'es2017',
-        },
-        module: {
-          type: isServer ? 'commonjs' : 'es6',
-        },
-      },
-    }),
-  },
   presets: [
     [
       "classic",
@@ -364,6 +342,30 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
+          org_v2beta: {
+            specPath: ".artifacts/openapi/zitadel/org/v2beta/org_service.swagger.json",
+            outputDir: "docs/apis/resources/org_service_v2beta",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
+          project_v2beta: {
+            specPath: ".artifacts/openapi/zitadel/project/v2beta/project_service.swagger.json",
+            outputDir: "docs/apis/resources/project_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
+          instance_v2: {
+            specPath: ".artifacts/openapi/zitadel/instance/v2beta/instance_service.swagger.json",
+            outputDir: "docs/apis/resources/instance_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
         },
       },
     ],
@@ -381,4 +383,17 @@ module.exports = {
     },
   ],
   themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  future: {
+    v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+    experimental_faster: {
+      swcJsLoader: false, // Disabled because of memory usage > 8GB which is a problem on vercel default runners
+      swcJsMinimizer: true,
+      swcHtmlMinimizer : true,
+      lightningCssMinimizer: true,
+      mdxCrossCompilerCache: true,
+      ssgWorkerThreads: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+      rspackBundler: true,
+      rspackPersistentCache: true,
+    },
+  },
 };

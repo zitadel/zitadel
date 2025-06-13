@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"math"
 	"math/rand"
 	"slices"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -60,6 +60,7 @@ type Handler struct {
 	requeueEvery     time.Duration
 	txDuration       time.Duration
 	now              nowFunc
+	queryGlobal      bool
 
 	triggeredInstancesSync sync.Map
 
@@ -143,6 +144,11 @@ type Projection interface {
 	Reducers() []AggregateReducer
 }
 
+type GlobalProjection interface {
+	Projection
+	FilterGlobalEvents()
+}
+
 func NewHandler(
 	ctx context.Context,
 	config *Config,
@@ -183,6 +189,10 @@ func NewHandler(
 			return nil, nil
 		},
 		metrics: metrics,
+	}
+
+	if _, ok := projection.(GlobalProjection); ok {
+		handler.queryGlobal = true
 	}
 
 	return handler
@@ -385,7 +395,8 @@ func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
 
 type triggerConfig struct {
 	awaitRunning bool
-	maxPosition  float64
+	maxPosition  decimal.Decimal
+	minPosition  decimal.Decimal
 }
 
 type TriggerOpt func(conf *triggerConfig)
@@ -396,9 +407,15 @@ func WithAwaitRunning() TriggerOpt {
 	}
 }
 
-func WithMaxPosition(position float64) TriggerOpt {
+func WithMaxPosition(position decimal.Decimal) TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.maxPosition = position
+	}
+}
+
+func WithMinPosition(position decimal.Decimal) TriggerOpt {
+	return func(conf *triggerConfig) {
+		conf.minPosition = position
 	}
 }
 
@@ -510,8 +527,13 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return additionalIteration, err
 	}
 	// stop execution if currentState.position >= config.maxPosition
-	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+	if !config.maxPosition.Equal(decimal.Decimal{}) && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
+	}
+
+	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
+		currentState.position = config.minPosition
+		currentState.offset = 0
 	}
 
 	var statements []*Statement
@@ -555,7 +577,10 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 
-	err = h.setState(tx, currentState)
+	setStateErr := h.setState(tx, currentState)
+	if setStateErr != nil {
+		err = setStateErr
+	}
 
 	return additionalIteration, err
 }
@@ -605,7 +630,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
-		if statement.Position == currentState.position &&
+		if statement.Position.Equal(currentState.position) &&
 			statement.Aggregate.ID == currentState.aggregateID &&
 			statement.Aggregate.Type == currentState.aggregateType &&
 			statement.Sequence == currentState.sequence {
@@ -668,12 +693,15 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	if currentState.position > 0 {
-		// decrease position by 10 because builder.PositionAfter filters for position > and we need position >=
-		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 10))
+	if currentState.position.GreaterThan(decimal.Decimal{}) {
+		builder = builder.PositionAtLeast(currentState.position)
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
 		}
+	}
+
+	if h.queryGlobal {
+		return builder
 	}
 
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(h.eventTypes))

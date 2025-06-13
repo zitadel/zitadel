@@ -923,6 +923,7 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 	withSignedRequest bool,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options idp.Options,
 ) (*instance.SAMLIDPChangedEvent, error) {
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
@@ -935,6 +936,7 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 		withSignedRequest,
 		nameIDFormat,
 		transientMappingAttributeName,
+		federatedLogoutEnabled,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
