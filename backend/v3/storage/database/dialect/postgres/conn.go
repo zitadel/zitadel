@@ -13,9 +13,7 @@ type pgxConn struct {
 	*pgxpool.Conn
 }
 
-var (
-	_ database.Client = (*pgxConn)(nil)
-)
+var _ database.Client = (*pgxConn)(nil)
 
 // Release implements [database.Client].
 func (c *pgxConn) Release(_ context.Context) error {
@@ -47,9 +45,9 @@ func (c *pgxConn) QueryRow(ctx context.Context, sql string, args ...any) databas
 
 // Exec implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
-func (c *pgxConn) Exec(ctx context.Context, sql string, args ...any) error {
-	_, err := c.Conn.Exec(ctx, sql, args...)
-	return err
+func (c *pgxConn) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
+	res, err := c.Conn.Exec(ctx, sql, args...)
+	return res.RowsAffected(), err
 }
 
 // Migrate implements [database.Migrator].

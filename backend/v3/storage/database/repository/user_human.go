@@ -24,10 +24,11 @@ const userEmailQuery = `SELECT h.email_address, h.email_verified_at FROM user_hu
 func (u *userHuman) GetEmail(ctx context.Context, condition database.Condition) (*domain.Email, error) {
 	var email domain.Email
 
-	u.builder.WriteString(userEmailQuery)
-	u.writeCondition(condition)
+	builder := database.StatementBuilder{}
+	builder.WriteString(userEmailQuery)
+	u.writeCondition(builder, condition)
 
-	err := u.client.QueryRow(ctx, u.builder.String(), u.builder.Args()...).Scan(
+	err := u.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(
 		&email.Address,
 		&email.VerifiedAt,
 	)
@@ -39,13 +40,15 @@ func (u *userHuman) GetEmail(ctx context.Context, condition database.Condition) 
 
 // Update implements [domain.HumanRepository].
 func (h userHuman) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
-	h.builder.WriteString(`UPDATE human_users SET `)
-	database.Changes(changes).Write(&h.builder)
-	h.writeCondition(condition)
+	builder := database.StatementBuilder{}
+	builder.WriteString(`UPDATE human_users SET `)
+	database.Changes(changes).Write(&builder)
+	h.writeCondition(builder, condition)
 
-	stmt := h.builder.String()
+	stmt := builder.String()
 
-	return h.client.Exec(ctx, stmt, h.builder.Args()...)
+	_, err := h.client.Exec(ctx, stmt, builder.Args()...)
+	return err
 }
 
 // -------------------------------------------------------------
