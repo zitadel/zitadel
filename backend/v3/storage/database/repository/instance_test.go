@@ -54,7 +54,7 @@ func TestCreateInstance(t *testing.T) {
 				}
 				return instance
 			}(),
-			err: errors.New("instnace name not provided"),
+			err: errors.New("instance name not provided"),
 		},
 		{
 			name: "adding same instance twice",
@@ -78,7 +78,7 @@ func TestCreateInstance(t *testing.T) {
 				require.NoError(t, err)
 				return &inst
 			},
-			err: errors.New("instnace id already exists"),
+			err: errors.New("instance id already exists"),
 		},
 		{
 			name: "adding instance with no id",
@@ -96,7 +96,7 @@ func TestCreateInstance(t *testing.T) {
 				}
 				return instance
 			}(),
-			err: errors.New("instnace id not provided"),
+			err: errors.New("instance id not provided"),
 		},
 	}
 	for _, tt := range tests {
