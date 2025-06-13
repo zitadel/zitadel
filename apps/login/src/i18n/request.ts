@@ -21,7 +21,7 @@ export default getRequestConfig(async () => {
     organization: i18nOrganization,
   });
 
-  translations.
+  console.log("Translations:", translations);
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
@@ -38,12 +38,13 @@ export default getRequestConfig(async () => {
     }
   }
 
-  const userMessages = (await import(`../../locales/${locale}.json`)).default;
+  const customMessages = translations;
+  const localeMessages = (await import(`../../locales/${locale}.json`)).default;
   const fallbackMessages = (await import(`../../locales/${fallback}.json`))
     .default;
 
   return {
     locale,
-    messages: deepmerge(fallbackMessages, userMessages),
+    messages: deepmerge(fallbackMessages, localeMessages, customMessages),
   };
 });
