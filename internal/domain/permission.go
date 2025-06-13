@@ -49,12 +49,16 @@ const (
 	PermissionProjectRoleDelete        = "project.role.delete"
 	PermissionInstanceMemberWrite      = "iam.member.write"
 	PermissionInstanceMemberDelete     = "iam.member.delete"
+	PermissionInstanceMemberRead       = "iam.member.read"
 	PermissionOrgMemberWrite           = "org.member.write"
 	PermissionOrgMemberDelete          = "org.member.delete"
+	PermissionOrgMemberRead            = "org.member.read"
 	PermissionProjectMemberWrite       = "project.member.write"
 	PermissionProjectMemberDelete      = "project.member.delete"
+	PermissionProjectMemberRead        = "project.member.read"
 	PermissionProjectGrantMemberWrite  = "project.grant.member.write"
 	PermissionProjectGrantMemberDelete = "project.grant.member.delete"
+	PermissionProjectGrantMemberRead   = "project.grant.member.read"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.

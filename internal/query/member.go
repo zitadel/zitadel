@@ -35,8 +35,17 @@ func NewMemberLastNameSearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewMemberUserIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(membershipUserID, value, TextEquals)
+	return NewTextQuery(MembershipUserID, value, TextEquals)
 }
+
+func NewMemberInUserIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(MembershipUserID, list, ListIn)
+}
+
 func NewMemberResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipResourceOwner, value, TextEquals)
 }
@@ -61,4 +70,66 @@ type Member struct {
 	DisplayName        string
 	AvatarURL          string
 	UserType           domain.UserType
+}
+
+func prepareInstanceMembers() string {
+	builder := sq.Select(
+		InstanceMemberCreationDate.identifier(),
+		InstanceMemberChangeDate.identifier(),
+		InstanceMemberSequence.identifier(),
+		InstanceMemberResourceOwner.identifier(),
+		InstanceMemberUserResourceOwner.identifier(),
+		InstanceMemberUserID.identifier(),
+		InstanceMemberRoles.identifier(),
+		LoginNameNameCol.identifier(),
+		HumanEmailCol.identifier(),
+		HumanFirstNameCol.identifier(),
+		HumanLastNameCol.identifier(),
+		HumanDisplayNameCol.identifier(),
+		MachineNameCol.identifier(),
+		HumanAvatarURLCol.identifier(),
+		UserTypeCol.identifier(),
+		countColumn.identifier(),
+	).From(instanceMemberTable.identifier()).
+		LeftJoin(join(HumanUserIDCol, InstanceMemberUserID)).
+		LeftJoin(join(MachineUserIDCol, InstanceMemberUserID)).
+		LeftJoin(join(UserIDCol, InstanceMemberUserID)).
+		LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID)).
+		Where(
+			sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
+		).PlaceholderFormat(sq.Dollar)
+
+	stmt, _ := builder.MustSql()
+	return stmt
+}
+
+func prepareOrgMembers() string {
+	builder := sq.Select(
+		OrgMemberCreationDate.identifier(),
+		OrgMemberChangeDate.identifier(),
+		OrgMemberSequence.identifier(),
+		OrgMemberResourceOwner.identifier(),
+		OrgMemberUserResourceOwner.identifier(),
+		OrgMemberUserID.identifier(),
+		OrgMemberRoles.identifier(),
+		LoginNameNameCol.identifier(),
+		HumanEmailCol.identifier(),
+		HumanFirstNameCol.identifier(),
+		HumanLastNameCol.identifier(),
+		HumanDisplayNameCol.identifier(),
+		MachineNameCol.identifier(),
+		HumanAvatarURLCol.identifier(),
+		UserTypeCol.identifier(),
+		countColumn.identifier(),
+	).From(orgMemberTable.identifier()).
+		LeftJoin(join(HumanUserIDCol, OrgMemberUserID)).
+		LeftJoin(join(MachineUserIDCol, OrgMemberUserID)).
+		LeftJoin(join(UserIDCol, OrgMemberUserID)).
+		LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID)).
+		Where(
+			sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
+		).PlaceholderFormat(sq.Dollar)
+
+	stmt, _ := builder.MustSql()
+	return stmt
 }

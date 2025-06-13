@@ -305,7 +305,7 @@ message ListAdministratorsRequest {
     }
   ];
   // Filter the administrator roles to be returned.
-  repeated AdministratorFilter filters = 3;
+  repeated AdministratorSearchFilter filters = 3;
 }
 
 message ListAdministratorsResponse {

@@ -259,7 +259,7 @@ func (i *Instance) DeleteUserMetadata(ctx context.Context, id, key string) *user
 	return resp
 }
 
-func (i *Instance) CreateUserTypeHuman(ctx context.Context) *user_v2.CreateUserResponse {
+func (i *Instance) CreateUserTypeHuman(ctx context.Context, email string) *user_v2.CreateUserResponse {
 	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
 		OrganizationId: i.DefaultOrg.GetId(),
 		UserType: &user_v2.CreateUserRequest_Human_{
@@ -269,7 +269,7 @@ func (i *Instance) CreateUserTypeHuman(ctx context.Context) *user_v2.CreateUserR
 					FamilyName: "Mouse",
 				},
 				Email: &user_v2.SetHumanEmail{
-					Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+					Email: email,
 					Verification: &user_v2.SetHumanEmail_ReturnCode{
 						ReturnCode: &user_v2.ReturnEmailVerificationCode{},
 					},
@@ -922,12 +922,13 @@ func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, proje
 	return resp.GetUserGrantId()
 }
 
-func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, userID string) {
-	_, err := i.Client.Admin.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
+func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, userID string) *admin.AddIAMMemberResponse {
+	resp, err := i.Client.Admin.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
 		UserId: userID,
 		Roles:  []string{domain.RoleIAMOwner},
 	})
 	require.NoError(t, err)
+	return resp
 }
 
 func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, userID string) {
@@ -937,12 +938,13 @@ func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, u
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, userID string) {
-	_, err := i.Client.Mgmt.AddOrgMember(ctx, &mgmt.AddOrgMemberRequest{
+func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, userID string) *mgmt.AddOrgMemberResponse {
+	resp, err := i.Client.Mgmt.AddOrgMember(ctx, &mgmt.AddOrgMemberRequest{
 		UserId: userID,
 		Roles:  []string{domain.RoleOrgOwner},
 	})
 	require.NoError(t, err)
+	return resp
 }
 
 func (i *Instance) DeleteOrgMembership(t *testing.T, ctx context.Context, userID string) {
@@ -952,13 +954,14 @@ func (i *Instance) DeleteOrgMembership(t *testing.T, ctx context.Context, userID
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
-	_, err := i.Client.Mgmt.AddProjectMember(ctx, &mgmt.AddProjectMemberRequest{
+func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) *mgmt.AddProjectMemberResponse {
+	resp, err := i.Client.Mgmt.AddProjectMember(ctx, &mgmt.AddProjectMemberRequest{
 		ProjectId: projectID,
 		UserId:    userID,
 		Roles:     []string{domain.RoleProjectOwner},
 	})
 	require.NoError(t, err)
+	return resp
 }
 
 func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
@@ -969,14 +972,15 @@ func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, pr
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
-	_, err := i.Client.Mgmt.AddProjectGrantMember(ctx, &mgmt.AddProjectGrantMemberRequest{
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) *mgmt.AddProjectGrantMemberResponse {
+	resp, err := i.Client.Mgmt.AddProjectGrantMember(ctx, &mgmt.AddProjectGrantMemberRequest{
 		ProjectId: projectID,
 		GrantId:   grantID,
 		UserId:    userID,
 		Roles:     []string{domain.RoleProjectGrantOwner},
 	})
 	require.NoError(t, err)
+	return resp
 }
 
 func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {

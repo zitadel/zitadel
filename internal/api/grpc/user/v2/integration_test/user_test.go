@@ -4917,7 +4917,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeHuman(CTX).GetId()
+			userId := Instance.CreateUserTypeHuman(CTX, gofakeit.Email()).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {
