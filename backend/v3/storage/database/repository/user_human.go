@@ -31,7 +31,6 @@ func (u *userHuman) GetEmail(ctx context.Context, condition database.Condition) 
 		&email.Address,
 		&email.VerifiedAt,
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -189,18 +188,18 @@ func (h userHuman) PhoneVerifiedAtColumn() database.Column {
 	return database.NewColumn("phone_verified_at")
 }
 
-func (h userHuman) columns() database.Columns {
-	return append(h.user.columns(),
-		h.FirstNameColumn(),
-		h.LastNameColumn(),
-		h.EmailAddressColumn(),
-		h.EmailVerifiedAtColumn(),
-		h.PhoneNumberColumn(),
-		h.PhoneVerifiedAtColumn(),
-	)
-}
+// func (h userHuman) columns() database.Columns {
+// 	return append(h.user.columns(),
+// 		h.FirstNameColumn(),
+// 		h.LastNameColumn(),
+// 		h.EmailAddressColumn(),
+// 		h.EmailVerifiedAtColumn(),
+// 		h.PhoneNumberColumn(),
+// 		h.PhoneVerifiedAtColumn(),
+// 	)
+// }
 
-func (h userHuman) writeReturning(builder *database.StatementBuilder) {
-	builder.WriteString(" RETURNING ")
-	h.columns().Write(builder)
-}
+// func (h userHuman) writeReturning(builder *database.StatementBuilder) {
+// 	builder.WriteString(" RETURNING ")
+// 	h.columns().Write(builder)
+// }
