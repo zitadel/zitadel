@@ -33,21 +33,20 @@ const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, cons
 
 // Get implements [domain.InstanceRepository].
 func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain.Instance, error) {
-	builder := database.StatementBuilder{}
+	var builder database.StatementBuilder
 
 	builder.WriteString(queryInstanceStmt)
 
-	// return only non deleted isntances
+	// return only non deleted instances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
-	andCondition := database.And(opts...)
-	i.writeCondition(&builder, andCondition)
+	i.writeCondition(&builder, database.And(opts...))
 
 	return scanInstance(i.client.QueryRow(ctx, builder.String(), builder.Args()...))
 }
 
 // List implements [domain.InstanceRepository].
 func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*domain.Instance, error) {
-	builder := database.StatementBuilder{}
+	var builder database.StatementBuilder
 
 	builder.WriteString(queryInstanceStmt)
 
@@ -71,7 +70,8 @@ const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org
 
 // Create implements [domain.InstanceRepository].
 func (i *instance) Create(ctx context.Context, instance *domain.Instance) error {
-	builder := database.StatementBuilder{}
+	var builder database.StatementBuilder
+
 	builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
 	builder.WriteString(createInstanceStmt)
 
@@ -101,7 +101,8 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 
 // Update implements [domain.InstanceRepository].
 func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
-	builder := database.StatementBuilder{}
+	var builder database.StatementBuilder
+
 	builder.WriteString(`UPDATE zitadel.instances SET `)
 	database.Changes(changes).Write(&builder)
 	i.writeCondition(&builder, condition)
@@ -118,6 +119,7 @@ func (i instance) Delete(ctx context.Context, condition database.Condition) erro
 		return errors.New("Delete must contain a condition") // (otherwise ALL instances will be deleted)
 	}
 	builder := database.StatementBuilder{}
+
 	builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
 	builder.AppendArgs(time.Now())
 

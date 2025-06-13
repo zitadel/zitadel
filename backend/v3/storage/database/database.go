@@ -35,6 +35,7 @@ type Querier interface {
 }
 
 // Executor is a database client that can execute statements.
+// It returns the number of rows affected or an error
 type Executor interface {
 	Exec(ctx context.Context, stmt string, args ...any) (int64, error)
 }
