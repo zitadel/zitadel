@@ -61,7 +61,7 @@ type OrganizationRepository interface {
 	organizationChanges
 
 	Get(ctx context.Context, opts ...database.Condition) (*Organization, error)
-	List(ctx context.Context, opts ...database.Condition) ([]Organization, error)
+	List(ctx context.Context, opts ...database.Condition) ([]*Organization, error)
 
 	Create(ctx context.Context, instance *Organization) error
 	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)

@@ -112,12 +112,12 @@ func TestServer_TestInstanceDeleteReduces(t *testing.T) {
 
 	instanceRepo := repository.InstanceRepository(pool)
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		instance, err := instanceRepo.Get(CTX,
 			instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 		)
 		// event instance.removed
 		require.Nil(t, instance)
-		require.NoError(ttt, err)
+		require.NoError(t, err)
 	}, retryDuration, tick)
 }

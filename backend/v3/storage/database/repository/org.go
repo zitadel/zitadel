@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -43,17 +42,17 @@ func (o *org) Get(ctx context.Context, opts ...database.Condition) (*domain.Orga
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
 
-	rows, err := o.client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+	// rows, err := o.client.Query(ctx, builder.String(), builder.Args()...)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// defer rows.Close()
 
-	return scanOrganization(rows)
+	return scanOrganization(ctx, o.client, &builder)
 }
 
 // List implements [domain.OrganizationRepository].
-func (o *org) List(ctx context.Context, opts ...database.Condition) ([]domain.Organization, error) {
+func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.Organization, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryOrganizationStmt)
@@ -63,13 +62,13 @@ func (o *org) List(ctx context.Context, opts ...database.Condition) ([]domain.Or
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
 
-	rows, err := o.client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+	// rows, err := o.client.Query(ctx, builder.String(), builder.Args()...)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// defer rows.Close()
 
-	return scanOrganizations(rows)
+	return scanOrganizations(ctx, o.client, &builder)
 }
 
 const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
@@ -206,9 +205,17 @@ func (o *org) writeCondition(
 	condition.Write(builder)
 }
 
-func scanOrganization(rows database.Rows) (*domain.Organization, error) {
-	organization, err := pgx.CollectOneRow[domain.Organization](rows, pgx.RowToStructByNameLax[domain.Organization])
+func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	organization := &domain.Organization{}
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
 		// if no results returned, this is not a error
 		// it just means the organization was not found
 		// the caller should check if the returned organization is nil
@@ -218,12 +225,17 @@ func scanOrganization(rows database.Rows) (*domain.Organization, error) {
 		return nil, err
 	}
 
-	return &organization, nil
+	return organization, nil
 }
 
-func scanOrganizations(rows database.Rows) ([]domain.Organization, error) {
-	organizations, err := pgx.CollectRows[domain.Organization](rows, pgx.RowToStructByNameLax[domain.Organization])
+func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
+		return nil, err
+	}
+
+	organizations := []*domain.Organization{}
+	if err := rows.(database.CollectableRows).Collect(&organizations); err != nil {
 		// if no results returned, this is not a error
 		// it just means the organization was not found
 		// the caller should check if the returned organization is nil

@@ -213,9 +213,18 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 	if err != nil {
 		return nil, err
 	}
+	if err != nil {
+		return nil, nil
+	}
 
 	instance := new(domain.Instance)
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
+		// if no results returned, this is not a error
+		// it just means the organization was not found
+		// the caller should check if the returned organization is nil
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -229,6 +238,12 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 	}
 
 	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
+		// if no results returned, this is not a error
+		// it just means the organization was not found
+		// the caller should check if the returned organization is nil
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
 		return nil, err
 	}
 
