@@ -24,12 +24,12 @@ login-help:
 	@echo "Makefile for the login service"
 	@echo "Available targets:"
 	@echo "  login-help              - Show this help message."
-	@echo "  login-lint              - Run linting and formatting checks. FORCE=true prevents skipping."
-	@echo "  login-test-unit         - Run unit tests. FORCE=true prevents skipping."
-	@echo "  login-test-integration  - Run integration tests. FORCE=true prevents skipping."
+	@echo "  login-quality           - Run all quality checks (login-lint, login-test-unit, login-test-integration, login-test-acceptance)."
 	@echo "  login-standalone-build  - Build the docker image for production login containers."
-	@echo "  login-quality           - Run all quality checks (login-lint, login-unit, login-integration)."
-	@echo "  login-ci                - Run all CI tasks. Run it with the -j flag to parallelize: make -j ci."
+	@echo "  login-lint              - Run linting and formatting checks. FORCE=true prevents skipping."
+	@echo "  login-test-unit         - Run unit tests. Tests without any dependencies. FORCE=true prevents skipping."
+	@echo "  login-test-integration  - Run integration tests. Tests a login production build against a mocked Zitadel core API. FORCE=true prevents skipping."
+	@echo "  login-test-acceptance   - Run acceptance tests. Tests a login production build with a local Zitadel instance behind a reverse proxy. FORCE=true prevents skipping."
 	@echo "  show-cache-keys         - Show all cache keys with image ids and exit codes."
 	@echo "  clean-cache-keys        - Remove all cache keys."
 
@@ -97,11 +97,7 @@ login-test-acceptance: login-standalone-build login-test-acceptance-build
   		$(LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG)"
 
 .PHONY: login-quality
-login-quality: login-lint login-test-unit login-test-integration
-	@:
-
-.PHONY: login-ci
-login-ci: login-quality login-standalone-build
+login-quality: login-lint login-test-unit login-test-integration login-test-acceptance
 	@:
 
 .PHONY: login-standalone-build
