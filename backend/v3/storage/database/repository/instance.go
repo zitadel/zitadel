@@ -50,7 +50,7 @@ func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*dom
 
 	builder.WriteString(queryInstanceStmt)
 
-	// return only non deleted isntances
+	// return only non deleted instances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	i.writeCondition(&builder, andCondition)

@@ -16,9 +16,9 @@ type Instance struct {
 	ConsoleClientID string     `json:"console_client_id,omitempty" db:"console_client_id"`
 	ConsoleAppID    string     `json:"console_app_id,omitempty" db:"console_app_id"`
 	DefaultLanguage string     `json:"default_language,omitempty" db:"default_language"`
-	CreatedAt       time.Time  `json:"-,omitempty" db:"created_at"`
-	UpdatedAt       time.Time  `json:"-,omitempty" db:"updated_at"`
-	DeletedAt       *time.Time `json:"-,omitempty" db:"deleted_at"`
+	CreatedAt       time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at" db:"updated_at"`
+	DeletedAt       *time.Time `json:"deleted_at" db:"deleted_at"`
 }
 
 type instanceCacheIndex uint8

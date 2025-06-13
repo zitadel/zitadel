@@ -34,20 +34,20 @@ func newEmbeededDB() (pool database.PoolTest, stop func(), err error) {
 	var connector database.Connector
 	connector, stop, err = embedded.StartEmbedded()
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start embedded postgres: %v", err)
+		return nil, nil, fmt.Errorf("unable to start embedded postgres: %w", err)
 	}
 
 	ctx := context.Background()
 
 	pool_, err := connector.Connect(ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to connect to embedded postgres: %v", err)
+		return nil, nil, fmt.Errorf("unable to connect to embedded postgres: %w", err)
 	}
 	pool = pool_.(database.PoolTest)
 
 	err = pool.MigrateTest(ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to migrate database: %v", err)
+		return nil, nil, fmt.Errorf("unable to migrate database: %w", err)
 	}
 	return pool, stop, err
 }
