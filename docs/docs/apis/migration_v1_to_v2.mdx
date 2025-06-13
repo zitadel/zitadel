@@ -48,9 +48,48 @@ This section details the migrated resources, including any breaking changes and 
 
 ### General Changes
 
+#### Sunsetting OpenAPI/REST Support in Favor of Connect RPC
+While our v1 API already offered gRPC, it also provided a parallel REST/OpenAPI interface for clients who preferred making traditional HTTP calls.
+
+In our v2 API, we are consolidating our efforts to provide a more streamlined and efficient development experience.
+The primary change is the removal of the OpenAPI/REST interface.
+We will now exclusively support interaction with our gRPC services directly or through [Connect RPC](https://connectrpc.com/).
+
+Connect RPC is being introduced as the new, official way to interact with our gRPC services using familiar, plain HTTP/1.1.
+It effectively replaces the previous REST gateway.
+
+For teams already using gRPC, your transition will be minimal.
+For teams who were using the v1 REST API, migrating to v2 will involve adopting one of the following methods:
+
+- Native gRPC: For the highest performance and to leverage features like bi-directional streaming.
+- Connect RPC: For making CRUD-like (Create, Read, Update, Delete) calls over HTTP. This is the recommended path for most clients migrating from our v1 REST API.
+
+A significant advantage of this new architecture remains the automatic generation of client libraries.
+Based on our .proto service definitions, you can generate type-safe clients for your specific programming language, whether you use native gRPC or Connect RPC.
+This eliminates the need to write boilerplate code for handling HTTP requests and parsing responses, leading to a more streamlined and less error-prone development process.
+
+#### Contextual Information in the Request Body
+
+A key change in v2 is that contextual data, like organization_id, must now be sent in the request body.
+Previously, this was sent in the request headers.
+
+**v1 (Header)**
+```
+x-zitadel-orgid: 1234567890
+```
+
+**v2 (Request Body)**
+```
+{
+    "organization_id": "1234567890"
+}
+```
+
 ### Instances
 
 ### Organizations
+
+No major changes have been made to the organization requests.
 
 ### Users
 
@@ -73,3 +112,25 @@ When migrating your user management from v1 to v2, the most significant updates 
 
 ### Projects
 
+We've simplified how you interact with projects by unifying projects and granted_projects into a single resource.
+From a consumer's perspective, it no longer matters if you own a project or if it was granted to you by another organization; it's all just a project.
+
+The main difference now is your level of permission.
+Your permissions determine whether you have administrative rights (like updating the project's details) or if you can only view the project and manage authorizations for your users.
+
+This change significantly streamlines API calls.
+For example, where you previously had to make two separate requests to see all projects, you now make one.
+
+**v1 (Separate Requests):**
+```
+- ListProjects
+- ListGrantedProjects
+```
+
+**v2 (Single Request with Filter):**
+```
+- ListProjects (returns all projects you have access to)
+```
+
+You can now use filters within the single ListProjects request if you need to differentiate between project types, such as filtering by projects you own versus those that have been granted to you.
+Update your code to use this new unified ListProjects endpoint.
