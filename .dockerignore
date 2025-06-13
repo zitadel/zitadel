@@ -26,4 +26,3 @@ Makefile
 docker-bake.hcl
 *.md
 .gitignore
-scripts

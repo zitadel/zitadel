@@ -3,9 +3,13 @@ import { code, otpFromSink } from "./code";
 import { loginname } from "./loginname";
 import { password } from "./password";
 import { totp } from "./zitadel";
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.resolve(__dirname, "../.env-file/.env") });
 
 export async function startLogin(page: Page) {
-  await page.goto("/loginname");
+  await page.goto(`./loginname`);
 }
 
 export async function loginWithPassword(page: Page, username: string, pw: string) {
@@ -21,7 +25,7 @@ export async function loginWithPasskey(page: Page, authenticatorId: string, user
 }
 
 export async function loginScreenExpect(page: Page, fullName: string) {
-  await expect(page).toHaveURL(/signedin.*/);
+  await expect(page).toHaveURL(/.*signedin.*/);
   await expect(page.getByRole("heading")).toContainText(fullName);
 }
 

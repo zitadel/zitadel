@@ -1,16 +1,23 @@
-export LOGIN_IMAGE_TAG ?= zitadel-login:local
-LOGIN_LINT_TAG ?= zitadel-login-lint:local
-LOGIN_DEPENDENCIES_TAG ?= zitadel-login-dependencies:local
-LOGIN_TEST_UNIT_TAG ?= zitadel-login-lint:local
-export CORE_MOCK_TAG ?= zitadel-core-mock:local
-export LOGIN_TEST_INTEGRATION_TAG ?= zitadel-login-test-integration:local
-export LOGIN_TEST_ACCEPTANCE_SETUP_TAG := zitadel-login-test-acceptance-setup:local
-export LOGIN_TEST_ACCEPTANCE_POSTGRES_TAG := postgres:17.0-alpine3.19
-export LOGIN_TEST_ACCEPTANCE_GOLANG_TAG := golang:1.24-alpine
-export ZITADEL_IMAGE_TAG ?= ghcr.io/zitadel/zitadel:latest
-
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
+
+export LOGIN_TAG ?= login:local
+export LOGIN_LINT_TAG := login-lint:local
+export LOGIN_TEST_UNIT_TAG := login-test-unit:local
+export LOGIN_TEST_INTEGRATION_TAG ?= login-test-integration:local
+export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:local
+export LOGIN_TEST_ACCEPTANCE_SETUP_TAG := login-test-acceptance-setup:local
+export LOGIN_TEST_ACCEPTANCE_SINK_TAG := login-test-acceptance-sink:local
+export LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG := login-test-acceptance-oidcrp:local
+export LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG := login-test-acceptance-oidcop:local
+export LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG := login-test-acceptance-samlsp:local
+export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:local
+export LOGIN_CLIENT_TAG := login-client:local
+export POSTGRES_TAG := postgres:17.0-alpine3.19
+export GOLANG_TAG := golang:1.24-alpine
+# TODO: use ghcr.io/zitadel/zitadel:latest
+export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164
+export CORE_MOCK_TAG := core-mock:local
 
 .PHONY: login-help
 login-help:
@@ -26,6 +33,8 @@ login-help:
 	@echo "  show-cache-keys         - Show all cache keys with image ids and exit codes."
 	@echo "  clean-cache-keys        - Remove all cache keys."
 
+login-lint-build:
+	docker buildx bake login-lint
 
 login-lint-run:
 	docker run --rm $(LOGIN_LINT_TAG) lint
@@ -35,6 +44,9 @@ login-lint-run:
 login-lint: login-lint-build
 	./scripts/run_or_skip.sh login-lint-run $(LOGIN_LINT_TAG)
 
+login-test-unit-build:
+	docker buildx bake login-test-unit
+
 login-test-unit-run:
 	docker run --rm $(LOGIN_TEST_UNIT_TAG) test:unit:standalone
 
@@ -42,20 +54,47 @@ login-test-unit-run:
 login-test-unit: login-test-unit-build
 	./scripts/run_or_skip.sh login-test-unit-run $(LOGIN_TEST_UNIT_TAG)
 
-login-test-integration-run:
-	docker compose --file ./apps/login-test-integration/docker-compose.yaml run --rm login-test-integration
+login-test-integration-build:
+	docker buildx bake core-mock
+	docker buildx bake login-test-integration
+
+login-test-integration-run: login-test-integration-cleanup
+	docker compose --file ./apps/login-test-integration/docker-compose.yaml run --rm integration
+
+login-test-integration-cleanup:
+	docker compose --file ./apps/login-test-integration/docker-compose.yaml down --volumes
 
 .PHONY: login-test-integration
 login-test-integration: login-standalone-build login-test-integration-build
-	./scripts/run_or_skip.sh login-test-integration-run "$(LOGIN_IMAGE_TAG);$(CORE_MOCK_TAG);$(LOGIN_TEST_INTEGRATION_TAG)"
+	./scripts/run_or_skip.sh login-test-integration-run \
+	"$(LOGIN_TAG) \
+	$(CORE_MOCK_TAG) \
+	$(LOGIN_TEST_INTEGRATION_TAG)"
 
-login-test-acceptance-run:
-	docker compose --file ./apps/login-test-acceptance/saml/docker-compose.yaml up --detach samlsp
-	docker compose --file ./apps/login-test-acceptance/oidc/docker-compose.yaml up --detach oidcrp
-	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run login-test-acceptance
+login-test-acceptance-build:
+	COMPOSE_BAKE=true docker compose --file ./apps/login-test-acceptance/docker-compose.yaml build
+	docker buildx bake login-standalone
+	docker buildx bake login-test-acceptance
+
+login-test-acceptance-run: login-acceptance-cleanup
+	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
+
+login-acceptance-cleanup:
+	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml down --volumes
 
 login-test-acceptance: login-standalone-build login-test-acceptance-build
-	./scripts/run_or_skip.sh login-test-acceptance-run "$(LOGIN_IMAGE_TAG);$(LOGIN_TEST_ACCEPTANCE_SETUP_TAG);$(LOGIN_TEST_ACCEPTANCE_POSTGRES_TAG);$(LOGIN_TEST_ACCEPTANCE_GOLANG_TAG)"
+	./scripts/run_or_skip.sh login-test-acceptance-run \
+		"$(LOGIN_TAG) \
+  		$(ZITADEL_TAG) \
+  		$(POSTGRES_TAG) \
+  		$(GOLANG_TAG) \
+  		$(LOGIN_TEST_ACCEPTANCE_TAG) \
+  		$(LOGIN_TEST_ACCEPTANCE_SETUP_TAG) \
+  		$(LOGIN_TEST_ACCEPTANCE_SINK_TAG) \
+  		$(LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG) \
+  		$(LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG) \
+  		$(LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG) \
+  		$(LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG)"
 
 .PHONY: login-quality
 login-quality: login-lint login-test-unit login-test-integration
@@ -65,26 +104,9 @@ login-quality: login-lint login-test-unit login-test-integration
 login-ci: login-quality login-standalone-build
 	@:
 
-login-dependencies-build:
-	docker buildx bake login-dependencies --set login-dependencies.tags=$(LOGIN_DEPENDENCIES_TAG);
-
-login-lint-build:
-	docker buildx bake login-lint --set login-lint.tags=$(LOGIN_LINT_TAG);
-
-login-test-unit-build:
-	docker buildx bake login-test-unit --set login-test-unit.tags=$(LOGIN_TEST_UNIT_TAG);
-
-login-test-integration-build:
-	docker buildx bake core-mock --set core-mock.tags=$(CORE_MOCK_TAG);
-	docker buildx bake login-test-integration --set login-test-integration.tags=$(LOGIN_TEST_INTEGRATION_TAG)
-
-login-test-acceptance-build:
-	# TODO: Prebuild sink, saml and oidc
-	docker buildx bake --pull --file apps/login-test-acceptance/docker-compose.yaml --set setup.context=apps/login-test-acceptance
-
 .PHONY: login-standalone-build
 login-standalone-build:
-	docker buildx bake login-standalone --set login-standalone.tags=$(LOGIN_IMAGE_TAG);
+	docker buildx bake login-standalone
 
 .PHONY: clean-cache-keys
 clean-cache-keys:

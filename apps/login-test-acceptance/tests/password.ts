@@ -5,7 +5,7 @@ const passwordSubmitButton = "submit-button";
 const passwordResetButton = "reset-button";
 
 export async function startChangePassword(page: Page, loginname: string) {
-  await page.goto("/password/change?" + new URLSearchParams({ loginName: loginname }));
+  await page.goto("./password/change?" + new URLSearchParams({ loginName: loginname }));
 }
 
 export async function changePassword(page: Page, password: string) {

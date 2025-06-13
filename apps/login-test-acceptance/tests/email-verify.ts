@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 import { emailVerifyScreen } from "./email-verify-screen";
 
 export async function startEmailVerify(page: Page, loginname: string) {
-  await page.goto("/verify");
+  await page.goto("./verify");
 }
 
 export async function emailVerify(page: Page, code: string) {

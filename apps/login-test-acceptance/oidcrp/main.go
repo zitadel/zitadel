@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -37,11 +38,10 @@ func main() {
 	domain := os.Getenv("API_DOMAIN")
 	loginURL := os.Getenv("LOGIN_URL")
 	issuer := os.Getenv("ISSUER")
-	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
 	scopeList := strings.Split(os.Getenv("SCOPES"), " ")
 
-	redirectURI := fmt.Sprintf("%v:%v%v", host, port, callbackPath)
+	redirectURI := fmt.Sprintf("%s%s", issuer, callbackPath)
 	cookieHandler := httphelper.NewCookieHandler(key, key, httphelper.WithUnsecure())
 
 	clientID, clientSecret, err := createZitadelResources(apiURL, pat, domain, redirectURI, loginURL)
@@ -57,6 +57,11 @@ func main() {
 	)
 	client := &http.Client{
 		Timeout: time.Minute,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
 	}
 	// enable outgoing request logging
 	logging.EnableHTTPClient(client,
@@ -69,6 +74,7 @@ func main() {
 		rp.WithHTTPClient(client),
 		rp.WithLogger(logger),
 		rp.WithSigningAlgsFromDiscovery(),
+		rp.WithCustomDiscoveryUrl(issuer + "/.well-known/openid-configuration"),
 	}
 	if clientSecret == "" {
 		options = append(options, rp.WithPKCE(cookieHandler))
@@ -139,6 +145,9 @@ func main() {
 			return slog.Int64("id", counter.Add(1))
 		}),
 	)
+
+	http.Handle("/healthy", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { return }))
+	fmt.Println("/healthy returns 200 OK")
 
 	server := &http.Server{
 		Addr:    ":" + port,

@@ -7,7 +7,7 @@ import { changePassword } from "./password";
 import { PasswordUser } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+dotenv.config({ path: path.resolve(__dirname, "../env-file/.env") });
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {
@@ -32,7 +32,7 @@ test("username and password login, change required", async ({ user, page }) => {
   const changedPw = "ChangedPw1!";
 
   await loginWithPassword(page, user.getUsername(), user.getPassword());
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(10000);
   await changePassword(page, changedPw);
   await loginScreenExpect(page, user.getFullName());
 

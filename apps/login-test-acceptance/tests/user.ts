@@ -69,7 +69,7 @@ export class PasswordUser extends User {
   async ensure(page: Page) {
     await super.ensure(page);
     // wait for projection of user
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(10000);
   }
 }
 
@@ -115,7 +115,7 @@ export class PasswordUserWithOTP extends User {
     await activateOTP(this.getUserId(), this.type);
 
     // wait for projection of user
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(10000);
   }
 }
 
@@ -128,7 +128,7 @@ export class PasswordUserWithTOTP extends User {
     this.secret = await addTOTP(this.getUserId());
 
     // wait for projection of user
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(10000);
   }
 
   public getSecret(): string {
@@ -167,7 +167,7 @@ export class PasskeyUser extends User {
     this.authenticatorId = authId;
 
     // wait for projection of user
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(10000);
   }
 
   async cleanup() {

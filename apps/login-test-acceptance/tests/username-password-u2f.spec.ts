@@ -1,6 +1,7 @@
 import { test } from "@playwright/test";
 
 test("username, password and u2f login", async ({ page }) => {
+  test.skip()
   // Given u2f is enabled on the organization of the user
   // Given the user has only u2f configured as second factor
   // User enters username
@@ -11,6 +12,7 @@ test("username, password and u2f login", async ({ page }) => {
 });
 
 test("username, password and u2f login, multiple mfa options", async ({ page }) => {
+  test.skip()
   // Given u2f and semailms otp is enabled on the organization of the user
   // Given the user has u2f and email otp configured as second factor
   // User enters username

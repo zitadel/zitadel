@@ -76,7 +76,7 @@ async function checkContent(page: Page, testid: string, match: boolean) {
 
 export async function resetPasswordScreen(page: Page, username: string, password1: string, password2: string) {
   // wait for send of the code
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(10000);
   const c = await getCodeFromSink(username);
   await page.getByTestId(codeField).pressSequentially(c);
   await page.getByTestId(passwordSetField).pressSequentially(password1);

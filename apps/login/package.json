@@ -11,7 +11,7 @@
     "lint:fix": "pnpm exec prettier --write .",
     "lint-staged": "lint-staged",
     "build": "pnpm exec next build",
-    "build:standalone": "NEXT_OUTPUT_MODE=standalone pnpm build",
+    "build:login:standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone pnpm build",
     "start": "pnpm build && pnpm exec next start",
     "start:built": "pnpm exec next start",
     "clean": "pnpm mock:stop && rm -rf .turbo && rm -rf node_modules && rm -rf .next"

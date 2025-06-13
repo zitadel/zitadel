@@ -1,8 +1,9 @@
-FROM login-platform AS login-base
+FROM node:20-bookworm AS login-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN apk add --no-cache libc6-compat bash git
+RUN apt-get update && apt-get install -y --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 COPY \
   turbo.json \
@@ -11,4 +12,5 @@ COPY \
   pnpm-lock.yaml \
   pnpm-workspace.yaml \
   ./
+
 ENTRYPOINT ["pnpm"]

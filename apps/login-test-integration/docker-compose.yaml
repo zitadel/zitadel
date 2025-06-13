@@ -1,28 +1,27 @@
 services:
   core-mock:
-    image: "${CORE_MOCK_TAG:-zitadel-core-mock:local}"
-    container_name: core-mock
+    image: "${CORE_MOCK_TAG:-core-mock:local}"
+    container_name: integration-core-mock
     ports:
       - 22220:22220
       - 22222:22222
 
   login:
-    image: "${LOGIN_IMAGE_TAG:-zitadel-login:local}"
-    container_name: login
+    image: "${LOGIN_TAG:-login:local}"
+    container_name: integration-login
     ports:
-      - 3000:3000
+      - 3001:3001
     environment:
+      - PORT=3001
       - ZITADEL_API_URL=http://core-mock:22222
       - ZITADEL_SERVICE_USER_TOKEN="yolo"
       - EMAIL_VERIFICATION=true
-      - DEBUG=true
-      - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
 
-  login-test-integration:
-    image: "${LOGIN_TEST_INTEGRATION_TAG:-zitadel-login-test-integration:local}"
-    container_name: login-test-integration
+  integration:
+    image: "${LOGIN_TEST_INTEGRATION_TAG:-login-test-integration:local}"
+    container_name: integration
     environment:
-      - LOGIN_BASE_URL=http://login:3000/ui/v2/login
+      - LOGIN_BASE_URL=http://login:3001/ui/v2/login
       - CYPRESS_CORE_MOCK_STUBS_URL=http://core-mock:22220/v1/stubs
     depends_on:
       login:

@@ -4,6 +4,7 @@
 import test from "@playwright/test";
 
 test("login with Microsoft IDP", async ({ page }) => {
+  test.skip()
   // Given a Microsoft IDP is configured on the organization
   // Given the user has Microsoft IDP added as auth method
   // User authenticates with the Microsoft IDP
@@ -12,6 +13,7 @@ test("login with Microsoft IDP", async ({ page }) => {
 });
 
 test("login with Microsoft IDP - error", async ({ page }) => {
+  test.skip()
   // Given the Microsoft IDP is configured on the organization
   // Given the user has Microsoft IDP added as auth method
   // User is redirected to the Microsoft IDP
@@ -21,6 +23,7 @@ test("login with Microsoft IDP - error", async ({ page }) => {
 });
 
 test("login with Microsoft IDP, no user existing - auto register", async ({ page }) => {
+  test.skip()
   // Given idp Microsoft is configure on the organization as only authencation method
   // Given idp Microsoft is configure with account creation alloweed, and automatic creation enabled
   // Given no user exists yet
@@ -32,6 +35,7 @@ test("login with Microsoft IDP, no user existing - auto register", async ({ page
 });
 
 test("login with Microsoft IDP, no user existing - auto register not possible", async ({ page }) => {
+  test.skip()
   // Given idp Microsoft is configure on the organization as only authencation method
   // Given idp Microsoft is configure with account creation alloweed, and automatic creation enabled
   // Given no user exists yet
@@ -49,6 +53,7 @@ test("login with Microsoft IDP, no user existing - auto register not possible", 
 test("login with Microsoft IDP, no user existing - auto register enabled - manual creation disabled, creation not possible", async ({
   page,
 }) => {
+  test.skip()
   // Given idp Microsoft is configure on the organization as only authencation method
   // Given idp Microsoft is configure with account creation not allowed, and automatic creation enabled
   // Given no user exists yet
@@ -60,6 +65,7 @@ test("login with Microsoft IDP, no user existing - auto register enabled - manua
 });
 
 test("login with Microsoft IDP, no user linked - auto link", async ({ page }) => {
+  test.skip()
   // Given idp Microsoft is configure on the organization as only authencation method
   // Given idp Microsoft is configure with account linking allowed, and linking set to existing email
   // Given user with email address user@zitadel.com exists
@@ -71,6 +77,7 @@ test("login with Microsoft IDP, no user linked - auto link", async ({ page }) =>
 });
 
 test("login with Microsoft IDP, no user linked, linking not possible", async ({ page }) => {
+  test.skip()
   // Given idp Microsoft is configure on the organization as only authencation method
   // Given idp Microsoft is configure with manually account linking  not allowed, and linking set to existing email
   // Given user with email address user@zitadel.com doesn't exists
@@ -82,6 +89,7 @@ test("login with Microsoft IDP, no user linked, linking not possible", async ({ 
 });
 
 test("login with Microsoft IDP, no user linked, linking successful", async ({ page }) => {
+  test.skip()
   // Given idp Microsoft is configure on the organization as only authencation method
   // Given idp Microsoft is configure with manually account linking allowed, and linking set to existing email
   // Given user with email address user@zitadel.com doesn't exists

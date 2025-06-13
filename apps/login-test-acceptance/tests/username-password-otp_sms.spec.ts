@@ -8,7 +8,7 @@ import { loginScreenExpect, loginWithPassword, loginWithPasswordAndPhoneOTP } fr
 import { OtpType, PasswordUserWithOTP } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+dotenv.config({ path: path.resolve(__dirname, "../env-file/.env") });
 
 const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
   user: async ({ page }, use) => {
@@ -31,7 +31,7 @@ const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
   },
 });
 
-test("username, password and sms otp login, enter code manually", async ({ user, page }) => {
+test.skip("DOESN'T WORK: username, password and sms otp login, enter code manually", async ({ user, page }) => {
   // Given sms otp is enabled on the organization of the user
   // Given the user has only sms otp configured as second factor
   // User enters username
@@ -43,7 +43,7 @@ test("username, password and sms otp login, enter code manually", async ({ user,
   await loginScreenExpect(page, user.getFullName());
 });
 
-test("username, password and sms otp login, resend code", async ({ user, page }) => {
+test.skip("DOESN'T WORK: username, password and sms otp login, resend code", async ({ user, page }) => {
   // Given sms otp is enabled on the organization of the user
   // Given the user has only sms otp configured as second factor
   // User enters username

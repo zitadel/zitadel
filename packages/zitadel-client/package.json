@@ -44,7 +44,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "pnpm exec tsup",
-    "build:standalone": "pnpm build",
+    "build:client:standalone": "pnpm build",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
     "test:unit": "pnpm exec vitest",

@@ -106,7 +106,7 @@ func main() {
 	idpMetadata, err := samlsp.FetchMetadata(context.Background(), http.DefaultClient,
 		*idpMetadataURL)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to fetch IDP metadata from %s: %w", idpURL, err))
 	}
 	fmt.Printf("idpMetadata: %+v\n", idpMetadata)
 	rootURL, err := url.Parse(host + ":" + port)
@@ -144,6 +144,9 @@ func main() {
 	if err := createZitadelResources(apiURL, pat, domain, metadata, loginURL); err != nil {
 		panic(err)
 	}
+
+	http.Handle("/healthy", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { return }))
+	fmt.Println("/healthy returns 200 OK")
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -238,8 +241,10 @@ func CreateApp(apiURL, pat, domain, projectID string, spMetadata []byte, loginUR
 			},
 		},
 	}
-
 	_, err := doRequestWithHeaders(apiURL+"/management/v1/projects/"+projectID+"/apps/saml", pat, domain, createApp)
+	if err != nil {
+		return fmt.Errorf("error creating saml app with request %+v: %v", *createApp, err)
+	}
 	return err
 }
 

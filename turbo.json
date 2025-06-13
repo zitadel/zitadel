@@ -20,7 +20,8 @@
       "cache": true
     },
     "build": {},
-    "build:standalone": {},
+    "build:login:standalone": {},
+    "build:client:standalone": {},
     "test": {},
     "start": {},
     "start:built": {},
@@ -28,6 +29,7 @@
     "test:unit:standalone": {},
     "test:integration": {},
     "test:integration:run": {},
+    "test:acceptance": {},
     "test:watch": {
       "persistent": true
     },

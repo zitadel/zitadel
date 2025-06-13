@@ -8,7 +8,7 @@ import { loginScreenExpect, loginWithPassword, loginWithPasswordAndTOTP } from "
 import { PasswordUserWithTOTP } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+dotenv.config({ path: path.resolve(__dirname, "../env-file/.env") });
 
 const test = base.extend<{ user: PasswordUserWithTOTP; sink: any }>({
   user: async ({ page }, use) => {
@@ -57,6 +57,7 @@ test("username, password and totp otp login, wrong code", async ({ user, page })
 });
 
 test("username, password and totp login, multiple mfa options", async ({ page }) => {
+  test.skip()
   // Given totp and email otp is enabled on the organization of the user
   // Given the user has totp and email otp configured as second factor
   // User enters username

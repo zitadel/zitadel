@@ -1,3 +1,7 @@
+ExternalDomain: traefik
+ExternalSecure: true
+ExternalPort: 443
+
 FirstInstance:
   PatPath: /pat/zitadel-admin-sa.pat
   Org:

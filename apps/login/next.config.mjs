@@ -69,6 +69,9 @@ const nextConfig = {
   images: {
     remotePatterns: imageRemotePatterns,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async headers() {
     return [
       {

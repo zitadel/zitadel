@@ -1,8 +1,9 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 PAT_FILE=${PAT_FILE:-./pat/zitadel-admin-sa.pat}
+LOGIN_BASE_URL=${LOGIN_BASE_URL:-"http://localhost:3000"}
 ZITADEL_API_PROTOCOL="${ZITADEL_API_PROTOCOL:-http}"
 ZITADEL_API_DOMAIN="${ZITADEL_API_DOMAIN:-localhost}"
 ZITADEL_API_PORT="${ZITADEL_API_PORT:-8080}"
@@ -11,6 +12,8 @@ ZITADEL_API_INTERNAL_URL="${ZITADEL_API_INTERNAL_URL:-${ZITADEL_API_URL}}"
 SINK_EMAIL_INTERNAL_URL="${SINK_EMAIL_INTERNAL_URL:-"http://sink:3333/email"}"
 SINK_SMS_INTERNAL_URL="${SINK_SMS_INTERNAL_URL:-"http://sink:3333/sms"}"
 SINK_NOTIFICATION_URL="${SINK_NOTIFICATION_URL:-"http://localhost:3333/notification"}"
+WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.local}
+WRITE_TEST_ENVIRONMENT_FILE=${WRITE_TEST_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login-test-acceptance/tests/.env.local}
 
 if [ -z "${PAT}" ]; then
   echo "Reading PAT from file ${PAT_FILE}"
@@ -55,17 +58,18 @@ echo "Received ServiceAccount Token: ${SA_PAT}"
 # Environment files
 #################################################################
 
-WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.local}
-echo "Writing environment file to ${WRITE_ENVIRONMENT_FILE} when done."
-WRITE_TEST_ENVIRONMENT_FILE=${WRITE_TEST_ENVIRONMENT_FILE:-$(dirname "$0")/../acceptance/tests/.env.local}
-echo "Writing environment file to ${WRITE_TEST_ENVIRONMENT_FILE} when done."
+echo "Writing environment file ${WRITE_ENVIRONMENT_FILE}."
+echo "Writing environment file ${WRITE_TEST_ENVIRONMENT_FILE}."
 
 echo "ZITADEL_API_URL=${ZITADEL_API_URL}
 ZITADEL_SERVICE_USER_TOKEN=${SA_PAT}
 ZITADEL_ADMIN_TOKEN=${PAT}
 SINK_NOTIFICATION_URL=${SINK_NOTIFICATION_URL}
 EMAIL_VERIFICATION=true
-DEBUG=true"| tee "${WRITE_ENVIRONMENT_FILE}" "${WRITE_TEST_ENVIRONMENT_FILE}" > /dev/null
+DEBUG=false
+LOGIN_BASE_URL=${LOGIN_BASE_URL}
+" | tee "${WRITE_ENVIRONMENT_FILE}" "${WRITE_TEST_ENVIRONMENT_FILE}" > /dev/null
+
 echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"
 cat ${WRITE_ENVIRONMENT_FILE}
 

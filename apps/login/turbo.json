@@ -5,7 +5,7 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "dependsOn": ["^build"]
     },
-    "build:standalone": {
+    "build:login:standalone": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "test": {

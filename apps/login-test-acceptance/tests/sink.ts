@@ -20,7 +20,7 @@ export async function getOtpFromSink(key: string): Promise<any> {
       console.error(error);
       throw new Error(error);
     }
-    return response.data.args.oTP;
+    return response.data.args.otp;
   } catch (error) {
     console.error("Error making request:", error);
     throw error;

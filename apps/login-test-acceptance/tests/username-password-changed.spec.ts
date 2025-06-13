@@ -8,7 +8,7 @@ import { changePasswordScreen, changePasswordScreenExpect } from "./password-scr
 import { PasswordUser } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+dotenv.config({ path: path.resolve(__dirname, "../env-file/.env") });
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {
@@ -34,7 +34,7 @@ test("username and password changed login", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
 
   // wait for projection of token
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(10000);
 
   await startChangePassword(page, user.getUsername());
   await changePassword(page, changedPw);

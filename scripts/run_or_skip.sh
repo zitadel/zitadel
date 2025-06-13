@@ -19,9 +19,14 @@ mkdir -p "$CACHE_DIR"
 
 get_image_ids() {
 	local ids=""
-	for img in $(echo "$IMAGES" | tr ';' ' '); do
+	for img in $(echo "$IMAGES"); do
 		local id=$(docker image inspect "$img" --format='{{.Id}}' 2>/dev/null || true)
-		id=${id:-new-or-error}
+		if [[ -z $id ]]; then
+		  docker pull "$img" >/dev/null 2>&1 || true
+		  id="$(docker image inspect "$img" --format='{{.Id}}' 2>/dev/null || true)"
+    fi
+		id=${id:-new-and-not-pullable-or-failed-to-build}
+		id="${img}@${id}"
 		ids="${ids}${id};"
 	done
 	ids=${ids%;}  # Remove trailing semicolon
@@ -30,8 +35,9 @@ get_image_ids() {
 
 OLD_DIGEST=$(cat "$DIGEST_FILE" 2>/dev/null || echo "")
 OLD_STATUS=$(echo "$OLD_DIGEST" | cut -d ';' -f1)
-OLD_IDS=$(echo "$OLD_DIGEST" | cut -d ';' -f2-9)
-if [[ "$OLD_IDS" == "$(get_image_ids)" ]]; then
+OLD_IDS=$(echo "$OLD_DIGEST" | cut -d ';' -f2-99)
+CURRENT_IMAGE_IDS=$(get_image_ids)
+if [[ "$OLD_IDS" == "$CURRENT_IMAGE_IDS" ]]; then
     if [[ "$FORCE" == "true" ]]; then
         echo "\$FORCE=$FORCE - Running $MAKE_TARGET despite unchanged images."
     else
@@ -39,7 +45,6 @@ if [[ "$OLD_IDS" == "$(get_image_ids)" ]]; then
         exit $OLD_STATUS
     fi
 fi
-
 echo "Running $MAKE_TARGET..."
 set +e
 make -j $MAKE_TARGET

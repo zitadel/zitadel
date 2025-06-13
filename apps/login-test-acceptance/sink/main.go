@@ -97,6 +97,8 @@ func main() {
 	fmt.Println(*email, " for email handling")
 	fmt.Println(*sms, " for sms handling")
 	fmt.Println(*notification, " for retrieving notifications")
+	http.Handle("/healthy", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { return }))
+	fmt.Println("/healthy returns 200 OK")
 	err := http.ListenAndServe(":"+*port, nil)
 	if err != nil {
 		panic("Server could not be started: " + err.Error())

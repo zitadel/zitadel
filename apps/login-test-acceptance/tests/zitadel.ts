@@ -3,6 +3,11 @@ import { createDigest, createRandomBytes } from "@otplib/plugin-crypto";
 import { keyDecoder, keyEncoder } from "@otplib/plugin-thirty-two"; // use your chosen base32 plugin
 import axios from "axios";
 import { OtpType, userProps } from "./user";
+import dotenv from "dotenv";
+import path from "path";
+import fs from "node:fs";
+
+dotenv.config({ path: path.resolve(__dirname, "../.env-file/.env") });
 
 export async function addUser(props: userProps) {
   const body = {

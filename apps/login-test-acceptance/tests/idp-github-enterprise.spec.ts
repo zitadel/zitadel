@@ -1,6 +1,7 @@
 import test from "@playwright/test";
 
 test("login with GitHub Enterprise IDP", async ({ page }) => {
+  test.skip()
   // Given a GitHub Enterprise IDP is configured on the organization
   // Given the user has GitHub Enterprise IDP added as auth method
   // User authenticates with the GitHub Enterprise IDP
@@ -9,6 +10,7 @@ test("login with GitHub Enterprise IDP", async ({ page }) => {
 });
 
 test("login with GitHub Enterprise IDP - error", async ({ page }) => {
+  test.skip()
   // Given the GitHub Enterprise IDP is configured on the organization
   // Given the user has GitHub Enterprise IDP added as auth method
   // User is redirected to the GitHub Enterprise IDP
@@ -18,6 +20,7 @@ test("login with GitHub Enterprise IDP - error", async ({ page }) => {
 });
 
 test("login with GitHub Enterprise IDP, no user existing - auto register", async ({ page }) => {
+  test.skip()
   // Given idp GitHub Enterprise is configure on the organization as only authencation method
   // Given idp GitHub Enterprise is configure with account creation alloweed, and automatic creation enabled
   // Given ZITADEL Action is added to autofill missing user information
@@ -30,6 +33,7 @@ test("login with GitHub Enterprise IDP, no user existing - auto register", async
 });
 
 test("login with GitHub Enterprise IDP, no user existing - auto register not possible", async ({ page }) => {
+  test.skip()
   // Given idp GitHub Enterprise is configure on the organization as only authencation method
   // Given idp GitHub Enterprise is configure with account creation alloweed, and automatic creation enabled
   // Given no user exists yet
@@ -47,6 +51,7 @@ test("login with GitHub Enterprise IDP, no user existing - auto register not pos
 test("login with GitHub Enterprise IDP, no user existing - auto register enabled - manual creation disabled, creation not possible", async ({
   page,
 }) => {
+  test.skip()
   // Given idp GitHub Enterprise is configure on the organization as only authencation method
   // Given idp GitHub Enterprise is configure with account creation not allowed, and automatic creation enabled
   // Given no user exists yet
@@ -58,6 +63,7 @@ test("login with GitHub Enterprise IDP, no user existing - auto register enabled
 });
 
 test("login with GitHub Enterprise IDP, no user linked - auto link", async ({ page }) => {
+  test.skip()
   // Given idp GitHub Enterprise is configure on the organization as only authencation method
   // Given idp GitHub Enterprise is configure with account linking allowed, and linking set to existing email
   // Given ZITADEL Action is added to autofill missing user information
@@ -70,6 +76,7 @@ test("login with GitHub Enterprise IDP, no user linked - auto link", async ({ pa
 });
 
 test("login with GitHub Enterprise IDP, no user linked, linking not possible", async ({ page }) => {
+  test.skip()
   // Given idp GitHub Enterprise is configure on the organization as only authencation method
   // Given idp GitHub Enterprise is configure with manually account linking  not allowed, and linking set to existing email
   // Given ZITADEL Action is added to autofill missing user information
@@ -82,6 +89,7 @@ test("login with GitHub Enterprise IDP, no user linked, linking not possible", a
 });
 
 test("login with GitHub Enterprise IDP, no user linked, linking successful", async ({ page }) => {
+  test.skip()
   // Given idp GitHub Enterprise is configure on the organization as only authencation method
   // Given idp GitHub Enterprise is configure with manually account linking allowed, and linking set to existing email
   // Given ZITADEL Action is added to autofill missing user information
