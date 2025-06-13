@@ -1,4 +1,6 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getHostedLoginTranslation } from "@/lib/zitadel";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
@@ -8,6 +10,18 @@ export default getRequestConfig(async () => {
   const cookiesList = await cookies();
 
   let locale: string = fallback;
+
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const i18nOrganization = _headers.get("x-zitadel-i18n-organization") || ""; // You may need to set this header in middleware
+
+  const translations = await getHostedLoginTranslation({
+    serviceUrl,
+    organization: i18nOrganization,
+  });
+
+  translations.
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
