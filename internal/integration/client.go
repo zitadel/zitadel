@@ -277,6 +277,24 @@ func (i *Instance) DeactivateOrganization(ctx context.Context, orgID string) *mg
 	return resp
 }
 
+func (i *Instance) ReactivateOrganization(ctx context.Context, orgID string) *mgmt.ReactivateOrgResponse {
+	resp, err := i.Client.Mgmt.ReactivateOrg(
+		SetOrgID(ctx, orgID),
+		&mgmt.ReactivateOrgRequest{},
+	)
+	logging.OnError(err).Fatal("reactivate org")
+	return resp
+}
+
+func (i *Instance) RemoveOrganization(ctx context.Context, orgID string) *mgmt.RemoveOrgResponse {
+	resp, err := i.Client.Mgmt.RemoveOrg(
+		SetOrgID(ctx, orgID),
+		&mgmt.RemoveOrgRequest{},
+	)
+	logging.OnError(err).Fatal("reactivate org")
+	return resp
+}
+
 func SetOrgID(ctx context.Context, orgID string) context.Context {
 	md, ok := metadata.FromOutgoingContext(ctx)
 	if !ok {
