@@ -225,6 +225,17 @@
           "mutability": "readWrite",
           "returned": "always",
           "uniqueness": "none"
+        },
+        {
+          "name": "type",
+          "description": "For details see RFC7643",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": true,
+          "mutability": "readWrite",
+          "returned": "always",
+          "uniqueness": "none"
         }
       ],
       "multiValued": true,
