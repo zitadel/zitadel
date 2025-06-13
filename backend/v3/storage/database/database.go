@@ -2,8 +2,6 @@ package database
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5"
 )
 
 // Pool is a connection pool. e.g. pgxpool
@@ -59,13 +57,25 @@ type Row interface {
 
 // Rows is an abstraction of sql.Rows.
 type Rows interface {
-	pgx.Rows
+	Scanner
+	Next() bool
+	Close() error
+	Err() error
 }
 
-// Collector is an interface for collecting rows into a specific type.
-type Collector[T any] interface {
-	// Collect collects a single row into the specified type.
-	Collect(Row) (T, error)
-	// CollectRows collects multiple rows into a slice of the specified type.
-	CollectRows(Rows) ([]T, error)
+type CollectableRows interface {
+	// Collect collects all rows and scans them into dest.
+	// dest must be a pointer to a slice of pointer to structs
+	// e.g. *[]*MyStruct
+	// Rows are closed after this call.
+	Collect(dest any) error
+	// CollectFirst collects the first row and scans it into dest.
+	// dest must be a pointer to a struct
+	// e.g. *MyStruct{}
+	// Rows are closed after this call.
+	CollectFirst(dest any) error
+	// CollectExactlyOneRow collects exactly one row and scans it into dest.
+	// e.g. *MyStruct{}
+	// Rows are closed after this call.
+	CollectExactlyOneRow(dest any) error
 }

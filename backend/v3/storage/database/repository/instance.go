@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -43,17 +42,11 @@ func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain
 	andCondition := database.And(opts...)
 	i.writeCondition(&builder, andCondition)
 
-	rows, err := i.client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	return scanInstance(rows)
+	return scanInstance(ctx, i.client, &builder)
 }
 
 // List implements [domain.InstanceRepository].
-func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]domain.Instance, error) {
+func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*domain.Instance, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryInstanceStmt)
@@ -63,13 +56,7 @@ func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]doma
 	andCondition := database.And(opts...)
 	i.writeCondition(&builder, andCondition)
 
-	rows, err := i.client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	return scanInstances(rows)
+	return scanInstances(ctx, i.client, &builder)
 }
 
 const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language)` +
@@ -221,31 +208,29 @@ func (i *instance) writeCondition(
 	condition.Write(builder)
 }
 
-func scanInstance(rows database.Rows) (*domain.Instance, error) {
-	instance, err := pgx.CollectOneRow[domain.Instance](rows, pgx.RowToStructByNameLax[domain.Instance])
+func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
-		// if no results returned, this is not a error
-		// it just means the instance was not found
-		// the caller should check if the returned instance is nil
-		if err.Error() == "no rows in result set" {
-			return nil, nil
-		}
 		return nil, err
 	}
 
-	return &instance, nil
+	instance := new(domain.Instance)
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
+		return nil, err
+	}
+
+	return instance, nil
 }
 
-func scanInstances(rows database.Rows) ([]domain.Instance, error) {
-	instances, err := pgx.CollectRows[domain.Instance](rows, pgx.RowToStructByNameLax[domain.Instance])
+func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (instances []*domain.Instance, err error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
-		// if no results returned, this is not a error
-		// it just means the instance was not found
-		// the caller should check if the returned instance is nil
-		if err.Error() == "no rows in result set" {
-			return nil, nil
-		}
 		return nil, err
 	}
+
+	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
+		return nil, err
+	}
+
 	return instances, nil
 }
