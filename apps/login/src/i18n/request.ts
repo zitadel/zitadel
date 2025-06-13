@@ -18,6 +18,7 @@ export default getRequestConfig(async () => {
 
   const translations = await getHostedLoginTranslation({
     serviceUrl,
+    locale,
     organization: i18nOrganization,
   });
 

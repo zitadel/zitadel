@@ -46,7 +46,6 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getLocale } from "next-intl/server";
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
 import { createServiceForHost } from "./service";
@@ -63,11 +62,12 @@ async function cacheWrapper<T>(callback: Promise<T>) {
 export async function getHostedLoginTranslation({
   serviceUrl,
   organization,
+  locale,
 }: {
   serviceUrl: string;
   organization?: string;
+  locale?: string;
 }) {
-  const locale = await getLocale();
   const settingsService: Client<typeof SettingsService> =
     await createServiceForHost(SettingsService, serviceUrl);
 
