@@ -24,7 +24,7 @@ func (mig *TransactionalTables) Execute(ctx context.Context, _ eventstore.Event)
 }
 
 func (mig *TransactionalTables) String() string {
-	return "54_repeatable_transactional_tables"
+	return "59_repeatable_transactional_tables"
 }
 
 func (mig *TransactionalTables) Check(lastRun map[string]interface{}) bool {
