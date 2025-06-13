@@ -23,9 +23,7 @@ target "login-test-unit" {
     login-dev-base = "target:login-dev-base"
     login-client   = "target:login-client"
   }
-  output= {
-    type = "docker"
-  }
+  output = ["type=docker"]
   tags = ["${LOGIN_TEST_UNIT_TAG}"]
 }
 
@@ -38,9 +36,7 @@ target "login-lint" {
   contexts = {
     login-dev-base = "target:login-dev-base"
   }
-  output= {
-    type = "docker"
-  }
+  output = ["type=docker"]
   tags = ["${LOGIN_LINT_TAG}"]
 }
 
@@ -95,9 +91,7 @@ target "login-test-integration" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  output= {
-    type = "docker"
-  }
+  output = ["type=docker"]
   tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
 }
 
@@ -110,9 +104,7 @@ target "login-test-acceptance" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  output= {
-    type = "docker"
-  }
+  output = ["type=docker"]
   tags = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
 }
 
