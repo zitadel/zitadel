@@ -628,6 +628,10 @@ func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery(AppColumnName, value, method)
 }
 
+func NewAppStateSearchQuery(value domain.AppState) (SearchQuery, error) {
+	return NewNumberQuery(AppColumnState, int(value), NumberEquals)
+}
+
 func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
 }

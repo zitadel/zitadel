@@ -142,6 +142,14 @@ func appQueryToModel(appQuery *app.ApplicationQuery) (query.SearchQuery, error) 
 	switch q := appQuery.GetQuery().(type) {
 	case *app.ApplicationQuery_NameQuery:
 		return query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(q.NameQuery.GetMethod()), q.NameQuery.Name)
+	case *app.ApplicationQuery_StateQuery:
+		return query.NewAppStateSearchQuery(domain.AppState(q.StateQuery))
+	case *app.ApplicationQuery_ApiAppOnly:
+		return query.NewNotNullQuery(query.AppAPIConfigColumnAppID)
+	case *app.ApplicationQuery_OidcAppOnly:
+		return query.NewNotNullQuery(query.AppOIDCConfigColumnAppID)
+	case *app.ApplicationQuery_SamlAppOnly:
+		return query.NewNotNullQuery(query.AppSAMLConfigColumnAppID)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid")
 	}

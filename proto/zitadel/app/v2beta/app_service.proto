@@ -328,6 +328,9 @@ service AppService {
     // Returns a list of applications matching the input parameters that belong to the provided
     // project.
     //
+    // The result can be sorted by app id, name, creation date, change date or state. It can also
+    // be filtered by app state, app type and app name.
+    //
     // The user needs to be owner of the project and have project.app.read permission
     //
     // Required permissions:

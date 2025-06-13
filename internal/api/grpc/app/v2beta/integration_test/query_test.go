@@ -4,6 +4,7 @@ package instance_test
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"testing"
 	"time"
@@ -169,6 +170,23 @@ func TestListApplications(t *testing.T) {
 	})
 	require.Nil(t, errAPIAppCreation)
 
+	deactivatedApiAppName := gofakeit.AppName()
+	createdDeactivatedApiApp, errDeactivatedAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: p.GetId(),
+		Name:      deactivatedApiAppName,
+		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
+			ApiRequest: &app.CreateAPIApplicationRequest{
+				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+			},
+		},
+	})
+	require.Nil(t, errDeactivatedAPIAppCreation)
+	_, deactivateErr := instance.Client.AppV2Beta.DeactivateApplication(iamOwnerCtx, &app.DeactivateApplicationRequest{
+		ProjectId:     p.GetId(),
+		ApplicationId: createdDeactivatedApiApp.GetAppId(),
+	})
+	require.Nil(t, deactivateErr)
+
 	samlAppName := gofakeit.AppName()
 	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
@@ -206,6 +224,7 @@ func TestListApplications(t *testing.T) {
 	// Sorting
 	appsSortedByName := appSortedByName{
 		{name: apiAppName, app: createdApiApp},
+		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
 		{name: samlAppName, app: createdSAMLApp},
 		{name: oidcAppName, app: createdOIDCApp},
 	}
@@ -213,6 +232,7 @@ func TestListApplications(t *testing.T) {
 
 	appsSortedByID := appSortedByID{
 		{name: apiAppName, app: createdApiApp},
+		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
 		{name: samlAppName, app: createdSAMLApp},
 		{name: oidcAppName, app: createdOIDCApp},
 	}
@@ -220,6 +240,7 @@ func TestListApplications(t *testing.T) {
 
 	appsSortedByCreationDate := appSortedByCreateTime{
 		{name: apiAppName, app: createdApiApp},
+		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
 		{name: samlAppName, app: createdSAMLApp},
 		{name: oidcAppName, app: createdOIDCApp},
 	}
@@ -229,11 +250,20 @@ func TestListApplications(t *testing.T) {
 		testName     string
 		inputRequest *app.ListApplicationsRequest
 
-		expectedErrorType   codes.Code
 		expectedOrderedList []appWithName
 		expectedOrderedKeys func(keys []appWithName) any
 		actualOrderedKeys   func(keys []*app.Application) any
 	}{
+		{
+			testName: "when no apps found should return empty list",
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId: "another-id",
+			},
+
+			expectedOrderedList: []appWithName{},
+			expectedOrderedKeys: func(keys []appWithName) any { return keys },
+			actualOrderedKeys:   func(keys []*app.Application) any { return keys },
+		},
 		{
 			testName: "when sorting by name should return apps sorted by name in descending order",
 			inputRequest: &app.ListApplicationsRequest{
@@ -310,18 +340,78 @@ func TestListApplications(t *testing.T) {
 				return creationDates
 			},
 		},
+		{
+			testName: "when filtering by active apps should return active apps only",
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId:  p.GetId(),
+				Pagination: &filter.PaginationRequest{Asc: true},
+				Queries: []*app.ApplicationQuery{
+					{Query: &app.ApplicationQuery_StateQuery{StateQuery: app.AppState_APP_STATE_ACTIVE}},
+				},
+			},
+			expectedOrderedList: slices.DeleteFunc(
+				slices.Clone(appsSortedByID),
+				func(a appWithName) bool { return a.name == deactivatedApiAppName },
+			),
+			expectedOrderedKeys: func(apps []appWithName) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.app.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+			actualOrderedKeys: func(apps []*app.Application) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+		},
+		{
+			testName: "when filtering by app type should return apps of matching type only",
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId:  p.GetId(),
+				Pagination: &filter.PaginationRequest{Asc: true},
+				Queries: []*app.ApplicationQuery{
+					{Query: &app.ApplicationQuery_OidcAppOnly{}},
+				},
+			},
+			expectedOrderedList: slices.DeleteFunc(
+				slices.Clone(appsSortedByID),
+				func(a appWithName) bool { return a.name != oidcAppName },
+			),
+			expectedOrderedKeys: func(apps []appWithName) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.app.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+			actualOrderedKeys: func(apps []*app.Application) any {
+				creationDates := make([]time.Time, len(apps))
+				for i, a := range apps {
+					creationDates[i] = a.GetCreationDate().AsTime()
+				}
+
+				return creationDates
+			},
+		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-
+			t.Parallel()
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 30*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.ListApplications(iamOwnerCtx, tc.inputRequest)
 
 				// Then
-				require.Equal(ttt, tc.expectedErrorType, status.Code(err))
+				require.Equal(ttt, codes.OK, status.Code(err))
 
 				if err == nil {
 					assert.Len(ttt, res.GetApp(), len(tc.expectedOrderedList))

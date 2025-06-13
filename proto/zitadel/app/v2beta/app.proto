@@ -69,6 +69,10 @@ message ApplicationQuery {
     oneof query {
         option (validate.required) = true;
         ApplicationNameQuery name_query = 1;
+        AppState state_query = 2;
+        bool api_app_only = 3;
+        bool oidc_app_only = 4;
+        bool saml_app_only = 5;
     }
 }
 
