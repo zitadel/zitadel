@@ -341,7 +341,7 @@ func TestListInstance(t *testing.T) {
 			testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
 				ctx := context.Background()
 				// create new db to make sure no instances exist
-				pool, stop, err := newEmbeededDB()
+				pool, stop, err := newEmbeededDB(ctx)
 				require.NoError(t, err)
 
 				instanceRepo := repository.InstanceRepository(pool)
@@ -374,7 +374,7 @@ func TestListInstance(t *testing.T) {
 			testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
 				ctx := context.Background()
 				// create new db to make sure no instances exist
-				pool, stop, err := newEmbeededDB()
+				pool, stop, err := newEmbeededDB(ctx)
 				require.NoError(t, err)
 
 				instanceRepo := repository.InstanceRepository(pool)
