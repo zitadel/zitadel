@@ -9,7 +9,7 @@ target "login-pnpm" {
 target "login-dev-base" {
   dockerfile = "dockerfiles/login-dev-base.Dockerfile"
   contexts = {
-      login-pnpm = "target:login-pnpm"
+    login-pnpm = "target:login-pnpm"
   }
 }
 
@@ -19,10 +19,10 @@ variable "LOGIN_TEST_UNIT_TAG" {
 
 target "login-test-unit" {
   dockerfile = "dockerfiles/login-test-unit.Dockerfile"
-    contexts = {
-      login-dev-base = "target:login-dev-base"
-      login-client = "target:login-client"
-    }
+  contexts = {
+    login-dev-base = "target:login-dev-base"
+    login-client   = "target:login-client"
+  }
   tags = ["${LOGIN_TEST_UNIT_TAG}"]
 }
 
@@ -35,6 +35,7 @@ target "login-lint" {
   contexts = {
     login-dev-base = "target:login-dev-base"
   }
+  load = true
   tags = ["${LOGIN_LINT_TAG}"]
 }
 
@@ -45,7 +46,7 @@ variable "LOGIN_CLIENT_TAG" {
 target "login-client" {
   dockerfile = "dockerfiles/login-client.Dockerfile"
   contexts = {
-    login-pnpm = "target:login-pnpm"
+    login-pnpm              = "target:login-pnpm"
     typescript-proto-client = "target:typescript-proto-client"
   }
   tags = ["${LOGIN_CLIENT_TAG}"]
@@ -89,7 +90,7 @@ target "login-test-integration" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-    tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
+  tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
 }
 
 variable "LOGIN_TEST_ACCEPTANCE_TAG" {
