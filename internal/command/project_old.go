@@ -9,18 +9,18 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) checkProjectExistsOld(ctx context.Context, projectID, resourceOwner string) (err error) {
+func (c *Commands) checkProjectExistsOld(ctx context.Context, projectID, resourceOwner string) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	projectWriteModel, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if !isProjectStateExists(projectWriteModel.State) {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-EbFMN", "Errors.Project.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-EbFMN", "Errors.Project.NotFound")
 	}
-	return nil
+	return projectWriteModel.ResourceOwner, nil
 }
 
 func (c *Commands) deactivateProjectOld(ctx context.Context, projectID string, resourceOwner string) (*domain.ObjectDetails, error) {
@@ -33,6 +33,9 @@ func (c *Commands) deactivateProjectOld(ctx context.Context, projectID string, r
 	}
 	if existingProject.State != domain.ProjectStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-mki55", "Errors.Project.NotActive")
+	}
+	if err := c.checkPermissionUpdateProject(ctx, existingProject.ResourceOwner, existingProject.AggregateID); err != nil {
+		return nil, err
 	}
 
 	//nolint: contextcheck
@@ -59,6 +62,9 @@ func (c *Commands) reactivateProjectOld(ctx context.Context, projectID string, r
 	if existingProject.State != domain.ProjectStateInactive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInactive")
 	}
+	if err := c.checkPermissionUpdateProject(ctx, existingProject.ResourceOwner, existingProject.AggregateID); err != nil {
+		return nil, err
+	}
 
 	//nolint: contextcheck
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
@@ -73,20 +79,20 @@ func (c *Commands) reactivateProjectOld(ctx context.Context, projectID string, r
 	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
-func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, projectGrant *domain.ProjectGrant, resourceOwner string) error {
-	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID, resourceOwner)
+func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, projectID, grantedOrgID, resourceOwner string, roles []string) (string, error) {
+	preConditions := NewProjectGrantPreConditionReadModel(projectID, grantedOrgID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if !preConditions.ProjectExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
 	}
 	if !preConditions.GrantedOrgExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 	}
-	if projectGrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
+	if domain.HasInvalidRoles(preConditions.ExistingRoleKeys, roles) {
+		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
-	return nil
+	return preConditions.ProjectResourceOwner, nil
 }

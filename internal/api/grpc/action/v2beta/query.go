@@ -164,7 +164,7 @@ func targetFieldNameToSortingColumn(field *action.TargetFieldName) query.Column 
 	}
 	switch *field {
 	case action.TargetFieldName_TARGET_FIELD_NAME_UNSPECIFIED:
-		return query.TargetColumnID
+		return query.TargetColumnCreationDate
 	case action.TargetFieldName_TARGET_FIELD_NAME_ID:
 		return query.TargetColumnID
 	case action.TargetFieldName_TARGET_FIELD_NAME_CREATED_DATE:
@@ -193,7 +193,7 @@ func executionFieldNameToSortingColumn(field *action.ExecutionFieldName) query.C
 	}
 	switch *field {
 	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_UNSPECIFIED:
-		return query.ExecutionColumnID
+		return query.ExecutionColumnCreationDate
 	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_ID:
 		return query.ExecutionColumnID
 	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_CREATED_DATE:

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefonnummer bereits verifiziert
       Empty: Telefonnummer ist leer
       NotChanged: Telefonnummer wurde nicht geändert
+      VerifyingRemovalIsNotSupported: Verifizieren der Telefonnummer Entfernung wird nicht unterstützt
     Address:
       NotFound: Adresse nicht gefunden
       NotChanged: Adresse wurde nicht geändert
@@ -536,6 +537,7 @@ Errors:
     StateMissing: State parameter fehlt im Request
     NotStarted: Intent wurde nicht gestartet oder wurde bereits beendet
     NotSucceeded: Intent war nicht erfolgreich
+    Expired: Intent ist abgelaufen
     TokenCreationFailed: Tokenerstellung schlug fehl
     InvalidToken: Intent Token ist ungültig
     OtherUser: Intent ist für anderen Benutzer gedacht

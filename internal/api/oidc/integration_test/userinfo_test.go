@@ -309,9 +309,7 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 		roleBar = "bar"
 	)
 
-	project, err := Instance.CreateProject(CTX)
-	projectID := project.GetId()
-	require.NoError(t, err)
+	projectID := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false).GetId()
 	user, _, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 	addProjectRolesGrants(t, user.GetUserId(), projectID, roleFoo, roleBar)

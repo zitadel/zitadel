@@ -228,9 +228,9 @@ export const ACTIONS: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.ACTIONS',
   groupI18nKey: 'SETTINGS.GROUPS.ACTIONS',
   requiredRoles: {
-    // todo: figure out roles
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['action.execution.write', 'action.target.write'],
   },
+  beta: true,
 };
 
 export const ACTIONS_TARGETS: SidenavSetting = {
@@ -238,7 +238,7 @@ export const ACTIONS_TARGETS: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.TARGETS',
   groupI18nKey: 'SETTINGS.GROUPS.ACTIONS',
   requiredRoles: {
-    // todo: figure out roles
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['action.execution.write', 'action.target.write'],
   },
+  beta: true,
 };

@@ -14,7 +14,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ReplaySubject, switchMap } from 'rxjs';
+import { ObservedValueOf, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -23,14 +23,13 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
-import { ExecutionTargetTypeSchema } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { MatSelectModule } from '@angular/material/select';
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { startWith } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/type-safe-cell-def.module';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { minArrayLengthValidator } from '../../../form-field/validators/validators';
 import { ProjectRoleChipModule } from '../../../project-role-chip/project-role-chip.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -72,11 +71,12 @@ export class ActionsTwoAddActionTargetComponent {
   }
 
   @Output() public readonly back = new EventEmitter<void>();
-  @Output() public readonly continue = new EventEmitter<MessageInitShape<typeof ExecutionTargetTypeSchema>[]>();
+  @Output() public readonly continue = new EventEmitter<string[]>();
 
   private readonly preselectedTargetIds$ = new ReplaySubject<string[]>(1);
 
-  protected readonly form: ReturnType<typeof this.buildForm>;
+  protected readonly form$: ReturnType<typeof this.buildForm>;
+
   protected readonly targets: ReturnType<typeof this.listTargets>;
   private readonly selectedTargetIds: Signal<string[]>;
   protected readonly selectableTargets: Signal<Target[]>;
@@ -87,26 +87,27 @@ export class ActionsTwoAddActionTargetComponent {
     private readonly actionService: ActionService,
     private readonly toast: ToastService,
   ) {
-    this.form = this.buildForm();
+    this.form$ = this.buildForm().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.targets = this.listTargets();
 
-    this.selectedTargetIds = this.getSelectedTargetIds(this.form);
-    this.selectableTargets = this.getSelectableTargets(this.targets, this.selectedTargetIds);
+    this.selectedTargetIds = this.getSelectedTargetIds(this.form$);
+    this.selectableTargets = this.getSelectableTargets(this.targets, this.selectedTargetIds, this.form$);
     this.dataSource = this.getDataSource(this.targets, this.selectedTargetIds);
   }
 
   private buildForm() {
-    const preselectedTargetIds = toSignal(this.preselectedTargetIds$, { initialValue: [] as string[] });
-
-    return computed(() => {
-      return this.fb.group({
-        autocomplete: new FormControl('', { nonNullable: true }),
-        selectedTargetIds: new FormControl(preselectedTargetIds(), {
-          nonNullable: true,
-          validators: [minArrayLengthValidator(1)],
-        }),
-      });
-    });
+    return this.preselectedTargetIds$.pipe(
+      startWith([] as string[]),
+      map((preselectedTargetIds) => {
+        return this.fb.group({
+          autocomplete: new FormControl('', { nonNullable: true }),
+          selectedTargetIds: new FormControl(preselectedTargetIds, {
+            nonNullable: true,
+            validators: [minArrayLengthValidator(1)],
+          }),
+        });
+      }),
+    );
   }
 
   private listTargets() {
@@ -129,24 +130,34 @@ export class ActionsTwoAddActionTargetComponent {
     return computed(targetsSignal);
   }
 
-  private getSelectedTargetIds(form: typeof this.form) {
-    const selectedTargetIds$ = toObservable(form).pipe(
-      startWith(form()),
-      switchMap((form) => {
-        const { selectedTargetIds } = form.controls;
+  private getSelectedTargetIds(form$: typeof this.form$) {
+    const selectedTargetIds$ = form$.pipe(
+      switchMap(({ controls: { selectedTargetIds } }) => {
         return selectedTargetIds.valueChanges.pipe(startWith(selectedTargetIds.value));
       }),
     );
     return toSignal(selectedTargetIds$, { requireSync: true });
   }
 
-  private getSelectableTargets(targets: typeof this.targets, selectedTargetIds: Signal<string[]>) {
-    return computed(() => {
+  private getSelectableTargets(targets: typeof this.targets, selectedTargetIds: Signal<string[]>, form$: typeof this.form$) {
+    const autocomplete$ = form$.pipe(
+      switchMap(({ controls: { autocomplete } }) => {
+        return autocomplete.valueChanges.pipe(startWith(autocomplete.value));
+      }),
+    );
+    const autocompleteSignal = toSignal(autocomplete$, { requireSync: true });
+
+    const unselectedTargets = computed(() => {
       const targetsCopy = new Map(targets().targets);
       for (const selectedTargetId of selectedTargetIds()) {
         targetsCopy.delete(selectedTargetId);
       }
       return Array.from(targetsCopy.values());
+    });
+
+    return computed(() => {
+      const autocomplete = autocompleteSignal().toLowerCase();
+      return unselectedTargets().filter(({ name }) => name.toLowerCase().includes(autocomplete));
     });
   }
 
@@ -178,46 +189,39 @@ export class ActionsTwoAddActionTargetComponent {
     return dataSource;
   }
 
-  protected addTarget(target: Target) {
-    const { selectedTargetIds } = this.form().controls;
+  protected addTarget(target: Target, form: ObservedValueOf<typeof this.form$>) {
+    const { selectedTargetIds } = form.controls;
     selectedTargetIds.setValue([target.id, ...selectedTargetIds.value]);
-    this.form().controls.autocomplete.setValue('');
+    form.controls.autocomplete.setValue('');
   }
 
-  protected removeTarget(index: number) {
-    const { selectedTargetIds } = this.form().controls;
+  protected removeTarget(index: number, form: ObservedValueOf<typeof this.form$>) {
+    const { selectedTargetIds } = form.controls;
     const data = [...selectedTargetIds.value];
     data.splice(index, 1);
     selectedTargetIds.setValue(data);
   }
 
-  protected drop(event: CdkDragDrop<undefined>) {
-    const { selectedTargetIds } = this.form().controls;
+  protected drop(event: CdkDragDrop<undefined>, form: ObservedValueOf<typeof this.form$>) {
+    const { selectedTargetIds } = form.controls;
 
     const data = [...selectedTargetIds.value];
     moveItemInArray(data, event.previousIndex, event.currentIndex);
     selectedTargetIds.setValue(data);
   }
 
-  protected handleEnter(event: Event) {
+  protected handleEnter(event: Event, form: ObservedValueOf<typeof this.form$>) {
     const selectableTargets = this.selectableTargets();
     if (selectableTargets.length !== 1) {
       return;
     }
 
     event.preventDefault();
-    this.addTarget(selectableTargets[0]);
+    this.addTarget(selectableTargets[0], form);
   }
 
   protected submit() {
-    const selectedTargets = this.selectedTargetIds().map((value) => ({
-      type: {
-        case: 'target' as const,
-        value,
-      },
-    }));
-
-    this.continue.emit(selectedTargets);
+    this.continue.emit(this.selectedTargetIds());
   }
 
   protected trackTarget(_: number, target: Target) {

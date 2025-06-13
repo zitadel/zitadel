@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Fluxos",
         "DESCRIPTION": "Escolha um fluxo de autenticação e acione sua ação em um evento específico dentro desse fluxo."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, uma nova e melhorada versão de Actions, já está disponível. A versão atual ainda é acessível, mas o nosso desenvolvimento futuro se concentrará na nova versão, que acabará por substituir a atual."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,13 +530,14 @@
     "APPLY": "Aplicar"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Você está atualmente usando a nova Actions V2, que está em versão beta. A versão anterior 1 ainda está disponível, mas será descontinuada no futuro. Por favor, reporte quaisquer problemas ou envie feedback.",
     "EXECUTION": {
       "TITLE": "Ações",
       "DESCRIPTION": "As ações permitem que você execute código personalizado em resposta a solicitações de API, eventos ou funções específicas. Use-as para estender o Zitadel, automatizar fluxos de trabalho e integrar-se a outros sistemas.",
       "TYPES": {
         "request": "Solicitação",
         "response": "Resposta",
-        "events": "Eventos",
+        "event": "Eventos",
         "function": "Função"
       },
       "DIALOG": {
@@ -566,6 +568,7 @@
             "TITLE": "Todas",
             "DESCRIPTION": "Selecione isso se você quiser executar sua ação em cada solicitação"
           },
+          "ALL_EVENTS": "Selecione isto se quiser executar sua ação em cada evento",
           "SELECT_SERVICE": {
             "TITLE": "Selecionar Serviço",
             "DESCRIPTION": "Escolha um Serviço Zitadel para sua ação."
@@ -619,6 +622,7 @@
           "restCall": "Chamada REST",
           "restAsync": "REST Assíncrono"
         },
+        "TYPES_DESCRIPTION": "Webhook, a chamada lida com o código de status, mas a resposta é irrelevante\nCall, a chamada lida com o código de status e a resposta\nAsync, a chamada não lida nem com o código de status nem com a resposta, mas pode ser chamada em paralelo com outros alvos",
         "ENDPOINT": "Ponto de Extremidade",
         "ENDPOINT_DESCRIPTION": "Insira o ponto de extremidade onde seu código está hospedado. Certifique-se de que ele esteja acessível para nós!",
         "TIMEOUT": "Tempo Limite",
@@ -689,6 +693,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Nome de Usuário",
     "ORGNAME": "Nome da Organização",
+    "ORGID": "ID da Organização",
     "PRIMARYDOMAIN": "Domínio primário",
     "PROJECTNAME": "Nome do Projeto",
     "RESOURCEOWNER": "Proprietário do Recurso",
@@ -1509,7 +1514,8 @@
       "APPEARANCE": "Aparência",
       "OTHER": "Outro",
       "STORAGE": "armazenar"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2147,6 +2153,7 @@
       "ACTIVATE": "Ativar Projeto",
       "DELETE": "Excluir Projeto",
       "ORGNAME": "Nome da Organização",
+      "ORGID": "ID da Organização",
       "ORGDOMAIN": "Domínio da Organização",
       "STATE": "Status",
       "TYPE": "Tipo",
@@ -2333,6 +2340,8 @@
     "DELETE_DESCRIPTION": "Você está prestes a excluir um provedor de identidade. As alterações resultantes são irreversíveis. Você realmente deseja fazer isso?",
     "DELETE_SELECTION_TITLE": "Excluir Provedor de Identidade",
     "DELETE_SELECTION_DESCRIPTION": "Você está prestes a excluir um provedor de identidade. As alterações resultantes são irreversíveis. Você realmente deseja fazer isso?",
+    "FEDERATEDLOGOUTENABLED": "Logout Federado Ativado",
+    "FEDERATEDLOGOUTENABLED_DESC": "Se ativado, o usuário também será desconectado do IdP se encerrar a sessão no ZITADEL.",
     "EMPTY": "Nenhum provedor de identidade disponível",
     "OIDC": {
       "GENERAL": "Informações Gerais",

@@ -4,29 +4,24 @@ import (
 	"context"
 	_ "embed"
 
-	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-type TransactionalTables struct {
+var (
+	//go:embed 54.sql
+	instancePositionIndex string
+)
+
+type InstancePositionIndex struct {
 	dbClient *database.DB
 }
 
-func (mig *TransactionalTables) Execute(ctx context.Context, _ eventstore.Event) error {
-	config := &postgres.Config{Pool: mig.dbClient.Pool}
-	pool, err := config.Connect(ctx)
-	if err != nil {
-		return err
-	}
-
-	return pool.Migrate(ctx)
+func (mig *InstancePositionIndex) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, instancePositionIndex)
+	return err
 }
 
-func (mig *TransactionalTables) String() string {
-	return "54_repeatable_transactional_tables"
-}
-
-func (mig *TransactionalTables) Check(lastRun map[string]interface{}) bool {
-	return true
+func (mig *InstancePositionIndex) String() string {
+	return "54_instance_position_index_again"
 }

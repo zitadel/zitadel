@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Téléphone déjà vérifié
       Empty: Téléphone est vide
       NotChanged: Téléphone n'a pas changé
+      VerifyingRemovalIsNotSupported: La vérification de la suppression n'est pas prise en charge
     Address:
       NotFound: Adresse non trouvée
       NotChanged: L'adresse n'a pas changé
@@ -536,6 +537,7 @@ Errors:
     StateMissing: Paramètre d'état manquant dans la requête
     NotStarted: Intent n'a pas démarré ou s'est déjà terminé
     NotSucceeded: l'intention n'a pas abouti
+    Expired: L'intention a expiré
     TokenCreationFailed: La création du token a échoué
     InvalidToken: Le jeton d'intention n'est pas valide
     OtherUser: Intention destinée à un autre utilisateur

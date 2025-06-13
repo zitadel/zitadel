@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Stromen",
         "DESCRIPTION": "Kies een authenticatiestroom en activeer je actie bij een specifieke gebeurtenis binnen deze stroom."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, een nieuwe en verbeterde versie van Actions, is nu beschikbaar. De huidige versie blijft toegankelijk, maar onze toekomstige ontwikkeling zal zich richten op de nieuwe versie, die uiteindelijk de huidige zal vervangen."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -529,13 +530,14 @@
     "APPLY": "Toepassen"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "U gebruikt momenteel de nieuwe Actions V2, die zich in de bètaversie bevindt. De vorige versie 1 is nog beschikbaar maar zal in de toekomst worden stopgezet. Meld alstublieft eventuele problemen of feedback.",
     "EXECUTION": {
       "TITLE": "Acties",
       "DESCRIPTION": "Met acties kunt u aangepaste code uitvoeren als reactie op API-verzoeken, gebeurtenissen of specifieke functies. Gebruik ze om Zitadel uit te breiden, workflows te automatiseren en te integreren met andere systemen.",
       "TYPES": {
         "request": "Verzoek",
         "response": "Reactie",
-        "events": "Gebeurtenissen",
+        "event": "Gebeurtenissen",
         "function": "Functie"
       },
       "DIALOG": {
@@ -566,6 +568,7 @@
             "TITLE": "Alle",
             "DESCRIPTION": "Selecteer dit als u uw actie bij elk verzoek wilt uitvoeren"
           },
+          "ALL_EVENTS": "Selecteer dit als je je actie bij elk evenement wilt uitvoeren",
           "SELECT_SERVICE": {
             "TITLE": "Service selecteren",
             "DESCRIPTION": "Kies een Zitadel-service voor uw actie."
@@ -619,6 +622,7 @@
           "restCall": "REST Aanroep",
           "restAsync": "REST Asynchroon"
         },
+        "TYPES_DESCRIPTION": "Webhook, de oproep verwerkt de statuscode maar de reactie is irrelevant\nCall, de oproep verwerkt de statuscode en de reactie\nAsync, de oproep verwerkt noch de statuscode noch de reactie, maar kan parallel aan andere doelen worden aangeroepen",
         "ENDPOINT": "Eindpunt",
         "ENDPOINT_DESCRIPTION": "Voer het eindpunt in waar uw code wordt gehost. Zorg ervoor dat het voor ons toegankelijk is!",
         "TIMEOUT": "Time-out",
@@ -689,6 +693,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Gebruikersnaam",
     "ORGNAME": "Organisatienaam",
+    "ORGID": "Organisatie ID",
     "PRIMARYDOMAIN": "Primair domein",
     "PROJECTNAME": "Projectnaam",
     "RESOURCEOWNER": "Eigenaar van de bron",
@@ -1508,7 +1513,8 @@
       "APPEARANCE": "Verschijning",
       "OTHER": "Andere",
       "STORAGE": "opslag"
-    }
+    },
+    "BETA": "BÈTA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2145,6 +2151,7 @@
       "ACTIVATE": "Activeer Project",
       "DELETE": "Verwijder Project",
       "ORGNAME": "Organisatienaam",
+      "ORGID": "Organisatie ID",
       "ORGDOMAIN": "Organisatie Domein",
       "STATE": "Status",
       "TYPE": "Type",
@@ -2341,6 +2348,8 @@
     "REMOVE_WARN_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. Dit zal de selectie van de beschikbare IDP voor uw gebruikers verwijderen en reeds geregistreerde gebruikers zullen niet opnieuw kunnen inloggen. Weet u zeker dat u wilt doorgaan?",
     "DELETE_SELECTION_TITLE": "Verwijder IDP",
     "DELETE_SELECTION_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. De resulterende wijzigingen zijn onomkeerbaar. Weet u zeker dat u dit wilt doen?",
+    "FEDERATEDLOGOUTENABLED": "Federatieve afmelding ingeschakeld",
+    "FEDERATEDLOGOUTENABLED_DESC": "Indien ingeschakeld, wordt de gebruiker ook afgemeld bij de IdP als de gebruiker de sessie in ZITADEL beëindigt.",
     "EMPTY": "Geen IDP beschikbaar",
     "OIDC": {
       "GENERAL": "Algemene Informatie",

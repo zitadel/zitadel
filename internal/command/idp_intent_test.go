@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/url"
 	"testing"
+	"time"
 
-	"github.com/crewjam/saml"
+	crewjam_saml "github.com/crewjam/saml"
+	goldap "github.com/go-ldap/ldap/v3"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,6 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	rep_idp "github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -740,6 +743,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 								false,
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								rep_idp.Options{},
 							)),
 					),
@@ -760,6 +764,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 								false,
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								rep_idp.Options{},
 							)),
 					),
@@ -867,7 +872,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "ro", 0),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -888,7 +893,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "ro", 0),
 				idpSession: &oauth.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
@@ -922,6 +927,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 									Crypted:    []byte("accessToken"),
 								},
 								"idToken",
+								time.Time{},
 							)
 							return event
 						}(),
@@ -930,7 +936,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 				idpSession: &openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
@@ -973,7 +979,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 		ctx        context.Context
 		writeModel *IDPIntentWriteModel
 		idpUser    idp.User
-		assertion  *saml.Assertion
+		session    *saml.Session
 		userID     string
 	}
 	type res struct {
@@ -998,7 +1004,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "ro", 0),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -1023,14 +1029,17 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 							},
+							time.Time{},
 						),
 					),
 				),
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
-				assertion:  &saml.Assertion{ID: "id"},
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
+				session: &saml.Session{
+					Assertion: &crewjam_saml.Assertion{ID: "id"},
+				},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
 					UserInfoProfile: oidc.UserInfoProfile{
@@ -1061,14 +1070,17 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 							},
+							time.Time{},
 						),
 					),
 				),
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
-				assertion:  &saml.Assertion{ID: "id"},
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
+				session: &saml.Session{
+					Assertion: &crewjam_saml.Assertion{ID: "id"},
+				},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
 					UserInfoProfile: oidc.UserInfoProfile{
@@ -1088,7 +1100,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
-			got, err := c.SucceedSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.assertion)
+			got, err := c.SucceedSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.session)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.token, got)
 		})
@@ -1128,7 +1140,7 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 				request:    "request",
 			},
 			res{},
@@ -1156,7 +1168,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 		writeModel *IDPIntentWriteModel
 		idpUser    idp.User
 		userID     string
-		attributes map[string][]string
+		session    *ldap.Session
 	}
 	type res struct {
 		token string
@@ -1180,7 +1192,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -1200,14 +1212,24 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 							"username",
 							"",
 							map[string][]string{"id": {"id"}},
+							time.Time{},
 						),
 					),
 				),
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
-				attributes: map[string][]string{"id": {"id"}},
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
+				session: &ldap.Session{
+					Entry: &goldap.Entry{
+						Attributes: []*goldap.EntryAttribute{
+							{
+								Name:   "id",
+								Values: []string{"id"},
+							},
+						},
+					},
+				},
 				idpUser: ldap.NewUser(
 					"id",
 					"",
@@ -1235,7 +1257,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
-			got, err := c.SucceedLDAPIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.attributes)
+			got, err := c.SucceedLDAPIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.session)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.token, got)
 		})
@@ -1275,7 +1297,7 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "instance"),
+				writeModel: NewIDPIntentWriteModel("id", "instance", 0),
 				reason:     "reason",
 			},
 			res{

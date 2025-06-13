@@ -35,7 +35,7 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosti
 # A single ZITADEL instance always needs the same 32 characters long masterkey
 # If you haven't done so already, you can generate a new one
 # The key must be passed as argument
-ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
+ZITADEL_MASTERKEY="$(LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32)"
 
 # Pass zitadel configuration by configuration files
 zitadel start-from-init \
@@ -62,7 +62,7 @@ export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 
 # A single ZITADEL instance always needs the same 32 bytes long masterkey
 # Generate one to a file if you haven't done so already and pass it as environment variable
-tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-masterkey
+LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
 
 # Let the zitadel binary read configuration from environment variables
 zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled --masterkeyFile ./zitadel-masterkey

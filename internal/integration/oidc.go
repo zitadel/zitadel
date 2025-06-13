@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -133,13 +134,9 @@ func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redire
 	return client, err
 }
 
-func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
-	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
-	})
-	if err != nil {
-		return nil, err
-	}
+func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.T, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
+	project := i.CreateProject(ctx, t, "", gofakeit.AppName(), false, false)
+
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                project.GetId(),
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
@@ -178,28 +175,9 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI
 	})
 }
 
-func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
-	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context, t *testing.T) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	project := i.CreateProject(ctx, t, "", gofakeit.AppName(), false, false)
 	return i.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
-}
-
-func (i *Instance) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {
-	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
-	})
-}
-
-func (i *Instance) CreateProjectWithPermissionCheck(ctx context.Context, projectRoleCheck, hasProjectCheck bool) (*management.AddProjectResponse, error) {
-	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name:             fmt.Sprintf("project-%d", time.Now().UnixNano()),
-		HasProjectCheck:  hasProjectCheck,
-		ProjectRoleCheck: projectRoleCheck,
-	})
 }
 
 func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
