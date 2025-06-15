@@ -31,7 +31,6 @@ func (m *Migrator) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx = WithQueue(ctx)
 	_, err = migrator.Migrate(ctx, rivermigrate.DirectionUp, nil)
 	return err
 
