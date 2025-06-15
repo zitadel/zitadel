@@ -112,6 +112,13 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	apiApp.AppID = appID
 
 	addedApplication := NewAPIApplicationWriteModel(apiApp.AggregateID, resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionCreateApp(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	events := []eventstore.Command{
@@ -165,6 +172,13 @@ func (c *Commands) PatchAPIApplication(ctx context.Context, apiApp *domain.APIAp
 	if !existingAPI.IsAPI() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Gnwt3", "Errors.Project.App.IsNotAPI")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingAPI); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionPatchApp(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 	changedEvent, hasChanged, err := existingAPI.NewChangedEvent(
 		ctx,
@@ -205,6 +219,13 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	if !existingAPI.IsAPI() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingAPI); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionRegenClientSecret(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
+		return nil, err
+	}
+
 	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err

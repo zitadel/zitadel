@@ -307,6 +307,19 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return app, err
 }
 
+func (q *Queries) AppByIDWithPermission(ctx context.Context, appID string, activeOnly bool, permissionCheck domain.PermissionCheck) (*App, error) {
+	app, err := q.AppByID(ctx, appID, activeOnly)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := appCheckPermission(ctx, app.ResourceOwner, app.ID, permissionCheck); err != nil {
+		return nil, err
+	}
+
+	return app, nil
+}
+
 func (q *Queries) AppByID(ctx context.Context, appID string, activeOnly bool) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -526,6 +539,19 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 	return app, err
 }
 
+func (q *Queries) SearchAppsWithPermission(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool, permissionCheck domain.PermissionCheck) (*Apps, error) {
+	apps, err := q.SearchApps(ctx, queries, withOwnerRemoved)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := appsCheckPermission(ctx, apps, permissionCheck); err != nil {
+		return nil, err
+	}
+
+	return apps, nil
+}
+
 func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool) (apps *Apps, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -622,6 +648,21 @@ func (q *Queries) SAMLAppLoginVersion(ctx context.Context, appID string) (loginV
 		return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-lvDDwRzIoP", "Errors.Internal")
 	}
 	return loginVersion, nil
+}
+
+func appCheckPermission(ctx context.Context, resourceOwner string, appID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectAppRead, resourceOwner, appID)
+}
+
+func appsCheckPermission(ctx context.Context, apps *Apps, permissionCheck domain.PermissionCheck) error {
+	var errCollector []error
+	for _, a := range apps.Apps {
+		if err := permissionCheck(ctx, domain.PermissionProjectAppRead, a.ResourceOwner, a.ID); err != nil {
+			errCollector = append(errCollector, err)
+		}
+	}
+
+	return errors.Join(errCollector...)
 }
 
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {

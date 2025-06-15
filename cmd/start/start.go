@@ -510,7 +510,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, debug_events.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, app.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, app.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 

@@ -162,6 +162,13 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	defer func() { span.EndWithError(err) }()
 
 	addedApplication := NewOIDCApplicationWriteModel(oidcApp.AggregateID, resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionCreateApp(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	oidcApp.AppID = appID
@@ -241,6 +248,13 @@ func (c *Commands) PatchOIDCApplication(ctx context.Context, oidc *domain.OIDCAp
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GBr34", "Errors.Project.App.IsNotOIDC")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingOIDC); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionPatchApp(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
 	changedEvent, hasChanged, err := existingOIDC.NewChangedEvent(
 		ctx,
@@ -301,6 +315,13 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingOIDC); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionRegenClientSecret(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
+		return nil, err
+	}
+
 	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err

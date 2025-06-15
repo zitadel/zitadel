@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
@@ -15,9 +16,10 @@ var _ app.AppServiceServer = (*Server)(nil)
 
 type Server struct {
 	app.UnimplementedAppServiceServer
-	command        *command.Commands
-	query          *query.Queries
-	systemDefaults systemdefaults.SystemDefaults
+	command         *command.Commands
+	query           *query.Queries
+	systemDefaults  systemdefaults.SystemDefaults
+	checkPermission domain.PermissionCheck
 }
 
 type Config struct{}
@@ -25,10 +27,12 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
+	checkPermission domain.PermissionCheck,
 ) *Server {
 	return &Server{
-		command: command,
-		query:   query,
+		command:         command,
+		query:           query,
+		checkPermission: checkPermission,
 	}
 }
 

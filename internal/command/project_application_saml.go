@@ -20,6 +20,13 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, err
 	}
 	addedApplication := NewSAMLApplicationWriteModel(application.AggregateID, resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionCreateApp(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 	events, err := c.addSAMLApplication(ctx, projectAgg, application)
 	if err != nil {
@@ -96,6 +103,13 @@ func (c *Commands) PatchSAMLApplication(ctx context.Context, samlApp *domain.SAM
 	if !existingSAML.IsSAML() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GBr35", "Errors.Project.App.IsNotSAML")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingSAML); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionPatchApp(ctx, existingSAML.ResourceOwner, existingSAML.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingSAML.WriteModel)
 
 	if samlApp.MetadataURL != "" {

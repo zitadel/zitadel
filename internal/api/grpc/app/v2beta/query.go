@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetApplication(ctx context.Context, req *app.GetApplicationRequest) (*app.GetApplicationResponse, error) {
-	res, err := s.query.AppByID(ctx, req.GetApplicationId(), false)
+	res, err := s.query.AppByIDWithPermission(ctx, req.GetApplicationId(), false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (s *Server) ListApplications(ctx context.Context, req *app.ListApplications
 		return nil, err
 	}
 
-	res, err := s.query.SearchApps(ctx, queries, false)
+	res, err := s.query.SearchAppsWithPermission(ctx, queries, false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

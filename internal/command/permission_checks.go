@@ -85,3 +85,27 @@ func (c *Commands) checkPermissionDeleteProjectGrant(ctx context.Context, resour
 	}
 	return nil
 }
+
+func (c *Commands) checkPermissionCreateApp(ctx context.Context, resourceOwner, appID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectAppWrite, project.AggregateType)(resourceOwner, appID)
+}
+
+func (c *Commands) checkPermissionPatchApp(ctx context.Context, resourceOwner, appID string) error {
+	return c.checkPermissionCreateApp(ctx, resourceOwner, appID)
+}
+
+func (c *Commands) checkPermissionDeactivateApp(ctx context.Context, resourceOwner, appID string) error {
+	return c.checkPermissionCreateApp(ctx, resourceOwner, appID)
+}
+
+func (c *Commands) checkPermissionReactivateApp(ctx context.Context, resourceOwner, appID string) error {
+	return c.checkPermissionCreateApp(ctx, resourceOwner, appID)
+}
+
+func (c *Commands) checkPermissionRegenClientSecret(ctx context.Context, resourceOwner, appID string) error {
+	return c.checkPermissionCreateApp(ctx, resourceOwner, appID)
+}
+
+func (c *Commands) checkPermissionDeleteApp(ctx context.Context, resourceOwner, appID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectAppDelete, project.AggregateType)(resourceOwner, appID)
+}

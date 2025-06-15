@@ -30,6 +30,13 @@ func (c *Commands) PatchApplication(ctx context.Context, projectID string, appCh
 	if existingApp.Name == appChange.GetApplicationName() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionCreateApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	pushedEvents, err := c.eventstore.Push(
 		ctx,
@@ -59,6 +66,13 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 	if existingApp.State != domain.AppStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-dsh35", "Errors.Project.App.NotActive")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionDeactivateApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
 	if err != nil {
@@ -86,6 +100,13 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 	if existingApp.State != domain.AppStateInactive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionReactivateApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
@@ -111,6 +132,13 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-0po9s", "Errors.Project.App.NotExisting")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionDeleteApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
 	entityID := ""
