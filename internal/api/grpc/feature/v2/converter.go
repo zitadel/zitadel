@@ -23,7 +23,6 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
-		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
 		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
@@ -40,7 +39,6 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
-		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
@@ -60,7 +58,6 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
-		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		WebKey:                          req.WebKey,
 		DebugOIDCParentError:            req.DebugOidcParentError,
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
@@ -80,7 +77,6 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
-		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		WebKey:                              featureSourceToFlagPb(&f.WebKey),
 		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
@@ -89,13 +85,6 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		LoginV2:                             loginV2ToLoginV2FlagPb(f.LoginV2),
 		PermissionCheckV2:                   featureSourceToFlagPb(&f.PermissionCheckV2),
 		ConsoleUseV2UserApi:                 featureSourceToFlagPb(&f.ConsoleUseV2UserApi),
-	}
-}
-
-func featureSourceToImprovedPerformanceFlagPb(fs *query.FeatureSource[[]feature.ImprovedPerformanceType]) *feature_pb.ImprovedPerformanceFeatureFlag {
-	return &feature_pb.ImprovedPerformanceFeatureFlag{
-		ExecutionPaths: improvedPerformanceTypesToPb(fs.Value),
-		Source:         featureLevelToSourcePb(fs.Level),
 	}
 }
 
@@ -157,66 +146,5 @@ func featureLevelToSourcePb(level feature.Level) feature_pb.Source {
 		return feature_pb.Source_SOURCE_USER
 	default:
 		return feature_pb.Source(level)
-	}
-}
-
-func improvedPerformanceTypesToPb(types []feature.ImprovedPerformanceType) []feature_pb.ImprovedPerformance {
-	res := make([]feature_pb.ImprovedPerformance, len(types))
-
-	for i, typ := range types {
-		res[i] = improvedPerformanceTypeToPb(typ)
-	}
-
-	return res
-}
-
-func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb.ImprovedPerformance {
-	switch typ {
-	case feature.ImprovedPerformanceTypeUnspecified:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
-	case feature.ImprovedPerformanceTypeOrgByID:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
-	case feature.ImprovedPerformanceTypeProjectGrant:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT
-	case feature.ImprovedPerformanceTypeProject:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT
-	case feature.ImprovedPerformanceTypeUserGrant:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_USER_GRANT
-	case feature.ImprovedPerformanceTypeOrgDomainVerified:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED
-	default:
-		return feature_pb.ImprovedPerformance(typ)
-	}
-}
-
-func improvedPerformanceListToDomain(list []feature_pb.ImprovedPerformance) []feature.ImprovedPerformanceType {
-	if list == nil {
-		return nil
-	}
-	res := make([]feature.ImprovedPerformanceType, len(list))
-
-	for i, typ := range list {
-		res[i] = improvedPerformanceToDomain(typ)
-	}
-
-	return res
-}
-
-func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.ImprovedPerformanceType {
-	switch typ {
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED:
-		return feature.ImprovedPerformanceTypeUnspecified
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
-		return feature.ImprovedPerformanceTypeOrgByID
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT:
-		return feature.ImprovedPerformanceTypeProjectGrant
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT:
-		return feature.ImprovedPerformanceTypeProject
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_USER_GRANT:
-		return feature.ImprovedPerformanceTypeUserGrant
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED:
-		return feature.ImprovedPerformanceTypeOrgDomainVerified
-	default:
-		return feature.ImprovedPerformanceTypeUnspecified
 	}
 }

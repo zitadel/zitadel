@@ -142,7 +142,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	esV3 := new_es.NewEventstore(dbClient)
 	config.Eventstore.Pusher = esV3
-	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 
 	logging.OnError(err).Fatal("unable to start eventstore")
@@ -189,8 +188,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s26AuthUsers3 = &AuthUsers3{dbClient: dbClient}
 	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: dbClient}
 	steps.s28AddFieldTable = &AddFieldTable{dbClient: dbClient}
-	steps.s29FillFieldsForProjectGrant = &FillFieldsForProjectGrant{eventstore: eventstoreClient}
-	steps.s30FillFieldsForOrgDomainVerified = &FillFieldsForOrgDomainVerified{eventstore: eventstoreClient}
 	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: dbClient}
 	steps.s32AddAuthSessionID = &AddAuthSessionID{dbClient: dbClient}
 	steps.s33SMSConfigs3TwilioAddVerifyServiceSid = &SMSConfigs3TwilioAddVerifyServiceSid{dbClient: dbClient}
@@ -205,7 +202,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: dbClient}
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
 	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
-	steps.s47FillMembershipFields = &FillMembershipFields{eventstore: eventstoreClient}
 	steps.s48Apps7SAMLConfigsLoginVersion = &Apps7SAMLConfigsLoginVersion{dbClient: dbClient}
 	steps.s49InitPermittedOrgsFunction = &InitPermittedOrgsFunction{eventstoreClient: dbClient}
 	steps.s50IDPTemplate6UsePKCE = &IDPTemplate6UsePKCE{dbClient: dbClient}
@@ -245,15 +241,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
 		steps.s26AuthUsers3,
-		steps.s29FillFieldsForProjectGrant,
-		steps.s30FillFieldsForOrgDomainVerified,
 		steps.s34AddCacheSchema,
 		steps.s35AddPositionToIndexEsWm,
 		steps.s36FillV2Milestones,
 		steps.s38BackChannelLogoutNotificationStart,
 		steps.s44ReplaceCurrentSequencesIndex,
 		steps.s45CorrectProjectOwners,
-		steps.s47FillMembershipFields,
 		steps.s49InitPermittedOrgsFunction,
 		steps.s50IDPTemplate6UsePKCE,
 		steps.s51IDPTemplate6RootCA,
@@ -286,9 +279,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			Version: build.Version(),
 		},
 		&DeleteStaleOrgFields{
-			eventstore: eventstoreClient,
-		},
-		&FillFieldsForInstanceDomains{
 			eventstore: eventstoreClient,
 		},
 		&SyncRolePermissions{

@@ -71,11 +71,6 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		return nil, err
 	}
 
-	err = es.handleFieldCommands(ctx, tx, commands)
-	if err != nil {
-		return nil, err
-	}
-
 	return events, nil
 }
 

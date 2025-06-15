@@ -86,12 +86,6 @@ var (
 	UserSchemaProjection                *handler.Handler
 	WebKeyProjection                    *handler.Handler
 	DebugEventsProjection               *handler.Handler
-
-	ProjectGrantFields      *handler.FieldHandler
-	OrgDomainVerifiedFields *handler.FieldHandler
-	InstanceDomainFields    *handler.FieldHandler
-	MembershipFields        *handler.FieldHandler
-	PermissionFields        *handler.FieldHandler
 )
 
 type projection interface {
@@ -102,10 +96,7 @@ type projection interface {
 	migration.Migration
 }
 
-var (
-	projections []projection
-	fields      []*handler.FieldHandler
-)
+var projections []projection
 
 func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) error {
 	projectionConfig = handler.Config{
@@ -180,15 +171,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	WebKeyProjection = newWebKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["web_keys"]))
 	DebugEventsProjection = newDebugEventsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_events"]))
 
-	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
-	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
-	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsInstanceDomain]))
-	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
-	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
-	// Don't forget to add the new field handler to [ProjectInstanceFields]
-
 	newProjectionsList()
-	newFieldsList()
 	return nil
 }
 
@@ -231,26 +214,6 @@ func ProjectInstance(ctx context.Context) error {
 	return nil
 }
 
-func ProjectInstanceFields(ctx context.Context) error {
-	for i, fieldProjection := range fields {
-		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("starting fields projection")
-		for {
-			err := fieldProjection.Trigger(ctx)
-			if err == nil {
-				break
-			}
-			var pgErr *pgconn.PgError
-			errors.As(err, &pgErr)
-			if pgErr.Code != database.PgUniqueConstraintErrorCode {
-				return err
-			}
-			logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("fields projection failed because of unique constraint, retrying")
-		}
-		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("fields projection done")
-	}
-	return nil
-}
-
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
@@ -273,20 +236,6 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	}
 
 	return config
-}
-
-// we know this is ugly, but we need to have a singleton slice of all projections
-// and are only able to initialize it after all projections are created
-// as setup and start currently create them individually, we make sure we get the right one
-// will be refactored when changing to new id based projections
-func newFieldsList() {
-	fields = []*handler.FieldHandler{
-		ProjectGrantFields,
-		OrgDomainVerifiedFields,
-		InstanceDomainFields,
-		MembershipFields,
-		PermissionFields,
-	}
 }
 
 // we know this is ugly, but we need to have a singleton slice of all projections

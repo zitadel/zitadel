@@ -14,7 +14,6 @@ type InstanceFeatures struct {
 	LegacyIntrospection             FeatureSource[bool]
 	UserSchema                      FeatureSource[bool]
 	TokenExchange                   FeatureSource[bool]
-	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
 	WebKey                          FeatureSource[bool]
 	DebugOIDCParentError            FeatureSource[bool]
 	OIDCSingleV1SessionTermination  FeatureSource[bool]

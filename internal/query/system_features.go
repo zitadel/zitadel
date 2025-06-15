@@ -25,7 +25,6 @@ type SystemFeatures struct {
 	LegacyIntrospection             FeatureSource[bool]
 	UserSchema                      FeatureSource[bool]
 	TokenExchange                   FeatureSource[bool]
-	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
 	OIDCSingleV1SessionTermination  FeatureSource[bool]
 	DisableUserTokenEvent           FeatureSource[bool]
 	EnableBackChannelLogout         FeatureSource[bool]

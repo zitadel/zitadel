@@ -61,11 +61,6 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 		return nil, err
 	}
 
-	err = es.handleFieldCommands(ctx, tx, commands)
-	if err != nil {
-		return nil, err
-	}
-
 	return events, nil
 }
 
