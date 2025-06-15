@@ -11,8 +11,9 @@ import "zitadel/feature/v2/feature.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
 
 message SetInstanceFeaturesRequest{
-  reserved 6;
-  reserved "actions";
+  reserved 6, 7;
+  reserved "actions", "improved_performance";
+
   optional bool login_default_org = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -43,15 +44,6 @@ message SetInstanceFeaturesRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
-    }
-  ];
-
-  repeated ImprovedPerformance improved_performance = 7 [
-    (validate.rules).repeated.unique = true,
-    (validate.rules).repeated.items.enum = {defined_only:  true, not_in: [0]},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "[1]";
-      description: "Improves performance of specified execution paths.";
     }
   ];
 

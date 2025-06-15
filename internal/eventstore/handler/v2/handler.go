@@ -27,7 +27,6 @@ type EventStore interface {
 	FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
-	FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) error
 }
 
 type Config struct {

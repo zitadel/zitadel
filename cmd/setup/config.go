@@ -127,8 +127,6 @@ type Steps struct {
 	s26AuthUsers3                           *AuthUsers3
 	s27IDPTemplate6SAMLNameIDFormat         *IDPTemplate6SAMLNameIDFormat
 	s28AddFieldTable                        *AddFieldTable
-	s29FillFieldsForProjectGrant            *FillFieldsForProjectGrant
-	s30FillFieldsForOrgDomainVerified       *FillFieldsForOrgDomainVerified
 	s31AddAggregateIndexToFields            *AddAggregateIndexToFields
 	s32AddAuthSessionID                     *AddAuthSessionID
 	s33SMSConfigs3TwilioAddVerifyServiceSid *SMSConfigs3TwilioAddVerifyServiceSid
@@ -143,7 +141,6 @@ type Steps struct {
 	s44ReplaceCurrentSequencesIndex         *ReplaceCurrentSequencesIndex
 	s45CorrectProjectOwners                 *CorrectProjectOwners
 	s46InitPermissionFunctions              *InitPermissionFunctions
-	s47FillMembershipFields                 *FillMembershipFields
 	s48Apps7SAMLConfigsLoginVersion         *Apps7SAMLConfigsLoginVersion
 	s49InitPermittedOrgsFunction            *InitPermittedOrgsFunction
 	s50IDPTemplate6UsePKCE                  *IDPTemplate6UsePKCE

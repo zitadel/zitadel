@@ -64,10 +64,6 @@ type ImprovedPerformanceType int32
 const (
 	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
 	ImprovedPerformanceTypeOrgByID
-	ImprovedPerformanceTypeProjectGrant
-	ImprovedPerformanceTypeProject
-	ImprovedPerformanceTypeUserGrant
-	ImprovedPerformanceTypeOrgDomainVerified
 )
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {

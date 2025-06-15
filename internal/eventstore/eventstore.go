@@ -12,7 +12,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func init() {
@@ -27,9 +26,8 @@ type Eventstore struct {
 	PushTimeout time.Duration
 	maxRetries  int
 
-	pusher   Pusher
-	querier  Querier
-	searcher Searcher
+	pusher  Pusher
+	querier Querier
 }
 
 var (
@@ -67,9 +65,8 @@ func NewEventstore(config *Config) *Eventstore {
 		PushTimeout: config.PushTimeout,
 		maxRetries:  int(config.MaxRetries),
 
-		pusher:   config.Pusher,
-		querier:  config.Querier,
-		searcher: config.Searcher,
+		pusher:  config.Pusher,
+		querier: config.Querier,
 	}
 }
 
@@ -147,20 +144,6 @@ func (es *Eventstore) EventTypes() []string {
 
 func (es *Eventstore) AggregateTypes() []string {
 	return aggregateTypes
-}
-
-// FillFields implements the [Searcher] interface
-func (es *Eventstore) FillFields(ctx context.Context, events ...FillFieldsEvent) error {
-	return es.searcher.FillFields(ctx, events...)
-}
-
-// Search implements the [Searcher] interface
-func (es *Eventstore) Search(ctx context.Context, conditions ...map[FieldType]any) ([]*SearchResult, error) {
-	if len(conditions) == 0 {
-		return nil, zerrors.ThrowInvalidArgument(nil, "V3-5Xbr1", "no search conditions")
-	}
-
-	return es.searcher.Search(ctx, conditions...)
 }
 
 // Filter filters the stored events based on the searchQuery
@@ -287,22 +270,6 @@ type Pusher interface {
 	Push(ctx context.Context, client database.ContextQueryExecuter, commands ...Command) (_ []Event, err error)
 	// Client returns the underlying database connection
 	Client() *database.DB
-}
-
-type FillFieldsEvent interface {
-	Event
-	Fields() []*FieldOperation
-}
-
-type Searcher interface {
-	// Search allows to search for specific fields of objects
-	// The instance id is taken from the context
-	// The list of conditions are combined with AND
-	// The search fields are combined with OR
-	// At least one must be defined
-	Search(ctx context.Context, conditions ...map[FieldType]any) (result []*SearchResult, err error)
-	// FillFields is to insert the fields of previously stored events
-	FillFields(ctx context.Context, events ...FillFieldsEvent) error
 }
 
 func appendEventType(typ EventType) {

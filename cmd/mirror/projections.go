@@ -123,7 +123,6 @@ func projections(
 	newEventstore := new_es.NewEventstore(client)
 	config.Eventstore.Querier = old_es.NewPostgres(client)
 	config.Eventstore.Pusher = newEventstore
-	config.Eventstore.Searcher = newEventstore
 
 	es := eventstore.NewEventstore(config.Eventstore)
 	esV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(client, &es_v4_pg.Config{
@@ -282,23 +281,9 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 			continue
 		}
 
-		err = projection.ProjectInstanceFields(ctx)
-		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger fields failed")
-			failedInstances <- instance
-			continue
-		}
-
 		err = admin_handler.ProjectInstance(ctx)
 		if err != nil {
 			logging.WithFields("instance", instance).WithError(err).Info("trigger admin handler failed")
-			failedInstances <- instance
-			continue
-		}
-
-		err = projection.ProjectInstanceFields(ctx)
-		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger fields failed")
 			failedInstances <- instance
 			continue
 		}

@@ -6,12 +6,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/feature"
-	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -379,94 +376,19 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, gran
 }
 
 func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectID, grantedOrgID, resourceOwner string, roles []string) (string, error) {
-	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
-		return c.checkProjectGrantPreConditionOld(ctx, projectID, grantedOrgID, resourceOwner, roles)
-	}
-	projectResourceOwner, existingRoleKeys, err := c.searchProjectGrantState(ctx, projectID, grantedOrgID, resourceOwner)
+	preConditions := NewProjectGrantPreConditionReadModel(projectID, grantedOrgID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return "", err
 	}
-
-	if domain.HasInvalidRoles(existingRoleKeys, roles) {
+	if !preConditions.ProjectExists {
+		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
+	}
+	if !preConditions.GrantedOrgExists {
+		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+	}
+	if domain.HasInvalidRoles(preConditions.ExistingRoleKeys, roles) {
 		return "", zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
-	return projectResourceOwner, nil
-}
-
-func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grantedOrgID, resourceOwner string) (_ string, existingRoleKeys []string, err error) {
-	projectStateQuery := map[eventstore.FieldType]any{
-		eventstore.FieldTypeAggregateType: project.AggregateType,
-		eventstore.FieldTypeAggregateID:   projectID,
-		eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
-		eventstore.FieldTypeObjectType:    project.ProjectSearchType,
-	}
-	grantedOrgQuery := map[eventstore.FieldType]any{
-		eventstore.FieldTypeAggregateType: org.AggregateType,
-		eventstore.FieldTypeAggregateID:   grantedOrgID,
-		eventstore.FieldTypeFieldName:     org.OrgStateSearchField,
-		eventstore.FieldTypeObjectType:    org.OrgSearchType,
-	}
-	roleQuery := map[eventstore.FieldType]any{
-		eventstore.FieldTypeAggregateType: project.AggregateType,
-		eventstore.FieldTypeAggregateID:   projectID,
-		eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,
-		eventstore.FieldTypeObjectType:    project.ProjectRoleSearchType,
-	}
-
-	// as resourceowner is not always provided, it has to be separately
-	if resourceOwner != "" {
-		projectStateQuery[eventstore.FieldTypeResourceOwner] = resourceOwner
-		roleQuery[eventstore.FieldTypeResourceOwner] = resourceOwner
-	}
-
-	results, err := c.eventstore.Search(
-		ctx,
-		projectStateQuery,
-		grantedOrgQuery,
-		roleQuery,
-	)
-	if err != nil {
-		return "", nil, err
-	}
-
-	var (
-		existsProject                bool
-		existingProjectResourceOwner string
-		existsGrantedOrg             bool
-	)
-
-	for _, result := range results {
-		switch result.Object.Type {
-		case project.ProjectRoleSearchType:
-			var role string
-			err := result.Value.Unmarshal(&role)
-			if err != nil {
-				return "", nil, err
-			}
-			existingRoleKeys = append(existingRoleKeys, role)
-		case org.OrgSearchType:
-			var state domain.OrgState
-			err := result.Value.Unmarshal(&state)
-			if err != nil {
-				return "", nil, err
-			}
-			existsGrantedOrg = state.Valid() && state != domain.OrgStateRemoved
-		case project.ProjectSearchType:
-			var state domain.ProjectState
-			err := result.Value.Unmarshal(&state)
-			if err != nil {
-				return "", nil, err
-			}
-			existsProject = state.Valid() && state != domain.ProjectStateRemoved
-			existingProjectResourceOwner = result.Aggregate.ResourceOwner
-		}
-	}
-
-	if !existsProject {
-		return "", nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
-	}
-	if !existsGrantedOrg {
-		return "", nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
-	}
-	return existingProjectResourceOwner, existingRoleKeys, nil
+	return preConditions.ProjectResourceOwner, nil
 }
