@@ -27,11 +27,10 @@ func (m *Migrator) Execute(ctx context.Context) error {
 		return err
 	}
 
-	migrator, err := rivermigrate.New(m.driver, nil)
+	migrator, err := rivermigrate.New(m.driver, &rivermigrate.Config{Schema: schema})
 	if err != nil {
 		return err
 	}
-	ctx = WithQueue(ctx)
 	_, err = migrator.Migrate(ctx, rivermigrate.DirectionUp, nil)
 	return err
 
