@@ -40,6 +40,7 @@ func NewQueue(config *Config) (_ *Queue, err error) {
 			Queues:     make(map[string]river.QueueConfig),
 			JobTimeout: -1,
 			Middleware: middleware,
+			Schema:     schema,
 		},
 	}, nil
 }
