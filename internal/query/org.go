@@ -8,13 +8,10 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	es "github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -134,10 +131,14 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		}
 	}()
 
-	if !authz.GetInstance(ctx).Features().ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgByID) {
-		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
+	if !shouldTriggerBulk {
+		return q.orgFromProjection(ctx, id)
 	}
 
+	return q.orgFromEventstore(ctx, id)
+}
+
+func (q *Queries) orgFromEventstore(ctx context.Context, id string) (*Org, error) {
 	foundOrg := readmodel.NewOrg(id)
 	eventCount, err := q.eventStoreV4.Query(
 		ctx,
@@ -168,17 +169,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	}, nil
 }
 
-func (q *Queries) oldOrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	if shouldTriggerBulk {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
-		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		traceSpan.EndWithError(err)
-	}
-
+func (q *Queries) orgFromProjection(ctx context.Context, id string) (org *Org, err error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnID.identifier():         id,

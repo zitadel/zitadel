@@ -2,7 +2,6 @@ package feature
 
 import (
 	"net/url"
-	"slices"
 )
 
 //go:generate enumer -type Key -transform snake -trimprefix Key
@@ -16,6 +15,7 @@ const (
 	KeyUserSchema
 	KeyTokenExchange
 	KeyActionsDeprecated
+	// This key is kept for backwards compatibility, do not use in new code.
 	KeyImprovedPerformance
 	KeyWebKey
 	KeyDebugOIDCParentError
@@ -41,34 +41,22 @@ const (
 )
 
 type Features struct {
-	LoginDefaultOrg                 bool                      `json:"login_default_org,omitempty"`
-	TriggerIntrospectionProjections bool                      `json:"trigger_introspection_projections,omitempty"`
-	LegacyIntrospection             bool                      `json:"legacy_introspection,omitempty"`
-	UserSchema                      bool                      `json:"user_schema,omitempty"`
-	TokenExchange                   bool                      `json:"token_exchange,omitempty"`
-	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
-	WebKey                          bool                      `json:"web_key,omitempty"`
-	DebugOIDCParentError            bool                      `json:"debug_oidc_parent_error,omitempty"`
-	OIDCSingleV1SessionTermination  bool                      `json:"oidc_single_v1_session_termination,omitempty"`
-	DisableUserTokenEvent           bool                      `json:"disable_user_token_event,omitempty"`
-	EnableBackChannelLogout         bool                      `json:"enable_back_channel_logout,omitempty"`
-	LoginV2                         LoginV2                   `json:"login_v2,omitempty"`
-	PermissionCheckV2               bool                      `json:"permission_check_v2,omitempty"`
-	ConsoleUseV2UserApi             bool                      `json:"console_use_v2_user_api,omitempty"`
+	LoginDefaultOrg                 bool    `json:"login_default_org,omitempty"`
+	TriggerIntrospectionProjections bool    `json:"trigger_introspection_projections,omitempty"`
+	LegacyIntrospection             bool    `json:"legacy_introspection,omitempty"`
+	UserSchema                      bool    `json:"user_schema,omitempty"`
+	TokenExchange                   bool    `json:"token_exchange,omitempty"`
+	WebKey                          bool    `json:"web_key,omitempty"`
+	DebugOIDCParentError            bool    `json:"debug_oidc_parent_error,omitempty"`
+	OIDCSingleV1SessionTermination  bool    `json:"oidc_single_v1_session_termination,omitempty"`
+	DisableUserTokenEvent           bool    `json:"disable_user_token_event,omitempty"`
+	EnableBackChannelLogout         bool    `json:"enable_back_channel_logout,omitempty"`
+	LoginV2                         LoginV2 `json:"login_v2,omitempty"`
+	PermissionCheckV2               bool    `json:"permission_check_v2,omitempty"`
+	ConsoleUseV2UserApi             bool    `json:"console_use_v2_user_api,omitempty"`
 }
 
 /* Note: do not generate the stringer or enumer for this type, is it breaks existing events */
-
-type ImprovedPerformanceType int32
-
-const (
-	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
-	ImprovedPerformanceTypeOrgByID
-)
-
-func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {
-	return slices.Contains(f.ImprovedPerformance, typ)
-}
 
 type LoginV2 struct {
 	Required bool     `json:"required,omitempty"`

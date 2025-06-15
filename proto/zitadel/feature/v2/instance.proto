@@ -123,8 +123,8 @@ message GetInstanceFeaturesRequest {
 }
 
 message GetInstanceFeaturesResponse {
-  reserved 7;
-  reserved "actions";
+  reserved 7, 8;
+  reserved "actions", "improved_performance";
   zitadel.object.v2.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -158,13 +158,6 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
-    }
-  ];
-
-  ImprovedPerformanceFeatureFlag improved_performance = 8 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "[1]";
-      description: "Improves performance of specified execution paths.";
     }
   ];
 

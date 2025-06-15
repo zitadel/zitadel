@@ -44,8 +44,6 @@ func (m *InstanceFeaturesReadModel) Reduce() (err error) {
 			err = reduceInstanceFeatureSet(m.instance, e)
 		case *feature_v2.SetEvent[*feature.LoginV2]:
 			err = reduceInstanceFeatureSet(m.instance, e)
-		case *feature_v2.SetEvent[[]feature.ImprovedPerformanceType]:
-			err = reduceInstanceFeatureSet(m.instance, e)
 		}
 		if err != nil {
 			return err
@@ -67,7 +65,6 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
-			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
@@ -97,7 +94,6 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.LegacyIntrospection = m.system.LegacyIntrospection
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
-	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
 	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
 	m.instance.EnableBackChannelLogout = m.system.EnableBackChannelLogout
@@ -124,8 +120,6 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
 		features.TokenExchange.set(level, event.Value)
-	case feature.KeyImprovedPerformance:
-		features.ImprovedPerformance.set(level, event.Value)
 	case feature.KeyWebKey:
 		features.WebKey.set(level, event.Value)
 	case feature.KeyDebugOIDCParentError:
