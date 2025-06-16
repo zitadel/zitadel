@@ -7,6 +7,7 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
+	"github.com/riverqueue/river/rivertype"
 	"github.com/robfig/cron/v3"
 	"github.com/zitadel/logging"
 
@@ -24,18 +25,16 @@ type Queue struct {
 }
 
 type Config struct {
-	Client       *database.DB         `mapstructure:"-"` // mapstructure is needed if we would like to use viper to configure the queue
-	PeriodicJobs []*river.PeriodicJob `mapstructure:"-"` // mapstructure is needed if we would like to use viper to configure the queue
+	Client *database.DB `mapstructure:"-"` // mapstructure is needed if we would like to use viper to configure the queue
 }
 
 func NewQueue(config *Config) (_ *Queue, err error) {
 	return &Queue{
 		driver: riverpgxv5.New(config.Client.Pool),
 		config: &river.Config{
-			Workers:      river.NewWorkers(),
-			Queues:       make(map[string]river.QueueConfig),
-			JobTimeout:   -1,
-			PeriodicJobs: config.PeriodicJobs,
+			Workers:    river.NewWorkers(),
+			Queues:     make(map[string]river.QueueConfig),
+			JobTimeout: -1,
 		},
 	}, nil
 }
@@ -71,21 +70,24 @@ func (q *Queue) AddWorkers(w ...Worker) {
 	}
 }
 
-func (q *Queue) SetPeriodicJob(schedule cron.Schedule, jobArgs river.JobArgs) (err error) {
+func (q *Queue) AddPeriodicJob(schedule cron.Schedule, jobArgs river.JobArgs, opts ...InsertOpt) (handle rivertype.PeriodicJobHandle) {
 	if q == nil {
 		logging.Info("skip adding periodic job because queue is not set")
 		return
 	}
-	q.config.PeriodicJobs = append(q.config.PeriodicJobs,
+	options := new(river.InsertOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+	return q.client.PeriodicJobs().Add(
 		river.NewPeriodicJob(
 			schedule,
 			func() (river.JobArgs, *river.InsertOpts) {
-				return jobArgs, nil
+				return jobArgs, options
 			},
 			nil,
 		),
 	)
-	return nil
 }
 
 type InsertOpt func(*river.InsertOpts)

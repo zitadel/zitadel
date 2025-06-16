@@ -3,19 +3,15 @@ package serviceping
 import (
 	"context"
 	"errors"
-	"fmt"
+	"net/http"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/muhlemmer/gu"
 	"github.com/riverqueue/river"
+	"github.com/robfig/cron/v3"
 	"github.com/zitadel/logging"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/v2/system"
@@ -53,23 +49,6 @@ type Queries interface {
 
 type Queue interface {
 	Insert(ctx context.Context, args river.JobArgs, opts ...queue.InsertOpt) error
-}
-
-func NewWorker(
-	reportClient analytics.TelemetryServiceClient,
-	queries *query.Queries,
-	q *queue.Queue,
-	config *Config,
-	systemID string,
-) *Worker {
-	return &Worker{
-		reportClient: reportClient,
-		db:           queries,
-		queue:        q,
-		config:       config,
-		systemID:     systemID,
-		version:      build.Version(),
-	}
 }
 
 // Register implements the [queue.Worker] interface.
@@ -164,24 +143,24 @@ func (w *Worker) reportResourceCounts(ctx context.Context, reportID string) erro
 }
 
 func (w *Worker) handleClientError(err error) error {
-	switch status.Code(err) {
-	case codes.OK:
-		return nil
-	case codes.InvalidArgument,
-		codes.NotFound,
-		codes.Unimplemented,
-		codes.AlreadyExists,
-		codes.FailedPrecondition:
+	telemetryError := new(TelemetryError)
+	if !errors.As(err, &telemetryError) {
+		// If the error is not a TelemetryError, we can assume that it is a transient error
+		// and can be retried by the queue.
+		return err
+	}
+	switch telemetryError.StatusCode {
+	case http.StatusBadRequest,
+		http.StatusNotFound,
+		http.StatusNotImplemented,
+		http.StatusConflict,
+		http.StatusPreconditionFailed:
 		// In case of these errors, we can assume that a retry does not make sense,
 		// so we can cancel the job.
 		return river.JobCancel(err)
-	case codes.Canceled,
-		codes.DeadlineExceeded,
-		codes.ResourceExhausted,
-		codes.Unavailable:
-		// These errors are typically transient and can be retried.
-		return err
 	default:
+		// As of now we assume that all other errors are transient and can be retried.
+		// So we just return the error, which will be handled by the queue as a failed attempt.
 		return err
 	}
 }
@@ -232,7 +211,7 @@ func (s *systemIDReducer) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func StartWorker(
+func Register(
 	ctx context.Context,
 	q *queue.Queue,
 	queries *query.Queries,
@@ -244,36 +223,27 @@ func StartWorker(
 	if err != nil {
 		return err
 	}
-	q.AddWorkers(NewWorker(
-		&mockReportClient{},
-		queries,
-		q,
-		config,
-		systemID.id,
-	))
+	q.AddWorkers(&Worker{
+		reportClient: NewClient(config),
+		db:           queries,
+		queue:        q,
+		config:       config,
+		systemID:     systemID.id,
+		version:      build.Version(),
+	})
 	return nil
 }
 
-type mockReportClient struct {
-	err error
-}
-
-func (m mockReportClient) ReportBaseInformation(ctx context.Context, in *analytics.ReportBaseInformationRequest, opts ...grpc.CallOption) (*analytics.ReportBaseInformationResponse, error) {
-	if m.err != nil {
-		return nil, m.err
-	}
-	reportID, err := id.SonyFlakeGenerator().Next()
+func Start(config *Config, q *queue.Queue) error {
+	schedule, err := cron.ParseStandard(config.Interval)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &analytics.ReportBaseInformationResponse{
-		ReportId: reportID,
-	}, nil
-}
-
-func (m mockReportClient) ReportResourceCounts(ctx context.Context, in *analytics.ReportResourceCountsRequest, opts ...grpc.CallOption) (*analytics.ReportResourceCountsResponse, error) {
-	fmt.Println(proto.MarshalTextString(in))
-	return &analytics.ReportResourceCountsResponse{
-		ReportId: in.GetReportId(),
-	}, nil
+	q.AddPeriodicJob(
+		schedule,
+		&ServicePingReport{},
+		queue.WithQueueName(QueueName),
+		queue.WithMaxAttempts(config.MaxAttempts),
+	)
+	return nil
 }

@@ -1201,13 +1201,20 @@ AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 # It's enabled by default, but you can opt out either completely or by disabling specific telemetry data.
 ServicePing:
   # By setting Enabled to false, the service ping is disabled completely.
-  Enabled: true # ZITADEL_SERVICEPING_ENABLED
+  # TODO: change to enabled by default, but as the corresponding endpoint is not yet available, we keep it disabled for now.
+  Enabled: false # ZITADEL_SERVICEPING_ENABLED
   # The gRPC endpoint to which the reports are sent.
   Endpoint: "zitadel.cloud:433" # ZITADEL_SERVICEPING_ENDPOINT
   # Interval at which the service ping is sent to the endpoint.
   # The interval is in the format of a cron expression.
   # By default, it is set to every day at midnight:
   Interval: "0 0 * * *" # ZITADEL_SERVICEPING_INTERVAL
+  # Maximum number of attempts for each individual report to be sent.
+  # If one report fails, it will be retried up to this number of times.
+  # Other reports will still be handled in parallel and have their own retry count.
+  # This means if the base information only succeeded after 3 attempts,
+  # the resource count still has 5 attempts to be sent.
+  MaxAttempts: 5 # ZITADEL_SERVICEPING_MAXATTEMPTS
   # The following features can be enabled or disabled individually.
   # By default, all features are enabled.
   # Note that if the service ping is enabled, base information about the system is always sent.
