@@ -15,8 +15,8 @@ jobs:
         with:
           install: true
       - run: docker buildx du
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - name: Build via Make
         run: make login-lint
-        env:
-          ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: docker buildx du
