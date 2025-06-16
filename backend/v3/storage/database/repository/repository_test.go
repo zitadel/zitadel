@@ -32,8 +32,7 @@ func runTests(m *testing.M) int {
 }
 
 func newEmbeededDB(ctx context.Context) (pool database.PoolTest, stop func(), err error) {
-	var connector database.Connector
-	connector, stop, err = embedded.StartEmbedded()
+	connector, stop, err := embedded.StartEmbedded()
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start embedded postgres: %w", err)
 	}
