@@ -8,10 +8,12 @@ import (
 	"github.com/riverqueue/river/riverdriver"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/riverqueue/river/rivertype"
+	"github.com/riverqueue/rivercontrib/otelriver"
 	"github.com/robfig/cron/v3"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 // Queue abstracts the underlying queuing library
@@ -29,12 +31,16 @@ type Config struct {
 }
 
 func NewQueue(config *Config) (_ *Queue, err error) {
+	middleware := []rivertype.Middleware{otelriver.NewMiddleware(&otelriver.MiddlewareConfig{
+		MeterProvider: metrics.GetMetricsProvider(),
+	})}
 	return &Queue{
 		driver: riverpgxv5.New(config.Client.Pool),
 		config: &river.Config{
 			Workers:    river.NewWorkers(),
 			Queues:     make(map[string]river.QueueConfig),
 			JobTimeout: -1,
+			Middleware: middleware,
 		},
 	}, nil
 }
