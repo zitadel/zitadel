@@ -55,6 +55,7 @@ enum AppState {
     APP_STATE_UNSPECIFIED = 0;
     APP_STATE_ACTIVE = 1;
     APP_STATE_INACTIVE = 2;
+    APP_STATE_REMOVED = 3;
 }
 
 enum AppSorting {

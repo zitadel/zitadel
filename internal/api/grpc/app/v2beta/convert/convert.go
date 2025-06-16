@@ -85,6 +85,10 @@ func appStateToPb(state domain.AppState) app.AppState {
 		return app.AppState_APP_STATE_ACTIVE
 	case domain.AppStateInactive:
 		return app.AppState_APP_STATE_INACTIVE
+	case domain.AppStateRemoved:
+		return app.AppState_APP_STATE_REMOVED
+	case domain.AppStateUnspecified:
+		fallthrough
 	default:
 		return app.AppState_APP_STATE_UNSPECIFIED
 	}

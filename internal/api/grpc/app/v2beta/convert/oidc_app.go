@@ -19,7 +19,7 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApp
 			AggregateID: projectID,
 		},
 		AppName:                  name,
-		OIDCVersion:              oidcVersionToDomain(req.GetVersion()),
+		OIDCVersion:              domain.OIDCVersionV1,
 		RedirectUris:             req.GetRedirectUris(),
 		ResponseTypes:            oidcResponseTypesToDomain(req.GetResponseTypes()),
 		GrantTypes:               oidcGrantTypesToDomain(req.GetGrantTypes()),
@@ -70,14 +70,6 @@ func PatchOIDCAppConfigRequestToDomain(appID, projectID string, app *app.PatchOI
 	}, nil
 }
 
-func oidcVersionToDomain(version app.OIDCVersion) domain.OIDCVersion {
-	switch version {
-	case app.OIDCVersion_OIDC_VERSION_1_0:
-		return domain.OIDCVersionV1
-	}
-	return domain.OIDCVersionV1
-}
-
 func oidcResponseTypesToDomain(responseTypes []app.OIDCResponseType) []domain.OIDCResponseType {
 	if len(responseTypes) == 0 {
 		return []domain.OIDCResponseType{domain.OIDCResponseTypeCode}
@@ -85,6 +77,8 @@ func oidcResponseTypesToDomain(responseTypes []app.OIDCResponseType) []domain.OI
 	oidcResponseTypes := make([]domain.OIDCResponseType, len(responseTypes))
 	for i, responseType := range responseTypes {
 		switch responseType {
+		case app.OIDCResponseType_OIDC_RESPONSE_TYPE_UNSPECIFIED:
+			oidcResponseTypes[i] = domain.OIDCResponseTypeUnspecified
 		case app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE:
 			oidcResponseTypes[i] = domain.OIDCResponseTypeCode
 		case app.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN:
@@ -175,7 +169,7 @@ func appOIDCConfigToPb(oidcApp *query.OIDCApp) *app.Application_OidcConfig {
 			ClientId:                 oidcApp.ClientID,
 			AuthMethodType:           oidcAuthMethodTypeToPb(oidcApp.AuthMethodType),
 			PostLogoutRedirectUris:   oidcApp.PostLogoutRedirectURIs,
-			Version:                  oidcVersionToPb(domain.OIDCVersion(oidcApp.Version)),
+			Version:                  app.OIDCVersion_OIDC_VERSION_1_0,
 			NoneCompliant:            len(oidcApp.ComplianceProblems) != 0,
 			ComplianceProblems:       ComplianceProblemsToLocalizedMessages(oidcApp.ComplianceProblems),
 			DevMode:                  oidcApp.IsDevMode,
@@ -197,6 +191,8 @@ func oidcResponseTypesFromModel(responseTypes []domain.OIDCResponseType) []app.O
 	oidcResponseTypes := make([]app.OIDCResponseType, len(responseTypes))
 	for i, responseType := range responseTypes {
 		switch responseType {
+		case domain.OIDCResponseTypeUnspecified:
+			oidcResponseTypes[i] = app.OIDCResponseType_OIDC_RESPONSE_TYPE_UNSPECIFIED
 		case domain.OIDCResponseTypeCode:
 			oidcResponseTypes[i] = app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE
 		case domain.OIDCResponseTypeIDToken:
@@ -253,14 +249,6 @@ func oidcAuthMethodTypeToPb(authType domain.OIDCAuthMethodType) app.OIDCAuthMeth
 	default:
 		return app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC
 	}
-}
-
-func oidcVersionToPb(version domain.OIDCVersion) app.OIDCVersion {
-	switch version {
-	case domain.OIDCVersionV1:
-		return app.OIDCVersion_OIDC_VERSION_1_0
-	}
-	return app.OIDCVersion_OIDC_VERSION_1_0
 }
 
 func oidcTokenTypeToPb(tokenType domain.OIDCTokenType) app.OIDCTokenType {
