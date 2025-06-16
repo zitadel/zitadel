@@ -17,7 +17,7 @@ import (
 func TestCreateInstance(t *testing.T) {
 	tests := []struct {
 		name     string
-		testFunc func() *domain.Instance
+		testFunc func(ctx context.Context, t *testing.T) *domain.Instance
 		instance domain.Instance
 		err      error
 	}{
@@ -39,7 +39,7 @@ func TestCreateInstance(t *testing.T) {
 			}(),
 		},
 		{
-			name: "create instance wihtout name",
+			name: "create instance without name",
 			instance: func() domain.Instance {
 				instanceId := gofakeit.Name()
 				// instanceName := gofakeit.Name()
@@ -58,12 +58,11 @@ func TestCreateInstance(t *testing.T) {
 		},
 		{
 			name: "adding same instance twice",
-			testFunc: func() *domain.Instance {
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
 				instanceRepo := repository.InstanceRepository(pool)
 				instanceId := gofakeit.Name()
 				instanceName := gofakeit.Name()
 
-				ctx := context.Background()
 				inst := domain.Instance{
 					ID:              instanceId,
 					Name:            instanceName,
@@ -105,7 +104,7 @@ func TestCreateInstance(t *testing.T) {
 
 			var instance *domain.Instance
 			if tt.testFunc != nil {
-				instance = tt.testFunc()
+				instance = tt.testFunc(ctx, t)
 			} else {
 				instance = &tt.instance
 			}
@@ -142,17 +141,16 @@ func TestCreateInstance(t *testing.T) {
 func TestUpdateInstance(t *testing.T) {
 	tests := []struct {
 		name         string
-		testFunc     func() *domain.Instance
+		testFunc     func(ctx context.Context, t *testing.T) *domain.Instance
 		rowsAffected int64
 	}{
 		{
 			name: "happy path",
-			testFunc: func() *domain.Instance {
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
 				instanceRepo := repository.InstanceRepository(pool)
 				instanceId := gofakeit.Name()
 				instanceName := gofakeit.Name()
 
-				ctx := context.Background()
 				inst := domain.Instance{
 					ID:              instanceId,
 					Name:            instanceName,
@@ -171,8 +169,39 @@ func TestUpdateInstance(t *testing.T) {
 			rowsAffected: 1,
 		},
 		{
+			name: "update deleted instance",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
+				instanceRepo := repository.InstanceRepository(pool)
+				instanceId := gofakeit.Name()
+				instanceName := gofakeit.Name()
+
+				inst := domain.Instance{
+					ID:              instanceId,
+					Name:            instanceName,
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+
+				// create instance
+				err := instanceRepo.Create(ctx, &inst)
+				require.NoError(t, err)
+
+				// delete instance
+				err = instanceRepo.Delete(ctx,
+					instanceRepo.IDCondition(inst.ID),
+				)
+				require.NoError(t, err)
+
+				return &inst
+			},
+			rowsAffected: 0,
+		},
+		{
 			name: "update non existent instance",
-			testFunc: func() *domain.Instance {
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
 				instanceId := gofakeit.Name()
 
 				inst := domain.Instance{
@@ -185,13 +214,13 @@ func TestUpdateInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			beforeUpdate := time.Now()
-
 			ctx := context.Background()
 			instanceRepo := repository.InstanceRepository(pool)
 
-			instance := tt.testFunc()
+			instance := tt.testFunc(ctx, t)
 
+			// had to minus 1 second due to a race conditon
+			beforeUpdate := time.Now().Add(-time.Second)
 			// update name
 			newName := "new_" + instance.Name
 			rowsAffected, err := instanceRepo.Update(ctx,
@@ -223,10 +252,9 @@ func TestUpdateInstance(t *testing.T) {
 func TestGetInstance(t *testing.T) {
 	instanceRepo := repository.InstanceRepository(pool)
 	type test struct {
-		name               string
-		testFunc           func() *domain.Instance
-		conditionClauses   []database.Condition
-		noInstanceReturned bool
+		name             string
+		testFunc         func(ctx context.Context, t *testing.T) *domain.Instance
+		conditionClauses []database.Condition
 	}
 
 	tests := []test{
@@ -234,10 +262,9 @@ func TestGetInstance(t *testing.T) {
 			instanceId := gofakeit.Name()
 			return test{
 				name: "happy path get using id",
-				testFunc: func() *domain.Instance {
+				testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
 					instanceName := gofakeit.Name()
 
-					ctx := context.Background()
 					inst := domain.Instance{
 						ID:              instanceId,
 						Name:            instanceName,
@@ -260,10 +287,9 @@ func TestGetInstance(t *testing.T) {
 			instanceName := gofakeit.Name()
 			return test{
 				name: "happy path get using name",
-				testFunc: func() *domain.Instance {
+				testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
 					instanceId := gofakeit.Name()
 
-					ctx := context.Background()
 					inst := domain.Instance{
 						ID:              instanceId,
 						Name:            instanceName,
@@ -284,16 +310,15 @@ func TestGetInstance(t *testing.T) {
 		}(),
 		{
 			name: "get non existent instance",
-			testFunc: func() *domain.Instance {
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
 				instanceId := gofakeit.Name()
 
-				inst := domain.Instance{
+				_ = domain.Instance{
 					ID: instanceId,
 				}
-				return &inst
+				return nil
 			},
-			conditionClauses:   []database.Condition{instanceRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name")},
-			noInstanceReturned: true,
+			conditionClauses: []database.Condition{instanceRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name")},
 		},
 	}
 	for _, tt := range tests {
@@ -303,7 +328,7 @@ func TestGetInstance(t *testing.T) {
 
 			var instance *domain.Instance
 			if tt.testFunc != nil {
-				instance = tt.testFunc()
+				instance = tt.testFunc(ctx, t)
 			}
 
 			// check instance values
@@ -311,8 +336,8 @@ func TestGetInstance(t *testing.T) {
 				tt.conditionClauses...,
 			)
 			require.NoError(t, err)
-			if tt.noInstanceReturned {
-				require.Nil(t, returnedInstance)
+			if instance == nil {
+				require.Nil(t, instance, returnedInstance)
 				return
 			}
 
@@ -329,21 +354,21 @@ func TestGetInstance(t *testing.T) {
 }
 
 func TestListInstance(t *testing.T) {
+	ctx := context.Background()
+	pool, stop, err := newEmbeededDB(ctx)
+	require.NoError(t, err)
+	defer stop()
+
 	type test struct {
 		name               string
-		testFunc           func() ([]*domain.Instance, database.PoolTest, func())
+		testFunc           func(ctx context.Context, t *testing.T) []*domain.Instance
 		conditionClauses   []database.Condition
 		noInstanceReturned bool
 	}
 	tests := []test{
 		{
 			name: "happy path single instance no filter",
-			testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
-				ctx := context.Background()
-				// create new db to make sure no instances exist
-				pool, stop, err := newEmbeededDB(ctx)
-				require.NoError(t, err)
-
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.Instance {
 				instanceRepo := repository.InstanceRepository(pool)
 				noOfInstances := 1
 				instances := make([]*domain.Instance, noOfInstances)
@@ -366,17 +391,12 @@ func TestListInstance(t *testing.T) {
 					instances[i] = &inst
 				}
 
-				return instances, pool, stop
+				return instances
 			},
 		},
 		{
 			name: "happy path multiple instance no filter",
-			testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
-				ctx := context.Background()
-				// create new db to make sure no instances exist
-				pool, stop, err := newEmbeededDB(ctx)
-				require.NoError(t, err)
-
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.Instance {
 				instanceRepo := repository.InstanceRepository(pool)
 				noOfInstances := 5
 				instances := make([]*domain.Instance, noOfInstances)
@@ -399,7 +419,7 @@ func TestListInstance(t *testing.T) {
 					instances[i] = &inst
 				}
 
-				return instances, pool, stop
+				return instances
 			},
 		},
 		func() test {
@@ -407,9 +427,7 @@ func TestListInstance(t *testing.T) {
 			instanceId := gofakeit.Name()
 			return test{
 				name: "instance filter on id",
-				testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
-					ctx := context.Background()
-
+				testFunc: func(ctx context.Context, t *testing.T) []*domain.Instance {
 					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
@@ -431,7 +449,7 @@ func TestListInstance(t *testing.T) {
 						instances[i] = &inst
 					}
 
-					return instances, nil, nil
+					return instances
 				},
 				conditionClauses: []database.Condition{instanceRepo.IDCondition(instanceId)},
 			}
@@ -441,9 +459,7 @@ func TestListInstance(t *testing.T) {
 			instanceName := gofakeit.Name()
 			return test{
 				name: "multiple instance filter on name",
-				testFunc: func() ([]*domain.Instance, database.PoolTest, func()) {
-					ctx := context.Background()
-
+				testFunc: func(ctx context.Context, t *testing.T) []*domain.Instance {
 					noOfInstances := 5
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
@@ -465,7 +481,7 @@ func TestListInstance(t *testing.T) {
 						instances[i] = &inst
 					}
 
-					return instances, nil, nil
+					return instances
 				},
 				conditionClauses: []database.Condition{instanceRepo.NameCondition(database.TextOperationEqual, instanceName)},
 			}
@@ -473,20 +489,13 @@ func TestListInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
+			// ctx := context.Background()
+			t.Cleanup(func() {
+				pool.Exec(ctx, "DELETE FROM zitadel.instances")
+			})
 
-			var instances []*domain.Instance
+			instances := tt.testFunc(ctx, t)
 
-			pool := pool
-			if tt.testFunc != nil {
-				var stop func()
-				var pool_ database.PoolTest
-				instances, pool_, stop = tt.testFunc()
-				if pool_ != nil {
-					pool = pool_
-					defer stop()
-				}
-			}
 			instanceRepo := repository.InstanceRepository(pool)
 
 			// check instance values
@@ -517,7 +526,7 @@ func TestListInstance(t *testing.T) {
 func TestDeleteInstance(t *testing.T) {
 	type test struct {
 		name             string
-		testFunc         func()
+		testFunc         func(ctx context.Context, t *testing.T)
 		conditionClauses database.Condition
 	}
 	tests := []test{
@@ -526,9 +535,7 @@ func TestDeleteInstance(t *testing.T) {
 			instanceId := gofakeit.Name()
 			return test{
 				name: "happy path delete single instance filter id",
-				testFunc: func() {
-					ctx := context.Background()
-
+				testFunc: func(ctx context.Context, t *testing.T) {
 					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
@@ -558,9 +565,7 @@ func TestDeleteInstance(t *testing.T) {
 			instanceName := gofakeit.Name()
 			return test{
 				name: "happy path delete single instance filter name",
-				testFunc: func() {
-					ctx := context.Background()
-
+				testFunc: func(ctx context.Context, t *testing.T) {
 					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
@@ -598,9 +603,7 @@ func TestDeleteInstance(t *testing.T) {
 			instanceName := gofakeit.Name()
 			return test{
 				name: "multiple instance filter on name",
-				testFunc: func() {
-					ctx := context.Background()
-
+				testFunc: func(ctx context.Context, t *testing.T) {
 					noOfInstances := 5
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
@@ -630,9 +633,7 @@ func TestDeleteInstance(t *testing.T) {
 			instanceName := gofakeit.Name()
 			return test{
 				name: "deleted already deleted instance",
-				testFunc: func() {
-					ctx := context.Background()
-
+				testFunc: func(ctx context.Context, t *testing.T) {
 					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
@@ -670,7 +671,7 @@ func TestDeleteInstance(t *testing.T) {
 			instanceRepo := repository.InstanceRepository(pool)
 
 			if tt.testFunc != nil {
-				tt.testFunc()
+				tt.testFunc(ctx, t)
 			}
 
 			// delete instance

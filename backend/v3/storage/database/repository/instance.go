@@ -53,8 +53,8 @@ func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*dom
 
 	// return only non deleted instances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
-	andCondition := database.And(opts...)
-	i.writeCondition(&builder, andCondition)
+	notDeletedCondition := database.And(opts...)
+	i.writeCondition(&builder, notDeletedCondition)
 
 	rows, err := i.client.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
@@ -105,8 +105,11 @@ func (i instance) Update(ctx context.Context, condition database.Condition, chan
 	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.instances SET `)
+
+	// don't update deleted instances
+	conditions := []database.Condition{condition, database.IsNull(i.DeletedAtColumn())}
 	database.Changes(changes).Write(&builder)
-	i.writeCondition(&builder, condition)
+	i.writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
 
