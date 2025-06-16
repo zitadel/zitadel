@@ -6,9 +6,6 @@ group "default" {
 
 target "login-pnpm" {
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
-  output = ["type=docker"]
-  cache-from = ["type=gha,scope=login-pnpm"]
-  cache-to   = ["type=gha,scope=login-pnpm,ignore-error=true,mode=max"]
 }
 
 target "login-dev-base" {
@@ -16,9 +13,6 @@ target "login-dev-base" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  output = ["type=docker"]
-  cache-from = ["type=gha,scope=login-dev-base"]
-  cache-to   = ["type=gha,scope=login-dev-base,ignore-error=true,mode=max"]
 }
 
 variable "LOGIN_LINT_TAG" {
@@ -31,9 +25,6 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   tags = ["${LOGIN_LINT_TAG}"]
-  output = ["type=docker"]
-  cache-from = ["type=gha,scope=login-lint"]
-  cache-to   = ["type=gha,scope=login-lint,ignore-error=true,mode=max"]
 }
 
 variable "LOGIN_TEST_UNIT_TAG" {
@@ -83,10 +74,6 @@ target "core-mock" {
   contexts = {
     protos = "target:proto-files"
   }
-  output = [
-    "type=docker",
-    "type=cacheonly"
-  ]
   tags = ["${CORE_MOCK_TAG}"]
 }
 
@@ -99,10 +86,6 @@ target "login-test-integration" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  output = [
-    "type=docker",
-    "type=cacheonly"
-  ]
   tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
 }
 
@@ -115,10 +98,6 @@ target "login-test-acceptance" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  output = [
-    "type=docker",
-    "type=cacheonly"
-  ]
   tags = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
 }
 
@@ -133,8 +112,4 @@ target "login-standalone" {
     login-client = "target:login-client"
   }
   tags = ["${LOGIN_TAG}"]
-  output = [
-    "type=docker",
-    "type=cacheonly"
-  ]
 }
