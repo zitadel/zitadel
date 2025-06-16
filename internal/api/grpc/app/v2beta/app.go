@@ -38,7 +38,7 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 			return nil, err
 		}
 
-		oidcApp, err := s.command.AddOIDCApplication(ctx, oidcAppRequest, authz.GetCtxData(ctx).OrgID)
+		oidcApp, err := s.command.AddOIDCApplication(ctx, oidcAppRequest, "")
 		if err != nil {
 			return nil, err
 		}
