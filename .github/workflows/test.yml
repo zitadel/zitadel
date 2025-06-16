@@ -9,15 +9,13 @@ jobs:
     permissions:
       contents: "read"
     steps:
-      - uses: actions/checkout@v4
       - name: Set up persistent Buildx builder
         uses: docker/setup-buildx-action@v3
-        with:
-          install: true
-          use: true
       - run: docker buildx du
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v3
-      - name: Build via Make
+      - name: Build
+        uses: docker/bake-action@v6
+        with:
+          push: false
+      - name: Run
         run: make login-lint
       - run: docker buildx du

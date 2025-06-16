@@ -1,3 +1,13 @@
+group "default" {
+  targets = [
+    "login-test-lint",
+    "login-test-unit",
+    "core-mock",
+    "login-test-integration",
+    "login-test-acceptance",
+  ]
+}
+
 target "default" {
   cache-from = ["type=gha"]
   cache-to   = ["type=gha,ignore-error=true,mode=max"]
