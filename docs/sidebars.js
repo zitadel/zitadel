@@ -16,6 +16,7 @@ const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/
 const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
+const sidebar_api_app_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
 
 module.exports = {
   guides: [
@@ -837,6 +838,22 @@ module.exports = {
               },
               items: sidebar_api_instance_service_v2,
             },
+            {
+              type: "category",
+              label: "App (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Application Service API (Beta)",
+                slug: "/apis/resources/application_service_v2",
+                description:
+                    "This API lets you manage Zitadel applications (API, SAML, OIDC).\n"+
+                    "\n"+
+                    "The API offers generic endpoints that work for all app types (API, SAML, OIDC), "+
+                    "\n"+
+                    "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+              },
+              items: sidebar_api_app_v2,
+            },
           ],
         },
         {
@@ -901,7 +918,7 @@ module.exports = {
               },
               items: sidebar_api_system,
             },
-              "apis/migration_v1_to_v2"
+            "apis/migration_v1_to_v2"
           ],
         },
         {
