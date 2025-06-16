@@ -37,7 +37,10 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   tags = ["${LOGIN_LINT_TAG}"]
-  output = ["type=docker"]
+  output = [
+    "type=docker",
+    "type=cacheonly"
+  ]
   cache-from = ["type=gha,scope=image"]
   cache-to   = ["type=gha,scope=image,ignore-error=true,mode=max"]
 }
@@ -76,7 +79,10 @@ target "core-mock" {
   contexts = {
     protos = "target:proto-files"
   }
-  output = ["type=docker"]
+  output = [
+    "type=docker",
+    "type=cacheonly"
+  ]
   tags = ["${CORE_MOCK_TAG}"]
 }
 
@@ -89,7 +95,10 @@ target "login-test-integration" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  output = ["type=docker"]
+  output = [
+    "type=docker",
+    "type=cacheonly"
+  ]
   tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
 }
 
@@ -102,7 +111,10 @@ target "login-test-acceptance" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  output = ["type=docker"]
+  output = [
+    "type=docker",
+    "type=cacheonly"
+  ]
   tags = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
 }
 
@@ -117,5 +129,8 @@ target "login-standalone" {
     login-client = "target:login-client"
   }
   tags = ["${LOGIN_TAG}"]
-  output = ["type=docker"]
+  output = [
+    "type=docker",
+    "type=cacheonly"
+  ]
 }
