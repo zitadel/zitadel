@@ -219,8 +219,7 @@ func TestUpdateInstance(t *testing.T) {
 
 			instance := tt.testFunc(ctx, t)
 
-			// had to minus 1 second due to a race conditon
-			beforeUpdate := time.Now().Add(-time.Second)
+			beforeUpdate := time.Now()
 			// update name
 			newName := "new_" + instance.Name
 			rowsAffected, err := instanceRepo.Update(ctx,
@@ -491,6 +490,7 @@ func TestListInstance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// ctx := context.Background()
 			t.Cleanup(func() {
+				//nolint
 				pool.Exec(ctx, "DELETE FROM zitadel.instances")
 			})
 
