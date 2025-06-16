@@ -15,6 +15,6 @@ jobs:
         with:
           install: true
           use: true
-      - run: docker buildx du -v
+      - run: docker buildx du
       - name: Build via Make
         run: make login-lint
