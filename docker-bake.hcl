@@ -36,8 +36,10 @@ target "login-lint" {
   contexts = {
     login-dev-base = "target:login-dev-base"
   }
-  output = ["type=docker"]
   tags = ["${LOGIN_LINT_TAG}"]
+  output = ["type=docker"]
+  cache-from = ["type=gha,scope=image"]
+  cache-to   = ["type=gha,scope=image,ignore-error=true,mode=max"]
 }
 
 target "login-client" {
