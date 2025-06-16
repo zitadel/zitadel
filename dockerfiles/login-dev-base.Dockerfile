@@ -4,6 +4,6 @@ COPY \
   .npmrc \
   package.json \
   ./
-COPY apps/login/package.json ./apps/login/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --filter .
+    pnpm install --frozen-lockfile --workspace-root --filter .
+

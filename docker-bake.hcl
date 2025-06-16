@@ -20,7 +20,6 @@ variable "LOGIN_TEST_UNIT_TAG" {
 target "login-test-unit" {
   dockerfile = "dockerfiles/login-test-unit.Dockerfile"
   contexts = {
-    login-dev-base = "target:login-dev-base"
     login-client   = "target:login-client"
   }
   output = ["type=docker"]

@@ -268,6 +268,9 @@ importers:
         specifier: ^5.3.0
         version: 5.8.0
     devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.53.0
+        version: 1.53.0
       '@bufbuild/protocompile':
         specifier: ^0.0.1
         version: 0.0.1(@bufbuild/buf@1.53.0)
