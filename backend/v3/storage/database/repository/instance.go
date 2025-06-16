@@ -76,16 +76,16 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 			// constraint violation
 			if pgErr.Code == "23514" {
 				if pgErr.ConstraintName == "instances_name_check" {
-					return errors.New("instnace name not provided")
+					return errors.New("instance name not provided")
 				}
 				if pgErr.ConstraintName == "instances_id_check" {
-					return errors.New("instnace id not provided")
+					return errors.New("instance id not provided")
 				}
 			}
 			// duplicate
 			if pgErr.Code == "23505" {
 				if pgErr.ConstraintName == "instances_pkey" {
-					return errors.New("instnace id already exists")
+					return errors.New("instance id already exists")
 				}
 			}
 		}

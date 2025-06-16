@@ -88,16 +88,19 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 			// constraint violation
 			if pgErr.Code == "23514" {
 				if pgErr.ConstraintName == "organizations_name_check" {
-					return errors.New("instnace name not provided")
+					return errors.New("organization name not provided")
 				}
 				if pgErr.ConstraintName == "organizations_id_check" {
-					return errors.New("instnace id not provided")
+					return errors.New("organization id not provided")
+				}
+				if pgErr.ConstraintName == "organizations_instance_id_check" {
+					return errors.New("instance id not provided")
 				}
 			}
 			// duplicate
 			if pgErr.Code == "23505" {
 				if pgErr.ConstraintName == "organizations_pkey" {
-					return errors.New("instnace id already exists")
+					return errors.New("organization id already exists")
 				}
 			}
 		}
@@ -137,8 +140,13 @@ func (o org) Delete(ctx context.Context, condition database.Condition) error {
 // -------------------------------------------------------------
 
 // SetName implements [domain.organizationChanges].
-func (i org) SetName(name string) database.Change {
-	return database.NewChange(i.NameColumn(), name)
+func (o org) SetName(name string) database.Change {
+	return database.NewChange(o.NameColumn(), name)
+}
+
+// SetState implements [domain.organizationChanges].
+func (i org) SetState(state domain.State) database.Change {
+	return database.NewChange(i.StateColumn(), state)
 }
 
 // -------------------------------------------------------------

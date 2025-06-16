@@ -37,13 +37,11 @@ func TestServer_TestOrganizationAddReduces(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		activeState := domain.State[0]
-
 		// event org.added
 		require.NotNil(t, organization.ID)
 		require.Equal(t, orgName, organization.Name)
 		require.NotNil(t, organization.InstanceID)
-		require.Equal(t, activeState, organization.State)
+		require.Equal(t, domain.Active, organization.State)
 		assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
 		assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
 		require.Nil(t, organization.DeletedAt)
@@ -107,11 +105,9 @@ func TestServer_TestOrganizationDeactivateReduces(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		deactiveState := domain.State[1]
-
 		// event org.deactivate
 		require.Equal(t, orgName, organization.Name)
-		require.Equal(t, deactiveState, organization.State)
+		require.Equal(t, domain.Inactive, organization.State)
 		assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
 	}, retryDuration, tick)
 }
@@ -144,11 +140,9 @@ func TestServer_TestOrganizationActivateReduces(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		deactiveState := domain.State[1]
-
 		// event org.reactivate
 		require.Equal(t, orgName, organization.Name)
-		require.Equal(t, deactiveState, organization.State)
+		require.Equal(t, domain.Inactive, organization.State)
 		assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
 	}, retryDuration, tick)
 }

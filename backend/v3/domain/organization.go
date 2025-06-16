@@ -7,16 +7,18 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-var State []string = []string{
-	"ACTIVE",
-	"INACTIVE",
-}
+type State string
+
+const (
+	Active   State = "ACTIVE"
+	Inactive State = "INACTIVE"
+)
 
 type Organization struct {
 	ID         string     `json:"id,omitempty" db:"id"`
 	Name       string     `json:"name,omitempty" db:"name"`
 	InstanceID string     `json:"instance_id,omitempty" db:"instance_id"`
-	State      string     `json:"state,omitempty" db:"state"`
+	State      State      `json:"state,omitempty" db:"state"`
 	CreatedAt  time.Time  `json:"created_at,omitempty" db:"created_at"`
 	UpdatedAt  time.Time  `json:"updated_at,omitempty" db:"updated_at"`
 	DeletedAt  *time.Time `json:"deleted_at,omitempty" db:"deleted_at"`
@@ -52,6 +54,7 @@ type organizationConditions interface {
 type organizationChanges interface {
 	// SetName sets the name column.
 	SetName(name string) database.Change
+	SetState(state State) database.Change
 }
 
 // OrganizationRepository is the interface for the instance repository.

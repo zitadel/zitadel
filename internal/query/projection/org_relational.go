@@ -96,16 +96,13 @@ func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uYq5R", "reduce.wrong.event.type %s", org.OrgAddedEventType)
 	}
 
-	// need to convert old state (int) to new state (enum)
-	state := repoDomain.State[domain.OrgStateActive-1]
-
 	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnID, e.Aggregate().ID),
 			handler.NewCol(OrgColumnName, e.Name),
 			handler.NewCol(OrgColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(State, state),
+			handler.NewCol(State, repoDomain.Active),
 			handler.NewCol(CreatedAt, e.CreationDate()),
 			handler.NewCol(UpdatedAt, e.CreationDate()),
 		},
@@ -139,12 +136,10 @@ func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstor
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BApK5", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
 	}
 
-	// need to convert old state (int) to new state (enum)
-	state := repoDomain.State[domain.OrgStateInactive-1]
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(State, state),
+			handler.NewCol(State, repoDomain.Inactive),
 			handler.NewCol(UpdatedAt, e.CreationDate()),
 		},
 		[]handler.Condition{
