@@ -660,71 +660,7 @@ module.exports = {
         id: "apis/apis/index",
       },
       items: [
-        {
-          type: "category",
-          label: "V1",
-          collapsed: false,
-          link: {
-            type: "generated-index",
-            title: "APIs V1 (GA)",
-            slug: "/apis/services/",
-            description:
-              "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
-          },
-          items: [
-            {
-              type: "category",
-              label: "Authenticated User",
-              link: {
-                type: "generated-index",
-                title: "Auth API",
-                slug: "/apis/resources/auth",
-                description:
-                  "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
-              },
-              items: sidebar_api_auth,
-            },
-            {
-              type: "category",
-              label: "Organization Objects",
-              link: {
-                type: "generated-index",
-                title: "Management API",
-                slug: "/apis/resources/mgmt",
-                description:
-                  "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
-              },
-              items: sidebar_api_mgmt,
-            },
-            {
-              type: "category",
-              label: "Instance Objects",
-              link: {
-                type: "generated-index",
-                title: "Admin API",
-                slug: "/apis/resources/admin",
-                description:
-                  "This API is intended to configure and manage one ZITADEL instance itself.",
-              },
-              items: sidebar_api_admin,
-            },
-            {
-              type: "category",
-              label: "Instance Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "System API",
-                slug: "/apis/resources/system",
-                description:
-                  "This API is intended to manage the different ZITADEL instances within the system.\n" +
-                  "\n" +
-                  "Checkout the guide how to access the ZITADEL System API.",
-              },
-              items: sidebar_api_system,
-            },
-              "apis/migration_v1_to_v2"
-          ],
-        },
+
         {
           type: "category",
           label: "V2",
@@ -742,7 +678,7 @@ module.exports = {
                 title: "User Service API",
                 slug: "/apis/resources/user_service_v2",
                 description:
-                  "This API is intended to manage users in a ZITADEL instance.\n",
+                    "This API is intended to manage users in a ZITADEL instance.\n",
               },
               items: sidebar_api_user_service_v2,
             },
@@ -754,7 +690,7 @@ module.exports = {
                 title: "Session Service API",
                 slug: "/apis/resources/session_service_v2",
                 description:
-                  "This API is intended to manage sessions in a ZITADEL instance.\n",
+                    "This API is intended to manage sessions in a ZITADEL instance.\n",
               },
               items: sidebar_api_session_service_v2,
             },
@@ -766,7 +702,7 @@ module.exports = {
                 title: "OIDC Service API",
                 slug: "/apis/resources/oidc_service_v2",
                 description:
-                  "Get OIDC Auth Request details and create callback URLs.\n",
+                    "Get OIDC Auth Request details and create callback URLs.\n",
               },
               items: sidebar_api_oidc_service_v2,
             },
@@ -778,7 +714,7 @@ module.exports = {
                 title: "Settings Service API",
                 slug: "/apis/resources/settings_service_v2",
                 description:
-                  "This API is intended to manage settings in a ZITADEL instance.\n",
+                    "This API is intended to manage settings in a ZITADEL instance.\n",
               },
               items: sidebar_api_settings_service_v2,
             },
@@ -790,7 +726,7 @@ module.exports = {
                 title: "Feature Service API",
                 slug: "/apis/resources/feature_service_v2",
                 description:
-                  'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n',
+                    'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n',
               },
               items: sidebar_api_feature_service_v2,
             },
@@ -802,7 +738,7 @@ module.exports = {
                 title: "Organization Service API",
                 slug: "/apis/resources/org_service/v2",
                 description:
-                  "This API is intended to manage organizations for ZITADEL. \n",
+                    "This API is intended to manage organizations for ZITADEL. \n",
               },
               items: sidebar_api_org_service_v2,
             },
@@ -814,7 +750,7 @@ module.exports = {
                 title: "Organization Service beta API",
                 slug: "/apis/resources/org_service/v2beta",
                 description:
-                  "This API is intended to manage organizations for ZITADEL. \n",
+                    "This API is intended to manage organizations for ZITADEL. \n",
               },
               items: sidebar_api_org_service_v2beta,
             },
@@ -826,7 +762,7 @@ module.exports = {
                 title: "Identity Provider Service API",
                 slug: "/apis/resources/idp_service_v2",
                 description:
-                  "This API is intended to manage identity providers (IdPs) for ZITADEL.\n",
+                    "This API is intended to manage identity providers (IdPs) for ZITADEL.\n",
               },
               items: sidebar_api_idp_service_v2,
             },
@@ -897,10 +833,75 @@ module.exports = {
                     "\n" +
                     "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
                     "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
-                    ,
+                ,
               },
               items: sidebar_api_instance_service_v2,
             },
+          ],
+        },
+        {
+          type: "category",
+          label: "V1",
+          collapsed: false,
+          link: {
+            type: "generated-index",
+            title: "APIs V1 (GA)",
+            slug: "/apis/services/",
+            description:
+              "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
+          },
+          items: [
+            {
+              type: "category",
+              label: "Authenticated User",
+              link: {
+                type: "generated-index",
+                title: "Auth API",
+                slug: "/apis/resources/auth",
+                description:
+                  "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+              },
+              items: sidebar_api_auth,
+            },
+            {
+              type: "category",
+              label: "Organization Objects",
+              link: {
+                type: "generated-index",
+                title: "Management API",
+                slug: "/apis/resources/mgmt",
+                description:
+                  "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+              },
+              items: sidebar_api_mgmt,
+            },
+            {
+              type: "category",
+              label: "Instance Objects",
+              link: {
+                type: "generated-index",
+                title: "Admin API",
+                slug: "/apis/resources/admin",
+                description:
+                  "This API is intended to configure and manage one ZITADEL instance itself.",
+              },
+              items: sidebar_api_admin,
+            },
+            {
+              type: "category",
+              label: "Instance Lifecycle",
+              link: {
+                type: "generated-index",
+                title: "System API",
+                slug: "/apis/resources/system",
+                description:
+                  "This API is intended to manage the different ZITADEL instances within the system.\n" +
+                  "\n" +
+                  "Checkout the guide how to access the ZITADEL System API.",
+              },
+              items: sidebar_api_system,
+            },
+              "apis/migration_v1_to_v2"
           ],
         },
         {

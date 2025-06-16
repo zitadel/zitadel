@@ -87,6 +87,8 @@ x-zitadel-orgid: 1234567890
 
 ### Instances
 
+No major changes have been made to the organization requests.
+
 ### Organizations
 
 No major changes have been made to the organization requests.
@@ -134,3 +136,38 @@ For example, where you previously had to make two separate requests to see all p
 
 You can now use filters within the single ListProjects request if you need to differentiate between project types, such as filtering by projects you own versus those that have been granted to you.
 Update your code to use this new unified ListProjects endpoint.
+
+### Applications
+
+We have streamlined the creation and management of applications.
+In v1, each application type had its own unique endpoints.
+In v2, we have unified these into a single set of endpoints for all application types.
+
+The biggest change is in how you create/update applications.
+Instead of calling a specific endpoint for each type (e.g., CreateOidcApp, CreateSamlApp), you will now use a single CreateApp endpoint.
+
+To specify the type of application, you will include its specific configuration object within the request body.
+For example, to create a OIDC app, you will provide a oidc object in the request.
+All properties that are common to every application, such as name, are now top-level fields in the request body, consistent across all types.
+
+This approach simplifies client-side logic, as you no longer need to route requests to different endpoints.
+
+**v1 (Multiple, Type-Specific Endpoints):**
+
+```
+- AddOIDCApp
+- AddSAMLApp
+- AddAPIApp
+```
+
+**v2 (Single Endpoint with Type-Specific Body):**
+
+```
+- CreateApplication
+  - ProjectID
+  - Name
+  - Type
+    - OIDC
+    - SAML
+    - API
+```
