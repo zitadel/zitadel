@@ -23,7 +23,7 @@ func runTests(m *testing.M) int {
 	ctx := context.Background()
 	pool, stop, err = newEmbeededDB(ctx)
 	if err != nil {
-		log.Print(err)
+		log.Printf("error with embedded postgres database: %v", err)
 		return 1
 	}
 	defer stop()
