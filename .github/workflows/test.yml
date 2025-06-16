@@ -21,6 +21,22 @@ jobs:
           driver: docker-container
           use: true
       - run: ls -lah turbo.json   .npmrc   package.json   pnpm-lock.yaml   pnpm-workspace.yaml
+      - name: Cache
+        uses: actions/cache@v3
+        id: pnpm-store-cache
+        with:
+          path: pnpm-store
+          key: cache-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: inject cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          cache-map: |
+            {
+              "pnpm-store": "/pnpm/store"
+            }
+          skip-extraction: ${{ steps.pnpm-store-cache.outputs.cache-hit }}
       - name: Build
         uses: docker/bake-action@v6
         with:
