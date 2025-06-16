@@ -119,7 +119,7 @@ func (i instance) Delete(ctx context.Context, condition database.Condition) erro
 	if condition == nil {
 		return errors.New("Delete must contain a condition") // (otherwise ALL instances will be deleted)
 	}
-	builder := database.StatementBuilder{}
+	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
 	builder.AppendArgs(time.Now())
