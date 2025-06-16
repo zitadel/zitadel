@@ -33,7 +33,7 @@ login-help:
 	@echo "  clean-cache-keys        - Remove all cache keys."
 
 login-lint-build:
-	docker buildx bake --builder default --provenance=false --pull login-lint
+	docker buildx bake --provenance=false --pull login-lint
 
 login-lint-run:
 	docker run --rm $(LOGIN_LINT_TAG) lint
