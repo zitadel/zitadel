@@ -154,7 +154,7 @@ type Steps struct {
 	s55ExecutionHandlerStart                *ExecutionHandlerStart
 	s56IDPTemplate6SAMLFederatedLogout      *IDPTemplate6SAMLFederatedLogout
 	s57CreateResourceCounts                 *CreateResourceCounts
-	s58GenerateSystemID                     *GenerateSystemID
+	s59GenerateSystemID                     *GenerateSystemID
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

@@ -23,5 +23,5 @@ func (mig *GenerateSystemID) Execute(ctx context.Context, _ eventstore.Event) er
 }
 
 func (mig *GenerateSystemID) String() string {
-	return "58_generate_system_id"
+	return "59_generate_system_id"
 }
