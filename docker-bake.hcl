@@ -6,8 +6,8 @@ group "default" {
 
 target "login-pnpm" {
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
-  cache-from = ["type=gha,scope=lint"]
-  cache-to   = ["type=gha,scope=lint,ignore-error=true,mode=max"]
+  cache-from = ["type=gha,scope=login-pnpm"]
+  cache-to   = ["type=gha,scope=login-pnpm,ignore-error=true,mode=max"]
 }
 
 target "login-dev-base" {
@@ -15,8 +15,8 @@ target "login-dev-base" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  cache-from = ["type=gha,scope=lint"]
-  cache-to   = ["type=gha,scope=lint,ignore-error=true,mode=max"]
+  cache-from = ["type=gha,scope=login-dev-base"]
+  cache-to   = ["type=gha,scope=login-dev-base,ignore-error=true,mode=max"]
 }
 
 variable "LOGIN_TEST_UNIT_TAG" {
@@ -42,8 +42,8 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   tags = ["${LOGIN_LINT_TAG}"]
-  cache-from = ["type=gha,scope=lint"]
-  cache-to   = ["type=gha,scope=lint,ignore-error=true,mode=max"]
+  cache-from = ["type=gha,scope=login-lint"]
+  cache-to   = ["type=gha,scope=login-lint,ignore-error=true,mode=max"]
 }
 
 target "login-client" {
