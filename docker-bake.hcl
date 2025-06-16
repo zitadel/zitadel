@@ -1,16 +1,7 @@
 group "default" {
   targets = [
     "login-lint",
-    "login-test-unit",
-    "core-mock",
-    "login-test-integration",
-    "login-test-acceptance",
   ]
-}
-
-target "default" {
-  cache-from = ["type=gha"]
-  cache-to   = ["type=gha,ignore-error=true,mode=max"]
 }
 
 target "login-pnpm" {
@@ -33,6 +24,8 @@ target "login-test-unit" {
   contexts = {
     login-client   = "target:login-client"
   }
+  cache-from = ["type=gha,scope=lint"]
+  cache-to   = ["type=gha,scope=lint,ignore-error=true,mode=max"]
   output = ["type=docker"]
   tags = ["${LOGIN_TEST_UNIT_TAG}"]
 }
