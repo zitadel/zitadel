@@ -17,6 +17,7 @@ jobs:
           driver-opts: image=moby/buildkit:latest
           install: true
           use: true
+          name: gha-builder
       - run: docker buildx du
       - name: Build via Make
         run: make login-lint
