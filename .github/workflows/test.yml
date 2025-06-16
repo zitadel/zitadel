@@ -12,6 +12,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Normalize file mtimes
+        run: |
+          find . -type f -exec touch -d "2000-01-01T00:00:00Z" {} +
       - name: Set up persistent Buildx builder
         uses: docker/setup-buildx-action@v3
       - run: docker buildx du
