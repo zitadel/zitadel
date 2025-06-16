@@ -3,6 +3,7 @@ package serviceping
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"reflect"
 	"testing"
 	"time"
@@ -606,7 +607,7 @@ func TestWorker_Work(t *testing.T) {
 							},
 						},
 					}).Return(
-						nil, status.Error(codes.Unimplemented, "method not implemented"),
+						nil, &TelemetryError{StatusCode: http.StatusNotFound, Body: []byte("endpoint not found")},
 					)
 					return client
 				},
@@ -624,7 +625,7 @@ func TestWorker_Work(t *testing.T) {
 					},
 				},
 			},
-			wantErr: river.JobCancel(status.Error(codes.Unimplemented, "method not implemented")),
+			wantErr: river.JobCancel(&TelemetryError{StatusCode: http.StatusNotFound, Body: []byte("endpoint not found")}),
 		},
 		{
 			name: "report base information, no reports enabled, no error",
@@ -939,7 +940,7 @@ func TestWorker_Work(t *testing.T) {
 							},
 						},
 					}).Return(
-						nil, status.Error(codes.FailedPrecondition, "report too old"),
+						nil, &TelemetryError{StatusCode: http.StatusPreconditionFailed, Body: []byte("report too old")},
 					)
 					return client
 				},
@@ -964,7 +965,7 @@ func TestWorker_Work(t *testing.T) {
 					},
 				},
 			},
-			wantErr: river.JobCancel(status.Error(codes.FailedPrecondition, "report too old")),
+			wantErr: river.JobCancel(&TelemetryError{StatusCode: http.StatusPreconditionFailed, Body: []byte("report too old")}),
 		},
 		{
 			name: "report resource counts, success, no error",
