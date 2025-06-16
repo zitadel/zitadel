@@ -1,6 +1,6 @@
 target "defaults" {
   cache-from = ["type=gha,scope=image"]
-  cache-to   = ["type=gha,scope=image,mode=max"]
+  cache-to   = ["type=gha,scope=image,ignore-error=true,mode=max"]
 }
 
 target "login-pnpm" {

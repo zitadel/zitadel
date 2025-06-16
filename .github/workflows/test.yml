@@ -10,16 +10,11 @@ jobs:
       contents: "read"
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Docker Buildx
+      - name: Set up persistent Buildx builder
         uses: docker/setup-buildx-action@v3
-      - name: Restore GHA Build Cache
-        uses: actions/cache@v4
         with:
-          path: /tmp/.buildx-cache
-          key: buildx-${{ github.ref_name }}
-          restore-keys: |
-            buildx-
-      - name: Build via Make (docker-bake.hcl uses type=gha)
-        env:
-          BUILDKIT_CACHE_DIR: /tmp/.buildx-cache
+          install: true
+          use: true
+      - run: docker buildx du -v
+      - name: Build via Make
         run: make login-lint
