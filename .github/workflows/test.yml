@@ -12,9 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Normalize file mtimes
-        run: |
-          find . -type f -exec touch -d "2000-01-01T00:00:00Z" {} +
+      - run: ls -lah turbo.json   .npmrc   package.json   pnpm-lock.yaml   pnpm-workspace.yaml
       - name: Set up persistent Buildx builder
         id: buildx
         uses: docker/setup-buildx-action@v3
@@ -22,6 +20,7 @@ jobs:
           install: true
           driver: docker-container
           use: true
+      - run: ls -lah turbo.json   .npmrc   package.json   pnpm-lock.yaml   pnpm-workspace.yaml
       - name: Build
         uses: docker/bake-action@v6
         with:
@@ -31,5 +30,6 @@ jobs:
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
             *.output=type=docker
+      - run: ls -lah turbo.json   .npmrc   package.json   pnpm-lock.yaml   pnpm-workspace.yaml
       - name: Run
         run: make login-lint
