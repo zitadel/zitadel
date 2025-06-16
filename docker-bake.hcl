@@ -1,5 +1,6 @@
-group "default" {
-  targets = ["typescript-proto-client"]
+target "defaults" {
+  cache-from = ["type=gha,scope=image"]
+  cache-to   = ["type=gha,scope=image,mode=max"]
 }
 
 target "login-pnpm" {
