@@ -406,6 +406,8 @@ func TestAddOIDCApp(t *testing.T) {
 }
 
 func TestCommandSide_AddOIDCApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
@@ -502,6 +504,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -609,6 +612,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -707,6 +711,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				idGenerator:     tt.fields.idGenerator,
@@ -714,6 +719,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
@@ -731,6 +737,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -875,6 +882,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -949,6 +957,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -1023,6 +1032,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						newOIDCAppChangedEvent(context.Background(),
 							"app1",
@@ -1095,8 +1105,10 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.PatchOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1113,6 +1125,8 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -1217,6 +1231,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewOIDCConfigSecretChangedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -1265,13 +1280,16 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(*testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				newHashedSecret: mockHashedSecret("secret"),
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.ChangeOIDCApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1309,6 +1327,8 @@ func newOIDCAppChangedEvent(ctx context.Context, appID, projectID, resourceOwner
 }
 
 func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
+	t.Parallel()
+
 	hasher := &crypto.Hasher{
 		Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.MinCost)),
 	}
@@ -1462,6 +1482,8 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			c := &Commands{
 				eventstore:   tt.eventstore(t),
 				secretHasher: hasher,

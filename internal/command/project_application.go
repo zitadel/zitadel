@@ -33,7 +33,7 @@ func (c *Commands) PatchApplication(ctx context.Context, projectID string, appCh
 	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionCreateApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+	if err := c.checkPermissionPatchApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
 		return nil, err
 	}
 

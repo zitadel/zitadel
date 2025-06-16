@@ -49,6 +49,8 @@ var testMetadataChangedEntityID = []byte(`<?xml version="1.0"?>
 `)
 
 func TestCommandSide_AddSAMLApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
@@ -117,6 +119,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -146,6 +149,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
 			},
@@ -176,6 +180,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
 			},
@@ -208,6 +213,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -267,6 +273,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -330,6 +337,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -390,6 +398,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
 				httpClient:  newTestClient(http.StatusNotFound, nil),
@@ -415,10 +424,13 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			c := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
-				httpClient:  tt.fields.httpClient,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				httpClient:      tt.fields.httpClient,
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.AddSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
@@ -436,6 +448,8 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 		httpClient *http.Client
@@ -560,6 +574,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 				),
 				httpClient: newTestClient(http.StatusOK, testMetadata),
 			},
@@ -606,6 +621,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 				),
 				httpClient: nil,
 			},
@@ -652,6 +668,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						newSAMLAppChangedEventMetadataURL(context.Background(),
 							"app1",
@@ -719,6 +736,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						newSAMLAppChangedEventMetadata(context.Background(),
 							"app1",
@@ -761,7 +779,8 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					State:       domain.AppStateActive,
 				},
 			},
-		}, {
+		},
+		{
 			name: "change saml app, ok, loginversion",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -785,6 +804,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						newSAMLAppChangedEventLoginVersion(context.Background(),
 							"app1",
@@ -838,9 +858,12 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
-				httpClient: tt.fields.httpClient,
+				eventstore:      tt.fields.eventstore(t),
+				httpClient:      tt.fields.httpClient,
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.PatchSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
