@@ -490,8 +490,8 @@ func TestListInstance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// ctx := context.Background()
 			t.Cleanup(func() {
-				//nolint
-				pool.Exec(ctx, "DELETE FROM zitadel.instances")
+				_, err := pool.Exec(ctx, "DELETE FROM zitadel.instances")
+				require.NoError(t, err)
 			})
 
 			instances := tt.testFunc(ctx, t)
