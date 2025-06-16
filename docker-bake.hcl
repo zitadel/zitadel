@@ -39,17 +39,12 @@ target "login-lint" {
   tags = ["${LOGIN_LINT_TAG}"]
 }
 
-variable "LOGIN_CLIENT_TAG" {
-  default = "login-client:local"
-}
-
 target "login-client" {
   dockerfile = "dockerfiles/login-client.Dockerfile"
   contexts = {
     login-pnpm              = "target:login-pnpm"
     typescript-proto-client = "target:typescript-proto-client"
   }
-  tags = ["${LOGIN_CLIENT_TAG}"]
 }
 
 target "typescript-proto-client" {
@@ -78,6 +73,7 @@ target "core-mock" {
   contexts = {
     protos = "target:proto-files"
   }
+  output = ["type=docker"]
   tags = ["${CORE_MOCK_TAG}"]
 }
 
@@ -118,4 +114,5 @@ target "login-standalone" {
     login-client = "target:login-client"
   }
   tags = ["${LOGIN_TAG}"]
+  output = ["type=docker"]
 }
