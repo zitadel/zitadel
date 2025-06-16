@@ -37,6 +37,8 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   tags = ["${LOGIN_LINT_TAG}"]
+  cache-from = ["type=gha"]
+  cache-to   = ["type=gha,ignore-error=true,mode=max"]
 }
 
 target "login-client" {
