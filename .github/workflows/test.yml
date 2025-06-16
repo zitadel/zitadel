@@ -22,4 +22,4 @@ jobs:
       - name: Build via Make (docker-bake.hcl uses type=gha)
         env:
           BUILDKIT_CACHE_DIR: /tmp/.buildx-cache
-        run: make login-quality
+        run: make login-lint
