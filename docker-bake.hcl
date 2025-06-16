@@ -38,7 +38,7 @@ target "login-lint" {
   }
   tags = ["${LOGIN_LINT_TAG}"]
   output = [
-    "type=docker",
+    "type=docker-container",
   ]
   cache-from = ["type=gha"]
   cache-to   = ["type=gha,ignore-error=true,mode=max"]
