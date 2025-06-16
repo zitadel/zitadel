@@ -1,11 +1,17 @@
 package serviceping
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
+	"io"
+	"net/http"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -13,15 +19,64 @@ import (
 	analytics "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta"
 )
 
-type ServicePing struct {
-	TelemetryServiceClient analytics.TelemetryServiceClient
+type Client struct {
+	httpClient *http.Client
+	endpoint   string
 }
 
-func NewClient(ctx context.Context, config Config) {
-	connection, err := grpc.NewClient(config.Endpoint)
-	_ = err
-	analytics.NewTelemetryServiceClient(connection)
+func (c Client) ReportBaseInformation(ctx context.Context, in *analytics.ReportBaseInformationRequest, opts ...grpc.CallOption) (*analytics.ReportBaseInformationResponse, error) {
+	reportResponse := new(analytics.ReportBaseInformationResponse)
+	err := c.callTelemetryService(ctx, in, reportResponse)
+	if err != nil {
+		return nil, err
+	}
+	return reportResponse, nil
+}
 
+func (c Client) ReportResourceCounts(ctx context.Context, in *analytics.ReportResourceCountsRequest, opts ...grpc.CallOption) (*analytics.ReportResourceCountsResponse, error) {
+	reportResponse := new(analytics.ReportResourceCountsResponse)
+	err := c.callTelemetryService(ctx, in, reportResponse)
+	if err != nil {
+		return nil, err
+	}
+	return reportResponse, nil
+}
+
+func (c Client) callTelemetryService(ctx context.Context, in proto.Message, out proto.Message) error {
+	requestBody, err := protojson.Marshal(in)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint, bytes.NewReader(requestBody))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return &TelemetryError{
+			StatusCode: resp.StatusCode,
+			Body:       body,
+		}
+	}
+
+	return protojson.Unmarshal(body, out)
+}
+
+func NewClient(config *Config) Client {
+	return Client{
+		httpClient: http.DefaultClient,
+		endpoint:   config.Endpoint,
+	}
 }
 
 func GenerateSystemID() (string, error) {
@@ -78,4 +133,13 @@ func countParentTypeToPb(parentType domain.CountParentType) analytics.CountParen
 	default:
 		return analytics.CountParentType_COUNT_PARENT_TYPE_UNSPECIFIED
 	}
+}
+
+type TelemetryError struct {
+	StatusCode int
+	Body       []byte
+}
+
+func (e *TelemetryError) Error() string {
+	return fmt.Sprintf("telemetry error %d: %s", e.StatusCode, e.Body)
 }
