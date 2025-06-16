@@ -18,6 +18,9 @@ jobs:
           install: true
           use: true
           name: gha-builder
+          cleanup: false
       - run: docker buildx du
       - name: Build via Make
         run: make login-lint
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
