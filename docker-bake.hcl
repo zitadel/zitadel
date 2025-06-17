@@ -4,7 +4,7 @@ variable "IMAGE_REGISTRY" {
   default = "ghcr.io/zitadel"
 }
 
-variable "GIT_BRANCH" {
+variable "BUILD_CACHE_KEY" {
   default = "local"
 }
 
@@ -28,10 +28,10 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   cache-from = [
-    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${GIT_BRANCH}",
+    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}",
     "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:main"
   ]
-  cache-to = ["type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${GIT_BRANCH},mode=max"]
+  cache-to = ["type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY},mode=max"]
 }
 
 variable "LOGIN_TEST_UNIT_TAG" {
