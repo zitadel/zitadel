@@ -66,9 +66,9 @@ func (c *Commands) setTranslationEvents(ctx context.Context, agg eventstore.Aggr
 	wm := NewHostedLoginTranslationWriteModel(agg.ID)
 	events := []eventstore.Command{}
 	switch agg.Type {
-	case "instance":
+	case instance.AggregateType:
 		events = append(events, instance.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang.String()))
-	case "org":
+	case org.AggregateType:
 		events = append(events, org.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang.String()))
 	default:
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMA-0aw7In", "Errors.Arguments.LevelType.Invalid")

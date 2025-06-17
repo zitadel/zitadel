@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -13,7 +14,7 @@ import (
 const (
 	HostedLoginTranslationTable = "projections.hosted_login_translations"
 
-	HostedLoginTranslationInstaceIDCol     = "instance_id"
+	HostedLoginTranslationInstanceIDCol    = "instance_id"
 	HostedLoginTranslationCreationDateCol  = "creation_date"
 	HostedLoginTranslationChangeDateCol    = "change_date"
 	HostedLoginTranslationAggregateIDCol   = "aggregate_id"
@@ -27,6 +28,29 @@ type hostedLoginTranslationProjection struct{}
 
 func newHostedLoginTranslationProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(hostedLoginTranslationProjection))
+}
+
+// Init implements [handler.initializer]
+func (p *hostedLoginTranslationProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(HostedLoginTranslationInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(HostedLoginTranslationCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(HostedLoginTranslationChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(HostedLoginTranslationAggregateIDCol, handler.ColumnTypeText),
+			handler.NewColumn(HostedLoginTranslationAggregateTypeCol, handler.ColumnTypeText),
+			handler.NewColumn(HostedLoginTranslationSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(HostedLoginTranslationLocaleCol, handler.ColumnTypeText),
+			handler.NewColumn(HostedLoginTranslationFileCol, handler.ColumnTypeJSONB),
+		},
+			handler.NewPrimaryKey(
+				HostedLoginTranslationInstanceIDCol,
+				HostedLoginTranslationAggregateIDCol,
+				HostedLoginTranslationAggregateTypeCol,
+				HostedLoginTranslationLocaleCol,
+			),
+		),
+	)
 }
 
 func (hltp *hostedLoginTranslationProjection) Name() string {
@@ -64,13 +88,13 @@ func (hltp *hostedLoginTranslationProjection) reduceSet(e eventstore.Event) (*ha
 		return handler.NewUpsertStatement(
 			&orgEvent,
 			[]handler.Column{
-				handler.NewCol(HostedLoginTranslationInstaceIDCol, nil),
+				handler.NewCol(HostedLoginTranslationInstanceIDCol, nil),
 				handler.NewCol(HostedLoginTranslationAggregateIDCol, nil),
 				handler.NewCol(HostedLoginTranslationAggregateTypeCol, nil),
 				handler.NewCol(HostedLoginTranslationLocaleCol, nil),
 			},
 			[]handler.Column{
-				handler.NewCol(HostedLoginTranslationInstaceIDCol, orgEvent.Aggregate().InstanceID),
+				handler.NewCol(HostedLoginTranslationInstanceIDCol, orgEvent.Aggregate().InstanceID),
 				handler.NewCol(HostedLoginTranslationAggregateIDCol, orgEvent.Aggregate().ID),
 				handler.NewCol(HostedLoginTranslationAggregateTypeCol, orgEvent.Aggregate().Type),
 				handler.NewCol(HostedLoginTranslationCreationDateCol, handler.OnlySetValueOnInsert(HostedLoginTranslationTable, orgEvent.CreationDate())),
@@ -85,13 +109,13 @@ func (hltp *hostedLoginTranslationProjection) reduceSet(e eventstore.Event) (*ha
 		return handler.NewUpsertStatement(
 			&instanceEvent,
 			[]handler.Column{
-				handler.NewCol(HostedLoginTranslationInstaceIDCol, nil),
+				handler.NewCol(HostedLoginTranslationInstanceIDCol, nil),
 				handler.NewCol(HostedLoginTranslationAggregateIDCol, nil),
 				handler.NewCol(HostedLoginTranslationAggregateTypeCol, nil),
 				handler.NewCol(HostedLoginTranslationLocaleCol, nil),
 			},
 			[]handler.Column{
-				handler.NewCol(HostedLoginTranslationInstaceIDCol, instanceEvent.Aggregate().InstanceID),
+				handler.NewCol(HostedLoginTranslationInstanceIDCol, instanceEvent.Aggregate().InstanceID),
 				handler.NewCol(HostedLoginTranslationAggregateIDCol, instanceEvent.Aggregate().ID),
 				handler.NewCol(HostedLoginTranslationAggregateTypeCol, instanceEvent.Aggregate().Type),
 				handler.NewCol(HostedLoginTranslationCreationDateCol, handler.OnlySetValueOnInsert(HostedLoginTranslationTable, instanceEvent.CreationDate())),

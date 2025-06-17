@@ -30,11 +30,11 @@ var (
 
 	hostedLoginTranslationTable = table{
 		name:          projection.HostedLoginTranslationTable,
-		instanceIDCol: projection.HostedLoginTranslationInstaceIDCol,
+		instanceIDCol: projection.HostedLoginTranslationInstanceIDCol,
 	}
 
 	hostedLoginTranslationColInstanceID = Column{
-		name:  projection.HostedLoginTranslationInstaceIDCol,
+		name:  projection.HostedLoginTranslationInstanceIDCol,
 		table: hostedLoginTranslationTable,
 	}
 	hostedLoginTranslationColResourceOwner = Column{

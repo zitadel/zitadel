@@ -30,12 +30,12 @@ func (wm *HostedLoginTranslationWriteModel) Reduce() error {
 			wm.Language = e.Language
 			wm.Translation = e.Translation
 			wm.Level = e.Level
-			wm.LevelID = e.LevelID
+			wm.LevelID = e.Aggregate().ID
 		case *instance.HostedLoginTranslationSetEvent:
 			wm.Language = e.Language
 			wm.Translation = e.Translation
 			wm.Level = e.Level
-			wm.LevelID = e.LevelID
+			wm.LevelID = e.Aggregate().ID
 		}
 	}
 

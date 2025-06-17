@@ -17,7 +17,6 @@ type HostedLoginTranslationSetEvent struct {
 	Translation map[string]any `json:"translation,omitempty"`
 	Language    string         `json:"language,omitempty"`
 	Level       string         `json:"level,omitempty"`
-	LevelID     string         `json:"level_id,omitempty"`
 }
 
 func NewHostedLoginTranslationSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, translation map[string]any, language string) *HostedLoginTranslationSetEvent {
@@ -26,7 +25,6 @@ func NewHostedLoginTranslationSetEvent(ctx context.Context, aggregate *eventstor
 		Translation: translation,
 		Language:    language,
 		Level:       string(aggregate.Type),
-		LevelID:     aggregate.ID,
 	}
 }
 
