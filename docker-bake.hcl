@@ -4,9 +4,18 @@ group "default" {
   ]
 }
 
+variable "LOGIN_PNPM_TAG" {
+  default = "login-pnpm:local"
+}
+
 target "login-pnpm" {
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
+  tags = ["${LOGIN_PNPM_TAG}"]
   output = ["type=docker"]
+}
+
+variable "LOGIN_DEV_BASE_TAG" {
+  default = "login-dev-base:local"
 }
 
 target "login-dev-base" {
@@ -14,6 +23,7 @@ target "login-dev-base" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
+  tags = ["${LOGIN_DEV_BASE_TAG}"]
   output = ["type=docker"]
 }
 
