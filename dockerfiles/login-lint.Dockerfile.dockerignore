@@ -1,0 +1,17 @@
+*
+!.prettierrc
+!.prettierignore
+!packages/zitadel-tsconfig/*.json
+!packages/zitadel-prettier-config/*.js
+!packages/zitadel-prettier-config/*.json
+!packages/zitadel-eslint-config/*.js
+!packages/zitadel-eslint-config/*.json
+!apps/login/src
+!apps/login/public
+!apps/login/locales
+!apps/login/constants
+!apps/login/*.json
+!apps/login/*.d.ts
+!apps/login/*.cjs
+!apps/login/*.mjs
+!apps/login/*.mts
