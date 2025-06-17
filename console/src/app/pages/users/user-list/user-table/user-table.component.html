@@ -24,7 +24,8 @@
     </div>
     <p class="user-sub cnsl-secondary-text">
       {{
-        (type === Type.HUMAN ? 'DESCRIPTIONS.USERS.HUMANS.DESCRIPTION' : 'DESCRIPTIONS.USERS.MACHINES.DESCRIPTION') | translate
+        (type === Type.HUMAN ? 'DESCRIPTIONS.USERS.HUMANS.DESCRIPTION' : 'DESCRIPTIONS.USERS.MACHINES.DESCRIPTION')
+          | translate
       }}
     </p>
     <ng-template cnslHasRole [hasRole]="['user.write']" actions>
@@ -172,15 +173,15 @@
         <ng-container matColumnDef="state">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.DATA.STATE' | translate }}</th>
           <td mat-cell *matCellDef="let user" [routerLink]="user.userId ? ['/users', user.userId] : null">
-          <span
-            class="state"
-            [ngClass]="{
-              active: user.state === UserState.ACTIVE,
-              inactive: user.state === UserState.INACTIVE,
-            }"
-          >
-            {{ 'USER.STATEV2.' + user.state | translate }}
-          </span>
+            <span
+              class="state"
+              [ngClass]="{
+                active: user.state === UserState.ACTIVE,
+                inactive: user.state === UserState.INACTIVE,
+              }"
+            >
+              {{ 'USER.STATEV2.' + user.state | translate }}
+            </span>
           </td>
         </ng-container>
 
@@ -209,10 +210,10 @@
                 (click)="deleteUser(user, authUser)"
                 [disabled]="(canWrite$ | async) === false || (canDelete$ | async) === false"
                 [attr.data-e2e]="
-                (canWrite$ | async) === false || (canDelete$ | async) === false
-                  ? 'disabled-delete-button'
-                  : 'enabled-delete-button'
-              "
+                  (canWrite$ | async) === false || (canDelete$ | async) === false
+                    ? 'disabled-delete-button'
+                    : 'enabled-delete-button'
+                "
                 mat-icon-button
               >
                 <i class="las la-trash"></i>
