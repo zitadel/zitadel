@@ -21,7 +21,7 @@ func runTests(m *testing.M) int {
 	var stop func()
 	var err error
 	ctx := context.Background()
-	pool, stop, err = newEmbeededDB(ctx)
+	pool, stop, err = newEmbeddedDB(ctx)
 	if err != nil {
 		log.Printf("error with embedded postgres database: %v", err)
 		return 1
@@ -31,7 +31,7 @@ func runTests(m *testing.M) int {
 	return m.Run()
 }
 
-func newEmbeededDB(ctx context.Context) (pool database.PoolTest, stop func(), err error) {
+func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), err error) {
 	connector, stop, err := embedded.StartEmbedded()
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start embedded postgres: %w", err)

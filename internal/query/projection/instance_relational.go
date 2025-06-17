@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -20,25 +19,6 @@ func newInstanceRelationalProjection(ctx context.Context, config handler.Config)
 
 func (*instanceRelationalProjection) Name() string {
 	return InstanceRelationalProjectionTable
-}
-
-func (*instanceRelationalProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(InstanceColumnID, handler.ColumnTypeText),
-			handler.NewColumn(InstanceColumnName, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnDefaultOrgID, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnProjectID, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnConsoleID, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnConsoleAppID, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(InstanceColumnDefaultLanguage, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(CreatedAt, handler.ColumnTypeTimestamp),
-			handler.NewColumn(UpdatedAt, handler.ColumnTypeTimestamp),
-			handler.NewColumn(DeletedAt, handler.ColumnTypeTimestamp),
-		},
-			handler.NewPrimaryKey(InstanceColumnID),
-		),
-	)
 }
 
 func (p *instanceRelationalProjection) Reducers() []handler.AggregateReducer {

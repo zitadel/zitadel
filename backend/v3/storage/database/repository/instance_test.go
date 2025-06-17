@@ -123,6 +123,8 @@ func TestCreateInstance(t *testing.T) {
 			instance, err = instanceRepo.Get(ctx,
 				instanceRepo.NameCondition(database.TextOperationEqual, instance.Name),
 			)
+			require.NoError(t, err)
+
 			require.Equal(t, tt.instance.ID, instance.ID)
 			require.Equal(t, tt.instance.Name, instance.Name)
 			require.Equal(t, tt.instance.DefaultOrgID, instance.DefaultOrgID)
@@ -133,7 +135,6 @@ func TestCreateInstance(t *testing.T) {
 			require.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
 			require.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
 			require.Nil(t, instance.DeletedAt)
-			require.NoError(t, err)
 		})
 	}
 }
@@ -339,6 +340,7 @@ func TestGetInstance(t *testing.T) {
 				require.Nil(t, instance, returnedInstance)
 				return
 			}
+			require.NoError(t, err)
 
 			require.Equal(t, returnedInstance.ID, instance.ID)
 			require.Equal(t, returnedInstance.Name, instance.Name)
@@ -347,14 +349,13 @@ func TestGetInstance(t *testing.T) {
 			require.Equal(t, returnedInstance.ConsoleClientID, instance.ConsoleClientID)
 			require.Equal(t, returnedInstance.ConsoleAppID, instance.ConsoleAppID)
 			require.Equal(t, returnedInstance.DefaultLanguage, instance.DefaultLanguage)
-			require.NoError(t, err)
 		})
 	}
 }
 
 func TestListInstance(t *testing.T) {
 	ctx := context.Background()
-	pool, stop, err := newEmbeededDB(ctx)
+	pool, stop, err := newEmbeddedDB(ctx)
 	require.NoError(t, err)
 	defer stop()
 
@@ -488,7 +489,6 @@ func TestListInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// ctx := context.Background()
 			t.Cleanup(func() {
 				_, err := pool.Exec(ctx, "DELETE FROM zitadel.instances")
 				require.NoError(t, err)
@@ -517,7 +517,6 @@ func TestListInstance(t *testing.T) {
 				require.Equal(t, returnedInstances[i].ConsoleClientID, instance.ConsoleClientID)
 				require.Equal(t, returnedInstances[i].ConsoleAppID, instance.ConsoleAppID)
 				require.Equal(t, returnedInstances[i].DefaultLanguage, instance.DefaultLanguage)
-				require.NoError(t, err)
 			}
 		})
 	}

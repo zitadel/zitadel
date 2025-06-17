@@ -16,6 +16,7 @@ type Pool interface {
 
 type PoolTest interface {
 	Pool
+	// MigrateTest is the same as [Migrator] but executes the migrations multiple times instead of only once.
 	MigrateTest(ctx context.Context) error
 }
 
