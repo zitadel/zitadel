@@ -10,18 +10,28 @@ jobs:
       contents: "read"
     steps:
       - uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/zitadel/login
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+          labels: |
+            git-branch={{branch}}
       - name: Set up persistent Buildx builder
         id: buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          install: true
-          driver: docker-container
-          use: true
       - name: Build
         uses: docker/bake-action@v6
+        env:
+          GIT_BRANCH: ${{ fromJSON(steps.meta.outputs.json).labels['git-branch'] }}
         with:
           source: .
           push: false
-          builder: ${{ steps.buildx.outputs.name }}
-          load: true
           targets: login-lint

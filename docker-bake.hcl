@@ -1,14 +1,10 @@
-group "default" {
-  targets = [
-    "login-lint",
-  ]
-}
+target "docker-metadata-action" {}
 
-variable "REGISTRY" {
+variable "IMAGE_REGISTRY" {
   default = "ghcr.io/zitadel"
 }
 
-variable "GITHUB_REF_NAME" {
+variable "GIT_BRANCH" {
   default = "local"
 }
 
@@ -32,10 +28,10 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   cache-from = [
-    "type=registry,ref=${REGISTRY}/login-lint-buildcache:${GITHUB_REF_NAME}",
-    "type=registry,ref=${REGISTRY}/login-lint-buildcache:main"
+    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${GIT_BRANCH}",
+    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:main"
   ]
-  cache-to = ["type=registry,ref=${REGISTRY}/login-lint-buildcache:${GITHUB_REF_NAME},mode=max"]
+  cache-to = ["type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${GIT_BRANCH},mode=max"]
 }
 
 variable "LOGIN_TEST_UNIT_TAG" {
