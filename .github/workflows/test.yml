@@ -39,8 +39,9 @@ jobs:
           BUILD_CACHE_KEY: ${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
         with:
           source: .
-          targets: login-pnpm,login-dev-base,login-lint
+          targets: login-lint
           provenance: false
+          push: false
           files: |
             docker-bake.hcl
             docker-bake-ci.hcl
