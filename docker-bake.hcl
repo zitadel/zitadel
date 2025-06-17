@@ -8,11 +8,12 @@ variable "BUILD_CACHE_KEY" {
   default = "local"
 }
 
-target "default" {
+target "_platforms" {
   platforms = ["linux/amd64"]
 }
 
 target "login-pnpm" {
+  inherits = ["_platforms"]
   cache-from = [
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}" }
 #    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:latest" },
@@ -21,6 +22,7 @@ target "login-pnpm" {
  }
 
 target "login-dev-base" {
+  inherits = ["_platforms"]
   cache-from = [
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}"}
 #    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:latest"},
@@ -32,6 +34,7 @@ target "login-dev-base" {
 }
 
 target "login-lint" {
+  inherits = ["_platforms"]
   cache-from = [
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}"}
 #    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:latest"},
