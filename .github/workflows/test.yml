@@ -17,29 +17,6 @@ jobs:
           install: true
           driver: docker-container
           use: true
-      - uses: docker/metadata-action@v5
-        id: meta
-        with:
-          images: Build
-      - name: Cache
-        uses: actions/cache@v3
-        id: pnpm-store-cache
-        with:
-          path: |
-            pnpm
-          key: pnpm-cache-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-cache-
-
-      - name: inject cache into docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.2.0
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          cache-map: |
-            {
-              "pnpm": "/pnpm"
-            }
-          skip-extraction: ${{ steps.pnpm-store-cache.outputs.cache-hit }}
       - name: Build
         uses: docker/bake-action@v6
         with:
@@ -50,4 +27,5 @@ jobs:
           set: |
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
+            *.provenance=false
           targets: login-lint
