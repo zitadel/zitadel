@@ -29,7 +29,7 @@ jobs:
         uses: docker/bake-action@v6
         env:
           # latest if branch is main, otherwise image version which is the pull request number
-          BUILD_CACHE_KEY: "${{ github.ref == 'refs/heads/main' ? "latest" : fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}"
+          BUILD_CACHE_KEY: ${{ github.ref == 'refs/heads/main' ? "latest" : fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
         with:
           source: .
           push: false
