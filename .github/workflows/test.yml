@@ -43,6 +43,7 @@ jobs:
       - name: Build
         uses: docker/bake-action@v6
         with:
+          source: .
           push: false
           builder: ${{ steps.buildx.outputs.name }}
           load: true
@@ -50,5 +51,3 @@ jobs:
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
           targets: login-lint
-      - name: Run
-        run: make login-lint
