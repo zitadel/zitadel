@@ -106,14 +106,17 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 
 	stmt, scan := prepareHostedLoginTranslationQuery()
 
+	langORBaseLang := sq.Or{
+		sq.Eq{hostedLoginTranslationColLocale.identifier(): lang.String()},
+		sq.Eq{hostedLoginTranslationColLocale.identifier(): baseLang.String()},
+	}
 	eq := sq.Eq{
 		hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
-		hostedLoginTranslationColLocale.identifier():            baseLang.String(),
 		hostedLoginTranslationColResourceOwner.identifier():     levelID,
 		hostedLoginTranslationColResourceOwnerType.identifier(): resourceOwner,
 	}
 
-	query, args, err := stmt.Where(eq).ToSql()
+	query, args, err := stmt.Where(eq).Where(langORBaseLang).ToSql()
 	if err != nil {
 		logging.Error(err)
 		return nil, zerrors.ThrowInternal(err, "QUERY-ZgCMux", "Errors.Query.SQLStatement")
