@@ -29,6 +29,8 @@ var (
 	//go:embed v2-default.json
 	defaultLoginTranslations []byte
 
+	defaultSystemTranslations map[string]any
+
 	hostedLoginTranslationTable = table{
 		name:          projection.HostedLoginTranslationTable,
 		instanceIDCol: projection.HostedLoginTranslationInstanceIDCol,
@@ -59,6 +61,13 @@ var (
 		table: hostedLoginTranslationTable,
 	}
 )
+
+func init() {
+	err := json.Unmarshal(defaultLoginTranslations, &defaultSystemTranslations)
+	if err != nil {
+		panic(err)
+	}
+}
 
 type HostedLoginTranslations struct {
 	SearchResponse
@@ -181,16 +190,9 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 }
 
 func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, string, error) {
-	defaultTranslations := map[string]any{}
-
-	err := json.Unmarshal(defaultLoginTranslations, &defaultTranslations)
-	if err != nil {
-		return nil, "", zerrors.ThrowInternal(err, "QUERY-nvx88W", "Errors.Query.UnmarshalDefaultLoginTranslations")
-	}
-
-	translation, ok := defaultTranslations[lang]
+	translation, ok := defaultSystemTranslations[lang]
 	if !ok {
-		translation, ok = defaultTranslations[instanceDefaultLang]
+		translation, ok = defaultSystemTranslations[instanceDefaultLang]
 		if !ok {
 			return nil, "", zerrors.ThrowNotFoundf(nil, "QUERY-6gb5QR", "Errors.Query.HostedLoginTranslationNotFound-%s", lang)
 		}

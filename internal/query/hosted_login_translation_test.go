@@ -23,12 +23,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
-func jsonSyntaxErrorGenerator(notAMap []byte) error {
-	d := map[string]any{}
-
-	return json.Unmarshal(notAMap, &d)
-}
-
 func TestGetSystemTranslation(t *testing.T) {
 	okTranslation := defaultLoginTranslations
 
@@ -36,8 +30,6 @@ func TestGetSystemTranslation(t *testing.T) {
 	require.Nil(t, json.Unmarshal(okTranslation, &parsedOKTranslation))
 
 	hashOK := md5.Sum(fmt.Append(nil, parsedOKTranslation["de"]))
-
-	malformedTranslation := []byte{1, 2}
 
 	tt := []struct {
 		testName string
@@ -50,12 +42,6 @@ func TestGetSystemTranslation(t *testing.T) {
 		expectedEtag     string
 		expectedError    error
 	}{
-		{
-			testName:               "when unmarshaling default translation fails should return internal error",
-			systemTranslationToSet: malformedTranslation,
-
-			expectedError: zerrors.ThrowInternal(jsonSyntaxErrorGenerator(malformedTranslation), "QUERY-nvx88W", "Errors.Query.UnmarshalDefaultLoginTranslations"),
-		},
 		{
 			testName:               "when neither input language nor system default language have translation should return not found error",
 			systemTranslationToSet: okTranslation,
