@@ -2,6 +2,9 @@ package projection
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -22,6 +25,7 @@ const (
 	HostedLoginTranslationSequenceCol      = "sequence"
 	HostedLoginTranslationLocaleCol        = "locale"
 	HostedLoginTranslationFileCol          = "file"
+	HostedLoginTranslationEtagCol          = "etag"
 )
 
 type hostedLoginTranslationProjection struct{}
@@ -42,6 +46,7 @@ func (p *hostedLoginTranslationProjection) Init() *old_handler.Check {
 			handler.NewColumn(HostedLoginTranslationSequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(HostedLoginTranslationLocaleCol, handler.ColumnTypeText),
 			handler.NewColumn(HostedLoginTranslationFileCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(HostedLoginTranslationEtagCol, handler.ColumnTypeText),
 		},
 			handler.NewPrimaryKey(
 				HostedLoginTranslationInstanceIDCol,
@@ -102,6 +107,7 @@ func (hltp *hostedLoginTranslationProjection) reduceSet(e eventstore.Event) (*ha
 				handler.NewCol(HostedLoginTranslationSequenceCol, orgEvent.Sequence()),
 				handler.NewCol(HostedLoginTranslationLocaleCol, orgEvent.Language),
 				handler.NewCol(HostedLoginTranslationFileCol, orgEvent.Translation),
+				handler.NewCol(HostedLoginTranslationEtagCol, hltp.computeEtag(orgEvent.Translation)),
 			},
 		), nil
 	case *instance.HostedLoginTranslationSetEvent:
@@ -123,10 +129,16 @@ func (hltp *hostedLoginTranslationProjection) reduceSet(e eventstore.Event) (*ha
 				handler.NewCol(HostedLoginTranslationSequenceCol, instanceEvent.Sequence()),
 				handler.NewCol(HostedLoginTranslationLocaleCol, instanceEvent.Language),
 				handler.NewCol(HostedLoginTranslationFileCol, instanceEvent.Translation),
+				handler.NewCol(HostedLoginTranslationEtagCol, hltp.computeEtag(instanceEvent.Translation)),
 			},
 		), nil
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-AZshaa", "reduce.wrong.event.type %v", []eventstore.EventType{org.HostedLoginTranslationSet})
 	}
 
+}
+
+func (hltp *hostedLoginTranslationProjection) computeEtag(translation map[string]any) string {
+	hash := md5.Sum(fmt.Append(nil, translation))
+	return hex.EncodeToString(hash[:])
 }

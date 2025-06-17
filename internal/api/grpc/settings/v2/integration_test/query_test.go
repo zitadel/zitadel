@@ -362,7 +362,7 @@ func TestServer_GetHostedLoginTranslation(t *testing.T) {
 	translations := map[string]any{"loginTitle": gofakeit.Slogan()}
 
 	protoTranslations, err := structpb.NewStruct(translations)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	setupRequest := &settings.SetHostedLoginTranslationRequest{
 		Level: &settings.SetHostedLoginTranslationRequest_OrganizationId{
@@ -372,7 +372,7 @@ func TestServer_GetHostedLoginTranslation(t *testing.T) {
 		Locale:       gofakeit.LanguageBCP(),
 	}
 	savedTranslation, err := Client.SetHostedLoginTranslation(AdminCTX, setupRequest)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	tt := []struct {
 		testName     string

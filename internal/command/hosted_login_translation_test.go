@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -100,9 +101,9 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 
 	testTranslation := map[string]any{"test": "translation", "translation": "2"}
 	protoTranslation, err := structpb.NewStruct(testTranslation)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	hashTestTranslation := md5.Sum([]byte(protoTranslation.String()))
+	hashTestTranslation := md5.Sum(fmt.Append(nil, testTranslation))
 	require.NotEmpty(t, hashTestTranslation)
 
 	tt := []struct {

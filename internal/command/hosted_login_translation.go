@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 
 	"golang.org/x/text/language"
-	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -51,12 +51,7 @@ func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.
 		return nil, err
 	}
 
-	protoTranslation, err := structpb.NewStruct(wm.Translation)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct")
-	}
-
-	etag := md5.Sum([]byte(protoTranslation.String()))
+	etag := md5.Sum(fmt.Append(nil, wm.Translation))
 	return &settings.SetHostedLoginTranslationResponse{
 		Etag: hex.EncodeToString(etag[:]),
 	}, nil

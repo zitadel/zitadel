@@ -7,6 +7,7 @@ import (
 	_ "embed"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"dario.cat/mergo"
@@ -53,6 +54,10 @@ var (
 		name:  projection.HostedLoginTranslationFileCol,
 		table: hostedLoginTranslationTable,
 	}
+	hostedLoginTranslationColEtag = Column{
+		name:  projection.HostedLoginTranslationEtagCol,
+		table: hostedLoginTranslationTable,
+	}
 )
 
 type HostedLoginTranslations struct {
@@ -70,6 +75,7 @@ type HostedLoginTranslation struct {
 	File      map[string]any
 	LevelType string
 	LevelID   string
+	Etag      string
 }
 
 func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.GetHostedLoginTranslationRequest) (res *settings.GetHostedLoginTranslationResponse, err error) {
@@ -85,7 +91,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	}
 	baseLang, _ := lang.Base()
 
-	sysTranslation, err := getSystemTranslation(baseLang.String(), defaultInstLang.String())
+	sysTranslation, systemEtag, err := getSystemTranslation(baseLang.String(), defaultInstLang.String())
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +99,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	var levelID, resourceOwner string
 	switch t := req.GetLevel().(type) {
 	case *settings.GetHostedLoginTranslationRequest_System:
-		return getTranslationOutputMessage(sysTranslation)
+		return getTranslationOutputMessage(sysTranslation, systemEtag)
 	case *settings.GetHostedLoginTranslationRequest_Instance:
 		levelID = authz.GetInstance(ctx).InstanceID()
 		resourceOwner = instance.AggregateType
@@ -146,6 +152,12 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	}
 
 	if !req.GetIgnoreInheritance() {
+
+		// There is no record for the requested level, set the upper level etag
+		if requestedTranslation.Etag == "" {
+			requestedTranslation.Etag = otherTranslation.Etag
+		}
+
 		// Case where Level == ORGANIZATION -> Check if we have an instance level translation
 		// If so, merge it with the translations we have
 		if otherTranslation != nil && otherTranslation.LevelType == instance.AggregateType {
@@ -154,43 +166,51 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 			}
 		}
 
+		// The DB query returned no results, we have to set the system translation etag
+		if requestedTranslation.Etag == "" {
+			requestedTranslation.Etag = systemEtag
+		}
+
 		// Merge the system translations
 		if err := mergo.Merge(&requestedTranslation.File, sysTranslation); err != nil {
 			return nil, zerrors.ThrowInternal(err, "QUERY-HdprNF", "Errors.Query.MergeTranslations")
 		}
 	}
 
-	return getTranslationOutputMessage(requestedTranslation.File)
+	return getTranslationOutputMessage(requestedTranslation.File, requestedTranslation.Etag)
 }
 
-func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, error) {
+func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, string, error) {
 	defaultTranslations := map[string]any{}
 
 	err := json.Unmarshal(defaultLoginTranslations, &defaultTranslations)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-nvx88W", "Errors.Query.UnmarshalDefaultLoginTranslations")
+		return nil, "", zerrors.ThrowInternal(err, "QUERY-nvx88W", "Errors.Query.UnmarshalDefaultLoginTranslations")
 	}
 
 	translation, ok := defaultTranslations[lang]
 	if !ok {
 		translation, ok = defaultTranslations[instanceDefaultLang]
 		if !ok {
-			return nil, zerrors.ThrowNotFoundf(nil, "QUERY-6gb5QR", "Errors.Query.HostedLoginTranslationNotFound-%s", lang)
+			return nil, "", zerrors.ThrowNotFoundf(nil, "QUERY-6gb5QR", "Errors.Query.HostedLoginTranslationNotFound-%s", lang)
 		}
 	}
 
 	castedTranslation, ok := translation.(map[string]any)
 	if !ok {
-		return nil, zerrors.ThrowInternal(nil, "QUERY-WrRn5e", "Errors.Query.HostedLoginCastError")
+		return nil, "", zerrors.ThrowInternal(nil, "QUERY-WrRn5e", "Errors.Query.HostedLoginCastError")
 	}
 
-	return castedTranslation, nil
+	hash := md5.Sum(fmt.Append(nil, castedTranslation))
+
+	return castedTranslation, hex.EncodeToString(hash[:]), nil
 }
 
 func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*HostedLoginTranslation, error)) {
 	return sq.Select(
 			hostedLoginTranslationColFile.identifier(),
 			hostedLoginTranslationColResourceOwnerType.identifier(),
+			hostedLoginTranslationColEtag.identifier(),
 		).From(hostedLoginTranslationTable.identifier()).
 			Limit(2).
 			PlaceholderFormat(sq.Dollar),
@@ -202,6 +222,7 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 				err := r.Scan(
 					&rawTranslation,
 					&translation.LevelType,
+					&translation.Etag,
 				)
 				if err != nil {
 					return nil, err
@@ -222,16 +243,14 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 		}
 }
 
-func getTranslationOutputMessage(translation map[string]any) (*settings.GetHostedLoginTranslationResponse, error) {
+func getTranslationOutputMessage(translation map[string]any, etag string) (*settings.GetHostedLoginTranslationResponse, error) {
 	protoTranslation, err := structpb.NewStruct(translation)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct")
 	}
 
-	hash := md5.Sum([]byte(protoTranslation.String()))
-
 	return &settings.GetHostedLoginTranslationResponse{
 		Translations: protoTranslation,
-		Etag:         hex.EncodeToString(hash[:]),
+		Etag:         etag,
 	}, nil
 }

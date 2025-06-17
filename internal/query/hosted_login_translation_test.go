@@ -6,6 +6,8 @@ import (
 	"database/sql/driver"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"maps"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,6 +35,8 @@ func TestGetSystemTranslation(t *testing.T) {
 	parsedOKTranslation := map[string]map[string]any{}
 	require.Nil(t, json.Unmarshal(okTranslation, &parsedOKTranslation))
 
+	hashOK := md5.Sum(fmt.Append(nil, parsedOKTranslation["de"]))
+
 	malformedTranslation := []byte{1, 2}
 
 	tt := []struct {
@@ -43,10 +47,11 @@ func TestGetSystemTranslation(t *testing.T) {
 		systemTranslationToSet []byte
 
 		expectedLanguage map[string]any
+		expectedEtag     string
 		expectedError    error
 	}{
 		{
-			testName:               "when unmarshalling default translation fails should return internal error",
+			testName:               "when unmarshaling default translation fails should return internal error",
 			systemTranslationToSet: malformedTranslation,
 
 			expectedError: zerrors.ThrowInternal(jsonSyntaxErrorGenerator(malformedTranslation), "QUERY-nvx88W", "Errors.Query.UnmarshalDefaultLoginTranslations"),
@@ -66,6 +71,7 @@ func TestGetSystemTranslation(t *testing.T) {
 			inputInstanceLanguage:  "de",
 
 			expectedLanguage: parsedOKTranslation["de"],
+			expectedEtag:     hex.EncodeToString(hashOK[:]),
 		},
 		{
 			testName:               "when input language has translation should return it",
@@ -74,6 +80,7 @@ func TestGetSystemTranslation(t *testing.T) {
 			inputInstanceLanguage:  "en",
 
 			expectedLanguage: parsedOKTranslation["de"],
+			expectedEtag:     hex.EncodeToString(hashOK[:]),
 		},
 	}
 
@@ -83,11 +90,12 @@ func TestGetSystemTranslation(t *testing.T) {
 			defaultLoginTranslations = tc.systemTranslationToSet
 
 			// When
-			translation, err := getSystemTranslation(tc.inputLanguage, tc.inputInstanceLanguage)
+			translation, etag, err := getSystemTranslation(tc.inputLanguage, tc.inputInstanceLanguage)
 
 			// Verify
 			require.Equal(t, tc.expectedError, err)
 			assert.Equal(t, tc.expectedLanguage, translation)
+			assert.Equal(t, tc.expectedEtag, etag)
 		})
 	}
 }
@@ -97,9 +105,10 @@ func TestGetTranslationOutput(t *testing.T) {
 
 	validMap := map[string]any{"loginHeader": "A login header"}
 	protoMap, err := structpb.NewStruct(validMap)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	hash := md5.Sum([]byte(protoMap.String()))
+	hash := md5.Sum(fmt.Append(nil, validMap))
+	encodedHash := hex.EncodeToString(hash[:])
 
 	tt := []struct {
 		testName         string
@@ -108,7 +117,7 @@ func TestGetTranslationOutput(t *testing.T) {
 		expectedResponse *settings.GetHostedLoginTranslationResponse
 	}{
 		{
-			testName:         "when unparseable map should return internal error",
+			testName:         "when unparsable map should return internal error",
 			inputTranslation: map[string]any{"\xc5z": "something"},
 			expectedError:    zerrors.ThrowInternal(protoimpl.X.NewError("invalid UTF-8 in string: %q", "\xc5z"), "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct"),
 		},
@@ -127,7 +136,7 @@ func TestGetTranslationOutput(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := getTranslationOutputMessage(tc.inputTranslation)
+			res, err := getTranslationOutputMessage(tc.inputTranslation, encodedHash)
 
 			// Verify
 			require.Equal(t, tc.expectedError, err)
@@ -137,7 +146,7 @@ func TestGetTranslationOutput(t *testing.T) {
 }
 
 func TestGetHostedLoginTranslation(t *testing.T) {
-	query := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type
+	query := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type, projections.hosted_login_translations.etag
 	FROM projections.hosted_login_translations
 	WHERE projections.hosted_login_translations.aggregate_id = $1
 	AND projections.hosted_login_translations.aggregate_type = $2
@@ -147,22 +156,21 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 	okTranslation := defaultLoginTranslations
 
 	parsedOKTranslation := map[string]map[string]any{}
-	require.Nil(t, json.Unmarshal(okTranslation, &parsedOKTranslation))
+	require.NoError(t, json.Unmarshal(okTranslation, &parsedOKTranslation))
 
 	protoDefaultTranslation, err := structpb.NewStruct(parsedOKTranslation["en"])
 	require.Nil(t, err)
 
-	defaultWithDBTranslations := parsedOKTranslation["en"]
+	defaultWithDBTranslations := maps.Clone(parsedOKTranslation["en"])
 	defaultWithDBTranslations["test"] = "translation"
 	defaultWithDBTranslations["test2"] = "translation2"
 	protoDefaultWithDBTranslation, err := structpb.NewStruct(defaultWithDBTranslations)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	nilProtoDefaultMap, err := structpb.NewStruct(nil)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	hashDefaultTranslations := md5.Sum([]byte(protoDefaultTranslation.String()))
-	hashDefaultWithDBTranslations := md5.Sum([]byte(protoDefaultWithDBTranslation.String()))
+	hashDefaultTranslations := md5.Sum(fmt.Append(nil, parsedOKTranslation["en"]))
 
 	tt := []struct {
 		testName string
@@ -245,7 +253,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 					query,
 					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
-						[]string{"file", "aggregate_type"},
+						[]string{"file", "aggregate_type", "etag"},
 						[][]driver.Value{},
 					),
 				),
@@ -271,7 +279,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 					query,
 					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
-						[]string{"file", "aggregate_type"},
+						[]string{"file", "aggregate_type", "etag"},
 						[][]driver.Value{},
 					),
 				),
@@ -285,7 +293,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			},
 
 			expectedResult: &settings.GetHostedLoginTranslationResponse{
-				Etag:         "d41d8cd98f00b204e9800998ecf8427e",
+				Etag:         "",
 				Translations: nilProtoDefaultMap,
 			},
 		},
@@ -298,10 +306,10 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 					query,
 					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
-						[]string{"file", "aggregate_type"},
+						[]string{"file", "aggregate_type", "etag"},
 						[][]driver.Value{
-							{`{"test": "translation"}`, `org`},
-							{`{"test2": "translation2"}`, `instance`},
+							{`{"test": "translation"}`, "org", "etag-org"},
+							{`{"test2": "translation2"}`, "instance", "etag-instance"},
 						},
 					),
 				),
@@ -314,7 +322,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			},
 
 			expectedResult: &settings.GetHostedLoginTranslationResponse{
-				Etag:         hex.EncodeToString(hashDefaultWithDBTranslations[:]),
+				Etag:         "etag-org",
 				Translations: protoDefaultWithDBTranslation,
 			},
 		},

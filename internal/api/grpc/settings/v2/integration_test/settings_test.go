@@ -5,6 +5,8 @@ package settings_test
 import (
 	"context"
 	"crypto/md5"
+	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -132,7 +134,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 	protoTranslations, err := structpb.NewStruct(translations)
 	require.Nil(t, err)
 
-	hash := md5.Sum([]byte(protoTranslations.String()))
+	hash := md5.Sum(fmt.Append(nil, translations))
 
 	tt := []struct {
 		testName     string
@@ -166,7 +168,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 				Locale:       "en-US",
 			},
 			expectedResponse: &settings.SetHostedLoginTranslationResponse{
-				Etag: string(hash[:]),
+				Etag: hex.EncodeToString(hash[:]),
 			},
 		},
 	}
@@ -182,7 +184,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 
 			if tc.expectedErrorMsg == "" {
 				require.NoError(t, err)
-				assert.NotEmpty(t, res.GetEtag())
+				assert.Equal(t, tc.expectedResponse.GetEtag(), res.GetEtag())
 			}
 		})
 	}
