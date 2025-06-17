@@ -45,5 +45,6 @@ jobs:
         with:
           push: false
           builder: ${{ steps.buildx.outputs.name }}
+          load: true
       - name: Run
         run: make login-lint
