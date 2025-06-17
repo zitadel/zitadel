@@ -9,7 +9,7 @@ import "google/api/annotations.proto";
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/authorization/v2beta/authorization.proto";
-import "zitadel/filter/v2/filter.proto";
+import "zitadel/filter/v2beta/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta;authorization";
 
@@ -26,7 +26,6 @@ service AuthorizationService {
   // Required permissions:
   //   - "user.grant.read"
   //   - no permissions required for listing own authorizations
-  /*
   rpc ListAuthorizations(ListAuthorizationsRequest) returns (ListAuthorizationsResponse) {
     option (google.api.http) = {
       // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
@@ -55,7 +54,6 @@ service AuthorizationService {
       };
     };
   }
-  */
 
   // Create Authorization
   //
@@ -274,7 +272,7 @@ service AuthorizationService {
 
 message ListAuthorizationsRequest {
   // Paginate through the results using a limit, offset and sorting.
-  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional AuthorizationFieldName sorting_column = 2 [
     (validate.rules).enum = {defined_only: true},
@@ -288,8 +286,8 @@ message ListAuthorizationsRequest {
 
 message ListAuthorizationsResponse {
   // Details contains the pagination information.
-  zitadel.filter.v2.PaginationResponse pagination = 1;
-  repeated Authorization result = 2;
+  zitadel.filter.v2beta.PaginationResponse pagination = 1;
+  repeated Authorization authorizations = 2;
 }
 
 message CreateAuthorizationRequest {

@@ -94,12 +94,24 @@ func NewUserGrantResourceOwnerSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantResourceOwner, id, TextEquals)
 }
 
+func NewUserGrantUserResourceOwnerSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(UserResourceOwnerCol, id, TextEquals)
+}
+
 func NewUserGrantGrantIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantGrantID, id, TextEquals)
 }
 
 func NewUserGrantIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantID, id, TextEquals)
+}
+
+func NewUserGrantInIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(UserGrantID, list, ListIn)
 }
 
 func NewUserGrantUserTypeQuery(typ domain.UserType) (SearchQuery, error) {

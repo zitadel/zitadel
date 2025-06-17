@@ -6,7 +6,6 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 
-import "zitadel/filter/v2/filter.proto";
 import "zitadel/filter/v2beta/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta;authorization";
@@ -109,29 +108,28 @@ message AuthorizationsSearchFilter {
     // Search for authorizations by their IDs.
     zitadel.filter.v2beta.InIDsFilter authorization_ids = 1;
     // Search for an organizations authorizations by its ID.
-    zitadel.filter.v2.IDFilter organization_id = 2;
-    // Search for authorizations by their creation date.
-    zitadel.filter.v2.TimestampFilter creation_date = 3;
-    // Search for authorizations by their change date.
-    zitadel.filter.v2.TimestampFilter change_date = 4;
+    zitadel.filter.v2beta.IDFilter organization_id = 2;
     // Search for authorizations by their state.
-    StateQuery state = 5;
+    StateQuery state = 3;
     // Search for authorizations by the ID of the user who was granted the authorization.
-    zitadel.filter.v2.IDFilter user_id = 6;
+    zitadel.filter.v2beta.IDFilter user_id = 4;
     // Search for authorizations by the ID of the organisation the user is part of.
-    zitadel.filter.v2.IDFilter user_organization_id = 7;
+    zitadel.filter.v2beta.IDFilter user_organization_id = 5;
     // Search for authorizations by the preferred login name of the granted user.
-    UserPreferredLoginNameQuery user_preferred_login_name = 8;
+    UserPreferredLoginNameQuery user_preferred_login_name = 6;
     // Search for authorizations by the public display name of the granted user.
-    UserDisplayNameQuery user_display_name = 9;
+    UserDisplayNameQuery user_display_name = 7;
     // Search for authorizations by the ID of the project the user was granted the authorization for.
     // This will also include authorizations granted for project grants of the same project.
-    zitadel.filter.v2.IDFilter project_id = 10;
+    zitadel.filter.v2beta.IDFilter project_id = 8;
     // Search for authorizations by the name of the project the user was granted the authorization for.
     // This will also include authorizations granted for project grants of the same project.
-    ProjectNameQuery project_name = 11;
+    ProjectNameQuery project_name = 9;
     // Search for authorizations by the key of the role the user was granted.
-    RoleKeyQuery role_key = 12;
+    RoleKeyQuery role_key = 10;
+    // Search for authorizations by the ID of the project grant the user was granted the authorization for.
+    // This will also include authorizations granted for project grants of the same project.
+    zitadel.filter.v2beta.IDFilter project_grant_id = 11;
   }
 }
 
@@ -149,7 +147,7 @@ message UserPreferredLoginNameQuery {
   // Specify the method to search for the preferred login name. Default is EQUAL.
   // For example, to search for all authorizations granted to a user with
   // a preferred login name containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
-  zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message UserDisplayNameQuery {
@@ -161,7 +159,7 @@ message UserDisplayNameQuery {
   // Specify the method to search for the display name. Default is EQUAL.
   // For example, to search for all authorizations granted to a user with
   // a display name containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
-  zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message ProjectNameQuery {
@@ -171,7 +169,7 @@ message ProjectNameQuery {
   // Specify the method to search for the project name. Default is EQUAL.
   // For example, to search for all authorizations granted on a project with
   // a name containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
-  zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message OrganizationNameQuery {
@@ -181,7 +179,7 @@ message OrganizationNameQuery {
   // Specify the method to search for the organization name. Default is EQUAL.
   // For example, to search for all authorizations with an organization name containing a specific string,
   // use CONTAINS or CONTAINS_IGNORE_CASE.
-  zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message RoleKeyQuery {
@@ -190,7 +188,7 @@ message RoleKeyQuery {
   // Specify the method to search for the role key. Default is EQUAL.
   // For example, to search for all authorizations starting with a specific role key,
   // use STARTS_WITH or STARTS_WITH_IGNORE_CASE.
-  zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
 enum AuthorizationFieldName {
