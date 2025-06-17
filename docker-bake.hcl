@@ -9,6 +9,7 @@ variable "LOGIN_PNPM_TAG" {
 }
 
 target "login-pnpm" {
+  context = "."
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
   tags = ["${LOGIN_PNPM_TAG}"]
 }
@@ -18,6 +19,7 @@ variable "LOGIN_DEV_BASE_TAG" {
 }
 
 target "login-dev-base" {
+  context = "."
   dockerfile = "dockerfiles/login-dev-base.Dockerfile"
   contexts = {
     login-pnpm = "target:login-pnpm"
@@ -30,6 +32,7 @@ variable "LOGIN_LINT_TAG" {
 }
 
 target "login-lint" {
+  context = "."
   dockerfile = "dockerfiles/login-lint.Dockerfile"
   contexts = {
     login-dev-base = "target:login-dev-base"
