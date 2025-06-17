@@ -281,6 +281,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			ExternalSecure: config.ExternalSecure,
 			defaults:       config.SystemDefaults,
 		},
+		&TransactionalTables{
+			dbClient: dbClient,
+		},
 		&projectionTables{
 			es:      eventstoreClient,
 			Version: build.Version(),
