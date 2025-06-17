@@ -40,6 +40,9 @@ jobs:
         with:
           source: .
           push: false
-          targets: login-lint
+          targets: |
+            login-pnpm
+            login-dev-base
+            login-lint
           provenance: false
           load: true
