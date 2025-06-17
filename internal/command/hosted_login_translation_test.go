@@ -45,7 +45,7 @@ func TestSetTranslationEvents(t *testing.T) {
 			inputLanguage:     language.MustParse("en-US"),
 			inputTranslations: map[string]any{"test": "translation"},
 			expectedCommands: []eventstore.Command{
-				instance.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: instance.AggregateType}, map[string]any{"test": "translation"}, "en-US"),
+				instance.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: instance.AggregateType}, map[string]any{"test": "translation"}, language.MustParse("en-US")),
 			},
 			expectedWriteModel: &HostedLoginTranslationWriteModel{
 				WriteModel: eventstore.WriteModel{AggregateID: "123", ResourceOwner: "123"},
@@ -57,7 +57,7 @@ func TestSetTranslationEvents(t *testing.T) {
 			inputLanguage:     language.MustParse("en-GB"),
 			inputTranslations: map[string]any{"test": "translation"},
 			expectedCommands: []eventstore.Command{
-				org.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: org.AggregateType}, map[string]any{"test": "translation"}, "en-GB"),
+				org.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: org.AggregateType}, map[string]any{"test": "translation"}, language.MustParse("en-GB")),
 			},
 			expectedWriteModel: &HostedLoginTranslationWriteModel{
 				WriteModel: eventstore.WriteModel{AggregateID: "123", ResourceOwner: "123"},
@@ -150,7 +150,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 						Version:       instance.AggregateVersion,
 					},
 					testTranslation,
-					"it-CH",
+					language.MustParse("it-CH"),
 				),
 			)),
 
@@ -175,7 +175,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 						Version:       org.AggregateVersion,
 					},
 					testTranslation,
-					"it-CH",
+					language.MustParse("it-CH"),
 				),
 			)),
 

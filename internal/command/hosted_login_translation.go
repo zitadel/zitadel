@@ -62,9 +62,9 @@ func (c *Commands) setTranslationEvents(ctx context.Context, agg eventstore.Aggr
 	events := []eventstore.Command{}
 	switch agg.Type {
 	case instance.AggregateType:
-		events = append(events, instance.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang.String()))
+		events = append(events, instance.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang))
 	case org.AggregateType:
-		events = append(events, org.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang.String()))
+		events = append(events, org.NewHostedLoginTranslationSetEvent(ctx, &agg, translations, lang))
 	default:
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMA-0aw7In", "Errors.Arguments.LevelType.Invalid")
 	}

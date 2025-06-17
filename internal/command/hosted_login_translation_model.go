@@ -1,6 +1,8 @@
 package command
 
 import (
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -8,7 +10,7 @@ import (
 
 type HostedLoginTranslationWriteModel struct {
 	eventstore.WriteModel
-	Language    string
+	Language    language.Tag
 	Translation map[string]any
 	Level       string
 	LevelID     string

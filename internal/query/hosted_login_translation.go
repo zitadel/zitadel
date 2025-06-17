@@ -116,7 +116,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		levelID = t.OrganizationId
 		resourceOwner = org.AggregateType
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-YB6Sri", "Errors.Arguments.Level.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "QUERY-YB6Sri", "Errors.Arguments.Level.Invalid")
 	}
 
 	stmt, scan := prepareHostedLoginTranslationQuery()
@@ -133,21 +133,21 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 
 	query, args, err := stmt.Where(eq).Where(langORBaseLang).ToSql()
 	if err != nil {
-		logging.Error(err)
+		logging.WithError(err).Error("unable to generate sql statement")
 		return nil, zerrors.ThrowInternal(err, "QUERY-ZgCMux", "Errors.Query.SQLStatement")
 	}
 
-	trs := []*HostedLoginTranslation{}
+	var trs []*HostedLoginTranslation
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
 		trs, err = scan(rows)
 		return err
 	}, query, args...)
 	if err != nil {
-		logging.Error(err)
+		logging.WithError(err).Error("failed to query translations")
 		return nil, zerrors.ThrowInternal(err, "QUERY-6k1zjx", "Errors.Internal")
 	}
 
-	requestedTranslation, otherTranslation := &HostedLoginTranslation{}, &HostedLoginTranslation{}
+	requestedTranslation, parentTranslation := &HostedLoginTranslation{}, &HostedLoginTranslation{}
 	for _, tr := range trs {
 		if tr == nil {
 			continue
@@ -156,7 +156,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		if tr.LevelType == resourceOwner {
 			requestedTranslation = tr
 		} else {
-			otherTranslation = tr
+			parentTranslation = tr
 		}
 	}
 
@@ -164,13 +164,13 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 
 		// There is no record for the requested level, set the upper level etag
 		if requestedTranslation.Etag == "" {
-			requestedTranslation.Etag = otherTranslation.Etag
+			requestedTranslation.Etag = parentTranslation.Etag
 		}
 
 		// Case where Level == ORGANIZATION -> Check if we have an instance level translation
 		// If so, merge it with the translations we have
-		if otherTranslation != nil && otherTranslation.LevelType == instance.AggregateType {
-			if err := mergo.Merge(&requestedTranslation.File, otherTranslation.File); err != nil {
+		if parentTranslation != nil && parentTranslation.LevelType == instance.AggregateType {
+			if err := mergo.Merge(&requestedTranslation.File, parentTranslation.File); err != nil {
 				return nil, zerrors.ThrowInternal(err, "QUERY-pdgEJd", "Errors.Query.MergeTranslations")
 			}
 		}
@@ -217,9 +217,9 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 			Limit(2).
 			PlaceholderFormat(sq.Dollar),
 		func(r *sql.Rows) ([]*HostedLoginTranslation, error) {
-			translations := []*HostedLoginTranslation{}
+			translations := make([]*HostedLoginTranslation, 0, 2)
 			for r.Next() {
-				rawTranslation := []byte{}
+				var rawTranslation json.RawMessage
 				translation := &HostedLoginTranslation{}
 				err := r.Scan(
 					&rawTranslation,

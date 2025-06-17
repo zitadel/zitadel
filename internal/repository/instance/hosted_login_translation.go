@@ -3,6 +3,8 @@ package instance
 import (
 	"context"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -15,11 +17,11 @@ type HostedLoginTranslationSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Translation map[string]any `json:"translation,omitempty"`
-	Language    string         `json:"language,omitempty"`
+	Language    language.Tag   `json:"language,omitempty"`
 	Level       string         `json:"level,omitempty"`
 }
 
-func NewHostedLoginTranslationSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, translation map[string]any, language string) *HostedLoginTranslationSetEvent {
+func NewHostedLoginTranslationSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, translation map[string]any, language language.Tag) *HostedLoginTranslationSetEvent {
 	return &HostedLoginTranslationSetEvent{
 		BaseEvent:   *eventstore.NewBaseEventForPush(ctx, aggregate, HostedLoginTranslationSet),
 		Translation: translation,

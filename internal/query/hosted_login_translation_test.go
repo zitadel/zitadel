@@ -294,8 +294,8 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 					mock.WithQueryResult(
 						[]string{"file", "aggregate_type", "etag"},
 						[][]driver.Value{
-							{`{"test": "translation"}`, "org", "etag-org"},
-							{`{"test2": "translation2"}`, "instance", "etag-instance"},
+							{[]byte(`{"test": "translation"}`), "org", "etag-org"},
+							{[]byte(`{"test2": "translation2"}`), "instance", "etag-instance"},
 						},
 					),
 				),
