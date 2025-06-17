@@ -10,19 +10,13 @@ jobs:
       contents: "read"
       packages: "write"
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Docker
-        # We enable the containerd image store, so the buildx driver of type docker can cache-export build layers.
-        # The driver docker-container has many cache misses, as it stores its state in an ephemeral docker volume.
-        # This state is only populated after the first build, but the docker build layer cache depends on it.
-        uses: docker/setup-docker-action@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          daemon-config: |
-            {
-              "features": {
-                "containerd-snapshotter": true
-              }
-            }
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -35,17 +29,9 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-      - name: Set up persistent Buildx builder
+      - name: Set up Buildx docker-container builder
         id: buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build
         uses: docker/bake-action@v6
         env:
