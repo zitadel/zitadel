@@ -10,8 +10,6 @@ jobs:
       contents: "read"
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Set up persistent Buildx builder
         id: buildx
         uses: docker/setup-buildx-action@v3
@@ -19,12 +17,19 @@ jobs:
           install: true
           driver: docker-container
           use: true
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: Build
       - name: Cache
         uses: actions/cache@v3
         id: pnpm-store-cache
         with:
-          path: pnpm-store
-          key: cache-${{ hashFiles('pnpm-lock.yaml') }}
+          path: |
+            pnpm
+          key: pnpm-cache-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-cache-
 
       - name: inject cache into docker
         uses: reproducible-containers/buildkit-cache-dance@v3.2.0
@@ -32,7 +37,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           cache-map: |
             {
-              "pnpm-store": "/pnpm/store"
+              "pnpm": "/pnpm"
             }
           skip-extraction: ${{ steps.pnpm-store-cache.outputs.cache-hit }}
       - name: Build
