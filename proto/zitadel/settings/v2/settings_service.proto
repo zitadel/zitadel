@@ -564,7 +564,7 @@ message GetHostedLoginTranslationRequest {
 }
 
 message GetHostedLoginTranslationResponse {
-  // md5 of the payload
+  // hash of the payload
   string etag = 1 [
     (validate.rules).string = {min_len: 32, max_len: 32},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -605,7 +605,7 @@ message SetHostedLoginTranslationRequest {
 }
 
 message SetHostedLoginTranslationResponse {
-  // md5 of the saved translation
+  // hash of the saved translation
   string etag = 1 [
     (validate.rules).string = {min_len: 32, max_len: 32},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
