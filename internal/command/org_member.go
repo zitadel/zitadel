@@ -95,6 +95,7 @@ func (c *Commands) AddOrgMember(ctx context.Context, member *AddOrgMember) (_ *d
 	if err := c.checkPermissionUpdateOrgMember(ctx, member.OrgID, member.OrgID); err != nil {
 		return nil, err
 	}
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddOrgMemberCommand(member))
 	if err != nil {
 		return nil, err

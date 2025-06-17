@@ -80,6 +80,7 @@ func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMem
 	if err := c.checkPermissionUpdateInstanceMember(ctx, member.InstanceID); err != nil {
 		return nil, err
 	}
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err

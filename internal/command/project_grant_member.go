@@ -66,7 +66,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		project.NewProjectGrantMemberAddedEvent(ctx,
-			ProjectAggregateFromWriteModel(&addedMember.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &addedMember.WriteModel),
 			member.UserID,
 			member.GrantID,
 			member.Roles...,
