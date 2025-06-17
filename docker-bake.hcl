@@ -28,8 +28,8 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   cache-from = [
-    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}",
-    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:main"
+    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}"
+#    "type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:latest"
   ]
   cache-to = ["type=registry,ref=${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY},mode=max"]
 }
