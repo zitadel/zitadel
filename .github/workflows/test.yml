@@ -41,10 +41,7 @@ jobs:
         with:
           source: .
           push: false
-          targets: |
-            login-pnpm
-            login-dev-base
-            login-lint
+          targets: login-pnpm,login-dev-base,login-lint
           provenance: false
           load: true
       - run: ls -la
