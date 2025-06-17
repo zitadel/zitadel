@@ -41,7 +41,7 @@ login-lint-run:
 
 .PHONY: login-lint
 login-lint: login-lint-build
-	./scripts/run_or_skip.sh login-lint-run $(LOGIN_LINT_TAG)
+#	./scripts/run_or_skip.sh login-lint-run $(LOGIN_LINT_TAG)
 
 login-test-unit-build:
 	docker buildx bake login-test-unit

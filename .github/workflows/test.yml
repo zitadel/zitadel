@@ -49,5 +49,6 @@ jobs:
           set: |
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
+          targets: login-lint
       - name: Run
         run: make login-lint

@@ -1,7 +1,5 @@
 group "default" {
   targets = [
-    "login-pnpm",
-    "login-dev-base",
     "login-lint",
   ]
 }

@@ -7,3 +7,4 @@ COPY apps/login/package.json apps/login/
 RUN --mount=type=cache,target=${PNPM_HOME} \
     pnpm install --frozen-lockfile --prefer-offline --workspace-root --filter zitadel-login
 COPY apps/login apps/login
+RUN pnpm lint && pnpm format --check
