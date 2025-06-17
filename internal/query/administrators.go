@@ -307,12 +307,14 @@ func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQu
 						OrgID: orgID.String,
 						Name:  orgName.String,
 					}
-				} else if instanceID.Valid {
+				}
+				if instanceID.Valid {
 					administrator.Instance = &InstanceAdministrator{
 						InstanceID: instanceID.String,
 						Name:       instanceName.String,
 					}
-				} else if projectID.Valid && grantID.Valid && grantedOrgID.Valid {
+				}
+				if projectID.Valid && grantID.Valid && grantedOrgID.Valid {
 					administrator.ProjectGrant = &ProjectGrantAdministrator{
 						ProjectID:     projectID.String,
 						ProjectName:   projectName.String,

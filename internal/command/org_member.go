@@ -151,7 +151,7 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *ChangeOrgMember)
 
 	pushedEvents, err := c.eventstore.Push(ctx,
 		org.NewMemberChangedEvent(ctx,
-			OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel),
+			OrgAggregateFromWriteModelWithCTX(ctx, &existingMember.MemberWriteModel.WriteModel),
 			member.UserID,
 			member.Roles...,
 		),
@@ -184,7 +184,7 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 
 	pushedEvents, err := c.eventstore.Push(ctx,
 		c.removeOrgMember(ctx,
-			OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel),
+			OrgAggregateFromWriteModelWithCTX(ctx, &existingMember.MemberWriteModel.WriteModel),
 			userID,
 			false,
 		),

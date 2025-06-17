@@ -65,7 +65,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *AddProjectMembe
 
 	pushedEvents, err := c.eventstore.Push(ctx,
 		project.NewProjectMemberAddedEvent(ctx,
-			ProjectAggregateFromWriteModel(&addedMember.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &addedMember.WriteModel),
 			member.UserID,
 			member.Roles...,
 		),
@@ -146,7 +146,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 		return nil, err
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingMember.MemberWriteModel.WriteModel)
 	removeEvent := c.removeProjectMember(ctx, projectAgg, userID, false)
 	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {

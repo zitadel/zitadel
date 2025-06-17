@@ -124,7 +124,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		project.NewProjectGrantMemberChangedEvent(ctx,
-			ProjectAggregateFromWriteModel(&existingMember.WriteModel),
+			ProjectAggregateFromWriteModelWithCTX(ctx, &existingMember.WriteModel),
 			member.UserID,
 			member.GrantID,
 			member.Roles...,
@@ -156,7 +156,7 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 	}
 
 	removeEvent := c.removeProjectGrantMember(ctx,
-		ProjectAggregateFromWriteModel(&existingMember.WriteModel),
+		ProjectAggregateFromWriteModelWithCTX(ctx, &existingMember.WriteModel),
 		userID,
 		grantID,
 		false,
