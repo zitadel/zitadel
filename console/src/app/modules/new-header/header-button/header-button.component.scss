@@ -1,0 +1,11 @@
+.header-button {
+  width: unset;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: stretch;
+  gap: 0.5rem;
+  padding-right: 0;
+  height: 32px;
+  max-height: 32px;
+}

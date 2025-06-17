@@ -4,9 +4,6 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 
 import { StorageKey, StorageLocation, StorageService } from '../storage.service';
 import { ConnectError, Interceptor } from '@connectrpc/connect';
-import { firstValueFrom, identity, Observable, Subject } from 'rxjs';
-import { debounceTime, filter, map } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ORG_HEADER_KEY = 'x-zitadel-orgid';
 @Injectable({ providedIn: 'root' })
@@ -43,8 +40,7 @@ export class OrgInterceptorProvider {
   constructor(private storageService: StorageService) {}
 
   getOrgId() {
-    const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
-    return org?.id;
+    return this.storageService.getItem(StorageKey.organizationId, StorageLocation.session);
   }
 
   handleError = (error: any): never => {
@@ -57,7 +53,7 @@ export class OrgInterceptorProvider {
       error.code === StatusCode.PERMISSION_DENIED &&
       error.message.startsWith("Organisation doesn't exist")
     ) {
-      this.storageService.removeItem(StorageKey.organization, StorageLocation.session);
+      this.storageService.removeItem(StorageKey.organizationId, StorageLocation.session);
     }
 
     throw error;

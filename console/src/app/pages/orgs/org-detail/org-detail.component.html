@@ -1,78 +1,72 @@
-<cnsl-top-view
-  *ngIf="['org.write:' + org?.id, 'org.write$'] | hasRole as hasWrite$"
-  [hasBackButton]="false"
-  title="{{ org?.name }}"
-  [isActive]="org?.state === OrgState.ORG_STATE_ACTIVE"
-  [isInactive]="org?.state === OrgState.ORG_STATE_INACTIVE"
-  [hasContributors]="true"
-  stateTooltip="{{ 'ORG.STATE.' + org?.state | translate }}"
-  [hasActions]="hasWrite$ | async"
->
-  <ng-container topActions *ngIf="hasWrite$ | async">
-    <button
-      mat-menu-item
-      *ngIf="org?.state === OrgState.ORG_STATE_ACTIVE"
-      (click)="changeState(OrgState.ORG_STATE_INACTIVE)"
-    >
-      {{ 'ORG.PAGES.DEACTIVATE' | translate }}
-    </button>
-
-    <button
-      mat-menu-item
-      *ngIf="org?.state === OrgState.ORG_STATE_INACTIVE"
-      (click)="changeState(OrgState.ORG_STATE_ACTIVE)"
-    >
-      {{ 'ORG.PAGES.REACTIVATE' | translate }}
-    </button>
-
-    <button data-e2e="rename" mat-menu-item (click)="renameOrg()">
-      {{ 'ORG.PAGES.RENAME.ACTION' | translate }}
-    </button>
-
-    <button data-e2e="delete" mat-menu-item (click)="deleteOrg()">
-      {{ 'ORG.PAGES.DELETE' | translate }}
-    </button>
-  </ng-container>
-  <cnsl-contributors
-    topContributors
-    [totalResult]="totalMemberResult"
-    [loading]="loading$ | async"
-    [membersSubject]="membersSubject"
-    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-    (addClicked)="openAddMember()"
-    (showDetailClicked)="showDetail()"
-    (refreshClicked)="loadMembers()"
-    [disabled]="(['org.member.write'] | hasRole | async) === false"
+<ng-container *ngIf="orgQuery.data() as org">
+  <cnsl-top-view
+    *ngIf="['org.write:' + org.id, 'org.write$'] | hasRole as hasWrite$"
+    [hasBackButton]="false"
+    title="{{ org.name }}"
+    [isActive]="org.state === OrganizationState.ACTIVE"
+    [isInactive]="org.state === OrganizationState.INACTIVE"
+    [hasContributors]="true"
+    stateTooltip="{{ 'ORG.STATE.' + org.state | translate }}"
+    [hasActions]="hasWrite$ | async"
   >
-  </cnsl-contributors>
+    <ng-container topActions *ngIf="hasWrite$ | async">
+      <button mat-menu-item *ngIf="org.state === OrganizationState.ACTIVE" (click)="changeState(OrganizationState.INACTIVE)">
+        {{ 'ORG.PAGES.DEACTIVATE' | translate }}
+      </button>
 
-  <cnsl-info-row topContent *ngIf="org" [org]="org"></cnsl-info-row>
-</cnsl-top-view>
-<div class="max-width-container">
-  <cnsl-meta-layout>
-    <ng-container *ngIf="['policy.read'] | hasRole | async; else nopolicyreadpermission">
-      <cnsl-settings-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-settings-grid>
+      <button mat-menu-item *ngIf="org.state === OrganizationState.INACTIVE" (click)="changeState(OrganizationState.ACTIVE)">
+        {{ 'ORG.PAGES.REACTIVATE' | translate }}
+      </button>
+
+      <button data-e2e="rename" mat-menu-item (click)="renameOrg(org)">
+        {{ 'ORG.PAGES.RENAME.ACTION' | translate }}
+      </button>
+
+      <button data-e2e="delete" mat-menu-item (click)="deleteOrg(org)">
+        {{ 'ORG.PAGES.DELETE' | translate }}
+      </button>
     </ng-container>
+    <cnsl-contributors
+      topContributors
+      [totalResult]="totalMemberResult"
+      [loading]="loading$ | async"
+      [membersSubject]="membersSubject"
+      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+      description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+      (addClicked)="openAddMember()"
+      (showDetailClicked)="showDetail()"
+      (refreshClicked)="loadMembers()"
+      [disabled]="(['org.member.write'] | hasRole | async) === false"
+    >
+    </cnsl-contributors>
 
-    <cnsl-metadata
-      [description]="'DESCRIPTIONS.ORG.METADATA' | translate"
-      [metadata]="metadata"
-      [disabled]="(['org.write'] | hasRole | async) === false"
-      (editClicked)="editMetadata()"
-      (refresh)="loadMetadata()"
-    ></cnsl-metadata>
+    <cnsl-info-row topContent [org]="org"></cnsl-info-row>
+  </cnsl-top-view>
+  <div class="max-width-container">
+    <cnsl-meta-layout>
+      <ng-container *ngIf="['policy.read'] | hasRole | async; else nopolicyreadpermission">
+        <cnsl-settings-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-settings-grid>
+      </ng-container>
 
-    <ng-template #nopolicyreadpermission>
-      <div class="no-permission-warn-wrapper">
-        <cnsl-info-section class="info-section-warn" [fitWidth]="true" [type]="InfoSectionType.ALERT">{{
-          'ORG.PAGES.NOPERMISSION' | translate
-        }}</cnsl-info-section>
+      <cnsl-metadata
+        [description]="'DESCRIPTIONS.ORG.METADATA' | translate"
+        [metadata]="metadata"
+        [disabled]="(['org.write'] | hasRole | async) === false"
+        (editClicked)="editMetadata()"
+        (refresh)="loadMetadata()"
+      ></cnsl-metadata>
+
+      <ng-template #nopolicyreadpermission>
+        <div class="no-permission-warn-wrapper">
+          <cnsl-info-section class="info-section-warn" [fitWidth]="true" [type]="InfoSectionType.ALERT">{{
+            'ORG.PAGES.NOPERMISSION' | translate
+          }}</cnsl-info-section>
+        </div>
+      </ng-template>
+
+      <div metainfo>
+        <cnsl-changes *ngIf="org && reloadChanges()" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
       </div>
-    </ng-template>
-
-    <div metainfo>
-      <cnsl-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
-    </div>
-  </cnsl-meta-layout>
-</div>
+    </cnsl-meta-layout>
+  </div>
+</ng-container>

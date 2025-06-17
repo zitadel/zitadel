@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, effect, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { BehaviorSubject, from, lastValueFrom, Observable, of } from 'rxjs';
+import { catchError, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -12,24 +12,24 @@ import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-comp
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
-import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
-import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { NewOrganizationService } from '../../../services/new-organization.service';
+import { injectMutation } from '@tanstack/angular-query-experimental';
+import { Organization, OrganizationState } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'cnsl-org-detail',
   templateUrl: './org-detail.component.html',
   styleUrls: ['./org-detail.component.scss'],
 })
-export class OrgDetailComponent implements OnInit, OnDestroy {
-  public org?: Org.AsObject;
+export class OrgDetailComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
-  public OrgState: any = OrgState;
+  public OrganizationState = OrganizationState;
   public ChangeType: any = ChangeType;
 
   public metadata: Metadata.AsObject[] = [];
@@ -40,18 +40,25 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public totalMemberResult: number = 0;
   public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
-  private destroy$: Subject<void> = new Subject();
 
   public InfoSectionType: any = InfoSectionType;
 
+  protected readonly orgQuery = this.newOrganizationService.activeOrganizationQuery();
+  private readonly reactivateOrgMutation = injectMutation(this.newOrganizationService.reactivateOrgMutationOptions);
+  private readonly deactivateOrgMutation = injectMutation(this.newOrganizationService.deactivateOrgMutationOptions);
+  private readonly deleteOrgMutation = injectMutation(this.newOrganizationService.deleteOrgMutationOptions);
+  private readonly renameOrgMutation = injectMutation(this.newOrganizationService.renameOrgMutationOptions);
+
+  protected reloadChanges = signal(true);
+
   constructor(
-    private auth: GrpcAuthService,
-    private dialog: MatDialog,
-    public mgmtService: ManagementService,
-    private adminService: AdminService,
-    private toast: ToastService,
-    private router: Router,
+    private readonly dialog: MatDialog,
+    private readonly mgmtService: ManagementService,
+    private readonly toast: ToastService,
+    private readonly router: Router,
+    private readonly newOrganizationService: NewOrganizationService,
     breadcrumbService: BreadcrumbService,
+    cdr: ChangeDetectorRef,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -59,26 +66,30 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     };
     breadcrumbService.setBreadcrumb([bread]);
 
-    auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      if (this.org && org) {
-        this.getData();
-        this.loadMetadata();
+    effect(() => {
+      const orgId = this.newOrganizationService.orgId();
+      if (!orgId) {
+        return;
       }
+      this.loadMembers();
+      this.loadMetadata();
+    });
+
+    // force rerender changes because it is not reactive to orgId changes
+    toObservable(this.newOrganizationService.orgId).subscribe(() => {
+      this.reloadChanges.set(false);
+      cdr.detectChanges();
+      this.reloadChanges.set(true);
     });
   }
 
   public ngOnInit(): void {
-    this.getData();
+    this.loadMembers();
     this.loadMetadata();
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  public changeState(newState: OrgState): void {
-    if (newState === OrgState.ORG_STATE_ACTIVE) {
+  public async changeState(newState: OrganizationState) {
+    if (newState === OrganizationState.ACTIVE) {
       const dialogRef = this.dialog.open(WarnDialogComponent, {
         data: {
           confirmKey: 'ACTIONS.REACTIVATE',
@@ -88,20 +99,20 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         },
         width: '400px',
       });
-      dialogRef.afterClosed().subscribe((resp) => {
-        if (resp) {
-          this.mgmtService
-            .reactivateOrg()
-            .then(() => {
-              this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
-              this.org!.state = OrgState.ORG_STATE_ACTIVE;
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-      });
-    } else if (newState === OrgState.ORG_STATE_INACTIVE) {
+      const resp = await lastValueFrom(dialogRef.afterClosed());
+      if (!resp) {
+        return;
+      }
+      try {
+        await this.reactivateOrgMutation.mutateAsync();
+        this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
+      } catch (error) {
+        this.toast.showError(error);
+      }
+      return;
+    }
+
+    if (newState === OrganizationState.INACTIVE) {
       const dialogRef = this.dialog.open(WarnDialogComponent, {
         data: {
           confirmKey: 'ACTIONS.DEACTIVATE',
@@ -111,23 +122,21 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         },
         width: '400px',
       });
-      dialogRef.afterClosed().subscribe((resp) => {
-        if (resp) {
-          this.mgmtService
-            .deactivateOrg()
-            .then(() => {
-              this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
-              this.org!.state = OrgState.ORG_STATE_INACTIVE;
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-      });
+
+      const resp = await lastValueFrom(dialogRef.afterClosed());
+      if (!resp) {
+        return;
+      }
+      try {
+        await this.deactivateOrgMutation.mutateAsync();
+        this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
+      } catch (error) {
+        this.toast.showError(error);
+      }
     }
   }
 
-  public deleteOrg(): void {
+  public async deleteOrg(org: Organization) {
     const mgmtUserData = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -136,66 +145,24 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
       hintKey: 'ORG.DIALOG.DELETE.TYPENAME',
       hintParam: 'ORG.DIALOG.DELETE.DESCRIPTION',
       confirmationKey: 'ORG.DIALOG.DELETE.ORGNAME',
-      confirmation: this.org?.name,
+      confirmation: org.name,
     };
 
-    if (this.org) {
-      let dialogRef;
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: mgmtUserData,
+      width: '400px',
+    });
 
-      dialogRef = this.dialog.open(WarnDialogComponent, {
-        data: mgmtUserData,
-        width: '400px',
-      });
-
-      // Before we remove the org we get the current default org
-      // we have to query before the current org is removed
-      dialogRef.afterClosed().subscribe((resp) => {
-        if (resp) {
-          this.adminService
-            .getDefaultOrg()
-            .then((response) => {
-              const org = response?.org;
-              if (org) {
-                // We now remove the org
-                this.mgmtService
-                  .removeOrg()
-                  .then(() => {
-                    setTimeout(() => {
-                      // We change active org to default org as
-                      // current org was deleted to avoid Organization doesn't exist
-                      this.auth.setActiveOrg(org);
-                      // Now we visit orgs
-                      this.router.navigate(['/orgs']);
-                    }, 1000);
-                    this.toast.showInfo('ORG.TOAST.DELETED', true);
-                  })
-                  .catch((error) => {
-                    this.toast.showError(error);
-                  });
-              } else {
-                this.toast.showError('ORG.TOAST.DEFAULTORGNOTFOUND', false, true);
-              }
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-      });
+    if (!(await lastValueFrom(dialogRef.afterClosed()))) {
+      return;
     }
-  }
 
-  private async getData(): Promise<void> {
-    this.mgmtService
-      .getMyOrg()
-      .then((resp) => {
-        if (resp.org) {
-          this.org = resp.org;
-        }
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-    this.loadMembers();
+    try {
+      await this.deleteOrgMutation.mutateAsync();
+      await this.router.navigate(['/orgs']);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   public openAddMember(): void {
@@ -234,8 +201,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  public showDetail(): void {
-    this.router.navigate(['org/members']);
+  public showDetail() {
+    return this.router.navigate(['org/members']);
   }
 
   public loadMembers(): void {
@@ -296,10 +263,10 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  public renameOrg(): void {
+  public async renameOrg(org: Organization): Promise<void> {
     const dialogRef = this.dialog.open(NameDialogComponent, {
       data: {
-        name: this.org?.name,
+        name: org.name,
         titleKey: 'ORG.PAGES.RENAME.TITLE',
         descKey: 'ORG.PAGES.RENAME.DESCRIPTION',
         labelKey: 'ORG.PAGES.NAME',
@@ -307,37 +274,20 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((name) => {
-      if (name) {
-        this.updateOrg(name);
-      }
-    });
-  }
+    const name = await lastValueFrom(dialogRef.afterClosed());
+    if (org.name === name) {
+      return;
+    }
 
-  public updateOrg(name: string): void {
-    if (this.org) {
-      this.mgmtService
-        .updateOrg(name)
-        .then(() => {
-          this.toast.showInfo('ORG.TOAST.UPDATED', true);
-          if (this.org) {
-            this.org.name = name;
-          }
-          this.mgmtService
-            .getMyOrg()
-            .then((resp) => {
-              if (resp.org) {
-                this.org = resp.org;
-                this.auth.setActiveOrg(resp.org);
-              }
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+    try {
+      await this.renameOrgMutation.mutateAsync(name);
+      this.toast.showInfo('ORG.TOAST.UPDATED', true);
+      const resp = await this.mgmtService.getMyOrg();
+      if (resp.org) {
+        await this.newOrganizationService.setOrgId(resp.org.id);
+      }
+    } catch (error) {
+      this.toast.showError(error);
     }
   }
 }

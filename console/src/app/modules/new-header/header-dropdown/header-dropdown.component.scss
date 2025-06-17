@@ -1,0 +1,48 @@
+@mixin header-dropdown-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  $border-radius: 1rem;
+
+  .dropdown-content {
+    max-height: 50vh;
+    min-width: 300px;
+    max-width: 80vw;
+    border-radius: $border-radius;
+    border: 1px solid rgba(#8795a1, 0.2);
+    box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+    background: map-get($background, cards);
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  }
+
+  @media only screen and (max-width: 599px) {
+    .dropdown-content {
+      width: 100vw;
+      max-width: 100vw;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  .dropdown-content > :first-child > :first-child {
+    border-top-left-radius: $border-radius;
+  }
+
+  .dropdown-content > :last-child > :first-child {
+    border-top-right-radius: $border-radius;
+  }
+
+  @media only screen and (min-width: 599px) {
+    .dropdown-content > :first-child > :last-child {
+      border-bottom-left-radius: $border-radius;
+    }
+
+    .dropdown-content > :last-child > :last-child {
+      border-bottom-right-radius: $border-radius;
+    }
+  }
+}
+

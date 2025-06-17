@@ -1,0 +1,47 @@
+<div cdkTrapFocus class="focus-trapper">
+  <!--  <div *ngIf="organizationsQuery.isPending() || setOrgId.isPending()">-->
+  <!--    Loading organizations...-->
+  <!--  </div>-->
+  <div class="org-header">
+    <button *ngIf="backButton" (click)="backButtonPressed.emit()" mat-button class="dropdown-button">
+      <span class="back-button">
+        <i class="las la-arrow-alt-circle-left"></i>
+        <h3>Back to {{ backButton }}</h3>
+      </span>
+    </button>
+    <span class="dropdown-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
+    <form [formGroup]="form" class="form">
+      <i class="las la-1x la-search search-icon"></i>
+      <input
+        class="search-input"
+        autocomplete="off"
+        cnslInput
+        [formControl]="form.controls.name"
+        [placeholder]="'PROJECT.GRANT.CREATE.SEL_ORG' | translate"
+      />
+    </form>
+  </div>
+  <div class="org-list">
+    <!-- Make sure active org is always at the top -->
+    <a *ngIf="activeOrgIfSearchMatches() as org" class="dropdown-button" mat-button (click)="changeOrg(org.id)">
+      {{ org.name }}
+      <i class="las la-1x la-check"></i>
+    </a>
+    <ng-container *ngFor="let page of organizationsQuery.data()?.pages; last as lastPage">
+      <ng-container *ngFor="let org of page.result; trackBy: trackOrg">
+        <a *ngIf="org.id !== activeOrg.data()?.id" class="dropdown-button" mat-button (click)="changeOrg(org.id)">
+          {{ org.name }}
+        </a>
+      </ng-container>
+      <button
+        class="dropdown-button"
+        mat-stroked-button
+        *ngIf="lastPage && page.details?.totalResult as totalResult"
+        (click)="organizationsQuery.fetchNextPage()"
+        [disabled]="!organizationsQuery.hasNextPage() || organizationsQuery.isFetchingNextPage()"
+      >
+        ...{{ totalResult - loadedOrgsCount() }} {{ 'PAGINATOR.MORE' | translate }}
+      </button>
+    </ng-container>
+  </div>
+</div>

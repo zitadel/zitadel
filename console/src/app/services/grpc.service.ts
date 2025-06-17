@@ -16,10 +16,15 @@ import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.intercep
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
+import {
+  createFeatureServiceClient,
+  createUserServiceClient,
+  createSessionServiceClient,
+  createOrganizationServiceClient,
+  // @ts-ignore
+} from '@zitadel/client/v2';
 //@ts-ignore
-import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
-//@ts-ignore
-import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
+import { createAdminServiceClient, createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 // @ts-ignore
 import { createClientFor } from '@zitadel/client';
@@ -45,6 +50,10 @@ export class GrpcService {
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
   public actionNew!: ReturnType<typeof createActionServiceClient>;
   public webKey!: ReturnType<typeof createWebKeyServiceClient>;
+  public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
+  public adminNew!: ReturnType<typeof createAdminServiceClient>;
+
+  public assets!: void;
 
   constructor(
     private readonly envService: EnvironmentService,
@@ -120,6 +129,8 @@ export class GrpcService {
         this.featureNew = createFeatureServiceClient(transport);
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
+        this.organizationNew = createOrganizationServiceClient(transport);
+        this.adminNew = createAdminServiceClient(transportOldAPIs);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',

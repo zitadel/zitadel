@@ -211,7 +211,8 @@ export class ProviderSamlSpComponent {
       // @ts-ignore
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat?.value]);
       req.setTransientMappingAttributeName(this.transientMapping?.value);
-      req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
+      // todo: figure out what happened here
+      // req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
       req.setProviderOptions(this.options);
 
       this.loading = true;
@@ -252,7 +253,8 @@ export class ProviderSamlSpComponent {
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value]);
     }
     req.setTransientMappingAttributeName(this.transientMapping?.value);
-    req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
+    // todo: figure out what happened here
+    //req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
     this.loading = true;
     this.service
       .addSAMLProvider(req)

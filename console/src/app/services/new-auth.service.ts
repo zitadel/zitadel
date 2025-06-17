@@ -6,7 +6,6 @@ import {
   GetMyLoginPolicyResponse,
   GetMyLoginPolicyRequestSchema,
   GetMyPasswordComplexityPolicyResponse,
-  GetMyUserResponse,
   ListMyAuthFactorsRequestSchema,
   ListMyAuthFactorsResponse,
   RemoveMyAuthFactorOTPEmailRequestSchema,
@@ -26,10 +25,6 @@ import {
 })
 export class NewAuthService {
   constructor(private readonly grpcService: GrpcService) {}
-
-  public getMyUser(): Promise<GetMyUserResponse> {
-    return this.grpcService.authNew.getMyUser({});
-  }
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
     return this.grpcService.authNew.verifyMyPhone({ code });

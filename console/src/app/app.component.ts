@@ -1,14 +1,14 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, DestroyRef, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, DestroyRef, effect, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { Observable, of, Subject, switchMap } from 'rxjs';
-import { filter, map, startWith, takeUntil, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { filter, map, startWith } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
@@ -22,6 +22,7 @@ import { UpdateService } from './services/update.service';
 import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
 import { PosthogService } from './services/posthog.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NewOrganizationService } from './services/new-organization.service';
 
 @Component({
   selector: 'cnsl-root',
@@ -42,12 +43,12 @@ export class AppComponent {
   @HostListener('window:scroll', ['$event']) onScroll(event: Event): void {
     this.yoffset = this.viewPortScroller.getScrollPosition()[1];
   }
-  public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
   public showAccount: boolean = false;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public showProjectSection: boolean = false;
+  public activeOrganizationQuery = this.newOrganizationService.activeOrganizationQuery();
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -70,6 +71,7 @@ export class AppComponent {
     @Inject(DOCUMENT) private document: Document,
     private posthog: PosthogService,
     private readonly destroyRef: DestroyRef,
+    private readonly newOrganizationService: NewOrganizationService,
   ) {
     console.log(
       '%cWait!',
@@ -199,9 +201,9 @@ export class AppComponent {
 
     this.getProjectCount();
 
-    this.authService.activeOrgChanged.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((org) => {
-      if (org) {
-        this.org = org;
+    effect(() => {
+      const orgId = this.newOrganizationService.orgId();
+      if (orgId) {
         this.getProjectCount();
       }
     });
@@ -212,22 +214,23 @@ export class AppComponent {
         filter(Boolean),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((org) => this.authService.getActiveOrg(org));
+      .subscribe((orgId) => this.newOrganizationService.setOrgId(orgId));
 
-    this.authenticationService.authenticationChanged
-      .pipe(
-        filter(Boolean),
-        switchMap(() => this.authService.getActiveOrg()),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (org) => (this.org = org),
-        error: async (err) => {
-          console.error(err);
-          return this.router.navigate(['/users/me']);
-        },
-      });
-
+    // todo: think about this one
+    // this.authenticationService.authenticationChanged
+    //   .pipe(
+    //     filter(Boolean),
+    //     switchMap(() => this.authService.getActiveOrg()),
+    //     takeUntilDestroyed(this.destroyRef),
+    //   )
+    //   .subscribe({
+    //     next: (org) => (this.org = org),
+    //     error: async (err) => {
+    //       console.error(err);
+    //       return this.router.navigate(['/users/me']);
+    //     },
+    //   });
+    //
     this.isDarkTheme = this.themeService.isDarkTheme;
     this.isDarkTheme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((dark) => {
       const theme = dark ? 'dark-theme' : 'light-theme';
@@ -266,7 +269,7 @@ export class AppComponent {
     this.componentCssClass = theme;
   }
 
-  public changedOrg(org: Org.AsObject): void {
+  public changedOrg(): void {
     // Reference: https://stackoverflow.com/a/58114797
     const currentUrl = this.router.url;
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
