@@ -159,8 +159,9 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 			testName: "when authZ request should save to db and return etag",
 			inputCtx: AdminCTX,
 			inputRequest: &settings.SetHostedLoginTranslationRequest{
-				Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-				LevelId:      Instance.DefaultOrg.GetId(),
+				Level: &settings.SetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: Instance.DefaultOrg.GetId(),
+				},
 				Translations: protoTranslations,
 				Locale:       "en-US",
 			},

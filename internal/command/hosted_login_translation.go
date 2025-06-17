@@ -8,6 +8,7 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -16,26 +17,19 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
-var (
-	level2AggregateMapper map[settings.TranslationLevelType]func(string) eventstore.Aggregate = map[settings.TranslationLevelType]func(string) eventstore.Aggregate{
-		settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE: func(resourceID string) eventstore.Aggregate {
-			return instance.NewAggregate(resourceID).Aggregate
-		},
-		settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG: func(resourceID string) eventstore.Aggregate {
-			return org.NewAggregate(resourceID).Aggregate
-		},
-	}
-)
-
 func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.SetHostedLoginTranslationRequest) (res *settings.SetHostedLoginTranslationResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	aggregateFunc, ok := level2AggregateMapper[req.GetLevel()]
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-YB6Sri", "Errors.Arguments.LevelType.Invalid")
+	var agg eventstore.Aggregate
+	switch t := req.GetLevel().(type) {
+	case *settings.SetHostedLoginTranslationRequest_Instance:
+		agg = instance.NewAggregate(authz.GetInstance(ctx).InstanceID()).Aggregate
+	case *settings.SetHostedLoginTranslationRequest_OrganizationId:
+		agg = org.NewAggregate(t.OrganizationId).Aggregate
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-YB6Sri", "Errors.Arguments.Level.Invalid")
 	}
-	agg := aggregateFunc(req.GetLevelId())
 
 	lang, err := language.BCP47.Parse(req.GetLocale())
 	if err != nil || lang.IsRoot() {

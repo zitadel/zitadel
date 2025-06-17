@@ -96,6 +96,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 
 	testCtx := authz.SetCtxData(context.Background(), authz.CtxData{UserID: "test-user"})
 	testCtx = service.WithService(testCtx, "test-service")
+	testCtx = authz.WithInstanceID(testCtx, "instance-id")
 
 	testTranslation := map[string]any{"test": "translation", "translation": "2"}
 	protoTranslation, err := structpb.NewStruct(testTranslation)
@@ -115,21 +116,11 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 		expectedResult *settings.SetHostedLoginTranslationResponse
 	}{
 		{
-			testName: "when level is neither instance nor org should return invalid argument error",
-			mockPush: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
-			inputReq: &settings.SetHostedLoginTranslationRequest{
-				Level: settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM,
-			},
-
-			expectedError: zerrors.ThrowInvalidArgument(nil, "COMMA-YB6Sri", "Errors.Arguments.LevelType.Invalid"),
-		},
-		{
 			testName: "when locale is malformed should return invalid argument error",
 			mockPush: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
 			inputReq: &settings.SetHostedLoginTranslationRequest{
-				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE,
-				LevelId: "instance-id",
-				Locale:  "123",
+				Level:  &settings.SetHostedLoginTranslationRequest_Instance{},
+				Locale: "123",
 			},
 
 			expectedError: zerrors.ThrowInvalidArgument(nil, "COMMA-xmjATA", "Errors.Arguments.Locale.Invalid"),
@@ -138,9 +129,8 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 			testName: "when locale is unknown should return invalid argument error",
 			mockPush: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
 			inputReq: &settings.SetHostedLoginTranslationRequest{
-				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE,
-				LevelId: "instance-id",
-				Locale:  "root",
+				Level:  &settings.SetHostedLoginTranslationRequest_Instance{},
+				Locale: "root",
 			},
 
 			expectedError: zerrors.ThrowInvalidArgument(nil, "COMMA-xmjATA", "Errors.Arguments.Locale.Invalid"),
@@ -164,8 +154,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 			)),
 
 			inputReq: &settings.SetHostedLoginTranslationRequest{
-				Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE,
-				LevelId:      "instance-id",
+				Level:        &settings.SetHostedLoginTranslationRequest_Instance{},
 				Locale:       "it-CH",
 				Translations: protoTranslation,
 			},
@@ -190,8 +179,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 			)),
 
 			inputReq: &settings.SetHostedLoginTranslationRequest{
-				Level:        settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-				LevelId:      "org-id",
+				Level:        &settings.SetHostedLoginTranslationRequest_OrganizationId{OrganizationId: "org-id"},
 				Locale:       "it-CH",
 				Translations: protoTranslation,
 			},

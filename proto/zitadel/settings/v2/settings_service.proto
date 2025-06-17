@@ -368,11 +368,11 @@ service SettingsService {
   // Get Hosted Login Translation
   //
   // Returns the translations in the requested locale for the hosted login.
-  // The translations returned are based on the input level specified (system, instance or organisation).
+  // The translations returned are based on the input level specified (system, instance or organization).
   //
-  // If the requested level doesn't contain all translations, a merging process fallbacks onto the higher levels
-  // ensuring all keys in the file have a translation, which could be in the default languange if the one of the locale
-  // is missing on all levels.
+  // If the requested level doesn't contain all translations, and ignore_inheritance is set to false,
+  // a merging process fallbacks onto the higher levels ensuring all keys in the file have a translation,
+  // which could be in the default language if the one of the locale is missing on all levels.
   //
   // Required permissions:
   //   - `iam.policy.read`
@@ -545,19 +545,13 @@ message SetSecuritySettingsResponse{
 }
 
 message GetHostedLoginTranslationRequest {
-  TranslationLevelType level = 1;
+  oneof level {
+    bool system = 1 [(validate.rules).bool = {const: true}];
+    bool instance = 2 [(validate.rules).bool = {const: true}];
+    string organization_id = 3;
+  }
 
-  // instance ID if level = INSTANCE or organization ID if level = ORGANIZATION. Ignored otherwise
-  string level_id = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"222430354126975533\"";
-    }
-  ];  
-
-  string locale = 3 [
+  string locale = 4 [
     (validate.rules).string = {min_len: 2},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 2;
@@ -566,7 +560,7 @@ message GetHostedLoginTranslationRequest {
   ];
 
   // if set to true, higher levels are ignored, if false higher levels are merged into the file
-  bool ignore_inheritance = 4;
+  bool ignore_inheritance = 5;
 }
 
 message GetHostedLoginTranslationResponse {
@@ -589,17 +583,10 @@ message GetHostedLoginTranslationResponse {
 }
 
 message SetHostedLoginTranslationRequest {
-  TranslationLevelType level = 1;
-
-  // instance ID if level = INSTANCE or organization ID if level = ORGANIZATION. Ignored otherwise
-  string level_id = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"222430354126975533\"";
-    }
-  ]; 
+  oneof level {
+    bool instance = 1 [(validate.rules).bool = {const: true}];
+    string organization_id = 2;
+  }
  
   string locale = 3 [
     (validate.rules).string = {min_len: 2},

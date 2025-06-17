@@ -209,7 +209,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
 				Locale: "en",
-				Level:  settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM,
+				Level:  &settings.GetHostedLoginTranslationRequest_System{},
 			},
 
 			expectedResult: &settings.GetHostedLoginTranslationResponse{
@@ -229,9 +229,10 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale:  "en",
-				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-				LevelId: "123",
+				Locale: "en",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
 			},
 
 			expectedError: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-6k1zjx", "Errors.Internal"),
@@ -251,9 +252,10 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale:  "en",
-				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-				LevelId: "123",
+				Locale: "en",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
 			},
 
 			expectedResult: &settings.GetHostedLoginTranslationResponse{
@@ -276,9 +278,10 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale:            "en",
-				Level:             settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-				LevelId:           "123",
+				Locale: "en",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
 				IgnoreInheritance: true,
 			},
 
@@ -305,9 +308,10 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale:  "en",
-				Level:   settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG,
-				LevelId: "123",
+				Locale: "en",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
 			},
 
 			expectedResult: &settings.GetHostedLoginTranslationResponse{

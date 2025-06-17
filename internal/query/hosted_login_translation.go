@@ -55,12 +55,6 @@ var (
 	}
 )
 
-var levelTypeMapper = map[settings.TranslationLevelType]string{
-	settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM:   "system",
-	settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_INSTANCE: instance.AggregateType,
-	settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_ORG:      org.AggregateType,
-}
-
 type HostedLoginTranslations struct {
 	SearchResponse
 	HostedLoginTranslations []*HostedLoginTranslation
@@ -96,8 +90,18 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		return nil, err
 	}
 
-	if req.GetLevel() == settings.TranslationLevelType_TRANSLATION_LEVEL_TYPE_SYSTEM {
+	var levelID, resourceOwner string
+	switch t := req.GetLevel().(type) {
+	case *settings.GetHostedLoginTranslationRequest_System:
 		return getTranslationOutputMessage(sysTranslation)
+	case *settings.GetHostedLoginTranslationRequest_Instance:
+		levelID = authz.GetInstance(ctx).InstanceID()
+		resourceOwner = instance.AggregateType
+	case *settings.GetHostedLoginTranslationRequest_OrganizationId:
+		levelID = t.OrganizationId
+		resourceOwner = org.AggregateType
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-YB6Sri", "Errors.Arguments.Level.Invalid")
 	}
 
 	stmt, scan := prepareHostedLoginTranslationQuery()
@@ -105,8 +109,8 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	eq := sq.Eq{
 		hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
 		hostedLoginTranslationColLocale.identifier():            baseLang.String(),
-		hostedLoginTranslationColResourceOwner.identifier():     req.GetLevelId(),
-		hostedLoginTranslationColResourceOwnerType.identifier(): levelTypeMapper[req.GetLevel()],
+		hostedLoginTranslationColResourceOwner.identifier():     levelID,
+		hostedLoginTranslationColResourceOwnerType.identifier(): resourceOwner,
 	}
 
 	query, args, err := stmt.Where(eq).ToSql()
@@ -131,7 +135,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 			continue
 		}
 
-		if tr.LevelType == levelTypeMapper[req.GetLevel()] {
+		if tr.LevelType == resourceOwner {
 			requestedTranslation = tr
 		} else {
 			otherTranslation = tr
@@ -139,7 +143,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	}
 
 	if !req.GetIgnoreInheritance() {
-		// Case where req.GetLevel() == ORGANIZATION -> Check if we have an instance level translation
+		// Case where Level == ORGANIZATION -> Check if we have an instance level translation
 		// If so, merge it with the translations we have
 		if otherTranslation != nil && otherTranslation.LevelType == instance.AggregateType {
 			if err := mergo.Merge(&requestedTranslation.File, otherTranslation.File); err != nil {
