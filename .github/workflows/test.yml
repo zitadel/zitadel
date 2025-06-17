@@ -40,8 +40,6 @@ jobs:
         with:
           push: false
           builder: ${{ steps.buildx.outputs.name }}
-          set: |
-            *.cache-from=type=gha
-            *.cache-to=type=gha,mode=max
+          load: true
       - name: Run
         run: make login-lint
