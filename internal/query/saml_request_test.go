@@ -148,7 +148,7 @@ func TestQueries_SamlRequestByID(t *testing.T) {
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 
 				got, err := q.SamlRequestByID(ctx, tt.args.shouldTriggerBulk, tt.args.id, tt.args.checkLoginClient)
 				require.ErrorIs(t, err, tt.wantErr)

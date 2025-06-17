@@ -95,7 +95,7 @@ func TestQueries_ActiveIntrospectionClientByID(t *testing.T) {
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "userID", language.English)
+				ctx := authz.NewMockContext("instanceID", "orgID", "userID", authz.WithMockDefaultLanguage(language.English))
 				got, err := q.ActiveIntrospectionClientByID(ctx, tt.args.clientID, tt.args.getKeys)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)

@@ -3198,7 +3198,7 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 				UserEventProvider: &mockEventUser{},
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instance1", "", "", language.English),
+				ctx:           authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
 				authReqID:     "authRequestID",
 				userID:        unknownUserID,
 				resourceOwner: "org1",
@@ -3227,7 +3227,7 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instance1", "", "", language.English),
+				ctx:           authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
 				authReqID:     "authRequestID",
 				userID:        "user1",
 				resourceOwner: "org1",

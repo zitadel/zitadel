@@ -435,7 +435,7 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 			if tt.encryption != nil {
 				q.keyEncryptionAlgorithm = tt.encryption(t)
 			}
-			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 			key, err := q.GetPublicKeyByID(ctx, "keyID")
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)

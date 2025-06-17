@@ -272,7 +272,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 				got, err := q.ActiveOIDCClientByID(ctx, "clientID", true)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)

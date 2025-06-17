@@ -104,7 +104,7 @@ func Test_publicKeyCache(t *testing.T) {
 	// create an empty cache with a purge go routine, runs every minute.
 	// keys are cached for at least 1 Hour after last use.
 	cache := newPublicKeyCache(background, time.Hour, queryKeyDB)
-	ctx := authz.NewMockContext("instanceID", "orgID", "userID", language.English)
+	ctx := authz.NewMockContext("instanceID", "orgID", "userID", authz.WithMockDefaultLanguage(language.English))
 
 	// query error
 	_, err := cache.getKey(ctx, "key9")

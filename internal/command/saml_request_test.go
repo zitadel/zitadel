@@ -23,7 +23,7 @@ import (
 )
 
 func TestCommands_AddSAMLRequest(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
@@ -134,7 +134,7 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 }
 
 func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore
 		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
@@ -236,7 +236,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -513,7 +513,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -595,7 +595,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -677,7 +677,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -752,7 +752,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -784,7 +784,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 }
 
 func TestCommands_FailSAMLRequest(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}

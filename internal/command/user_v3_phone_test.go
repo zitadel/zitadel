@@ -49,7 +49,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:  authz.NewMockContext("instanceID", "", "", language.English),
+				ctx:  authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{},
 			},
 			res{
@@ -65,7 +65,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID:    "user1",
 					Phone: &Phone{Number: "nonumber"},
@@ -85,7 +85,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID: "user1",
 				},
@@ -117,7 +117,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID:    "user1",
 					Phone: &Phone{Number: "+41791234567"},
@@ -157,7 +157,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID: "user1",
 					Phone: &Phone{
@@ -242,7 +242,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID: "user1",
 					Phone: &Phone{
@@ -324,7 +324,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID: "user1",
 					Phone: &Phone{
@@ -399,7 +399,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID: "user1",
 					Phone: &Phone{
@@ -441,7 +441,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ChangeSchemaUserPhone{
 					ID: "user1",
 					Phone: &Phone{
@@ -521,7 +521,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				id:  "",
 			},
 			res{
@@ -538,7 +538,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				id:  "user1",
 			},
 			res{
@@ -568,7 +568,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				id:  "user1",
 			},
 			res{
@@ -626,7 +626,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				id:  "user1",
 			},
 			res{
@@ -678,7 +678,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				id:  "user1",
 			},
 			res{
@@ -730,7 +730,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				id:  "user1",
 			},
 			res{
@@ -790,7 +790,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:  authz.NewMockContext("instanceID", "", "", language.English),
+				ctx:  authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				id:   "user1",
 				code: "phoneverify",
 			},
@@ -849,7 +849,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID: "",
 				},
@@ -868,7 +868,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID: "user1",
 				},
@@ -900,7 +900,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID: "user1",
 				},
@@ -960,7 +960,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID: "user1",
 				},
@@ -1014,7 +1014,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID: "user1",
 				},
@@ -1116,7 +1116,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify2", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID: "user1",
 				},
@@ -1207,7 +1207,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID: "user1",
 				},
@@ -1309,7 +1309,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify2", time.Hour),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", language.English),
+				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
 				user: &ResendSchemaUserPhoneCode{
 					ID:         "user1",
 					ReturnCode: true,

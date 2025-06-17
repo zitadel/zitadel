@@ -33,8 +33,8 @@ func newTestEvent(id, description string, data func() interface{}, checkPrevious
 		data:                data,
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
-			service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser", language.English), "editorService"),
-			NewAggregate(authz.NewMockContext("zitadel", "caos", "adlerhurst", language.English), id, "test.aggregate", "v1"),
+			service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser", authz.WithMockDefaultLanguage(language.English)), "editorService"),
+			NewAggregate(authz.NewMockContext("zitadel", "caos", "adlerhurst", authz.WithMockDefaultLanguage(language.English)), id, "test.aggregate", "v1"),
 			"test.event",
 		),
 	}

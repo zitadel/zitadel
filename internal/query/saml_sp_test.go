@@ -113,7 +113,7 @@ func TestQueries_ActiveSAMLServiceProviderByID(t *testing.T) {
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 				got, err := q.ActiveSAMLServiceProviderByID(ctx, "entityID")
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)

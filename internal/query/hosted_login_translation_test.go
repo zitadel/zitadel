@@ -142,9 +142,8 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 	WHERE projections.hosted_login_translations.aggregate_id = $1
 	AND projections.hosted_login_translations.aggregate_type = $2
 	AND projections.hosted_login_translations.instance_id = $3
-	AND projections.hosted_login_translations.locale = $4
+	AND (projections.hosted_login_translations.locale = $4 OR projections.hosted_login_translations.locale = $5)
 	LIMIT 2`
-
 	okTranslation := defaultLoginTranslations
 
 	parsedOKTranslation := map[string]map[string]any{}
@@ -208,7 +207,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 
 			defaultInstanceLanguage: language.English,
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale: "en",
+				Locale: "en-US",
 				Level:  &settings.GetHostedLoginTranslationRequest_System{},
 			},
 
@@ -224,12 +223,12 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
 					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryErr(sql.ErrConnDone),
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale: "en",
+				Locale: "en-US",
 				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
 					OrganizationId: "123",
 				},
@@ -244,7 +243,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
 					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
 						[]string{"file", "aggregate_type"},
 						[][]driver.Value{},
@@ -252,7 +251,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale: "en",
+				Locale: "en-US",
 				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
 					OrganizationId: "123",
 				},
@@ -270,7 +269,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
 					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
 						[]string{"file", "aggregate_type"},
 						[][]driver.Value{},
@@ -278,7 +277,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale: "en",
+				Locale: "en-US",
 				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
 					OrganizationId: "123",
 				},
@@ -297,7 +296,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
 					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en"),
+					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
 						[]string{"file", "aggregate_type"},
 						[][]driver.Value{
@@ -308,7 +307,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				),
 			},
 			inputRequest: &settings.GetHostedLoginTranslationRequest{
-				Locale: "en",
+				Locale: "en-US",
 				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
 					OrganizationId: "123",
 				},
@@ -327,7 +326,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			db := &database.DB{DB: mock.NewSQLMock(t, tc.sqlExpectations...).DB}
 			querier := Queries{client: db}
 
-			ctx := authz.NewMockContext("instance-id", "org-id", "user-id", tc.defaultInstanceLanguage)
+			ctx := authz.NewMockContext("instance-id", "org-id", "user-id", authz.WithMockDefaultLanguage(tc.defaultInstanceLanguage))
 
 			// When
 			res, err := querier.GetHostedLoginTranslation(ctx, tc.inputRequest)

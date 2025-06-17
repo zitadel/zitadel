@@ -23,7 +23,7 @@ import (
 )
 
 func TestCommands_AddAuthRequest(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 	type fields struct {
 		eventstore  func(*testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
@@ -173,7 +173,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 }
 
 func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
@@ -290,7 +290,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -608,7 +608,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -700,7 +700,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -792,7 +792,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -877,7 +877,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", language.English),
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English)),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
@@ -909,7 +909,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 }
 
 func TestCommands_FailAuthRequest(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -1017,7 +1017,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 }
 
 func TestCommands_AddAuthRequestCode(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", language.English)
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient", authz.WithMockDefaultLanguage(language.English))
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}

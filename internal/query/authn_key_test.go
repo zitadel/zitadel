@@ -533,7 +533,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 						DB: db,
 					},
 				}
-				ctx := authz.NewMockContext("instanceID", "orgID", "userID", language.English)
+				ctx := authz.NewMockContext("instanceID", "orgID", "userID", authz.WithMockDefaultLanguage(language.English))
 				got, err := q.GetAuthNKeyUser(ctx, "keyID", "userID")
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
