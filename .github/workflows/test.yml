@@ -42,3 +42,4 @@ jobs:
           push: false
           targets: login-lint
           provenance: false
+          load: true

@@ -1,8 +1,8 @@
 FROM node:20-bookworm AS login-pnpm
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-RUN apt-get update && apt-get install -y --no-install-recommends && \
+RUN corepack enable && corepack prepare pnpm@9.1.2 --activate \
+    apt-get update && apt-get install -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 
